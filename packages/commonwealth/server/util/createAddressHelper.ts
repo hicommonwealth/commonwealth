@@ -1,12 +1,17 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB, UserInstance } from '@hicommonwealth/model';
 import { AddressInstance } from '@hicommonwealth/model';
-import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  WalletId,
+  WalletSsoSource,
+  addressSwapper,
+} from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { addressSwapper, bech32ToHex } from '../../shared/utils';
+import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { Errors } from '../routes/createAddress';
@@ -94,10 +99,7 @@ export async function createAddressHelper(
         throw new AppError('Eth address is not valid');
       }
     } else if (community.base === ChainBase.NEAR) {
-      const nearRegex = /^[a-z0-9_\-.]*$/;
-      if (!nearRegex.test(encodedAddress)) {
-        throw new AppError('NEAR address is not valid');
-      }
+      throw new AppError('NEAR login not supported');
     } else if (community.base === ChainBase.Solana) {
       const { PublicKey } = await import('@solana/web3.js');
       const key = new PublicKey(encodedAddress);

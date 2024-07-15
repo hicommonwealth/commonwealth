@@ -19,6 +19,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
   return {
     ...schemas.GetCommunityMembers,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const community = await models.Community.findByPk(payload.community_id);
       if (!community) {
@@ -84,6 +85,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         }
       }
 
+      // This query is overly complex in order to entice the query planner to use the trigram indices
       const sqlWithoutPagination = `
     SELECT
       "Profiles".id,
@@ -95,20 +97,31 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       array_agg("Addresses".community_id) as community_ids,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
-    FROM
-      "Profiles"
-    JOIN
-      "Addresses" ON "Profiles".user_id = "Addresses".user_id
-    WHERE
-      ${communityWhere}
-      (
-        "Profiles".profile_name ILIKE '%' || :searchTerm || '%'
-        OR
-        "Addresses".address ILIKE '%' || :searchTerm || '%'
-      )
+      FROM "Profiles"
+      RIGHT JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      WHERE ${communityWhere} 
+      ("Profiles".profile_name ILIKE '%' || :searchTerm || '%')
       ${membershipsWhere}
-    GROUP BY
-      "Profiles".id
+      GROUP BY "Profiles".id
+
+      UNION
+
+      SELECT
+      "Profiles".id,
+      "Profiles".user_id,
+      "Profiles".profile_name,
+      "Profiles".avatar_url,
+      "Profiles".created_at,
+      array_agg("Addresses".id) as address_ids,
+      array_agg("Addresses".community_id) as community_ids,
+      array_agg("Addresses".address) as addresses,
+      MAX("Addresses".last_active) as last_active
+      FROM "Profiles"
+      JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      WHERE ${communityWhere} 
+      ("Addresses".address ILIKE '%' || :searchTerm || '%')
+      ${membershipsWhere}
+      GROUP BY "Profiles".id
   `;
 
       const allCommunityProfiles = await models.sequelize.query<{
@@ -145,16 +158,15 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           throw new InvalidState(Errors.StakeholderGroup);
         }
         const node = await models.ChainNode.findByPk(community.chain_node_id);
-        if (!node) {
+        if (!node || !node.eth_chain_id) {
           throw new InvalidState(Errors.ChainNodeNotFound);
         }
         const addresses = allCommunityProfiles.map((p) => p.addresses).flat();
         const balances = await contractHelpers.getNamespaceBalance(
           community.namespace_address!,
           stake.stake_id,
-          node.eth_chain_id!,
+          node.eth_chain_id,
           addresses,
-          node.url,
         );
         // add balances to profiles
         for (const profile of allCommunityProfiles) {

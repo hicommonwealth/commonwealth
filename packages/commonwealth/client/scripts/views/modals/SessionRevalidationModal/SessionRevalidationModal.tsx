@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
+import { addressSwapper, WalletSsoSource } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
+import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import WebWalletController from 'controllers/app/web_wallets';
-import { addressSwapper } from 'shared/utils';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import _ from 'underscore';
-import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
+import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
@@ -34,6 +34,7 @@ const SessionRevalidationModal = ({
   walletAddress,
 }: SessionRevalidationModalProps) => {
   const [connectWithEmail, setConnectWithEmail] = useState(false);
+  const user = useUserStore();
 
   const {
     onWalletAddressSelect,
@@ -55,7 +56,7 @@ const SessionRevalidationModal = ({
       // expected for session key revalidation
 
       // @ts-expect-error StrictNullChecks
-      const isSubstrate = app.user.activeAccounts.find(
+      const isSubstrate = user.accounts.find(
         (addr) => addr.address === walletAddress,
       ).community.ss58Prefix;
       if (
@@ -64,16 +65,15 @@ const SessionRevalidationModal = ({
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
             signedAddress)
       ) {
-        const updatedAddress = app.user.activeAccounts.find(
+        const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === walletAddress,
         );
-        await setActiveAccount(updatedAddress!);
+        await setActiveAccount(signedAddressAccount!);
       } else {
-        await setActiveAccount(
-          app.user.activeAccounts.find(
-            (addr) => addr.address === signedAddress!,
-          )!,
+        const signedAddressAccount = user.accounts.find(
+          (addr) => addr.address === signedAddress,
         );
+        await setActiveAccount(signedAddressAccount!);
         openConfirmation({
           title: 'Logged in with unexpected address',
           description: (
@@ -83,10 +83,18 @@ const SessionRevalidationModal = ({
                 but your wallet has the address{' '}
                 <b>{formatAddress(signedAddress!)}</b>.
               </p>
-              <p>
-                We’ve switched your active address to the one in your wallet.
-                You can switch it back in the user menu.
-              </p>
+              {signedAddressAccount ? (
+                <p>
+                  We’ve switched your active address to the one in your wallet.
+                  You can switch it back in the user menu.
+                </p>
+              ) : (
+                <p>
+                  Select <strong>Connect a new address</strong> in the user menu
+                  to connect this as a new address, or switch addresses in your
+                  wallet to continue.
+                </p>
+              )}
             </>
           ),
           buttons: [
@@ -114,18 +122,25 @@ const SessionRevalidationModal = ({
 
   return (
     <div className="SessionRevalidationModal">
-      <CWModalHeader label="Session expired" onModalClose={onModalClose} />
+      <CWModalHeader label="Verify ownership" onModalClose={onModalClose} />
       <CWModalBody>
         <CWText className="info">
-          The session for your address{' '}
-          <strong>{formatAddress(walletAddress)}</strong> has expired.
+          You haven’t used this address recently, so we need you to sign in
+          again.
         </CWText>
         <CWText className="info">
-          To continue what you were doing, sign in with{' '}
-          {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown
-            ? walletSsoSource[0].toUpperCase() + walletSsoSource.slice(1)
-            : 'your wallet'}{' '}
-          again:
+          Please use
+          {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown ? (
+            ` ${walletSsoSource[0].toUpperCase() + walletSsoSource.slice(1)} `
+          ) : (
+            <span>
+              {' '}
+              your wallet for <strong>
+                {formatAddress(walletAddress)}
+              </strong>{' '}
+            </span>
+          )}
+          to continue:
         </CWText>
         <div>
           {walletSsoSource === WalletSsoSource.Google ? (

@@ -1,8 +1,5 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -19,6 +16,7 @@ import {
 } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
+import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { trpc } from 'utils/trpcClient';
@@ -29,6 +27,8 @@ import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import {
   CWTab,
   CWTabsRow,
@@ -53,9 +53,9 @@ const GROUP_AND_MEMBER_FILTERS = [
 
 const CommunityMembersPage = () => {
   const allowlistEnabled = useFlag('allowlist');
-  useUserActiveAccount();
   const location = useLocation();
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState({
@@ -77,8 +77,8 @@ const CommunityMembersPage = () => {
 
   const { data: memberships = null } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -157,14 +157,14 @@ const CommunityMembersPage = () => {
     {
       initialCursor: 1,
       getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+      enabled: user.activeAccount?.address ? !!memberships : true,
     },
   );
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled: user.activeAccount?.address ? !!memberships : true,
   });
 
   const filterOptions = useMemo(
@@ -283,8 +283,8 @@ const CommunityMembersPage = () => {
   useEffect(() => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
-  }, []);
+    refetch().catch((e) => console.log(e));
+  }, [refetch]);
 
   useEffect(() => {
     // Set the active tab based on URL
@@ -394,7 +394,7 @@ const CommunityMembersPage = () => {
                 }))
               }
             />
-            {app.user.activeAccount && (
+            {user.activeAccount && (
               <div className="select-dropdown-container">
                 <CWText type="b2" fontWeight="bold" className="filter-text">
                   Filter

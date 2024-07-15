@@ -1,18 +1,19 @@
 import type { Action, Message, Session } from '@canvas-js/interfaces';
-import { CANVAS_TOPIC } from 'canvas';
-
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
-import { encode } from '@ipld/dag-json';
-import { sha256 } from '@noble/hashes/sha256';
-import app from 'client/scripts/state';
 import {
+  CANVAS_TOPIC,
+  CanvasSignResult,
+  ChainBase,
+  CosmosSignerCW,
+  WalletSsoSource,
+  addressSwapper,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
-} from 'shared/canvas/chainMappings';
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
-import { CanvasSignResult } from 'shared/canvas/types';
-import { getSessionSigners } from 'shared/canvas/verify';
-import { addressSwapper } from '../../../../shared/utils';
+  getSessionSigners,
+} from '@hicommonwealth/shared';
+import { encode } from '@ipld/dag-json';
+import { sha256 } from '@noble/hashes/sha256';
+import app from 'state';
+import { fetchCachedConfiguration } from 'state/api/configuration';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 
@@ -100,7 +101,7 @@ async function sign(
   call: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
-): Promise<CanvasSignResult> {
+): Promise<CanvasSignResult | null> {
   const address = getCaip2Address(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
@@ -122,7 +123,13 @@ async function sign(
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
         address: lookupAddress,
       });
+
+      const config = fetchCachedConfiguration();
+
       if (!savedSessionMessage) {
+        if (!config?.enforceSessionKeys) {
+          return null;
+        }
         throw new SessionKeyError({
           name: 'Authentication Error',
           message: `No session found for address ${address}`,
@@ -136,6 +143,9 @@ async function sign(
       if (session.duration !== null) {
         const sessionExpirationTime = session.timestamp + session.duration;
         if (Date.now() > sessionExpirationTime) {
+          if (!config?.enforceSessionKeys) {
+            return null;
+          }
           throw new SessionKeyError({
             name: 'Authentication Error',
             message: `Session expired for address ${address}`,

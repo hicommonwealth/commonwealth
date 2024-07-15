@@ -170,13 +170,6 @@ export async function __deleteCommunity(
             transaction: t,
           });
 
-          await this.models.Template.destroy({
-            where: {
-              created_for_community: community.id,
-            },
-            transaction: t,
-          });
-
           await this.models.Community.destroy({
             where: { id: community.id },
             transaction: t,

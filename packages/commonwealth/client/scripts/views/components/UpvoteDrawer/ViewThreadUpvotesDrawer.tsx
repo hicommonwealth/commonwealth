@@ -1,4 +1,4 @@
-import type Thread from 'client/scripts/models/Thread';
+import type Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
 import { ViewUpvotesDrawer } from './ViewUpvotesDrawer';

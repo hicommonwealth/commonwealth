@@ -1,21 +1,21 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import app from 'client/scripts/state';
-import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
-import AuthButton from 'client/scripts/views/components/AuthButton';
+import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import app from 'state';
+import useAuthModalStore from 'state/ui/modals/authModal';
+import AuthButton from 'views/components/AuthButton';
 import {
   AuthTypes,
   AuthWallets,
   EVMWallets,
-} from 'client/scripts/views/components/AuthButton/types';
+} from 'views/components/AuthButton/types';
 import {
   CWTab,
   CWTabsRow,
-} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
-import clsx from 'clsx';
-import React, { Fragment, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+} from 'views/components/component_kit/new_designs/CWTabs';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import {
@@ -150,14 +150,12 @@ const ModalBase = ({
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
-  const nearWallet = findWalletById(WalletId.NearWallet)?.name;
 
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
-    // 2. On communities based on `Ethereum`, `Cosmos`, `Solana`, `Substrate`, or `Near` chains:
+    // 2. On communities based on `Ethereum`, `Cosmos`, `Solana`, or `Substrate`chains:
     //    - Display wallets specific to the respective community chain.
-    //    - `Near` is the only community where `Near` wallet is shown
     // 3. On non-community pages, show `Ethereum`, `Cosmos`, `Solana`, and `Substrate` based wallets
     // 4. On specific communities, show specific wallets
     //    a. On `terra` community, only show `terrastation` and `terra-walletconnect` (wallet connect for terra) wallets
@@ -175,8 +173,6 @@ const ModalBase = ({
           return solanaWallets;
         case ChainBase.Substrate:
           return substrateWallets;
-        case ChainBase.NEAR:
-          return nearWallet ? [nearWallet] : [];
         default:
           return [];
       }

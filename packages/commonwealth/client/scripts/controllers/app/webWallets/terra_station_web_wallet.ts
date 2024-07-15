@@ -2,7 +2,7 @@ import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import type IWebWallet from '../../../models/IWebWallet';
 
 import { toBase64 } from '@cosmjs/encoding';
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import { CosmosSignerCW } from '@hicommonwealth/shared';
 import app from 'state';
 
 declare global {

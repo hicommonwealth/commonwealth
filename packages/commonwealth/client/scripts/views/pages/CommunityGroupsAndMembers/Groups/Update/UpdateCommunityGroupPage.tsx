@@ -103,7 +103,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   requirement.data.source.evm_chain_id ||
                   0
                 }`,
-                label: chainTypes.find(
+                label: chainTypes?.find(
                   (chain) =>
                     chain.value ==
                     (requirement.data.source.cosmos_chain_id ||

@@ -3,11 +3,12 @@ import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import { Session } from '@canvas-js/interfaces';
+import { serializeCanvas } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
-import { serializeCanvas } from 'shared/canvas/types';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import { userStore } from '../state/ui/user';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
 
@@ -172,46 +173,17 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
-  public async validate(session: Session, shouldRedraw = true) {
+  public async validate(session: Session) {
     const params = {
       address: this.address,
       community_id: this.community.id,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       session: serializeCanvas(session),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
     };
 
-    const res = await axios.post(`${app.serverUrl()}/verifyAddress`, params);
-
-    if (res.data.result.status === 'Success') {
-      // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(
-        ({ address, ghostAddress, community }) =>
-          ghostAddress &&
-          this.community.id === community.id &&
-          app.user.activeAccounts.some(
-            (account) => account.address === address,
-          ),
-      );
-
-      if (hasGhostAddress) {
-        const response = await axios.post(
-          `${app.serverUrl()}/updateAddress`,
-          params,
-        );
-
-        if (response.data.success && response.data.ghostAddressId) {
-          // remove ghost address from addresses
-          app.user.setAddresses(
-            app.user.addresses.filter(({ ghostAddress }) => {
-              return !ghostAddress;
-            }),
-          );
-          app.user.setActiveAccounts([], shouldRedraw);
-        }
-      }
-    }
+    return await axios.post(`${app.serverUrl()}/verifyAddress`, params);
   }
 }
 

@@ -1,10 +1,10 @@
 import { Any, numberToLong } from '@hicommonwealth/chains';
-import { ITXModalData } from 'client/scripts/models/interfaces';
 import type {
   CosmosToken,
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
 import ProposalModule from 'models/ProposalModule';
+import { ITXModalData } from 'models/interfaces';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';

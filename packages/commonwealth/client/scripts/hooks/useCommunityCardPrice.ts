@@ -35,9 +35,9 @@ export const useCommunityCardPrice = ({
     stakeId: stakeId,
     amount: 1,
     apiEnabled: stakeEnabled,
-    chainRpc: community.ChainNode.url,
+    chainRpc: community.ChainNode?.url,
     // @ts-expect-error StrictNullChecks
-    ethChainId: community.ChainNode.ethChainId,
+    ethChainId: community.ChainNode?.ethChainId,
   });
 
   if (!stakeEnabled || isLoading) {

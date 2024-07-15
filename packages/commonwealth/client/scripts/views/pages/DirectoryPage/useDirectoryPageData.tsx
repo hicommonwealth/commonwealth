@@ -1,10 +1,11 @@
-import app from 'client/scripts/state';
 import { isCommandClick } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useMemo } from 'react';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
+import { useFetchNodesQuery } from 'state/api/nodes';
+import { getNodeById } from 'state/api/nodes/utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -18,7 +19,7 @@ export enum ViewType {
   Tiles = 'Tiles',
 }
 interface UseDirectoryPageDataProps {
-  chainNodeId: number;
+  chainNodeId?: number;
   searchTerm: string;
   selectedViewType: ViewType;
 }
@@ -29,6 +30,7 @@ const useDirectoryPageData = ({
   selectedViewType,
 }: UseDirectoryPageDataProps) => {
   const navigate = useCommonNavigate();
+  const { data: nodes } = useFetchNodesQuery();
   const { data: relatedCommunities = [], isLoading } =
     useFetchRelatedCommunitiesQuery({
       chainNodeId,
@@ -60,7 +62,7 @@ const useDirectoryPageData = ({
   const relatedCommunitiesData = useMemo(
     () =>
       relatedCommunities.map((c) => ({
-        ChainNode: app.config.nodes.getById(c.chain_node_id),
+        ChainNode: getNodeById(c.chain_node_id, nodes),
         name: c.community,
         nameLower: c.community.toLowerCase(),
         namespace: c.namespace,
@@ -70,7 +72,7 @@ const useDirectoryPageData = ({
         iconUrl: c.icon_url,
         id: c.id,
       })),
-    [relatedCommunities],
+    [nodes, relatedCommunities],
   );
 
   const filteredRelatedCommunitiesData = useMemo(

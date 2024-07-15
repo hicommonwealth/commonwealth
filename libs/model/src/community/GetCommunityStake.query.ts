@@ -6,6 +6,7 @@ export function GetCommunityStake(): Query<typeof schemas.GetCommunityStake> {
   return {
     ...schemas.GetCommunityStake,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       return (
         await models.CommunityStake.findOne({

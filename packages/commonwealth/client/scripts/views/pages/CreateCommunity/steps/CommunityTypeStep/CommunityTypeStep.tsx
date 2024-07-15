@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import AddressInfo from 'models/AddressInfo';
-import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCommunitySelector, {
   SelectedCommunity,
@@ -18,6 +17,7 @@ import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyti
 import { communityTypeOptions } from './helpers';
 
 import { ChainBase } from '@hicommonwealth/shared';
+import useUserStore from 'state/ui/user';
 import { AuthModal } from 'views/modals/AuthModal';
 import useAppStatus from '../../../../../hooks/useAppStatus';
 import './CommunityTypeStep.scss';
@@ -42,6 +42,8 @@ const CommunityTypeStep = ({
   const { isLoggedIn } = useUserLoggedIn();
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const user = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -75,11 +77,10 @@ const CommunityTypeStep = ({
   };
 
   const handleClickContinue = (address: string) => {
-    const pickedAddress = app.user.addresses.find(
+    const pickedAddress = user.addresses.find(
       ({ addressId }) => String(addressId) === address,
     );
-    // @ts-expect-error <StrictNullChecks/>
-    setSelectedAddress(pickedAddress);
+    pickedAddress && setSelectedAddress(pickedAddress);
     handleContinue();
   };
 
@@ -98,7 +99,7 @@ const CommunityTypeStep = ({
       <div className="advanced-options-container">
         <CWCommunitySelector
           key={baseOption.type}
-          type={baseOption.type}
+          img={baseOption.img}
           title={baseOption.title}
           description={baseOption.description}
           isRecommended={baseOption.isRecommended}
@@ -111,7 +112,7 @@ const CommunityTypeStep = ({
         />
         <CWCommunitySelector
           key={blastOption.type}
-          type={blastOption.type}
+          img={blastOption.img}
           title={blastOption.title}
           description={blastOption.description}
           isRecommended={blastOption.isRecommended}
@@ -125,7 +126,7 @@ const CommunityTypeStep = ({
 
         <CWCommunitySelector
           key={ethereumOption.type}
-          type={ethereumOption.type}
+          img={ethereumOption.img}
           title={ethereumOption.title}
           description={ethereumOption.description}
           isRecommended={ethereumOption.isRecommended}
@@ -142,10 +143,10 @@ const CommunityTypeStep = ({
 
         {advancedOptions
           .filter(({ isHidden }) => !isHidden)
-          .map(({ type, chainBase, title, description }) => (
+          .map(({ type, chainBase, title, description, img }) => (
             <CWCommunitySelector
               key={type}
-              type={type}
+              img={img}
               title={title}
               description={description}
               onClick={() => handleCommunitySelection({ type, chainBase })}

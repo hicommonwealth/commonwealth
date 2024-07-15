@@ -1,4 +1,3 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import React, { useState } from 'react';
 import app from 'state';
@@ -12,11 +11,7 @@ type SublayoutBannersProps = {
   terms?: string;
 };
 
-export const SublayoutBanners = ({
-  banner,
-  chain,
-  terms,
-}: SublayoutBannersProps) => {
+export const SublayoutBanners = ({ banner, terms }: SublayoutBannersProps) => {
   const bannerLocalStorageId = `${app.activeChainId()}-banner`;
 
   const [bannerStatus, setBannerStatus] = useState(
@@ -33,11 +28,6 @@ export const SublayoutBanners = ({
       {banner && bannerStatus !== 'off' && (
         <CWMessageBanner bannerContent={banner} onClose={handleDismissBanner} />
       )}
-      {!!chain &&
-        app.isLoggedIn() &&
-        ([ChainNetwork.Aave, ChainNetwork.Compound].includes(chain.network) ||
-          chain.base === ChainBase.CosmosSDK) &&
-        [ChainType.DAO, ChainType.Chain].includes(chain.type as ChainType)}
       {isNonEmptyString(terms) && <TermsBanner terms={terms} />}
     </>
   );

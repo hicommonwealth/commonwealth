@@ -9,6 +9,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -24,6 +25,8 @@ export const SidebarQuickSwitcher = ({
   const { isLoggedIn } = useUserLoggedIn();
   const { setMenu } = useSidebarStore();
 
+  const user = useUserStore();
+
   const allCommunities = app.config.chains
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -34,7 +37,10 @@ export const SidebarQuickSwitcher = ({
   const starredCommunities = allCommunities.filter((item) => {
     // filter out non-starred communities
     return !(
-      item instanceof ChainInfo && !app.user.isCommunityStarred(item.id)
+      item instanceof ChainInfo &&
+      !user.starredCommunities.find(
+        (starCommunity) => starCommunity.community_id === item.id,
+      )
     );
   });
 

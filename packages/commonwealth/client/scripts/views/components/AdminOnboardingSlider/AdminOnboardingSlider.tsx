@@ -5,7 +5,6 @@ import shape4Url from 'assets/img/shapes/shape4.svg';
 import shape5Url from 'assets/img/shapes/shape5.svg';
 import shape6Url from 'assets/img/shapes/shape6.svg';
 import { useFlag } from 'hooks/useFlag';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -14,14 +13,9 @@ import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import Permissions from 'utils/Permissions';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { ActionCard } from '../ActionCard';
-import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
+import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-import './AdminOnboardingSlider.scss';
-import { DismissModal } from './DismissModal';
 
 const CARD_TYPES = {
   'launch-contest': {
@@ -79,8 +73,6 @@ export const AdminOnboardingSlider = () => {
     shouldHideAdminCardsPermanently,
     setShouldHideAdminOnboardingCardsForCommunity,
   } = useAdminOnboardingSliderMutationStore();
-
-  useUserActiveAccount();
 
   const { contestsData, isContestDataLoading } = useCommunityContests();
 
@@ -150,77 +142,73 @@ export const AdminOnboardingSlider = () => {
 
   return (
     <>
-      <CWPageLayout className="AdminOnboardingSliderPageLayout">
-        <section className="AdminOnboardingSlider">
-          <div className="header">
-            <CWText type="h4">Finish setting up your community</CWText>
-
-            <CWButton
-              containerClassName="dismissBtn"
-              buttonType="tertiary"
-              buttonWidth="narrow"
-              onClick={() => {
-                setIsModalVisible(true);
-              }}
-              label="Dismiss"
-            />
-          </div>
-          <div className="cards">
-            {contestEnabled && isEvmCommunity && (
-              <ActionCard
-                ctaText={CARD_TYPES['launch-contest'].ctaText}
-                title={CARD_TYPES['launch-contest'].title}
-                description={CARD_TYPES['launch-contest'].description}
-                iconURL={CARD_TYPES['launch-contest'].iconURL}
-                iconAlt="launch-contest-icon"
-                isActionCompleted={contestsData?.length > 0}
-                onCTAClick={() => redirectToPage('launch-contest')}
-              />
-            )}
-            <ActionCard
-              ctaText={CARD_TYPES['create-topic'].ctaText}
-              title={CARD_TYPES['create-topic'].title}
-              description={CARD_TYPES['create-topic'].description}
-              iconURL={CARD_TYPES['create-topic'].iconURL}
-              iconAlt="create-topic-icon"
-              isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
-              onCTAClick={() => redirectToPage('create-topic')}
-            />
-            <ActionCard
-              ctaText={CARD_TYPES['make-group'].ctaText}
-              title={CARD_TYPES['make-group'].title}
-              description={CARD_TYPES['make-group'].description}
-              iconURL={CARD_TYPES['make-group'].iconURL}
-              iconAlt="make-group-icon"
-              isActionCompleted={groups.length > 0}
-              onCTAClick={() => redirectToPage('create-group')}
-            />
-            <ActionCard
-              ctaText={CARD_TYPES['enable-integrations'].ctaText}
-              title={CARD_TYPES['enable-integrations'].title}
-              description={CARD_TYPES['enable-integrations'].description}
-              iconURL={CARD_TYPES['enable-integrations'].iconURL}
-              iconAlt="enable-integrations-icon"
-              isActionCompleted={hasAnyIntegration}
-              onCTAClick={() => redirectToPage('manage-integrations')}
-            />
-            <ActionCard
-              ctaText={CARD_TYPES['create-thread'].ctaText}
-              title={CARD_TYPES['create-thread'].title}
-              description={CARD_TYPES['create-thread'].description}
-              iconURL={CARD_TYPES['create-thread'].iconURL}
-              iconAlt="create-thread-icon"
-              isActionCompleted={threadCount > 0}
-              onCTAClick={() => redirectToPage('create-thread')}
-            />
-          </div>
-        </section>
-      </CWPageLayout>
+      <CardsSlider
+        containerClassName="AdminOnboardingSliderPageLayout"
+        className="AdminOnboardingSlider"
+        headerText="Finish setting up your community"
+        onDismiss={() => setIsModalVisible(true)}
+      >
+        {contestEnabled && isEvmCommunity && (
+          <ActionCard
+            ctaText={CARD_TYPES['launch-contest'].ctaText}
+            title={CARD_TYPES['launch-contest'].title}
+            description={CARD_TYPES['launch-contest'].description}
+            iconURL={CARD_TYPES['launch-contest'].iconURL}
+            iconAlt="launch-contest-icon"
+            isActionCompleted={contestsData?.length > 0}
+            onCTAClick={() => redirectToPage('launch-contest')}
+          />
+        )}
+        <ActionCard
+          ctaText={CARD_TYPES['create-topic'].ctaText}
+          title={CARD_TYPES['create-topic'].title}
+          description={CARD_TYPES['create-topic'].description}
+          iconURL={CARD_TYPES['create-topic'].iconURL}
+          iconAlt="create-topic-icon"
+          isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
+          onCTAClick={() => redirectToPage('create-topic')}
+        />
+        <ActionCard
+          ctaText={CARD_TYPES['make-group'].ctaText}
+          title={CARD_TYPES['make-group'].title}
+          description={CARD_TYPES['make-group'].description}
+          iconURL={CARD_TYPES['make-group'].iconURL}
+          iconAlt="make-group-icon"
+          isActionCompleted={groups.length > 0}
+          onCTAClick={() => redirectToPage('create-group')}
+        />
+        <ActionCard
+          ctaText={CARD_TYPES['enable-integrations'].ctaText}
+          title={CARD_TYPES['enable-integrations'].title}
+          description={CARD_TYPES['enable-integrations'].description}
+          iconURL={CARD_TYPES['enable-integrations'].iconURL}
+          iconAlt="enable-integrations-icon"
+          isActionCompleted={hasAnyIntegration}
+          onCTAClick={() => redirectToPage('manage-integrations')}
+        />
+        <ActionCard
+          ctaText={CARD_TYPES['create-thread'].ctaText}
+          title={CARD_TYPES['create-thread'].title}
+          description={CARD_TYPES['create-thread'].description}
+          iconURL={CARD_TYPES['create-thread'].iconURL}
+          iconAlt="create-thread-icon"
+          isActionCompleted={threadCount > 0}
+          onCTAClick={() => redirectToPage('create-thread')}
+        />
+      </CardsSlider>
       <CWModal
         size="small"
         visibleOverflow
         content={
           <DismissModal
+            label="Setting up your community"
+            description={`
+              You can access all of these features from the admin capabilities
+              section of the side panel in your community. We will remind you to
+              complete these tasks next time you log in unless you select
+              "Don't show this again."
+            `}
+            showDismissCheckbox={true}
             onModalClose={() => setIsModalVisible(false)}
             onDismiss={(shouldDismissPermanently) => {
               setIsModalVisible(false);

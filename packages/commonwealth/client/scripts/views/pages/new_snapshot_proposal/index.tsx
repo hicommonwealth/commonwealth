@@ -2,16 +2,15 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { idToProposal } from 'identifiers';
 import _ from 'lodash';
 import Thread from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/new_snapshot_proposal.scss';
 import { DeltaStatic } from 'quill';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
@@ -55,16 +54,7 @@ export const NewSnapshotProposalForm = ({
   const [errorMessage, setErrorMessage] = useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
-
-  const location = useLocation();
-  const pathVars = useMemo(() => {
-    const search = new URLSearchParams(location.search);
-    const params: Record<string, any> = {};
-    for (const [key, value] of search) {
-      params[key] = value;
-    }
-    return params;
-  }, [location]);
+  const user = useUserStore();
 
   const clearLocalStorage = () => {
     localStorage.removeItem(
@@ -126,27 +116,6 @@ export const NewSnapshotProposalForm = ({
         type: 'single-choice',
       };
 
-      if (pathVars.fromProposalType && pathVars.fromProposalId) {
-        const fromProposalId =
-          typeof pathVars.fromProposalId === 'number'
-            ? pathVars.fromProposalId
-            : pathVars.fromProposalId.toString();
-
-        const fromProposalType = pathVars.fromProposalType.toString();
-
-        const fromProposal = idToProposal(fromProposalType, fromProposalId);
-
-        initialForm.name = fromProposal.title;
-
-        if (fromProposal.body) {
-          try {
-            const parsedBody = JSON.parse(fromProposal.body);
-            initialForm.body = parsedBody.ops[0].insert;
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      }
       if (thread && thread.body) {
         const currentPath = window.location.pathname;
         if (currentPath.includes('/discussion/')) {
@@ -176,7 +145,7 @@ export const NewSnapshotProposalForm = ({
       const snapshotSpace = app.snapshot.space;
       const scoreResponse = await getScore(
         snapshotSpace,
-        app.user.activeAccount.address,
+        user.activeAccount?.address || '',
       );
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
@@ -195,7 +164,7 @@ export const NewSnapshotProposalForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const author = app.user.activeAccount;
+  const author = user.activeAccount;
 
   const isMember =
     author &&
