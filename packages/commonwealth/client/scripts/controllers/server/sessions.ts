@@ -8,6 +8,7 @@ import {
   addressSwapper,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
+  getSessionSigners,
 } from '@hicommonwealth/shared';
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';

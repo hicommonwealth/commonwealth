@@ -9,6 +9,7 @@ import {
 import Sequelize from 'sequelize';
 
 import {
+  incrementProfileCount,
   type AddressInstance,
   type DB,
   type ProfileAttributes,

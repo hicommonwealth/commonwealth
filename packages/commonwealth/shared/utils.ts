@@ -1,4 +1,10 @@
 import { Dec, IntPretty } from '@keplr-wallet/unit';
+import { isHex, isU8a } from '@polkadot/util';
+import {
+  checkAddress,
+  decodeAddress,
+  encodeAddress,
+} from '@polkadot/util-crypto';
 
 export const slugifyPreserveDashes = (str: string): string => {
   // Remove any character that isn't a alphanumeric character, a
