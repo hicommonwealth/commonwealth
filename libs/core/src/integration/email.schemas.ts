@@ -30,7 +30,7 @@ export const EnrichedChainProposalsNotification =
 
 export const EnrichedSnapshotProposalCreatedNotification =
   SnapshotProposalCreatedNotification.extend({
-    community_icon_url: z.string(),
+    community_icon_url: z.string().nullish(),
   });
 
 export const GetRecapEmailData = {
