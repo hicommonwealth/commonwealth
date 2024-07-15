@@ -38,8 +38,10 @@ export function createSitemapGenerator(
         const sitemap = createSitemap(page.links);
         const sitemapPath = `sitemap-${idx++}.xml`;
         const res = await writer.write(sitemapPath, sitemap);
-        console.log('Wrote sitemap: ' + sitemapPath);
-        children.push({ location: res.location });
+        const url = new URL(res.location);
+        const location = 'https://' + url.hostname + '/' + sitemapPath;
+        console.log(`Wrote sitemap: ${sitemapPath} to location ${location}`);
+        children.push({ location });
       }
     }
 
@@ -49,7 +51,9 @@ export function createSitemapGenerator(
       );
       const idx_path = `sitemap-index.xml`;
       const res = await writer.write(idx_path, index);
-      console.log('Wrote sitemap index ' + idx_path);
+      console.log(
+        `Wrote sitemap index ${idx_path} at location: ${res.location}`,
+      );
       return { location: res.location };
     }
 
