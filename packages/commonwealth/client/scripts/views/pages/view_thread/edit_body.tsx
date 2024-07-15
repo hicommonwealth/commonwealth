@@ -49,7 +49,7 @@ export const EditBody = (props: EditBodyProps) => {
     currentTopicId: thread.topic.id,
   });
 
-  const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const cancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
     const hasContentChanged =
@@ -84,33 +84,37 @@ export const EditBody = (props: EditBodyProps) => {
     }
   };
 
-  const save = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const save = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
     setSaving(true);
 
-    try {
-      const newBody = JSON.stringify(contentDelta);
-      await editThread({
-        newBody: JSON.stringify(contentDelta) || thread.body,
-        newTitle: title || thread.title,
-        threadId: thread.id,
-        authorProfile: user.activeAccount?.profile,
-        address: user.activeAccount?.address || '',
-        communityId: app.activeChainId(),
-      });
-      clearEditingLocalStorage(thread.id, ContentType.Thread);
-      notifySuccess('Thread successfully edited');
-      threadUpdatedCallback(title, newBody);
-    } catch (err) {
-      if (err instanceof SessionKeyError) {
-        return;
+    const asyncHandle = async () => {
+      try {
+        const newBody = JSON.stringify(contentDelta);
+        await editThread({
+          newBody: JSON.stringify(contentDelta) || thread.body,
+          newTitle: title || thread.title,
+          threadId: thread.id,
+          authorProfile: user.activeAccount?.profile,
+          address: user.activeAccount?.address || '',
+          communityId: app.activeChainId(),
+        });
+        clearEditingLocalStorage(thread.id, ContentType.Thread);
+        notifySuccess('Thread successfully edited');
+        threadUpdatedCallback(title, newBody);
+      } catch (err) {
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
+        notifyError('Failed to edit thread');
+      } finally {
+        setSaving(false);
       }
-      console.error(err?.responseJSON?.error || err?.message);
-      notifyError('Failed to edit thread');
-    } finally {
-      setSaving(false);
-    }
+    };
+
+    asyncHandle().then().catch(console.error);
   };
 
   return (

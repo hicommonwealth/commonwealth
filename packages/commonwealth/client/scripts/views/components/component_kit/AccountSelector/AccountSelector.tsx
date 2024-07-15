@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 import type { ChainNetwork } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
 import type Substrate from 'controllers/chain/substrate/adapter';
@@ -75,13 +74,14 @@ const LinkAccountItem = ({
 type AccountSelectorProps = {
   accounts:
     | Array<{ address: string; meta?: { name: string } }>
-    | readonly any[];
+    | readonly unknown[];
   onModalClose: () => void;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
   walletNetwork: ChainNetwork;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const AccountSelector = (props: AccountSelectorProps) => {
   const { accounts, onModalClose, walletNetwork, walletChain, onSelect } =
     props;

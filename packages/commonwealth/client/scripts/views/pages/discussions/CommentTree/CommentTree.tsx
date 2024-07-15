@@ -495,9 +495,9 @@ export const CommentTree = ({
                 }
                 canEdit={!isLocked && (comment.isCommentAuthor || isAdminOrMod)}
                 editDraft={edits?.[comment.id]?.editDraft || ''}
-                onEditStart={async () => await handleEditStart(comment)}
-                onEditCancel={async (hasContentChanged: boolean) =>
-                  await handleEditCancel(comment, hasContentChanged)
+                onEditStart={() => handleEditStart(comment)}
+                onEditCancel={(hasContentChanged: boolean) =>
+                  handleEditCancel(comment, hasContentChanged)
                 }
                 onEditConfirm={async (newDelta) =>
                   await handleEditConfirm(comment, newDelta)
@@ -513,9 +513,9 @@ export const CommentTree = ({
                   setIsReplying(true);
                   scrollToElement();
                 }}
-                onDelete={async () => await handleDeleteComment(comment)}
+                onDelete={() => handleDeleteComment(comment)}
                 isSpam={!!comment.markedAsSpamAt}
-                onSpamToggle={async () => await handleFlagMarkAsSpam(comment)}
+                onSpamToggle={() => handleFlagMarkAsSpam(comment)}
                 canToggleSpam={
                   !isLocked && (comment.isCommentAuthor || isAdminOrMod)
                 }
