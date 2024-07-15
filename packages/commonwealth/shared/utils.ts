@@ -1,4 +1,3 @@
-import { AccessLevel, RoleObject } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 
 export const slugifyPreserveDashes = (str: string): string => {
@@ -186,33 +185,40 @@ export function formatAddressShort(
   }
 }
 
-export function aggregatePermissions(
-  roles: RoleObject[],
-  chain_permissions: { allow: number; deny: number },
-) {
-  const ORDER: AccessLevel[] = [
-    AccessLevel.Member,
-    AccessLevel.Moderator,
-    AccessLevel.Admin,
-  ];
+export const addressSwapper = (options: {
+  address: string;
+  currentPrefix: number;
+}): string => {
+  if (!options.address) throw new Error('No address provided to swap');
 
-  function compare(o1: RoleObject, o2: RoleObject) {
-    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
+  if (!options.currentPrefix) return options.address;
+
+  if (isU8a(options.address) || isHex(options.address)) {
+    throw new Error('address not in SS58 format');
   }
 
-  roles = roles.sort(compare);
+  // check if it is valid as an address
+  let decodedAddress: Uint8Array;
 
-  const permissionsAllowDeny: Array<{
-    allow: number;
-    deny: number;
-  }> = roles.map(({ allow, deny }) => ({ allow, deny }));
+  try {
+    decodedAddress = decodeAddress(options.address);
+  } catch (e) {
+    throw new Error('failed to decode address');
+  }
 
-  // add chain default permissions to beginning of permissions array
-  permissionsAllowDeny.unshift(chain_permissions);
+  // check if it is valid with the current prefix & reencode if needed
+  const [valid] = checkAddress(options.address, options.currentPrefix);
 
-  // compute permissions
-  return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
-}
+  if (!valid) {
+    try {
+      return encodeAddress(decodedAddress, options.currentPrefix);
+    } catch (e) {
+      throw new Error('failed to reencode address');
+    }
+  } else {
+    return options.address;
+  }
+};
 
 /**
  * Convert Cosmos-style minimal denom amount to readable full-denom amount

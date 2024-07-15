@@ -75,7 +75,6 @@ import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
 import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
-import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
@@ -1059,14 +1058,6 @@ function setupRouter(
       // @ts-expect-error StrictNullChecks
       return res.json({ status: 'Success', result: req.user.toJSON() });
     },
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/auth/callback',
-    passport.authenticate('jwt', { session: false }),
-    authCallback.bind(this, models),
   );
 
   // logout

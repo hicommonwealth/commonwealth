@@ -115,9 +115,8 @@ async function enrichDiscussionNotifications(
     user_avatars: { [user_id: string]: string };
   }>(
     `
-        SELECT JSONB_OBJECT_AGG(A.id, P.avatar_url) as user_avatars
-        FROM "Addresses" A
-                 JOIN "Profiles" P ON A.profile_id = P.id
+        SELECT JSONB_OBJECT_AGG(A.id, U.profile->>'avatar_url') as user_avatars
+        FROM "Addresses" A JOIN "Users" U ON A.user_id = U.id
         WHERE A.id IN (:addressIds);
     `,
     {

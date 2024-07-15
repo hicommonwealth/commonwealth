@@ -15,6 +15,7 @@ import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
+import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { CWText } from '../component_kit/cw_text';
@@ -45,6 +46,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const userData = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
@@ -60,9 +62,9 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   if (!isLoggedIn) {
     return <CannotVote label="Sign in to vote" />;
-  } else if (!app.user.activeAccount) {
+  } else if (!userData.activeAccount) {
     return <CannotVote label="Connect an address to vote" />;
-  } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
+  } else if (!proposal.canVoteFrom(userData.activeAccount)) {
     return <CannotVote label="Cannot vote from this address" />;
   }
 
@@ -72,7 +74,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     proposal instanceof CosmosProposal ||
     proposal instanceof CosmosProposalV1
   ) {
-    user = app.user.activeAccount as CosmosAccount;
+    user = userData.activeAccount as CosmosAccount;
   } else {
     return <CannotVote label="Unrecognized proposal type" />;
   }

@@ -8,6 +8,8 @@ import {
   getSessionSigners,
 } from '@hicommonwealth/shared';
 import app from 'state';
+import useUserStore from 'state/ui/user';
+
 interface UseCheckAuthenticatedAddressesProps {
   recheck: boolean;
 }
@@ -15,7 +17,7 @@ interface UseCheckAuthenticatedAddressesProps {
 const useCheckAuthenticatedAddresses = ({
   recheck,
 }: UseCheckAuthenticatedAddressesProps) => {
-  const userActiveAccounts = app.user.activeAccounts;
+  const user = useUserStore();
   const chainBase = app.chain?.base;
   const idOrPrefix =
     chainBase === ChainBase.CosmosSDK
@@ -32,7 +34,7 @@ const useCheckAuthenticatedAddresses = ({
 
     const newAuthenticatedAddresses: Record<string, boolean> = {};
 
-    for (const account of userActiveAccounts) {
+    for (const account of user.accounts) {
       const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
 
       const communityIdOrPrefix =
@@ -62,7 +64,7 @@ const useCheckAuthenticatedAddresses = ({
     }
 
     setAuthenticatedAddresses(newAuthenticatedAddresses);
-  }, [canvasChainId, chainBase, userActiveAccounts, recheck]);
+  }, [canvasChainId, chainBase, user.accounts, recheck]);
 
   return { authenticatedAddresses };
 };

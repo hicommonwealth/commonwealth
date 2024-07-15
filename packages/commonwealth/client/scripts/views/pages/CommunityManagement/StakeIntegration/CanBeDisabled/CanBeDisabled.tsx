@@ -1,5 +1,5 @@
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
 import './CanBeDisabled.scss';
 
 const CanBeDisabled = () => {

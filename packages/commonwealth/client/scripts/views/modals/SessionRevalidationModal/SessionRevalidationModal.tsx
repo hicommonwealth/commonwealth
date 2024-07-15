@@ -6,6 +6,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import _ from 'underscore';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
@@ -33,6 +34,7 @@ const SessionRevalidationModal = ({
   walletAddress,
 }: SessionRevalidationModalProps) => {
   const [connectWithEmail, setConnectWithEmail] = useState(false);
+  const user = useUserStore();
 
   const {
     onWalletAddressSelect,
@@ -54,7 +56,7 @@ const SessionRevalidationModal = ({
       // expected for session key revalidation
 
       // @ts-expect-error StrictNullChecks
-      const isSubstrate = app.user.activeAccounts.find(
+      const isSubstrate = user.accounts.find(
         (addr) => addr.address === walletAddress,
       ).community.ss58Prefix;
       if (
@@ -63,12 +65,12 @@ const SessionRevalidationModal = ({
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
             signedAddress)
       ) {
-        const signedAddressAccount = app.user.activeAccounts.find(
+        const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === walletAddress,
         );
         await setActiveAccount(signedAddressAccount!);
       } else {
-        const signedAddressAccount = app.user.activeAccounts.find(
+        const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === signedAddress,
         );
         await setActiveAccount(signedAddressAccount!);

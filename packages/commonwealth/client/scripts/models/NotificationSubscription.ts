@@ -102,7 +102,7 @@ export const modelFromServer = (
   if (Thread) {
     try {
       // The `Thread` var here uses /server/models/thread.ts as its type
-      // and we are modeling it to /client/scripts/models/Thread.ts so
+      // and we are modeling it to /models/Thread.ts so
       // using any here to avoid lint error.
       modeledThread = new ThreadT(Thread as any);
     } catch (e) {

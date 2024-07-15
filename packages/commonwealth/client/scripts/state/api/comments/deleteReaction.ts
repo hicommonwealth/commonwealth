@@ -1,9 +1,10 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signDeleteCommentReaction } from 'client/scripts/controllers/server/sessions';
+import { signDeleteCommentReaction } from 'controllers/server/sessions';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
@@ -28,7 +29,7 @@ const deleteReaction = async ({
         author_community_id: communityId,
         address: address,
         community_id: communityId,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         ...toCanvasSignedDataApiArgs(canvasSignedData),
       },
     })

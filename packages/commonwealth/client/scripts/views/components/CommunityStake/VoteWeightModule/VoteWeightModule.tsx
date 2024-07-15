@@ -10,8 +10,9 @@ import CWPopover, {
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
-import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
+import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './VoteWeightModule.scss';
 
@@ -30,8 +31,10 @@ export const VoteWeightModule = ({
   denomination,
   onOpenStakeModal,
 }: VoteWeightModuleProps) => {
+  const user = useUserStore();
+
   // allow user to buy stake if they have a connected address that matches active community base chain
-  const canBuyStake = !!app?.user?.addresses?.find?.(
+  const canBuyStake = !!user.addresses.find?.(
     (address) => address?.community?.base === app?.chain?.base,
   );
 

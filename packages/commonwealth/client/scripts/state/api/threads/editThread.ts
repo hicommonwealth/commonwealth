@@ -1,11 +1,12 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signThread } from 'client/scripts/controllers/server/sessions';
+import { signThread } from 'controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import app from 'state';
+import { userStore } from '../../ui/user';
 import {
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
@@ -77,7 +78,7 @@ const editThread = async ({
     author_community_id: communityId,
     address: address,
     community_id: communityId,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     // for edit profile
     ...(url && { url }),
     ...(newBody && { body: encodeURIComponent(newBody) }),

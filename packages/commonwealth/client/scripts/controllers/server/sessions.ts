@@ -8,14 +8,13 @@ import {
   addressSwapper,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
-  getSessionSigners,
 } from '@hicommonwealth/shared';
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
-import app from 'client/scripts/state';
+import app from 'state';
+import { fetchCachedConfiguration } from 'state/api/configuration';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
-import { fetchCachedConfiguration } from '../../state/api/configuration/index';
 
 export class SessionKeyError extends Error {
   readonly address: string;

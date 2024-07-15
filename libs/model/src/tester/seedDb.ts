@@ -28,12 +28,14 @@ export const seedDb = async () => {
         emailVerified: true,
         isAdmin: true,
         is_welcome_onboard_flow_complete: true,
+        profile: {},
       },
       {
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
         is_welcome_onboard_flow_complete: true,
+        profile: {},
       },
     ]);
 
@@ -181,6 +183,7 @@ export const seedDb = async () => {
       },
       {
         id: 'ethereum',
+        address_count: 2,
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
         name: 'Ethereum',

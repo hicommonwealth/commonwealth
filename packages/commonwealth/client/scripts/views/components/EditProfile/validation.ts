@@ -1,7 +1,7 @@
 import {
   emailValidationSchema,
   quillValidationSchema,
-} from 'client/scripts/helpers/formValidations/common';
+} from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
 

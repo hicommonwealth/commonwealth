@@ -1,4 +1,3 @@
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
@@ -8,12 +7,13 @@ import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
 import {
   useFetchProfileByIdQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
@@ -49,6 +49,7 @@ const EditProfile = () => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
@@ -226,8 +227,8 @@ const EditProfile = () => {
           .filter((tag) => tag.isSelected)
           .map((tag) => tag.item.id),
         profileId: profile?.id,
-        address: app.user?.activeAccount?.address,
-        chain: app.user?.activeAccount?.community?.id,
+        address: user.activeAccount?.address || '',
+        chain: user.activeAccount?.community?.id || '',
       })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
@@ -393,12 +394,15 @@ const EditProfile = () => {
                 // @ts-expect-error <StrictNullChecks/>
                 addresses={addresses}
                 profile={profile}
-                refreshProfiles={(address: string) => {
+                refreshProfiles={(addressInfo) => {
                   refetch().catch(console.error);
-                  app.user.removeAddress(
-                    // @ts-expect-error <StrictNullChecks/>
-                    addresses.find((a) => a.address === address),
-                  );
+                  user.setData({
+                    addresses: [...user.addresses].filter(
+                      (addr) =>
+                        addr.community.id !== addressInfo.community.id &&
+                        addr.address !== addressInfo.address,
+                    ),
+                  });
                 }}
               />
               <CWText type="caption" fontWeight="medium">

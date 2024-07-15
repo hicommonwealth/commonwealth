@@ -5,6 +5,11 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+} from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWCard } from '../../components/component_kit/cw_card';
@@ -37,6 +42,11 @@ const emailIntervalFrequencyMap = {
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
+  const user = useUserStore();
+
+  const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
+  const { mutateAsync: updateEmailSettings } =
+    useUpdateUserEmailSettingsMutation();
 
   const {
     email,
@@ -88,7 +98,7 @@ const NotificationSettingsPage = () => {
               you need it.
             </CWText>
           </div>
-          {app.user.emailVerified ? (
+          {user.isEmailVerified ? (
             <PopoverMenu
               renderTrigger={(onclick) => (
                 <CWButton
@@ -102,7 +112,9 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Once a week',
                   onClick: () => {
-                    app.user.writeEmailSettings('weekly').catch(console.log);
+                    updateEmailSettings({
+                      emailNotificationInterval: 'weekly',
+                    }).catch(console.log);
                     setCurrentFrequency('weekly');
                     forceRerender();
                   },
@@ -110,7 +122,9 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Never',
                   onClick: () => {
-                    app.user.writeEmailSettings('never').catch(console.log);
+                    updateEmailSettings({
+                      emailNotificationInterval: 'never',
+                    }).catch(console.log);
                     setCurrentFrequency('never');
                     forceRerender();
                   },
@@ -123,7 +137,7 @@ const NotificationSettingsPage = () => {
             </CWText>
           )}
         </div>
-        {(!app.user.email || !app.user.emailVerified) && (
+        {(!user.email || !user.isEmailVerified) && (
           <div className="email-input-section">
             <CWCard fullWidth className="email-card">
               {sentEmail ? (
@@ -167,14 +181,11 @@ const NotificationSettingsPage = () => {
                       buttonHeight="sm"
                       disabled={!emailValidated}
                       onClick={() => {
-                        try {
-                          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                          app.user.updateEmail(email);
-                          setSentEmail(true);
-                          // forceRerender();
-                        } catch (e) {
-                          console.log(e);
-                        }
+                        updateEmail({ email })
+                          .then(() => {
+                            setSentEmail(true);
+                          })
+                          .catch((e) => console.log(e));
                       }}
                     />
                   </div>

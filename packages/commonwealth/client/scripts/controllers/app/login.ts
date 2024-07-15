@@ -23,10 +23,16 @@ import { OpenFeature } from '@openfeature/web-sdk';
 import { Magic } from 'magic-sdk';
 
 import axios from 'axios';
-import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
-import { authModal } from 'client/scripts/state/ui/modals/authModal';
-import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
 import app from 'state';
+import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import {
+  onUpdateEmailError,
+  onUpdateEmailSuccess,
+  updateEmail,
+} from 'state/api/user/updateEmail';
+import { authModal } from 'state/ui/modals/authModal';
+import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
+import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
@@ -41,33 +47,31 @@ export function linkExistingAddressToChainOrCommunity(
     address,
     community_id: community,
     originChain, // not used
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 }
 
-export async function setActiveAccount(
-  account: Account,
-  shouldRedraw = true,
-): Promise<void> {
+export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, community });
 
   if (!role) {
-    app.user.ephemerallySetActiveAccount(account);
+    userStore.getState().setData({
+      activeAccount: account,
+    });
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(
-        app.user.activeAccounts.concat([account]),
-        shouldRedraw,
-      );
+      userStore.getState().setData({
+        accounts: [...userStore.getState().accounts, account],
+      });
     }
 
     // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
     // Emit a force re-render on cosmos chains to make sure
-    // that app.user.activeAccount is set - this is required for many actions
-    // There is a race condition b/w the app accessing app.user.activeAccount
+    // that user.activeAccount (in useUserStore) is set - this is required for many actions
+    // There is a race condition b/w the app accessing user.activeAccount (in useUserStore)
     // and updating it. A proper solution would be to fix this race condition
     // for cosmos chains - since the issue happens only on that chain
     if (app.chain.base === 'cosmos') {
@@ -82,7 +86,7 @@ export async function setActiveAccount(
       address: account.address,
       author_community_id: account.community.id,
       community_id: community,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       auth: true,
     });
 
@@ -95,15 +99,16 @@ export async function setActiveAccount(
       throw Error(`Unsuccessful status: ${response.status}`);
     }
 
-    app.user.ephemerallySetActiveAccount(account);
+    userStore.getState().setData({
+      activeAccount: account,
+    });
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(
-        app.user.activeAccounts.concat([account]),
-        shouldRedraw,
-      );
+      userStore.getState().setData({
+        accounts: [...userStore.getState().accounts, account],
+      });
     }
   } catch (err) {
     // Failed to set the user's active address to this account.
@@ -116,11 +121,13 @@ export async function setActiveAccount(
 
 export async function completeClientLogin(account: Account) {
   try {
-    let addressInfo = app.user.addresses.find(
-      (a) =>
-        a.address === account.address &&
-        a.community.id === account.community.id,
-    );
+    let addressInfo = userStore
+      .getState()
+      .addresses.find(
+        (a) =>
+          a.address === account.address &&
+          a.community.id === account.community.id,
+      );
 
     if (!addressInfo && account.addressId) {
       addressInfo = new AddressInfo({
@@ -130,7 +137,7 @@ export async function completeClientLogin(account: Account) {
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
-      app.user.addresses.push(addressInfo);
+      userStore.getState().addresses.push(addressInfo);
     }
 
     // link the address to the community
@@ -157,28 +164,25 @@ export async function completeClientLogin(account: Account) {
     // set the address as active
     await setActiveAccount(account);
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      userStore.getState().setData({
+        accounts: [...userStore.getState().accounts, account],
+      });
     }
   } catch (e) {
     console.trace(e);
   }
 }
 
-export async function updateActiveAddresses({
-  chain,
-  shouldRedraw = true,
-}: {
-  chain?: ChainInfo;
-  shouldRedraw?: boolean;
-}) {
+export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
-  app.user.setActiveAccounts(
-    app.user.addresses
-      // @ts-expect-error StrictNullChecks
+  userStore.getState().setData({
+    accounts: userStore
+      .getState()
+      .addresses // @ts-expect-error StrictNullChecks
       .filter((a) => a.community.id === chain.id)
       .map((addr) => {
         const tempAddr = app.chain?.accounts.get(
@@ -191,30 +195,34 @@ export async function updateActiveAddresses({
         return tempAddr;
       })
       .filter((addr) => addr),
-    shouldRedraw,
-  );
+  });
 
   // select the address that the new chain should be initialized with
-  const memberAddresses = app.user.activeAccounts.filter((account) => {
+  const memberAddresses = userStore.getState().accounts.filter((account) => {
     // @ts-expect-error StrictNullChecks
     return app.roles.isMember({ community: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
-    await setActiveAccount(memberAddresses[0], shouldRedraw);
-  } else if (app.user.activeAccounts.length === 0) {
+    await setActiveAccount(memberAddresses[0]);
+  } else if (userStore.getState().accounts.length === 0) {
     // no addresses - preview the community
   } else {
     // Find all addresses in the current community for this account, sorted by last used date/time
     const communityAddressesSortedByLastUsed = [
-      // @ts-expect-error StrictNullChecks
-      ...(app.user.addresses.filter((a) => a.community.id === chain.id) || []),
-      // @ts-expect-error StrictNullChecks
-    ].sort((a, b) => b.lastActive?.diff(a.lastActive));
+      ...(userStore
+        .getState()
+        .addresses.filter((a) => a.community.id === chain?.id) || []),
+    ].sort((a, b) => {
+      if (b.lastActive && a.lastActive) return b.lastActive.diff(a.lastActive);
+      if (!b.lastActive && !a.lastActive) return 0; // no change
+      if (!b.lastActive) return -1; // move b towards end
+      return 1; // move a towards end
+    });
 
     // From the sorted adddress in the current community, find an address which has an active session key
-    let foundAddressWithActiveSessionKey = null;
+    let foundAddressWithActiveSessionKey: AddressInfo | null = null;
 
     const sessionSigners = getSessionSigners();
     for (const communityAccount of communityAddressesSortedByLastUsed) {
@@ -230,7 +238,6 @@ export async function updateActiveAddresses({
       });
 
       if (session !== null) {
-        // @ts-expect-error <StrictNullChecks>
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }
@@ -241,13 +248,13 @@ export async function updateActiveAddresses({
       foundAddressWithActiveSessionKey || communityAddressesSortedByLastUsed[0];
 
     if (addressToUse) {
-      const account = app.user.activeAccounts.find((a) => {
+      const account = userStore.getState().accounts.find((a) => {
         return (
           a.community.id === addressToUse.community.id &&
           a.address === addressToUse.address
         );
       });
-      if (account) await setActiveAccount(account, shouldRedraw);
+      if (account) await setActiveAccount(account);
     }
   }
 }
@@ -255,59 +262,66 @@ export async function updateActiveAddresses({
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
-    app.user.setId(0);
-    // @ts-expect-error StrictNullChecks
-    app.user.setEmail(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setEmailInterval(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setEmailVerified(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setPromotionalEmailsEnabled(null);
-    app.user.setIsWelcomeOnboardFlowComplete(false);
-    // @ts-expect-error StrictNullChecks
-    app.user.setKnockJWT(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setJWT(null);
-
-    app.user.setAddresses([]);
-
-    app.user.setSiteAdmin(false);
-    app.user.setUnseenPosts({});
-
-    app.user.setActiveAccounts([]);
-    // @ts-expect-error StrictNullChecks
-    app.user.ephemerallySetActiveAccount(null);
+    userStore.getState().setData({
+      id: 0,
+      email: '',
+      emailNotificationInterval: '',
+      knockJWT: '',
+      addresses: [],
+      starredCommunities: [],
+      joinedCommunitiesWithNewContent: [],
+      accounts: [],
+      activeAccount: null,
+      jwt: null,
+      isSiteAdmin: false,
+      isEmailVerified: false,
+      isPromotionalEmailEnabled: false,
+      isWelcomeOnboardFlowComplete: false,
+    });
   } else {
-    app.user.setId(data.id);
-    app.user.setEmail(data.email);
-    app.user.setEmailInterval(data.emailInterval);
-    app.user.setEmailVerified(data.emailVerified);
-    app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
-    app.user.setIsWelcomeOnboardFlowComplete(
-      data.is_welcome_onboard_flow_complete,
-    );
-    app.user.setKnockJWT(data.knockJwtToken);
-    app.user.setJWT(data.jwt);
-
-    app.user.setAddresses(
-      data.addresses.map(
-        (a) =>
-          new AddressInfo({
-            id: a.id,
-            address: a.address,
-            communityId: a.community_id,
-            keytype: a.keytype,
-            walletId: a.wallet_id,
-            walletSsoSource: a.wallet_sso_source,
-            ghostAddress: a.ghost_address,
-            lastActive: a.last_active,
-          }),
-      ),
+    const addresses = data.addresses.map(
+      (a) =>
+        new AddressInfo({
+          id: a.id,
+          address: a.address,
+          communityId: a.community_id,
+          keytype: a.keytype,
+          walletId: a.wallet_id,
+          walletSsoSource: a.wallet_sso_source,
+          ghostAddress: a.ghost_address,
+          lastActive: a.last_active,
+        }),
     );
 
-    app.user.setSiteAdmin(data.isAdmin);
-    app.user.setUnseenPosts(data.unseenPosts);
+    const joinedCommunitiesWithNewContent = (() => {
+      if (!data.unseenPosts) return [];
+
+      const communityIds: string[] = [];
+
+      // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8391
+      Object.keys(data.unseenPosts).map(
+        (c) =>
+          (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
+          communityIds.push(c),
+      );
+
+      return communityIds;
+    })();
+
+    userStore.getState().setData({
+      id: data.id || 0,
+      email: data.email || '',
+      emailNotificationInterval: data.emailInterval || '',
+      knockJWT: data.knockJwtToken || '',
+      addresses,
+      joinedCommunitiesWithNewContent,
+      jwt: data.jwt || null,
+      // add boolean values as boolean -- not undefined
+      isSiteAdmin: !!data.isAdmin,
+      isEmailVerified: !!data.emailVerified,
+      isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
+      isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+    });
   }
 }
 
@@ -326,7 +340,7 @@ export async function createUserWithAddress(
   const response = await axios.post(`${app.serverUrl()}/createAddress`, {
     address,
     community_id: chain,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     wallet_id: walletId,
     wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
@@ -587,7 +601,7 @@ export async function handleSocialLoginCallback({
     {
       data: {
         community_id: desiredChain?.id,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         username: profileMetadata?.username,
         avatarUrl: profileMetadata?.avatarUrl,
         magicAddress,
@@ -608,9 +622,9 @@ export async function handleSocialLoginCallback({
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:
     if (app.chain) {
-      const c = app.user.selectedCommunity
-        ? app.user.selectedCommunity
-        : app.config.chains.getById(app.activeChainId());
+      const c =
+        userStore.getState().activeCommunity ||
+        app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
 
@@ -619,14 +633,16 @@ export async function handleSocialLoginCallback({
 
       // if email is not set, set the SSO email as the default email
       // only if its a standalone account (no account linking)
-      if (!app.user.email && ssoEmail && profiles?.length === 1) {
-        await app.user.updateEmail(ssoEmail, false);
+      if (!userStore.getState().email && ssoEmail && profiles?.length === 1) {
+        await updateEmail({ email: ssoEmail })
+          .then(onUpdateEmailSuccess)
+          .catch(() => onUpdateEmailError(false));
       }
 
       // if account is newly created and user has not completed onboarding flow
       // then open the welcome modal.
       const profileId = profiles?.[0]?.id;
-      if (profileId && !app.user.isWelcomeOnboardFlowComplete) {
+      if (profileId && !userStore.getState().isWelcomeOnboardFlowComplete) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
         }, 1000);

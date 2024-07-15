@@ -6,6 +6,7 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -33,9 +34,11 @@ const resetSidebarState = () => {
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+  // eslint-disable-next-line react/destructuring-assignment
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   if (props.type === 'default') {
     const {
       disabled,
@@ -82,13 +85,17 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'header') {
     return (
       <div className="SidebarMenuItem header">
+        {/* eslint-disable-next-line react/destructuring-assignment */}
         <CWText type="caption">{props.label}</CWText>
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'community') {
+    /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
     // @ts-expect-error <StrictNullChecks/>
     const roles = app.roles.getAllRolesInCommunity({ community: item.id });
@@ -152,10 +159,13 @@ type SidebarMenuProps = {
   menuItems: Array<MenuItem>;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+
+  const user = useUserStore();
 
   return (
     <div
@@ -179,8 +189,11 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             ...item,
             isStarred:
               item.type === 'community'
-                ? // @ts-expect-error <StrictNullChecks/>
-                  app.user.isCommunityStarred(item.community.id)
+                ? !!user.starredCommunities.find(
+                    (starCommunity) =>
+                      starCommunity.community_id ===
+                      (item?.community?.id || ''),
+                  )
                 : false,
           };
 

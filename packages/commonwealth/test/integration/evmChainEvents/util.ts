@@ -155,6 +155,7 @@ export async function getTestUser() {
   const [user] = await models.User.findOrCreate({
     where: {
       email: 'test@gmail.com',
+      profile: {},
     },
   });
 

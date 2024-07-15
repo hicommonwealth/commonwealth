@@ -1,5 +1,5 @@
 import { CosmosSignerCW, WalletId } from '@hicommonwealth/shared';
-import app from 'client/scripts/state';
+import app from 'state';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 
 export interface LeapWindow {

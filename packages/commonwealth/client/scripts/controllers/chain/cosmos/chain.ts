@@ -20,6 +20,7 @@ import moment from 'moment';
 import { LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { userStore } from 'state/ui/user';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,
@@ -191,10 +192,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       throw new Error('Tx not yet supported on Terra');
     }
 
-    const activeAddress = this._app.user.activeAccount?.address;
-    const walletId = this._app.user.addresses?.find(
-      (a) => a.address === activeAddress && a.community?.id === chain.id,
-    )?.walletId;
+    const activeAddress = userStore.getState().activeAccount?.address;
+    const walletId = userStore
+      .getState()
+      .addresses.find(
+        (a) => a.address === activeAddress && a.community?.id === chain.id,
+      )?.walletId;
     const isKeplr = walletId === WalletId.Keplr;
     const isKeplrEvm = walletId === WalletId.KeplrEthereum;
     const isLeap = walletId === WalletId.Leap;

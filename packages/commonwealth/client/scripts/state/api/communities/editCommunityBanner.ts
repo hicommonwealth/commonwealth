@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { userStore } from '../../ui/user';
 
 interface EditCommunityBannerProps {
   communityId: string;
@@ -15,7 +16,7 @@ const editCommunityBanner = async ({
     community_id: communityId,
     banner_text: bannerText,
     auth: true,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return response.data.result;
