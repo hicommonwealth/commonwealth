@@ -49,6 +49,12 @@ const authenticate = async (
             email: 'hello@knock.app',
           };
           break;
+        case config.LOAD_TESTING.AUTH_TOKEN:
+          req.user = {
+            id: ExternalServiceUserIds.K6,
+            email: 'info@grafana.com',
+          };
+          break;
         default:
           throw new Error('Not authenticated');
       }
