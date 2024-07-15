@@ -1,5 +1,4 @@
-import { WalletId } from '@hicommonwealth/shared';
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import { CosmosSignerCW, WalletId } from '@hicommonwealth/shared';
 import app from 'state';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 
