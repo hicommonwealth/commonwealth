@@ -1,12 +1,17 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB, UserInstance } from '@hicommonwealth/model';
 import { AddressInstance } from '@hicommonwealth/model';
-import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  WalletId,
+  WalletSsoSource,
+  addressSwapper,
+} from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { addressSwapper, bech32ToHex } from '../../shared/utils';
+import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { Errors } from '../routes/createAddress';

@@ -5,12 +5,10 @@ import { success } from '../types';
 import {
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
-} from 'shared/canvas/types';
-import {
   verifyComment,
   verifyReaction,
   verifyThread,
-} from 'shared/canvas/verify';
+} from '@hicommonwealth/shared';
 
 type CanvasGetReq = {
   query: {
