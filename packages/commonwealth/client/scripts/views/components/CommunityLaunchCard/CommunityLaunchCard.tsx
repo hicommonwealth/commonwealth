@@ -258,7 +258,7 @@ export const CommunityLaunchCard: React.FC<CommunityLaunchCardProps> = ({
             iconLeft="sparkle"
           />
           <CWButton
-            label={isLoggedIn ? 'Launch' : 'Sign In to Launch'}
+            label={isLoggedIn ? 'Launch' : 'Must Sign In'}
             onClick={handleLaunch}
             disabled={!description || isLoading || !isLoggedIn}
             buttonHeight="med"

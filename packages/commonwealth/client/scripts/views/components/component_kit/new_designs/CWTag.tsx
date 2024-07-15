@@ -27,7 +27,8 @@ type TagType =
   | 'input'
   | 'address'
   | 'group'
-  | 'contest';
+  | 'contest'
+  | 'click-to-earn';
 
 export type TagProps = {
   iconName?: IconName;
@@ -84,6 +85,9 @@ export const CWTag = ({
       {type === 'contest' && <CWIcon iconName="trophy" iconSize="small" />}
       {!!iconName && (
         <CWIcon iconName={iconName} iconSize="small" className={iconName} />
+      )}
+      {type === 'click-to-earn' && (
+        <CWIcon iconName="cursorClick" iconSize="small" />
       )}
       <CWText type="caption" fontWeight="medium" noWrap>
         {displayLabel()}

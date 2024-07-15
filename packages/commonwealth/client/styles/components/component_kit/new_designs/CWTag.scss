@@ -234,6 +234,28 @@
         color: $neutral-900;
       }
     }
+  }
+
+  &.click-to-earn {
+    background-color: $neutral-900;
+    color: $white;
+
+    .Text {
+      color: $white;
+    }
+
+    .Icon {
+      margin-right: 4px;
+    }
+
+    &.prize-1 {
+      background-color: $yellow-500;
+      color: $neutral-900;
+
+      .Text {
+        color: $neutral-900;
+      }
+    }
 
     &.prize-2 {
       background-color: $neutral-100;

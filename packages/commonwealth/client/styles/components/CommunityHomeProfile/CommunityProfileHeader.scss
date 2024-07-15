@@ -1,75 +1,20 @@
 @import '../../shared';
 
-// .ProfileHeader {
-//   border: 1px solid $neutral-200;
-//   border-radius: 16px;
-//   padding: 24px;
-//   height: fit-content;
-//   flex: 1;
-//   background-color: $white;
-//   margin: 0;
+.counter-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-//   @include smallInclusive {
-//     margin-bottom: 16px;
-//     margin-right: 0;
-//   }
+  .b1 {
+    color: $neutral-400;
+    font-size: 14px;
+  }
 
-//   .edit {
-//     display: flex;
-//     justify-content: flex-end;
-//   }
-
-//   .profile-image {
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     margin-bottom: 16px;
-
-//     img {
-//       height: 160px;
-//       width: 160px;
-//       border-radius: 50%;
-//       object-fit: cover;
-//     }
-//   }
-
-//   .profile-name-and-bio {
-//     .bio {
-//       margin-top: 16px;
-//     }
-
-//     .buttons {
-//       display: flex;
-//       justify-content: center;
-
-//       &.hasMargin {
-//         margin-bottom: 24px;
-//       }
-
-//       > :not(last-child) {
-//         margin-right: 8px;
-//       }
-//     }
-
-//     .name {
-//       justify-content: center;
-//       word-break: break-word;
-//       text-align: center;
-
-//       &.hasMargin {
-//         margin-bottom: 24px;
-//       }
-//     }
-
-//     .read-more {
-//       margin: 8px 0;
-//       color: $primary-500;
-//       &:hover {
-//         cursor: pointer;
-//       }
-//     }
-//   }
-// }
+  .b2 {
+    color: $neutral-400;
+    font-size: 12px;
+  }
+}
 
 .ProfileHeader {
   padding: 24px;
@@ -77,7 +22,6 @@
   border-radius: 6px;
   border: 1px solid $neutral-100;
   background: $white;
-  margin-bottom: 16px;
 
   .content-container {
     display: flex;
@@ -90,31 +34,71 @@
       width: 100%;
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: center;
 
       .community-name {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
 
-        .community-avatar,
-        .default-icon {
-          width: 120px;  // Increased size for better visibility
-          height: 120px; // Increased size for better visibility
-          border-radius: 50%;
-          overflow: hidden;
-          margin: 0 auto; // This centers the image horizontally
-        }
+        .community-avatar-wrapper {
+          position: relative;
+          cursor: pointer;
+          transition: transform 0.05s ease-in-out;
+          user-select: none; // Prevent text selection
+          outline: none; // Remove focus outline
+          -webkit-tap-highlight-color: transparent; // Remove tap highlight on mobile
+          -webkit-touch-callout: none; // Disable callout on long-press (iOS)
 
-        .default-icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: $neutral-200;
-          color: $neutral-800;
-          font-size: 48px; // Increased size for better visibility
-          font-weight: bold;
+          &:active {
+            transform: scale(1.05);
+          }
+
+          .community-avatar,
+          .default-icon {
+            width: 160px; // Increased size for better visibility
+            height: 160px; // Increased size for better visibility
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto; // This centers the image horizontally
+            object-fit: cover;
+            border: 6px solid $neutral-900; // Black border in unclicked state
+            transition: border-color 0.05s ease-in-out;
+
+            -webkit-user-drag: none; // Prevent dragging of image
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+
+            &:hover {
+              border-color: rgba(123, 158, 63, 0.5);
+            }
+
+            &.clicked .community-avatar,
+            &.clicked .default-icon {
+              border-color: #7b9e3f;
+            }
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: $neutral-200;
+            color: $neutral-800;
+            font-size: 48px; // Increased size for better visibility
+            font-weight: bold;
+          }
+
+          .overlay {
+            position: absolute;
+            background-color: #7b9e3f;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            animation: fadeUpAndOut 0.5s ease-out;
+            pointer-events: none;
+          }
         }
 
         .name {
@@ -237,5 +221,16 @@
         }
       }
     }
+  }
+}
+
+@keyframes fadeUpAndOut {
+  0% {
+    opacity: 0.8;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
   }
 }

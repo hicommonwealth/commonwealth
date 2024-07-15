@@ -11,7 +11,15 @@
   }
 
   .header {
+    margin-bottom: 12px;
+  }
+
+  .header-top {
     margin-bottom: 24px;
+    display: flex; // Add this line
+    flex-direction: row;
+    align-items: center; // Add this line
+    gap: 12px; // Add this line for spacing between elements
   }
 
   &.loading {
@@ -23,7 +31,7 @@
   .ProfilePageContainer {
     display: flex;
     flex-direction: row;
-    gap: 24px;
+    gap: 12px;
 
     @include smallInclusive {
       flex-direction: column;

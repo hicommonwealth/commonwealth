@@ -1,8 +1,8 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { useState } from 'react';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import { slugifyPreserveDashes } from 'utils';
-import app from '../state';
 import { chainTypes } from '../views/pages/CreateCommunity/steps/BasicInformationStep/BasicInformationForm/constants';
 
 const DEFAULT_CHAIN_ID = '8453'; // Ethereum Mainnet
@@ -12,11 +12,12 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import Launchpad from 'helpers/ContractHelpers/Launchpad';
 
 const useLaunchpad = (ethChainId: number) => {
+  const { data: nodes } = useFetchNodesQuery();
+
   const launchpadAddress =
     commonProtocol.factoryContracts[ethChainId]?.launchpad;
-  const chainRpc = app.config.nodes
-    .getAll()
-    .find((node) => node.ethChainId === ethChainId)?.url;
+  const chainRpc = nodes?.find((node) => node.ethChainId === ethChainId)?.url;
+
   // @ts-expect-error StrictNullChecks
   const launchpad = new Launchpad(launchpadAddress, chainRpc);
 
