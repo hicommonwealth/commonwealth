@@ -38,7 +38,7 @@ async function run() {
         }));
 
         if (commentVersionHistory.length === 0) {
-          break;
+          return;
         }
 
         for (const versionHistory of commentVersionHistory) {

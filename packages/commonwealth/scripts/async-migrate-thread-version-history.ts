@@ -45,7 +45,7 @@ async function run() {
         }));
 
         if (threadVersionHistory.length === 0) {
-          break;
+          return;
         }
 
         for (const versionHistory of threadVersionHistory) {
