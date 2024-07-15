@@ -214,19 +214,10 @@ const CommunityMembersPage = () => {
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
-      }))
-      .filter((p) =>
-        debouncedSearchTerm
-          ? p.groups.find((g) =>
-              // @ts-expect-error <StrictNullChecks/>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-            ) ||
-            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-          : true,
-      );
+      }));
 
     return results;
-  }, [members, groups, debouncedSearchTerm]);
+  }, [members, groups]);
 
   const filteredGroups = useMemo(() => {
     const modifiedGroupsArr = (groups || []).map((group) => ({
