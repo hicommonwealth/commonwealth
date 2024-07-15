@@ -41,6 +41,14 @@ following patterns/strategies when creating load tests:
 queries to different data in the database thus simulating a real world scenario. If all virtual users use the same JWT,
 performance results will be biased since the database can cache the specific data that is queried repeatedly.
 
+# Creating API Request Functions
+- Use `k6/http` not Axios or the native node `http` module.
+- k6 currently doesn't natively support ignoring metrics for HTTP requests from `setup` and `teardown` functions (see
+[this GitHub Issue][10] for context) but there is a workaround described [here][11]. To use this workaround, ensure that
+any tests that make HTTP requests in setup or teardown functions have an options object that extend the 
+`IgnoreLifecycleMetrics` configuration.
+- Use `check` functions to ensure requests were successful.
+
 # Generating Tests from OpenAPI Spec
 Execute the `generate-load-tests` command from the root of the repository to generate a javascript load test in
 `/packages/load-testing/generated-load-test`. Note that this Javascript test must be converted to Typescript and
@@ -104,6 +112,8 @@ Description: Checks the types of `/test` and `/src`.
 
 - Explicitly `async` test lifecycle functions are not supported by k6. To implement k6 async functionality use callback
 syntax as described here: https://github.com/grafana/k6/issues/2935#issuecomment-1443462207.
+- Open and closed model scenarios refers to different executors: 
+https://grafana.com/docs/k6/latest/using-k6/scenarios/concepts/open-vs-closed/
 
 [1]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#groups
 [2]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#discouraged-one-group-per-request
@@ -114,3 +124,5 @@ syntax as described here: https://github.com/grafana/k6/issues/2935#issuecomment
 [7]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#user-defined-tags
 [8]: https://grafana.com/docs/k6/latest/using-k6/scenarios/
 [9]: https://grafana.com/docs/k6/latest/javascript-api/k6-data/sharedarray/
+[10]: https://github.com/grafana/k6/issues/1321
+[11]: https://community.grafana.com/t/ignore-http-calls-made-in-setup-or-teardown-in-results/97260/2
