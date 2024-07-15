@@ -18,41 +18,43 @@ async function run() {
   let i = 0;
   while (i < count) {
     try {
-      const commentVersionHistory: {
-        id: number;
-        versionHistories: { timestamp: string; body: string }[];
-      }[] = (
-        await models.sequelize.query(
-          `SELECT id, version_history FROM "Comments" where version_history_updated = false LIMIT 10`,
-          {
-            raw: true,
-            type: QueryTypes.SELECT,
-          },
-        )
-      ).map((c) => ({
-        id: parseInt(c['id']),
-        versionHistories: c['version_history'].map((v) => JSON.parse(v)),
-      }));
+      await models.sequelize.transaction(async (transaction) => {
+        const commentVersionHistory: {
+          id: number;
+          versionHistories: { timestamp: string; body: string }[];
+        }[] = (
+          await models.sequelize.query(
+            `SELECT id, version_history FROM "Comments" where version_history_updated = false
+             FOR UPDATE SKIP LOCKED LIMIT 1`,
+            {
+              raw: true,
+              type: QueryTypes.SELECT,
+              transaction,
+            },
+          )
+        ).map((c) => ({
+          id: parseInt(c['id']),
+          versionHistories: c['version_history'].map((v) => JSON.parse(v)),
+        }));
 
-      if (commentVersionHistory.length === 0) {
-        break;
-      }
+        if (commentVersionHistory.length === 0) {
+          break;
+        }
 
-      for (const versionHistory of commentVersionHistory) {
-        console.log(
-          `${i}/${count} Updating comment version_histories for id ${versionHistory.id}`,
-        );
+        for (const versionHistory of commentVersionHistory) {
+          console.log(
+            `${i}/${count} Updating comment version_histories for id ${versionHistory.id}`,
+          );
 
-        const formattedValues = versionHistory.versionHistories.map((v) => {
-          const { body, ...rest } = v;
-          return {
-            comment_id: versionHistory.id,
-            ...rest,
-            text: body,
-          };
-        }) as unknown as CommentVersionHistoryInstance[];
+          const formattedValues = versionHistory.versionHistories.map((v) => {
+            const { body, ...rest } = v;
+            return {
+              comment_id: versionHistory.id,
+              ...rest,
+              text: body,
+            };
+          }) as unknown as CommentVersionHistoryInstance[];
 
-        await models.sequelize.transaction(async (transaction) => {
           await models.sequelize.query(
             `UPDATE "Comments" SET version_history_updated = true WHERE id = $id`,
             {
@@ -66,8 +68,8 @@ async function run() {
               transaction,
             },
           );
-        });
-      }
+        }
+      });
     } catch (error) {
       console.error('Error:', error.message);
       throw error;
