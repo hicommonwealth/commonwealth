@@ -20,8 +20,8 @@ const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
 };
 
 type Filters = {
-  groupsJoin: string;
-  addressFilter: string;
+  joins: string;
+  filters: string;
 };
 
 const buildFilters = (memberships: string, addresses: string[]): Filters => {
@@ -29,41 +29,42 @@ const buildFilters = (memberships: string, addresses: string[]): Filters => {
   switch (memberships) {
     case 'in-group':
       return {
-        groupsJoin: `JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL`,
-        addressFilter: '',
+        joins: `JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL`,
+        filters: '',
       };
 
     case `in-group:${ids}`:
       return {
-        groupsJoin: `JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL AND M.group_id IN (${ids})`,
-        addressFilter: '',
+        joins: `JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL AND M.group_id IN (${ids})`,
+        filters: '',
       };
 
     case 'not-in-group':
-      return { groupsJoin: '', addressFilter: '' }; // TODO: consider default group
+      return {
+        joins: `LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL`,
+        filters: 'AND M.address_id IS NULL',
+      };
 
     case 'allow-specified-addresses':
       return {
-        groupsJoin: '',
-        addressFilter: addresses.length ? `AND A.address IN(:addresses)` : '',
+        joins: '',
+        filters: addresses.length ? `AND A.address IN(:addresses)` : '',
       };
 
     case 'not-allow-specified-addresses':
       return {
-        groupsJoin: '',
-        addressFilter: addresses.length
-          ? `AND A.address NOT IN(:addresses)`
-          : '',
+        joins: '',
+        filters: addresses.length ? `AND A.address NOT IN(:addresses)` : '',
       };
 
     default:
-      return { groupsJoin: '', addressFilter: '' };
+      return { joins: '', filters: '' };
   }
 };
 
 const buildFilteredQuery = (
   search: string,
-  { groupsJoin, addressFilter }: Filters,
+  { joins: groupsJoin, filters: addressFilter }: Filters,
 ) => {
   // TODO: Temporarily removing option to search by address until product team decides what to do with it
   // Using UNION instead of OR when combining search terms to
@@ -205,6 +206,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         type: QueryTypes.SELECT,
       });
 
+      console.log(members, payload);
       return schemas.buildPaginatedResponse(
         members,
         members.at(0)?.total ?? 0,
@@ -216,10 +218,3 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
     },
   };
 }
-
-// TODO: Fix UI Issues
-// - UI: Inifite look when searching numbers like 0x1 (fixed here PR 8463)
-// - UI: Fix page result ordering issue in table view
-// - UI: Fix not in group filters
-// - UI: When searching by address (like 3B9 dillon's) the server returns 27 results
-//       that are not shown in the UI
