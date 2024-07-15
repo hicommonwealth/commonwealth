@@ -140,9 +140,8 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       );
 
       const sql = `
-      WITH F AS (${cte})
+      WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
       SELECT
-        (SELECT COUNT(*) FROM F)::INTEGER AS total,
         U.id AS user_id,
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
@@ -156,13 +155,15 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           'profile_id', A.profile_id -- TO BE REMOVED
         )) AS addresses,
         ARRAY_AGG(A.role) AS roles,
-        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
+        T.total
       FROM 
         F 
         JOIN "Addresses" A ON F.id = A.id
         JOIN "Users" U ON A.user_id = U.id
         LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
-      GROUP BY U.id
+        JOIN T ON true
+      GROUP BY U.id, T.total
       ORDER BY ${orderBy}
       LIMIT ${limit} OFFSET ${offset};
       `;
