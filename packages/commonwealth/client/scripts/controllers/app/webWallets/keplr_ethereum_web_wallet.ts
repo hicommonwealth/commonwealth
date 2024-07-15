@@ -6,9 +6,13 @@ import {
 } from '@keplr-wallet/types';
 
 import { fromBech32 } from '@cosmjs/encoding';
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  CosmosSignerCW,
+  WalletId,
+} from '@hicommonwealth/shared';
 import { bytesToHex } from '@noble/hashes/utils';
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 import { getCosmosChains } from './utils';

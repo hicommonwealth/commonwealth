@@ -24,8 +24,8 @@ import {
 import {
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
-} from 'shared/canvas/chainMappings';
-import { getSessionSigners } from 'shared/canvas/verify';
+  getSessionSigners,
+} from '@hicommonwealth/shared';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 
 import { useCommunityStake } from '../CommunityStake';

@@ -11,7 +11,7 @@ export function assert(
   }
 }
 
-export function assertMatches(a, b, obj: string, field: string) {
+export function assertMatches(a: any, b: any, obj: string, field: string) {
   assert(
     a === b,
     `Invalid signed ${obj} (${field}: ${JSON.stringify(a)}, ${JSON.stringify(

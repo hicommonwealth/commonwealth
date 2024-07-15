@@ -1,7 +1,7 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { signDeleteThreadReaction } from 'controllers/server/sessions';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
