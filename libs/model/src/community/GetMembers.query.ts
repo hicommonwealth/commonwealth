@@ -226,8 +226,11 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
 }
 
 // TODO:
+// - UI: Inifite look when searching numbers like 0x1 (fixed here PR 8463)
 // - UI: Fix page result ordering issue in table view
 // - UI: Fix not in group filters
+// - UI: When searching by address (like 3B9 dillon's) the server returns 27 results
+//       that are not shown in the UI
 // - Create query plans
 // - Remove comments and logging (logging:true, console.log)
 // - Add stake balance to address migration (stake_balance, updated_date)
