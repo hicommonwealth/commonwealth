@@ -92,21 +92,19 @@ const updateNewProfile = async (
   // @ts-expect-error StrictNullChecks
   await updateTags(tag_ids, models, profile.user_id, 'user_id');
 
-  if (process.env.FLAG_USER_ONBOARDING_ENABLED === 'true') {
-    const DEFAULT_NAME = 'Anonymous';
-    const isProfileNameUnset =
-      !profile.profile_name || profile.profile_name === DEFAULT_NAME;
+  const DEFAULT_NAME = 'Anonymous';
+  const isProfileNameUnset =
+    !profile.profile_name || profile.profile_name === DEFAULT_NAME;
 
-    if (
-      name &&
-      name !== DEFAULT_NAME &&
-      isProfileNameUnset &&
-      req.user &&
-      !req.user.is_welcome_onboard_flow_complete
-    ) {
-      req.user.is_welcome_onboard_flow_complete = true;
-      await req.user.save();
-    }
+  if (
+    name &&
+    name !== DEFAULT_NAME &&
+    isProfileNameUnset &&
+    req.user &&
+    !req.user.is_welcome_onboard_flow_complete
+  ) {
+    req.user.is_welcome_onboard_flow_complete = true;
+    await req.user.save();
   }
 
   if (!updateStatus || !rows) {

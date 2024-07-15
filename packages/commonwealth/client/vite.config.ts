@@ -103,9 +103,6 @@ export default defineConfig(({ mode }) => {
       'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
         env.FLAG_COMMUNITY_STAKE,
       ),
-      'process.env.FLAG_USER_ONBOARDING_ENABLED': JSON.stringify(
-        env.FLAG_USER_ONBOARDING_ENABLED,
-      ),
       'process.env.FLAG_ALLOWLIST': JSON.stringify(env.FLAG_ALLOWLIST),
       'process.env.IS_PRODUCTION': JSON.stringify(env.IS_PRODUCTION),
       'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
