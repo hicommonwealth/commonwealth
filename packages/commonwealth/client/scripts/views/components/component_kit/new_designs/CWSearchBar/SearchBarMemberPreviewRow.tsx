@@ -1,13 +1,14 @@
 import React, { FC } from 'react';
 
+import { CommunityMember } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { MemberResult } from '../../../../pages/search/helpers';
 import { User } from '../../../user/user';
 
 import './SearchBarMemberPreviewRow.scss';
 
 interface SearchBarMemberPreviewRowProps {
-  searchResult: MemberResult;
+  searchResult: z.infer<typeof CommunityMember>;
   searchTerm?: string;
   onSearchItemClick?: () => void;
 }
@@ -22,7 +23,11 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
   const navigate = useCommonNavigate();
 
   const handleClick = () => {
-    navigate(`/profile/id/${searchResult.id}`, {}, null);
+    navigate(
+      `/profile/id/${searchResult.addresses.at(0)?.profile_id}`,
+      {},
+      null,
+    );
     onSearchItemClick?.();
   };
 
