@@ -103,6 +103,7 @@ type ReplyResultRowProps = {
   searchTerm: string;
   setRoute: any;
 };
+// eslint-disable-next-line react/no-multi-comp
 const ReplyResultRow = ({
   comment,
   searchTerm,
