@@ -9,10 +9,14 @@ const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
     case 'name':
       return `profile_name ${direction}`;
 
-    case 'stakeBalance': // TODO: fix when stake balance is available
-      return `addresses[0].stake_balance ${direction}`;
+    // - Add stake balance to address migration (stake_balance, updated_date)
+    // - Project stake balances in separate process
+    // case 'stakeBalance': // TODO: fix when stake balance is available
+    //   return `addresses[0].stake_balance ${direction}`;
+
+    default:
+      return `last_active ${direction}`;
   }
-  return `last_active ${direction}`;
 };
 
 type Filters = {
@@ -199,47 +203,8 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
-        logging: true,
       });
 
-      // TODO: do this async from the client or project stake balances to addresses table
-      // if (payload.include_stake_balances) {
-      //   const stake = await models.CommunityStake.findOne({
-      //     where: { community_id },
-      //   });
-      //   if (!stake) {
-      //     throw new InvalidState(Errors.StakeNotFound);
-      //   }
-      //   const stakeholderGroup = await models.Group.findOne({
-      //     where: {
-      //       community_id,
-      //       is_system_managed: true,
-      //     },
-      //   });
-      //   if (!stakeholderGroup) {
-      //     throw new InvalidState(Errors.StakeholderGroup);
-      //   }
-      //   const node = await models.ChainNode.findByPk(community.chain_node_id);
-      //   if (!node || !node.eth_chain_id) {
-      //     throw new InvalidState(Errors.ChainNodeNotFound);
-      //   }
-      //   const addresses = allCommunityProfiles.map((p) => p.addresses).flat();
-      //   const balances = await contractHelpers.getNamespaceBalance(
-      //     community.namespace_address!,
-      //     stake.stake_id,
-      //     node.eth_chain_id,
-      //     addresses,
-      //   );
-      //   // add balances to profiles
-      //   for (const profile of allCommunityProfiles) {
-      //     for (const address of profile.addresses) {
-      //       profile.stake_balances ||= [];
-      //       profile.stake_balances.push(balances[address] || '0');
-      //     }
-      //   }
-      // }
-
-      console.log(members, payload);
       return schemas.buildPaginatedResponse(
         members,
         members.at(0)?.total ?? 0,
@@ -252,13 +217,9 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
   };
 }
 
-// TODO:
+// TODO: Fix UI Issues
 // - UI: Inifite look when searching numbers like 0x1 (fixed here PR 8463)
 // - UI: Fix page result ordering issue in table view
 // - UI: Fix not in group filters
 // - UI: When searching by address (like 3B9 dillon's) the server returns 27 results
 //       that are not shown in the UI
-// - Create query plans
-// - Remove comments and logging (logging:true, console.log)
-// - Add stake balance to address migration (stake_balance, updated_date)
-// - Project stake balances in separate process
