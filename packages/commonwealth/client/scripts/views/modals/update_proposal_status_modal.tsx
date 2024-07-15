@@ -7,9 +7,6 @@ import {
 import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import type Thread from '../../models/Thread';
 
-import { ThreadStage } from '../../models/types';
-import { SelectList } from '../components/component_kit/cw_select_list';
-
 import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
@@ -27,8 +24,11 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,
 } from '../../../../shared/analytics/types';
+import '../../../styles/pages/UpdateProposalStatusModal.scss';
 import useAppStatus from '../../hooks/useAppStatus';
+import { ThreadStage } from '../../models/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
+import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
@@ -185,7 +185,7 @@ export const UpdateProposalStatusModal = ({
       }
     } catch (err) {
       console.log(err);
-      throw new Error('Failed to update proposal links');
+      notifyError('Failed to update proposal links');
     }
 
     try {
@@ -223,7 +223,7 @@ export const UpdateProposalStatusModal = ({
       }
     } catch (err) {
       console.log(err);
-      throw new Error('Failed to update linked proposals');
+      notifyError('Failed to update linked proposals');
     }
 
     trackAnalytics({
@@ -251,7 +251,7 @@ export const UpdateProposalStatusModal = ({
       onModalClose();
     } catch (error) {
       console.log(error);
-      throw new Error('Failed to remove linked proposal');
+      notifyError('Failed to remove linked proposal');
     }
   };
 
@@ -325,31 +325,32 @@ export const UpdateProposalStatusModal = ({
           />
         )}
       </CWModalBody>
-      <CWModalFooter className="proposal-modal">
-        <div className="left-button">
-          {snapshotProposalConnected && (
+      <CWModalFooter>
+        <div className="proposal-modal">
+          <div className="left-button">
+            {snapshotProposalConnected && (
+              <CWButton
+                label="Remove proposal"
+                buttonType="destructive"
+                buttonHeight="sm"
+                onClick={handleRemoveProposal}
+              />
+            )}
+          </div>
+          <div className="right-buttons">
             <CWButton
-              label="Remove proposal"
-              buttonType="destructive"
+              label="Cancel"
+              buttonType="secondary"
               buttonHeight="sm"
-              className="test"
-              onClick={handleRemoveProposal}
+              onClick={onModalClose}
             />
-          )}
-        </div>
-        <div className="right-buttons">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary"
-            buttonHeight="sm"
-            onClick={onModalClose}
-          />
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Save changes"
-            onClick={handleSaveChanges}
-          />
+            <CWButton
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Save changes"
+              onClick={handleSaveChanges}
+            />
+          </div>
         </div>
       </CWModalFooter>
     </div>
