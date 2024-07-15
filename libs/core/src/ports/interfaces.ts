@@ -216,6 +216,10 @@ export interface Broker extends Disposable {
     topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
+    hooks?: {
+      beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      afterHandleEvent: (topic: string, content: any, context: any) => void;
+    },
   ): Promise<boolean>;
 }
 

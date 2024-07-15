@@ -1,4 +1,4 @@
-import ChainInfo from 'client/scripts/models/ChainInfo';
+import ChainInfo from 'models/ChainInfo';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { devtools } from 'zustand/middleware';

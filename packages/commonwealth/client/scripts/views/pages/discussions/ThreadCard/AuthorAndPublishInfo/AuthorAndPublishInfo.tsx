@@ -1,11 +1,11 @@
 import { PopperPlacementType } from '@mui/base/Popper';
-import CommunityInfo from 'client/scripts/views/components/component_kit/CommunityInfo';
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
 import React, { useRef } from 'react';
 import app from 'state';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
+import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import CWPopover, {

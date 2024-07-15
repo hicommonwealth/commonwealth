@@ -125,6 +125,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => new Promise((resolve) => resolve([])),
         },
       };
       const banCache: any = {

@@ -2,18 +2,18 @@ import type { DeltaStatic } from 'quill';
 import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 
-import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
-import { SharePopover } from 'client/scripts/views/components/SharePopover';
-import {
-  ViewCommentUpvotesDrawer,
-  ViewUpvotesDrawerTrigger,
-} from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
+import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import type Comment from 'models/Comment';
 import { verify } from 'shared/canvas';
 import { CanvasSignedData, deserializeCanvas } from 'shared/canvas/types';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
+import { SharePopover } from 'views/components/SharePopover';
+import {
+  ViewCommentUpvotesDrawer,
+  ViewUpvotesDrawerTrigger,
+} from 'views/components/UpvoteDrawer';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';

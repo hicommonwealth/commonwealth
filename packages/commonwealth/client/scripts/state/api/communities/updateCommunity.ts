@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app, { initAppState } from 'state';
+import { userStore } from '../../ui/user';
 
 interface UpdateCommunityProps {
   communityId: string;
@@ -16,7 +17,7 @@ const updateCommunity = async ({
   transactionHash,
 }: UpdateCommunityProps) => {
   return await axios.patch(`${app.serverUrl()}/communities/${communityId}`, {
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     id: communityId,
     namespace,
     default_symbol: symbol,

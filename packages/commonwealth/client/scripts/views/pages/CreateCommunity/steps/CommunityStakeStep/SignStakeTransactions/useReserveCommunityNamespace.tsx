@@ -4,8 +4,8 @@ import {
   BaseMixpanelPayload,
   MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
-import app from 'state';
 import { useUpdateCommunityMutation } from 'state/api/communities';
+import useUserStore from 'state/ui/user';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ActionState, defaultActionState } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
@@ -32,6 +32,7 @@ const useReserveCommunityNamespace = ({
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -66,8 +67,7 @@ const useReserveCommunityNamespace = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,
         community: chainId,
-        // @ts-expect-error <StrictNullChecks/>
-        userId: app.user.activeAccount.profile.id,
+        userId: user.activeAccount?.profile?.id,
         userAddress: userAddress,
         isPWA: isAddedToHomeScreen,
       });

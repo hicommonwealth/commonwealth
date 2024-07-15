@@ -25,7 +25,8 @@ import {
   LaunchContestStep,
 } from '../../types';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useFlag } from 'hooks/useFlag';
+import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
@@ -53,6 +54,7 @@ const SignTransactionsStep = ({
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
+  const user = useUserStore();
 
   const isContestRecurring =
     contestFormData.contestRecurring === ContestRecurringType.Yes;
@@ -76,7 +78,7 @@ const SignTransactionsStep = ({
       ? ONE_HOUR_IN_SECONDS
       : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
-    const walletAddress = app.user.activeAccount?.address;
+    const walletAddress = user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
       : stakeData?.stake_token;

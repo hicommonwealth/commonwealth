@@ -76,6 +76,15 @@ export const Address = z.object({
   updated_at: z.any(),
 });
 
+export const SsoToken = z.object({
+  address_id: PG_INT,
+  issued_at: PG_INT,
+  issuer: z.string(),
+  state_id: z.string().nullish(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
 export const CommunityMember = z.object({
   user_id: PG_INT,
   profile_name: z.string().nullish(),

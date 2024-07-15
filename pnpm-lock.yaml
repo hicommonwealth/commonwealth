@@ -975,9 +975,6 @@ importers:
       '@trpc/react-query':
         specifier: ^10.45.1
         version: 10.45.2(@tanstack/react-query@4.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@types/react-helmet':
-        specifier: ^6.1.11
-        version: 6.1.11
       '@types/react-helmet-async':
         specifier: ^1.0.3
         version: 1.0.3(react@18.3.1)
@@ -1218,9 +1215,6 @@ importers:
       react-error-boundary:
         specifier: ^3.1.4
         version: 3.1.4(react@18.3.1)
-      react-helmet:
-        specifier: ^6.1.0
-        version: 6.1.0(react@18.3.1)
       react-helmet-async:
         specifier: ^2.0.4
         version: 2.0.5(react@18.3.1)
@@ -6949,12 +6943,6 @@ packages:
         integrity: sha512-DqbSuZPSHiH1l3XI/y8LbhrAGNh+Bpc9QY4MsYRM1yD4+qhax8bN4DInUMpv/tNyIdjsa+1V8XXmbRx8W5dB0w==,
       }
     deprecated: This is a stub types definition. react-helmet-async provides its own type definitions, so you do not need this installed.
-
-  '@types/react-helmet@6.1.11':
-    resolution:
-      {
-        integrity: sha512-0QcdGLddTERotCXo3VFlUSWO3ztraw8nZ6e3zJSgG7apwV5xt+pJUS8ewPBqT4NYB1optGLprNQzFleIY84u/g==,
-      }
 
   '@types/react-redux@7.1.33':
     resolution:
@@ -15728,14 +15716,6 @@ packages:
     peerDependencies:
       react: ^16.6.0 || ^17.0.0 || ^18.0.0
 
-  react-helmet@6.1.0:
-    resolution:
-      {
-        integrity: sha512-4uMzEY9nlDlgxr61NL3XbKRy1hEkXmKNXhjbAIOVw5vcFrsdYbH2FEwcNyWvWinl103nXgzYNlns9ca+8kFiWw==,
-      }
-    peerDependencies:
-      react: '>=16.3.0'
-
   react-hook-form@7.51.4:
     resolution:
       {
@@ -15910,14 +15890,6 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-  react-side-effect@2.1.2:
-    resolution:
-      {
-        integrity: sha512-PVjOcvVOyIILrYoyGEpDN3vmYNLdy1CajSFNt4TDsVQC5KpTijDvWVoR+/7Rz2xT978D8/ZtFceXxzsPwZEDvw==,
-      }
-    peerDependencies:
-      react: ^16.3.0 || ^17.0.0 || ^18.0.0
 
   react-style-singleton@2.2.1:
     resolution:
@@ -23997,10 +23969,6 @@ snapshots:
     transitivePeerDependencies:
       - react
 
-  '@types/react-helmet@6.1.11':
-    dependencies:
-      '@types/react': 18.3.1
-
   '@types/react-redux@7.1.33':
     dependencies:
       '@types/hoist-non-react-statics': 3.3.5
@@ -30095,14 +30063,6 @@ snapshots:
       react-fast-compare: 3.2.2
       shallowequal: 1.1.0
 
-  react-helmet@6.1.0(react@18.3.1):
-    dependencies:
-      object-assign: 4.1.1
-      prop-types: 15.8.1
-      react: 18.3.1
-      react-fast-compare: 3.2.2
-      react-side-effect: 2.1.2(react@18.3.1)
-
   react-hook-form@7.51.4(react@18.3.1):
     dependencies:
       react: 18.3.1
@@ -30229,10 +30189,6 @@ snapshots:
       use-isomorphic-layout-effect: 1.1.2(@types/react@18.3.1)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
-
-  react-side-effect@2.1.2(react@18.3.1):
-    dependencies:
-      react: 18.3.1
 
   react-style-singleton@2.2.1(@types/react@18.3.1)(react@18.3.1):
     dependencies:

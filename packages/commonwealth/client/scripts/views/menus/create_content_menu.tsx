@@ -1,6 +1,5 @@
 /* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -8,6 +7,7 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore, { userStore } from 'state/ui/user';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -35,7 +35,7 @@ const resetSidebarState = () => {
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
-    app.user.activeAccount && !!app.chain?.meta.snapshot.length;
+    userStore.getState() && !!app.chain?.meta.snapshot.length;
 
   const showOnChainProposalItem =
     app.chain?.base === ChainBase.CosmosSDK &&
@@ -202,13 +202,13 @@ export const CreateContentSidebar = ({
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   if (
     !isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
-    !hasJoinedCommunity
+    !user.activeAccount
   ) {
     return;
   }

@@ -1,8 +1,4 @@
 import { DefaultPage } from '@hicommonwealth/shared';
-import {
-  PreferenceTags,
-  usePreferenceTags,
-} from 'client/scripts/views/components/PreferenceTags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
@@ -14,6 +10,10 @@ import {
   useEditCommunityTagsMutation,
 } from 'state/api/communities';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
+import {
+  PreferenceTags,
+  usePreferenceTags,
+} from 'views/components/PreferenceTags';
 import {
   CWCoverImageUploader,
   ImageBehavior,
