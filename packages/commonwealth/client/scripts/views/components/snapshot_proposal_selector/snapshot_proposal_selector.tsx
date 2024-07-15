@@ -88,6 +88,7 @@ export const SnapshotProposalSelector = ({
     setSearchTerm(e.target.value);
   };
 
+  // eslint-disable-next-line react/no-multi-comp
   const EmptyComponent = () => (
     <div className="empty-component">{getEmptyContentMessage()}</div>
   );
