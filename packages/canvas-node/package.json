@@ -15,8 +15,8 @@
     "url": "git+https://github.com/hicommonwealth/canvas-node.git"
   },
   "dependencies": {
-    "@canvas-js/core": "0.10.0-beta.2",
-    "@canvas-js/cli": "0.10.0-beta.2",
+    "@canvas-js/core": "0.10.0-beta.3",
+    "@canvas-js/cli": "0.10.0-beta.3",
     "chalk": "^5.2.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
