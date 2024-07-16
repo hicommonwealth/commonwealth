@@ -14,10 +14,16 @@ export const options = {
       options: {
         testFuncName: 'globalActivity',
       },
+      quickDevScenario: {
+        iterations: 500,
+      },
     }),
     userFeed: createScenario({
       options: {
         testFuncName: 'userActivity',
+      },
+      quickDevScenario: {
+        iterations: 500,
       },
     }),
   },

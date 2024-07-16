@@ -3,16 +3,16 @@ type ScenarioBaseOptions = {
   tags?: Record<string, string>;
 };
 
-type TrafficSpikeScenarioOptions = ScenarioBaseOptions & {
+type TrafficSpikeScenarioOptions = {
   allocatedVUs?: number;
 };
 
-type ConstantTrafficScenarioOptions = ScenarioBaseOptions & {
+type ConstantTrafficScenarioOptions = {
   rate?: number;
   allocatedVUs?: number;
 };
 
-type QuickDevScenarioOptions = ScenarioBaseOptions & {
+type QuickDevScenarioOptions = {
   iterations?: number;
 };
 
@@ -54,7 +54,7 @@ export function createTrafficSpikeScenario({
   testFuncName,
   tags,
   allocatedVUs,
-}: TrafficSpikeScenarioOptions) {
+}: ScenarioBaseOptions & TrafficSpikeScenarioOptions) {
   return {
     executor: 'ramping-arrival-rate',
     tags,
@@ -95,7 +95,7 @@ export function createConstantTrafficScenario({
   tags,
   allocatedVUs,
   rate,
-}: ConstantTrafficScenarioOptions) {
+}: ScenarioBaseOptions & ConstantTrafficScenarioOptions) {
   return {
     executor: 'constant-arrival-rate',
     tags,
@@ -131,7 +131,7 @@ export function createQuickDevScenario({
   testFuncName,
   tags,
   iterations,
-}: QuickDevScenarioOptions) {
+}: ScenarioBaseOptions & QuickDevScenarioOptions) {
   return {
     executor: 'shared-iterations',
     exec: testFuncName,
