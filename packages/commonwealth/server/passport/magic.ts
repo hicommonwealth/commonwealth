@@ -15,6 +15,7 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import { SsoToken } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   ChainBase,
@@ -28,8 +29,9 @@ import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
-import { Op, Transaction, WhereOptions } from 'sequelize';
+import { Op, QueryTypes, Transaction, WhereOptions } from 'sequelize';
 import { fileURLToPath } from 'url';
+import { z } from 'zod';
 import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
@@ -221,19 +223,29 @@ async function loginExistingMagicUser({
 
   return sequelize.transaction(async (transaction) => {
     // verify login token
-    const ssoToken = await models.SsoToken.scope('withPrivateData').findOne({
-      where: {
-        issuer: decodedMagicToken.issuer,
-      },
-      include: [
-        {
-          model: models.Address,
-          where: { address: decodedMagicToken.publicAddress },
-          required: true,
+    const ssoTokensRes = await models.sequelize.query<
+      z.infer<typeof SsoToken> & { address_id: string }
+    >(
+      `
+        SELECT S.*, A.id as address_id
+        FROM "SsoTokens" S
+                 JOIN "Addresses" A ON A.id = S.address_id
+        WHERE S.issuer = :magicIssuer
+          AND A.address = :publicAddress
+        LIMIT 1;
+    `,
+      {
+        type: QueryTypes.SELECT,
+        raw: true,
+        replacements: {
+          magicIssuer: decodedMagicToken.issuer,
+          publicAddress: decodedMagicToken.publicAddress,
         },
-      ],
-      transaction,
-    });
+      },
+    );
+
+    let ssoToken: z.infer<typeof SsoToken> | undefined;
+    if (ssoTokensRes.length > 0) ssoToken = ssoTokensRes[0];
 
     let malformedSsoToken: SsoTokenInstance;
     if (ssoToken) {
@@ -246,7 +258,18 @@ async function loginExistingMagicUser({
       }
       ssoToken.issued_at = decodedMagicToken.claim.iat;
       ssoToken.updated_at = new Date();
-      await ssoToken.save({ transaction });
+      await models.SsoToken.update(
+        {
+          issued_at: decodedMagicToken.claim.iat,
+          updated_at: new Date(),
+        },
+        {
+          where: {
+            issuer: decodedMagicToken.issuer,
+            address_id: ssoToken.address_id,
+          },
+        },
+      );
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
       // situation for legacy SsoToken instances:
