@@ -1,5 +1,6 @@
-import validateGroupMembership, {
+import {
   OptionsWithBalances,
+  validateGroupMembership,
 } from '@hicommonwealth/model';
 import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
 import { expect } from 'chai';
