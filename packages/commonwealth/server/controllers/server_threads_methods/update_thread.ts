@@ -54,7 +54,7 @@ export type UpdateThreadOptions = {
   address: AddressInstance;
   threadId?: number;
   title?: string;
-  body?: string;
+  body: string;
   stage?: string;
   url?: string;
   locked?: boolean;
@@ -106,6 +106,9 @@ export async function __updateThread(
   }
   if (discordMeta) {
     threadWhere.discord_meta = discordMeta;
+  }
+  if (!body) {
+    throw new AppError(Errors.NoBody);
   }
 
   const thread = await this.models.Thread.findOne({
@@ -201,7 +204,6 @@ export async function __updateThread(
   const community = await this.models.Community.findByPk(thread.community_id);
 
   const previousDraftMentions = parseUserMentions(latestVersion);
-  // @ts-expect-error StrictNullChecks
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
@@ -275,6 +277,18 @@ export async function __updateThread(
         },
         {
           where: { id: threadId },
+          transaction,
+        },
+      );
+
+      await this.models.ThreadVersionHistory.create(
+        {
+          thread_id: threadId!,
+          address: address.address,
+          body,
+          timestamp: new Date(),
+        },
+        {
           transaction,
         },
       );

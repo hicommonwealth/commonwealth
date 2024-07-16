@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PG_INT, discordMetaSchema, linksSchema, zDate } from '../utils';
+import { discordMetaSchema, linksSchema, PG_INT, zDate } from '../utils';
 import { Address } from './user.schemas';
 
 export const Thread = z.object({
@@ -45,4 +45,14 @@ export const Thread = z.object({
 
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
+});
+
+export const ThreadVersionHistory = z.object({
+  id: PG_INT.optional(),
+  thread_id: PG_INT,
+  address: z
+    .string()
+    .describe('Address of the creator of the post or the collaborator'),
+  body: z.string(),
+  timestamp: z.date(),
 });

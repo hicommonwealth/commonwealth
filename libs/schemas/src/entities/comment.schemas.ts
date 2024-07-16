@@ -11,6 +11,7 @@ export const Comment = z.object({
   community_id: z.string(),
   parent_id: z.string().nullish(),
   version_history: z.array(z.string()).nullish(),
+  version_history_updated: z.boolean().nullish(),
 
   canvas_signed_data: z.string(),
   canvas_hash: z.string(),
@@ -36,4 +37,11 @@ export const Comment = z.object({
   reaction_weights_sum: PG_INT.nullish(),
 
   Address: Address.nullish(),
+});
+
+export const CommentVersionHistory = z.object({
+  id: PG_INT.optional(),
+  comment_id: PG_INT,
+  text: z.string(),
+  timestamp: z.date(),
 });

@@ -72,6 +72,11 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      version_history_updated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       hooks: {
