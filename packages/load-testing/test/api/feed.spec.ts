@@ -9,14 +9,13 @@ import { IgnoreLifecycleMetrics } from '../util/utils.ts';
 
 export const options = {
   ...IgnoreLifecycleMetrics,
-  // scenarios
   scenarios: {
-    globalFeedOnly: createScenario({
+    globalFeed: createScenario({
       options: {
         testFuncName: 'globalActivity',
       },
     }),
-    userFeedOnly: createScenario({
+    userFeed: createScenario({
       options: {
         testFuncName: 'userActivity',
       },
