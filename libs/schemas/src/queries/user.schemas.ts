@@ -18,3 +18,16 @@ export const GetNewProfileResp = z.object({
   isOwner: z.boolean(),
   tags: z.array(Tag),
 });
+
+export const GetAddressProfileReq = z.object({
+  addresses: z.array(z.string()),
+  communities: z.array(z.string()),
+});
+
+export const GetAddressProfileResp = z.object({
+  profileId: z.number(),
+  name: z.string(),
+  address: z.string(),
+  lastActive: z.date(),
+  avatarUrl: z.string().optional(),
+});

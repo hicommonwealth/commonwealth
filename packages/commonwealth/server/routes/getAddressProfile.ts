@@ -1,6 +1,11 @@
 import type { DB } from '@hicommonwealth/model';
+import {
+  GetAddressProfileReq,
+  GetAddressProfileResp,
+} from '@hicommonwealth/schemas';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure } from '../types';
 
@@ -9,23 +14,10 @@ export const getAddressProfileValidation = [
   body('addresses').exists().toArray(),
 ];
 
-export type GetAddressProfileReq = {
-  addresses: string[];
-  communities: string[];
-};
-
-type GetAddressProfileResp = {
-  profileId: number;
-  name: string;
-  address: string;
-  lastActive: Date;
-  avatarUrl?: string | null;
-};
-
 const getAddressProfiles = async (
   models: DB,
-  req: TypedRequestBody<GetAddressProfileReq>,
-  res: TypedResponse<GetAddressProfileResp[]>,
+  req: TypedRequestBody<z.infer<typeof GetAddressProfileReq>>,
+  res: TypedResponse<z.infer<typeof GetAddressProfileResp>[]>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -63,7 +55,7 @@ const getAddressProfiles = async (
       name: address.User?.profile.name ?? 'Anonymous',
       address: address.address,
       lastActive: address.last_active ?? address.User?.created_at,
-      avatarUrl: address.User?.profile.avatar_url,
+      avatarUrl: address.User?.profile.avatar_url ?? undefined,
     };
   });
 
