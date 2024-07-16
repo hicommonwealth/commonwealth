@@ -192,6 +192,7 @@ export const UpdateProposalStatusModal = ({
               identifier: String(sn.id),
             })),
           }).then((updatedThread) => {
+            // eslint-disable-next-line no-param-reassign
             links = updatedThread.links;
             return links;
           });
@@ -224,6 +225,7 @@ export const UpdateProposalStatusModal = ({
             })),
             isPWA: isAddedToHomeScreen,
           }).then((updatedThread) => {
+            // eslint-disable-next-line no-param-reassign
             links = updatedThread.links;
             return { toDelete, links };
           });
@@ -241,6 +243,7 @@ export const UpdateProposalStatusModal = ({
               identifier: String(identifier),
             })),
           }).then((updatedThread) => {
+            // eslint-disable-next-line no-param-reassign
             links = updatedThread.links;
             return links;
           });
