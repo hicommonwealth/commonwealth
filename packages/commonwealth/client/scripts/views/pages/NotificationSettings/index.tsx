@@ -6,6 +6,7 @@ import React, { useCallback, useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 // eslint-disable-next-line max-len
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
+import { useUnregisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useUnregisterClientRegistrationTokenMutation';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
@@ -32,6 +33,9 @@ const NotificationSettings = () => {
   const registerClientRegistrationToken =
     useRegisterClientRegistrationTokenMutation();
 
+  const unregisterClientRegistrationToken =
+    useUnregisterClientRegistrationTokenMutation();
+
   const communityAlertsIndex = createIndexForCommunityAlerts(
     (communityAlerts.data as unknown as ReadonlyArray<
       z.infer<typeof CommunityAlert>
@@ -49,7 +53,7 @@ const NotificationSettings = () => {
     [threadsFilter],
   );
 
-  const handlePushNotificationSubscription = useCallback(() => {
+  const handleRegisterPushNotificationSubscription = useCallback(() => {
     async function doAsync() {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
@@ -64,6 +68,22 @@ const NotificationSettings = () => {
 
     doAsync().catch(console.error);
   }, [registerClientRegistrationToken]);
+
+  const handleUnregisterPushNotificationSubscription = useCallback(() => {
+    async function doAsync() {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        console.log('Notification permission granted.');
+        const token = await getFirebaseMessagingToken();
+        await unregisterClientRegistrationToken.mutateAsync({
+          id: 'none',
+          token,
+        });
+      }
+    }
+
+    doAsync().catch(console.error);
+  }, [unregisterClientRegistrationToken]);
 
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
@@ -88,8 +108,13 @@ const NotificationSettings = () => {
 
             <p>
               <CWButton
-                label="Subscribe to Push Notifications"
-                onClick={handlePushNotificationSubscription}
+                label="Register Push Notifications"
+                onClick={handleRegisterPushNotificationSubscription}
+              />
+
+              <CWButton
+                label="Unregister Push Notifications"
+                onClick={handleUnregisterPushNotificationSubscription}
               />
             </p>
           </div>

@@ -34,6 +34,38 @@ function formatScheduleResponse(
 export function KnockProvider(): NotificationsProvider {
   const knock = new Knock(config.NOTIFICATIONS.KNOCK_SECRET_KEY);
 
+  async function getExistingKnockTokensForUser(
+    userId: number,
+    channelId: string,
+  ): Promise<ReadonlyArray<string>> {
+    try {
+      const channelData = await knock.users.getChannelData(
+        `${userId}`,
+        channelId,
+      );
+      return channelData.data.tokens;
+    } catch (e) {
+      // if (e instanceof KnockError && e.statusCode === 404) {
+      //   console.error('Channel data not found (404)');
+      //   // Handle 404 error specifically
+
+      // the knock SDK says it returns '404' if the user does not have channel
+      // data but the typescript SDK doesn't provide the status so there's no
+      // way to find
+      console.warn('Unable to fetch existing tokens: ', e);
+      return [];
+    }
+  }
+
+  function computeChannelId(channelType: 'FCM' | 'APNS'): string | undefined {
+    switch (channelType) {
+      case 'APNS':
+        return config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID;
+
+      case 'FCM':
+        return config.PUSH_NOTIFICATIONS.KNOCK_APNS_CHANNEL_ID;
+    }
+  }
   return {
     name: 'KnockProvider',
     dispose: () => Promise.resolve(),
@@ -85,15 +117,49 @@ export function KnockProvider(): NotificationsProvider {
     async registerClientRegistrationToken(
       userId: number,
       token: string,
+      channelType: 'FCM' | 'APNS',
     ): Promise<boolean> {
-      if (config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID) {
-        await knock.users.setChannelData(
-          `${userId}`,
-          config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID,
-          {
-            tokens: [token],
-          },
+      // TODO: this is wrong too because we support Apple too.
+
+      const channelId = computeChannelId(channelType);
+
+      if (channelId) {
+        const existingTokens = await getExistingKnockTokensForUser(
+          userId,
+          channelId,
         );
+        const tokens: ReadonlyArray<string> = [token, ...existingTokens];
+
+        await knock.users.setChannelData(`${userId}`, channelId, {
+          tokens,
+        });
+        return true;
+      } else {
+        console.warn('Push notifications not enabled');
+        return false;
+      }
+    },
+
+    async unregisterClientRegistrationToken(
+      userId: number,
+      token: string,
+      channelType: 'FCM' | 'APNS',
+    ): Promise<boolean> {
+      const channelId = computeChannelId(channelType);
+
+      if (channelId) {
+        const existingTokens = await getExistingKnockTokensForUser(
+          userId,
+          channelId,
+        );
+
+        const tokens: ReadonlyArray<string> = existingTokens.filter(
+          (current) => current !== token,
+        );
+
+        await knock.users.setChannelData(`${userId}`, channelId, {
+          tokens,
+        });
         return true;
       } else {
         console.warn('Push notifications not enabled');

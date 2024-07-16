@@ -73,3 +73,10 @@ export const RegisterClientRegistrationToken = {
   }),
   output: z.object({}),
 };
+
+export const UnregisterClientRegistrationToken = {
+  input: z.object({
+    token: z.string(),
+  }),
+  output: z.object({}),
+};

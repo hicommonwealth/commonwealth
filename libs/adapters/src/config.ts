@@ -19,6 +19,7 @@ const {
   KNOCK_PUBLIC_API_KEY,
   FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   KNOCK_FCM_CHANNEL_ID,
+  KNOCK_APNS_CHANNEL_ID,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
   LOAD_TESTING_AUTH_TOKEN,
@@ -56,6 +57,7 @@ export const config = configure(
       FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED:
         FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED === 'true',
       KNOCK_FCM_CHANNEL_ID,
+      KNOCK_APNS_CHANNEL_ID,
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
     },
@@ -150,6 +152,10 @@ export const config = configure(
           .describe(
             'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
           ),
+        KNOCK_APNS_CHANNEL_ID: z
+          .string()
+          .optional()
+          .describe('The Apple channel identifier for Safari/iOS users.'),
         KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY: z
           .string()
           .optional()
@@ -177,6 +183,7 @@ export const config = configure(
           if (data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED) {
             return (
               data.KNOCK_FCM_CHANNEL_ID &&
+              data.KNOCK_APNS_CHANNEL_ID &&
               data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY &&
               data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG
             );
@@ -188,6 +195,7 @@ export const config = configure(
             'FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED requires additional properties.  See paths.',
           path: [
             'KNOCK_FCM_CHANNEL_ID',
+            'KNOCK_APNS_CHANNEL_ID',
             'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY',
             'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG',
           ],
