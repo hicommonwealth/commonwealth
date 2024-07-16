@@ -232,7 +232,7 @@ async function loginExistingMagicUser({
                  JOIN "Addresses" A ON A.id = S.address_id
         WHERE S.issuer = :magicIssuer
           AND A.address = :publicAddress
-        LIMIT 1;
+        LIMIT 1 FOR UPDATE;
     `,
       {
         type: QueryTypes.SELECT,
@@ -241,6 +241,7 @@ async function loginExistingMagicUser({
           magicIssuer: decodedMagicToken.issuer,
           publicAddress: decodedMagicToken.publicAddress,
         },
+        transaction,
       },
     );
 
@@ -266,6 +267,7 @@ async function loginExistingMagicUser({
             issuer: decodedMagicToken.issuer,
             address_id: ssoToken.address_id,
           },
+          transaction,
         },
       );
       log.trace('SSO TOKEN HANDLED NORMALLY');
