@@ -1,6 +1,9 @@
-import { events, logger, Policy } from '@hicommonwealth/core';
+import { Actor, events, logger, Policy } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
+import { config, Contest, tokenBalanceCache } from '..';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
 import { buildThreadContentUrl } from '../utils';
@@ -32,40 +35,14 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload.id!,
         );
 
-        const activeContestManagers = await models.sequelize.query<{
-          contest_address: string;
-          url: string;
-          private_url: string;
-        }>(
-          `
-            SELECT COALESCE(cn.private_url, cn.url) as url, cm.contest_address
-            FROM "Communities" c
-            JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
-            JOIN "ContestManagers" cm ON cm.community_id = c.id
-            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
-            JOIN (
-                SELECT contest_address, MAX(contest_id) AS max_contest_id, MAX(end_time) as end_time
-                FROM "Contests"
-                GROUP BY contest_address
-            ) co ON cm.contest_address = co.contest_address
-            WHERE ct.topic_id = :topic_id
-            AND cm.community_id = :community_id
-            AND cm.cancelled = false
-            AND (
-              cm.interval = 0 AND NOW() < co.end_time
-              OR
-              cm.interval > 0
-            )
-        `,
-          {
-            type: QueryTypes.SELECT,
-            replacements: {
-              topic_id: payload.topic_id!,
+        const activeContestManagers =
+          await Contest.GetActiveContestManagers().body({
+            actor: {} as Actor,
+            payload: {
               community_id: payload.community_id,
+              topic_id: payload.topic_id,
             },
-          },
-        );
-
+          });
         if (!activeContestManagers?.length) {
           log.warn('ThreadCreated: no matching contest managers found');
           return;
@@ -73,9 +50,46 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const chainNodeUrl = activeContestManagers[0]!.url;
 
-        const addressesToProcess = activeContestManagers.map(
-          (c) => c.contest_address,
+        // ensure that user has non-dust ETH value
+        const balances = await tokenBalanceCache.getBalances({
+          balanceSourceType: BalanceSourceType.ETHNative,
+          addresses: [userAddress],
+          sourceOptions: {
+            evmChainId: activeContestManagers[0]!.eth_chain_id,
+          },
+          cacheRefresh: true,
+        });
+        const minUserEthBigNumber = BigNumber.from(
+          (config.CONTESTS.MIN_USER_ETH * 1e18).toFixed(),
         );
+        if (BigNumber.from(balances[userAddress]).lt(minUserEthBigNumber)) {
+          log.warn(
+            `ThreadCreated: user ETH balance insufficient (${balances[userAddress]} of ${minUserEthBigNumber})`,
+          );
+          return;
+        }
+
+        const addressesToProcess = activeContestManagers
+          .filter((c) => {
+            // only process contest managers for which
+            // the user has not exceeded the post limit
+            // on the latest contest
+            const postsInContest = c.actions.filter(
+              (action) =>
+                action.actor_address === userAddress &&
+                action.action === 'added',
+            );
+            const quotaReached =
+              postsInContest.length >=
+              config.CONTESTS.MAX_USER_POSTS_PER_CONTEST;
+            if (quotaReached) {
+              log.warn(
+                `ThreadCreated: user reached post limit for contest ${c.contest_address} (ID ${c.max_contest_id})`,
+              );
+            }
+            return !quotaReached;
+          })
+          .map((c) => c.contest_address);
 
         log.debug(
           `ThreadCreated: addresses to process: ${JSON.stringify(

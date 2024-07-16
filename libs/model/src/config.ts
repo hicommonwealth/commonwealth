@@ -10,6 +10,7 @@ const {
   TBC_BALANCE_TTL_SECONDS,
   ALLOWED_EVENTS,
   INIT_TEST_DB,
+  MAX_USER_POSTS_PER_CONTEST,
 } = process.env;
 
 const NAME =
@@ -41,6 +42,12 @@ export const config = configure(
     OUTBOX: {
       ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
     },
+    CONTESTS: {
+      MIN_USER_ETH: 0.0005,
+      MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
+        ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
+        : 2,
+    },
   },
   z.object({
     DB: z.object({
@@ -58,6 +65,10 @@ export const config = configure(
     }),
     OUTBOX: z.object({
       ALLOWED_EVENTS: z.array(z.string()),
+    }),
+    CONTESTS: z.object({
+      MIN_USER_ETH: z.number(),
+      MAX_USER_POSTS_PER_CONTEST: z.number().int(),
     }),
   }),
 );
