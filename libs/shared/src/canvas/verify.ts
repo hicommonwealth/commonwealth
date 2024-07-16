@@ -44,12 +44,12 @@ export const verify = async ({
   ed25519.verify(sessionMessageSignature, sessionMessage);
 
   // if the session has an expiry, assert that the session is not expired
-  if (sessionMessage.payload.context.duration !== null) {
+  if (sessionMessage.payload.context.duration !== undefined) {
     const sessionExpirationTime =
       sessionMessage.payload.context.timestamp +
-      (sessionMessage.payload.context.duration ?? 0);
+      sessionMessage.payload.context.duration;
     assert(
-      actionMessage.payload.context.timestamp < sessionExpirationTime,
+      actionMessage.payload.context.timestamp <= sessionExpirationTime,
       'Invalid action: Signed by a session that was expired at the time of action',
     );
   }
