@@ -92,6 +92,11 @@ fi
 
 echo "Configured Options = Cloud: $CLOUD - Scenario: $SCENARIO - App: $APP_ENVIRONMENT"
 
+LOAD_TESTING_AUTH_TOKEN="testing"
+if [[ "$APP_ENVIRONMENT" != "local" ]]; then
+  LOAD_TESTING_AUTH_TOKEN=$(heroku config:get LOAD_TESTING_AUTH_TOKEN -a commonwealth-"$APP_ENVIRONMENT")
+fi
+
 K6_PROJECT_ID=3704072
 if [[ "$CLOUD" = "cloud" ]]; then
   if [[ "$APP_ENVIRONMENT" = "frick" ]]; then
@@ -113,13 +118,20 @@ else
   SERVER_URL=$(heroku config:get SERVER_URL -a commonwealth-"$APP_ENVIRONMENT")
 fi
 
+
 if [ "$NATIVE_K6" ]; then
   K6_VERSION=$(k6 --version 2>&1)
   echo "Running tests using native $K6_VERSION"
   if [ "$CLOUD" = "true" ]; then
-    K6_CLOUD_PROJECT_ID=$K6_PROJECT_ID k6 cloud -e SERVER_URL="$SERVER_URL" -e SCENARIO="$SCENARIO" --compatibility-mode=experimental_enhanced "$TEST_FILEPATH"
+    K6_CLOUD_PROJECT_ID=$K6_PROJECT_ID k6 cloud \
+      -e SERVER_URL="$SERVER_URL" -e SCENARIO="$SCENARIO" -e LOAD_TESTING_AUTH_TOKEN="$LOAD_TESTING_AUTH_TOKEN" \
+      --compatibility-mode=experimental_enhanced \
+      "$TEST_FILEPATH"
   else
-    K6_OUT=influxdb=http://localhost:8086/k6 k6 run -e SERVER_URL="$SERVER_URL" -e SCENARIO="$SCENARIO" --compatibility-mode=experimental_enhanced "$TEST_FILEPATH"
+    K6_OUT=influxdb=http://localhost:8086/k6 k6 run \
+      -e SERVER_URL="$SERVER_URL" -e SCENARIO="$SCENARIO" -e LOAD_TESTING_AUTH_TOKEN="$LOAD_TESTING_AUTH_TOKEN" \
+      --compatibility-mode=experimental_enhanced \
+      "$TEST_FILEPATH"
   fi
 
 else
@@ -130,10 +142,17 @@ else
 
     run_docker_command run --entrypoint /bin/sh -v "${PWD}"/test:/test --name $K6_DOCKER_CONTAINER_NAME -i grafana/k6:0.52.0-with-browser -c "
       k6 login cloud --token '${K6_CLOUD_PERSONAL_TOKEN}' &&
-      K6_CLOUD_PROJECT_ID=$K6_PROJECT_ID k6 cloud -e SERVER_URL='$SERVER_URL' -e SCENARIO='$SCENARIO' --compatibility-mode=experimental_enhanced '/$TEST_FILEPATH'
+      K6_CLOUD_PROJECT_ID=$K6_PROJECT_ID k6 cloud \
+        -e SERVER_URL='$SERVER_URL' -e SCENARIO='$SCENARIO' -e LOAD_TESTING_AUTH_TOKEN='$LOAD_TESTING_AUTH_TOKEN' \
+        --compatibility-mode=experimental_enhanced \
+        '/$TEST_FILEPATH'
     "
   else
-    run_docker_command run --rm -v "${PWD}"/test:/test -i grafana/k6:0.52.0-with-browser run -e SERVER_URL="$SERVER_URL" -e SCENARIO="$SCENARIO" -o influxdb=http://host.docker.internal:8086 --compatibility-mode=experimental_enhanced "/$TEST_FILEPATH"
+    run_docker_command run --rm -v "${PWD}"/test:/test -i grafana/k6:0.52.0-with-browser run \
+      -e SERVER_URL="$SERVER_URL" -e SCENARIO="$SCENARIO" -e LOAD_TESTING_AUTH_TOKEN="$LOAD_TESTING_AUTH_TOKEN" \
+      -o influxdb=http://host.docker.internal:8086 \
+      --compatibility-mode=experimental_enhanced \
+      "/$TEST_FILEPATH"
   fi
 fi
 
