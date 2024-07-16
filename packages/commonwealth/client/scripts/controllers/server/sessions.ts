@@ -79,7 +79,7 @@ export async function getSessionFromWallet(
   }
 }
 
-function getCaip2Address(address: string) {
+function getDidForCurrentAddress(address: string) {
   const caip2Prefix = chainBaseToCaip2(app.chain.base);
 
   const idOrPrefix =
@@ -88,7 +88,7 @@ function getCaip2Address(address: string) {
       : app.chain?.meta.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(app.chain.base, idOrPrefix);
 
-  return `${caip2Prefix}:${canvasChainId}:${address}`;
+  return `did:pkh:${caip2Prefix}:${canvasChainId}:${address}`;
 }
 
 // Sign an arbitrary action, using context from the last authSession() call.
@@ -102,14 +102,19 @@ async function sign(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
 ): Promise<CanvasSignResult | null> {
-  const address = getCaip2Address(address_);
+  const did = getDidForCurrentAddress(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
-    if (signer.match(address)) {
-      let lookupAddress = address;
+    if (signer.match(did)) {
+      let lookupDid = did;
 
-      const [chainBaseFromAddress, chainIdFromAddress, walletAddress] =
-        address.split(':');
+      const [
+        _did,
+        _pkh,
+        chainBaseFromAddress,
+        chainIdFromAddress,
+        walletAddress,
+      ] = did.split(':');
 
       // if using polkadot, we need to convert the address so that it has the prefix 42
       if (chainBaseFromAddress === 'polkadot') {
@@ -117,11 +122,11 @@ async function sign(
           address: walletAddress,
           currentPrefix: 42,
         });
-        lookupAddress = `polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
+        lookupDid = `did:pkh:polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
       }
 
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
-        address: lookupAddress,
+        did,
       });
 
       const config = fetchCachedConfiguration();
@@ -132,7 +137,7 @@ async function sign(
         }
         throw new SessionKeyError({
           name: 'Authentication Error',
-          message: `No session found for address ${address}`,
+          message: `No session found for ${did}`,
           address: walletAddress,
           ssoSource: WalletSsoSource.Unknown,
         });
@@ -149,7 +154,7 @@ async function sign(
           }
           throw new SessionKeyError({
             name: 'Authentication Error',
-            message: `Session expired for address ${address}`,
+            message: `Session expired for ${did}`,
             address: walletAddress,
             ssoSource: WalletSsoSource.Unknown,
           });
@@ -193,7 +198,7 @@ async function sign(
       };
     }
   }
-  throw new Error(`No signer found for address ${address}`);
+  throw new Error(`No signer found for ${did}`);
 }
 
 // Public signer methods

@@ -55,12 +55,12 @@ function parseAddress(address: string): [chain: string, walletAddress: string] {
  * since we don't know the chain ID, but also don't want to reencode the chain address
  */
 export class CosmosSignerCW extends CosmosSigner {
-  public async getAddress(): Promise<string> {
+  public async getDid(): Promise<string> {
     const chainId = await this._signer.getChainId();
     const walletAddress = await this._signer.getAddress(chainId);
     const { data } = fromBech32(walletAddress);
     const walletAddressWithPrefix = toBech32(this.bech32Prefix, data);
-    return `cosmos:cosmoshub-1:${walletAddressWithPrefix}`;
+    return `did:pkh:cosmos:cosmoshub-1:${walletAddressWithPrefix}`;
   }
 
   // Use this._signer.getChainId() instead of the chainId inferred from the CAIP-2 address
