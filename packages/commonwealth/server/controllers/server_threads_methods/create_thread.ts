@@ -1,12 +1,14 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
-import { AppError } from '@hicommonwealth/core';
+import { Actor, AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
+  Contest,
   ThreadAttributes,
   UserInstance,
+  config,
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
@@ -34,6 +36,7 @@ export const Errors = {
   FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
   NoBody: 'Thread body cannot be blank',
+  PostLimitReached: 'Post limit reached',
 };
 
 export type CreateThreadOptions = {
@@ -106,6 +109,30 @@ export async function __createThread(
   });
   if (!canInteract) {
     throw new AppError(`Ban error: ${banError}`);
+  }
+
+  // check contest limits
+  const activeContestManagers = await Contest.GetActiveContestManagers().body({
+    actor: {} as Actor,
+    payload: {
+      community_id: community.id!,
+      topic_id: topicId!,
+    },
+  });
+  if (activeContestManagers.length > 0) {
+    const validActiveContests = activeContestManagers.filter((c) => {
+      const userPostsInContest = c.actions.filter(
+        (action) =>
+          action.actor_address === address.address && action.action === 'added',
+      );
+      const quotaReached =
+        userPostsInContest.length >= config.CONTESTS.MAX_USER_POSTS_PER_CONTEST;
+      return !quotaReached;
+    });
+    if (validActiveContests.length === 0) {
+      // limit reached for all active contests
+      throw new AppError(Errors.PostLimitReached);
+    }
   }
 
   // Render a copy of the thread to plaintext for the search indexer

@@ -74,13 +74,13 @@ export function ContestWorker(): Policy<typeof inputs> {
             // only process contest managers for which
             // the user has not exceeded the post limit
             // on the latest contest
-            const postsInContest = c.actions.filter(
+            const userPostsInContest = c.actions.filter(
               (action) =>
                 action.actor_address === userAddress &&
                 action.action === 'added',
             );
             const quotaReached =
-              postsInContest.length >=
+              userPostsInContest.length >=
               config.CONTESTS.MAX_USER_POSTS_PER_CONTEST;
             if (quotaReached) {
               log.warn(
