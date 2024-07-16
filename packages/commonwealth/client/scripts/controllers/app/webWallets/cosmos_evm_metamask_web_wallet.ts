@@ -5,7 +5,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import type Web3 from 'web3';
 
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import { CosmosSignerCW } from '@hicommonwealth/shared';
 import { userStore } from 'state/ui/user';
 import { Transaction, Web3BaseProvider } from 'web3';
 import IWebWallet from '../../../models/IWebWallet';

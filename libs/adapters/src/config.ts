@@ -1,6 +1,10 @@
 import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
+const DEFAULTS = {
+  LOAD_TESTING_AUTH_TOKEN: 'testing',
+};
+
 const {
   MIXPANEL_PROD_TOKEN,
   MIXPANEL_DEV_TOKEN,
@@ -17,6 +21,7 @@ const {
   KNOCK_FCM_CHANNEL_ID,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
+  LOAD_TESTING_AUTH_TOKEN,
 } = process.env;
 
 export const config = configure(
@@ -53,6 +58,9 @@ export const config = configure(
       KNOCK_FCM_CHANNEL_ID,
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
+    },
+    LOAD_TESTING: {
+      AUTH_TOKEN: LOAD_TESTING_AUTH_TOKEN || DEFAULTS.LOAD_TESTING_AUTH_TOKEN,
     },
   },
   z.object({
@@ -189,5 +197,25 @@ export const config = configure(
       MIXPANEL_PROD_TOKEN: z.string().optional(),
       MIXPANEL_DEV_TOKEN: z.string().optional(),
     }),
+    LOAD_TESTING: z
+      .object({
+        AUTH_TOKEN: z.string().optional(),
+      })
+      .refine(
+        (data) => {
+          if (target.NODE_ENV === 'production') {
+            return (
+              !!LOAD_TESTING_AUTH_TOKEN &&
+              data.AUTH_TOKEN !== DEFAULTS.LOAD_TESTING_AUTH_TOKEN
+            );
+          }
+          return true;
+        },
+        {
+          message:
+            'LOAD_TESTING_AUTH_TOKEN must be set in production environments',
+          path: ['AUTH_TOKEN'],
+        },
+      ),
   }),
 );

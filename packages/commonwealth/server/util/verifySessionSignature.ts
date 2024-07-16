@@ -1,18 +1,19 @@
 import { Session } from '@canvas-js/interfaces';
 import assert from 'assert';
 
-import { NotificationCategories } from '@hicommonwealth/shared';
+import {
+  CANVAS_TOPIC,
+  NotificationCategories,
+  getSessionSignerForAddress,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { getSessionSignerForAddress } from 'shared/canvas/verify';
 
 import {
+  incrementProfileCount,
   type AddressInstance,
   type DB,
   type ProfileAttributes,
 } from '@hicommonwealth/model';
-
-import { incrementProfileCount } from '@hicommonwealth/model';
-import { CANVAS_TOPIC } from '../../shared/canvas';
 
 /**
  * Verify the session signature is valid for the address model,

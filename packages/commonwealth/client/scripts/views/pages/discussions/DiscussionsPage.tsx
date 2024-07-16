@@ -21,7 +21,6 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
@@ -30,6 +29,7 @@ import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -40,7 +40,6 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
@@ -154,6 +153,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useManageDocumentTitle('Discussions');
 
+  const activeContestsInTopic = contestsData?.filter((contest) => {
+    const isContestInTopic = (contest.topics || []).find(
+      (topic) => topic.id === topicId,
+    );
+    const isActive = isContestActive({ contest });
+    return isContestInTopic && isActive;
+  });
+
   return (
     // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
@@ -193,7 +200,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadTopicGated: isRestrictedMembership,
           });
 
-          const isTopicInContest = checkIsTopicInContest(
+          const isThreadTopicInContest = checkIsTopicInContest(
             contestsData,
             thread?.topic?.id,
           );
@@ -220,7 +227,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideRecentComments
-              editingDisabled={isTopicInContest}
+              editingDisabled={isThreadTopicInContest}
             />
           );
         }}
@@ -240,7 +247,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           Header: () => (
             <>
               <Breadcrumbs />
-              {userOnboardingEnabled && <UserTrainingSlider />}
+              <UserTrainingSlider />
               <AdminOnboardingSlider />
 
               <HeaderWithFilters
@@ -261,6 +268,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 isIncludingArchivedThreads={includeArchivedThreads}
                 onIncludeArchivedThreads={setIncludeArchivedThreads}
                 isOnArchivePage={isOnArchivePage}
+                activeContests={activeContestsInTopic}
               />
             </>
           ),
