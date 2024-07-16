@@ -1,7 +1,6 @@
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import { useWelcomeOnboardModal } from 'client/scripts/state/ui/modals';
+import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useEffect, useState } from 'react';
+import { useWelcomeOnboardModal } from 'state/ui/modals';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
 import { AuthTypeGuidanceModal } from './AuthTypeGuidanceModal';
@@ -17,7 +16,6 @@ const AuthModal = ({
   showWalletsFor,
   onSignInClick,
 }: AuthModalProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [modalType, setModalType] = useState(type);
   const { setIsWelcomeOnboardModalOpen } = useWelcomeOnboardModal();
 
@@ -40,11 +38,7 @@ const AuthModal = ({
     const userUniqueAddresses = getUniqueUserAddresses({});
 
     // open welcome modal only if there is a single connected address
-    if (
-      userOnboardingEnabled &&
-      isNewlyCreated &&
-      userUniqueAddresses.length === 1
-    ) {
+    if (isNewlyCreated && userUniqueAddresses.length === 1) {
       // using timeout to make the modal transition smooth
       setTimeout(() => {
         setIsWelcomeOnboardModalOpen(true);

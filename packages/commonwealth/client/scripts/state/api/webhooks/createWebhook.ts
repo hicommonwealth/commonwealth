@@ -3,6 +3,7 @@ import axios from 'axios';
 import Webhook from 'models/Webhook';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface CreateWebhookProps {
   communityId: string;
@@ -17,7 +18,7 @@ const createWebhook = async ({
     chain: communityId,
     webhookUrl,
     auth: true,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   const newWebhook = response.data.result;

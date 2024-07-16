@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import _ from 'lodash';
 import { ZodType, z } from 'zod';
 
 dotenv.config({ path: '../../.env' });
@@ -19,7 +20,7 @@ export const configure = <T, E extends Record<string, unknown>>(
   extend: Readonly<E>,
   schema: ZodType<E>,
 ): Readonly<T & E> =>
-  Object.assign(target || {}, schema.parse(extend)) as Readonly<T & E>;
+  _.merge(target || {}, schema.parse(extend)) as Readonly<T & E>;
 
 const {
   NODE_ENV,

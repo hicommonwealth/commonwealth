@@ -5,8 +5,12 @@ import type {
 } from '@cosmjs/proto-signing';
 import type { ChainInfo } from '@keplr-wallet/types';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import {
+  ChainBase,
+  ChainNetwork,
+  CosmosSignerCW,
+  WalletId,
+} from '@hicommonwealth/shared';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -87,7 +91,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix || 'osmo',
+      bech32Prefix: app.chain?.meta?.bech32Prefix || 'osmo',
       signer: {
         type: 'amino',
         signAmino: window.wallet.signAmino,
@@ -128,14 +132,14 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
+        const bech32Prefix = app.chain?.meta?.bech32Prefix?.toLowerCase();
         const info: ChainInfo = {
           chainId: this._chainId,
-          chainName: app.chain.meta.name,
+          chainName: app.chain?.meta?.name,
           rpc: url,
           // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
           // use the RPC url as hack, which will break some querying functionality but not signing.
-          rest: app.chain.meta.node.altWalletUrl || url,
+          rest: app.chain?.meta?.node?.altWalletUrl || url,
           bip44: {
             coinType: 118,
           },
@@ -149,23 +153,23 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
           },
           currencies: [
             {
-              coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: app.chain.meta.decimals || 6,
+              coinDenom: app.chain?.meta?.default_symbol,
+              coinMinimalDenom: `u${app.chain?.meta?.default_symbol?.toLowerCase()}`,
+              coinDecimals: app.chain?.meta?.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
-              coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: app.chain.meta.decimals || 6,
+              coinDenom: app.chain?.meta?.default_symbol,
+              coinMinimalDenom: `u${app.chain?.meta?.default_symbol?.toLowerCase()}`,
+              coinDecimals: app.chain?.meta?.decimals || 6,
               gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
             },
           ],
           stakeCurrency: {
-            coinDenom: app.chain.meta.default_symbol,
-            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-            coinDecimals: app.chain.meta.decimals || 6,
+            coinDenom: app.chain?.meta?.default_symbol,
+            coinMinimalDenom: `u${app.chain?.meta?.default_symbol?.toLowerCase()}`,
+            coinDecimals: app.chain?.meta?.decimals || 6,
           },
           features: [],
         };

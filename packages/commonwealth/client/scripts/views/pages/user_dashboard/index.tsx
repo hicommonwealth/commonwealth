@@ -1,4 +1,3 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -37,12 +36,11 @@ const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowExtraSmall } = useBrowserWindow({});
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   useStickyHeader({
     elementId: 'dashboard-header',
     zIndex: 70,
     // To account for new authentication buttons, shown in small screen sizes
-    top: !isLoggedIn && userOnboardingEnabled ? 68 : 0,
+    top: !isLoggedIn ? 68 : 0,
     stickyBehaviourEnabled: !!isWindowExtraSmall,
   });
 

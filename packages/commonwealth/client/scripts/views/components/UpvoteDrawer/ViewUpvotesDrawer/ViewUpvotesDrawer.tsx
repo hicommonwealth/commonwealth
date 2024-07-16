@@ -1,20 +1,19 @@
-import Account from 'client/scripts/models/Account';
-import AddressInfo from 'client/scripts/models/AddressInfo';
-import MinimumProfile from 'client/scripts/models/MinimumProfile';
+import { APIOrderDirection } from 'helpers/constants';
+import Account from 'models/Account';
+import AddressInfo from 'models/AddressInfo';
+import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
+import app from 'state';
+import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
 } from '../../component_kit/new_designs/CWDrawer';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
-import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
-
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import app from 'state';
-import { User } from 'views/components/user/user';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
+import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 import './ViewUpvotesDrawer.scss';
 
 type Profile = Account | AddressInfo | MinimumProfile;

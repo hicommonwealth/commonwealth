@@ -1,8 +1,12 @@
 declare let window: any;
 
 import { SolanaSigner } from '@canvas-js/chain-solana';
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { SOLANA_MAINNET_CHAIN_ID } from 'shared/canvas/chainMappings';
+import {
+  ChainBase,
+  ChainNetwork,
+  SOLANA_MAINNET_CHAIN_ID,
+  WalletId,
+} from '@hicommonwealth/shared';
 import IWebWallet from '../../../models/IWebWallet';
 
 class PhantomWebWalletController implements IWebWallet<string> {
@@ -68,6 +72,11 @@ class PhantomWebWalletController implements IWebWallet<string> {
       this._enabled = true;
     } catch (err) {
       this._enabling = false;
+      if (!window.solana.isConnected) {
+        throw new Error(
+          'No Phantom accounts found! Please setup your Phantom wallet and try again.',
+        );
+      }
       throw new Error('Could not connect to Phantom wallet!');
     }
   }

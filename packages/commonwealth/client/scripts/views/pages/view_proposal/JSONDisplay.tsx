@@ -1,6 +1,6 @@
 import { ChainNetwork } from '@hicommonwealth/shared';
-import { CoinObject } from 'client/scripts/controllers/chain/cosmos/types';
 import 'components/proposals/json_display.scss';
+import { CoinObject } from 'controllers/chain/cosmos/types';
 import React from 'react';
 import app from 'state';
 import { CWDivider } from '../../components/component_kit/cw_divider';

@@ -1,11 +1,11 @@
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useEffect, useMemo, useState } from 'react';
-import app from 'state';
+import useUserStore from 'state/ui/user';
 
 const useUserAddressesForFundForm = () => {
-  const { activeAccount } = useUserActiveAccount();
+  const user = useUserStore();
+  const activeAccount = user.activeAccount;
 
-  const addressOptions = app?.user?.activeAccounts?.map((account) => ({
+  const addressOptions = user.accounts.map((account) => ({
     value: String(account.address),
     label: account.address,
   }));
@@ -13,7 +13,7 @@ const useUserAddressesForFundForm = () => {
   const activeAccountOption = useMemo(
     () => ({
       value: String(activeAccount?.address),
-      label: activeAccount?.address,
+      label: activeAccount?.address || '',
     }),
     [activeAccount?.address],
   );

@@ -4,6 +4,7 @@ import { MutableRefObject, useCallback } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import {
   SerializableDeltaStatic,
   VALID_IMAGE_TYPES,
@@ -24,6 +25,8 @@ export const useImageDropAndPaste = ({
   setIsUploading,
   setContentDelta,
 }: UseImageDropAndPasteProps) => {
+  const user = useUserStore();
+
   // must be memoized or else infinite loop
   const handleImageDropAndPaste = useCallback(
     async (imageDataUrl, imageType) => {
@@ -54,17 +57,13 @@ export const useImageDropAndPaste = ({
           }
           return true;
         });
-        setContentDelta({
-          ops: opsWithoutBase64Images,
-          ___isMarkdown: true,
-        } as SerializableDeltaStatic);
 
         const file = base64ToFile(imageDataUrl, imageType);
 
         const uploadedFileUrl = await uploadFileToS3(
           file,
           app.serverUrl(),
-          app.user.jwt,
+          user.jwt || '',
         );
 
         const selectedIndex = editor.getSelection()?.index;
@@ -73,6 +72,7 @@ export const useImageDropAndPaste = ({
         editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
 
         setContentDelta({
+          ops: opsWithoutBase64Images,
           ...editor.getContents(),
           ___isMarkdown: true,
         } as SerializableDeltaStatic); // sync state with editor content
@@ -84,7 +84,7 @@ export const useImageDropAndPaste = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading],
+    [editorRef, setContentDelta, setIsUploading, user.jwt],
   );
 
   return { handleImageDropAndPaste };

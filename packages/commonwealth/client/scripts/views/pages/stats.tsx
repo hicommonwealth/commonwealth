@@ -3,6 +3,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/stats.scss';
 import React, { useState } from 'react';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
@@ -98,7 +99,7 @@ const StatsPage = () => {
         const response = await axios.get(`${app.serverUrl()}/communityStats`, {
           params: {
             chain: app.activeChainId(),
-            jwt: app.user?.jwt,
+            jwt: userStore.getState().jwt,
           },
         });
 
@@ -137,7 +138,7 @@ const StatsPage = () => {
       }
     };
 
-    if (app.user && app.activeChainId()) {
+    if (app.activeChainId()) {
       fetch();
     }
   }, []);

@@ -1,7 +1,7 @@
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';

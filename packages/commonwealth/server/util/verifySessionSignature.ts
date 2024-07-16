@@ -1,16 +1,19 @@
 import { Session } from '@canvas-js/interfaces';
 import assert from 'assert';
 
-import { NotificationCategories } from '@hicommonwealth/shared';
+import {
+  CANVAS_TOPIC,
+  NotificationCategories,
+  getSessionSignerForAddress,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { getSessionSignerForAddress } from 'shared/canvas/verify';
 
 import {
+  incrementProfileCount,
   type AddressInstance,
   type DB,
   type ProfileAttributes,
 } from '@hicommonwealth/model';
-import { CANVAS_TOPIC } from '../../shared/canvas';
 
 /**
  * Verify the session signature is valid for the address model,
@@ -57,9 +60,23 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
-        const user = await models.User.createWithProfile?.({
-          email: null,
-          profile: {},
+        const user = await models.sequelize.transaction(async (transaction) => {
+          const userEntity = await models.User.createWithProfile?.(
+            {
+              email: null,
+              profile: {},
+            },
+            { transaction },
+          );
+
+          await incrementProfileCount(
+            models,
+            addressModel.community_id,
+            userEntity!.id!,
+            transaction,
+          );
+
+          return userEntity;
         });
         if (!user || !user.id) throw new Error('Failed to create user');
         addressModel.profile_id = (user!.Profiles?.[0] as ProfileAttributes).id;
