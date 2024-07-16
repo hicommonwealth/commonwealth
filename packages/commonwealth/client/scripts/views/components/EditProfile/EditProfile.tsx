@@ -272,10 +272,10 @@ const EditProfile = () => {
         <div className="EditProfile">
           <CWForm
             initialValues={{
-              username: data?.profile?.profile_name || '',
+              username: data?.profile?.name || '',
               email: data?.profile?.email || '',
               backgroundImg: data?.profile?.background_image?.url || '',
-              bio: deserializeDelta(data?.profile?.bio),
+              bio: deserializeDelta(data?.profile?.bio ?? ''),
             }}
             onSubmit={handleSubmit}
             validationSchema={editProfileValidation}

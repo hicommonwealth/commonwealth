@@ -45,7 +45,6 @@ const verifySessionSignature = async (
 
   if (user_id === null || user_id === undefined) {
     // mark the address as verified, and if it doesn't have an associated user, create a new user
-    // @ts-expect-error StrictNullChecks
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     if (!addressModel.user_id) {
@@ -71,7 +70,7 @@ const verifySessionSignature = async (
 
           await incrementProfileCount(
             models,
-            addressModel.community_id,
+            addressModel.community_id!,
             userEntity!.id!,
             transaction,
           );
@@ -95,7 +94,6 @@ const verifySessionSignature = async (
     }
   } else {
     // mark the address as verified
-    // @ts-expect-error StrictNullChecks
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     addressModel.user_id = user_id;

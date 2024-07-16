@@ -172,7 +172,6 @@ export async function __createThreadComment(
     // @ts-expect-error StrictNullChecks
     address_id: address.id,
     community_id: thread.community_id,
-    // @ts-expect-error StrictNullChecks
     parent_id: null,
     // @ts-expect-error <StrictNullChecks>
     canvas_signed_data: canvasSignedData,
@@ -220,7 +219,7 @@ export async function __createThreadComment(
             category_id: NotificationCategories.NewReaction,
             // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
-            comment_id: comment.id,
+            comment_id: comment.id!,
             is_active: true,
           },
           {
@@ -229,7 +228,7 @@ export async function __createThreadComment(
             category_id: NotificationCategories.NewComment,
             // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
-            comment_id: comment.id,
+            comment_id: comment.id!,
             is_active: true,
           },
         ],
@@ -273,7 +272,7 @@ export async function __createThreadComment(
         // @ts-expect-error StrictNullChecks
         community_id: comment.community_id,
         author_address: address.address,
-        author_community_id: address.community_id,
+        author_community_id: address.community_id!,
       },
     },
     excludeAddresses: rootNotifExcludeAddresses,
@@ -298,7 +297,7 @@ export async function __createThreadComment(
           // @ts-expect-error StrictNullChecks
           community_id: comment.community_id,
           author_address: address.address,
-          author_community_id: address.community_id,
+          author_community_id: address.community_id!,
         },
       },
       excludeAddresses: excludedAddrs,

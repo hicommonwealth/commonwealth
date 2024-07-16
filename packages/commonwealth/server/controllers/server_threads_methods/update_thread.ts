@@ -468,7 +468,6 @@ export async function __updateThread(
   ).map((c) => {
     const temp = {
       ...c,
-      ...(c?.Address?.Profile || {}),
       address: c?.Address?.address || '',
     };
 

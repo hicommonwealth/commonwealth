@@ -1,6 +1,7 @@
 import { ThresholdData } from './protocol';
 
-export type Role = 'admin' | 'moderator' | 'member';
+export const Roles = ['admin', 'moderator', 'member'] as const;
+export type Role = typeof Roles[number];
 
 export enum DefaultPage {
   Discussions = 'default_all_discussions_view',

@@ -140,7 +140,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
     const communityRole: CommunityRoleAttributes = {
       id: a.id,
       name: a.role,
-      community_id: a.community_id,
+      community_id: a.community_id!,
       allow: 0 as any,
       deny: 0 as any,
       created_at: a.created_at,

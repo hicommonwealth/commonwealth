@@ -1,3 +1,4 @@
+import { Roles, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
@@ -66,11 +67,11 @@ export const Address = z.object({
   is_validator: z.boolean().optional(),
   ghost_address: z.boolean().optional(),
   profile_id: PG_INT.nullish().optional(),
-  wallet_id: z.string().max(255).optional(),
+  wallet_id: z.nativeEnum(WalletId).optional(),
   block_info: z.string().max(255).optional(),
   is_user_default: z.boolean().optional(),
-  role: z.enum(['member', 'admin', 'moderator']).default('member'),
-  wallet_sso_source: z.string().max(255).optional(),
+  role: z.enum(Roles).default('member'),
+  wallet_sso_source: z.nativeEnum(WalletSsoSource).optional(),
   hex: z.string().max(64).optional(),
   created_at: z.any(),
   updated_at: z.any(),
