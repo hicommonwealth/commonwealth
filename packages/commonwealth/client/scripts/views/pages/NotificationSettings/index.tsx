@@ -15,6 +15,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from 'views/pages/404';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
+import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
@@ -105,6 +106,8 @@ const NotificationSettings = () => {
         {enableKnockPushNotifications && (
           <div>
             <CWText type="h5">Push Notifications</CWText>
+
+            <PushNotificationsToggle />
 
             <p>
               <CWButton
