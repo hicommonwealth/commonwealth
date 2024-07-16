@@ -1,23 +1,27 @@
+import clsx from 'clsx';
 import moment from 'moment';
 import React from 'react';
 
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
+import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
+import { isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
@@ -51,9 +55,11 @@ interface ContestCardProps {
   ticker?: string;
   isAdmin: boolean;
   isCancelled?: boolean;
-  onFund: () => void;
+  onFund?: () => void;
   feeManagerBalance?: string;
   isRecurring: boolean;
+  showShareButton?: boolean;
+  isHorizontal?: boolean;
 }
 
 const ContestCard = ({
@@ -70,16 +76,24 @@ const ContestCard = ({
   onFund,
   feeManagerBalance,
   isRecurring,
+  showShareButton = true,
+  isHorizontal = false,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
 
-  const hasEnded = moment(finishDate) < moment();
-  const isActive = isCancelled ? false : !hasEnded;
+  const isActive = isContestActive({
+    contest: {
+      cancelled: isCancelled,
+      contests: [{ end_time: new Date(finishDate) }],
+    },
+  });
 
   useRerender({ isActive, interval: 6000 });
+
+  const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
   const { data: oneOffContestBalance } = useGetContestBalanceQuery({
     contestAddress: address,
@@ -127,7 +141,7 @@ const ContestCard = ({
   };
 
   const handleFundClick = () => {
-    onFund();
+    onFund?.();
   };
 
   const balance = isRecurring
@@ -138,9 +152,22 @@ const ContestCard = ({
   const showNoUpvotesInfo = isActive && (!score || score.length === 0);
 
   return (
-    <CWCard className="ContestCard">
+    <CWCard
+      className={clsx('ContestCard', {
+        isHorizontal: isHorizontal && !isWindowMediumSmallInclusive,
+      })}
+    >
       {imageUrl && (
-        <img src={imageUrl} alt="contest-image" className="contest-image" />
+        <>
+          {isHorizontal && (
+            <CWTag
+              label="Active Contest"
+              type="contest"
+              classNames="active-contest-tag prize-1"
+            />
+          )}
+          <img src={imageUrl} alt="contest-image" className="contest-image" />
+        </>
       )}
       <div className="contest-body">
         <div className="header-row">
@@ -203,18 +230,20 @@ const ContestCard = ({
             onClick={handleLeaderboardClick}
           />
 
-          <SharePopoverOld
-            customUrl="/contests"
-            renderTrigger={(handleInteraction) => (
-              <CWThreadAction
-                action="share"
-                label="Share"
-                onClick={handleInteraction}
-              />
-            )}
-          />
+          {showShareButton && (
+            <SharePopoverOld
+              customUrl="/contests"
+              renderTrigger={(handleInteraction) => (
+                <CWThreadAction
+                  action="share"
+                  label="Share"
+                  onClick={handleInteraction}
+                />
+              )}
+            />
+          )}
 
-          {isActive && hasJoinedCommunity && (
+          {onFund && isActive && user.activeAccount && (
             <CWThreadAction
               label="Fund"
               action="fund"

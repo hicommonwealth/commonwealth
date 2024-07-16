@@ -1,10 +1,10 @@
-import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MembersSection.scss';
 

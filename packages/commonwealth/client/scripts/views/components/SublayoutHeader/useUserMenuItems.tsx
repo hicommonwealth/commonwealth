@@ -23,12 +23,13 @@ import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationMod
 import {
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
-} from 'shared/canvas/chainMappings';
-import { getSessionSigners } from 'shared/canvas/verify';
+  getSessionSigners,
+} from '@hicommonwealth/shared';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 
 import { useCommunityStake } from '../CommunityStake';
 
+import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -97,6 +98,7 @@ const useUserMenuItems = ({
     error: sessionKeyRevalidationError,
   });
 
+  const userData = useUserStore();
   const { data: configurationData } = useFetchConfigurationQuery();
 
   const navigate = useCommonNavigate();
@@ -104,7 +106,7 @@ const useUserMenuItems = ({
   const { selectedAddress, setSelectedAddress } =
     useManageCommunityStakeModalStore();
 
-  const user = app.user?.addresses?.[0];
+  const user = userData.addresses?.[0];
   // @ts-expect-error <StrictNullChecks/>
   const profileId = user?.profileId || user?.profile.id;
 
@@ -114,12 +116,12 @@ const useUserMenuItems = ({
   const shouldShowAddressesSwitcherForNonMember =
     stakeEnabled &&
     app.activeChainId() &&
-    !app?.user?.activeAccount &&
+    !userData?.activeAccount &&
     uniqueChainAddresses?.length > 0;
 
   useEffect(() => {
     // if a user is in a stake enabled community without membership, set first user address as active that
-    // matches active chain base. This address should show be set to app.user.activeAccount.
+    // matches active chain base. This address should show be set to user.activeAccount in useUserStore().
     if (!selectedAddress && shouldShowAddressesSwitcherForNonMember) {
       setSelectedAddress(uniqueChainAddresses[0]);
     }
@@ -134,52 +136,50 @@ const useUserMenuItems = ({
     setSelectedAddress,
   ]);
 
-  const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
-    (account) => {
-      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
-      const communityIdOrPrefix =
-        account.community.base === ChainBase.CosmosSDK
-          ? account.community.ChainNode?.bech32
-          : account.community.ChainNode?.ethChainId;
-      const communityCanvasChainId = chainBaseToCanvasChainId(
-        account.community.base,
-        // @ts-expect-error StrictNullChecks
-        communityIdOrPrefix,
-      );
-      const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+  const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
+    const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+    const communityIdOrPrefix =
+      account.community.base === ChainBase.CosmosSDK
+        ? account.community.ChainNode?.bech32
+        : account.community.ChainNode?.ethChainId;
+    const communityCanvasChainId = chainBaseToCanvasChainId(
+      account.community.base,
+      // @ts-expect-error StrictNullChecks
+      communityIdOrPrefix,
+    );
+    const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
-      const signed = authenticatedAddresses[caip2Address];
-      const isActive = app.user.activeAccount?.address === account.address;
-      const walletSsoSource = app.user.addresses.find(
-        (address) => address.address === account.address,
-      )?.walletSsoSource;
+    const signed = authenticatedAddresses[caip2Address];
+    const isActive = userData.activeAccount?.address === account.address;
+    const walletSsoSource = userData.addresses.find(
+      (address) => address.address === account.address,
+    )?.walletSsoSource;
 
-      return {
-        type: 'default',
-        label: (
-          <UserMenuItem
-            isSignedIn={!configurationData?.enforceSessionKeys || signed}
-            hasJoinedCommunity={isActive}
-            address={account.address}
-          />
-        ),
-        onClick: async () => {
-          if (!configurationData?.enforceSessionKeys || signed) {
-            onAddressItemClick?.();
-            return await setActiveAccount(account);
-          }
-
+    return {
+      type: 'default',
+      label: (
+        <UserMenuItem
+          isSignedIn={!configurationData?.enforceSessionKeys || signed}
+          hasJoinedCommunity={isActive}
+          address={account.address}
+        />
+      ),
+      onClick: async () => {
+        if (!configurationData?.enforceSessionKeys || signed) {
           onAddressItemClick?.();
+          return await setActiveAccount(account);
+        }
 
-          onRevalidationModalData({
-            // @ts-expect-error <StrictNullChecks/>
-            walletSsoSource: walletSsoSource,
-            walletAddress: account.address,
-          });
-        },
-      };
-    },
-  );
+        onAddressItemClick?.();
+
+        onRevalidationModalData({
+          // @ts-expect-error <StrictNullChecks/>
+          walletSsoSource: walletSsoSource,
+          walletAddress: account.address,
+        });
+      },
+    };
+  });
 
   const uniqueChainAddressOptions: PopoverMenuItem[] = uniqueChainAddresses.map(
     (address) => {
@@ -204,7 +204,8 @@ const useUserMenuItems = ({
     RevalidationModal,
     userMenuItems: [
       // if a user is in a stake enabled community without membership, show user addresses that
-      // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
+      // match active chain base in the dropdown. This address should show be set to
+      // user.activeAccount of useUserStore().
       ...(shouldShowAddressesSwitcherForNonMember
         ? ([
             {
@@ -215,7 +216,7 @@ const useUserMenuItems = ({
             { type: 'divider' },
           ] as PopoverMenuItem[])
         : []),
-      ...(app.user.activeAccounts.length > 0
+      ...(userData.accounts.length > 0
         ? ([
             {
               type: 'header',

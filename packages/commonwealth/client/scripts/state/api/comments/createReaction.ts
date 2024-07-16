@@ -1,13 +1,13 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signCommentReaction } from 'client/scripts/controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
+import { signCommentReaction } from 'controllers/server/sessions';
 import Reaction from 'models/Reaction';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import useUserStore, { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateReactionProps {
@@ -32,11 +32,11 @@ const createReaction = async ({
   return await axios.post(
     `${app.serverUrl()}/comments/${commentId}/reactions`,
     {
-      author_community_id: app.user.activeAccount.community.id,
+      author_community_id: userStore.getState().activeAccount?.community?.id,
       community_id: communityId,
       address,
       reaction: reactionType,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
       comment_id: commentId,
     },
@@ -48,7 +48,6 @@ const useCreateCommentReactionMutation = ({
   commentId,
   communityId,
 }: Partial<CreateReactionProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     // @ts-expect-error StrictNullChecks
@@ -56,6 +55,7 @@ const useCreateCommentReactionMutation = ({
     // @ts-expect-error StrictNullChecks
     threadId,
   });
+  const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
@@ -78,14 +78,12 @@ const useCreateCommentReactionMutation = ({
         return tempComments;
       });
 
-      if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+      const profileId = user.addresses?.[0]?.profile?.id;
+      profileId &&
         markTrainingActionAsComplete(
           UserTrainingCardTypes.GiveUpvote,
-          // @ts-expect-error StrictNullChecks
           profileId,
         );
-      }
 
       return reaction;
     },

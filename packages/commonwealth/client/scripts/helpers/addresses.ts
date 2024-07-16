@@ -1,5 +1,5 @@
 import ChainInfo from 'models/ChainInfo';
-import app from 'state';
+import { userStore } from '../state/ui/user';
 
 /**
  * Get the unique communities but also sort them.
@@ -7,7 +7,7 @@ import app from 'state';
 export function getUniqueCommunities() {
   const dict: { [id: string]: ChainInfo } = {};
 
-  for (const addr of app.user.addresses) {
+  for (const addr of userStore.getState().addresses) {
     dict[addr.community.id] = addr.community;
   }
 

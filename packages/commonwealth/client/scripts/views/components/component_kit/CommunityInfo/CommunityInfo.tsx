@@ -1,8 +1,8 @@
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CWCommunityAvatar } from 'client/scripts/views/components/component_kit/cw_community_avatar';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import ChainInfo from 'models/ChainInfo';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { IconSize } from '../cw_icons/types';
 import './CommunityInfo.scss';
 

@@ -1,5 +1,7 @@
 import { AccessLevel } from '@hicommonwealth/shared';
 import app from 'state';
+import { userStore } from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import RoleInfo from '../../models/RoleInfo';
@@ -76,11 +78,11 @@ export class RolesController {
     account?: Account;
     community?: string;
   }): RoleInfo {
-    const account = options.account || this.User.activeAccount;
+    const account = options.account || userStore.getState().activeAccount;
     // @ts-expect-error StrictNullChecks
     if (!account) return;
 
-    const address_id = this.User.addresses.find((a) => {
+    const address_id = userStore.getState().addresses.find((a) => {
       return (
         a.address === account.address && a.community.id === account.community.id
       );
@@ -104,9 +106,9 @@ export class RolesController {
     community?: string;
   }): RoleInfo {
     if (
-      !this.User.activeAccount ||
+      !userStore.getState().activeAccount ||
       !app.isLoggedIn() ||
-      this.User.addresses.length === 0 ||
+      userStore.getState().addresses.length === 0 ||
       this.roles.length === 0
     )
       // @ts-expect-error StrictNullChecks
@@ -114,12 +116,13 @@ export class RolesController {
     // @ts-expect-error StrictNullChecks
     return this.roles.find((r) => {
       const permission = r.permission === options.role;
-      const referencedAddress = this.User.addresses.find(
-        (address) => address.id === r.address_id,
-      );
+      const referencedAddress = userStore
+        .getState()
+        .addresses.find((address) => address.id === r.address_id);
       if (!referencedAddress) return;
       const isSame =
-        this.User?.activeAccount?.address === referencedAddress.address;
+        userStore.getState().activeAccount?.address ===
+        referencedAddress.address;
       const ofCommunity = r.community_id === options.community;
       return permission && referencedAddress && isSame && ofCommunity;
     });
@@ -153,12 +156,12 @@ export class RolesController {
    * @param options A community or a community ID
    */
   public isAdminOfEntity(options: { community?: string }): boolean {
-    if (!this.User.activeAccount) return false;
-    if (app.user.isSiteAdmin) return true;
+    if (!userStore.getState().activeAccount) return false;
+    if (Permissions.isSiteAdmin()) return true;
 
     const adminRole = this.roles.find((role) => {
       return (
-        role.address === this.User.activeAccount.address &&
+        role.address === userStore.getState().activeAccount?.address &&
         role.permission === AccessLevel.Admin &&
         options.community &&
         role.community_id === options.community
@@ -180,7 +183,7 @@ export class RolesController {
   }): boolean {
     const addressinfo: AddressInfo | undefined =
       options.account instanceof Account
-        ? this.User.addresses.find(
+        ? userStore.getState().addresses.find(
             (a) =>
               // @ts-expect-error StrictNullChecks
               options.account.address === a.address &&

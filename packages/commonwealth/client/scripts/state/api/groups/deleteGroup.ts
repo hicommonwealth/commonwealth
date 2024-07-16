@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { userStore } from '../../ui/user';
 import { ApiEndpoints, queryClient } from '../config';
 
 interface DeleteGroupProps {
@@ -16,7 +17,7 @@ const deleteGroup = async ({
 }: DeleteGroupProps) => {
   return await axios.delete(`${app.serverUrl()}/groups/${groupId}`, {
     data: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       community_id: communityId,
       author_community_id: communityId,
       address,

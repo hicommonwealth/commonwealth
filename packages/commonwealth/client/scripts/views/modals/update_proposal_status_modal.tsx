@@ -22,6 +22,7 @@ import {
   useDeleteThreadLinksMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,
@@ -61,6 +62,7 @@ export const UpdateProposalStatusModal = ({
 }: UpdateProposalStatusModalProps) => {
   const { customStages } = app.chain.meta;
   const stages = parseCustomStages(customStages);
+  const user = useUserStore();
 
   const [tempStage, setTempStage] = useState(
     stages.includes(thread.stage) ? thread.stage : null,
@@ -105,7 +107,7 @@ export const UpdateProposalStatusModal = ({
     // set stage
     try {
       await editThread({
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address || '',
         communityId: app.activeChainId(),
         threadId: thread.id,
         // @ts-expect-error <StrictNullChecks/>

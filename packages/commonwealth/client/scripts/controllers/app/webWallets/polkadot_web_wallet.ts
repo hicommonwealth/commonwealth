@@ -5,10 +5,14 @@ import {
 } from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import {
+  addressSwapper,
+  ChainBase,
+  ChainNetwork,
+  WalletId,
+} from '@hicommonwealth/shared';
 
-import { SubstrateSignerCW } from 'shared/canvas/sessionSigners';
-import { addressSwapper } from 'shared/utils';
+import { SubstrateSignerCW } from '@hicommonwealth/shared';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 

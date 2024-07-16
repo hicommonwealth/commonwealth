@@ -1,16 +1,16 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signThread } from 'client/scripts/controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
+import { signThread } from 'controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
+import useUserStore, { userStore } from '../../ui/user';
 import { addThreadInAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
 
@@ -65,7 +65,7 @@ const createThread = async ({
       topic_id: topic.id,
       url,
       readOnly,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
     {
@@ -81,9 +81,10 @@ const createThread = async ({
 const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const user = useUserStore();
 
   return useMutation({
     mutationFn: createThread,
@@ -105,14 +106,12 @@ const useCreateThreadMutation = ({
       // increment communities thread count
       if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
-      if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+      const profileId = user.addresses?.[0]?.profile?.id;
+      profileId &&
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          // @ts-expect-error StrictNullChecks
           profileId,
         );
-      }
 
       return newThread;
     },

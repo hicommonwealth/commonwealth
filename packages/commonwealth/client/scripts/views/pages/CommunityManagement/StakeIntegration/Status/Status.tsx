@@ -1,6 +1,6 @@
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import React from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
 import './Status.scss';
 
 interface StatusProps {
