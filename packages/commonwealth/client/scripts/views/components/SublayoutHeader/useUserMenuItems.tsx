@@ -132,9 +132,9 @@ const useUserMenuItems = ({
       // @ts-expect-error StrictNullChecks
       communityIdOrPrefix,
     );
-    const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+    const did = `did:pkh:${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
-    const signed = authenticatedAddresses[caip2Address];
+    const signed = authenticatedAddresses[did];
     const isActive = userData.activeAccount?.address === account.address;
     const walletSsoSource = userData.addresses.find(
       (address) => address.address === account.address,
