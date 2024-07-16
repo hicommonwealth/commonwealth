@@ -18,6 +18,5 @@ export function createJwts(apiUrl: string, numberOfJwt: number) {
   if (res.status !== 200) {
     throw new Error(`Failed to create JWTs: ${JSON.stringify(result)}`);
   }
-  console.log('\n\n', res.json());
   return res.json() as string[];
 }
