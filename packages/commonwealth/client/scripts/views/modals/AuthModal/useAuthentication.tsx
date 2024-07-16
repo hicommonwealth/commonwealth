@@ -1,5 +1,10 @@
 import type { Session } from '@canvas-js/interfaces';
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  addressSwapper,
+  ChainBase,
+  verifySession,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
   completeClientLogin,
@@ -8,9 +13,9 @@ import {
   updateActiveAddresses,
 } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
+import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import WebWalletController from 'controllers/app/web_wallets';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   getSessionFromWallet,
@@ -19,11 +24,9 @@ import {
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
-import { addressSwapper } from 'utils';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -35,7 +38,6 @@ import { setDarkMode } from '../../../helpers/darkMode';
 import { getAddressFromWallet } from '../../../helpers/wallet';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import { useFlag } from '../../../hooks/useFlag';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import {
@@ -58,7 +60,6 @@ type UseAuthenticationProps = {
 type Wallet = IWebWallet<any>;
 
 const useAuthentication = (props: UseAuthenticationProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [username, setUsername] = useState<string>('Anonymous');
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<Wallet>>();
@@ -169,7 +170,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // then open the user auth type guidance modal
       // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
       if (
-        userOnboardingEnabled &&
         isAddressNew &&
         !isAttemptingToConnectAddressToCommunity &&
         !app.isLoggedIn()
@@ -422,35 +422,33 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       return;
     }
 
-    if (userOnboardingEnabled) {
-      // check if address exists
-      const profileAddresses = await fetchProfilesByAddress({
-        currentChainId: '',
-        profileAddresses: [
-          wallet.chain === ChainBase.Substrate
-            ? addressSwapper({
-                address: selectedAddress,
-                currentPrefix: parseInt(
-                  (app.chain as Substrate)?.meta.ss58Prefix,
-                  10,
-                ),
-              })
-            : selectedAddress,
-        ],
-        profileChainIds: [app.activeChainId() ?? wallet.chain],
-        initiateProfilesAfterFetch: false,
-      });
-      const addressExists = profileAddresses?.length > 0;
-      const isAttemptingToConnectAddressToCommunity =
-        app.isLoggedIn() && app.activeChainId();
-      if (
-        !addressExists &&
-        !isAttemptingToConnectAddressToCommunity &&
-        props.onUnrecognizedAddressReceived
-      ) {
-        const shouldContinue = props.onUnrecognizedAddressReceived();
-        if (!shouldContinue) return;
-      }
+    // check if address exists
+    const profileAddresses = await fetchProfilesByAddress({
+      currentChainId: '',
+      profileAddresses: [
+        wallet.chain === ChainBase.Substrate
+          ? addressSwapper({
+              address: selectedAddress,
+              currentPrefix: parseInt(
+                (app.chain as Substrate)?.meta.ss58Prefix,
+                10,
+              ),
+            })
+          : selectedAddress,
+      ],
+      profileChainIds: [app.activeChainId() ?? wallet.chain],
+      initiateProfilesAfterFetch: false,
+    });
+    const addressExists = profileAddresses?.length > 0;
+    const isAttemptingToConnectAddressToCommunity =
+      app.isLoggedIn() && app.activeChainId();
+    if (
+      !addressExists &&
+      !isAttemptingToConnectAddressToCommunity &&
+      props.onUnrecognizedAddressReceived
+    ) {
+      const shouldContinue = props.onUnrecognizedAddressReceived();
+      if (!shouldContinue) return;
     }
 
     if (props.useSessionKeyLoginFlow) {

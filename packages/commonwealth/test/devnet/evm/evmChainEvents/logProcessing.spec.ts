@@ -70,6 +70,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const currentBlockNum = await provider.getBlockNumber();
       const { logs } = await getLogs({
         rpc: localRpc,
+        maxBlockRange: 500,
         contractAddresses: [],
         startingBlockNum: currentBlockNum,
       });
@@ -80,6 +81,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       await expect(
         getLogs({
           rpc: 'http://fake',
+          maxBlockRange: 500,
           contractAddresses: ['0x1'],
           startingBlockNum: 1,
         }),
@@ -97,6 +99,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       await expect(
         getLogs({
           rpc: localRpc,
+          maxBlockRange: 500,
           contractAddresses: ['0x1'],
           startingBlockNum: currentBlockNum + 1000,
         }),
@@ -122,6 +125,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
         const propCreatedLogs = await getLogs({
           rpc: localRpc,
+          maxBlockRange: 500,
           contractAddresses: [sdk.contractAddrs.compound.governance],
           startingBlockNum: propCreatedResult.block,
           endingBlockNum: propCreatedResult.block + 1,
@@ -131,6 +135,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
         const propQueuedLogs = await getLogs({
           rpc: localRpc,
+          maxBlockRange: 500,
           contractAddresses: [sdk.contractAddrs.compound.governance],
           startingBlockNum: propQueuedResult.block,
           endingBlockNum: propQueuedResult.block + 1,
@@ -141,7 +146,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
     );
 
     test(
-      'should restrict the maximum block range fetched to 500 blocks',
+      'should restrict the maximum block range fetched',
       { timeout: 80_000 },
       async () => {
         expectAbi();
@@ -151,6 +156,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
         const { logs } = await getLogs({
           rpc: localRpc,
+          maxBlockRange: 500,
           contractAddresses: [sdk.contractAddrs.compound.governance],
           startingBlockNum: propQueuedResult.block - 1,
         });
@@ -174,6 +180,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
     test('should not throw if an invalid ABI is given for a contract address', async () => {
       let evmSource: EvmSource = {
         rpc: localRpc,
+        maxBlockRange: 500,
         contracts: {
           [sdk.contractAddrs.compound.governance]: {
             sources: [
@@ -194,6 +201,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       evmSource = {
         rpc: localRpc,
+        maxBlockRange: 500,
         contracts: {
           [sdk.contractAddrs.compound.governance]: {
             abi: 'invalid abi' as unknown as AbiType,
@@ -215,6 +223,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       evmSource = {
         rpc: localRpc,
+        maxBlockRange: 500,
         contracts: {
           [sdk.contractAddrs.compound.governance]: {
             abi: [],
@@ -240,6 +249,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       const evmSource: EvmSource = {
         rpc: localRpc,
+        maxBlockRange: 500,
         contracts: {
           [sdk.contractAddrs.compound.governance]: {
             abi,
@@ -294,6 +304,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       const evmSource: EvmSource = {
         rpc: localRpc,
+        maxBlockRange: 500,
         contracts: {
           [sdk.contractAddrs.compound.governance]: {
             abi,
@@ -340,6 +351,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
     test('should return all fetched and parsed logs', async () => {
       const evmSource: EvmSource = {
         rpc: localRpc,
+        maxBlockRange: 500,
         contracts: {
           [sdk.contractAddrs.compound.governance]: {
             abi,

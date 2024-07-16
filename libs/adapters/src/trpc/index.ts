@@ -49,6 +49,12 @@ const authenticate = async (
             email: 'hello@knock.app',
           };
           break;
+        case config.LOAD_TESTING.AUTH_TOKEN:
+          req.user = {
+            id: ExternalServiceUserIds.K6,
+            email: 'info@grafana.com',
+          };
+          break;
         default:
           throw new Error('Not authenticated');
       }
@@ -135,7 +141,8 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
     .mutation(async ({ ctx, input }) => {
       // md.secure must explicitly be false if the route requires no authentication
       // if we provide any authorization method we force authentication as well
-      if (md.secure !== false || md.auth?.length) await authenticate(ctx.req);
+      if (md.secure !== false || md.auth?.length)
+        await authenticate(ctx.req, md.authStrategy);
       try {
         return await core.command(
           md,
