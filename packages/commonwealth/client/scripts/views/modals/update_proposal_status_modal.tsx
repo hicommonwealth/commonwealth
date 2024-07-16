@@ -290,6 +290,12 @@ export const UpdateProposalStatusModal = ({
     }
   };
 
+  const handleRemoveProposalWrapper = () => {
+    handleRemoveProposal().catch((error) => {
+      console.error('Unhandled error:', error);
+    });
+  };
+
   const setVotingStage = () => {
     if (
       tempStage === ThreadStage.Discussion ||
@@ -368,7 +374,7 @@ export const UpdateProposalStatusModal = ({
                 label="Remove proposal"
                 buttonType="destructive"
                 buttonHeight="sm"
-                onClick={handleRemoveProposal}
+                onClick={handleRemoveProposalWrapper}
               />
             )}
           </div>
