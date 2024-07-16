@@ -165,7 +165,7 @@ async function sign(
       const sessionMessageSignature = await messageSigner.sign(sessionMessage);
 
       const actionMessage: Message<Action> = {
-        clock: 0,
+        clock: 1,
         parents: [],
         topic: CANVAS_TOPIC,
         payload: {
