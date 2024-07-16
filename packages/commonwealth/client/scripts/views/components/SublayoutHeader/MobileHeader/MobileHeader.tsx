@@ -8,7 +8,6 @@ import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
@@ -17,7 +16,6 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
-import { useFlag } from 'hooks/useFlag';
 import useUserStore from 'state/ui/user';
 import { AuthModalType } from 'views/modals/AuthModal';
 import './MobileHeader.scss';
@@ -41,7 +39,6 @@ const MobileHeader = ({
   isInsideCommunity,
   onRevalidationModalData,
 }: MobileHeaderProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
@@ -93,7 +90,7 @@ const MobileHeader = ({
             />
           )}
 
-          {isLoggedIn ? (
+          {isLoggedIn && (
             <div onClick={() => setIsUserDrawerOpen(true)}>
               <User
                 shouldShowAvatarOnly
@@ -102,15 +99,6 @@ const MobileHeader = ({
                 userCommunityId={user?.community?.id}
               />
             </div>
-          ) : userOnboardingEnabled ? (
-            <></>
-          ) : (
-            <CWButton
-              label="Sign in"
-              buttonHeight="sm"
-              disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={() => onAuthModalOpen()}
-            />
           )}
         </div>
       </div>
