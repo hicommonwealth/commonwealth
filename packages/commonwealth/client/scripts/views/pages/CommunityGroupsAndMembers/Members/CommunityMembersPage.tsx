@@ -156,7 +156,13 @@ const CommunityMembersPage = () => {
     },
     {
       initialCursor: 1,
-      getNextPageParam: (lastPage) => lastPage.page + 1,
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) {
+          return nextPageNum;
+        }
+        return undefined;
+      },
       enabled: user.activeAccount?.address ? !!memberships : true,
     },
   );
