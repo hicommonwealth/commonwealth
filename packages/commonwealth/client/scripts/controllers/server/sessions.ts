@@ -140,8 +140,9 @@ async function sign(
       const { payload: session, signer: messageSigner } = savedSessionMessage;
 
       // check if session is expired
-      if (session.duration !== null) {
-        const sessionExpirationTime = session.timestamp + session.duration;
+      if (session.context.duration) {
+        const sessionExpirationTime =
+          session.context.timestamp + session.context.duration;
         if (Date.now() > sessionExpirationTime) {
           if (!config?.enforceSessionKeys) {
             return null;
@@ -170,11 +171,12 @@ async function sign(
         topic: CANVAS_TOPIC,
         payload: {
           type: 'action' as const,
-          address: session.address,
-          blockhash: null,
+          did: session.did,
+          context: {
+            timestamp: Date.now(),
+          },
           name: call,
           args,
-          timestamp: Date.now(),
         },
       };
 

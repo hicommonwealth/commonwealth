@@ -261,7 +261,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const { payload: session, signer } = await sessionSigner.newSession(
       CANVAS_TOPIC,
     );
-    const walletAddress = session.address.split(':')[2];
+    const walletAddress = session.did.split(':')[4];
 
     let res = await chai.request
       .agent(app)
@@ -292,7 +292,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const email = res.body.result.user.email;
     return {
       address_id,
-      address: session.address,
+      address: session.did.split(':')[4],
+      did: session.did,
       user_id,
       email,
       session,
