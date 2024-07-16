@@ -1,8 +1,8 @@
 import {
   AddressAttributes,
-  DB,
   GroupInstance,
   MembershipRejectReason,
+  type DB,
 } from '@hicommonwealth/model';
 import { GroupPermissionAction } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
