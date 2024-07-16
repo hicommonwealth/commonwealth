@@ -89,5 +89,5 @@ export const ThreadVersionHistory = z.object({
     .string()
     .describe('Address of the creator of the post or the collaborator'),
   body: z.string(),
-  timestamp: z.date().optional(),
+  timestamp: z.date(),
 });
