@@ -1,11 +1,10 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signThread } from 'controllers/server/sessions';
+import { signUpdateThread } from 'controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
-import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
@@ -19,6 +18,7 @@ interface EditThreadProps {
   address: string;
   communityId: string;
   threadId: number;
+  threadMsgId: string;
   // for edit profile
   newBody?: string;
   newTitle?: string;
@@ -47,6 +47,7 @@ const editThread = async ({
   address,
   communityId,
   threadId,
+  threadMsgId,
   // for edit profile
   newBody,
   newTitle,
@@ -67,13 +68,16 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps): Promise<Thread> => {
-  const canvasSignedData = await signThread(address, {
-    community: app.activeChainId(),
-    title: newTitle,
-    body: newBody,
-    link: url,
-    topic: topicId,
-  });
+  let canvasSignedData;
+  if (newBody || newTitle) {
+    canvasSignedData = await signUpdateThread(address, {
+      thread_id: threadMsgId,
+      title: newTitle,
+      body: newBody,
+      link: url,
+      topic: topicId,
+    });
+  }
 
   const response = await axios.patch(`${SERVER_URL}/threads/${threadId}`, {
     // common payload
@@ -111,6 +115,7 @@ const editThread = async ({
 interface UseEditThreadMutationProps {
   communityId: string;
   threadId: number;
+  threadMsgId: string;
   currentStage: ThreadStage;
   currentTopicId: number;
 }

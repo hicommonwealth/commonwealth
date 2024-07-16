@@ -20,6 +20,7 @@ import { CommentEditor } from './CommentEditor';
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
+  parentCommentMsgId?: string | null;
   rootThread: Thread;
   canComment: boolean;
   tooltipText?: string;
@@ -28,6 +29,7 @@ type CreateCommentProps = {
 export const CreateComment = ({
   handleIsReplying,
   parentCommentId,
+  parentCommentMsgId,
   rootThread,
   canComment,
   tooltipText = '',
@@ -90,8 +92,10 @@ export const CreateComment = ({
           communityId,
           profile: user.activeAccount!.profile!.toUserProfile(),
           threadId: rootThread.id,
+          threadMsgId: rootThread.canvasMsgId,
           unescapedText: serializeDelta(contentDelta),
           parentCommentId: parentCommentId ?? null,
+          parentCommentMsgId: parentCommentMsgId ?? null,
           existingNumberOfComments: rootThread.numberOfComments || 0,
           isPWA: isAddedToHomeScreen,
         });

@@ -33,7 +33,7 @@ export type CreateThreadReactionOptions = {
   reaction: 'like';
   threadId: number;
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
 };
 
 export type CreateThreadReactionResult = [
@@ -50,7 +50,7 @@ export async function __createThreadReaction(
     reaction,
     threadId,
     canvasSignedData,
-    canvasHash,
+    canvasMsgId,
   }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
@@ -149,7 +149,7 @@ export async function __createThreadReaction(
     ...reactionWhere,
     calculated_voting_weight: calculatedVotingWeight,
     canvas_signed_data: canvasSignedData,
-    canvas_hash: canvasHash,
+    canvas_msg_id: canvasMsgId,
   };
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({

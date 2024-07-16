@@ -10,18 +10,18 @@ import useFetchCommentsQuery from './fetchComments';
 interface DeleteReactionProps {
   communityId: string;
   address: string;
-  canvasHash: string;
+  reactionMsgId: string;
   reactionId: number;
 }
 
 const deleteReaction = async ({
   communityId,
   address,
-  canvasHash,
+  reactionMsgId,
   reactionId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteCommentReaction(address, {
-    comment_id: canvasHash,
+    comment_id: reactionMsgId,
   });
 
   return await axios

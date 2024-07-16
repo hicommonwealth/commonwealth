@@ -15,6 +15,7 @@ import {
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
+import { startCanvasNode } from '@hicommonwealth/shared';
 import express from 'express';
 import { config } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
@@ -43,6 +44,8 @@ startHealthCheckLoop({
     }
   },
 });
+
+export const canvas = await startCanvasNode();
 
 const app = express();
 

@@ -15,6 +15,7 @@ env:
   ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
   ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
   GITHUB_BASE_REF: ${{ github.base_ref }}
+  POSTGRES_FEDERATION_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
 
 on:
   pull_request:
@@ -484,5 +485,3 @@ jobs:
         with:
           parallel-finished: true
           carryforward: "cosmos-devnet-test-coverage"
-
-

@@ -33,7 +33,7 @@ export type CreateCommentReactionOptions = {
   reaction: 'like';
   commentId: number;
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
 };
 
 export type CreateCommentReactionResult = [
@@ -50,7 +50,7 @@ export async function __createCommentReaction(
     reaction,
     commentId,
     canvasSignedData,
-    canvasHash,
+    canvasMsgId,
   }: CreateCommentReactionOptions,
 ): Promise<CreateCommentReactionResult> {
   const comment = await this.models.Comment.findOne({
@@ -156,7 +156,7 @@ export async function __createCommentReaction(
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_hash: canvasHash,
+    canvas_msg_id: canvasMsgId,
     canvas_signed_data: canvasSignedData,
   };
 

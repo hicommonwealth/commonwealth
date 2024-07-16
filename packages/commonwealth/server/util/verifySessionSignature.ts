@@ -5,7 +5,7 @@ import {
   CANVAS_TOPIC,
   NotificationCategories,
   addressSwapper,
-  getSessionSignerForAddress,
+  getSessionSignerForDid,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 
@@ -38,7 +38,7 @@ const verifySessionSignature = async (
       })
     : addressModel.address;
 
-  const sessionRawAddress = session.address.split(':')[2];
+  const sessionRawAddress = session.did.split(':')[4];
   const walletAddress = addressModel.Community?.ss58_prefix
     ? addressSwapper({
         address: sessionRawAddress,
@@ -47,10 +47,10 @@ const verifySessionSignature = async (
     : sessionRawAddress;
   assert(
     walletAddress === expectedAddress,
-    `session.address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
+    `session.did address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
   );
 
-  const signer = getSessionSignerForAddress(session.address);
+  const signer = getSessionSignerForDid(session.did);
   if (!signer) {
     throw new Error('missing signer');
   }

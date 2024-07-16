@@ -12,6 +12,7 @@ interface UseDeleteThreadReactionMutationProps {
   communityId: string;
   address: string;
   threadId: number;
+  threadMsgId: string;
 }
 
 interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
@@ -23,9 +24,10 @@ const deleteReaction = async ({
   address,
   reactionId,
   threadId,
+  threadMsgId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteThreadReaction(address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
   });
 
   const response = await axios.delete(`${SERVER_URL}/reactions/${reactionId}`, {
