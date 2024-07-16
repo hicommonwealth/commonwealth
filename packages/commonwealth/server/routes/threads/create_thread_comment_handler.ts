@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
 
-import { canvas } from 'server';
 import {
   addressSwapper,
   applyCanvasSignedData,
@@ -9,6 +8,7 @@ import {
   hasCanvasSignedDataApiArgs,
   verifyComment,
 } from '@hicommonwealth/shared';
+import { canvas } from 'server';
 import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
@@ -77,8 +77,7 @@ export const createThreadCommentHandler = async (
         thread_id: parseInt(threadId, 10) || undefined,
         text,
         address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
+          canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
                 // @ts-expect-error <StrictNullChecks>

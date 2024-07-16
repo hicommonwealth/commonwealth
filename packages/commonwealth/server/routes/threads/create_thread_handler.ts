@@ -71,8 +71,7 @@ export const createThreadHandler = async (
         title,
         body,
         address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
+          canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
                 // @ts-expect-error <StrictNullChecks>

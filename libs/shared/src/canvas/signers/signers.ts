@@ -2,7 +2,11 @@ import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { SolanaSigner } from '@canvas-js/chain-solana';
 import { SubstrateSigner } from '@canvas-js/chain-substrate';
-import { AbstractSessionData, Session } from '@canvas-js/interfaces';
+import {
+  AbstractSessionData,
+  DidIdentifier,
+  Session,
+} from '@canvas-js/interfaces';
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { addressSwapper } from '@hicommonwealth/shared';
 
@@ -15,7 +19,7 @@ export const getSessionSigners = () => {
   ];
 };
 
-export const getSessionSignerForAddress = (address: string) => {
+export const getSessionSignerForDid = (address: string) => {
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(address)) return signer;
@@ -33,7 +37,7 @@ export const getSessionSignerForAddress = (address: string) => {
  */
 
 function parseAddress(address: string): [chain: string, walletAddress: string] {
-  const addressPattern = /^cosmos:([0-9a-z\-_]+):([a-zA-Fa-f0-9]+)$/;
+  const addressPattern = /^did:pkh:cosmos:([0-9a-z\-_]+):([a-zA-Fa-f0-9]+)$/;
   const result = addressPattern.exec(address);
   if (result === null) {
     throw new Error(
@@ -41,8 +45,8 @@ function parseAddress(address: string): [chain: string, walletAddress: string] {
     );
   }
 
-  const chain = result[1];
-  const walletAddress = result[2];
+  const chain = result[3];
+  const walletAddress = result[4];
   return [chain, walletAddress];
 }
 
@@ -58,8 +62,13 @@ export class CosmosSignerCW extends CosmosSigner {
   // Use this._signer.getChainId() instead of the chainId inferred from the CAIP-2 address
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async authorize(data: AbstractSessionData): Promise<Session<any>> {
-    const { topic, address, timestamp, publicKey, duration } = data;
-    const [chainId, walletAddress] = parseAddress(address);
+    const {
+      topic,
+      did,
+      publicKey,
+      context: { timestamp, duration },
+    } = data;
+    const [chainId, walletAddress] = parseAddress(did);
 
     const issuedAt = new Date(timestamp);
     const message = {
@@ -84,12 +93,17 @@ export class CosmosSignerCW extends CosmosSigner {
 
     return {
       type: 'session',
-      address: address,
+      did: did,
       publicKey: publicKey,
       authorizationData: signResult,
-      blockhash: null,
-      timestamp: timestamp,
-      duration: duration,
+      context: duration
+        ? {
+            timestamp: timestamp,
+            duration: duration,
+          }
+        : {
+            timestamp: timestamp,
+          },
     };
   }
 }
@@ -98,13 +112,13 @@ export class SubstrateSignerCW extends SubstrateSigner {
   // override SubstrateSigner to always use 42 as the ss58 id
   // TODO: Could we pass the ss58prefix to this._signer.getAddress()
   // in packages/chain-substrate instead?
-  public async getAddress(): Promise<string> {
+  public async getDid(): Promise<DidIdentifier> {
     const walletAddress = await this._signer.getAddress();
     const finalAddress = addressSwapper({
       currentPrefix: 42,
       address: walletAddress,
     });
-    return `polkadot:42:${finalAddress}`;
+    return `did:pkh:polkadot:42:${finalAddress}`;
   }
 
   // override AbstractSessionSigner to use ss58 id 42 in hasSession

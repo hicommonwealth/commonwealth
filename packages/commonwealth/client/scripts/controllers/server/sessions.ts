@@ -34,7 +34,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   account: Account,
 ) {
   const session = await getSessionFromWallet(wallet);
-  const walletAddress = session.address.split(':')[2];
+  const walletAddress = session.did.split(':')[4];
   if (walletAddress !== account.address) {
     throw new Error(
       `Session signed with wrong address ('${walletAddress}', expected '${account.address}')`,

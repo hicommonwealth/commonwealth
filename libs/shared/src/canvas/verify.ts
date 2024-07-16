@@ -9,14 +9,14 @@ import { ed25519 } from '@canvas-js/signatures';
 import assert from 'assert';
 
 import { topic } from './runtime/contract';
-import { getSessionSignerForAddress } from './signers';
+import { getSessionSignerForDid } from './signers';
 import { CanvasSignedData } from './types';
 import { assertMatches } from './utils';
 
 export const verifySession = async (session: Session) => {
-  const signer = getSessionSignerForAddress(session.address);
+  const signer = getSessionSignerForDid(session.did);
   if (!signer) {
-    throw new Error(`No signer for session ${session.address}`);
+    throw new Error(`No signer for session ${session.did}`);
   }
   await signer.verifySession(topic, session);
 };
@@ -36,7 +36,7 @@ export const verify = async ({
   await verifySession(sessionMessage.payload);
 
   assert(
-    actionMessage.payload.address === sessionMessage.payload.address,
+    actionMessage.payload.did === sessionMessage.payload.did,
     'Action message must be signed by wallet address',
   );
 
@@ -44,16 +44,18 @@ export const verify = async ({
   ed25519.verify(sessionMessageSignature, sessionMessage);
 
   // if the session has an expiry, assert that the session is not expired
-  if (sessionMessage.payload.duration !== null) {
+  if (sessionMessage.payload.context.duration !== null) {
     const sessionExpirationTime =
-      sessionMessage.payload.timestamp + sessionMessage.payload.duration;
+      sessionMessage.payload.context.timestamp +
+      (sessionMessage.payload.context.duration ?? 0);
     assert(
-      actionMessage.payload.timestamp < sessionExpirationTime,
+      actionMessage.payload.context.timestamp < sessionExpirationTime,
       'Invalid action: Signed by a session that was expired at the time of action',
     );
   }
   assert(
-    actionMessage.payload.timestamp >= sessionMessage.payload.timestamp,
+    actionMessage.payload.context.timestamp >=
+      sessionMessage.payload.context.timestamp,
     'Invalid action: Signed by a session after the action',
   );
 };
@@ -84,7 +86,7 @@ export const verifyComment = async (
 
   assertMatches(
     address,
-    actionMessage.payload.address.split(':')[2],
+    actionMessage.payload.did.split(':')[4],
     'comment',
     'origin',
   );
@@ -119,7 +121,7 @@ export const verifyThread = async (
 
   assertMatches(
     address,
-    actionMessage.payload.address.split(':')[2],
+    actionMessage.payload.did.split(':')[4],
     'thread',
     'origin',
   );
@@ -150,7 +152,7 @@ export const verifyReaction = async (
 
   assertMatches(
     address,
-    actionMessage.payload.address.split(':')[2],
+    actionMessage.payload.did.split(':')[4],
     'reaction',
     'origin',
   );
