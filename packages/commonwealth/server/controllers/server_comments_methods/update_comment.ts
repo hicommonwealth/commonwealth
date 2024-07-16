@@ -130,6 +130,19 @@ export async function __updateComment(
       },
     );
 
+    if (versionHistory) {
+      await this.models.CommentVersionHistory.create(
+        {
+          comment_id: comment.id!,
+          text: text!,
+          timestamp: new Date(),
+        },
+        {
+          transaction,
+        },
+      );
+    }
+
     await emitMentions(this.models, transaction, {
       // @ts-expect-error StrictNullChecks
       authorAddressId: address.id,
