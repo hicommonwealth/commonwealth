@@ -6,9 +6,9 @@ import {
   AddressInstance,
   UserInstance,
   VoteAttributes,
+  validateTopicGroupsMembership,
 } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerPollsController } from '../server_polls_controller';
 

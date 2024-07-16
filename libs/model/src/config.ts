@@ -5,6 +5,7 @@ const {
   TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
+  MEMBERSHIP_REFRESH_TTL_SECONDS,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
@@ -30,6 +31,10 @@ export const config = configure(
         : undefined,
       INIT_TEST_DB: INIT_TEST_DB === 'true',
     },
+    MEMBERSHIP_REFRESH_TTL_SECONDS: parseInt(
+      MEMBERSHIP_REFRESH_TTL_SECONDS ?? '120',
+      10,
+    ),
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
     },
@@ -50,6 +55,7 @@ export const config = configure(
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
       INIT_TEST_DB: z.boolean(),
     }),
+    MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
     WEB3: z.object({
       PRIVATE_KEY: z.string(),
     }),

@@ -13,7 +13,7 @@ const ajv = new Ajv();
  * @param requirements an array of requirements types
  * @returns Error if invalid, otherwise null
  */
-export default function validateRequirements(
+export function validateRequirements(
   requirements: Requirement[],
 ): Error | null {
   const validate = ajv.compile(requirementsSchema);

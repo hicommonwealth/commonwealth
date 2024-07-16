@@ -1,7 +1,7 @@
 import { GroupMetadata } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-export default function validateMetadata(
+export function validateMetadata(
   metadata: z.infer<typeof GroupMetadata>,
 ): Error | null {
   const schema = z.object({
@@ -13,7 +13,7 @@ export default function validateMetadata(
   try {
     schema.parse(metadata);
   } catch (err) {
-    return err;
+    return err as Error;
   }
   return null;
 }

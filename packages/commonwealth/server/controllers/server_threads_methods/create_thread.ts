@@ -7,6 +7,7 @@ import {
   CommunityInstance,
   ThreadAttributes,
   UserInstance,
+  validateTopicGroupsMembership,
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
@@ -19,7 +20,6 @@ import {
   queryMentionedUsers,
   uniqueMentions,
 } from '../../util/parseUserMentions';
-import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';

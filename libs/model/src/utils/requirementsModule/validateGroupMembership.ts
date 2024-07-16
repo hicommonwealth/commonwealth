@@ -23,7 +23,7 @@ export type ValidateGroupMembershipResponse = {
  * @param balances address balances
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
-export default function validateGroupMembership(
+export function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   balances: OptionsWithBalances[],
@@ -200,7 +200,7 @@ function _thresholdCheck(
   } catch (error) {
     return {
       result: false,
-      message: `Error: ${error.message}`,
+      message: `Error: ${(error as Error).message}`,
     };
   }
 }
@@ -218,7 +218,7 @@ function _allowlistCheck(
   } catch (error) {
     return {
       result: false,
-      message: `Error: ${error.message}`,
+      message: `Error: ${(error as Error).message}`,
     };
   }
 }

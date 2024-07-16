@@ -5,14 +5,14 @@ import {
   TopicInstance,
   UserInstance,
   sequelize,
+  validateMetadata,
+  validateRequirements,
 } from '@hicommonwealth/model';
 import { GroupMetadata } from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import validateMetadata from '../../util/requirementsModule/validateMetadata';
-import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerGroupsController } from '../server_groups_controller';

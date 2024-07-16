@@ -3,9 +3,9 @@ import {
   AddressInstance,
   MembershipRejectReason,
   UserInstance,
+  refreshMembershipsForAddress,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
