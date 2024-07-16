@@ -1,6 +1,6 @@
+import { Image } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { MappedProfile } from '../state/api/profiles/fetchProfileById';
-import type { Image } from '../views/components/EditProfile/EditProfile';
-
 class NewProfile {
   private _name: string;
   private _email: string;
@@ -11,7 +11,7 @@ class NewProfile {
   private _socials: string[];
   private _id: number;
   private _isOwner: boolean;
-  private _backgroundImage: Image;
+  private _backgroundImage: z.infer<typeof Image>;
 
   get name() {
     return this._name;
@@ -74,7 +74,7 @@ class NewProfile {
     this._socials = socials!;
     this._id = id;
     this._isOwner = is_owner;
-    this._backgroundImage = background_image as any;
+    this._backgroundImage = background_image ?? { url: '', imageBehavior: '' };
   }
 
   public static fromJSON(json) {
