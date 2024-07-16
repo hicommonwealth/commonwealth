@@ -96,7 +96,7 @@ export async function __searchProfiles(
   const sqlWithoutPagination = `
     SELECT
       "Addresses".profile_id, -- TO BE REMOVED
-      "Users".user_id,
+      "Users".id AS user_id,
       "Users".profile->>'name' AS profile_name,
       "Users".profile->>'avatar_url' AS avatar_url,
       "Users".created_at,
@@ -115,7 +115,8 @@ export async function __searchProfiles(
         "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
     GROUP BY
-      "Users".id
+      "Users".id,
+      "Addresses".profile_id
   `;
 
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([
