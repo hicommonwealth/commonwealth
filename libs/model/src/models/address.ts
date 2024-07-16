@@ -1,6 +1,6 @@
 import { Role, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { decrementProfileCount } from '../utils';
+import { decrementProfileCount } from '../utils/denormalizedCountUtils';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
