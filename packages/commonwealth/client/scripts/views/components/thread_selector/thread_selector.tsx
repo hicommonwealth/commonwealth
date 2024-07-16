@@ -94,11 +94,6 @@ export const ThreadSelector = ({
     [linkedThreadsToSet, onSelect],
   );
 
-  // eslint-disable-next-line react/no-multi-comp
-  const EmptyComponent = () => (
-    <div className="empty-component">{getEmptyContentMessage()}</div>
-  );
-
   return (
     <div className="ThreadSelector">
       <CWTextInput
