@@ -26,7 +26,7 @@ export const statsMiddleware = (
       const latency = Date.now() - start;
       stats().histogram(`cw.path.latency`, latency, {
         path,
-        statusCode: String(res.statusCode),
+        statusCode: `${res.statusCode}`,
       });
     });
   } catch (err: unknown) {
