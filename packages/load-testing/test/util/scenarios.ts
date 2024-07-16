@@ -27,9 +27,9 @@ export function createScenario({
   constantTrafficScenario?: TrafficSpikeScenarioOptions;
   quickDevScenario?: QuickDevScenarioOptions;
 }) {
-  if (__ENV.MODE === 'spike')
+  if (__ENV.SCENARIO === 'spike')
     return createTrafficSpikeScenario({ ...options, ...trafficSpikeScenario });
-  else if (__ENV.MODE === 'constant')
+  else if (__ENV.SCENARIO === 'constant')
     return createConstantTrafficScenario({
       ...options,
       ...constantTrafficScenario,
