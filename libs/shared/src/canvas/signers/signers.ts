@@ -45,11 +45,15 @@ function parseAddress(address: string): [chain: string, walletAddress: string] {
     );
   }
 
-  const chain = result[3];
-  const walletAddress = result[4];
+  const chain = result[1];
+  const walletAddress = result[2];
   return [chain, walletAddress];
 }
 
+/**
+ * Use addresses of the form `cosmos:cosmoshub-1:osmo1...`
+ * since we don't know the chain ID, but also don't want to reencode the chain address
+ */
 export class CosmosSignerCW extends CosmosSigner {
   public async getAddress(): Promise<string> {
     const chainId = await this._signer.getChainId();
