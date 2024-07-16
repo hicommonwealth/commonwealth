@@ -108,7 +108,8 @@ const EditProfile = () => {
 
     if (data) {
       setProfile(new NewProfile(data.profile));
-      setAvatarUrl(data.profile.avatar_url as any);
+      // @ts-expect-error <StrictNullChecks/>
+      setAvatarUrl(data.profile.avatar_url);
       setPreferenceTags((tags) =>
         [...(tags || [])].map((t) => ({
           ...t,
