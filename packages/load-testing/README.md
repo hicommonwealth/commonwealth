@@ -7,11 +7,12 @@
 2. Navigate to `packages/commonwealth` and execute `pnpm db-all` to bootstrap the load test database.
 3. Navigate to `packages/commonwealth` and execute `pnpm start` to start the Commonwealth server.
 4. Execute `pnpm test test/<path_to_test_file>.ts`
+  - This executes load tests against your local API with the 'dev' scenario.
 
 ### Remote API
 1. Execute `pnpm start <frick | frack | beta>` to start up the required services in Docker and connect them to the
 desired Heroku app.
-2. Execute `pnpm test test/<path_to_test_file>.ts <frick | frack | beta>`
+2. Execute `pnpm test test/<path_to_test_file>.ts -a <frick | frack | beta>`
 
 ## Testing Remote API from K6 Cloud
 To use native k6 on the cloud you must first execute `k6 login cloud -token [K6_CLOUD_PERSONAL_TOKEN]`. To use k6 on the
@@ -20,15 +21,16 @@ necessary since all the metrics will be hosted on the k6 cloud.
 
 1. Execute `pnpm start <frick | frack | beta>` to start up the required services in Docker and connect them to the
    desired Heroku app.
-2. Execute `pnpm test test/<path_to_test_file>.ts <frick | frack | beta> cloud`
+2. Execute `pnpm test test/<path_to_test_file>.ts -a <frick | frack | beta> -c`
 
-# Adding Remote Modules
+# Best Practices
+## Adding Remote Modules
 K6 supports loading some compatible remote modules. A list of compatible modules can be found [here][3]. These modules
 generally will not have types, but it may be worth looking for some in the @types repository. If none can be found, it
 is recommended to declare the module types in `test/types.d.ts`. If declaring custom types is too complex you can add
 `//@ts-ignore` above the import to ignore the type error. More information can be found in the [K6 documentation][4].
 
-# Test Organization and Best Practices
+## Test Organization and Creation
 To keep tests organized/robust and help with visualizing, sorting, and filtering test results in Grafana use the 
 following patterns/strategies when creating load tests:
 - Define API request functions in `test/util/apiRequests` and then use those functions to create a test.
@@ -37,11 +39,14 @@ following patterns/strategies when creating load tests:
   - Don't use a Group for a single request. See the [docs][2] for reasoning.
 - Use [k6 user-defined tags][7] to tag related requests even if they are in different groups e.g. Thread creation <> Comment creation.
 - Use [k6 scenarios][8] to simulate different workloads for the same test.
-- Use [k6 SharedArrays][9] to store different JWTs for every virtual user. This ensures that each VU test cycle triggers 
+- ~~Use [k6 SharedArrays][9] to store different JWTs for every virtual user. This ensures that each VU test cycle triggers 
 queries to different data in the database thus simulating a real world scenario. If all virtual users use the same JWT,
-performance results will be biased since the database can cache the specific data that is queried repeatedly.
+performance results will be biased since the database can cache the specific data that is queried repeatedly.~~ Edit:
+Setting up shared arrays in `setup` lifecycle functions is not supported. Return the result of the `createJWTs` function 
+from the `setup` function which is accessible (copied to each VU on first iteration) as the first argument of test
+functions. See [this GitHub issue][12] for more info.
 
-# Creating API Request Functions
+## Creating API Request Functions
 - Use `k6/http` not Axios or the native node `http` module.
 - k6 currently doesn't natively support ignoring metrics for HTTP requests from `setup` and `teardown` functions (see
 [this GitHub Issue][10] for context) but there is a workaround described [here][11]. To use this workaround, ensure that
@@ -55,6 +60,24 @@ Execute the `generate-load-tests` command from the root of the repository to gen
 thoroughly updated to fit the desired testing scenarios. Indeed, this generator script should only be used to generate
 the general outline of utility request functions in `load-testing/test/apiRequests/`. This script has limited utility.
 
+# Load Test Scenarios
+Each k6 load test can be executed with 3 different preconfigured scenarios. To specify a scenario when running a test,
+use the `-s <dev | constant | spike>` option. The default scenario (if unspecified) is `dev`. More information can be 
+found in `test/util/scenarios.ts`.
+
+### dev
+This scenario is a fast test which runs a set number of iterations (defaults to 100) in maximum 30 seconds. 
+This scenario can only be used when running tests from a local environment (but can be run against remote apps). This
+scenario should only be used to get a quick and dirty estimate of RPS during development.
+
+### constant
+This scenario is a medium-length test which makes API requests at a constant rate regardless of the performance of the
+API (open-model). This is the best scenario to execute to get an accurate measure of the RPS under stable load.
+
+### spike
+This scenario is a long-running test which ramps the number of requests generated up then down to simulate a temporary
+spike in traffic. This test should be used to determine API performance under short bouts of extreme load.
+
 # Package Scripts
 
 ### start
@@ -67,10 +90,10 @@ remote database is not specified, a Postgres container will be created.
 
 ### test-load
 
-Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh <path-to-test-file> <environment> <cloud | null>`
+Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh`
 
-Description: Executes the specified Typescript k6 load test using Docker against the specified environment. The
-environment argument is optional (defaults to local) but can be set to frick, frack, or beta.
+Description: Use `pnpm test-load --help` to see available options. The script executes a specified Typescript k6 load 
+test using Docker against a specified app environment.
 
 Considerations: Executing load tests with Docker is less performant than executing them with a native k6 installation
 (see [test-load-native](#test-load-native)). Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. 
@@ -78,10 +101,10 @@ See [start](#start).
 
 ### test-load-native
 
-Definition: `chmod u+x scripts/k6.sh && NATIVE_K6=true ./scripts/k6.sh <path-to-test-file> <environment> <cloud | null>`
+Definition: `chmod u+x scripts/k6.sh && NATIVE_K6=true ./scripts/k6.sh`
 
-Description: Executes the specified Typescript k6 load test using a native/local k6 installation against the specified 
-environment. The environment argument is optional (defaults to local) but can be set to frick, frack, or beta.
+Description: Use `pnpm test-load --help` to see available options. The script executes a specified Typescript k6 load 
+test using a native/local k6 installation against a specified app environment.
 
 Considerations: Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. See [start](#start).
 
@@ -115,6 +138,11 @@ syntax as described here: https://github.com/grafana/k6/issues/2935#issuecomment
 - Open and closed model scenarios refers to different executors: 
 https://grafana.com/docs/k6/latest/using-k6/scenarios/concepts/open-vs-closed/
 
+# Tracking Issues
+- [SharedArray Improvements][12]
+- https://github.com/grafana/k6/issues/1342
+- https://community.grafana.com/t/sequentially-run-scenarios/99153/6
+
 [1]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#groups
 [2]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#discouraged-one-group-per-request
 [3]: https://jslib.k6.io/
@@ -126,3 +154,4 @@ https://grafana.com/docs/k6/latest/using-k6/scenarios/concepts/open-vs-closed/
 [9]: https://grafana.com/docs/k6/latest/javascript-api/k6-data/sharedarray/
 [10]: https://github.com/grafana/k6/issues/1321
 [11]: https://community.grafana.com/t/ignore-http-calls-made-in-setup-or-teardown-in-results/97260/2
+[12]: https://github.com/grafana/k6/issues/2043
