@@ -10,6 +10,7 @@ export const INVALID_STATE_ERROR = 'Invalid State Error';
 
 export const ExternalServiceUserIds = {
   Knock: -1,
+  K6: -2,
 } as const;
 
 export type AuthStrategies = {
@@ -175,6 +176,7 @@ export type CommandMetadata<
   readonly auth: CommandHandler<Input, Output>[];
   readonly body: CommandHandler<Input, Output>;
   readonly secure?: boolean;
+  readonly authStrategy?: AuthStrategies;
 };
 
 /**

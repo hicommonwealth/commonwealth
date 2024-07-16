@@ -1,6 +1,10 @@
 import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
+const DEFAULTS = {
+  JWT_SECRET: 'my secret',
+};
+
 const {
   TEST_DB_NAME,
   DATABASE_URL,
@@ -11,6 +15,7 @@ const {
   ALLOWED_EVENTS,
   INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
+  JWT_SECRET,
 } = process.env;
 
 const NAME =
@@ -47,6 +52,9 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 2,
+    AUTH: {
+      JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
+      SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
     },
   },
   z.object({
@@ -70,5 +78,23 @@ export const config = configure(
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
     }),
+    AUTH: z
+      .object({
+        JWT_SECRET: z.string(),
+        SESSION_EXPIRY_MILLIS: z.number().int(),
+      })
+      .refine(
+        (data) => {
+          if (target.NODE_ENV === 'production') {
+            return !!JWT_SECRET && data.JWT_SECRET !== DEFAULTS.JWT_SECRET;
+          }
+          return true;
+        },
+        {
+          message:
+            'JWT_SECRET must be set to a non-default value in production environments',
+          path: ['JWT_SECRET'],
+        },
+      ),
   }),
 );
