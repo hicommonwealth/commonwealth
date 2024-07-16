@@ -256,8 +256,6 @@ async function loginExistingMagicUser({
           `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
         );
       }
-      ssoToken.issued_at = decodedMagicToken.claim.iat;
-      ssoToken.updated_at = new Date();
       await models.SsoToken.update(
         {
           issued_at: decodedMagicToken.claim.iat,
