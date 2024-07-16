@@ -61,7 +61,8 @@ const Profile = ({ profileId }: ProfileProps) => {
         );
         return { ...c, thread };
       });
-      setComments(commentsWithAssociatedThread as any);
+      // @ts-expect-error <StrictNullChecks/>
+      setComments(commentsWithAssociatedThread);
 
       setAddresses(
         // @ts-expect-error <StrictNullChecks/>
