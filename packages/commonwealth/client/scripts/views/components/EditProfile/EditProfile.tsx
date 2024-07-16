@@ -108,7 +108,7 @@ const EditProfile = () => {
 
     if (data) {
       setProfile(new NewProfile(data.profile));
-      setAvatarUrl(data.profile.avatar_url);
+      setAvatarUrl(data.profile.avatar_url as any);
       setPreferenceTags((tags) =>
         [...(tags || [])].map((t) => ({
           ...t,
@@ -123,12 +123,13 @@ const EditProfile = () => {
         })),
       );
       setAddresses(
+        // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
               id: a.id,
               address: a.address,
-              communityId: a.community_id,
+              communityId: a.community_id!,
               keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,

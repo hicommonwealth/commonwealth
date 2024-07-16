@@ -1,4 +1,4 @@
-import { GetNewProfileResp } from '@hicommonwealth/schemas';
+import { GetNewProfileResp, UserProfile } from '@hicommonwealth/schemas';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import AddressInfo from 'models/AddressInfo';
@@ -20,8 +20,13 @@ type UseFetchProfileByIdQueryCommonProps =
       shouldFetchSelfProfile: boolean;
     };
 
+export type MappedProfile = z.infer<typeof UserProfile> & {
+  id: number;
+  profile_name: string;
+  is_owner: boolean;
+};
 type MappedResponse = z.infer<typeof GetNewProfileResp> & {
-  profile: { id: number; profile_name: string; is_owner: boolean };
+  profile: MappedProfile;
 };
 
 const fetchProfileById = async ({

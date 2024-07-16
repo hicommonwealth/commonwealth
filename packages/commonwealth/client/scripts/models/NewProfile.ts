@@ -1,3 +1,4 @@
+import { MappedProfile } from '../state/api/profiles/fetchProfileById';
 import type { Image } from '../views/components/EditProfile/EditProfile';
 
 class NewProfile {
@@ -63,17 +64,17 @@ class NewProfile {
     id,
     is_owner,
     background_image,
-  }) {
+  }: MappedProfile) {
     this._name = profile_name;
-    this._email = email;
-    this._website = website;
-    this._bio = bio;
-    this._avatarUrl = avatar_url;
-    this._slug = slug;
-    this._socials = socials;
+    this._email = email!;
+    this._website = website!;
+    this._bio = bio!;
+    this._avatarUrl = avatar_url!;
+    this._slug = slug!;
+    this._socials = socials!;
     this._id = id;
     this._isOwner = is_owner;
-    this._backgroundImage = background_image;
+    this._backgroundImage = background_image as any;
   }
 
   public static fromJSON(json) {
