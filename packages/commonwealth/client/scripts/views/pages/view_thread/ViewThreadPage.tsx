@@ -1,5 +1,4 @@
 import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
-import useGetViewCountByObjectIdQuery from 'client/scripts/state/api/general/getViewCountByObjectId';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -17,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
