@@ -1,9 +1,8 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { ChainBase } from '@hicommonwealth/shared';
+import { addressSwapper, ChainBase } from '@hicommonwealth/shared';
 import type { NextFunction, Response } from 'express';
 import Sequelize from 'sequelize';
-import { addressSwapper } from 'shared/utils';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',

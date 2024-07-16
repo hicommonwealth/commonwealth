@@ -163,7 +163,7 @@ const CommunityMembersPage = () => {
         }
         return undefined;
       },
-      enabled: user?.activeAccount?.address ? !!memberships : true,
+      enabled: user.activeAccount?.address ? !!memberships : true,
     },
   );
 

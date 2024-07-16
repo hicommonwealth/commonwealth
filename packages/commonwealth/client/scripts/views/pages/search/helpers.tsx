@@ -24,7 +24,7 @@ export type ThreadResult = {
   body: string;
   address_id: number;
   address: string;
-  address_chain: string;
+  address_community_id: string;
   created_at: string;
 };
 type ThreadResultRowProps = {
@@ -66,8 +66,10 @@ const ThreadResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={thread?.address}
-            userCommunityId={thread?.address_chain}
-            shouldShowAsDeleted={!thread?.address && !thread?.address_chain}
+            userCommunityId={thread?.address_community_id}
+            shouldShowAsDeleted={
+              !thread?.address && !thread?.address_community_id
+            }
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
