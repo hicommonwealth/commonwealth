@@ -1,3 +1,4 @@
+import { BrowserType, getBrowserType } from 'helpers/browser';
 import React, { useCallback, useState } from 'react';
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
 import { useUnregisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useUnregisterClientRegistrationTokenMutation';
@@ -6,12 +7,28 @@ import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getF
 
 const LOCAL_STORAGE_KEY = 'pushNotificationsEnabled';
 
+function computeChannelTypeFromBrowserType(
+  browserType: BrowserType | undefined,
+): 'FCM' | 'APNS' | undefined {
+  switch (browserType) {
+    case 'safari':
+      return 'APNS';
+    case 'chrome':
+      return 'FCM';
+  }
+
+  return undefined;
+}
+
 export const PushNotificationsToggle = () => {
   const registerClientRegistrationToken =
     useRegisterClientRegistrationTokenMutation();
 
   const unregisterClientRegistrationToken =
     useUnregisterClientRegistrationTokenMutation();
+
+  const browserType = getBrowserType();
+  const channelType = computeChannelTypeFromBrowserType(browserType);
 
   const [checked, setChecked] = useState(
     () => localStorage.getItem(LOCAL_STORAGE_KEY) === 'on',
