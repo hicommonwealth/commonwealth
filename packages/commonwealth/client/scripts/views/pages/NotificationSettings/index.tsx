@@ -4,10 +4,6 @@ import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useCallback, useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
-// eslint-disable-next-line max-len
-import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
-import { useUnregisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useUnregisterClientRegistrationTokenMutation';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
@@ -16,7 +12,6 @@ import {
 import { PageNotFound } from 'views/pages/404';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
-import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -31,11 +26,6 @@ const NotificationSettings = () => {
   const communityAlerts = useCommunityAlertsQuery();
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const { isLoggedIn } = useUserLoggedIn();
-  const registerClientRegistrationToken =
-    useRegisterClientRegistrationTokenMutation();
-
-  const unregisterClientRegistrationToken =
-    useUnregisterClientRegistrationTokenMutation();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     (communityAlerts.data as unknown as ReadonlyArray<
@@ -53,38 +43,6 @@ const NotificationSettings = () => {
     },
     [threadsFilter],
   );
-
-  const handleRegisterPushNotificationSubscription = useCallback(() => {
-    async function doAsync() {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        console.log('Notification permission granted.');
-        const token = await getFirebaseMessagingToken();
-        await registerClientRegistrationToken.mutateAsync({
-          id: 'none',
-          token,
-        });
-      }
-    }
-
-    doAsync().catch(console.error);
-  }, [registerClientRegistrationToken]);
-
-  const handleUnregisterPushNotificationSubscription = useCallback(() => {
-    async function doAsync() {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        console.log('Notification permission granted.');
-        const token = await getFirebaseMessagingToken();
-        await unregisterClientRegistrationToken.mutateAsync({
-          id: 'none',
-          token,
-        });
-      }
-    }
-
-    doAsync().catch(console.error);
-  }, [unregisterClientRegistrationToken]);
 
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
@@ -108,18 +66,6 @@ const NotificationSettings = () => {
             <CWText type="h5">Push Notifications</CWText>
 
             <PushNotificationsToggle />
-
-            <p>
-              <CWButton
-                label="Register Push Notifications"
-                onClick={handleRegisterPushNotificationSubscription}
-              />
-
-              <CWButton
-                label="Unregister Push Notifications"
-                onClick={handleUnregisterPushNotificationSubscription}
-              />
-            </p>
           </div>
         )}
 
