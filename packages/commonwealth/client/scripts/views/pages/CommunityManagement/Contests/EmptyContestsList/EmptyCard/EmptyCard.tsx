@@ -3,6 +3,8 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
+import { CONTEST_FAQ_URL } from '../../utils';
+
 import './EmptyCard.scss';
 
 interface EmptyCardProps {
@@ -17,7 +19,7 @@ interface EmptyCardProps {
 
 const EmptyCard = ({ img, title, subtitle, button }: EmptyCardProps) => {
   const handleOpenLink = () => {
-    window.open('https://commonwealth.im/', '_blank');
+    window.open(CONTEST_FAQ_URL, '_blank');
   };
 
   return (

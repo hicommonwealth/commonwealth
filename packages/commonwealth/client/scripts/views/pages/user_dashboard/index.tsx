@@ -13,14 +13,12 @@ import {
   MixpanelPWAEvent,
 } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
-import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
-import { fetchActivity } from './helpers';
 import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 
 export enum DashboardViews {
@@ -126,18 +124,16 @@ const UserDashboard = (props: UserDashboardProps) => {
             <>
               {activePage === DashboardViews.ForYou && (
                 <Feed
-                  fetchData={() => fetchActivity(activePage)}
+                  dashboardView={DashboardViews.ForYou}
                   noFeedMessage="Join some communities to see Activity!"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
               {activePage === DashboardViews.Global && (
                 <Feed
-                  fetchData={() => fetchActivity(activePage)}
+                  dashboardView={DashboardViews.Global}
                   noFeedMessage="No Activity"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
