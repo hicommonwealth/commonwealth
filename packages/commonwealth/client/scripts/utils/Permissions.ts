@@ -30,6 +30,7 @@ const isCommunityRole = (adminOrMod: Role, communityId?: string) => {
   const chainInfo = communityId
     ? app.config.chains.getById(communityId)
     : app.chain?.meta;
+  if (!chainInfo) return false;
   return userStore.getState().addresses.some(({ community, address }) => {
     return (
       community.id === chainInfo.id &&

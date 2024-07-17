@@ -78,6 +78,8 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     isThreadTopicGated: isRestrictedMembership,
   });
 
+  // edge case for deleted communities with orphaned posts
+  if (!chain) return;
   return (
     <ThreadCard
       thread={thread}
