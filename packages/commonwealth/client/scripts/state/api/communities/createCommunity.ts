@@ -78,8 +78,8 @@ const useCreateCommunityMutation = () => {
       if (data?.result?.admin_address) {
         await linkExistingAddressToChainOrCommunity(
           data.result.admin_address,
-          data.result.role.community_id,
-          data.result.role.community_id,
+          data.result.community.id,
+          data.result.community.id,
         );
       }
 

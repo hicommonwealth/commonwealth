@@ -11,12 +11,10 @@ import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
-import { Op, QueryTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
-import type { RoleInstanceWithPermission } from '../util/roles';
-import { findAllRoles } from '../util/roles';
 
 type ThreadCountQueryData = {
   communityId: string;
@@ -25,7 +23,6 @@ type ThreadCountQueryData = {
 
 type StatusResp = {
   recentThreads: ThreadCountQueryData[];
-  roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
   user?: {
     id: number;
@@ -104,17 +101,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       user.isAdmin,
       user.disableRichText,
     ]);
-
-  // look up my roles & private communities
-  // @ts-expect-error StrictNullChecks
-  const myAddressIds: number[] = Array.from(
-    addresses.map((address) => address.id),
-  );
-
-  const roles = await findAllRoles(models, {
-    where: { address_id: { [Op.in]: myAddressIds } },
-    include: [models.Address],
-  });
 
   // get starred communities for user
   const starredCommunitiesPromise = models.StarredCommunity.findAll({
@@ -269,7 +255,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
    */
 
   return {
-    roles,
     user: {
       id: user.id,
       email: user.email,
@@ -323,7 +308,7 @@ export const status = async (
         profilePromise,
       ]);
       const { communityCategories, threadCountQueryData } = communityStatus;
-      const { roles, user, id } = userStatus;
+      const { user, id } = userStatus;
 
       const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
         expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
@@ -337,7 +322,6 @@ export const status = async (
 
       return success(res, {
         recentThreads: threadCountQueryData,
-        roles,
         loggedIn: true,
         // @ts-expect-error StrictNullChecks
         user: { ...user, profileId: profileInstance.id },
