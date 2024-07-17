@@ -65,7 +65,17 @@ const NotificationSettings = () => {
           <div>
             <CWText type="h5">Push Notifications</CWText>
 
-            <PushNotificationsToggle />
+            <div className="setting-container">
+              <div className="setting-container-left">
+                <CWText className="text-muted">
+                  Turn on notifications to receive alerts on your device.
+                </CWText>
+              </div>
+
+              <div className="setting-container-right">
+                <PushNotificationsToggle />
+              </div>
+            </div>
           </div>
         )}
 
