@@ -121,10 +121,26 @@ async function deleteUser(user_id: number) {
 
 async function main() {
   if (!process.argv[2]) {
-    throw new Error('Must provide a user id (number) to delete');
+    throw new Error(
+      'Must provide a user id (number) or email (string) to delete',
+    );
   }
 
-  await deleteUser(parseInt(process.argv[2]));
+  if (process.argv[2].includes('@')) {
+    const user = await models.User.findOne({
+      where: {
+        email: process.argv[2],
+      },
+    });
+
+    if (user) {
+      await deleteUser(user.id!);
+    } else {
+      log.warn(`User with email ${process.argv[2]} not found.`);
+    }
+  } else {
+    await deleteUser(parseInt(process.argv[2]));
+  }
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
