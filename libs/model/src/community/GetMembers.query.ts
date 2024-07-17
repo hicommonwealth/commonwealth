@@ -206,7 +206,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         type: QueryTypes.SELECT,
       });
 
-      console.log(members, payload);
+      // console.log(members, payload);
       return schemas.buildPaginatedResponse(
         members,
         members.at(0)?.total ?? 0,
