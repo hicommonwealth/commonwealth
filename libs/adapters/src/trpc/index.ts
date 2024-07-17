@@ -1,10 +1,10 @@
 import * as core from '@hicommonwealth/core';
 import {
-  AuthStrategies,
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   logger,
+  type AuthStrategies,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,

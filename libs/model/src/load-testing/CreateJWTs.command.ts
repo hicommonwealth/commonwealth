@@ -1,8 +1,8 @@
 import { ExternalServiceUserIds, type Command } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import jwt from 'jsonwebtoken';
 import { QueryTypes } from 'sequelize';
+import { config } from '../config';
 import { models } from '../database';
 
 export function CreateJWTs(): Command<typeof schemas.CreateJWTs> {
