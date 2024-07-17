@@ -33,6 +33,7 @@ export type CommentAttributes = {
   deleted_at?: Date;
   marked_as_spam_at?: Date;
   discord_meta?: IDiscordMeta;
+  version_history_updated?: boolean;
 
   // associations
   Community?: CommunityAttributes;
@@ -97,6 +98,11 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      version_history_updated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       hooks: {
@@ -108,9 +114,13 @@ export default (
               where: { id: thread_id },
             });
             if (thread) {
-              await thread.increment('comment_count', {
-                transaction: options.transaction,
-              });
+              await thread.update(
+                {
+                  comment_count: Sequelize.literal('comment_count + 1'),
+                  activity_rank_date: comment.created_at,
+                },
+                { transaction: options.transaction },
+              );
               stats().increment('cw.hook.comment-count', {
                 thread_id: String(thread_id),
               });

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { ChainBase } from '@hicommonwealth/shared';
-import { CANVAS_TOPIC, chainBaseToCanvasChainId } from 'canvas';
-import { chainBaseToCaip2 } from 'shared/canvas/chainMappings';
-import { getSessionSigners } from 'shared/canvas/verify';
+import {
+  CANVAS_TOPIC,
+  ChainBase,
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+  getSessionSigners,
+} from '@hicommonwealth/shared';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 

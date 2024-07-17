@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { useFlag } from 'hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
@@ -71,7 +70,6 @@ interface UseUpdateProfileByAddressMutation {
 const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
 }: UseUpdateProfileByAddressMutation = {}) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const user = useUserStore();
 
   return useMutation({
@@ -105,7 +103,6 @@ const useUpdateProfileByAddressMutation = ({
         // if `profileId` matches auth user's profile id, and user profile has a defined name, then
         // set welcome onboard step as complete
         if (
-          userOnboardingEnabled &&
           updatedProfile.name &&
           updatedProfile.name !== 'Anonymous' &&
           !user.isWelcomeOnboardFlowComplete
