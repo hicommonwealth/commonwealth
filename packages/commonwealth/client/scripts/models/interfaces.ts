@@ -5,7 +5,6 @@ import type { EventEmitter } from 'events';
 import type moment from 'moment';
 import type Account from './Account';
 import type StorageModule from './StorageModule';
-import type { TransactionStatus } from './types';
 
 /* eslint-disable */
 
@@ -52,7 +51,7 @@ export interface IChainModule<C extends Coin, A extends Account> {
 export interface IAccountsModule<A extends Account> extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
-  get(address: string, keytype?: string, ignoreProfile?: boolean): A;
+  get(address: string, ignoreProfile?: boolean): A;
 }
 
 export type IBalanceAccount<C extends Coin> = Account & { balance: Promise<C> };

@@ -60,7 +60,6 @@ export const Address = z.object({
   verification_token: z.string().max(255).optional(),
   verification_token_expires: z.date().nullable().optional(),
   verified: z.date().nullable().optional(),
-  keytype: z.string().max(255).optional(),
   last_active: z.date().nullable().optional(),
   is_councillor: z.boolean().optional(),
   is_validator: z.boolean().optional(),

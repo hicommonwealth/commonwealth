@@ -503,7 +503,6 @@ export async function __createCommunity(
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
-      keytype: addressToBeAdmin.keytype,
       wallet_id: addressToBeAdmin.wallet_id,
       is_user_default: true,
       role: 'admin',

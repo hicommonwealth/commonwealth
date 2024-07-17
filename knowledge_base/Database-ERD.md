@@ -358,7 +358,6 @@ erDiagram
     character-varying(255) verification_token 
     timestamp-with-time-zone verification_token_expires 
     timestamp-with-time-zone verified 
-    character-varying(255) keytype 
     timestamp-with-time-zone last_active 
     boolean is_councillor 
     boolean is_validator 
