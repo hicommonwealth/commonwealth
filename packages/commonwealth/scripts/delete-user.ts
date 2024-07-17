@@ -1,5 +1,5 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { UserInstance, models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -126,20 +126,25 @@ async function main() {
     );
   }
 
+  let user: UserInstance | null;
   if (process.argv[2].includes('@')) {
-    const user = await models.User.findOne({
+    user = await models.User.findOne({
       where: {
         email: process.argv[2],
       },
     });
-
-    if (user) {
-      await deleteUser(user.id!);
-    } else {
-      log.warn(`User with email ${process.argv[2]} not found.`);
-    }
   } else {
-    await deleteUser(parseInt(process.argv[2]));
+    user = await models.User.findOne({
+      where: {
+        id: parseInt(process.argv[2]),
+      },
+    });
+  }
+
+  if (user) {
+    await deleteUser(user.id!);
+  } else {
+    log.warn(`User not found.`);
   }
 }
 
