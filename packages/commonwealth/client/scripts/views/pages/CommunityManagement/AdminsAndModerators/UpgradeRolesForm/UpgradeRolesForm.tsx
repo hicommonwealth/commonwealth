@@ -1,4 +1,4 @@
-import { AccessLevel, AddressRole } from '@hicommonwealth/shared';
+import { AddressRole } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
@@ -43,10 +43,7 @@ export const UpgradeRolesForm = ({
 
   // TODO: any => RoleInfo
   const nonAdmins: any[] = roleData.filter((_role) => {
-    return (
-      _role.permission === AccessLevel.Member ||
-      _role.permission === AccessLevel.Moderator
-    );
+    return _role.permission === 'member' || _role.permission === 'moderator';
   });
 
   const nonAdminNames: string[] = nonAdmins.map((_role) => {

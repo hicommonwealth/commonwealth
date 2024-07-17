@@ -97,7 +97,6 @@ export const ThreadCard = ({
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
     Permissions.isCommunityAdmin(thread.communityId) ||
-    // @ts-expect-error <StrictNullChecks/>
     Permissions.isCommunityModerator(thread.communityId);
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
