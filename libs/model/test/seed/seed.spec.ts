@@ -1,4 +1,5 @@
-import { dispose, schemas, type DeepPartial } from '@hicommonwealth/core';
+import { dispose, type DeepPartial } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceType,
   ChainBase,
@@ -8,8 +9,8 @@ import {
 } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { step } from 'mocha-steps';
-import { Model, ModelStatic, ValidationError } from 'sequelize';
+import { Model, ValidationError, type ModelStatic } from 'sequelize';
+import { afterAll, describe, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
@@ -20,19 +21,19 @@ chai.use(chaiAsPromised);
 // then attempts to find the entity and validate it
 async function testSeed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas.entities[T]>>,
+  values?: DeepPartial<z.infer<typeof schemas[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<z.infer<typeof schemas.entities[T]>> {
+): Promise<z.infer<typeof schemas[T]>> {
   const [record, records] = await seed(name, values, options);
   expect(records.length, 'failed to create entity').to.be.gt(0);
 
   // perform schema validation on created entity (throws)
-  const schema = schemas.entities[name];
-  const model = models[name];
+  const schema = schemas[name];
+  const model: ModelStatic<Model> = models[name];
   const data: ReturnType<typeof schema.parse> = schema.parse(record);
 
   // attempt to find entity that was created
-  const existingEntity = await (model as ModelStatic<Model>).findOne({
+  const existingEntity = await model.findOne({
     where: {
       [model.primaryKeyAttribute]:
         data[model.primaryKeyAttribute as keyof typeof data],
@@ -46,17 +47,21 @@ async function testSeed<T extends schemas.Aggregates>(
 }
 
 describe('Seed functions', () => {
-  after(async () => {
+  let shouldExit = true;
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('User', () => {
-    step('Should seed with defaults', async () => {
+    test('Should seed with defaults', async () => {
       await testSeed('User', { selected_community_id: null });
       await testSeed('User', { selected_community_id: null });
+      shouldExit = false;
     });
 
-    step('Should seed with overrides', async () => {
+    test('Should seed with overrides', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       const values = {
         email: 'temp@gmail.com',
         emailVerified: true,
@@ -66,16 +71,22 @@ describe('Seed functions', () => {
       // are explicitly excluded via sequelize model config
       const result = await testSeed('User', values);
       expect(result).contains(values);
+      shouldExit = false;
     });
   });
 
   describe('ChainNode', () => {
-    step('Should seed with defaults', async () => {
+    test('Should seed with defaults', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       await testSeed('ChainNode', { contracts: undefined });
       await testSeed('ChainNode', { contracts: undefined });
+      shouldExit = false;
     });
 
-    step('Should seed with overrides', async () => {
+    test('Should seed with overrides', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       await testSeed('ChainNode', {
         url: 'mainnet1.edgewa.re',
         name: 'Edgeware Mainnet',
@@ -91,11 +102,14 @@ describe('Seed functions', () => {
           },
         ],
       });
+      shouldExit = false;
     });
   });
 
   describe('Community', () => {
-    step('Should seed with overrides', async () => {
+    test('Should seed with overrides', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       const node = await testSeed('ChainNode', { contracts: undefined });
       const user = await testSeed('User', { selected_community_id: null });
       await testSeed('Community', {
@@ -103,7 +117,7 @@ describe('Seed functions', () => {
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
         name: 'Ethereum',
-        icon_url: '/static/img/protocols/eth.png',
+        icon_url: 'assets/img/protocols/eth.png',
         active: true,
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
@@ -129,7 +143,7 @@ describe('Seed functions', () => {
         network: ChainNetwork.Ethereum,
         default_symbol: 'SETH',
         name: 'Super Eth',
-        icon_url: '/static/img/protocols/eth.png',
+        icon_url: 'assets/img/protocols/eth.png',
         active: true,
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
@@ -172,12 +186,16 @@ describe('Seed functions', () => {
         thread_id: undefined,
         comment_id: undefined,
       });
+      shouldExit = false;
     });
 
-    step('Should not mock data', async () => {
+    test('Should not mock data', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       expect(
         seed('Community', {}, { mock: false }),
       ).to.eventually.be.rejectedWith(ValidationError);
+      shouldExit = false;
     });
   });
 });

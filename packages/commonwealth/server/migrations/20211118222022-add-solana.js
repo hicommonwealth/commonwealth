@@ -18,7 +18,7 @@ module.exports = {
             decimals: 9,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -29,7 +29,7 @@ module.exports = {
             url: 'devnet',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'Chains',
@@ -46,7 +46,7 @@ module.exports = {
             decimals: 9,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -57,7 +57,7 @@ module.exports = {
             url: 'testnet',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'Chains',
@@ -74,7 +74,7 @@ module.exports = {
             decimals: 9,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -85,7 +85,7 @@ module.exports = {
             url: 'mainnet-beta',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -95,32 +95,32 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'solana-devnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'solana-devnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'solana-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'solana-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'solana' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'solana' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

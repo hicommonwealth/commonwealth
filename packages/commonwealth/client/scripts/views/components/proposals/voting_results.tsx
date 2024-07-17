@@ -1,39 +1,24 @@
 import React, { useEffect, useState } from 'react';
 
-import { Coin, formatNumberLong } from 'adapters/currency';
+import { Coin } from 'adapters/currency';
 import BN from 'bn.js';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
-import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
-import { ChainNetwork } from '@hicommonwealth/shared';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
-import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
 import {
-  useAaveProposalVotesQuery,
-  useCompoundProposalVotesQuery,
-} from 'state/api/proposals';
-import { Web3 } from 'web3';
-import {
-  AaveVotingResult,
   CompletedProposalVotingResult,
   SimpleYesApprovalVotingResult,
-  VotingResult,
   YesNoAbstainVetoVotingResult,
-  YesNoRejectVotingResult,
 } from './voting_result_components';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
-  const forceRerender = useForceRerender();
-  const [isLoading, setLoading] = useState(
+  const [, setLoading] = useState(
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized,
   );
 
@@ -46,59 +31,10 @@ export const VotingResults = (props: VotingResultsProps) => {
     };
   }, []);
 
-  useEffect(() => {
-    app.proposalEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.proposalEmitter.removeAllListeners();
-    };
-  }, [forceRerender]);
-
-  const { data: aaveVotes } = useAaveProposalVotesQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
-    communityId: app.chain?.id,
-    proposalId: proposal.identifier,
-  });
-
-  const { data: compoundVotes } = useCompoundProposalVotesQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
-    communityId: app.chain?.id,
-    proposalId: proposal.data.id,
-    proposalIdentifier: proposal.identifier,
-  });
-
-  const votes = aaveVotes || compoundVotes || proposal.getVotes();
+  const votes = proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (
-    proposal.votingType === VotingType.SimpleYesNoVoting ||
-    proposal.votingType === VotingType.ConvictionYesNoVoting
-  ) {
-    return (
-      <VotingResult
-        yesVotes={votes.filter((v) => v.choice === true)}
-        noVotes={votes.filter((v) => v.choice === false)}
-        proposal={proposal}
-      />
-    );
-  } else if (proposal.votingType === VotingType.CompoundYesNo) {
-    return (
-      <VotingResult
-        yesVotes={votes.filter((v) => v.choice === BravoVote.YES)}
-        noVotes={votes.filter((v) => v.choice === BravoVote.NO)}
-        proposal={proposal}
-      />
-    );
-  } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
-    return (
-      <VotingResult
-        abstainVotes={votes.filter((v) => v.choice === BravoVote.ABSTAIN)}
-        yesVotes={votes.filter((v) => v.choice === BravoVote.YES)}
-        noVotes={votes.filter((v) => v.choice === BravoVote.NO)}
-        proposal={proposal}
-      />
-    );
-  } else if (
     proposal.votingType === VotingType.SimpleYesApprovalVoting &&
     (proposal instanceof CosmosProposal || proposal instanceof CosmosProposalV1)
   ) {
@@ -106,6 +42,7 @@ export const VotingResults = (props: VotingResultsProps) => {
     return (
       <SimpleYesApprovalVotingResult
         approvedCount={proposal.depositorsAsVotes.length}
+        // @ts-expect-error <StrictNullChecks/>
         proposal={proposal}
         votes={proposal.depositorsAsVotes}
       />
@@ -116,39 +53,6 @@ export const VotingResults = (props: VotingResultsProps) => {
         approvedCount={votes.length}
         proposal={proposal}
         votes={votes}
-      />
-    );
-  } else if (proposal instanceof AaveProposal) {
-    const yesVotes: AaveProposalVote[] = votes.filter((v) => !!v.choice);
-
-    const yesBalance = yesVotes.reduce(
-      (total, v) => total.add(v.power),
-      new BN(0),
-    );
-
-    const yesBalanceString = `${formatNumberLong(
-      +Web3.utils.fromWei(yesBalance.toString(), 'ether'),
-    )} ${app.chain.meta.default_symbol}`;
-
-    const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
-
-    const noBalance = noVotes.reduce(
-      (total, v) => total.add(v.power),
-      new BN(0),
-    );
-
-    const noBalanceString = `${formatNumberLong(
-      +Web3.utils.fromWei(noBalance.toString(), 'ether'),
-    )} ${app.chain.meta.default_symbol}`;
-
-    return (
-      <AaveVotingResult
-        noBalanceString={noBalanceString}
-        noVotesCount={noVotes.length}
-        proposal={proposal}
-        votes={votes}
-        yesBalanceString={yesBalanceString}
-        yesVotesCount={yesVotes.length}
       />
     );
   } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
@@ -192,16 +96,6 @@ export const VotingResults = (props: VotingResultsProps) => {
         />
       );
     }
-  } else if (proposal.votingType === VotingType.YesNoReject) {
-    return (
-      <YesNoRejectVotingResult
-        proposal={proposal as NearSputnikProposal}
-        votes={votes}
-      />
-    );
-  } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
-    // to be implemented
-    return null;
   } else {
     // to be implemented
     return null;

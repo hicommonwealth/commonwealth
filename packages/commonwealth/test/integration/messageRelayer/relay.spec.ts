@@ -1,23 +1,24 @@
 import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
+import { afterEach, beforeAll, describe, test } from 'vitest';
 import { relay } from '../../../server/workers/messageRelayer/relay';
 import { testOutboxEvents } from './util';
 
 describe('relay', () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     const res = await import('@hicommonwealth/model');
     models = res['models'];
     await tester.bootstrap_testing(true);
   });
 
-  afterEach('Clean outbox', async () => {
+  afterEach(async () => {
     await models.Outbox.truncate();
   });
 
-  it('Should relay a single event and update relayed column', async () => {
+  test('Should relay a single event and update relayed column', async () => {
     await models.Outbox.create({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       event_name: 'test' as any,
@@ -36,12 +37,13 @@ describe('relay', () => {
     expect(events.length).to.equal(1);
   });
 
-  it('Should relay multiple events in order', async () => {
+  test('Should relay multiple events in order', async () => {
     const publishedEvents = [];
     const spyBroker: Broker = {
       ...successfulInMemoryBroker,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
       publish: async (topic: string, event: any) => {
+        // @ts-expect-error StrictNullChecks
         publishedEvents.push(event.name);
         return true;
       },
@@ -60,13 +62,14 @@ describe('relay', () => {
     expect(publishedEvents[2]).to.equal('third');
   });
 
-  it('should stop relaying if publish fails in order to preserve order', async () => {
+  test('should stop relaying if publish fails in order to preserve order', async () => {
     const publishedEvents = [];
     const spyBroker: Broker = {
       ...successfulInMemoryBroker,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
       publish: async (topic: string, event: any) => {
         if (publishedEvents.length === 1) return false;
+        // @ts-expect-error StrictNullChecks
         publishedEvents.push(event.name);
         return true;
       },

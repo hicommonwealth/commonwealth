@@ -54,6 +54,8 @@
     display: flex;
     flex-direction: column;
     align-items: end;
+    padding-right: 4px;
+    padding-bottom: 4px;
   }
 
   @include smallInclusive {
@@ -79,5 +81,9 @@
     .filter-label {
       padding: 8px 0;
     }
+  }
+
+  .ContestCard {
+    margin-bottom: 16px;
   }
 }

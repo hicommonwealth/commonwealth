@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
+import { addressSwapper, WalletSsoSource } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
+import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import WebWalletController from 'controllers/app/web_wallets';
-import useWallets from 'hooks/useWallets';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import _ from 'underscore';
-import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
+import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
@@ -20,6 +20,7 @@ import {
 import { formatAddress } from 'views/components/user/user_block';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import useAuthentication from '../AuthModal/useAuthentication'; // TODO: This modal should be absorbed into AuthModal
 import './SessionRevalidationModal.scss';
 
 interface SessionRevalidationModalProps {
@@ -33,6 +34,7 @@ const SessionRevalidationModal = ({
   walletAddress,
 }: SessionRevalidationModalProps) => {
   const [connectWithEmail, setConnectWithEmail] = useState(false);
+  const user = useUserStore();
 
   const {
     onWalletAddressSelect,
@@ -42,7 +44,7 @@ const SessionRevalidationModal = ({
     onSocialLogin,
     setEmail,
     isMagicLoading,
-  } = useWallets({
+  } = useAuthentication({
     useSessionKeyLoginFlow: true,
     onModalClose: () => {
       // do nothing, let the user close out of session revalidation
@@ -50,29 +52,59 @@ const SessionRevalidationModal = ({
     onSuccess: async (signedAddress) => {
       onModalClose();
 
-      // if user tries to sign in with different address than
+      // check if user tries to sign in with different address than
       // expected for session key revalidation
-      if (signedAddress !== walletAddress) {
-        openConfirmation({
-          title: 'Address mismatch',
-          description: (
-            <>
-              Expected the address <b>{formatAddress(walletAddress)}</b>, but
-              the wallet you signed in with has address{' '}
-              <b>{formatAddress(signedAddress)}</b>.
-              <br />
-              Please try sign again with expected address.
-              <br />
-            </>
-          ),
-          buttons: [],
-          className: 'AddressMismatch',
-        });
-      } else {
-        const updatedAddress = app.user.activeAccounts.find(
+
+      // @ts-expect-error StrictNullChecks
+      const isSubstrate = user.accounts.find(
+        (addr) => addr.address === walletAddress,
+      ).community.ss58Prefix;
+      if (
+        signedAddress === walletAddress ||
+        (isSubstrate &&
+          addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
+            signedAddress)
+      ) {
+        const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === walletAddress,
         );
-        await setActiveAccount(updatedAddress);
+        await setActiveAccount(signedAddressAccount!);
+      } else {
+        const signedAddressAccount = user.accounts.find(
+          (addr) => addr.address === signedAddress,
+        );
+        await setActiveAccount(signedAddressAccount!);
+        openConfirmation({
+          title: 'Logged in with unexpected address',
+          description: (
+            <>
+              <p style={{ marginBottom: 6 }}>
+                You tried to sign in as <b>{formatAddress(walletAddress!)}</b>,
+                but your wallet has the address{' '}
+                <b>{formatAddress(signedAddress!)}</b>.
+              </p>
+              {signedAddressAccount ? (
+                <p>
+                  We’ve switched your active address to the one in your wallet.
+                  You can switch it back in the user menu.
+                </p>
+              ) : (
+                <p>
+                  Select <strong>Connect a new address</strong> in the user menu
+                  to connect this as a new address, or switch addresses in your
+                  wallet to continue.
+                </p>
+              )}
+            </>
+          ),
+          buttons: [
+            {
+              label: 'Continue',
+              buttonType: 'primary',
+            },
+          ],
+          className: 'AddressMismatch',
+        });
       }
     },
   });
@@ -90,18 +122,25 @@ const SessionRevalidationModal = ({
 
   return (
     <div className="SessionRevalidationModal">
-      <CWModalHeader label="Session expired" onModalClose={onModalClose} />
+      <CWModalHeader label="Verify ownership" onModalClose={onModalClose} />
       <CWModalBody>
         <CWText className="info">
-          The session for your address{' '}
-          <strong>{formatAddress(walletAddress)}</strong> has expired.
+          You haven’t used this address recently, so we need you to sign in
+          again.
         </CWText>
         <CWText className="info">
-          To continue what you were doing, sign in with{' '}
-          {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown
-            ? walletSsoSource[0].toUpperCase() + walletSsoSource.slice(1)
-            : 'your wallet'}{' '}
-          again:
+          Please use
+          {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown ? (
+            ` ${walletSsoSource[0].toUpperCase() + walletSsoSource.slice(1)} `
+          ) : (
+            <span>
+              {' '}
+              your wallet for <strong>
+                {formatAddress(walletAddress)}
+              </strong>{' '}
+            </span>
+          )}
+          to continue:
         </CWText>
         <div>
           {walletSsoSource === WalletSsoSource.Google ? (

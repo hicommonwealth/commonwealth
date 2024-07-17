@@ -1,5 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { ReactNode, useEffect } from 'react';
+import React, {
+  ReactNode,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+} from 'react';
 import { FormProvider, UseFormReturn, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -14,49 +19,67 @@ type FormProps = {
   onWatch?: (values: any) => void;
 };
 
+export type CWFormRef = UseFormReturn;
+
 /**
  * Provides a wrapper around the HTML <form/> components. This wrapper
  * adds form validation to the nested fields with a simple to use API.
  */
-const CWForm = ({
-  id,
-  onSubmit = () => null,
-  onErrors = () => null,
-  validationSchema,
-  children,
-  className,
-  initialValues,
-  onWatch,
-}: FormProps) => {
-  const formMethods: UseFormReturn = useForm({
-    resolver: zodResolver(validationSchema),
-    defaultValues: initialValues,
-    mode: 'all',
-  });
+const CWForm = forwardRef<UseFormReturn, FormProps>(
+  (
+    {
+      id,
+      onSubmit = () => null,
+      onErrors = () => null,
+      validationSchema,
+      children,
+      className,
+      initialValues,
+      onWatch,
+    }: FormProps,
+    ref,
+  ) => {
+    const formMethods: UseFormReturn = useForm({
+      resolver: zodResolver(validationSchema),
+      defaultValues: initialValues,
+      mode: 'all',
+    });
 
-  useEffect(() => {
-    if (onWatch) {
-      const subscription = formMethods.watch(onWatch);
-      return () => subscription.unsubscribe();
-    }
-  }, [formMethods, onWatch]);
+    // Expose formMethods to parent components using ref
+    useImperativeHandle(ref, () => formMethods);
 
-  const handleFormSubmit = async (event) => {
-    // This will chain our custom onSubmit along with the react-hook-form's submit chain
-    await formMethods.handleSubmit(onSubmit)(event);
+    useEffect(() => {
+      if (onWatch) {
+        const subscription = formMethods.watch(onWatch);
+        return () => subscription.unsubscribe();
+      }
+    }, [formMethods, onWatch]);
 
-    // trigger error callback if there are any errors
-    Object.keys(formMethods.formState.errors).length &&
-      (await onErrors(formMethods.formState.errors));
-  };
+    const handleFormSubmit = (event) => {
+      // This will chain our custom onSubmit along with the react-hook-form's submit chain
+      formMethods
+        .handleSubmit(onSubmit)(event)
+        .then(() => {
+          // trigger error callback if there are any errors
+          if (Object.keys(formMethods.formState.errors).length) {
+            onErrors(formMethods.formState.errors);
+          }
+        })
+        .catch((e) => {
+          console.error(`CWForm submit error => `, e);
+        });
+    };
 
-  return (
-    <FormProvider {...formMethods}>
-      <form id={id} onSubmit={handleFormSubmit} className={className}>
-        {typeof children === 'function' ? children(formMethods) : children}
-      </form>
-    </FormProvider>
-  );
-};
+    return (
+      <FormProvider {...formMethods}>
+        <form id={id} onSubmit={handleFormSubmit} className={className}>
+          {typeof children === 'function' ? children(formMethods) : children}
+        </form>
+      </FormProvider>
+    );
+  },
+);
+
+CWForm.displayName = 'CWForm';
 
 export { CWForm };

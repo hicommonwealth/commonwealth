@@ -1,3 +1,5 @@
+import { config } from '@hicommonwealth/core';
+
 export type HttpStatusCode = 200 | 400 | 401 | 403 | 404 | 409 | 500;
 
 export type HttpResponse<T> = {
@@ -58,6 +60,6 @@ export const InternalServerError = (
   statusText: 'Internal Server Error',
   error: {
     message: message ?? 'Internal Server Error',
-    stack: process.env.NODE_ENV !== 'production' ? stack : undefined,
+    stack: config.NODE_ENV !== 'production' ? stack : undefined,
   },
 });

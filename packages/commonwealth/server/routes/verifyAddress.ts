@@ -1,8 +1,8 @@
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 
-import { AppError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { Session } from '@canvas-js/interfaces';
+import { AppError, logger } from '@hicommonwealth/core';
 import type {
   CommunityInstance,
   DB,
@@ -13,12 +13,12 @@ import {
   DynamicTemplate,
   NotificationCategories,
   WalletId,
-  WalletSsoSource,
+  addressSwapper,
+  deserializeCanvas,
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
@@ -34,7 +34,6 @@ export const Errors = {
   InvalidSignature: 'Invalid signature, please re-register',
   NoEmail: 'No email to alert',
   InvalidArguments: 'Invalid arguments',
-  CouldNotVerifySignature: 'Failed to verify signature',
   BadSecret: 'Invalid jwt secret',
   BadToken: 'Invalid sign in token',
   WrongWallet: 'Verified with different wallet than created',
@@ -43,15 +42,10 @@ export const Errors = {
 const processAddress = async (
   models: DB,
   community: CommunityInstance,
-  chain_id: string | number,
   address: string,
   wallet_id: WalletId,
-  wallet_sso_source: WalletSsoSource,
-  signature: string,
   user: Express.User,
-  sessionAddress: string | null,
-  sessionIssued: string | null,
-  sessionBlockInfo: string | null,
+  session: Session,
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
@@ -75,45 +69,40 @@ const processAddress = async (
 
   // verify the signature matches the session information = verify ownership
   try {
-    const valid = await verifySessionSignature(
+    await verifySessionSignature(
       models,
-      community,
-      chain_id,
       addressInstance,
       user ? user.id : null,
-      signature,
-      sessionAddress,
-      sessionIssued,
-      sessionBlockInfo,
+      session,
     );
-    if (!valid) {
-      throw new AppError(Errors.InvalidSignature);
-    }
   } catch (e) {
     log.warn(`Failed to verify signature for ${address}: ${e.stack}`);
-    throw new AppError(Errors.CouldNotVerifySignature);
+    throw new AppError(Errors.InvalidSignature);
   }
 
   addressInstance.last_active = new Date();
 
   if (!user?.id) {
     // user is not logged in
+    // @ts-expect-error StrictNullChecks
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
+      // @ts-expect-error StrictNullChecks
       const newUser = await models.User.createWithProfile({
         email: null,
       });
-      addressInstance.profile_id = (
-        newUser.Profiles[0] as ProfileAttributes
-      ).id;
+      addressInstance.profile_id = // @ts-expect-error StrictNullChecks
+        (newUser.Profiles[0] as ProfileAttributes).id;
       await models.Subscription.create({
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
         is_active: true,
       });
       await models.Subscription.create({
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,
@@ -122,12 +111,14 @@ const processAddress = async (
     }
   } else {
     // user is already logged in => verify the newly created address
+    // @ts-expect-error StrictNullChecks
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     addressInstance.user_id = user.id;
     const profile = await models.Profile.findOne({
       where: { user_id: user.id },
     });
+    // @ts-expect-error StrictNullChecks
     addressInstance.profile_id = profile.id;
   }
   await addressInstance.save();
@@ -135,6 +126,7 @@ const processAddress = async (
   // if address has already been previously verified, update all other addresses
   // to point to the new user = "transfer ownership".
   const addressToTransfer = await models.Address.findOne({
+    // @ts-expect-error StrictNullChecks
     where: {
       address,
       user_id: { [Op.ne]: addressInstance.user_id },
@@ -150,6 +142,7 @@ const processAddress = async (
         profile_id: addressInstance.profile_id,
       },
       {
+        // @ts-expect-error StrictNullChecks
         where: {
           address,
           user_id: { [Op.ne]: addressInstance.user_id },
@@ -175,6 +168,7 @@ const processAddress = async (
           chain: community.name,
         },
       };
+      // @ts-expect-error StrictNullChecks
       await sgMail.send(msg);
       log.info(
         `Sent address move email: ${address} transferred to a new account`,
@@ -191,18 +185,17 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.community_id || !req.body.chain_id) {
+  if (!req.body.community_id) {
     throw new AppError(Errors.NoChain);
   }
   const community = await models.Community.findOne({
     where: { id: req.body.community_id },
   });
-  const chain_id = req.body.chain_id;
   if (!community) {
     return next(new AppError(Errors.InvalidCommunity));
   }
 
-  if (!req.body.address || !req.body.signature) {
+  if (!req.body.address) {
     throw new AppError(Errors.InvalidArguments);
   }
 
@@ -210,22 +203,21 @@ const verifyAddress = async (
     community.base === ChainBase.Substrate
       ? addressSwapper({
           address: req.body.address,
+          // @ts-expect-error StrictNullChecks
           currentPrefix: community.ss58_prefix,
         })
       : req.body.address;
 
+  const decodedSession: Session = deserializeCanvas(req.body.session);
+
   await processAddress(
     models,
     community,
-    chain_id,
     address,
     req.body.wallet_id,
-    req.body.wallet_sso_source,
-    req.body.signature,
+    // @ts-expect-error <StrictNullChecks>
     req.user,
-    req.body.session_public_address,
-    req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null, // disallow empty strings
+    decodedSession,
   );
 
   // assertion check
@@ -243,8 +235,10 @@ const verifyAddress = async (
       where: { community_id: req.body.community_id, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
+      // @ts-expect-error StrictNullChecks
       where: { id: newAddress.user_id },
     });
+    // @ts-expect-error StrictNullChecks
     req.login(user, (err) => {
       const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
@@ -259,6 +253,7 @@ const verifyAddress = async (
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          // @ts-expect-error StrictNullChecks
           userId: user.id,
         },
         req,

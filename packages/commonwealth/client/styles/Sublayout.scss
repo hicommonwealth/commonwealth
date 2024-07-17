@@ -77,6 +77,26 @@
         height: 100%;
         overflow-y: auto;
         width: 100%;
+
+        .mobile-auth-buttons {
+          display: none !important;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          width: 100%;
+          padding: 16px;
+          padding-bottom: 8px;
+          margin-bottom: -8px;
+          background-color: white;
+
+          &.isVisible {
+            display: grid !important;
+          }
+
+          .btn-border {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+        }
       }
     }
   }

@@ -4,6 +4,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import RoleInfo from '../../../../../models/RoleInfo';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
@@ -31,6 +32,8 @@ export const UpgradeRolesForm = ({
     { id: 2, checked: false },
   ]);
 
+  const userData = useUserStore();
+
   const zeroOutRadioButtons = () => {
     const zeroedOutRadioButtons = radioButtons.map((radioButton) => ({
       ...radioButton,
@@ -49,6 +52,7 @@ export const UpgradeRolesForm = ({
   const nonAdminNames: string[] = nonAdmins.map((_role) => {
     const roletext = _role.permission === 'moderator' ? '(moderator)' : '';
     const fullText = `${(_role as any)?.displayName} - ${formatAddressShort(
+      // @ts-expect-error <StrictNullChecks/>
       _role.Address.address,
     )} ${roletext}`;
     return fullText;
@@ -80,9 +84,10 @@ export const UpgradeRolesForm = ({
     try {
       const response = await axios.post(`${app.serverUrl()}/upgradeMember`, {
         new_role: newRole,
+        // @ts-expect-error <StrictNullChecks/>
         address: _user.Address.address,
         community_id: app.activeChainId(),
-        jwt: app.user.jwt,
+        jwt: userData.jwt,
       });
 
       if (response.data.status === 'Success') {

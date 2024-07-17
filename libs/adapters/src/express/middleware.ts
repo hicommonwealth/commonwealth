@@ -4,6 +4,7 @@ import {
   INVALID_INPUT_ERROR,
   User,
   analytics,
+  config,
   stats,
 } from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
@@ -23,7 +24,10 @@ export const statsMiddleware = (
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      stats().histogram(`cw.path.latency`, latency, { path });
+      stats().histogram(`cw.path.latency`, latency, {
+        path,
+        statusCode: `${res.statusCode}`,
+      });
     });
   } catch (err: unknown) {
     console.error(err); // don't use logger port here
@@ -60,7 +64,7 @@ export const errorMiddleware = (
       default:
         response = InternalServerError(
           message,
-          process.env.NODE_ENV !== 'production' ? stack : undefined,
+          config.NODE_ENV !== 'production' ? stack : undefined,
         );
     }
   }

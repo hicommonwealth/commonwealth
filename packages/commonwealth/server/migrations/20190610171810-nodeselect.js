@@ -19,22 +19,6 @@ const newChainRecords = [
     active: true,
   },
   {
-    id: 'edgeware-testnet',
-    network: 'edgeware',
-    symbol: 'testEDG',
-    icon_url: '/static/img/protocols/edg.png',
-    name: 'Edgeware Testnet',
-    active: true,
-  },
-  {
-    id: 'edgeware-local',
-    network: 'edgeware',
-    symbol: 'testEDG',
-    icon_url: '/static/img/protocols/edg.png',
-    name: 'Edgeware Local',
-    active: true,
-  },
-  {
     id: 'kusama',
     network: 'kusama',
     symbol: 'KSM',
@@ -69,7 +53,7 @@ module.exports = {
         {
           id: ['cosmos', 'maker', 'tezos', 'polkadot', 'ethereum'],
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // convert old 'edgeware' to new 'edgeware-testnet'
@@ -80,7 +64,7 @@ module.exports = {
           name: 'Edgeware Testnet',
         },
         { id: 'edgeware' },
-        { transaction: t }
+        { transaction: t },
       );
 
       // update other columns to support node selection
@@ -94,19 +78,19 @@ module.exports = {
             defaultValue: 'edgeware', // set default value to populate preexisting models' fields
             allowNull: false,
           },
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.addColumn(
           'OffchainThreads',
           'chain',
           {
             type: Sequelize.STRING,
-            defaultValue: 'edgeware-testnet', // set default value to populate preexisting models' fields
+            defaultValue: 'edgeware', // set default value to populate preexisting models' fields
             references: { model: 'Chains', key: 'id' },
             onUpdate: 'CASCADE',
             onDelete: 'SET NULL',
           },
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.addColumn(
           'Users',
@@ -118,7 +102,7 @@ module.exports = {
             onUpdate: 'CASCADE',
             onDelete: 'SET NULL',
           },
-          { transaction: t }
+          { transaction: t },
         ),
       ]);
 
@@ -133,13 +117,12 @@ module.exports = {
       await queryInterface.bulkInsert(
         'ChainNodes',
         [
-          { chain: 'edgeware-local', url: 'localhost:9944' },
           { chain: 'edgeware', url: 'mainnet1.edgewa.re' },
           { chain: 'edgeware', url: 'mainnet2.edgewa.re' },
           { chain: 'edgeware', url: 'mainnet3.edgewa.re' },
           { chain: 'edgeware', url: 'mainnet4.edgewa.re' },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -155,14 +138,14 @@ module.exports = {
           defaultValue: 9944,
           allowNull: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // remove new chains
       await queryInterface.bulkDelete(
         'Chains',
         { id: newChainRecords.map((r) => r.id) },
-        { transaction: t }
+        { transaction: t },
       );
 
       // convert 'edgeware' back to 'edgeware-testnet'
@@ -172,7 +155,7 @@ module.exports = {
         {
           id: 'edgeware-testnet',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await Promise.all([

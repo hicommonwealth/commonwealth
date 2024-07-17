@@ -9,16 +9,19 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
+import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
-import { useWelcomeOnboardModal } from '../state/ui/modals';
-import { Footer } from './Footer';
+import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
+import useUserStore, { userStore } from '../state/ui/user';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
+import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
+import { AuthModal, AuthModalType } from './modals/AuthModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
@@ -26,42 +29,68 @@ type SublayoutProps = {
   isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
-const Sublayout = ({
-  children,
-  hideFooter = true,
-  isInsideCommunity,
-}: SublayoutProps) => {
+const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const [authModalType, setAuthModalType] = useState<AuthModalType>();
+  const [profileId, setProfileId] = useState<null | number>(null);
+  useStickyHeader({
+    elementId: 'mobile-auth-buttons',
+    stickyBehaviourEnabled: true,
+    zIndex: 70,
+  });
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
+  const user = useUserStore();
+
+  useEffect(() => {
+    if (triggerOpenModalType) {
+      setAuthModalType(triggerOpenModalType);
+      // @ts-expect-error StrictNullChecks
+      setTriggerOpenModalType(undefined);
+    }
+  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    if (isLoggedIn) {
+      timeout = setTimeout(() => {
+        user.addresses?.[0]?.profile?.id &&
+          setProfileId(user.addresses?.[0]?.profile?.id);
+      }, 100);
+    } else {
+      setProfileId(null);
+    }
+
+    return () => {
+      if (timeout !== null) clearTimeout(timeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn]);
 
   useNecessaryEffect(() => {
-    if (isLoggedIn && userOnboardingEnabled && !isWelcomeOnboardModalOpen) {
-      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
-      const hasUsername = app?.user?.addresses?.find(
-        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
-      );
-
-      // open welcome modal if user is not onboarded
-      if (!hasUsername) {
-        setIsWelcomeOnboardModalOpen(true);
-      }
+    if (
+      isLoggedIn &&
+      !isWelcomeOnboardModalOpen &&
+      profileId &&
+      !userStore.getState().isWelcomeOnboardFlowComplete
+    ) {
+      setIsWelcomeOnboardModalOpen(true);
     }
 
     if (!isLoggedIn && isWelcomeOnboardModalOpen) {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
-    userOnboardingEnabled,
+    profileId,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
     isLoggedIn,
@@ -74,6 +103,16 @@ const Sublayout = ({
   });
 
   const routesWithoutGenericBreadcrumbs = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
+
+  const routesWithoutGenericSliders = matchRoutes(
     [
       { path: '/discussions/*' },
       { path: ':scope/discussions/*' },
@@ -106,7 +145,9 @@ const Sublayout = ({
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
+  // @ts-expect-error StrictNullChecks
   const terms = app.chain ? chain.terms : null;
+  // @ts-expect-error StrictNullChecks
   const banner = app.chain ? chain.communityBanner : null;
 
   return (
@@ -114,15 +155,26 @@ const Sublayout = ({
       {!isWindowSmallInclusive && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
         />
       )}
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
+        // @ts-expect-error StrictNullChecks
         isInsideCommunity={isInsideCommunity}
+        onAuthModalOpen={(modalType) =>
+          setAuthModalType(modalType || AuthModalType.SignIn)
+        }
+      />
+      <AuthModal
+        type={authModalType}
+        onClose={() => setAuthModalType(undefined)}
+        isOpen={!!authModalType}
       />
       <div className="sidebar-and-body-container">
         <Sidebar
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
           onMobile={isWindowExtraSmall}
         />
@@ -140,23 +192,33 @@ const Sublayout = ({
             resizing,
           )}
         >
+          {/* @ts-expect-error StrictNullChecks */}
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">
+            <div
+              className={clsx('mobile-auth-buttons', {
+                isVisible: !isLoggedIn && isWindowExtraSmall,
+              })}
+              id="mobile-auth-buttons"
+            >
+              <AuthButtons
+                fullWidthButtons
+                onButtonClick={(selectedType) => setAuthModalType(selectedType)}
+              />
+            </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {isInsideCommunity && <AdminOnboardingSlider />}
+            {!routesWithoutGenericSliders && <UserTrainingSlider />}
+            {isInsideCommunity && !routesWithoutGenericSliders && (
+              <AdminOnboardingSlider />
+            )}
             {children}
-            {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        {userOnboardingEnabled && (
-          <WelcomeOnboardModal
-            isOpen={isWelcomeOnboardModalOpen}
-            onClose={() =>
-              setIsWelcomeOnboardModalOpen(!isWelcomeOnboardModalOpen)
-            }
-          />
-        )}
+        <WelcomeOnboardModal
+          isOpen={isWelcomeOnboardModalOpen}
+          onClose={() => setIsWelcomeOnboardModalOpen(false)}
+        />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

@@ -1,7 +1,7 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
@@ -13,6 +13,7 @@ import {
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
+import useUserStore from 'state/ui/user';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import {
   deserializeDelta,
@@ -44,7 +45,7 @@ type CommentsTreeAttrs = {
   canReply?: boolean;
   canComment: boolean;
   commentSortType: CommentsFeaturedFilterTypes;
-  disabledActionsTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
 };
 
 export const CommentTree = ({
@@ -63,6 +64,31 @@ export const CommentTree = ({
   commentSortType,
   disabledActionsTooltipText,
 }: CommentsTreeAttrs) => {
+  const urlParams = new URLSearchParams(location.search);
+  const focusCommentsParam = urlParams.get('focusComments') === 'true';
+
+  const user = useUserStore();
+
+  useEffect(() => {
+    let timeout;
+
+    if (focusCommentsParam) {
+      timeout = setTimeout(() => {
+        const ele = document.getElementsByClassName('CommentsTree')[0];
+        ele.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 100);
+    }
+
+    return () => {
+      timeout !== undefined && clearTimeout(timeout);
+    };
+    // we only want to run this on first mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [highlightedComment, setHighlightedComment] = useState(false);
 
   const { data: allComments = [] } = useFetchCommentsQuery({
@@ -104,7 +130,6 @@ export const CommentTree = ({
       threadId: thread.id,
     });
 
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const [edits, setEdits] = useState<{
@@ -144,6 +169,7 @@ export const CommentTree = ({
     includeSpams,
     commentSortType,
     isLocked,
+    // @ts-expect-error <StrictNullChecks/>
     fromDiscordBot,
     isLoggedIn,
   });
@@ -152,6 +178,7 @@ export const CommentTree = ({
 
   const scrollToElement = () => {
     if (scrollToRef.current) {
+      // @ts-expect-error <StrictNullChecks/>
       scrollToRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
@@ -162,9 +189,11 @@ export const CommentTree = ({
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
     if (isReplying) {
+      // @ts-expect-error <StrictNullChecks/>
       setParentCommentId(id);
       setIsReplying(true);
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       setParentCommentId(undefined);
       setIsReplying(false);
     }
@@ -185,7 +214,7 @@ export const CommentTree = ({
                 commentId: comment.id,
                 canvasHash: comment.canvasHash,
                 communityId: app.activeChainId(),
-                address: app.user.activeAccount.address,
+                address: user.activeAccount?.address || '',
                 existingNumberOfComments: thread.numberOfComments,
               });
             } catch (err) {
@@ -223,11 +252,13 @@ export const CommentTree = ({
               setEdits((p) => ({
                 ...p,
                 [comment.id]: {
+                  // @ts-expect-error <StrictNullChecks/>
                   ...(p[comment.id] || {}),
                   isEditing: false,
                   editDraft: '',
                 },
               }));
+              // @ts-expect-error <StrictNullChecks/>
               setIsGloballyEditing(false);
               clearEditingLocalStorage(comment.id, ContentType.Comment);
             },
@@ -243,11 +274,13 @@ export const CommentTree = ({
       setEdits((p) => ({
         ...p,
         [comment.id]: {
+          // @ts-expect-error <StrictNullChecks/>
           ...(p[comment.id] || {}),
           isEditing: false,
           editDraft: '',
         },
       }));
+      // @ts-expect-error <StrictNullChecks/>
       setIsGloballyEditing(false);
     }
   };
@@ -278,6 +311,7 @@ export const CommentTree = ({
                   contentDelta: body,
                 },
               }));
+              // @ts-expect-error <StrictNullChecks/>
               setIsGloballyEditing(true);
             },
           },
@@ -295,6 +329,7 @@ export const CommentTree = ({
                   contentDelta: body,
                 },
               }));
+              // @ts-expect-error <StrictNullChecks/>
               setIsGloballyEditing(true);
             },
           },
@@ -310,6 +345,7 @@ export const CommentTree = ({
           contentDelta: deserializeDelta(comment.text),
         },
       }));
+      // @ts-expect-error <StrictNullChecks/>
       setIsGloballyEditing(true);
     }
   };
@@ -318,55 +354,57 @@ export const CommentTree = ({
     comment: CommentType<any>,
     newDelta: DeltaStatic,
   ) => {
-    {
+    setEdits((p) => ({
+      ...p,
+      [comment.id]: {
+        // @ts-expect-error <StrictNullChecks/>
+        ...(p[comment.id] || {}),
+        isSavingEdit: true,
+      },
+    }));
+
+    try {
+      await editComment({
+        commentId: comment.id,
+        updatedBody: serializeDelta(newDelta) || comment.text,
+        threadId: thread.id,
+        parentCommentId: comment.parentComment,
+        communityId: app.activeChainId(),
+        profile: {
+          id: user.activeAccount?.profile?.id || 0,
+          address: user.activeAccount?.address || '',
+          avatarUrl: user.activeAccount?.profile?.avatarUrl || '',
+          name: user.activeAccount?.profile?.name || '',
+          lastActive: user.activeAccount?.profile?.lastActive.toString() || '',
+        },
+      });
       setEdits((p) => ({
         ...p,
         [comment.id]: {
+          // @ts-expect-error <StrictNullChecks/>
           ...(p[comment.id] || {}),
-          isSavingEdit: true,
+          isEditing: false,
         },
       }));
 
-      try {
-        await editComment({
-          commentId: comment.id,
-          updatedBody: serializeDelta(newDelta) || comment.text,
-          threadId: thread.id,
-          parentCommentId: comment.parentComment,
-          communityId: app.activeChainId(),
-          profile: {
-            id: app.user.activeAccount.profile.id,
-            address: app.user.activeAccount.address,
-            avatarUrl: app.user.activeAccount.profile.avatarUrl,
-            name: app.user.activeAccount.profile.name,
-            lastActive: app.user.activeAccount.profile.lastActive?.toString(),
-          },
-        });
-        setEdits((p) => ({
-          ...p,
-          [comment.id]: {
-            ...(p[comment.id] || {}),
-            isEditing: false,
-          },
-        }));
-
-        setIsGloballyEditing(false);
-        clearEditingLocalStorage(comment.id, ContentType.Comment);
-      } catch (err) {
-        if (err instanceof SessionKeyError) {
-          return;
-        }
-        console.error(err?.responseJSON?.error || err?.message);
-        notifyError('Failed to edit comment');
-      } finally {
-        setEdits((p) => ({
-          ...p,
-          [comment.id]: {
-            ...(p[comment.id] || {}),
-            isSavingEdit: false,
-          },
-        }));
+      // @ts-expect-error <StrictNullChecks/>
+      setIsGloballyEditing(false);
+      clearEditingLocalStorage(comment.id, ContentType.Comment);
+    } catch (err) {
+      if (err instanceof SessionKeyError) {
+        return;
       }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to edit comment');
+    } finally {
+      setEdits((p) => ({
+        ...p,
+        [comment.id]: {
+          // @ts-expect-error <StrictNullChecks/>
+          ...(p[comment.id] || {}),
+          isSavingEdit: false,
+        },
+      }));
     }
   };
 
@@ -419,7 +457,7 @@ export const CommentTree = ({
                 commentId: comment.id,
                 isSpam: !comment.markedAsSpamAt,
                 communityId: app.activeChainId(),
-                address: app.user.activeAccount.address,
+                address: user.activeAccount?.address || '',
               });
             } catch (err) {
               console.log(err);
@@ -464,12 +502,15 @@ export const CommentTree = ({
                   disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
                   canReply={
-                    !!hasJoinedCommunity && !thread.archivedAt && canReply
+                    !!user.activeAccount &&
+                    !thread.archivedAt &&
+                    !thread.lockedAt &&
+                    canReply
                   }
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
                     !thread.archivedAt &&
-                    (!!hasJoinedCommunity || isAdmin) &&
+                    (!!user.activeAccount || isAdmin) &&
                     canReact
                   }
                   canEdit={
@@ -501,6 +542,7 @@ export const CommentTree = ({
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)
                   }
                   comment={comment}
+                  shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
                 />
               </div>
               <div ref={scrollToRef}></div>

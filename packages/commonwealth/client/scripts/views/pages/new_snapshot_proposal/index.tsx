@@ -2,18 +2,18 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { idToProposal } from 'identifiers';
 import _ from 'lodash';
 import Thread from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/new_snapshot_proposal.scss';
 import { DeltaStatic } from 'quill';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -53,15 +53,8 @@ export const NewSnapshotProposalForm = ({
   const [userScore, setUserScore] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState(false);
 
-  const location = useLocation();
-  const pathVars = useMemo(() => {
-    const search = new URLSearchParams(location.search);
-    const params: Record<string, any> = {};
-    for (const [key, value] of search) {
-      params[key] = value;
-    }
-    return params;
-  }, [location]);
+  const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   const clearLocalStorage = () => {
     localStorage.removeItem(
@@ -74,13 +67,16 @@ export const NewSnapshotProposalForm = ({
       setIsSaving(true);
 
       const content = JSON.stringify(contentDelta);
+      // @ts-expect-error <StrictNullChecks/>
       const response = await createNewProposal(form, content, author, space);
 
       clearLocalStorage();
       trackAnalytics({
         event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_CREATED,
+        isPWA: isAddedToHomeScreen,
       });
       notifySuccess('Snapshot Created!');
+      // @ts-expect-error <StrictNullChecks/>
       navigate(`/snapshot/${space.id}`);
 
       if (onSave) {
@@ -120,27 +116,6 @@ export const NewSnapshotProposalForm = ({
         type: 'single-choice',
       };
 
-      if (pathVars.fromProposalType && pathVars.fromProposalId) {
-        const fromProposalId =
-          typeof pathVars.fromProposalId === 'number'
-            ? pathVars.fromProposalId
-            : pathVars.fromProposalId.toString();
-
-        const fromProposalType = pathVars.fromProposalType.toString();
-
-        const fromProposal = idToProposal(fromProposalType, fromProposalId);
-
-        initialForm.name = fromProposal.title;
-
-        if (fromProposal.body) {
-          try {
-            const parsedBody = JSON.parse(fromProposal.body);
-            initialForm.body = parsedBody.ops[0].insert;
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      }
       if (thread && thread.body) {
         const currentPath = window.location.pathname;
         if (currentPath.includes('/discussion/')) {
@@ -170,7 +145,7 @@ export const NewSnapshotProposalForm = ({
       const snapshotSpace = app.snapshot.space;
       const scoreResponse = await getScore(
         snapshotSpace,
-        app.user.activeAccount.address,
+        user.activeAccount?.address || '',
       );
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
@@ -189,7 +164,7 @@ export const NewSnapshotProposalForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const author = app.user.activeAccount;
+  const author = user.activeAccount;
 
   const isMember =
     author &&
@@ -201,15 +176,18 @@ export const NewSnapshotProposalForm = ({
   const minScoreFromSpace =
     space?.validation?.params.minScore ?? space?.filters?.minScore; // Fall back to filters
 
+  // @ts-expect-error <StrictNullChecks/>
   const hasMinScore = userScore >= minScoreFromSpace;
 
   const showScoreWarning =
+    // @ts-expect-error <StrictNullChecks/>
     minScoreFromSpace > 0 && !hasMinScore && !isMember && userScore !== null;
 
   const isValid =
     !!space &&
     (!space.filters?.onlyMembers || (space.filters?.onlyMembers && isMember)) &&
     (minScoreFromSpace === 0 ||
+      // @ts-expect-error <StrictNullChecks/>
       (minScoreFromSpace > 0 && userScore > minScoreFromSpace) ||
       isMember);
 
@@ -230,6 +208,7 @@ export const NewSnapshotProposalForm = ({
         )
       ) : (
         <>
+          {/* @ts-expect-error StrictNullChecks*/}
           {space.filters?.onlyMembers && !isMember && (
             <CWText>
               You need to be a member of the space in order to submit a
@@ -238,11 +217,13 @@ export const NewSnapshotProposalForm = ({
           )}
           {showScoreWarning ? (
             <CWText>
-              You need to have a minimum of {space.validation.params.minScore}{' '}
+              You need to have a minimum of {space!.validation.params.minScore}{' '}
+              {/* @ts-expect-error StrictNullChecks*/}
               {space.symbol} in order to submit a proposal.
             </CWText>
           ) : (
             <CWText>
+              {/* @ts-expect-error StrictNullChecks*/}
               You need to meet the minimum quorum of {space.symbol} in order to
               submit a proposal.
             </CWText>
@@ -251,17 +232,21 @@ export const NewSnapshotProposalForm = ({
             label="Question/Proposal"
             placeholder="Should 0xMaki be our new Mayor?"
             onInput={(e) => {
+              // @ts-expect-error <StrictNullChecks/>
               setForm({
                 ...form,
                 name: e.target.value,
               });
               localStorage.setItem(
                 `${app.activeChainId()}-new-snapshot-proposal-name`,
+                // @ts-expect-error <StrictNullChecks/>
                 form.name,
               );
             }}
+            // @ts-expect-error <StrictNullChecks/>
             defaultValue={form.name}
           />
+          {/* @ts-expect-error StrictNullChecks*/}
           {form.choices.map((unused1, idx) => {
             return (
               <CWTextInput
@@ -271,21 +256,26 @@ export const NewSnapshotProposalForm = ({
                   idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
                 }
                 onInput={(e) => {
+                  // @ts-expect-error <StrictNullChecks/>
                   setForm({
                     ...form,
+                    // @ts-expect-error <StrictNullChecks/>
                     choices: form.choices.map((choice, i) =>
                       i === idx ? e.target.value : choice,
                     ),
                   });
                 }}
                 iconRight={
+                  // @ts-expect-error <StrictNullChecks/>
                   idx > 1 && idx === form.choices.length - 1
                     ? 'trash'
                     : undefined
                 }
                 iconRightonClick={() => {
+                  // @ts-expect-error <StrictNullChecks/>
                   setForm({
                     ...form,
+                    // @ts-expect-error <StrictNullChecks/>
                     choices: form.choices.slice(0, -1),
                   });
                 }}
@@ -299,9 +289,12 @@ export const NewSnapshotProposalForm = ({
               buttonHeight="sm"
               label="Add voting choice"
               onClick={() => {
+                // @ts-expect-error <StrictNullChecks/>
                 setForm({
                   ...form,
+                  // @ts-expect-error <StrictNullChecks/>
                   choices: form.choices.concat(
+                    // @ts-expect-error <StrictNullChecks/>
                     `Option ${form.choices.length + 1}`,
                   ),
                 });

@@ -1,4 +1,4 @@
-import type * as Rascal from 'rascal';
+import * as Rascal from 'rascal';
 import { getAllRascalConfigs } from './configuration/rascalConfig';
 import {
   RascalBindings,
@@ -71,22 +71,34 @@ export function getRabbitMQConfig(
       RascalExchanges.MessageRelayer,
     ]);
     copyConfigs(allQueues, vhostConfig.queues, [
-      RascalQueues.SnapshotListener,
       RascalQueues.ChainEvent,
       RascalQueues.NotificationsProvider,
+      RascalQueues.ContestWorkerPolicy,
+      RascalQueues.ContestProjection,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
-      RascalBindings.SnapshotListener,
       RascalBindings.ChainEvent,
-      // TODO: add notifications provider binding
+      RascalBindings.NotificationsProviderCommentCreated,
+      RascalBindings.NotificationsProviderChainEventCreated,
+      RascalBindings.NotificationsProviderSnapshotProposalCreated,
+      RascalBindings.NotificationsProviderUserMentioned,
+      RascalBindings.NotificationsProviderPreferencesUpdated,
+      RascalBindings.ContestWorkerPolicyThreadCreated,
+      RascalBindings.ContestWorkerPolicyThreadUpvoted,
+      RascalBindings.ContestProjectionRecurringContestManagerDeployed,
+      RascalBindings.ContestProjectionOneOffContestManagerDeployed,
+      RascalBindings.ContestProjectionContestStarted,
+      RascalBindings.ContestProjectionContestContentAdded,
+      RascalBindings.ContestProjectionContestContentUpvoted,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
-      RascalSubscriptions.SnapshotListener,
       RascalSubscriptions.ChainEvent,
       RascalSubscriptions.NotificationsProvider,
+      RascalSubscriptions.ContestWorkerPolicy,
+      RascalSubscriptions.ContestProjection,
     ]);
   } else if (service === RascalConfigServices.DiscobotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [

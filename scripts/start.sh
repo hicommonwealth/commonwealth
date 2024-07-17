@@ -1,7 +1,9 @@
 if [ "$1" = "all" ]; then
-  concurrently -p '{name}' -c red,yellow -n cw-app,cw-consumer 'yarn --cwd packages/commonwealth start' 'yarn --cwd packages/commonwealth start-consumer'
+  echo "Starting app with all workers..."
+  concurrently -p '{name}' -c red,green,blue,yellow -n app,relayer,consumer,evm 'pnpm -F commonwealth start' 'pnpm -F commonwealth start-message-relayer' 'pnpm -F commonwealth start-consumer' 'pnpm -F commonwealth start-evm-ce'
 elif [ "$1" = "apps" ]; then
-  concurrently -p '{name}' -c red,blue -n cw-app,snapshot-app 'yarn --cwd packages/commonwealth start' 'yarn --cwd packages/snapshot-listener start'
+  echo "Starting app with snapshot listener..."
+  concurrently -p '{name}' -c red,blue -n cw-app,snapshot-app 'pnpm -F commonwealth start' 'pnpm -F snapshot-listener start'
 else
-  yarn start
+  pnpm -F commonwealth start
 fi;

@@ -6,6 +6,7 @@ import { sanitizeDeletedComment } from 'server/util/sanitizeDeletedComment';
 
 export const Errors = {
   NoRootId: 'Must provide thread_id',
+  InvalidId: 'Invalid thread_id',
 };
 
 const viewComments = async (
@@ -21,7 +22,13 @@ const viewComments = async (
     return next(new AppError(Errors.NoRootId));
   }
 
+  const parsedInt = parseInt(threadId, 10);
+  if (isNaN(parsedInt) || parsedInt !== parseFloat(threadId)) {
+    return next(new AppError(Errors.InvalidId));
+  }
+
   const comments = await models.Comment.findAll({
+    // @ts-expect-error StrictNullChecks
     where: { community_id: community.id, thread_id: threadId },
     include: [
       {

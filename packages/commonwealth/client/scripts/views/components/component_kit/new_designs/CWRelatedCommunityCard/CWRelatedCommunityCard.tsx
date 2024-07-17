@@ -1,6 +1,6 @@
-import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
+import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import type ChainInfo from 'models/ChainInfo';
@@ -11,6 +11,7 @@ import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import { useCommunityCardPrice } from '../../../../../hooks/useCommunityCardPrice';
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
@@ -44,11 +45,14 @@ export const CWRelatedCommunityCard = ({
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
     community: community,
+    // @ts-expect-error <StrictNullChecks/>
     ethUsdRate,
     stakeId: 2,
+    // @ts-expect-error <StrictNullChecks/>
     historicalPrice,
   });
 
@@ -65,6 +69,7 @@ export const CWRelatedCommunityCard = ({
       e.preventDefault();
       trackAnalytics({
         event: MixpanelClickthroughEvent.DIRECTORY_TO_COMMUNITY_PAGE,
+        isPWA: isAddedToHomeScreen,
       });
       if (isCommandClick(e)) {
         window.open(`/${community.id}`, '_blank');
@@ -72,7 +77,7 @@ export const CWRelatedCommunityCard = ({
       }
       navigateToCommunity({ navigate, path: '', chain: community.id });
     },
-    [navigate, trackAnalytics, community.id],
+    [navigate, trackAnalytics, community.id, isAddedToHomeScreen],
   );
 
   const handleBuyStakeClick = () => {

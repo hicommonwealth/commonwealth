@@ -2,15 +2,15 @@ import { dispose } from '@hicommonwealth/core';
 import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
-import { TESTING, TEST_DB_NAME } from '../config';
-import { buildDb, syncDb, type DB } from '../models';
+import { config } from '../config';
+import { buildDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
  * creating a fresh instance if it doesn't exist.
  * @param name db name
  */
-const verify_db = async (name: string): Promise<void> => {
+export const verify_db = async (name: string): Promise<void> => {
   let pg: Sequelize | undefined = undefined;
   try {
     pg = new Sequelize({
@@ -21,7 +21,9 @@ const verify_db = async (name: string): Promise<void> => {
       logging: false,
     });
     const [{ count }] = await pg.query<{ count: number }>(
-      `SELECT COUNT(*) FROM pg_database WHERE datname = '${name}'`,
+      `SELECT COUNT(*)
+       FROM pg_database
+       WHERE datname = '${name}'`,
       { type: QueryTypes.SELECT },
     );
     if (!+count) {
@@ -140,46 +142,41 @@ export const get_info_schema = async (
 ): Promise<Record<string, TABLE_INFO>> => {
   const columns = await db.query<COLUMN_INFO>(
     `
-SELECT
-	table_name,
-	column_name,
-	COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name)
-	|| CASE WHEN is_identity = 'YES' THEN '-id' ELSE '' END
-	|| CASE WHEN is_nullable = 'YES' THEN '-null' ELSE '' END as column_type,
-	column_default
-FROM information_schema.columns
-WHERE table_schema = 'public'
-ORDER BY 1, 2;`,
+        SELECT table_name,
+               column_name,
+               COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name)
+                   || CASE WHEN is_identity = 'YES' THEN '-id' ELSE '' END
+                   || CASE WHEN is_nullable = 'YES' THEN '-null' ELSE '' END as column_type,
+               column_default
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+        ORDER BY 1, 2;`,
     { type: QueryTypes.SELECT },
   );
   const constraints = await db.query<CONSTRAINT_INFO>(
     `
-SELECT
-	C.TABLE_NAME,
-	C.CONSTRAINT_TYPE || coalesce(' ' || C2.TABLE_NAME,'') || '(' || STRING_AGG(
-		K.COLUMN_NAME,
-		','
-		ORDER BY
-			COLUMN_NAME
-	) || ')' || COALESCE(' UPDATE ' || R.UPDATE_RULE, '') || COALESCE(' DELETE ' || R.DELETE_RULE, '') AS CONSTRAINT
-FROM
-	INFORMATION_SCHEMA.TABLE_CONSTRAINTS C
-	JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE K ON C.CONSTRAINT_NAME = K.CONSTRAINT_NAME
-	LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS R ON C.CONSTRAINT_NAME = R.CONSTRAINT_NAME
-	LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS C2 ON R.UNIQUE_CONSTRAINT_NAME = C2.CONSTRAINT_NAME
-WHERE
-	C.TABLE_SCHEMA = 'public'
-GROUP BY
-	C.TABLE_NAME,
-	C.CONSTRAINT_NAME,
-	C.CONSTRAINT_TYPE,
-	C2.TABLE_NAME,
-	R.UPDATE_RULE,
-	R.DELETE_RULE
-ORDER BY
-	1,
-	2;
-`,
+        SELECT C.TABLE_NAME,
+               C.CONSTRAINT_TYPE || coalesce(' ' || C2.TABLE_NAME, '') || '(' || STRING_AGG(
+                       K.COLUMN_NAME,
+                       ','
+                       ORDER BY
+                           COLUMN_NAME
+                                                                                 ) || ')' ||
+               COALESCE(' UPDATE ' || R.UPDATE_RULE, '') || COALESCE(' DELETE ' || R.DELETE_RULE, '') AS CONSTRAINT
+        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS C
+                 JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE K ON C.CONSTRAINT_NAME = K.CONSTRAINT_NAME
+                 LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS R ON C.CONSTRAINT_NAME = R.CONSTRAINT_NAME
+                 LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS C2 ON R.UNIQUE_CONSTRAINT_NAME = C2.CONSTRAINT_NAME
+        WHERE C.TABLE_SCHEMA = 'public'
+        GROUP BY C.TABLE_NAME,
+                 C.CONSTRAINT_NAME,
+                 C.CONSTRAINT_TYPE,
+                 C2.TABLE_NAME,
+                 R.UPDATE_RULE,
+                 R.DELETE_RULE
+        ORDER BY 1,
+                 2;
+    `,
     { type: QueryTypes.SELECT },
   );
   const tables: Record<string, TABLE_INFO> = {};
@@ -203,37 +200,35 @@ ORDER BY
   return tables;
 };
 
+// NOTE: the db variable is not shared between Vitest test suites. This is only useful
+// so that the db object does not need to be rebuilt for every to bootstrap_testing from within
+// a single test suite
 let db: DB | undefined = undefined;
 /**
- * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
- * and creating/migrating a fresh instance if it doesn't exist.
+ * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
  * @param truncate when true, truncates all tables in model
  * @returns synchronized sequelize db instance
  */
-export const bootstrap_testing = async (
-  truncate = false,
-  log = false,
-): Promise<DB> => {
-  if (!TESTING) throw new Error('Seeds only work when testing!');
+export const bootstrap_testing = async (truncate = false): Promise<DB> => {
   if (!db) {
-    await verify_db(TEST_DB_NAME);
-    try {
-      db = buildDb(
-        new Sequelize({
-          dialect: 'postgres',
-          database: TEST_DB_NAME,
-          username: 'commonwealth',
-          password: 'edgeware',
-          logging: false,
-        }),
-      );
-      await syncDb(db, log);
-    } catch (error) {
-      console.error('Error bootstrapping test db:', error);
-      throw error;
-    }
-  } else if (truncate) await truncate_db(db);
+    db = buildDb(
+      new Sequelize({
+        dialect: 'postgres',
+        database: config.DB.NAME,
+        username: 'commonwealth',
+        password: 'edgeware',
+        logging: false,
+      }),
+    );
+    console.log('Database object built');
+  }
+
+  if (truncate) {
+    await truncate_db(db);
+    console.log('Database truncated');
+  }
+
   return db;
 };
 
-TESTING && dispose(async () => truncate_db(db));
+config.NODE_ENV === 'test' && dispose(async () => truncate_db(db));

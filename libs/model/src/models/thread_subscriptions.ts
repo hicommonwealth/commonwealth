@@ -1,34 +1,33 @@
-import { schemas } from '@hicommonwealth/core';
+import { ThreadSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type ThreadSubscriptionAttributes = z.infer<
-  typeof schemas.entities.ThreadSubscription
->;
+  typeof ThreadSubscription
+> & {
+  // associations
+  Thread?: any;
+};
 
 export type ThreadSubscriptionInstance =
-  ModelInstance<ThreadSubscriptionAttributes>;
+  ModelInstance<ThreadSubscriptionAttributes> & {
+    // no mixins used
+  };
 
-export type ThreadSubscriptionModelStatic =
-  ModelStatic<ThreadSubscriptionInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <ThreadSubscriptionModelStatic>sequelize.define<ThreadSubscriptionInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ThreadSubscriptionInstance> =>
+  sequelize.define<ThreadSubscriptionInstance>(
     'ThreadSubscriptions',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       user_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       thread_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -49,8 +48,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       underscored: false,
       indexes: [
         {
-          fields: ['user_id', 'thread_id'],
-          unique: true,
+          fields: ['thread_id'],
         },
       ],
     },

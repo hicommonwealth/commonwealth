@@ -3,13 +3,16 @@ import {
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
 import axios from 'axios';
-import type { Express } from 'express';
+import type { Router } from 'express';
+import { registerRoute } from '../middleware/methodNotAllowed';
 
 const defaultCacheDuration = 24 * 60 * 60; // 1 day
 
-function setupIpfsProxy(app: Express, cacheDecorator: CacheDecorator) {
-  app.get(
-    '/api/ipfsProxy',
+function setupIpfsProxy(router: Router, cacheDecorator: CacheDecorator) {
+  registerRoute(
+    router,
+    'get',
+    '/ipfsProxy',
     calcIpfsCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       defaultCacheDuration,

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
@@ -9,7 +8,6 @@ import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
@@ -18,12 +16,14 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
+import useUserStore from 'state/ui/user';
+import { AuthModalType } from 'views/modals/AuthModal';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
   onMobile: boolean;
   isInsideCommunity: boolean;
-  onAuthModalOpen: (open: boolean) => void;
+  onAuthModalOpen: (modalType?: AuthModalType) => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,
@@ -31,7 +31,6 @@ interface MobileHeaderProps {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }) => void;
-  onFeedbackModalOpen: (open: boolean) => void;
 }
 
 const MobileHeader = ({
@@ -39,20 +38,20 @@ const MobileHeader = ({
   onAuthModalOpen,
   isInsideCommunity,
   onRevalidationModalData,
-  onFeedbackModalOpen,
 }: MobileHeaderProps) => {
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
-  const user = app?.user?.addresses?.[0];
+  const userData = useUserStore();
+  const user = userData.addresses?.[0];
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
     ? !menuVisible
     : true;
 
-  const userMenuItems = useUserMenuItems({
+  const { RevalidationModal, userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
     onRevalidationModalData,
     isMenuOpen: isUserDrawerOpen,
@@ -69,13 +68,6 @@ const MobileHeader = ({
     {
       label: 'Help documentation',
       onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
-    },
-    {
-      label: 'Send feedback',
-      onClick: () => {
-        onFeedbackModalOpen(true);
-        setIsUserDrawerOpen(false);
-      },
     },
   ] as PopoverMenuItem[];
 
@@ -98,7 +90,7 @@ const MobileHeader = ({
             />
           )}
 
-          {isLoggedIn ? (
+          {isLoggedIn && (
             <div onClick={() => setIsUserDrawerOpen(true)}>
               <User
                 shouldShowAvatarOnly
@@ -107,13 +99,6 @@ const MobileHeader = ({
                 userCommunityId={user?.community?.id}
               />
             </div>
-          ) : (
-            <CWButton
-              label="Sign in"
-              buttonHeight="sm"
-              disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={() => onAuthModalOpen(true)}
-            />
           )}
         </div>
       </div>
@@ -155,6 +140,7 @@ const MobileHeader = ({
         onClose={() => isSetModalOpen(false)}
         open={isModalOpen}
       />
+      {RevalidationModal}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import type { Role } from '@hicommonwealth/model';
+import type { Role } from '@hicommonwealth/shared';
 
 // DEPRECATED. This class is currently obtained by getting Address information.
 // If you can, just query for address instead.

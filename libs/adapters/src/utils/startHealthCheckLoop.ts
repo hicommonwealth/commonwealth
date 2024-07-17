@@ -1,5 +1,4 @@
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 
 const PING_INTERVAL = 1_000 * 20;
@@ -7,6 +6,7 @@ const PING_INTERVAL = 1_000 * 20;
 export enum ServiceKey {
   Commonwealth = 'commonwealth',
   CommonwealthConsumer = 'commonwealth-consumer',
+  MessageRelayer = 'message-relayer',
   DiscordBotListener = 'discord-bot-listener',
   DiscordBotConsumer = 'discord-bot-consumer',
   ChainEventsApp = 'chain-events-app',

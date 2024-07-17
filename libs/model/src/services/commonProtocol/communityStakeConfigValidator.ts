@@ -1,57 +1,76 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { commonProtocol } from '@hicommonwealth/shared';
-import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
+import Web3, { AbiFunctionFragment } from 'web3';
 import { CommunityAttributes } from '../../models/community';
 
 export const validateCommunityStakeConfig = async (
   community: CommunityAttributes,
   id: number,
 ) => {
-  if (!community.ChainNode?.eth_chain_id || !community.namespace) {
-    throw new AppError('Invalid community');
+  if (!community.chain_node_id || !community.namespace) {
+    throw new AppError(`Community ${community.id} is invalid`);
   }
-  const chain_id = community.ChainNode.eth_chain_id;
-  if (!Object.values(commonProtocol.ValidChains).includes(chain_id)) {
-    throw new AppError(
-      "Community Stakes not configured for community's chain node",
-    );
+
+  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
+    where: {
+      id: community.chain_node_id,
+    },
+  });
+
+  if (!chainNode) {
+    throw new ServerError(`ChainNode not found`);
   }
+
+  if (
+    !chainNode.eth_chain_id ||
+    !chainNode.private_url ||
+    !Object.values(commonProtocol.ValidChains).includes(chainNode.eth_chain_id)
+  ) {
+    throw new AppError(`Community Stakes not available on ${chainNode.name}`);
+  }
+
   const factoryData =
-    commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
-  const web3 = new Web3(community.ChainNode.url);
-  const communityStakes = new web3.eth.Contract(
-    [
+    commonProtocol.factoryContracts[
+      chainNode.eth_chain_id as commonProtocol.ValidChains
+    ];
+  const web3 = new Web3(chainNode.private_url);
+
+  const abiItem = {
+    inputs: [
       {
-        inputs: [
-          {
-            internalType: 'address',
-            name: '',
-            type: 'address',
-          },
-          {
-            internalType: 'uint256',
-            name: '',
-            type: 'uint256',
-          },
-        ],
-        stateMutability: 'view',
-        type: 'function',
-        name: 'whitelist',
-        outputs: [
-          {
-            internalType: 'bool',
-            name: '',
-            type: 'bool',
-          },
-        ],
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
-    ] as AbiItem[],
-    factoryData.communityStake,
-  );
-  const whitelisted = await communityStakes.methods
-    .whitelist(community.namespace_address, id)
-    .call();
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    name: 'whitelist',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+  } as AbiFunctionFragment;
+
+  const calldata = web3.eth.abi.encodeFunctionCall(abiItem, [
+    community.namespace_address,
+    id,
+  ]);
+  const whitelistResponse = await web3.eth.call({
+    to: factoryData.communityStake,
+    data: calldata,
+  });
+  const whitelisted = web3.eth.abi.decodeParameter('bool', whitelistResponse);
+
   if (!whitelisted) {
     return new AppError('Community Stake not configured');
   }

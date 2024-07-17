@@ -26,19 +26,24 @@ export function cosmosLCDDuration(req) {
   if (proposalStatus) {
     if (activeProposalCodes.some((c) => c === +proposalStatus)) {
       // ACTIVE PROPOSALS: 10 seconds cache
+      // @ts-expect-error StrictNullChecks
       duration = 10;
     } else if (completedProposalCodes.some((c) => c === +proposalStatus)) {
       // COMPLETED PROPOSALS: cache 30 seconds
+      // @ts-expect-error StrictNullChecks
       duration = 30;
     }
   } else if (/\/proposals\/\d+\/(votes|tally|deposits)/.test(url)) {
     // live proposal voting data: cache 6 seconds
+    // @ts-expect-error StrictNullChecks
     duration = oneBlock;
   } else if (/\/proposals\/(\d+)$/.test(url)) {
     // specific proposal request: long-term cache (1 week)
+    // @ts-expect-error StrictNullChecks
     duration = 60 * 60 * 24 * 7;
   } else if (url?.includes('/params/')) {
     // PARAMS: cache long term (5 days)
+    // @ts-expect-error StrictNullChecks
     duration = 60 * 60 * 24 * 5;
   }
   return duration;
@@ -61,24 +66,30 @@ export const cosmosRPCDuration = (body) => {
     return null;
   } else if (/(block|status)/.test(body?.method)) {
     // BLOCK CHECK: short cache
+    // @ts-expect-error StrictNullChecks
     duration = oneBlock;
   } else if (/Query\/(Proposal)$/.test(body?.params?.path)) {
     // Individual Proposal: cache long-term (1 week)
+    // @ts-expect-error StrictNullChecks
     duration = 60 * 60 * 24 * 7;
   } else if (/Query\/(Votes|TallyResult|Deposits)/.test(body?.params?.path)) {
     // LIVE DATA: 6 seconds
+    // @ts-expect-error StrictNullChecks
     duration = oneBlock;
   } else if (/Query\/(Params|Pool)/.test(body?.params?.path)) {
     // chain PARAMS: cache long-term (5 days)
+    // @ts-expect-error StrictNullChecks
     duration = 60 * 60 * 24 * 5;
   } else if (/(0801|0802)/.test(body?.params?.data)) {
     // ACTIVE PROPOSALS: 10 seconds
     // RPC specific codes from cosmJS requests:
     // 0801 = 'DepositPeriod', 0802 = 'VotingPeriod'
+    // @ts-expect-error StrictNullChecks
     duration = 10;
   } else if (/(0803|0804|0805)/.test(body?.params?.data)) {
     // COMPLETED PROPOSALS: 30 seconds
     // 0803 = 'Passed', 0804 = 'Rejected', 0805 = 'Failed'
+    // @ts-expect-error StrictNullChecks
     duration = 30;
   }
   return duration;

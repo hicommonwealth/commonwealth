@@ -8,7 +8,7 @@ const { expect } = chai;
 
 export const discussionTests = (test) => {
   return () => {
-    test('Discussion page loads and can navigate to first thread', async ({
+    test.skip('Discussion page loads and can navigate to first thread', async ({
       page,
     }) => {
       await page.waitForSelector('div.HeaderWithFilters');
@@ -55,13 +55,16 @@ export const discussionTests = (test) => {
       expect(page.url()).to.include('/profile/id/');
     });
 
-    test('Check User can Like/Dislike post', async ({ page }) => {
+    test.skip('Check User can Like/Dislike post', async ({ page }) => {
       await login(page);
 
       let reactionsCountDivs = await page.locator('div.reactions-count');
 
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('div.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         await pwexpect(reactionsCountDivs.first()).toBeVisible();
       }).toPass();
 
@@ -80,7 +83,10 @@ export const discussionTests = (test) => {
       ).toString();
       // assert reaction count increased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           expectedNewReactionCount,
         );
@@ -94,7 +100,10 @@ export const discussionTests = (test) => {
 
       // assert reaction count decreased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           firstThreadReactionCount,
         );

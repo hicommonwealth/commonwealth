@@ -1,8 +1,8 @@
-import { schemas, type Command } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, type Command } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { Sequelize } from 'sequelize';
 import { URL } from 'url';
-import { DATABASE_URI, DEV } from '../config';
+import { config } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
 import { isSuperAdmin } from '../middleware';
 import {
@@ -25,9 +25,9 @@ type CleanupFn = {
 };
 
 export const ImportDiscourseCommunity: Command<
-  typeof schemas.commands.ImportDiscourseCommunity
+  typeof schemas.ImportDiscourseCommunity
 > = () => ({
-  ...schemas.commands.ImportDiscourseCommunity,
+  ...schemas.ImportDiscourseCommunity,
   auth: [isSuperAdmin],
   body: async ({ id: communityId, payload }) => {
     // TODO: use global lock to limit concurrency on this command?
@@ -77,9 +77,9 @@ export const ImportDiscourseCommunity: Command<
       // connect to discourse DB as superuser to
       // grant privileges to restricted user
       const superUserDiscourseDbUri = (() => {
-        const parsedUrl = new URL(DATABASE_URI);
+        const parsedUrl = new URL(config.DB.URI);
         parsedUrl.pathname = discourseDbName;
-        if (DEV) {
+        if (config.DB.NO_SSL) {
           parsedUrl.searchParams.set('sslmode', 'disable');
         }
         return parsedUrl.toString();
@@ -100,11 +100,11 @@ export const ImportDiscourseCommunity: Command<
 
       // create restricted discourse DB URI
       const restrictedDiscourseDbUri = (() => {
-        const parsedUrl = new URL(DATABASE_URI);
+        const parsedUrl = new URL(config.DB.URI);
         const host = parsedUrl.host;
         const port = parsedUrl.port || 5432;
         let uri = `postgresql://${restrictedDiscourseDbUser}:${restrictedDiscourseDbPass}@${host}:${port}/${discourseDbName}`;
-        if (DEV) {
+        if (config.DB.NO_SSL) {
           uri += '?sslmode=disable';
         }
         return uri;
@@ -236,7 +236,6 @@ export const ImportDiscourseCommunity: Command<
       log.debug(`Subscriptions: ${subscriptions.length}`);
 
       await transaction.commit();
-      return {};
     } catch (err) {
       await transaction.rollback();
       throw err;

@@ -6,6 +6,7 @@ import type { DeltaStatic } from 'quill';
 import React from 'react';
 import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Thread from '../../../models/Thread';
@@ -39,6 +40,8 @@ export const EditBody = (props: EditBodyProps) => {
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
+
+  const user = useUserStore();
 
   const {
     mutateAsync: editThread,
@@ -102,8 +105,8 @@ export const EditBody = (props: EditBodyProps) => {
         newBody: JSON.stringify(contentDelta) || thread.body,
         newTitle: title || thread.title,
         threadId: thread.id,
-        authorProfile: app.user.activeAccount.profile,
-        address: app.user.activeAccount.address,
+        authorProfile: user.activeAccount?.profile,
+        address: user.activeAccount?.address || '',
         communityId: app.activeChainId(),
       });
       clearEditingLocalStorage(thread.id, ContentType.Thread);

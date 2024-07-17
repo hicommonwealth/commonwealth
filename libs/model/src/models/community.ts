@@ -1,22 +1,21 @@
-import { schemas } from '@hicommonwealth/core';
+import { Community } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
+import type { CommunityAlertAttributes } from './community_alerts';
 import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicInstance } from './topic';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 import type { UserAttributes } from './user';
 
-export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
+export type CommunityAttributes = z.infer<typeof Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
-  StarredCommunities?:
-    | StarredCommunityAttributes[]
-    | StarredCommunityAttributes['id'][];
+  StarredCommunities?: StarredCommunityAttributes[];
   Threads?: ThreadAttributes[] | ThreadAttributes['id'][];
   Comments?: CommentAttributes[] | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
@@ -24,6 +23,9 @@ export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
   Contract?: ContractInstance;
   thread_count?: number;
   address_count?: number;
+  profile_count?: number;
+  count_updated?: boolean;
+  communityAlerts?: CommunityAlertAttributes[];
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {
@@ -42,10 +44,10 @@ export type CommunityInstance = ModelInstance<CommunityAttributes> & {
   getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
-export type CommunityModelStatic = ModelStatic<CommunityInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommunityModelStatic>sequelize.define<CommunityInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommunityInstance> =>
+  sequelize.define<CommunityInstance>(
     // Leave this as is for now so that we don't need to alias and models can join
     // with this model using .Chain rather than .Community. Models should incrementally
     // be aliased via `as: 'Community'` until all models use Community at which point,
@@ -133,6 +135,11 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
         defaultValue: 0,
       },
+      profile_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       namespace: { type: Sequelize.STRING, allowNull: true },
       namespace_address: {
         type: Sequelize.STRING,
@@ -146,6 +153,15 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
         defaultValue: [],
       },
+      include_in_digest_email: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      count_updated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
     },
     {
       tableName: 'Communities',
@@ -153,5 +169,6 @@ export default (sequelize: Sequelize.Sequelize) =>
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
+      indexes: [{ fields: ['include_in_digest_email'] }],
     },
   );

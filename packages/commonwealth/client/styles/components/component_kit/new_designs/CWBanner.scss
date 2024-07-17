@@ -40,7 +40,6 @@
 
   .content-container {
     display: flex;
-    flex-direction: column;
     padding-right: 5px;
 
     .header {
@@ -50,6 +49,10 @@
     .body {
       color: $neutral-600;
     }
+  }
+
+  .right-side {
+    margin-left: auto;
   }
 
   .close-icon-container {

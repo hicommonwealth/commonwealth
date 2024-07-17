@@ -1,9 +1,10 @@
-import useTransactionHistory from 'client/scripts/hooks/useTransactionHistory';
 import { formatAddressShort } from 'helpers';
 import { getCommunityStakeSymbol } from 'helpers/stakes';
+import useTransactionHistory from 'hooks/useTransactionHistory';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -33,22 +34,23 @@ const MyCommunityStake = () => {
     searchText: '',
     selectedAddress: BASE_ADDRESS_FILTER,
   });
+  const user = useUserStore();
 
   const ADDRESS_FILTERS = [
     BASE_ADDRESS_FILTER,
-    ...[...new Set((app?.user?.addresses || []).map((x) => x.address))].map(
-      (address) => ({
-        label: formatAddressShort(address, 5, 6),
-        value: address,
-      }),
-    ),
+    ...[...new Set(user.addresses.map((x) => x.address))].map((address) => ({
+      label: formatAddressShort(address, 5, 6),
+      value: address,
+    })),
   ];
 
   const possibleAddresses = ADDRESS_FILTERS.filter((a) => a.value !== '').map(
     (a) => a.value,
   );
 
+  // @ts-expect-error <StrictNullChecks/>
   let addressFilter = [filterOptions.selectedAddress.value];
+  // @ts-expect-error <StrictNullChecks/>
   if (filterOptions.selectedAddress.value === '') {
     addressFilter = possibleAddresses;
   }
@@ -99,6 +101,7 @@ const MyCommunityStake = () => {
                   options={ADDRESS_FILTERS}
                   value={filterOptions.selectedAddress}
                   onChange={(option) =>
+                    // @ts-expect-error <StrictNullChecks/>
                     setFilterOptions((filters) => ({
                       ...filters,
                       selectedAddress: option,
@@ -120,8 +123,10 @@ const MyCommunityStake = () => {
             </CWTabsRow>
 
             {activeTabIndex === 0 ? (
+              // @ts-expect-error <StrictNullChecks/>
               <Stakes transactions={updatedData} />
             ) : (
+              // @ts-expect-error <StrictNullChecks/>
               <Transactions transactions={updatedData} />
             )}
           </>

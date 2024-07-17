@@ -2,43 +2,78 @@ import {
   Broker,
   BrokerPublications,
   BrokerSubscriptions,
+  CustomRetryStrategyError,
   EventContext,
   EventSchemas,
+  Events,
   EventsHandlerMetadata,
+  ILogger,
   InvalidInput,
   RetryStrategyFn,
   handleEvent,
-  schemas,
+  logger,
 } from '@hicommonwealth/core';
-import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 import { fileURLToPath } from 'url';
 
-const defaultRetryStrategy: RetryStrategyFn = (
-  err: Error | undefined,
-  topic: BrokerSubscriptions,
-  content: any,
-  ackOrNackFn: AckOrNack,
-  log: ILogger,
-) => {
-  if (err instanceof InvalidInput) {
-    log.error(`Invalid event`, err, {
+/**
+ * Build a retry strategy function based on custom retry strategies map.
+ *
+ * @param {Function} customRetryStrategiesMap - A function which maps errors to retry strategies. The function should
+ * return `true` if an error was successfully mapped to a strategy and `false` otherwise.
+ * @param defaultDefer
+ * @param defaultAttempts
+ * @returns {RetryStrategyFn} The built retry strategy function.
+ */
+export function buildRetryStrategy(
+  customRetryStrategiesMap?: (...args: Parameters<RetryStrategyFn>) => boolean,
+  defaultDefer: number = 2000,
+  defaultAttempts: number = 3,
+): RetryStrategyFn {
+  return function (
+    err: Error | InvalidInput | CustomRetryStrategyError,
+    topic: BrokerSubscriptions,
+    content: any,
+    ackOrNackFn: AckOrNack,
+    log: ILogger,
+  ) {
+    const logContext = {
       topic,
       message: content,
-    });
-    ackOrNackFn(err, { strategy: 'nack' });
-  } else {
-    log.error(`Failed to process event`, err, {
-      topic,
-      message: content,
-    });
-    ackOrNackFn(err, [
-      { strategy: 'republish', defer: 2000, attempts: 3 },
-      { strategy: 'nack' },
-    ]);
-  }
-};
+    };
+
+    if (err instanceof InvalidInput) {
+      log.error(`Invalid event`, err, logContext);
+      ackOrNackFn(err, { strategy: 'nack' });
+      return;
+    } else if (err instanceof CustomRetryStrategyError) {
+      log.error(err.message, err, logContext);
+      ackOrNackFn(err, err.recoveryStrategy);
+      return;
+    }
+
+    let res = false;
+    if (customRetryStrategiesMap) {
+      res = customRetryStrategiesMap(err, topic, content, ackOrNackFn, log);
+    }
+
+    if (!res) {
+      log.error(`Failed to process event`, err, logContext);
+      ackOrNackFn(err, [
+        {
+          strategy: 'republish',
+          defer: defaultDefer,
+          attempts: defaultAttempts,
+        },
+        { strategy: 'nack' },
+      ]);
+      return;
+    }
+  };
+}
+
+const defaultRetryStrategy = buildRetryStrategy();
 
 export class RabbitMQAdapter implements Broker {
   protected _initialized = false;
@@ -47,7 +82,7 @@ export class RabbitMQAdapter implements Broker {
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
-  private _log: ILogger;
+  private readonly _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     const __filename = fileURLToPath(import.meta.url);
@@ -92,7 +127,7 @@ export class RabbitMQAdapter implements Broker {
     this._initialized = true;
   }
 
-  public async publish<Name extends schemas.Events>(
+  public async publish<Name extends Events>(
     topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean> {
@@ -157,6 +192,10 @@ export class RabbitMQAdapter implements Broker {
     topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<EventSchemas>,
     retryStrategy?: RetryStrategyFn,
+    hooks?: {
+      beforeHandleEvent: (topic: string, event: any, context: any) => void;
+      afterHandleEvent: (topic: string, event: any, context: any) => void;
+    },
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
@@ -181,6 +220,16 @@ export class RabbitMQAdapter implements Broker {
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
+          const { beforeHandleEvent, afterHandleEvent } = hooks || {};
+          const context: any = {};
+          try {
+            beforeHandleEvent?.(topic, content, context);
+          } catch (err) {
+            this._log.error(
+              `beforeHandleEvent failed on topic ${topic}`,
+              err as Error,
+            );
+          }
           handleEvent(handler, content, true)
             .then(() => {
               this._log.debug('Message Acked', {
@@ -189,7 +238,7 @@ export class RabbitMQAdapter implements Broker {
               });
               ackOrNackFn();
             })
-            .catch((err: Error | undefined) => {
+            .catch((err: Error) => {
               if (retryStrategy)
                 retryStrategy(err, topic, content, ackOrNackFn, this._log);
               else
@@ -200,6 +249,16 @@ export class RabbitMQAdapter implements Broker {
                   ackOrNackFn,
                   this._log,
                 );
+            })
+            .finally(async () => {
+              try {
+                afterHandleEvent?.(topic, content, context);
+              } catch (err) {
+                this._log.error(
+                  `afterHandleEvent failed on topic ${topic}`,
+                  err as Error,
+                );
+              }
             });
         },
       );
@@ -234,7 +293,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async dispose(): Promise<void> {
-    await this.broker!.shutdown();
+    await this.broker?.shutdown();
     this._initialized = false;
   }
 

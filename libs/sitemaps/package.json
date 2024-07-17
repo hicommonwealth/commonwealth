@@ -1,20 +1,31 @@
 {
   "name": "@hicommonwealth/sitemaps",
   "private": "true",
+  "type": "module",
   "version": "0.1.0",
   "description": "Sitemaps generator and related code",
   "files": [
     "build"
   ],
-  "main": "build/index.js",
-  "types": "src/index",
+  "exports": {
+    ".": {
+      "default": "./build/index.js",
+      "devmode": "./src/index.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "echo No tests for @hicommonwealth/sitemaps"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts"
   },
   "dependencies": {
-    "aws-sdk": "^2.814.0"
+    "@aws-sdk/client-s3": "^3.577.0",
+    "@aws-sdk/lib-storage": "^3.578.0",
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/model": "workspace:*",
+    "@hicommonwealth/shared": "workspace:*",
+    "moment": "^2.23.0",
+    "sequelize": "^6.32.1"
   }
 }

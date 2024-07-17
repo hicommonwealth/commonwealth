@@ -1,6 +1,5 @@
-import { analytics } from '@hicommonwealth/core';
+import { analytics, config } from '@hicommonwealth/core';
 import { AnalyticsPayload } from 'shared/analytics/types';
-import { SERVER_URL } from '../config';
 
 export type TrackOptions = Record<string, any> & AnalyticsPayload;
 
@@ -17,10 +16,12 @@ export class ServerAnalyticsController {
       newOptions = {
         ...newOptions,
         ...browserInfo,
-        ...(host && { isCustomDomain: SERVER_URL.includes(host) }),
+        ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
       };
     }
+    const reqIsPWA = req?.headers?.['isPWA'] === 'true';
     const { event, ...payload } = newOptions;
+    payload.isPWA = reqIsPWA;
     analytics().track(event, payload);
   }
 }

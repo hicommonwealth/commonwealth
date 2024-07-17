@@ -1,7 +1,5 @@
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
-import { useFlag } from 'hooks/useFlag';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo, useState } from 'react';
@@ -9,8 +7,9 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import ThreadContestTag from 'views/components/ThreadContestTag';
+import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -79,6 +78,8 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
+  setThreadBody?: (body: string) => void;
+  editingDisabled?: boolean;
 };
 
 export const CWContentPage = ({
@@ -115,25 +116,28 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
+  setThreadBody,
+  editingDisabled,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-  const contestsEnabled = useFlag('contest');
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
+    // @ts-expect-error <StrictNullChecks/>
     membership.topicIds.includes(thread?.topic?.id),
   );
 
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
+      // @ts-expect-error <StrictNullChecks/>
       membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
   );
 
@@ -184,52 +188,48 @@ export const CWContentPage = ({
         {...(thread?.lockedAt && {
           lockedAt: thread.lockedAt.toISOString(),
         })}
-        {...(thread?.updatedAt && {
-          lastUpdated: thread.updatedAt.toISOString(),
+        {...(thread?.lastEdited && {
+          lastUpdated: (thread?.lastEdited || thread.createdAt).toISOString(),
         })}
+        // @ts-expect-error <StrictNullChecks/>
         authorAddress={author?.address}
+        // @ts-expect-error <StrictNullChecks/>
         authorCommunityId={authorCommunityId}
         collaboratorsInfo={collaborators}
-        publishDate={moment(createdOrEditedDate)}
+        publishDate={moment(createdOrEditedDate, 'X')}
+        //second parameter in moment() is case sensitive.
+        //If 'x' is passed instead of 'X' it will show "Published 54 years ago" again.
         viewsCount={viewCount}
         showPublishLabelWithDate={!lastEdited}
         showEditedLabelWithDate={!!lastEdited}
         isSpamThread={isSpamThread}
         threadStage={stageLabel}
+        // @ts-expect-error <StrictNullChecks/>
         archivedAt={thread?.archivedAt}
+        // @ts-expect-error <StrictNullChecks/>
         isHot={isHot(thread)}
         profile={thread?.profile}
+        versionHistory={thread?.versionHistory}
+        changeContentText={setThreadBody}
       />
     </div>
   );
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
   });
-
-  const contestWinners = [
-    { date: '03/09/2024', round: 7, isRecurring: true },
-    { date: '03/10/2024', isRecurring: false },
-    {
-      date: '03/10/2024',
-      round: 8,
-      isRecurring: true,
-    },
-  ];
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
         {typeof title === 'string' ? (
           <h1 className="title">
-            {showContestWinnerTag &&
-              contestWinners?.map((winner, index) => (
-                <ThreadContestTag key={index} {...winner} />
-              ))}
+            <ThreadContestTagContainer
+              associatedContests={thread?.associatedContests}
+            />
             {truncate(title)}
           </h1>
         ) : (
@@ -245,6 +245,7 @@ export const CWContentPage = ({
             upvoteBtnVisible={!thread?.readOnly}
             upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
+            // @ts-expect-error <StrictNullChecks/>
             thread={thread}
             totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}
@@ -260,9 +261,11 @@ export const CWContentPage = ({
             canReact={!disabledActionsTooltipText}
             canComment={!disabledActionsTooltipText}
             onProposalStageChange={onProposalStageChange}
-            disabledActionTooltipText={disabledActionsTooltipText}
+            disabledActionsTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+            shareEndpoint={`${window.location.origin}${window.location.pathname}`}
+            editingDisabled={editingDisabled}
           />,
         )}
 
@@ -279,6 +282,7 @@ export const CWContentPage = ({
           {showSidebar && (
             <div className="sidebar">
               {sidebarComponents?.map((c) => (
+                // @ts-expect-error <StrictNullChecks/>
                 <React.Fragment key={c.label}>{c.item}</React.Fragment>
               ))}
             </div>
@@ -297,7 +301,9 @@ export const CWContentPage = ({
               />
               {sidebarComponents?.map((item, i) => (
                 <CWTab
+                  // @ts-expect-error <StrictNullChecks/>
                   key={item.label}
+                  // @ts-expect-error <StrictNullChecks/>
                   label={item.label}
                   onClick={() => {
                     setTabSelected(i + 1);
@@ -308,14 +314,20 @@ export const CWContentPage = ({
             </CWTabsRow>
           </div>
           {tabSelected === 0 && mainBody}
+          {/* @ts-expect-error StrictNullChecks*/}
           {sidebarComponents?.length >= 1 &&
             tabSelected === 1 &&
+            // @ts-expect-error <StrictNullChecks/>
             sidebarComponents[0].item}
+          {/* @ts-expect-error StrictNullChecks*/}
           {sidebarComponents?.length >= 2 &&
             tabSelected === 2 &&
+            // @ts-expect-error <StrictNullChecks/>
             sidebarComponents[1].item}
+          {/* @ts-expect-error StrictNullChecks*/}
           {sidebarComponents?.length >= 3 &&
             tabSelected === 3 &&
+            // @ts-expect-error <StrictNullChecks/>
             sidebarComponents[2].item}
         </div>
       )}

@@ -38,20 +38,32 @@ export const getAddedAndDeleted = <T>(
   return { toAdd, toDelete };
 };
 
+type ThreadTooltipTextActions = 'upvote' | 'comment' | 'reply' | 'submit';
+
+export type GetThreadActionTooltipTextResponse =
+  | string
+  | ((action: ThreadTooltipTextActions) => string);
+
+const getActionTooltipForNonCommunityMember = (
+  action: ThreadTooltipTextActions,
+) => {
+  return `Join community to ${action}`;
+};
+
 export const getThreadActionTooltipText = ({
   isCommunityMember = false,
   isThreadArchived = false,
   isThreadLocked = false,
   isThreadTopicGated = false,
-  action = 'upvote',
 }: {
   isCommunityMember?: boolean;
   isThreadArchived?: boolean;
   isThreadLocked?: boolean;
   isThreadTopicGated?: boolean;
-  action?: string;
-}) => {
-  if (!isCommunityMember) return `Join community to ${action}`;
+}): GetThreadActionTooltipTextResponse => {
+  if (!isCommunityMember) {
+    return getActionTooltipForNonCommunityMember;
+  }
   if (isThreadArchived) return 'Thread is archived';
   if (isThreadLocked) return 'Thread is locked';
   if (isThreadTopicGated) return 'Topic is gated';

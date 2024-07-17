@@ -1,190 +1,232 @@
-import { DB } from '.';
+import type { DB } from './factories';
 
 /**
  * Associates models with type safety
  */
 export const buildAssociations = (db: DB) => {
-  db.User.withMany(db.Address, 'user_id')
-    .withMany(db.ThreadSubscription, 'user_id', {
-      asMany: 'ThreadSubscriptions',
-      onDelete: 'CASCADE',
-    })
-    .withMany(db.CommunityAlert, 'user_id', {
-      asMany: 'CommunityAlerts',
-      onDelete: 'CASCADE',
-    })
-    .withMany(db.CommentSubscription, 'user_id', {
-      asMany: 'CommentSubscriptions',
-      onDelete: 'CASCADE',
-    })
-    .withOne(db.SubscriptionPreference, ['id', 'user_id'], {
-      as: 'SubscriptionPreferences',
+  db.User.withMany(db.Address)
+    .withMany(db.Profile, { onUpdate: 'CASCADE' })
+    .withMany(db.ProfileTags)
+    .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
+    .withMany(db.NotificationsRead)
+    .withMany(db.SubscriptionPreference, {
+      asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
     });
 
-  db.Address.withMany(db.Membership, 'address_id', {
-    asOne: 'address',
-    asMany: 'Memberships',
-  });
+  // TODO: to be deprecated by #5564
+  db.Profile.withMany(db.Address);
 
-  db.ChainNode.withMany(db.Community, 'chain_node_id')
-    .withMany(db.Contract, 'chain_node_id', { asMany: 'contracts' })
-    .withOne(db.LastProcessedEvmBlock, ['id', 'chain_node_id']);
+  db.Address.withMany(db.Thread, {
+    asOne: 'Address',
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
+    .withMany(db.Comment, {
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    })
+    .withMany(db.Reaction)
+    .withOne(db.SsoToken, {
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    });
 
-  db.ContractAbi.withMany(db.Contract, 'abi_id').withMany(
+  db.ChainNode.withMany(db.Community)
+    .withMany(db.Contract, { asMany: 'contracts' })
+    .withMany(db.EvmEventSource)
+    .withOne(db.LastProcessedEvmBlock);
+
+  db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' }).withMany(
     db.EvmEventSource,
-    'abi_id',
+    { foreignKey: 'abi_id' },
   );
 
-  db.Community.withMany(db.Group, 'community_id', { asMany: 'groups' })
-    .withMany(db.Topic, 'community_id', {
+  db.Community.withMany(db.Group, { asMany: 'groups' })
+    .withMany(db.Topic, {
       asOne: 'community',
       asMany: 'topics',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Address, 'community_id')
-    .withMany(db.Thread, 'community_id', {
+    .withMany(db.Address)
+    .withMany(db.Thread, {
       asOne: 'Community',
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     })
-    .withMany(db.Comment, 'community_id')
-    .withMany(db.CommunityStake, 'community_id')
-    .withMany(db.ContestManager, 'community_id', {
+    .withMany(db.Poll)
+    .withMany(db.CommunityStake)
+    .withMany(db.ContestManager, {
       asMany: 'contest_managers',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.CommunityAlert, 'community_id', {
+    .withMany(db.Notification)
+    .withMany(db.Webhook)
+    .withMany(db.Ban)
+    .withMany(db.CommunityBanner)
+    .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
-    .withMany(db.Notification, 'community_id')
-    .withMany(db.Webhook, 'community_id')
-    .withOne(db.DiscordBotConfig, ['discord_config_id', 'community_id'], {
+    .withOne(db.DiscordBotConfig, {
+      targeyKey: 'discord_config_id',
       onDelete: 'CASCADE',
+    })
+    .withOne(db.User, {
+      foreignKey: 'selected_community_id',
+      as: 'selectedCommunity',
     });
 
-  db.Group.withMany(db.Membership, 'group_id', {
-    asOne: 'group',
-    asMany: 'memberships',
+  db.Tags.withMany(db.ProfileTags, {
+    foreignKey: 'tag_id',
+    onDelete: 'CASCADE',
+  }).withMany(db.CommunityTags, {
+    foreignKey: 'tag_id',
+    onDelete: 'CASCADE',
   });
 
-  db.Topic.withMany(db.Thread, 'topic_id', {
+  db.Topic.withMany(db.Thread, {
+    asOne: 'topic',
     asMany: 'threads',
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
-  }).withMany(db.ContestTopic, 'topic_id');
+  }).withMany(db.ContestTopic);
 
-  db.Thread.withMany(db.Poll, 'thread_id', {})
-    .withMany(db.ContestAction, 'thread_id', {
+  db.Thread.withMany(db.Poll)
+    .withMany(db.ContestAction, {
       optional: true,
     })
-    .withMany(db.ThreadSubscription, 'thread_id', {
-      onDelete: 'CASCADE',
-    })
-    .withMany(db.Reaction, 'thread_id', {
+    .withMany(db.Reaction, {
       asMany: 'reactions',
-    });
+    })
+    .withMany(db.Comment)
+    .withMany(db.Notification)
+    .withMany(db.ThreadVersionHistory);
 
-  db.Comment.withMany(db.Reaction, 'comment_id', {
+  db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
-  }).withMany(db.CommentSubscription, 'comment_id', { onDelete: 'CASCADE' });
+  }).withMany(db.CommentVersionHistory);
 
-  db.ContestManager.withMany(db.Contest, 'contest_address', {
+  db.ContestManager.withMany(db.Contest, {
+    foreignKey: 'contest_address',
     asMany: 'contests',
-  }).withMany(db.ContestTopic, 'contest_address', { asMany: 'topics' });
+  }).withMany(db.ContestTopic, {
+    foreignKey: 'contest_address',
+    asMany: 'topics',
+  });
 
-  db.Contest.withMany(db.ContestAction, ['contest_address', 'contest_id'], {
+  db.Contest.withMany(db.ContestAction, {
+    foreignKey: ['contest_address', 'contest_id'],
     asMany: 'actions',
   });
 
-  db.CommunityStake.withMany(
-    db.StakeTransaction,
-    ['community_id', 'stake_id'],
-    {
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-    },
-  );
+  db.CommunityStake.withMany(db.StakeTransaction, {
+    foreignKey: ['community_id', 'stake_id'],
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
 
-  db.Poll.withMany(db.Vote, 'poll_id', {
+  db.Poll.withMany(db.Vote, {
     asOne: 'poll',
     asMany: 'votes',
     onDelete: 'CASCADE',
   });
 
-  db.NotificationCategory.withMany(db.Subscription, 'category_id').withMany(
-    db.Notification,
-    'category_id',
-  );
+  db.NotificationCategory.withMany(db.Subscription, {
+    foreignKey: 'category_id',
+  }).withMany(db.Notification, { foreignKey: 'category_id' });
+
+  db.Group.withMany(db.GroupPermission);
 
   // Many-to-many associations (cross-references)
+  db.Membership.withManyToMany(
+    {
+      model: db.Group,
+      as: 'memberships',
+      asOne: 'group',
+    },
+    {
+      model: db.Address,
+      as: 'Memberships',
+      asOne: 'address',
+    },
+  );
   db.Collaboration.withManyToMany(
-    [db.Address, 'address_id', 'collaborators', {}],
-    [db.Thread, 'thread_id', 'collaborations', {}],
+    { model: db.Address },
+    { model: db.Thread, asMany: 'collaborators' },
   );
   db.CommunityContract.withManyToMany(
-    [db.Community, 'community_id', 'communities', {}],
-    [db.Contract, 'contract_id', 'contracts', {}],
+    { model: db.Community },
+    { model: db.Contract },
   );
   db.StarredCommunity.withManyToMany(
-    [db.Community, 'community_id', 'communities', { onUpdate: 'CASCADE' }],
-    [db.User, 'user_id', 'users', { onUpdate: 'CASCADE' }],
+    { model: db.Community, onUpdate: 'CASCADE' },
+    { model: db.User, onUpdate: 'CASCADE' },
+  );
+  db.CommunityAlert.withManyToMany(
+    {
+      model: db.User,
+      as: 'communityAlerts',
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.Community,
+      as: 'communityAlerts',
+      onDelete: 'CASCADE',
+    },
   );
 
-  // Reconciling constraint rules in "loose" FKs
-  db.User.belongsTo(db.Community, {
-    as: 'selectedCommunity',
-    foreignKey: 'selected_community_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
-  db.Template.belongsTo(db.ContractAbi, {
-    foreignKey: 'abi_id',
-  });
-  db.Template.belongsTo(db.Community, {
-    foreignKey: 'created_for_community',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
-  db.Subscription.belongsTo(db.User, {
-    foreignKey: 'subscriber_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
-  db.SsoToken.belongsTo(db.Profile, {
-    foreignKey: 'profile_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
-  db.Poll.belongsTo(db.Community, {
+  db.ThreadSubscription.withManyToMany(
+    {
+      model: db.Thread,
+      as: 'subscriptions',
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.User,
+      as: 'threadSubscriptions',
+      onDelete: 'CASCADE',
+    },
+  );
+  db.CommentSubscription.withManyToMany(
+    {
+      model: db.Comment,
+      as: 'subscriptions',
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.User,
+      as: 'commentSubscriptions',
+      onDelete: 'CASCADE',
+    },
+  );
+  db.NotificationsRead.withManyToMany(
+    { model: db.Subscription, onDelete: 'CASCADE' },
+    {
+      model: db.Notification,
+      onDelete: 'CASCADE',
+      hooks: true,
+    },
+  );
+
+  // "loose" FKs
+  db.Comment.belongsTo(db.Community, {
     foreignKey: 'community_id',
-    targetKey: 'id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
   });
-  db.NotificationsRead.belongsTo(db.User, {
-    foreignKey: 'user_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
-  db.EvmEventSource.belongsTo(db.ChainNode, {
-    foreignKey: 'chain_node_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
-  db.CommunityBanner.belongsTo(db.Community, {
+  db.Reaction.belongsTo(db.Community, {
     foreignKey: 'community_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
   });
-  db.Ban.belongsTo(db.Community, {
+  db.Subscription.belongsTo(db.Community, {
     foreignKey: 'community_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
   });
-  db.Contract.belongsTo(db.ChainNode, {
-    foreignKey: 'chain_node_id',
+  db.Subscription.belongsTo(db.Thread, {
+    foreignKey: 'thread_id',
+  });
+  db.Subscription.belongsTo(db.Comment, {
+    foreignKey: 'comment_id',
+  });
+  db.ContestManager.belongsTo(db.ContestManager, {
+    foreignKey: 'community_id',
   });
 };

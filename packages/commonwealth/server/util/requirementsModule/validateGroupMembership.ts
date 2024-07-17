@@ -1,13 +1,13 @@
 import {
+  MembershipRejectReason,
+  OptionsWithBalances,
+} from '@hicommonwealth/model';
+import {
   AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
-} from '@hicommonwealth/core';
-import {
-  MembershipRejectReason,
-  OptionsWithBalances,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
 
 export type ValidateGroupMembershipResponse = {
@@ -65,6 +65,7 @@ export default function validateGroupMembership(
       numRequirementsMet++;
     } else {
       response.isValid = false;
+      // @ts-expect-error StrictNullChecks
       response.messages.push({
         requirement,
         message: checkResult.message,
@@ -99,6 +100,12 @@ function _thresholdCheck(
     let chainId: string;
     let tokenId: string;
     switch (thresholdData.source.source_type) {
+      case 'spl': {
+        balanceSourceType = BalanceSourceType.SPL;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.evm_chain_id.toString();
+        break;
+      }
       case 'erc20': {
         balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
@@ -115,6 +122,7 @@ function _thresholdCheck(
         balanceSourceType = BalanceSourceType.ERC1155;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.evm_chain_id.toString();
+        // @ts-expect-error StrictNullChecks
         tokenId = thresholdData.source.token_id.toString();
         break;
       }
@@ -171,6 +179,8 @@ function _thresholdCheck(
               b.options.sourceOptions.contractAddress == contractAddress &&
               b.options.sourceOptions.cosmosChainId.toString() === chainId
             );
+          case BalanceSourceType.SPL:
+            return b.options.mintAddress == contractAddress;
           default:
             return null;
         }

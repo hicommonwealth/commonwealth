@@ -9,10 +9,11 @@ import {
   serializeDelta,
 } from 'client/scripts/views/components/react_quill_editor/utils';
 import { DeltaStatic } from 'quill';
+import { describe, test } from 'vitest';
 
 describe('react quill editor unit tests', () => {
   describe('createDeltaFromText', () => {
-    it('should convert text to delta (richtext)', () => {
+    test('should convert text to delta (richtext)', () => {
       const text = 'hello';
       const expectedDelta = {
         ops: [{ insert: 'hello' }],
@@ -22,17 +23,18 @@ describe('react quill editor unit tests', () => {
       assert.deepEqual(result, expectedDelta);
     });
 
-    it('should convert text to delta (richtext) – bad input case', () => {
+    test('should convert text to delta (richtext) – bad input case', () => {
       const text = null;
       const expectedDelta = {
         ops: [{ insert: '' }],
         ___isMarkdown: false,
       } as any as SerializableDeltaStatic;
+      // @ts-expect-error StrictNullChecks
       const result = createDeltaFromText(text);
       assert.deepEqual(result, expectedDelta);
     });
 
-    it('should convert text to delta (markdown)', () => {
+    test('should convert text to delta (markdown)', () => {
       const text = 'hello';
       const expectedDelta = {
         ops: [{ insert: 'hello' }],
@@ -44,7 +46,7 @@ describe('react quill editor unit tests', () => {
   });
 
   describe('getTextFromDelta', () => {
-    it('should convert delta to text', () => {
+    test('should convert delta to text', () => {
       const delta = {
         ops: [{ insert: 'wasup' }],
       } as SerializableDeltaStatic;
@@ -55,7 +57,7 @@ describe('react quill editor unit tests', () => {
   });
 
   describe('countLinesMarkdown', () => {
-    it('should return num lines in markdown text', () => {
+    test('should return num lines in markdown text', () => {
       // content will usually have a new line at the end
       const content = 'hello\nthere\nblah\n';
       const expectedNumLines = 3;
@@ -65,7 +67,7 @@ describe('react quill editor unit tests', () => {
   });
 
   describe('countLinesQuill', () => {
-    it('should return num lines in richtext', () => {
+    test('should return num lines in richtext', () => {
       // content will usually have a new line at the end
       const delta = {
         ops: [{ insert: 'hello\nthere\n' }, { insert: 'blah\n123\n' }],
@@ -77,7 +79,7 @@ describe('react quill editor unit tests', () => {
   });
 
   describe('serializeDelta', () => {
-    it('should serialize a DeltaStatic (richtext) to string', () => {
+    test('should serialize a DeltaStatic (richtext) to string', () => {
       const original = {
         ops: [{ insert: 'hello' }],
         ___isMarkdown: false,
@@ -88,7 +90,7 @@ describe('react quill editor unit tests', () => {
       assert.equal(result, expectedOutput);
     });
 
-    it('should serialize a DeltaStatic (markdown) to string', () => {
+    test('should serialize a DeltaStatic (markdown) to string', () => {
       const original = {
         ops: [{ insert: 'hello' }],
         ___isMarkdown: true,
@@ -100,7 +102,7 @@ describe('react quill editor unit tests', () => {
   });
 
   describe('deserializeDelta', () => {
-    it('should deserialize a string (richtext) to DeltaStatic', () => {
+    test('should deserialize a string (richtext) to DeltaStatic', () => {
       const original = '{"ops":[{"insert":"hello"}],"___isMarkdown":false}';
       const expectedOutput = {
         ops: [{ insert: 'hello' }],
@@ -110,18 +112,19 @@ describe('react quill editor unit tests', () => {
       assert.deepEqual(result, expectedOutput);
     });
 
-    it('should deserialize a string (richtext) to DeltaStatic - bad input case', () => {
+    test('should deserialize a string (richtext) to DeltaStatic - bad input case', () => {
       // bad input should return an empty richtext delta with markdown true
       const original = null;
       const expectedOutput = {
         ops: [{ insert: '' }],
         ___isMarkdown: true,
       } as SerializableDeltaStatic;
+      // @ts-expect-error StrictNullChecks
       const result = deserializeDelta(original);
       assert.deepEqual(result, expectedOutput);
     });
 
-    it('should deserialize a string (markdown) to DeltaStatic', () => {
+    test('should deserialize a string (markdown) to DeltaStatic', () => {
       const original = 'hello';
       const expectedOutput = {
         ops: [{ insert: 'hello' }],

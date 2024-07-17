@@ -1,17 +1,25 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import baseImg from 'assets/img/communitySelector/base.svg';
+import blastImg from 'assets/img/communitySelector/blast.png';
+import cosmosImg from 'assets/img/communitySelector/cosmos.svg';
+import ethereumImg from 'assets/img/communitySelector/ethereum.svg';
+import polygonImg from 'assets/img/communitySelector/polygon.svg';
+import solanaImg from 'assets/img/communitySelector/solana.svg';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
 export const communityTypeOptions = [
   {
     type: CommunityType.Base,
+    img: baseImg,
     chainBase: ChainBase.Ethereum,
     title: 'BASE',
     isRecommended: true,
     description:
-      'Base in an Ethereum layer 2 network with high TVL and low transaction fees',
+      'Base is an Ethereum Layer 2 network with high TVL and low transaction fees',
   },
   {
     type: CommunityType.Blast,
+    img: blastImg,
     chainBase: ChainBase.Ethereum,
     title: 'Blast',
     isRecommended: false,
@@ -21,6 +29,7 @@ export const communityTypeOptions = [
   },
   {
     type: CommunityType.Ethereum,
+    img: ethereumImg,
     chainBase: ChainBase.Ethereum,
     title: 'Ethereum (EVM)',
     isRecommended: false,
@@ -31,6 +40,7 @@ export const communityTypeOptions = [
 
   {
     type: CommunityType.Cosmos,
+    img: cosmosImg,
     chainBase: ChainBase.CosmosSDK,
     title: 'Cosmos',
     isRecommended: false,
@@ -40,6 +50,7 @@ export const communityTypeOptions = [
   },
   {
     type: CommunityType.Polygon,
+    img: polygonImg,
     chainBase: ChainBase.Ethereum,
     title: 'Polygon',
     isRecommended: false,
@@ -49,10 +60,11 @@ export const communityTypeOptions = [
   },
   {
     type: CommunityType.Solana,
+    img: solanaImg,
     chainBase: ChainBase.Solana,
     title: 'Solana',
     isRecommended: false,
-    isHidden: true,
+    isHidden: false,
     description:
       'Solana is a rapidly growing technology due to its speed and scale. ' +
       'Our integration with Solana allows you to create a community for your project with just a click!',

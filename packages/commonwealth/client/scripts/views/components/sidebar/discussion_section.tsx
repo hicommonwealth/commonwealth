@@ -44,11 +44,15 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
+interface DiscussionSectionProps {
+  isContestAvailable: boolean;
+  topicIdsIncludedInContest: number[];
+}
+
 export const DiscussionSection = ({
   isContestAvailable,
-}: {
-  isContestAvailable: boolean;
-}) => {
+  topicIdsIncludedInContest,
+}: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -74,10 +78,6 @@ export const DiscussionSection = ({
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
     location,
   );
-  const matchesSputnikDaosRoute = matchRoutes(
-    [{ path: '/sputnik-daos' }, { path: ':scope/sputnik-daos' }],
-    location,
-  );
 
   const { data: topicsData } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -86,6 +86,7 @@ export const DiscussionSection = ({
   const topics = (topicsData || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
+    // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
@@ -106,11 +107,6 @@ export const DiscussionSection = ({
           All: {
             toggledState: false,
           },
-          ...(app.activeChainId() === 'near' && {
-            SputnikDaos: {
-              toggledState: false,
-            },
-          }),
         },
       };
     }
@@ -204,38 +200,12 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
-    app.activeChainId() === 'near' && {
-      title: 'Sputnik Daos',
-      containsChildren: false,
-      hasDefaultToggle: false,
-      isVisible: true,
-      isUpdated: true,
-      isActive:
-        !!matchesSputnikDaosRoute &&
-        (app.chain ? app.chain.serverLoaded : true),
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/sputnik-daos`,
-          app.activeChainId(),
-          () => {
-            setDiscussionsToggleTree(
-              `children.SputnikDAOs.toggledState`,
-              toggle,
-            );
-          },
-        );
-      },
-      displayData: null,
-    },
   ];
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
-      const topicInvolvedInActiveContest = false;
+      const topicInvolvedInActiveContest =
+        contestsEnabled && topicIdsIncludedInContest.includes(topic.id);
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,

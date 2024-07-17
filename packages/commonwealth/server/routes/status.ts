@@ -4,15 +4,15 @@ import type {
   CommunityInstance,
   DB,
   EmailNotificationInterval,
-  NotificationCategoryInstance,
   StarredCommunityAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
+import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
-import { ETH_RPC, JWT_SECRET } from '../config';
+import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
@@ -24,15 +24,16 @@ type ThreadCountQueryData = {
 };
 
 type StatusResp = {
-  notificationCategories: NotificationCategoryInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
   user?: {
+    id: number;
     email: string;
     emailVerified: boolean;
     emailInterval: EmailNotificationInterval;
     jwt: string;
+    knockJwtToken: string;
     addresses: AddressInstance[];
     selectedCommunity: CommunityInstance;
     isAdmin: boolean;
@@ -47,18 +48,16 @@ type StatusResp = {
 };
 
 const getCommunityStatus = async (models: DB) => {
-  const [communities, notificationCategories] = await Promise.all([
-    models.Community.findAll({
-      where: { active: true },
-    }),
-    models.NotificationCategory.findAll(),
-  ]);
+  const communities = await models.Community.findAll({
+    where: { active: true },
+  });
 
   const communityCategories: {
     [communityId: string]: CommunityCategoryType[];
   } = {};
   for (const community of communities) {
     if (community.category !== null) {
+      // @ts-expect-error StrictNullChecks
       communityCategories[community.id] =
         community.category as CommunityCategoryType[];
     }
@@ -81,7 +80,6 @@ const getCommunityStatus = async (models: DB) => {
     );
 
   return {
-    notificationCategories,
     communityCategories,
     threadCountQueryData,
   };
@@ -108,6 +106,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ]);
 
   // look up my roles & private communities
+  // @ts-expect-error StrictNullChecks
   const myAddressIds: number[] = Array.from(
     addresses.map((address) => address.id),
   );
@@ -272,10 +271,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   return {
     roles,
     user: {
+      id: user.id,
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
+      promotional_emails_enabled: user.promotional_emails_enabled,
+      is_welcome_onboard_flow_complete: user.is_welcome_onboard_flow_complete,
       jwt: '',
+      knockJwtToken: '',
       addresses,
       selectedCommunity,
       isAdmin,
@@ -297,17 +300,13 @@ export const status = async (
     const communityStatusPromise = getCommunityStatus(models);
     const { user: reqUser } = req;
     if (!reqUser) {
-      const {
-        notificationCategories,
-        communityCategories,
-        threadCountQueryData,
-      } = await communityStatusPromise;
+      const { communityCategories, threadCountQueryData } =
+        await communityStatusPromise;
 
       return success(res, {
-        notificationCategories,
         recentThreads: threadCountQueryData,
-        evmTestEnv: ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        evmTestEnv: config.EVM.ETH_RPC,
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     } else {
@@ -323,23 +322,27 @@ export const status = async (
         userStatusPromise,
         profilePromise,
       ]);
-      const {
-        notificationCategories,
-        communityCategories,
-        threadCountQueryData,
-      } = communityStatus;
-      const { roles, user, id, email } = userStatus;
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
+      const { communityCategories, threadCountQueryData } = communityStatus;
+      const { roles, user, id } = userStatus;
+
+      const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
+        expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
+      });
+
+      // @ts-expect-error StrictNullChecks
+      const knockJwtToken = await computeKnockJwtToken(user.id);
+
       user.jwt = jwtToken as string;
+      user.knockJwtToken = knockJwtToken!;
 
       return success(res, {
-        notificationCategories,
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
+        // @ts-expect-error StrictNullChecks
         user: { ...user, profileId: profileInstance.id },
-        evmTestEnv: ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        evmTestEnv: config.EVM.ETH_RPC,
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     }
@@ -349,11 +352,24 @@ export const status = async (
   }
 };
 
+/**
+ * We have to generate a JWT token for use by the frontend Knock SDK.
+ */
+async function computeKnockJwtToken(userId: number) {
+  if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
+    return await Knock.signUserToken(`${userId}`, {
+      signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
+      expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
+    });
+  }
+}
+
 type CommunityActivity = [communityId: string, timestamp: string | null][];
 
 function getCommunityActivity(
   addresses: AddressInstance[],
 ): Promise<CommunityActivity> {
+  // @ts-expect-error StrictNullChecks
   return Promise.all(
     addresses.map(async (address) => {
       const { community_id, last_active } = address;

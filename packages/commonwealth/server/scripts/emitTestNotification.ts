@@ -1,12 +1,12 @@
-import { logger } from '@hicommonwealth/logging';
+import { dispose, logger } from '@hicommonwealth/core';
 import {
   NotificationInstance,
   SubscriptionInstance,
   models,
 } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
 import Sequelize, { Transaction } from 'sequelize';
+import { fileURLToPath } from 'url';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import emitNotifications from '../util/emitNotifications';
@@ -191,6 +191,7 @@ async function setupNotification(
     );
   }
 
+  // @ts-expect-error StrictNullChecks
   if (!existingNotifications) {
     existingNotifications = await getExistingNotifications(
       transaction,
@@ -336,8 +337,9 @@ async function main() {
           'Wallet address not found. ' +
             'Make sure the given address is an address you have used to sign in before.',
         );
-        process.exit(1);
+        await dispose()('ERROR', true);
       } else {
+        // @ts-expect-error StrictNullChecks
         userId = address.user_id;
       }
     }
@@ -346,7 +348,7 @@ async function main() {
     if (argv.chain_id) {
       result = await models.Subscription.findOrCreate({
         where: {
-          subscriber_id: userId,
+          subscriber_id: userId!,
           community_id: argv.chain_id,
           category_id: NotificationCategories.ChainEvent,
         },
@@ -355,7 +357,7 @@ async function main() {
     } else {
       result = await models.Subscription.findOrCreate({
         where: {
-          subscriber_id: userId,
+          subscriber_id: userId!,
           snapshot_id: argv.snapshot_id,
           category_id: NotificationCategories.SnapshotProposal,
         },
@@ -394,7 +396,7 @@ async function main() {
 
 /**
  * In order to execute this script on Frack, Frick, Beta, or any Heroku environment you must run
- * the yarn script (yarn emit-notification) on a Heroku one-off dyno.
+ * the pnpm script (pnpm emit-notification) on a Heroku one-off dyno.
  * To run a one-off dyno use `heroku run bash -a [app-name]`.
  *
  * If the mock (`-m`) option is used multiple times in succession, the same notification data will be re-emitted.
@@ -406,17 +408,19 @@ async function main() {
  * used in rare circumstances such as in local testing when implementing a new chain event or snapshot notification
  * type.
  *
- * Example usage: `yarn emit-notification -c dydx -w [your-wallet-address]`. This finds a random old dydx
+ * Example usage: `pnpm emit-notification -c dydx -w [your-wallet-address]`. This finds a random old dydx
  * chain-event notification and re-emits it as if it were a brand new notification. Since it replaces an old
  * (but real) notification, it links to a real proposal.
  */
 if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
-      process.exit(0);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
     })
     .catch((err) => {
       console.log('Failed to emit a notification:', err);
-      process.exit(1);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
     });
 }

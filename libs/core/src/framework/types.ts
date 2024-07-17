@@ -1,5 +1,5 @@
 import z, { ZodSchema, ZodUndefined } from 'zod';
-import { Events, events } from '../schemas';
+import { Events, events } from '../integration/events';
 
 /**
  * Error names as constants
@@ -7,6 +7,16 @@ import { Events, events } from '../schemas';
 export const INVALID_INPUT_ERROR = 'Invalid Input Error';
 export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
+
+export const ExternalServiceUserIds = {
+  Knock: -1,
+  K6: -2,
+} as const;
+
+export type AuthStrategies = {
+  name: 'jwt' | 'authtoken';
+  userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+};
 
 /**
  * Deep partial utility
@@ -47,6 +57,7 @@ export type Actor = {
  */
 export class InvalidInput extends Error {
   public readonly details?: string[];
+
   constructor(message: string, details?: string[]) {
     super(details ? `${message}:\n${details.join('\n')}` : message);
     this.name = INVALID_INPUT_ERROR;
@@ -165,6 +176,7 @@ export type CommandMetadata<
   readonly auth: CommandHandler<Input, Output>[];
   readonly body: CommandHandler<Input, Output>;
   readonly secure?: boolean;
+  readonly authStrategy?: AuthStrategies;
 };
 
 /**
@@ -180,6 +192,7 @@ export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
   readonly auth: QueryHandler<Input, Output>[];
   readonly body: QueryHandler<Input, Output>;
   readonly secure?: boolean;
+  readonly authStrategy?: AuthStrategies;
 };
 
 /**
@@ -213,31 +226,31 @@ export type Schemas<Input extends ZodSchema, Output extends ZodSchema> = {
 };
 
 /**
- * Command factory function
+ * Command metadata
  */
 export type Command<Schema> = Schema extends Schemas<infer Input, infer Output>
-  ? () => CommandMetadata<Input, Output>
+  ? CommandMetadata<Input, Output>
   : never;
 
 /**
- * Query factory function
+ * Query metadata
  */
 export type Query<Schema> = Schema extends Schemas<infer Input, infer Output>
-  ? () => QueryMetadata<Input, Output>
+  ? QueryMetadata<Input, Output>
   : never;
 
 /**
- * Policy factory function
+ * Policy metadata
  */
 export type Policy<
-  Inputs extends EventSchemas,
+  Inputs,
   Output extends ZodSchema | ZodUndefined = ZodUndefined,
-> = () => EventsHandlerMetadata<Inputs, Output>;
+> = Inputs extends EventSchemas ? EventsHandlerMetadata<Inputs, Output> : never;
 
 /**
- * Projection factory function
+ * Projection metadata
  */
 export type Projection<
-  Inputs extends EventSchemas,
+  Inputs,
   Output extends ZodSchema | ZodUndefined = ZodUndefined,
-> = () => EventsHandlerMetadata<Inputs, Output>;
+> = Inputs extends EventSchemas ? EventsHandlerMetadata<Inputs, Output> : never;

@@ -72,6 +72,7 @@ export const Select = ({
   return (
     <ClickAwayListener
       onClickAway={async () => {
+        // @ts-expect-error <StrictNullChecks/>
         popoverProps.setAnchorEl(null);
         onClose && (await onClose());
       }}
@@ -80,6 +81,7 @@ export const Select = ({
       <div className={containerClassname}>
         {label && <MessageRow label={label} />}
         <CWButton
+          type="button"
           className={`Select ${
             popoverProps.anchorEl ? 'active' : ''
           } ${`size-${size}`}`}
@@ -130,7 +132,9 @@ export const Select = ({
                     label={optionLabel}
                     onClick={async (e) => {
                       e.preventDefault();
+                      // @ts-expect-error <StrictNullChecks/>
                       onSelect(option);
+                      // @ts-expect-error <StrictNullChecks/>
                       popoverProps.setAnchorEl(null);
                       onClose && (await onClose());
                     }}
@@ -144,6 +148,7 @@ export const Select = ({
                             iconSize="small"
                             onClick={(e) => {
                               e.stopPropagation();
+                              // @ts-expect-error <StrictNullChecks/>
                               popoverProps.setAnchorEl(null);
                               onOptionEdit?.(option);
                             }}

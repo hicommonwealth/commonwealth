@@ -3,6 +3,7 @@ import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface UpdateFeaturedTopicsOrderProps {
   featuredTopics: Topic[];
@@ -12,13 +13,14 @@ const updateFeaturedTopicsOrder = async ({
   featuredTopics,
 }: UpdateFeaturedTopicsOrderProps) => {
   const orderedIds = featuredTopics
+    // @ts-expect-error StrictNullChecks
     .sort((a, b) => a.order - b.order)
     .map((t) => t.id);
 
   await axios.put(`${app.serverUrl()}/topics-order`, {
     community_id: app.activeChainId(),
     orderedIds,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 

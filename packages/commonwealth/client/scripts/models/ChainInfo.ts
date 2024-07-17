@@ -4,17 +4,20 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
+import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
+import Tag from './Tag';
 
 class ChainInfo {
   public readonly id: string;
   public readonly chainNodeId: string;
   public readonly ChainNode: NodeInfo;
   public readonly CommunityStakes: StakeInfo[];
+  public CommunityTags: Tag[];
   public readonly tokenName: string;
-  public readonly threadCount: number;
+  public threadCount: number;
   public readonly addressCount: number;
   public readonly default_symbol: string;
   public name: string;
@@ -81,6 +84,7 @@ class ChainInfo {
     chain_node_id,
     ChainNode,
     CommunityStakes,
+    CommunityTags,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
@@ -119,8 +123,10 @@ class ChainInfo {
     this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
     this.CommunityStakes = CommunityStakes;
+    this.CommunityTags = CommunityTags;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
+    // @ts-expect-error StrictNullChecks
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
@@ -170,6 +176,7 @@ class ChainInfo {
     thread_count,
     address_count,
     CommunityStakes,
+    CommunityTags,
     snapshot_spaces,
   }) {
     let blockExplorerIdsParsed;
@@ -215,8 +222,9 @@ class ChainInfo {
       substrateSpec: substrate_spec,
       tokenName: token_name,
       chain_node_id,
-      ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
+      ChainNode: ChainNode,
       CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
+      CommunityTags: CommunityTags?.map((t) => new Tag(t)) ?? [],
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
@@ -273,6 +281,7 @@ class ChainInfo {
     directory_page_enabled,
     directory_page_chain_node_id,
     type,
+    isPWA,
   }: {
     name?: string;
     description?: string;
@@ -293,30 +302,40 @@ class ChainInfo {
     directory_page_enabled?: boolean;
     directory_page_chain_node_id?: number;
     type?: string;
+    isPWA?: boolean;
   }) {
     const id = app.activeChainId() ?? this.id;
-    const r = await axios.patch(`${app.serverUrl()}/communities/${id}`, {
-      id,
-      name,
-      description,
-      social_links,
-      stages_enabled: stagesEnabled,
-      custom_stages: customStages,
-      custom_domain: customDomain,
-      snapshot,
-      terms,
-      icon_url: iconUrl,
-      default_summary_view: defaultOverview,
-      default_page: defaultPage,
-      has_homepage: hasHomepage,
-      chain_node_id,
-      cosmos_gov_version,
-      discord_bot_webhooks_enabled,
-      directory_page_enabled,
-      directory_page_chain_node_id,
-      type,
-      jwt: app.user.jwt,
-    });
+    const r = await axios.patch(
+      `${app.serverUrl()}/communities/${id}`,
+      {
+        id,
+        name,
+        description,
+        social_links,
+        stages_enabled: stagesEnabled,
+        custom_stages: customStages,
+        custom_domain: customDomain,
+        snapshot,
+        terms,
+        icon_url: iconUrl,
+        default_summary_view: defaultOverview,
+        default_page: defaultPage,
+        has_homepage: hasHomepage,
+        chain_node_id,
+        cosmos_gov_version,
+        discord_bot_webhooks_enabled,
+        directory_page_enabled,
+        directory_page_chain_node_id,
+        type,
+        jwt: userStore.getState().jwt,
+      },
+      {
+        headers: {
+          isPWA: isPWA?.toString(),
+        },
+      },
+    );
+
     const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
@@ -365,6 +384,10 @@ class ChainInfo {
       });
 
     return categorizedLinks;
+  }
+
+  public updateTags(tags: Tag[]) {
+    this.CommunityTags = tags;
   }
 }
 

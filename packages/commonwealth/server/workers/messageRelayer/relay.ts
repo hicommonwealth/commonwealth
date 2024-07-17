@@ -1,15 +1,15 @@
 import {
   Broker,
   BrokerPublications,
-  schemas,
+  Outbox,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { z } from 'zod';
-import { MESSAGE_RELAYER_PREFETCH } from '../../config';
+import { config } from '../../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -17,9 +17,7 @@ const log = logger(__filename);
 export async function relay(broker: Broker, models: DB): Promise<number> {
   const publishedEventIds: number[] = [];
   await models.sequelize.transaction(async (transaction) => {
-    const events = await models.sequelize.query<
-      z.infer<typeof schemas.entities.Outbox>
-    >(
+    const events = await models.sequelize.query<z.infer<typeof Outbox>>(
       `
       SELECT *
       FROM "Outbox"
@@ -31,7 +29,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
       {
         transaction,
         type: QueryTypes.SELECT,
-        replacements: { prefetch: MESSAGE_RELAYER_PREFETCH },
+        replacements: { prefetch: config.WORKERS.MESSAGE_RELAYER_PREFETCH },
       },
     );
 
@@ -49,6 +47,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
           });
           break;
         }
+        // @ts-expect-error StrictNullChecks
         publishedEventIds.push(event.event_id);
         stats().incrementBy(
           'messageRelayerPublished',

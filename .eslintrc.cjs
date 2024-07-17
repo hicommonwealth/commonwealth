@@ -4,7 +4,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'n'],
   parser: '@typescript-eslint/parser',
   // indicates this is the parent eslint so eslint will stop searching further up for eslint configs
   root: true,
@@ -29,26 +29,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            group: [
-              '@hicommonwealth/core/**',
-              '@hicommonwealth/adapters/**',
-              '@hicommonwealth/model/**',
-              '@hicommonwealth/chains/**',
-              '**/core/src/**',
-              '**/adapters/src/**',
-              '**/model/src/**',
-              '**/chains/src/**',
-            ],
-            message:
-              "Avoid importing from 'lib' directories. Import from the main entry point instead.",
-          },
-        ],
-      },
-    ],
+    'n/no-process-exit': 'error',
   },
 };

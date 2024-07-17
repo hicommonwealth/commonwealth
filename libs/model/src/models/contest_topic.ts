@@ -1,14 +1,14 @@
-import { schemas } from '@hicommonwealth/core';
+import { ContestTopic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-type ContestTopic = ModelInstance<
-  z.infer<typeof schemas.entities.ContestTopic>
->;
+type ContestTopic = ModelInstance<z.infer<typeof ContestTopic>>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <ModelStatic<ContestTopic>>sequelize.define<ContestTopic>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ContestTopic> =>
+  sequelize.define<ContestTopic>(
     'ContestTopic',
     {
       contest_address: {

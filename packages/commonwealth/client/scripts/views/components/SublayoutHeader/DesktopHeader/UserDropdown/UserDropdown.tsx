@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
-import app from 'state';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -9,10 +8,11 @@ import { User } from 'views/components/user/user';
 
 import useUserMenuItems from '../../useUserMenuItems';
 
+import useUserStore from 'state/ui/user';
 import './UserDropdown.scss';
 
 interface UserDropdownProps {
-  onAuthModalOpen: (open: boolean) => void;
+  onAuthModalOpen: () => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,
@@ -28,13 +28,15 @@ const UserDropdown = ({
 }: UserDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const userMenuItems = useUserMenuItems({
+  const { RevalidationModal, userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
     onRevalidationModalData,
     isMenuOpen: isOpen,
   });
 
-  const user = app.user?.addresses?.[0];
+  const userData = useUserStore();
+
+  const user = userData.addresses?.[0];
 
   return (
     <>
@@ -63,6 +65,7 @@ const UserDropdown = ({
           </button>
         )}
       />
+      {RevalidationModal}
     </>
   );
 };

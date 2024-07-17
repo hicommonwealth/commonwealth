@@ -1,10 +1,19 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
 import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
-import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
+import {
+  EthSignType,
+  type ChainInfo,
+  type Window as KeplrWindow,
+} from '@keplr-wallet/types';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import { fromBech32 } from '@cosmjs/encoding';
+import {
+  ChainBase,
+  ChainNetwork,
+  CosmosSignerCW,
+  WalletId,
+} from '@hicommonwealth/shared';
+import { bytesToHex } from '@noble/hashes/utils';
 import app from 'state';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import { getCosmosChains } from './utils';
 
@@ -56,7 +65,9 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const url = `${
+      window.location.origin
+    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -70,19 +81,32 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    const keplr = await import('@keplr-wallet/types');
-    const canvas = await import('@canvas-js/interfaces');
-    const signature = await window.keplr.signEthereum(
-      this._chainId,
-      account.address,
-      canvas.serializeSessionPayload(canvasSessionPayload),
-      keplr.EthSignType.MESSAGE,
-    );
-    return `0x${Buffer.from(signature).toString('hex')}`;
+  public getSessionSigner() {
+    return new CosmosSignerCW({
+      bech32Prefix: app.chain.meta.bech32Prefix,
+      signer: {
+        type: 'ethereum',
+        signEthereum: async (
+          chainId: string,
+          signerAddress: string,
+          message: string,
+        ) => {
+          // @ts-expect-error <StrictNullChecks>
+          const signature = await window.keplr.signEthereum(
+            chainId,
+            signerAddress,
+            message,
+            EthSignType.MESSAGE,
+          );
+          return `0x${Buffer.from(signature).toString('hex')}`;
+        },
+        getAddress: () => {
+          const { data: addressData } = fromBech32(this.accounts[0].address);
+          return `0x${bytesToHex(addressData)}`;
+        },
+        getChainId: () => this._chainId || 'evmos_9001-2',
+      },
+    });
   }
 
   // ACTIONS
@@ -98,7 +122,9 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${app.chain.network}`;
+      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+        app.chain.id
+      }`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();

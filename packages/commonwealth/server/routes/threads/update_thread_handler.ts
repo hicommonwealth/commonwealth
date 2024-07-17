@@ -1,5 +1,4 @@
-import { IDiscordMeta } from '@hicommonwealth/core';
-import { ThreadAttributes } from '@hicommonwealth/model';
+import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -10,7 +9,7 @@ export const Errors = {
 
 type UpdateThreadRequestBody = {
   title?: string;
-  body?: string;
+  body: string;
   stage?: string;
   url?: string;
   locked?: boolean;
@@ -22,34 +21,47 @@ type UpdateThreadRequestBody = {
     toAdd?: number[];
     toRemove?: number[];
   };
-  canvasSession?: any;
-  canvasAction?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discord_meta?: IDiscordMeta; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
 
 export const updateThreadHandler = async (
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
   res: TypedResponse<UpdateThreadResponse>,
 ) => {
   const { user, address } = req;
+  // @ts-expect-error StrictNullChecks
   const { id } = req.params;
   const {
+    // @ts-expect-error StrictNullChecks
     title,
+    // @ts-expect-error StrictNullChecks
     body,
+    // @ts-expect-error StrictNullChecks
     stage,
+    // @ts-expect-error StrictNullChecks
     url,
+    // @ts-expect-error StrictNullChecks
     locked,
+    // @ts-expect-error StrictNullChecks
     pinned,
+    // @ts-expect-error StrictNullChecks
     archived,
+    // @ts-expect-error StrictNullChecks
     spam,
+    // @ts-expect-error StrictNullChecks
     topicId,
+    // @ts-expect-error StrictNullChecks
     collaborators,
-    canvasSession,
-    canvasAction,
+    // @ts-expect-error StrictNullChecks
+    canvasSignedData,
+    // @ts-expect-error StrictNullChecks
     canvasHash,
+    // @ts-expect-error StrictNullChecks
     discord_meta: discordMeta,
   } = req.body;
 
@@ -59,8 +71,11 @@ export const updateThreadHandler = async (
   // `undefined` if they are not intended to be updated
   const [updatedThread, notificationOptions, analyticsOptions] =
     await controllers.threads.updateThread({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
+      // @ts-expect-error StrictNullChecks
       threadId,
       title,
       body,
@@ -72,8 +87,7 @@ export const updateThreadHandler = async (
       spam,
       topicId,
       collaborators,
-      canvasSession,
-      canvasAction,
+      canvasSignedData,
       canvasHash,
       discordMeta,
     });

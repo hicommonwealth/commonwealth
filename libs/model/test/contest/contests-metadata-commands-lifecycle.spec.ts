@@ -1,8 +1,10 @@
-import { Actor, command, dispose, schemas } from '@hicommonwealth/core';
-import { Contest, TopicAttributes } from '@hicommonwealth/model';
+import { Actor, command, dispose } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
+import { Contest, TopicAttributes } from '../../src/index';
 import { bootstrap_testing, seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
@@ -21,14 +23,14 @@ describe('Contests metadata commands lifecycle', () => {
   const decimals = 18;
 
   let community: [
-    z.infer<typeof schemas.entities['Community']> | undefined,
+    z.infer<typeof schemas.Community> | undefined,
     Record<string, any>[],
   ];
-  let topics: z.infer<typeof schemas.entities['Topic']>[] = [];
+  let topics: z.infer<typeof schemas.Topic>[] = [];
   let communityAdminActor: Actor | null = null;
   let communityMemberActor: Actor | null = null;
 
-  before(async () => {
+  beforeAll(async () => {
     await bootstrap_testing();
     const [chain] = await seed('ChainNode', {});
 
@@ -122,12 +124,12 @@ describe('Contests metadata commands lifecycle', () => {
     expect(communityMemberActor.address_id).to.not.be.empty;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('create contest metadata', () => {
-    it('should fail to create if not community admin', async () => {
+    test('should fail to create if not community admin', async () => {
       const promise = command(Contest.CreateContestManagerMetadata(), {
         actor: communityMemberActor!,
         id: community_id,
@@ -147,7 +149,7 @@ describe('Contests metadata commands lifecycle', () => {
       expect(promise).to.be.rejectedWith('User is not admin in the community');
     });
 
-    it('should fail to create if community does not exist', async () => {
+    test('should fail to create if community does not exist', async () => {
       const promise = command(Contest.CreateContestManagerMetadata(), {
         actor: communityAdminActor!,
         id: 'does-not-exist',
@@ -168,7 +170,7 @@ describe('Contests metadata commands lifecycle', () => {
       expect(promise).to.be.rejectedWith('User is not admin in the community');
     });
 
-    it(`should create contest manager metadata`, async () => {
+    test(`should create contest manager metadata`, async () => {
       const contest_address = '0xContestAddress';
 
       const createResult = await command(
@@ -221,7 +223,7 @@ describe('Contests metadata commands lifecycle', () => {
   });
 
   describe('update contest metadata', () => {
-    it('should fail to update if not community admin', async () => {
+    test('should fail to update if not community admin', async () => {
       const { contest_address } = community[0]!.contest_managers![0];
 
       const promise = command(Contest.UpdateContestManagerMetadata(), {
@@ -237,7 +239,7 @@ describe('Contests metadata commands lifecycle', () => {
       expect(promise).to.be.rejectedWith('User is not admin in the community');
     });
 
-    it('should fail to update if contest manager does not exist', async () => {
+    test('should fail to update if contest manager does not exist', async () => {
       const promise = command(Contest.UpdateContestManagerMetadata(), {
         actor: communityAdminActor!,
         id: community_id,
@@ -246,10 +248,10 @@ describe('Contests metadata commands lifecycle', () => {
           name: 'xxx',
         },
       });
-      expect(promise).to.be.rejectedWith('ContestManager must exist');
+      expect(promise).to.be.rejectedWith('Contest Manager must exist');
     });
 
-    it('should update contest manager metadata', async () => {
+    test('should update contest manager metadata', async () => {
       const { contest_address } = community[0]!.contest_managers![0];
 
       const updateResult = await command(
@@ -281,7 +283,7 @@ describe('Contests metadata commands lifecycle', () => {
       });
     });
 
-    it('should update contest manager metadata topics', async () => {
+    test('should update contest manager metadata topics', async () => {
       const { contest_address } = community[0]!.contest_managers![0];
 
       {
@@ -343,7 +345,7 @@ describe('Contests metadata commands lifecycle', () => {
   });
 
   describe('cancel contest metadata', () => {
-    it('should fail to cancel if not admin', async () => {
+    test('should fail to cancel if not admin', async () => {
       const { contest_address } = community[0]!.contest_managers![1];
 
       expect(contest_address).to.not.be.empty;
@@ -358,7 +360,7 @@ describe('Contests metadata commands lifecycle', () => {
       expect(promise).to.be.rejectedWith('User is not admin in the community');
     });
 
-    it('should fail to cancel if contest manager does not exist', async () => {
+    test('should fail to cancel if contest manager does not exist', async () => {
       const promise = command(Contest.CancelContestManagerMetadata(), {
         actor: communityAdminActor!,
         id: community_id,
@@ -366,10 +368,10 @@ describe('Contests metadata commands lifecycle', () => {
           contest_address: 'does-not-exist',
         },
       });
-      expect(promise).to.be.rejectedWith('ContestManager must exist');
+      expect(promise).to.be.rejectedWith('Contest Manager must exist');
     });
 
-    it('should cancel contest manager metadata', async () => {
+    test('should cancel contest manager metadata', async () => {
       const { contest_address, cancelled } = community[0]!.contest_managers![1];
 
       expect(contest_address).to.not.be.empty;

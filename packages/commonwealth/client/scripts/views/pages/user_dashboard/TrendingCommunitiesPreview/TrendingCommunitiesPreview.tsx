@@ -1,15 +1,26 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
 
 export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const sortedCommunities = app.config.chains
     .getAll()
+    .filter((community) => {
+      const name = community.name.toLowerCase();
+      //this filter is meant to not include any de facto communities that are actually xss attempts.
+      //It's a way of keeping the front facing parts of the app clean looking for users
+      return (
+        !['"', '>', '<', "'", '/', '`'].includes(name[0]) &&
+        !['"', '>', '<', "'", '/', '`'].includes(name[1])
+      );
+    })
     .sort((a, b) => {
       const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
       const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
@@ -20,17 +31,18 @@ export const TrendingCommunitiesPreview = () => {
         community.id,
       );
       const isMember = app.roles.isMember({
-        account: app.user.activeAccount,
+        account: user.activeAccount || undefined,
         community: community.id,
       });
-      const { unseenPosts } = app.user;
-      const hasVisitedCommunity = !!unseenPosts[community.id];
 
       return {
         community,
         monthlyThreadCount,
         isMember,
-        hasUnseenPosts: app.isLoggedIn() && !hasVisitedCommunity,
+        // TODO: should we remove the new label once user visits the community? -- ask from product
+        hasUnseenPosts: user.joinedCommunitiesWithNewContent.includes(
+          community.id,
+        ),
         onClick: () => navigate(`/${community.id}`),
       };
     });

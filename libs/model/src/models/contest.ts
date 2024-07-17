@@ -1,12 +1,14 @@
-import { schemas } from '@hicommonwealth/core';
+import { Contest } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-type Contest = ModelInstance<z.infer<typeof schemas.projections.Contest>>;
+type Contest = ModelInstance<z.infer<typeof Contest>>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <ModelStatic<Contest>>sequelize.define<Contest>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<Contest> =>
+  sequelize.define<Contest>(
     'Contest',
     {
       contest_address: {
@@ -25,13 +27,16 @@ export default (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.DATE,
         allowNull: false,
       },
-      winners: {
-        type: Sequelize.ARRAY(Sequelize.JSONB),
+      score_updated_at: {
+        type: Sequelize.DATE,
+      },
+      score: {
+        type: Sequelize.JSONB,
       },
     },
     {
       tableName: 'Contests',
       timestamps: false,
-      indexes: [{ fields: ['start_time'] }], // TODO: can we enforce typings in indexes?
+      indexes: [{ fields: ['start_time'] }],
     },
   );

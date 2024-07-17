@@ -8,7 +8,6 @@ If you add a script to the `package.json` file, please add documentation for it 
 
 * [Build Scripts](#build-scripts)
   + [build](#build)
-  + [build-ci](#build-ci)
   + [heroku-prebuild](#heroku-prebuild)
   + [heroku-postbuild](#heroku-postbuild)
 * [CI/CD](#cicd)
@@ -80,23 +79,6 @@ Description:
 - Default: If successful, fires the commonwalth app build script
 - Optional: To build other app workspaces, see `/scripts/build.sh` for configuration options
 
-### build-ci
-
-Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db`
-
-Description:
-
-- Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
-- Installs node modules, ignoring engine errors
-- Runs the default application build script (above)
-- Runs db migrations
-
-### heroku-prebuild
-
-Definition: `yarn global add node-gyp`
-
-Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
-
 ### heroku-postbuild
 
 Definition: `chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh`
@@ -132,11 +114,11 @@ Contributor: Timothee Legros
 
 Definition: `npx sequelize migration:generate --name`
 
-Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `yarn create-migration remove-user-last-visited-col`).
+Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `pnpm create-migration remove-user-last-visited-col`).
 
 ### db-all
 
-Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
+Definition: `pnpm reset-db && pnpm load-db && pnpm migrate-db`
 
 Description: Resets, loads, and migrates db (composite script).
 
@@ -158,7 +140,7 @@ Contributor: Roger Torres
 
 ### dump-db
 
-Definition: `pg_dump $(heroku config:get HEROKU_POSTGRESQL_MAROON_URL -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
+Definition: `pg_dump $(heroku config:get HEROKU_POSTGRESQL_MAROON_URL -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"EmailUpdateTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
 
 Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, and Notifications.
 
@@ -208,13 +190,13 @@ Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WAL
 
 Examples:
 
-- `yarn set-super-admin`
+- `pnpm set-super-admin`
   - This sets the local user specified by the environment variables to a super admin.
-- `yarn set-super-admin false`
+- `pnpm set-super-admin false`
   - This disables super admin for the local user.
-- `yarn set-super-admin [frick | frack | beta | demo]`
+- `pnpm set-super-admin [frick | frack | beta | demo]`
   - This enables super admin for the specified user on the specified app.
-- `yarn set-super-admin [frick | frack | beta | demo] false`
+- `pnpm set-super-admin [frick | frack | beta | demo] false`
   - This disables super admin for the specified user on the specified app.
 
 ## Docker
@@ -271,7 +253,7 @@ Considerations: Why lint styles separately? Why not just include `.scss` file ex
 
 ### e2e-start-server
 
-Definition: `ETH_RPC=e2e-test yarn start`
+Definition: `ETH_RPC=e2e-test pnpm start`
 
 Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
 
@@ -281,7 +263,7 @@ Contributor: Kurtis Assad
 
 Definition: `tsx  server/scripts/emitTestNotification.ts`
 
-Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
+Description: Emits a chain-event or snapshot notification. Run `pnpm emit-notification --help` to see options.
 
 Contributor: Timothee Legros
 
@@ -311,73 +293,51 @@ Open considerations:
   - See e.g. [test-select](#test-select)
 - Any test scripts we remove, we should ensure their respective invocations in `CI.yml` are replaced with appropriate definitions.
 
-### integration-test
-
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha  './test/integration/**/*.spec.ts'`
-
-Description: Runs all tests in our integration folder and its subdirectories.
-
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested. We should also keep an eye on similar integration-scoped test scripts; there may be redundancies.
-
 ### test
 
-See `unit-test`.
+See `test-unit`.
 
 ### test-api
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha --allow-uncaught './test/integration/api/**/*.spec.ts'`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration/api`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-### test-devnet
+### test-integration
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha ./test/devnet/**/*.spec.ts`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration`
 
-Description: Runs all tests in our `/devnet` folder. If `cosmos` is given as the first argument then run only the tests in `./test/devnet/cosmos/**/*.spec.ts`. If `evm` is given as the first argument then run only the tests in `./test/devnet/evm/**/*.spec.ts`.
+Description: Runs all tests in the /test/integration folder (includes API tests).
 
-### test-integration-util
+### test-devnet:evm
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha ./test/integration/*.spec.ts`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/evm`
 
-Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
+Description: Runs all tests in our `/devnet/evm` folder.
 
-Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
+### test-devnet:cosmos
 
-Contributor: Timothee Legros
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/cosmos`
+
+Description: Runs all tests in our `/devnet/cosmos` folder.
 
 ### test-select
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run`
 
 Description: Append a path to run specific test files or folders.
 
-### test-suite
+### test-unit
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'`
-
-Description: Runs all tests in our /test directory.
-
-Considerations: This is equivalent to our `test` script but with `NODE_ENV=test` added. Why? Do we actually need both versions? **Flagged for possible removal.**
-
-### unit-test
-
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/unit/seed_hack.spec.ts' && NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true mocha './test/unit/**/*.spec.ts'`
+Definition: `NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ../../vite.config.ts run test/unit`
 
 Description: Tests all .spec files within the `./test/unit` sub-directory of test folder.
 
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
+### test-select:watch
 
-Contributor: Ryan Bennett
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false`
 
-### unit-test:watch
-
-Definition: `NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'`
-
-Description: Watches for changes to any .spec files within `./test/unit` and automatically runs test when they are updated.
-
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
-
-Contributor: Ryan Bennett
+Description: Watches for changes to any .spec files within the given path and automatically runs test when they are updated.
 
 ## TypeScript
 
@@ -399,7 +359,8 @@ Description: Sanity scripts developers should run locally before pushing code, c
 
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
 
-Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
+Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `pnpm build` , and finally `pnpm bundle-report`.
+
 ### start
 
 Definition: `tsx watch  --max-old-space-size=4096 server.ts`
@@ -408,9 +369,9 @@ Description: Windows-compatible start script. Used to start the Commonwealth app
 
 ### start-all
 
-Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'`
+Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'pnpm start' 'pnpm start-consumer'`
 
-Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
+Description: Runs `pnpm start` and `pnpm start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
 
 ### start-consumer
 

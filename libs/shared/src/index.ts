@@ -1,3 +1,5 @@
+export * from './canvas';
 export * as commonProtocol from './commonProtocol';
-export * from './shared-types';
+export * from './constants';
+export * from './types';
 export * from './utils';

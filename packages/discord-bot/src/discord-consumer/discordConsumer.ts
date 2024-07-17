@@ -9,20 +9,22 @@ import {
 import {
   Broker,
   BrokerSubscriptions,
-  CommentDiscordActions,
   EventHandler,
-  IDiscordMessage,
   Policy,
-  ThreadDiscordActions,
   broker,
-  schemas,
+  events,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import {
+  CommentDiscordActions,
+  IDiscordMessage,
+  ThreadDiscordActions,
+} from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
-import { CW_BOT_KEY, DISCOBOT_ADDRESS, RABBITMQ_URI } from '../utils/config';
+import { config } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -53,21 +55,21 @@ const processDiscordMessageCreated: EventHandler<
   const { handleCommentMessages, handleThreadMessages } = await import(
     '../discord-consumer/handlers'
   );
-  const { getForumLinkedTopic } = await import('../utils/util');
+  const { getForumLinkedTopic } = await import('../util');
 
   try {
     const parsedMessage = payload as IDiscordMessage;
     const topic = await getForumLinkedTopic(parsedMessage.parent_channel_id);
     const action = parsedMessage.action;
     const sharedReqData = {
-      auth: CW_BOT_KEY,
+      auth: config.DISCORD.CW_BOT_KEY,
       discord_meta: {
         message_id: parsedMessage.message_id,
         channel_id: parsedMessage.parent_channel_id,
         user: parsedMessage.user,
       },
       author_chain: topic.community_id,
-      address: DISCOBOT_ADDRESS,
+      address: config.DISCORD.DISCOBOT_ADDRESS,
       chain: topic.community_id,
     };
 
@@ -112,10 +114,15 @@ const processDiscordMessageCreated: EventHandler<
 };
 
 async function main() {
+  config.NODE_ENV !== 'production' && console.log(config);
+
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.DiscobotService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -126,15 +133,17 @@ async function main() {
   }
 
   const inputs = {
-    DiscordMessageCreated: schemas.events.DiscordMessageCreated,
+    DiscordMessageCreated: events.DiscordMessageCreated,
   };
 
-  const Discord: Policy<typeof inputs> = () => ({
-    inputs,
-    body: {
-      DiscordMessageCreated: processDiscordMessageCreated,
-    },
-  });
+  function Discord(): Policy<typeof inputs> {
+    return {
+      inputs,
+      body: {
+        DiscordMessageCreated: processDiscordMessageCreated,
+      },
+    };
+  }
 
   const result = await brokerInstance.subscribe(
     BrokerSubscriptions.DiscordListener,

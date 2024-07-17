@@ -5,10 +5,9 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { broker } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
-import { RABBITMQ_URI } from '../../config';
+import { broker, logger } from '@hicommonwealth/core';
+import { fileURLToPath } from 'url';
+import { config } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
@@ -19,7 +18,7 @@ let isServiceHealthy = false;
 
 startHealthCheckLoop({
   enabled: import.meta.url.endsWith(process.argv[1]),
-  service: ServiceKey.CommonwealthConsumer,
+  service: ServiceKey.MessageRelayer,
   // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {
     if (!isServiceHealthy) {
@@ -33,7 +32,10 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
 
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.CommonwealthService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -51,10 +53,17 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
   });
   incrementNumUnrelayedEvents(count);
 
-  await setupListener();
+  const pgClient = await setupListener();
 
   isServiceHealthy = true;
-  return relayForever(maxRelayIterations);
+  relayForever(maxRelayIterations).catch((err) => {
+    log.fatal(
+      'Unknown error fatal requires immediate attention. Restart REQUIRED!',
+      err,
+    );
+  });
+
+  return pgClient;
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {

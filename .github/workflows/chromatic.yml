@@ -4,7 +4,7 @@ name: 'Chromatic'
 # Event for the workflow
 on:
   pull_request:
-    types: [ labeled ]
+    types: [labeled]
 
 # List of jobs
 jobs:
@@ -16,8 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install dependencies
-        # 👇 Install dependencies with the same package manager used in the project (replace it as needed), e.g. yarn, npm, pnpm
-        run: yarn
+        # 👇 Install dependencies with the same package manager used in the project (replace it as needed), e.g. pnpm, npm, pnpm
+        run: pnpm
         # 👇 Adds Chromatic as a step in the workflow
       - name: Publish commonwealth package to Chromatic
         uses: chromaui/action@v1

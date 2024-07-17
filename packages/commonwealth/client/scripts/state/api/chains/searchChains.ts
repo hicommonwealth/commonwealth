@@ -1,11 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from 'client/scripts/helpers/constants';
-import { CommunityResult } from 'client/scripts/views/pages/search/helpers';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import app from 'state';
+import { CommunityResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h

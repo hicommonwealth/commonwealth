@@ -1,7 +1,11 @@
 import * as core from '@hicommonwealth/core';
 import {
+  AuthStrategies,
+  Events,
+  ExternalServiceUserIds,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  logger,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
@@ -10,6 +14,7 @@ import {
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request } from 'express';
+import { OpenAPIV3 } from 'openapi-types';
 import passport from 'passport';
 import {
   createOpenApiExpressMiddleware,
@@ -18,7 +23,12 @@ import {
   type OpenApiMeta,
   type OpenApiRouter,
 } from 'trpc-openapi';
+import { fileURLToPath } from 'url';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
+import { config } from '../config';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export interface Context {
   req: Request;
@@ -26,16 +36,54 @@ export interface Context {
 
 const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 
-const authenticate = async (req: Request) => {
+const authenticate = async (
+  req: Request,
+  authStrategy: AuthStrategies = { name: 'jwt' },
+) => {
   try {
-    await passport.authenticate('jwt', { session: false });
+    if (authStrategy.name === 'authtoken') {
+      switch (req.headers['authorization']) {
+        case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
+          req.user = {
+            id: ExternalServiceUserIds.Knock,
+            email: 'hello@knock.app',
+          };
+          break;
+        case config.LOAD_TESTING.AUTH_TOKEN:
+          req.user = {
+            id: ExternalServiceUserIds.K6,
+            email: 'info@grafana.com',
+          };
+          break;
+        default:
+          throw new Error('Not authenticated');
+      }
+    } else {
+      await passport.authenticate(authStrategy.name, { session: false });
+    }
+
     if (!req.user) throw new Error('Not authenticated');
+    if (
+      authStrategy.userId &&
+      (req.user as core.User).id !== authStrategy.userId
+    ) {
+      throw new Error('Not authenticated');
+    }
   } catch (error) {
     throw new TRPCError({
       message: error instanceof Error ? error.message : (error as string),
       code: 'UNAUTHORIZED',
     });
   }
+};
+
+const logError = (path: string | undefined, error: TRPCError) => {
+  const msg = `${error.code}: [${error.cause?.name ?? error.name}] ${path}: ${
+    error.cause?.message ?? error.message
+  }`;
+  error.code === 'INTERNAL_SERVER_ERROR'
+    ? log.error(msg, error.cause)
+    : log.warn(msg);
 };
 
 const trpcerror = (error: unknown): TRPCError => {
@@ -52,7 +100,7 @@ const trpcerror = (error: unknown): TRPCError => {
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message,
-          cause: process.env.NODE_ENV !== 'production' ? error : undefined,
+          cause: error,
         });
     }
   }
@@ -93,7 +141,8 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
     .mutation(async ({ ctx, input }) => {
       // md.secure must explicitly be false if the route requires no authentication
       // if we provide any authorization method we force authentication as well
-      if (md.secure !== false || md.auth?.length) await authenticate(ctx.req);
+      if (md.secure !== false || md.auth?.length)
+        await authenticate(ctx.req, md.authStrategy);
       try {
         return await core.command(
           md,
@@ -138,7 +187,7 @@ export const event = <
         const [[name, payload]] = Object.entries(input as object);
         return await core.handleEvent(
           md,
-          { name: name as core.schemas.Events, payload },
+          { name: name as Events, payload },
           false,
         );
       } catch (error) {
@@ -165,7 +214,8 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
     .input(md.input)
     .output(md.output)
     .query(async ({ ctx, input }) => {
-      if (md.secure) await authenticate(ctx.req);
+      // enable secure by default
+      if (md.secure !== false) await authenticate(ctx.req, md.authStrategy);
       try {
         return await core.query(
           md,
@@ -189,6 +239,7 @@ export const toExpress = (router: OpenApiRouter) =>
   createExpressMiddleware({
     router,
     createContext: ({ req }: { req: any }) => ({ req }),
+    onError: ({ path, error }) => logError(path, error),
   });
 
 // used for REST like routes (External)
@@ -196,9 +247,8 @@ export const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
     createContext: ({ req }: { req: any }) => ({ req }),
-    onError: ({ error }: { error: any }) => {
-      console.error(error.code, JSON.stringify(error.cause));
-    },
+    onError: ({ path, error }: { path: string; error: TRPCError }) =>
+      logError(path, error),
     responseMeta: undefined,
     maxBodySize: undefined,
   });
@@ -206,6 +256,7 @@ export const toOpenApiExpress = (router: OpenApiRouter) =>
 export const toOpenApiDocument = (
   router: OpenApiRouter,
   opts: GenerateOpenApiDocumentOptions,
-) => generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
+): OpenAPIV3.Document =>
+  generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
 
 export const router = trpc.router;

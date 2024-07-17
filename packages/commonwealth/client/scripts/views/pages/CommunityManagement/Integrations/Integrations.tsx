@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import CustomTOS from './CustomTOS';
@@ -11,10 +10,6 @@ import Stake from './Stake';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
-  const existingCommunityStakeIntegrationEnabled = useFlag(
-    'existingCommunityStakeIntegrationEnabled',
-  );
-
   return (
     <CommunityManagementLayout
       title="Integrations"
@@ -29,7 +24,7 @@ const Integrations = () => {
     >
       <section className="Integrations">
         <Directory />
-        {existingCommunityStakeIntegrationEnabled && <Stake />}
+        <Stake />
         <Snapshots />
         <Discord />
         <Webhooks />

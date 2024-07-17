@@ -1,10 +1,14 @@
 import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
+import { afterEach, beforeEach, describe, test } from 'vitest';
+
+chai.use(chaiAsPromised);
 
 describe('ServerCommentsController', () => {
   beforeEach(() => {
@@ -16,10 +20,11 @@ describe('ServerCommentsController', () => {
     Sinon.restore();
   });
   describe('#createCommentReaction', () => {
-    it('should create a comment reaction (new reaction)', async () => {
+    test('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         sequelize: {
+          query: sandbox.stub().resolves([]),
           transaction: async (callback) => {
             return callback();
           },
@@ -53,6 +58,7 @@ describe('ServerCommentsController', () => {
           ]),
         },
         Comment: {
+          update: sandbox.stub().resolves(null),
           findOne: sandbox.stub().resolves({
             id: 3,
             text: 'my comment body',
@@ -144,6 +150,7 @@ describe('ServerCommentsController', () => {
 
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
+      // @ts-expect-error StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(allAnalyticsOptions[0]).to.include({
@@ -152,9 +159,13 @@ describe('ServerCommentsController', () => {
       });
     });
 
-    it('should throw error (comment not found)', async () => {
+    test('should throw error (comment not found)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: (callback) => Promise.resolve(callback()),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -182,6 +193,7 @@ describe('ServerCommentsController', () => {
         },
         Comment: {
           findOne: sandbox.stub().resolves(null),
+          update: sandbox.stub().resolves(null),
         },
         Thread: {
           findOne: sandbox.stub().resolves({
@@ -216,9 +228,13 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Comment not found: 123');
     });
 
-    it('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: (callback) => Promise.resolve(callback()),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -249,6 +265,7 @@ describe('ServerCommentsController', () => {
             id: 3,
             text: 'my comment body',
           }),
+          update: sandbox.stub().resolves(null),
         },
         Thread: {
           findOne: sandbox.stub().resolves(null),
@@ -279,9 +296,13 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Thread not found for comment');
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: (callback) => Promise.resolve(callback()),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -317,6 +338,7 @@ describe('ServerCommentsController', () => {
               community_id: 'ethereum',
             },
           }),
+          update: sandbox.stub().resolves(null),
         },
       };
       const banCache = {
@@ -345,9 +367,13 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    it('should throw error (token balance)', async () => {
+    test('should throw error (token balance)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: (callback) => Promise.resolve(callback()),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -384,6 +410,7 @@ describe('ServerCommentsController', () => {
               topic_id: 77,
             },
           }),
+          update: sandbox.stub().resolves(null),
         },
         // for validateTopicThreshold
         Topic: {
@@ -472,7 +499,7 @@ describe('ServerCommentsController', () => {
   });
 
   describe('#searchComments', () => {
-    it('should return comment search results', async () => {
+    test('should return comment search results', async () => {
       const db = {
         sequelize: {
           query: (sql: string) => {
@@ -500,6 +527,7 @@ describe('ServerCommentsController', () => {
         page: 2,
         orderBy: 'created_at',
         orderDirection: 'DESC',
+        includeCount: true,
       };
       const comments = await serverCommentsController.searchComments(
         searchOptions,
@@ -515,7 +543,7 @@ describe('ServerCommentsController', () => {
   });
 
   describe('#updateComment', () => {
-    it('should update a comment', async () => {
+    test('should update a comment', async () => {
       const data = {
         id: 123,
         thread_id: 2,
@@ -545,6 +573,21 @@ describe('ServerCommentsController', () => {
         },
         Comment: {
           findOne: async () => data,
+          update: () => (data.text = 'Hello'),
+        },
+        CommentVersionHistory: {
+          create: () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {
@@ -591,10 +634,11 @@ describe('ServerCommentsController', () => {
       });
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
+      // @ts-expect-error StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const data = {
         id: 123,
         thread_id: 2,
@@ -621,6 +665,18 @@ describe('ServerCommentsController', () => {
       const db = {
         Comment: {
           findOne: async () => data,
+          update: () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
+          query: Promise.resolve([]),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -649,7 +705,7 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    it('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const data = {
         id: 123,
         thread_id: 2,
@@ -667,9 +723,21 @@ describe('ServerCommentsController', () => {
       const db = {
         Comment: {
           findOne: async () => data,
+          update: () => null,
         },
         Thread: {
           findOne: async () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
+          query: Promise.resolve([]),
         },
       };
       const banCache = {
@@ -702,9 +770,12 @@ describe('ServerCommentsController', () => {
   });
 
   describe('#deleteComment', () => {
-    it('should delete a comment', async () => {
+    test('should delete a comment', async () => {
       let didDestroy = false;
       const db = {
+        sequelize: {
+          query: Promise.resolve([]),
+        },
         Address: {
           findAll: async () => [{ address_id: 1 }], // used in findOneRole
         },
@@ -715,6 +786,7 @@ describe('ServerCommentsController', () => {
               didDestroy = true;
             },
           }),
+          update: () => ({}),
         },
         Subscription: {
           destroy: async () => ({}),

@@ -25,6 +25,7 @@ import type {
   ICosmosProposalTally,
 } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import Long from 'long';
 import Cosmos from '../../adapter';
 import { CosmosApiType } from '../../chain';
 import CosmosGovernance from './governance-v1beta1';
@@ -60,6 +61,7 @@ export const asciiLiteralToDecimal = async (n: Uint8Array) => {
 
 // todo
 export const marshalTally = (tally: TallyResult): ICosmosProposalTally => {
+  // @ts-expect-error StrictNullChecks
   if (!tally) return null;
   return {
     yes: new BN(tally.yes),
@@ -83,6 +85,7 @@ const fetchProposalsByStatus = async (
       await api.gov.proposals(status, '', '');
 
     let nextKey = pagination?.nextKey;
+    // @ts-expect-error StrictNullChecks
     while (nextKey.length > 0) {
       // console.log(nextKey);
       const { proposals, pagination: nextPage } = await api.gov.proposals(
@@ -92,6 +95,7 @@ const fetchProposalsByStatus = async (
         nextKey,
       );
       proposalsByStatus.push(...proposals);
+      // @ts-expect-error StrictNullChecks
       nextKey = nextPage.nextKey;
     }
     return proposalsByStatus;
@@ -146,17 +150,23 @@ export const getCompletedProposalsV1Beta1 = async (
 };
 
 const sortProposals = (proposals: Proposal[]): ICosmosProposal[] => {
-  return proposals
-    .map((p) => msgToIProposal(p))
-    .filter((p) => !!p)
-    .sort((p1, p2) => +p2.identifier - +p1.identifier);
+  // @ts-expect-error StrictNullChecks
+  return (
+    proposals
+      .map((p) => msgToIProposal(p))
+      .filter((p) => !!p)
+      // @ts-expect-error StrictNullChecks
+      .sort((p1, p2) => +p2.identifier - +p1.identifier)
+  );
 };
 
 export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
   const content = p.content;
   const status = stateEnumToString(p.status);
   // TODO: support more types
+  // @ts-expect-error StrictNullChecks
   const { title, description } = TextProposal.decode(content.value);
+  // @ts-expect-error StrictNullChecks
   const isCommunitySpend = content.typeUrl?.includes(
     'CommunityPoolSpendProposal',
   );
@@ -164,6 +174,7 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
   let spendRecipient: string;
   let spendAmount: CoinObject[];
   if (isCommunitySpend) {
+    // @ts-expect-error StrictNullChecks
     const spend = CommunityPoolSpendProposal.decode(content.value);
     type = 'communitySpend';
     spendRecipient = spend.recipient;
@@ -181,12 +192,19 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
     type,
     title,
     description,
+    // @ts-expect-error StrictNullChecks
     submitTime: moment.unix(p.submitTime.seconds.toNumber()),
+    // @ts-expect-error StrictNullChecks
     depositEndTime: moment.unix(p.depositEndTime.seconds.toNumber()),
+    // @ts-expect-error StrictNullChecks
     votingEndTime: moment.unix(p.votingEndTime.seconds.toNumber()),
+    // @ts-expect-error StrictNullChecks
     votingStartTime: moment.unix(p.votingStartTime.seconds.toNumber()),
+    // @ts-expect-error StrictNullChecks
     proposer: null,
+    // @ts-expect-error StrictNullChecks
     spendRecipient,
+    // @ts-expect-error StrictNullChecks
     spendAmount,
     state: {
       identifier: p.proposalId.toString(),
@@ -199,6 +217,7 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
           : new BN(0),
       depositors: [],
       voters: [],
+      // @ts-expect-error StrictNullChecks
       tally: p.finalTallyResult && marshalTally(p.finalTallyResult),
     },
   };
@@ -283,6 +302,7 @@ export const getDepositParams = async (
   const { depositParams } = await cosmosChain.chain.api.gov.params('deposit');
 
   // TODO: support off-denom deposits
+  // @ts-expect-error StrictNullChecks
   const depositCoins = depositParams.minDeposit.find(
     ({ denom }) => denom === stakingDenom,
   );

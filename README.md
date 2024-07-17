@@ -1,16 +1,20 @@
+[![Coverage Status](https://coveralls.io/repos/github/hicommonwealth/commonwealth/badge.svg?branch=master)](https://coveralls.io/github/hicommonwealth/commonwealth?branch=master)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/hicommonwealth/commonwealth/CI.yml?branch=master&label=CI)
+![GitHub repo size](https://img.shields.io/github/repo-size/hicommonwealth/commonwealth)
+
 # Scripts
-- `yarn start-all`
+- `pnpm start-all`
   - Starts ALL the microservices in different processes. Requires a RabbitMQ instance/connection to function properly.
-- `yarn start-apps`
+- `pnpm start-apps`
   - Starts just the web-servers from all the microservices (currently just Commonwealth and Chain-Events)
   - This should be enough for most local front-end development
-- `yarn start-rmq`
+- `pnpm start-rmq`
   - Starts a local RabbitMQ instance using Docker.
-  - Run this in a separate terminal and pair it with the `yarn start-all` command to get a fully functional app.
-- `yarn start-redis`
+  - Run this in a separate terminal and pair it with the `pnpm start-all` command to get a fully functional app.
+- `pnpm start-redis`
   - make sure to have `REDIS_URL=redis://localhost:6379` in your .env file     
   - Starts a local redis instance using Docker, it will start redis on its default port 6379
-- `yarn load-db [optional-dump-name]`
+- `pnpm load-db [optional-dump-name]`
   - Loads the default `latest.dump` or the `optional-dump-name` into the database
   - Only available in the `commonwealth` and `chain-events` packages
 

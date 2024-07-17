@@ -1,4 +1,4 @@
-import type Thread from 'client/scripts/models/Thread';
+import type Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
 import { ViewUpvotesDrawer } from './ViewUpvotesDrawer';
@@ -36,7 +36,12 @@ export const ViewThreadUpvotesDrawer = ({
       contentBody={thread.body}
       header="Thread upvotes"
       reactorData={reactorData}
-      author={thread?.author ? app.chain.accounts.get(thread?.author) : null}
+      // @ts-expect-error <StrictNullChecks/>
+      author={
+        thread?.author && app?.chain?.accounts
+          ? app.chain.accounts.get(thread?.author)
+          : null
+      }
       publishDate={thread.createdAt}
     />
   );

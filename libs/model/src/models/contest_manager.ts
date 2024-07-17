@@ -1,14 +1,14 @@
-import { schemas } from '@hicommonwealth/core';
+import { ContestManager } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-type ContestManager = ModelInstance<
-  z.infer<typeof schemas.entities.ContestManager>
->;
+type ContestManager = ModelInstance<z.infer<typeof ContestManager>>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <ModelStatic<ContestManager>>sequelize.define<ContestManager>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ContestManager> =>
+  sequelize.define<ContestManager>(
     'ContestManager',
     {
       contest_address: {
@@ -39,6 +39,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       decimals: { type: Sequelize.INTEGER },
       created_at: { type: Sequelize.DATE, allowNull: false },
       cancelled: { type: Sequelize.BOOLEAN },
+      ended: { type: Sequelize.BOOLEAN },
     },
     {
       tableName: 'ContestManagers',

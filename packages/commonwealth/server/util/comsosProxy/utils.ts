@@ -1,7 +1,6 @@
-import { NodeHealth } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
-import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
+import { CosmosGovernanceVersion, NodeHealth } from '@hicommonwealth/shared';
 import axios, { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import _ from 'lodash';
@@ -74,6 +73,7 @@ export async function updateSlip44IfNeeded(
 ): Promise<void> {
   try {
     const slip44 = chainNode?.slip44;
+    // @ts-expect-error StrictNullChecks
     if (slip44 || DEVNET_COSMOS_ID_RE.test(chainNode.cosmos_chain_id)) return;
 
     const registeredChain = await axios.get(
@@ -166,6 +166,7 @@ export async function queryExternalProxy(
     url = req.originalUrl.replace(req.baseUrl, proxyUrl);
   }
 
+  log.info(`Querying Cosmos node at ${url}`);
   return await axios.post(url, _.isEmpty(req.body) ? null : req.body, {
     headers: {
       origin: 'https://commonwealth.im',

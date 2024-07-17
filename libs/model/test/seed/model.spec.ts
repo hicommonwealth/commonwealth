@@ -1,6 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { Sequelize } from 'sequelize';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { Factories } from '../../src/models/factories';
 import {
   bootstrap_testing,
@@ -15,42 +16,45 @@ const generateSchemas = async () => {
 
   // TODO: resolve remaining conflicts!!!
   const model_schema = await get_info_schema(model.sequelize, {
-    ignore_columns: {},
+    ignore_columns: { GroupPermissions: ['allowed_actions'] },
     ignore_constraints: {
-      // TODO: missing in migrations - removed FKs for performance reasons?
-      Addresses: [
-        'FOREIGN KEY Profiles(profile_id) UPDATE CASCADE DELETE SET NULL',
-      ],
+      // Removed in production for performance reasons
       Comments: [
-        'FOREIGN KEY Communities(community_id) UPDATE NO ACTION DELETE NO ACTION',
-      ],
-      Notifications: [
-        'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
-      ],
-      Reactions: [
-        'FOREIGN KEY Addresses(address_id) UPDATE CASCADE DELETE NO ACTION',
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
       ],
+      Reactions: [
+        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
+      ],
+
+      // These will be deprecated soon
+      Notifications: [
+        'FOREIGN KEY Threads(thread_id) UPDATE NO ACTION DELETE NO ACTION',
+      ],
       Subscriptions: [
-        'FOREIGN KEY Comments(comment_id) UPDATE CASCADE DELETE SET NULL',
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE SET NULL',
         'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
+        'FOREIGN KEY Comments(comment_id) UPDATE CASCADE DELETE SET NULL',
       ],
-      Memberships: [
-        'PRIMARY KEY(id)', // TODO: should we remove this id with a migration?
+      NotificationsRead: [
+        'FOREIGN KEY Notifications(notification_id) UPDATE NO ACTION DELETE CASCADE',
+        'FOREIGN KEY Subscriptions(subscription_id) UPDATE NO ACTION DELETE CASCADE',
       ],
-      Outbox: [
-        'PRIMARY KEY(event_id)', // removed in migration
+      Addresses: [
+        'FOREIGN KEY Profiles(profile_id) UPDATE NO ACTION DELETE NO ACTION',
       ],
+
+      // Removed in migration
+      Outbox: ['PRIMARY KEY(event_id)'],
     },
   });
   const migration_schema = await get_info_schema(migration, {
     ignore_columns: {
-      // TODO: missing in model - due to migrations with backups?
+      // Missing in model - migrations with backups
       Comments: ['body_backup', 'text_backup', 'root_id', '_search'],
       Profiles: ['bio_backup', 'profile_name_backup'],
       Threads: ['body_backup', '_search'],
       Topics: ['default_offchain_template_backup'],
+      GroupPermissions: ['allowed_actions'],
     },
     ignore_constraints: {},
   });
@@ -70,11 +74,11 @@ const generateSchemas = async () => {
 describe('Model schema', () => {
   let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
 
-  before(async () => {
+  beforeAll(async () => {
     schemas = await generateSchemas();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -86,7 +90,7 @@ describe('Model schema', () => {
   });
   Object.values(Factories).forEach((factory) => {
     const m = factory(s);
-    it(`Should match ${m.tableName}`, async () => {
+    test(`Should match ${m.tableName}`, async () => {
       const { model, migration } = schemas[m.tableName];
 
       //console.log(model.columns, migration.columns);

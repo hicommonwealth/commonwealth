@@ -1,8 +1,11 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import ghostSvg from 'assets/img/ghost.svg';
+import clsx from 'clsx';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPopover, {
@@ -32,8 +35,10 @@ export const FullUser = ({
   showSkeleton,
   popoverPlacement,
   profile,
+  className,
 }: FullUserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
+  const loggedInUser = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (showSkeleton) {
@@ -61,7 +66,7 @@ export const FullUser = ({
   const friendlyCommunityName =
     app.config.chains.getById(userCommunityId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-  const isGhostAddress = app.user.addresses.some(
+  const isGhostAddress = loggedInUser.addresses.some(
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
@@ -82,7 +87,7 @@ export const FullUser = ({
     </>
   );
 
-  const isSelfSelected = app.user.addresses
+  const isSelfSelected = loggedInUser.addresses
     .map((a) => a.address)
     .includes(userAddress);
 
@@ -100,7 +105,7 @@ export const FullUser = ({
         profile?.name
       ) : (
         <>
-          <div>{profile?.name}</div>
+          <div className="profile-name">{profile?.name}</div>
           <div className="id-short">{fullAddress}</div>
         </>
       )}
@@ -123,6 +128,7 @@ export const FullUser = ({
     >
       {showAvatar && (
         <Link
+          // @ts-expect-error <StrictNullChecks/>
           to={
             profile && shouldLinkProfile
               ? `/profile/id/${profile?.id}`
@@ -155,7 +161,7 @@ export const FullUser = ({
           {isGhostAddress && (
             <img
               alt="ghost"
-              src="/static/img/ghost.svg"
+              src={ghostSvg}
               width="20px"
               style={{ display: 'inline-block' }}
             />
@@ -180,6 +186,7 @@ export const FullUser = ({
             {app.chain && app.chain.base === ChainBase.Substrate && (
               <Link
                 className="user-display-name substrate@"
+                // @ts-expect-error <StrictNullChecks/>
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
@@ -236,7 +243,7 @@ export const FullUser = ({
 
   return shouldShowPopover ? (
     <div
-      className="user-popover-wrapper"
+      className={clsx('user-popover-wrapper', className)}
       onMouseEnter={popoverProps.handleInteraction}
       onMouseLeave={popoverProps.handleInteraction}
     >

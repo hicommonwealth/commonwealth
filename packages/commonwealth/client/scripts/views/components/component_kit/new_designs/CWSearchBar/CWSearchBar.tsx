@@ -44,8 +44,6 @@ const goToSearchPage = (
     return;
   }
 
-  app.search.addToHistory(query);
-
   setRoute(`/search?${query.toUrlParams()}`);
 };
 
@@ -66,6 +64,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const { searchResults } = useSearchResults(searchTerm, [
     'threads',
     'replies',
+    // @ts-expect-error <StrictNullChecks/>
     communityId === 'all_communities' ? 'communities' : null,
     'members',
   ]);
@@ -98,6 +97,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     // Give time for child click events to
     // fire before resetting the search bar
     if (!resetTimer) {
+      // @ts-expect-error <StrictNullChecks/>
       resetTimer = setTimeout(() => {
         resetSearchBar();
         resetTimer = null;
@@ -155,6 +155,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           )}
         >
           <input
+            // @ts-expect-error <StrictNullChecks/>
             ref={inputRef}
             placeholder={placeholder}
             onInput={handleOnInput}

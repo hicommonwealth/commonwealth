@@ -8,15 +8,17 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import type { SubscriptionInstance } from '@hicommonwealth/model';
+import { Subscription } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
+import { userStore } from 'state/ui/user';
 import { NotificationStore } from 'stores';
+import { z } from 'zod';
 import Notification from '../../models/Notification';
 
 const post = async (route, args, callback) => {
   try {
-    args['jwt'] = app.user.jwt;
+    args['jwt'] = userStore.getState().jwt;
     const response = await axios.post(app.serverUrl() + route, args);
 
     if (response.data.status === 'Success') {
@@ -31,7 +33,7 @@ const post = async (route, args, callback) => {
 
 const get = async (route, args, callback) => {
   try {
-    args['jwt'] = app.user.jwt;
+    args['jwt'] = userStore.getState().jwt;
     const response = await axios.get(app.serverUrl() + route, { params: args });
 
     if (response.data.status === 'Success') {
@@ -130,7 +132,7 @@ class NotificationsController {
           is_active: true,
           ...requestData,
         },
-        (result: SubscriptionInstance) => {
+        (result: z.infer<typeof Subscription>) => {
           const newSubscription = modelFromServer(result);
           this._subscriptions.push(newSubscription);
         },
@@ -164,6 +166,7 @@ class NotificationsController {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.disable();
+          // @ts-expect-error StrictNullChecks
           if (s.category === 'chain-event') ceSubs.push(s);
         }
       },
@@ -317,10 +320,11 @@ class NotificationsController {
   }
 
   public getChainEventNotifications() {
-    if (!app.user || !app.user.jwt) {
+    if (!userStore.getState().jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
 
+    // @ts-expect-error StrictNullChecks
     const options: NotifOptions = app.isCustomDomain()
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };
@@ -334,9 +338,10 @@ class NotificationsController {
   }
 
   public getDiscussionNotifications() {
-    if (!app.user || !app.user.jwt) {
+    if (!userStore.getState().jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
+    // @ts-expect-error StrictNullChecks
     const options: NotifOptions = app.isCustomDomain()
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };

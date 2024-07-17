@@ -26,14 +26,14 @@ Set the `SEND_WEBHOOKS_EMAILS` env var to true to enable sending Webhooks and em
 
 ### Testing Script
 
-To facilitate testing of specific webhooks there is a script (`packages/commonwealth/server/scripts/emitWebhook.ts`) which can be invoked to emit a webhook with real data to any desired destination via the `yarn emit-webhook` command.
+To facilitate testing of specific webhooks there is a script (`packages/commonwealth/server/scripts/emitWebhook.ts`) which can be invoked to emit a webhook with real data to any desired destination via the `pnpm emit-webhook` command.
 
-For information on how to use this script, run `yarn emit-webhook --help`.
+For information on how to use this script, run `pnpm emit-webhook --help`.
 
 Example - emit a new thread notification to `webhook-testing` Discord channel:
 
 ```bash
-yarn emit-webhook -c new-thread-creation -d discord
+pnpm emit-webhook -c new-thread-creation -d discord
 ```
 
 ### Pattern

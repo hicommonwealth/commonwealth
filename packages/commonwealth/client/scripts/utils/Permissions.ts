@@ -1,6 +1,7 @@
 import app from 'state';
 import Account from '../models/Account';
 import Thread from '../models/Thread';
+import { userStore } from '../state/ui/user';
 
 const ROLES = {
   ADMIN: 'admin',
@@ -8,7 +9,11 @@ const ROLES = {
 };
 
 const isSiteAdmin = () => {
-  return app.user.activeAccount && app.user.isSiteAdmin;
+  return (
+    (userStore.getState().activeAccount ||
+      userStore.getState().addresses?.length > 0) &&
+    userStore.getState().isSiteAdmin
+  );
 };
 
 const isCommunityMember = (communityId?: string) => {
@@ -19,23 +24,25 @@ const isCommunityMember = (communityId?: string) => {
   );
 };
 
-const isCommunityAdmin = (account?: Account) => {
+const isCommunityAdmin = (account?: Account, communityId?: string) => {
   return (
-    app.user.activeAccount &&
+    (userStore.getState().activeAccount ||
+      userStore.getState().addresses?.length > 0) &&
     app.roles.isRoleOfCommunity({
       role: ROLES.ADMIN,
-      community: app.activeChainId(),
+      community: communityId || app.activeChainId(),
       ...(account && { account }),
     })
   );
 };
 
-const isCommunityModerator = (account?: Account) => {
+const isCommunityModerator = (account?: Account, communityId?: string) => {
   return (
-    app.user.activeAccount &&
+    (userStore.getState().activeAccount ||
+      userStore.getState().addresses?.length > 0) &&
     app.roles.isRoleOfCommunity({
       role: ROLES.MODERATOR,
-      community: app.activeChainId(),
+      community: communityId || app.activeChainId(),
       ...(account && { account }),
     })
   );
@@ -43,19 +50,20 @@ const isCommunityModerator = (account?: Account) => {
 
 const isThreadCollaborator = (thread: Thread) => {
   return (
-    thread.collaborators?.filter((c) => {
+    // @ts-expect-error StrictNullChecks
+    thread?.collaborators?.filter((c) => {
       return (
-        c.address === app.user.activeAccount?.address &&
-        c.community_id === app.user.activeAccount?.community.id
+        c?.address === userStore.getState().activeAccount?.address &&
+        c?.community_id === userStore.getState().activeAccount?.community.id
       );
-    }).length > 0
+    })?.length > 0
   );
 };
 
 const isThreadAuthor = (thread: Thread) => {
   return (
-    app.user.activeAccount?.address === thread.author &&
-    app.user.activeAccount?.community.id === thread.authorCommunity
+    userStore.getState().activeAccount?.address === thread?.author &&
+    userStore.getState().activeAccount?.community.id === thread?.authorCommunity
   );
 };
 

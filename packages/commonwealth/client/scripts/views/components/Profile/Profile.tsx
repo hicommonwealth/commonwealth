@@ -1,7 +1,7 @@
-import axios from 'axios';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
+import { Helmet } from 'react-helmet-async';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
@@ -24,36 +24,36 @@ type ProfileProps = {
   profileId: string;
 };
 
-const NoProfileFoundError = 'No profile found';
-
 const Profile = ({ profileId }: ProfileProps) => {
-  const [addresses, setAddresses] = useState<AddressInfo[]>();
-  const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
-  const [error, setError] = useState<ProfileError>(ProfileError.None);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
   const [profile, setProfile] = useState<NewProfile>();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>();
+  const [addresses, setAddresses] = useState<AddressInfo[]>();
+  const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
 
-  const getProfileData = async (query: string, signal: AbortSignal) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
-        params: {
-          profileId: query,
-          jwt: app.user.jwt,
-        },
-        signal,
-      });
+  const { data, error, isLoading } = useFetchProfileByIdQuery({
+    apiCallEnabled: !!profileId,
+    profileId,
+  });
 
-      const { result } = response.data;
+  useEffect(() => {
+    if (isLoading) return;
+    if (error) {
+      setErrorCode(ProfileError.NoProfileFound);
+      setProfile(undefined);
+      setThreads([]);
+      setIsOwner(undefined);
+      setAddresses([]);
+      setComments([]);
+    }
+    if (data) {
+      setProfile(new NewProfile(data.profile));
+      setThreads(data.threads.map((t) => new Thread(t)));
 
-      setProfile(new NewProfile(result.profile));
-      setThreads(result.threads.map((t) => new Thread(t)));
-
-      const responseComments = result.comments.map((c) => new Comment(c));
+      const responseComments = data.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
-        const thread = result.commentThreads.find(
+        const thread = data.commentThreads.find(
           (t) => t.id === parseInt(c.threadId, 10),
         );
         return { ...c, thread };
@@ -61,7 +61,7 @@ const Profile = ({ profileId }: ProfileProps) => {
       setComments(commentsWithAssociatedThread);
 
       setAddresses(
-        result.addresses.map((a) => {
+        data.addresses.map((a) => {
           try {
             return new AddressInfo({
               id: a.id,
@@ -79,28 +79,12 @@ const Profile = ({ profileId }: ProfileProps) => {
         }),
       );
 
-      setIsOwner(result.isOwner);
-    } catch (err) {
-      if (
-        err.response &&
-        err.response.status === 500 &&
-        err.response.data.error === NoProfileFoundError
-      ) {
-        setError(ProfileError.NoProfileFound);
-      }
+      setIsOwner(data.isOwner);
+      setErrorCode(ProfileError.None);
     }
-    setLoading(false);
-  };
+  }, [data, isLoading, error]);
 
-  useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-    getProfileData(profileId, signal);
-
-    return () => abortController.abort();
-  }, [profileId]);
-
-  if (loading)
+  if (isLoading)
     return (
       <div className="Profile loading">
         <div className="loading-spinner">
@@ -109,10 +93,10 @@ const Profile = ({ profileId }: ProfileProps) => {
       </div>
     );
 
-  if (error === ProfileError.NoProfileFound)
+  if (errorCode === ProfileError.NoProfileFound)
     return <PageNotFound message="We cannot find this profile." />;
 
-  if (error === ProfileError.None) {
+  if (errorCode === ProfileError.None) {
     if (!profile) return;
 
     let backgroundUrl;
@@ -125,31 +109,39 @@ const Profile = ({ profileId }: ProfileProps) => {
     }
 
     return (
-      <CWPageLayout>
-        <div
-          className="Profile"
-          style={
-            profile.backgroundImage
-              ? {
-                  backgroundImage: `url(${backgroundUrl})`,
-                  backgroundRepeat: `${
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'no-repeat'
-                      : 'repeat'
-                  }`,
-                  backgroundSize:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'cover'
-                      : '100px',
-                  backgroundPosition:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'center'
-                      : '56px 56px',
-                  backgroundAttachment: 'fixed',
-                }
-              : {}
-          }
-        >
+      <div
+        className="Profile"
+        style={
+          profile.backgroundImage
+            ? {
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundRepeat: `${
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
+                }`,
+                backgroundSize:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'cover'
+                    : '100px',
+                backgroundPosition:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'center'
+                    : '56px 56px',
+                backgroundAttachment: 'fixed',
+              }
+            : {}
+        }
+      >
+        <div className="fixed-slug-header"></div>
+        <CWPageLayout>
+          <Helmet>
+            <link
+              rel="canonical"
+              href={`https://commonwealth.im/profile/id/${profileId}`}
+            />
+          </Helmet>
+
           <div className="header">
             <CWText type="h2" fontWeight="medium">
               {profile.name
@@ -164,25 +156,29 @@ const Profile = ({ profileId }: ProfileProps) => {
                 : 'ProfilePageContainer smaller-margins'
             }
           >
+            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
+              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>
-        </div>
-      </CWPageLayout>
+        </CWPageLayout>
+      </div>
     );
   } else {
     return (
       <CWPageLayout>
         <div className="Profile">
           <div className="ProfilePageContainer">
+            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
+              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>

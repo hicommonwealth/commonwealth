@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ContractAttributes, ContractInstance } from './contract';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CommunityContractAttributes = {
   id?: number;
@@ -21,11 +21,10 @@ export type CommunityContractInstance =
     getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
   };
 
-export type CommunityContractModelStatic =
-  ModelStatic<CommunityContractInstance>;
-
-export default (sequelize: Sequelize.Sequelize): CommunityContractModelStatic =>
-  <CommunityContractModelStatic>sequelize.define<CommunityContractInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommunityContractInstance> =>
+  sequelize.define<CommunityContractInstance>(
     'CommunityContract',
     {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },

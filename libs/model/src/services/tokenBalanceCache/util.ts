@@ -1,8 +1,9 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
-import AbiCoder from 'web3-eth-abi';
+import * as AbiCoder from 'web3-eth-abi';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
@@ -117,7 +118,7 @@ export async function evmOffChainRpcBatching(
 
     const address = idAddressMap[data.id];
     balances[address] = source.contractAddress
-      ? AbiCoder.decodeParameter('uint256', data.result).toString()
+      ? String(AbiCoder.decodeParameter('uint256', data.result))
       : ethers.BigNumber.from(data.result).toString();
   }
 
@@ -144,8 +145,7 @@ export async function evmBalanceFetcherBatching(
 ): Promise<{ balances: Balances; failedAddresses: string[] }> {
   if (!rpc.batchSize) rpc.batchSize = 500;
   // 0x0 tells the on-chain contract to only return ETH balances
-  if (!source.contractAddress)
-    source.contractAddress = '0x0000000000000000000000000000000000000000';
+  if (!source.contractAddress) source.contractAddress = ZERO_ADDRESS;
 
   const rpcRequests = [];
 
@@ -215,9 +215,12 @@ export async function evmBalanceFetcherBatching(
         continue;
       }
 
-      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
+      const balances = AbiCoder.decodeParameter(
+        'uint256[]',
+        data.result,
+      ) as number[];
       relevantAddresses.forEach(
-        (key, i) => (addressBalanceMap[key] = balances[i]),
+        (key, i) => (addressBalanceMap[key] = String(balances[i])),
       );
     }
   }

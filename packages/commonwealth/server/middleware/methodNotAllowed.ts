@@ -1,5 +1,4 @@
 import { stats } from '@hicommonwealth/core';
-import { HttpMethod } from 'aws-sdk/clients/appmesh';
 import {
   NextFunction,
   Request,
@@ -25,6 +24,7 @@ const statsMiddleware = (method: string, path: string) => (req, res, next) => {
       const latency = Date.now() - start;
       stats().histogram(`cw.path.latency`, latency, {
         path: routePattern,
+        statusCode: `${res.statusCode}`,
       });
     });
   } catch (err) {
@@ -45,7 +45,7 @@ const statsMiddleware = (method: string, path: string) => (req, res, next) => {
  */
 export const registerRoute = (
   router: Router,
-  method: HttpMethod,
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete',
   path: string,
   ...handlers: RequestHandler[] | ValidateThenHandle
 ) => {

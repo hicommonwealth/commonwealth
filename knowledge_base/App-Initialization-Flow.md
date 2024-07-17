@@ -2,7 +2,7 @@
 
 The goal of this document is to describe the current state of the app initialization flow in as much detail as possible, so that we are better informed when engineering improvements.
 
-1. On `yarn start`, bundling begins with the `webpack.base.config.js`-defined entry point, currently set to the `client/scripts` file `index.tsx`.
+1. On `pnpm start`, bundling begins with the `webpack.base.config.js`-defined entry point, currently set to the `client/scripts` file `index.tsx`.
 2. `index.tsx` uses the browser's `root` element as a container to render the `App` view component (imported from `app.tsx`) within.
 3. The `App` component fires the `useInitApp()` hook (`hooks/useInitApp.tsx`), which:
     1. Sets the `isLoading` and `customDomain` state variables, as well as initializing their respective setter functions.
@@ -37,7 +37,7 @@ The goal of this document is to describe the current state of the app initializa
         5. If, _at render time_, the `selectedScope` differs from `app.activeChainId()`, the `isLoading` and `scopeToLoad` global state variables are updated (to `true` and `selectedScope`, respectively). `selectChain()` is fired, receiving new scope's chain as argument; on completion, the `isLoading` state variable is set to `false`.
         6. If none of these conditions apply, the routed-to page is rendered.
 9. If `selectChain()` (`/helpers/chain.ts`) is fired, per step #8:
-    1. If no `chain` argument is passed, the function defaults to a `chain` value set my `app.user.selectedChain`, or else `app.config.defaultChain`.
+    1. If no `chain` argument is passed, the function defaults to a `chain` value set my `app.user.selectedChain`, or else 'edgeware'.
     2. If we do not need to initialize a new chain (i.e. the chain we are switching to has already been initialized and selected), exit the function immediately.
     3. Globally deinit other active communities via `deinitChainOrCommunity`.
         - This method triggers a cascade of “deinit” calls, which set various statuses to false, destroy connections to blockchain endpoints, and eentually sets `app.chain` to `null`.
@@ -45,8 +45,6 @@ The goal of this document is to describe the current state of the app initializa
         - If ChainBase is Substrate, import the Substrate adapter.
         - If ChainBase is Cosmos, import the Cosmos adapter.
         - If Network is Ethereum, import the (ETH) tokenAdapter.
-        - If Network is NEAR or NEARTestnet, import the NEAR adapter.
-        - If Network is Sputnik, import the Sputnik adapter (NEAR + gov).
         - If Network is Compound, import the Compound adapter (ETH).
         - If Network is Aave, import the Aave adapter (ETH).
         - If Network is ERC20, import the (ETH) tokenAdapter.
@@ -57,7 +55,7 @@ The goal of this document is to describe the current state of the app initializa
         - Otherwise, throw an “invalid chain” error.
     5. `initServer()` is called the returned `IChainAdapter` instance, which clears local storage and makes a call to `/bulkOffchain`, whose data is used to initialize community content.
     6. Dark mode preferences are set, and forum data (e.g. threads, admins, banners, recent activity) is populated. The `app.chain` state variable is set globally to the now-server-initialized `IChainAdapter` instance.
-    7. If the `initChain` argument is `true` (e.g. in the case of NEAR communities), we then proceed to `initChain()`.
+    7. If the `initChain` argument is `true`, we then proceed to `initChain()`.
         1. If `selectChain` has not been called, or if chain is already loaded, immediately exit the function.
         2. If the chain's API is not initialized, `app.chain.initApi()` is fired.
             - This triggers chain-specific setup of communication with the blockchain endpoint, defined in e.g. controllers/chain/cosmos/adapter.ts. Often this initializes the “chain” (holds the core functionality and chain connections) and “accounts” modules (deals with user-specific logic, rarely used now), but it specifically does not initialize governance modules.

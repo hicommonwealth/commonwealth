@@ -1,6 +1,7 @@
-import { logger } from '@hicommonwealth/logging';
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { dispose, logger, stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -30,6 +31,7 @@ export async function generateCosmosGovNotifications() {
   // fetch proposal id of the latest proposal notification for each community
   const latestProposalIds = await fetchLatestNotifProposalIds(
     models,
+    // @ts-expect-error StrictNullChecks
     communities.map((c) => c.id),
   );
   log.info(
@@ -40,6 +42,7 @@ export async function generateCosmosGovNotifications() {
 
   // fetch new proposals for each community
   const communitiesWithPropId = communities.filter(
+    // @ts-expect-error StrictNullChecks
     (c) => latestProposalIds[c.id],
   );
   if (communitiesWithPropId.length > 0) {
@@ -54,6 +57,7 @@ export async function generateCosmosGovNotifications() {
 
   // if a proposal id cannot be found, fetch the latest proposal from the community
   const missingPropIdCommunities = communities.filter(
+    // @ts-expect-error StrictNullChecks
     (c) => !latestProposalIds[c.id],
   );
   if (missingPropIdCommunities.length > 0) {
@@ -67,9 +71,14 @@ export async function generateCosmosGovNotifications() {
 
 if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
-    .then(() => process.exit(0))
+    .then(() => {
+      stats(HotShotsStats()).increment('cw.scheduler.send-cosmos-notifs');
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
+    })
     .catch((err) => {
       log.error(err);
-      process.exit(1);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
     });
 }

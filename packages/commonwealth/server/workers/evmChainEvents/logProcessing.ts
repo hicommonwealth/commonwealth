@@ -1,8 +1,7 @@
 import { Log } from '@ethersproject/providers';
-import { stats } from '@hicommonwealth/core';
-import { logger as _logger } from '@hicommonwealth/logging';
+import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,11 +33,13 @@ export function getProvider(rpc: string) {
  */
 export async function getLogs({
   rpc,
+  maxBlockRange,
   contractAddresses,
   startingBlockNum,
   endingBlockNum,
 }: {
   rpc: string;
+  maxBlockRange: number;
   contractAddresses: string[];
   startingBlockNum: number;
   endingBlockNum?: number;
@@ -65,11 +66,10 @@ export async function getLogs({
     return { logs: [], lastBlockNum: endBlock };
   }
 
-  if (endBlock - startBlock > 500) {
-    // limit the number of blocks to fetch to 500 to avoid rate limiting on some EVM nodes like Celo
-    // this should eventually be configured on the ChainNodes table by rpc since each rpc has different
-    // rate limits e.g. Alchemy has a limit of 10k logs while Celo public nodes have a limit of 500.
-    startBlock = endBlock - 500;
+  // limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
+  // maxBlockRange = -1 indicates there is no block range limit
+  if (maxBlockRange !== -1 && endBlock - startBlock > maxBlockRange) {
+    startBlock = endBlock - maxBlockRange;
     logger.error(
       'Block span too large. The number of fetch blocked is reduced to 500.',
       undefined,
@@ -81,8 +81,7 @@ export async function getLogs({
     );
   }
 
-  // TODO: upgrade to ethersJS v6 -> supports getLogs() with multiple contract
-  //  addresses (v5 doesn't). Once upgraded, log formatting will be done for us
+  // TODO: use Web3.JS instead
   const logs: Array<{
     address: string;
     blockHash: string;
@@ -167,6 +166,7 @@ export async function getEvents(
 ): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
   const { logs, lastBlockNum } = await getLogs({
     rpc: evmSource.rpc,
+    maxBlockRange: evmSource.maxBlockRange,
     contractAddresses: Object.keys(evmSource.contracts),
     startingBlockNum,
     endingBlockNum,
@@ -200,6 +200,7 @@ export async function migrateEvents(
           };
         }
         contracts[contractAddress].sources.push(source);
+        // @ts-expect-error StrictNullChecks
         if (!oldestBlock || oldestBlock > source.created_at_block) {
           oldestBlock = source.created_at_block;
         }
@@ -211,12 +212,15 @@ export async function migrateEvents(
     const result = await getEvents(
       {
         rpc: evmSource.rpc,
+        maxBlockRange: evmSource.maxBlockRange,
         contracts,
       },
+      // @ts-expect-error StrictNullChecks
       oldestBlock,
       endingBlockNum,
     );
     logger.info('Events migrated', {
+      // @ts-expect-error StrictNullChecks
       startingBlockNum: oldestBlock,
       endingBlockNum,
     });

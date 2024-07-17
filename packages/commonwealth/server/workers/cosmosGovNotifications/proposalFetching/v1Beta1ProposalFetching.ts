@@ -1,8 +1,8 @@
 import { ProposalStatus } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { getCosmosClient } from './getCosmosClient';
 import { GovV1Beta1ClientType } from './types';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
@@ -25,6 +25,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
       ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
       '',
       '',
+      // @ts-expect-error StrictNullChecks
       nextKey,
     );
     if (!result) {
@@ -36,6 +37,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
         const newNextKey = numberToUint8ArrayBE(
           result.pagination.total.toNumber(),
         );
+        // @ts-expect-error StrictNullChecks
         if (nextKey != newNextKey) {
           nextKey = newNextKey;
         } else {
@@ -43,6 +45,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
         }
       } else nextKey = result.pagination?.nextKey;
     }
+    // @ts-expect-error StrictNullChecks
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 
   if (finalProposalsPage.length > 0) {
@@ -73,6 +76,7 @@ export async function fetchUpToLatestCosmosProposalV1Beta1(
     let proposal: Proposal;
     try {
       const result = await client.gov.proposal(proposalId);
+      // @ts-expect-error StrictNullChecks
       proposal = result.proposal;
     } catch (e) {
       if (!e.message.includes('rpc error: code = NotFound')) {
@@ -80,6 +84,7 @@ export async function fetchUpToLatestCosmosProposalV1Beta1(
       }
     }
 
+    // @ts-expect-error StrictNullChecks
     if (proposal) {
       proposals.push(proposal);
       proposalId++;

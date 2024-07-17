@@ -27,11 +27,15 @@ Descriptive const names should be the first line of defense in producing human-r
 
 TSDoc syntax is preferred over inline comments when documenting newly declared functions, including class functions.
 
-TSDoc syntax is especially preferred for code that is either exported or frequently re-invoked, so as to populate built-in IDE preview features.
+TSDoc syntax is especially preferred in the following cases:
+
+1. Code where clear naming and descriptive typing still leave ambiguity of intent.
+2. Code that is exported or else frequently re-invoked, so as to populate built-in IDE preview features.
+3. Code we plan to expose to external developers (e.g. in our API),where we may wish to autogenerate external-facing HTML documents describing how to use our interface.
 
 As with all inline documentation, TSDoc annotations should be used sparingly, for complex or non-obvious code. By extension, TSDoc annotations do not need to be "complete," in the sense of fully documenting a given function. If only a single param needs explaining, then only that param needs annotation.
 
-The full TSDoc annotation format is as follows:
+The TSDoc annotation format is as follows:
 
 ```typescript
 /**

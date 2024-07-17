@@ -1,19 +1,20 @@
 import {
-  BalanceSourceType,
-  ContractSource,
-  CosmosContractSource,
-  CosmosSource,
-  NativeSource,
-} from '@hicommonwealth/core';
-import {
   GetBalancesOptions,
   GetCosmosBalancesOptions,
   GetCwBalancesOptions,
   GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
+  GetSPLBalancesOptions,
   GroupAttributes,
 } from '@hicommonwealth/model';
+import {
+  BalanceSourceType,
+  ContractSource,
+  CosmosContractSource,
+  CosmosSource,
+  NativeSource,
+} from '@hicommonwealth/shared';
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],
@@ -63,6 +64,7 @@ export function makeGetBalancesOptions(
                 castedOpt.sourceOptions.contractAddress ===
                   castedSource.contract_address &&
                 castedOpt.sourceOptions.tokenId ===
+                  // @ts-expect-error StrictNullChecks
                   parseInt(castedSource.token_id, 10)
               );
             });
@@ -73,6 +75,7 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   evmChainId: castedSource.evm_chain_id,
                   contractAddress: castedSource.contract_address,
+                  // @ts-expect-error StrictNullChecks
                   tokenId: parseInt(castedSource.token_id, 10),
                 },
                 addresses,
@@ -146,6 +149,25 @@ export function makeGetBalancesOptions(
                   contractAddress: castedSource.contract_address,
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
+                addresses,
+              });
+            }
+            break;
+          }
+          case BalanceSourceType.SPL: {
+            const castedSource = requirement.data.source as ContractSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetSPLBalancesOptions;
+              return (
+                castedOpt.balanceSourceType === castedSource.source_type &&
+                castedOpt.mintAddress === castedSource.contract_address
+              );
+            });
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType:
+                  castedSource.source_type as BalanceSourceType.SPL,
+                mintAddress: castedSource.contract_address,
                 addresses,
               });
             }

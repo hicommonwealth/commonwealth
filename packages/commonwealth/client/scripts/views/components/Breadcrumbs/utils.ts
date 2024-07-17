@@ -1,7 +1,7 @@
 import { To } from 'react-router-dom';
 import { breadCrumbURLS } from './data';
 
-type currentDiscussion = {
+type CurrentDiscussion = {
   currentThreadName: string;
   currentTopic: string;
   topicURL: string;
@@ -47,7 +47,7 @@ export const generateBreadcrumbs = (
   profileId: number,
   navigate: (val: To) => void,
   customDomain: string,
-  currentDiscussion?: currentDiscussion,
+  currentDiscussion?: CurrentDiscussion,
 ) => {
   let link: string;
   let label: string;
@@ -116,8 +116,10 @@ export const generateBreadcrumbs = (
 
     //First pass of generating the label
     label =
+      // @ts-expect-error StrictNullChecks
       index === pathSegments.length - 1 && !!currentDiscussion.currentThreadName
-        ? currentDiscussion.currentThreadName
+        ? // @ts-expect-error StrictNullChecks
+          currentDiscussion.currentThreadName
         : matchedBreadcrumb
         ? matchedBreadcrumb.breadcrumb
         : removedThreadId;
@@ -205,9 +207,12 @@ export const generateBreadcrumbs = (
     };
   });
 
+  // @ts-expect-error StrictNullChecks
   currentDiscussion.currentTopic &&
     breadcrumbs.splice(1, 0, {
+      // @ts-expect-error StrictNullChecks
       label: currentDiscussion.currentTopic,
+      // @ts-expect-error StrictNullChecks
       path: currentDiscussion.topicURL,
       navigate: (val: To) => navigate(val),
       isParent: false,

@@ -1,7 +1,12 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signDeleteComment } from 'controllers/server/sessions';
+import Comment from 'models/Comment';
+import { IUniqueId } from 'models/interfaces';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -19,17 +24,16 @@ const deleteComment = async ({
   commentId,
   canvasHash,
 }: DeleteCommentProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
-    comment_id: canvasHash,
-  });
+  const canvasSignedData = await signDeleteComment(
+    userStore.getState().activeAccount?.address || '',
+    {
+      comment_id: canvasHash,
+    },
+  );
 
   await axios.delete(`${app.serverUrl()}/comments/${commentId}`, {
     data: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       address: address,
       community_id: communityId,
       author_community_id: communityId,
@@ -46,9 +50,7 @@ const deleteComment = async ({
       text: '[deleted]',
       plaintext: '[deleted]',
       versionHistory: [],
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   };
 };
@@ -96,6 +98,16 @@ const useDeleteCommentMutation = ({
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments - 1 || 0,
       });
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        {
+          recentComments: [
+            { id: response.softDeleted.id },
+          ] as Comment<IUniqueId>[],
+        },
+        'removeFromExisting',
+      );
       return response;
     },
   });
