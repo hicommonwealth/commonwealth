@@ -15,7 +15,7 @@ export const query = async <Input extends ZodSchema, Output extends ZodSchema>(
   { input, auth, body }: QueryMetadata<Input, Output>,
   { actor, payload }: QueryContext<Input>,
   validate = true,
-): Promise<z.infer<Output>> => {
+): Promise<z.infer<Output> | undefined> => {
   try {
     const context: QueryContext<Input> = {
       actor,
