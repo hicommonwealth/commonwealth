@@ -9,7 +9,7 @@ export type GetTopicsOptions = {
   with_contest_managers: boolean;
 };
 
-const ActiveContestManagers = z.object({
+const ActiveContestManagers = schemas.ContestManager.extend({
   content: z.array(schemas.ContestAction),
   contest_manager: schemas.ContestManager,
 });
