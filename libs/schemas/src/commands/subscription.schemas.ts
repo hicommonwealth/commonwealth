@@ -70,6 +70,7 @@ export const CreateThreadSubscription = {
 export const RegisterClientRegistrationToken = {
   input: z.object({
     token: z.string(),
+    channelType: z.enum(['APNS', 'FCM']),
   }),
   output: z.object({}),
 };
@@ -77,6 +78,7 @@ export const RegisterClientRegistrationToken = {
 export const UnregisterClientRegistrationToken = {
   input: z.object({
     token: z.string(),
+    channelType: z.enum(['APNS', 'FCM']),
   }),
   output: z.object({}),
 };

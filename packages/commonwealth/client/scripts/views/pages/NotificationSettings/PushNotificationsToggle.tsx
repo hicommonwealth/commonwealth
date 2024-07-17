@@ -48,6 +48,7 @@ export const PushNotificationsToggle = () => {
         await registerClientRegistrationToken.mutateAsync({
           id: 'none',
           token,
+          channelType,
         });
       }
     }
@@ -64,6 +65,7 @@ export const PushNotificationsToggle = () => {
         await unregisterClientRegistrationToken.mutateAsync({
           id: 'none',
           token,
+          channelType,
         });
       }
     }

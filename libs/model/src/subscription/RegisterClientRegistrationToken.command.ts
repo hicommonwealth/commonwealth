@@ -17,7 +17,7 @@ export function RegisterClientRegistrationToken(): Command<
       await notifications.registerClientRegistrationToken(
         actor.user.id,
         payload.token,
-        'FCM',
+        payload.channelType,
       );
       return {};
     },

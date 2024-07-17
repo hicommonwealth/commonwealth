@@ -17,7 +17,7 @@ export function UnregisterClientRegistrationToken(): Command<
       await notifications.unregisterClientRegistrationToken(
         actor.user.id,
         payload.token,
-        'FCM',
+        payload.channelType,
       );
       return {};
     },
