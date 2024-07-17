@@ -1,6 +1,8 @@
 import { BrowserType, getBrowserType } from 'helpers/browser';
 import React, { useCallback, useState } from 'react';
+// eslint-disable-next-line max-len
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
+// eslint-disable-next-line max-len
 import { useUnregisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useUnregisterClientRegistrationTokenMutation';
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
@@ -54,7 +56,7 @@ export const PushNotificationsToggle = () => {
     }
 
     doAsync().catch(console.error);
-  }, [registerClientRegistrationToken]);
+  }, [channelType, registerClientRegistrationToken]);
 
   const handleUnregisterPushNotificationSubscription = useCallback(() => {
     async function doAsync() {
@@ -71,7 +73,7 @@ export const PushNotificationsToggle = () => {
     }
 
     doAsync().catch(console.error);
-  }, [unregisterClientRegistrationToken]);
+  }, [channelType, unregisterClientRegistrationToken]);
 
   const handleRegistration = useCallback(
     (newValue: boolean) => {
