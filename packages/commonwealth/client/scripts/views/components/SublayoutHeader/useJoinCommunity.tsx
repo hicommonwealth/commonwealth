@@ -141,20 +141,6 @@ const useJoinCommunity = () => {
 
         // set active address if in a community
         if (activeChainId) {
-          // set role in community
-          if (
-            !app.roles.getRoleInCommunity({
-              account,
-              community: activeChainId,
-            })
-          ) {
-            await app.roles.createRole({
-              // @ts-expect-error <StrictNullChecks/>
-              address: addressInfo,
-              community: activeChainId,
-            });
-          }
-
           account && (await setActiveAccount(account));
 
           // update active accounts

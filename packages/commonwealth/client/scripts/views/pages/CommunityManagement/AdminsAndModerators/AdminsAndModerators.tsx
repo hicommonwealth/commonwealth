@@ -1,3 +1,4 @@
+import { AddressRole } from '@hicommonwealth/shared';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import useFetchAdminQuery from 'state/api/members/fetchAdmin';
@@ -8,7 +9,6 @@ import {
   APIOrderDirection,
 } from '../../../../../scripts/helpers/constants';
 import useSearchProfilesQuery from '../../../../../scripts/state/api/profiles/searchProfiles';
-import RoleInfo from '../../../../models/RoleInfo';
 import { ComponentType } from '../../../components/component_kit/types';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import ManageRoles from './ManageRoles';
@@ -67,55 +67,35 @@ const AdminsAndModerators = () => {
     }
   }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
 
-  const handleRoleUpdate = (oldRole, newRole) => {
-    // newRole doesn't have the Address property that oldRole has,
-    // Add the missing Address property to the newRole, then splice it into the array.
-    newRole.Address = oldRole.Address;
-
-    const predicate = (r) => {
-      return r.address_id === oldRole.address_id;
-    };
-
-    app.roles.addRole(newRole);
-    app.roles.removeRole(predicate);
-
+  const handleRoleUpdate = (oldRole: AddressRole, newRole: AddressRole) => {
     const { adminsAndMods } = app.chain.meta;
 
-    if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
-      const idx = adminsAndMods.findIndex(predicate);
+    if (oldRole.role === 'admin' || oldRole.role === 'moderator') {
+      const idx = adminsAndMods.findIndex(
+        ({ address }) => address === oldRole.address,
+      );
 
       if (idx !== -1) {
         adminsAndMods.splice(idx, 1);
       }
-      if (oldRole.permission === 'admin') {
+      if (oldRole.role === 'admin') {
         // @ts-expect-error StrictNullChecks
         setAdmins(admins.filter((a) => a.address_id !== oldRole.address_id));
       }
-      if (oldRole.permission === 'moderator') {
+      if (oldRole.role === 'moderator') {
         // @ts-expect-error StrictNullChecks
         setMods(mods.filter((a) => a.address_id !== oldRole.address_id));
       }
     }
 
-    if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
-      const roleInfo = new RoleInfo({
-        id: newRole.address_id,
-        address_id: newRole.Address?.id || newRole.address_id,
-        address: newRole.Address.address,
-        address_chain: newRole.Address.community_id,
-        community_id: newRole.chain_id,
-        permission: newRole.permission,
-        allow: newRole.allow,
-        deny: newRole.deny,
-        is_user_default: newRole.is_user_default,
-      });
-      adminsAndMods.push(roleInfo);
+    if (newRole.role === 'admin' || newRole.role === 'moderator') {
+      adminsAndMods.push(newRole);
 
-      if (newRole.permission === 'admin') {
+      if (newRole.role === 'admin') {
         // @ts-expect-error StrictNullChecks
         setAdmins([...admins, newRole]);
       }
-      if (newRole.permission === 'moderator') {
+      if (newRole.role === 'moderator') {
         // @ts-expect-error StrictNullChecks
         setMods([...mods, newRole]);
       }

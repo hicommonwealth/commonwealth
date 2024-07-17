@@ -4,7 +4,6 @@ import axios from 'axios';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { baseToNetwork } from 'helpers';
 import app, { initAppState } from 'state';
-import { updateAdminOnCreateCommunity } from 'views/pages/create_community/community_input_rows';
 import { userStore } from '../../ui/user';
 
 interface CreateCommunityProps {
@@ -75,7 +74,7 @@ const createCommunity = async ({
 const useCreateCommunityMutation = () => {
   return useMutation({
     mutationFn: createCommunity,
-    onSuccess: async ({ data }, variables) => {
+    onSuccess: async ({ data }) => {
       if (data?.result?.admin_address) {
         await linkExistingAddressToChainOrCommunity(
           data.result.admin_address,
@@ -85,7 +84,6 @@ const useCreateCommunityMutation = () => {
       }
 
       await initAppState(false);
-      await updateAdminOnCreateCommunity(variables.id);
     },
   });
 };

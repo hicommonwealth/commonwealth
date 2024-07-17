@@ -42,6 +42,11 @@ export enum AccessLevel {
   Member = 'member',
 }
 
+export type AddressRole = {
+  address: string;
+  role: Role;
+};
+
 export enum ContentType {
   Thread = 'thread',
   Comment = 'comment',

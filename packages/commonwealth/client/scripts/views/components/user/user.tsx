@@ -71,25 +71,20 @@ export const User = ({
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =
     Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const friendlyCommunityName =
-    app.config.chains.getById(userCommunityId)?.name;
-  const adminsAndMods = app.chain?.meta.adminsAndMods || [];
+  const userCommunity = app.config.chains.getById(userCommunityId);
+  const friendlyCommunityName = userCommunity?.name;
+  const roleInCommunity = userCommunity?.adminsAndMods?.find(
+    ({ address }) => address === userAddress,
+  )?.role;
   const isGhostAddress = loggedInUser.addresses.some(
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
-  const roleInCommunity =
-    role ||
-    adminsAndMods.find(
-      (r) => r.address === userAddress && r.address_chain === userCommunityId,
-    );
 
   const roleTags = (
     <>
       {shouldShowRole && roleInCommunity && (
         <div className="role-tag-container">
-          <CWText className="role-tag-text">
-            {roleInCommunity.permission}
-          </CWText>
+          <CWText className="role-tag-text">{roleInCommunity}</CWText>
         </div>
       )}
     </>

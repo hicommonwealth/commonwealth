@@ -51,14 +51,7 @@ export const DeleteAddressModal = ({
         chain,
         jwt: user.jwt,
       });
-      // remove deleted role from app.roles
-      const foundAddressInfo = addresses.find((a) => a.address === address);
-      app.roles.deleteRole({
-        // @ts-expect-error <StrictNullChecks/>
-        address: foundAddressInfo,
-        community: chain,
-      });
-
+      // TODO: need to update userStore?
       if (response?.data.status === 'Success') {
         notifySuccess('Address has been successfully removed.');
       }

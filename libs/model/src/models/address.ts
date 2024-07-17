@@ -124,6 +124,7 @@ export default (
       indexes: [
         { fields: ['address', 'community_id'], unique: true },
         { fields: ['user_id'] },
+        // TODO: maybe add index on mod/admin
       ],
       defaultScope: {
         attributes: {
