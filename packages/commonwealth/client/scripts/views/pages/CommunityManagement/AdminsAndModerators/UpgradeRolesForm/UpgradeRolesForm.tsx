@@ -9,11 +9,12 @@ import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_grou
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../../../components/members_search_bar';
+import { MemberResult } from '../../../search/helpers';
 import './UpgradeRolesForm.scss';
 
 type UpgradeRolesFormProps = {
   onRoleUpdate: (oldRole: AddressRole, newRole: AddressRole) => void;
-  roleData: any[];
+  roleData: MemberResult[];
   searchTerm: string;
   setSearchTerm: (v: string) => void;
 };
@@ -41,18 +42,22 @@ export const UpgradeRolesForm = ({
     setRadioButtons(zeroedOutRadioButtons);
   };
 
-  // TODO: any => RoleInfo
-  const nonAdmins: any[] = roleData.filter((_role) => {
-    return _role.permission === 'member' || _role.permission === 'moderator';
+  const nonAdmins: MemberResult[] = roleData.filter(({ addresses }) => {
+    return !addresses.some(({ role: r }) => r === 'admin');
   });
 
-  const nonAdminNames: string[] = nonAdmins.map((_role) => {
-    const roletext = _role.permission === 'moderator' ? '(moderator)' : '';
-    const fullText = `${(_role as any)?.displayName} - ${formatAddressShort(
-      _role.Address.address,
-    )} ${roletext}`;
-    return fullText;
-  });
+  const nonAdminNames: string[] = nonAdmins.map(
+    ({ profile_name, addresses }) => {
+      const roletext = addresses.some(({ role: r }) => r === 'moderator')
+        ? '(moderator)'
+        : '';
+      // TODO: we don't actually know if this is the right address?
+      const fullText = `${profile_name} - ${formatAddressShort(
+        addresses[0].address,
+      )} ${roletext}`;
+      return fullText;
+    },
+  );
 
   const options = useMemo(() => {
     return nonAdminNames.map((n) => ({ label: n, value: n }));
@@ -80,7 +85,8 @@ export const UpgradeRolesForm = ({
     try {
       const response = await axios.post(`${app.serverUrl()}/upgradeMember`, {
         new_role: newRole,
-        address: _user.Address.address,
+        // TODO: allow setting any address (??)
+        address: _user.addresses[0].address,
         community_id: app.activeChainId(),
         jwt: userData.jwt,
       });
@@ -88,10 +94,15 @@ export const UpgradeRolesForm = ({
       if (response.data.status === 'Success') {
         notifySuccess('Member upgraded');
         onRoleUpdate(
-          { address: _user.address, role: _user.permission },
+          {
+            // TODO: allow setting any address (??)
+            address: _user.addresses[0].address,
+            // @ts-expect-error StrictNullChecks
+            role: _user.addresses[0].role,
+          },
           {
             address: response.data.result.address,
-            role: response.data.result.permission,
+            role: response.data.result.role,
           },
         );
         zeroOutRadioButtons();

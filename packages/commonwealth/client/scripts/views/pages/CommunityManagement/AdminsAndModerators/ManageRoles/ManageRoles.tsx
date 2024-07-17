@@ -14,7 +14,7 @@ import './ManageRoles.scss';
 type ManageRoleRowProps = {
   label: string;
   onRoleUpdate: (oldRole: AddressRole, newRole: AddressRole) => void;
-  roledata?: any[]; // RoleInfo
+  roledata?: AddressRole[];
 };
 
 export const ManageRoles = ({
@@ -41,7 +41,7 @@ export const ManageRoles = ({
       const roleData = res.data.result;
       const newRole: AddressRole = {
         address: roleData.address,
-        role: roleData.permission,
+        role: roleData.role,
       };
       onRoleUpdate(role, newRole);
     } catch (err) {
@@ -63,18 +63,18 @@ export const ManageRoles = ({
         permissions: ['moderator', 'admin'],
       },
     });
-    const returnedRoles = res.data.result;
+    const returnedAddrs = res.data.result;
 
-    const userAdminsAndMods = returnedRoles.filter((role_) => {
+    const userAdminsAndMods = returnedAddrs.filter((addr) => {
       const belongsToUser = !!user.addresses.filter(
-        (addr_) => addr_.id === role_.address_id,
+        (addr_) => addr_.address === addr.address,
       ).length;
       return belongsToUser;
     });
 
     const onlyModsRemaining = () => {
       const modCount = userAdminsAndMods.filter(
-        (r) => r.permission === 'moderator',
+        (r) => r.role === 'moderator',
       ).length;
 
       const remainingRoleCount = userAdminsAndMods.length - 1;
@@ -119,15 +119,14 @@ export const ManageRoles = ({
     <div className="ManageRoles">
       <CWLabel label={label} />
       <div className="roles-container">
-        {roledata?.map((role) => {
-          const addr = role.Address;
+        {roledata?.map((r) => {
+          const { role, address } = r;
 
           return (
-            <div className="role-row" key={addr.id}>
+            <div className="role-row" key={address}>
               <User
-                userAddress={addr?.address}
-                userCommunityId={role?.community_id}
-                shouldShowAsDeleted={!addr?.address && !role?.community_id}
+                userAddress={address}
+                userCommunityId={app.activeChainId()}
                 shouldShowPopover
                 shouldLinkProfile
                 shouldHideAvatar
@@ -137,8 +136,8 @@ export const ManageRoles = ({
                 iconSize="small"
                 onClick={() =>
                   handleDeleteRole({
-                    address: role.address,
-                    role: role.permission,
+                    address,
+                    role,
                   })
                 }
               />

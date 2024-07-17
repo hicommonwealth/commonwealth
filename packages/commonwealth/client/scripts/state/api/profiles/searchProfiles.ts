@@ -21,7 +21,6 @@ interface SearchProfilesProps {
   limit: number;
   orderBy?: APIOrderBy;
   orderDirection?: APIOrderDirection;
-  includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
   includeGroupIds?: boolean;
   includeCount?: boolean;
@@ -35,7 +34,6 @@ const searchProfiles = async ({
   limit,
   orderBy,
   orderDirection,
-  includeRoles,
   includeCount,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -53,7 +51,6 @@ const searchProfiles = async ({
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
-        include_roles: includeRoles,
         include_count: includeCount,
       },
     },
@@ -67,7 +64,6 @@ const useSearchProfilesQuery = ({
   limit,
   orderBy,
   orderDirection,
-  includeRoles,
   includeCount,
   enabled = true,
 }: SearchProfilesProps) => {
@@ -77,7 +73,6 @@ const useSearchProfilesQuery = ({
       communityId,
       orderBy,
       orderDirection,
-      includeRoles,
     },
   ];
   return useInfiniteQuery(
@@ -90,7 +85,6 @@ const useSearchProfilesQuery = ({
         limit,
         orderBy,
         orderDirection,
-        includeRoles,
         includeCount,
       }),
     {

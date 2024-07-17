@@ -10,13 +10,14 @@ import {
 } from '../../../../../scripts/helpers/constants';
 import useSearchProfilesQuery from '../../../../../scripts/state/api/profiles/searchProfiles';
 import { ComponentType } from '../../../components/component_kit/types';
+import { MemberResult } from '../../search/helpers';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import ManageRoles from './ManageRoles';
 import UpgradeRolesForm from './UpgradeRolesForm';
 
 const AdminsAndModerators = () => {
-  const [admins, setAdmins] = useState([]);
-  const [mods, setMods] = useState([]);
+  const [admins, setAdmins] = useState<AddressRole[]>([]);
+  const [mods, setMods] = useState<AddressRole[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const adminsAndModeratorsClass = true;
 
@@ -36,34 +37,31 @@ const AdminsAndModerators = () => {
     limit: 100,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
   });
 
-  const roleData = useMemo(() => {
+  const roleData = useMemo<MemberResult[]>(() => {
     if (!searchResults?.pages?.length) {
       return [];
     }
-    return searchResults.pages[0].results.map((profile) => {
-      return {
-        // @ts-expect-error StrictNullChecks
-        ...(profile.roles[0] || {}),
-        Address: profile.addresses[0],
-        id: profile.addresses[0].id,
-        displayName: profile.profile_name || 'Anonymous',
-      };
-    });
+    return searchResults.pages[0].results;
   }, [searchResults]);
 
   useEffect(() => {
-    // @ts-expect-error StrictNullChecks
-    if (!isFetchAdminQueryLoading && returnedAdmins.length > 0) {
-      // @ts-expect-error StrictNullChecks
-      setAdmins(returnedAdmins);
+    if (!isFetchAdminQueryLoading && returnedAdmins) {
+      setAdmins(
+        returnedAdmins.map(({ address, role }) => ({
+          address,
+          role,
+        })),
+      );
     }
-    // @ts-expect-error StrictNullChecks
-    if (!isFetchAdminQueryLoading && returnedMods.length > 0) {
-      // @ts-expect-error StrictNullChecks
-      setMods(returnedMods);
+    if (!isFetchAdminQueryLoading && returnedMods) {
+      setMods(
+        returnedMods.map(({ address, role }) => ({
+          address,
+          role,
+        })),
+      );
     }
   }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
 
@@ -79,12 +77,10 @@ const AdminsAndModerators = () => {
         adminsAndMods.splice(idx, 1);
       }
       if (oldRole.role === 'admin') {
-        // @ts-expect-error StrictNullChecks
-        setAdmins(admins.filter((a) => a.address_id !== oldRole.address_id));
+        setAdmins(admins.filter((a) => a.address !== oldRole.address));
       }
       if (oldRole.role === 'moderator') {
-        // @ts-expect-error StrictNullChecks
-        setMods(mods.filter((a) => a.address_id !== oldRole.address_id));
+        setMods(mods.filter((a) => a.address !== oldRole.address));
       }
     }
 
@@ -92,11 +88,9 @@ const AdminsAndModerators = () => {
       adminsAndMods.push(newRole);
 
       if (newRole.role === 'admin') {
-        // @ts-expect-error StrictNullChecks
         setAdmins([...admins, newRole]);
       }
       if (newRole.role === 'moderator') {
-        // @ts-expect-error StrictNullChecks
         setMods([...mods, newRole]);
       }
     }

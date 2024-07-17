@@ -62,7 +62,6 @@ const useSearchResults = (
 
   const { data: profilesData } = useSearchProfilesQuery({
     ...sharedQueryOptions,
-    includeRoles: false,
     enabled: queryEnabled && filters.includes('members'),
   });
 

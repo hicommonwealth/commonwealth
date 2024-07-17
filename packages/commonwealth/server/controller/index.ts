@@ -1,15 +1,25 @@
 import { AppError } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import type { AddressAttributes, DB } from '@hicommonwealth/model';
 import type { Role } from '@hicommonwealth/shared';
-import type { Request, Response } from 'express';
-import { findAllRoles } from '../util/roles';
+import { Op } from 'sequelize';
+import { TypedRequestQuery, TypedResponse } from 'server/types';
 
 export const Errors = {
   InvalidChain: 'Invalid chain',
   InvalidPermissions: 'Invalid permissions',
 };
 
-export async function listRoles(models: DB, req: Request, res: Response) {
+type ListRolesReq = {
+  permissions: string[];
+};
+
+type ListRolesResp = AddressAttributes[];
+
+export async function listRoles(
+  models: DB,
+  req: TypedRequestQuery<ListRolesReq>,
+  res: TypedResponse<ListRolesResp>,
+) {
   const { permissions } = req.query;
   if (!req.chain) {
     throw new AppError(Errors.InvalidChain);
@@ -17,9 +27,7 @@ export async function listRoles(models: DB, req: Request, res: Response) {
   if (typeof permissions !== 'undefined' && !Array.isArray(permissions)) {
     throw new AppError(Errors.InvalidPermissions);
   }
-  // @ts-expect-error StrictNullChecks
-  const filteredPermissions: Role[] =
-    // @ts-expect-error StrictNullChecks
+  const filteredPermissions: Role[] | undefined =
     permissions?.length > 0 && Array.isArray(permissions)
       ? (permissions
           .map(String)
@@ -27,15 +35,18 @@ export async function listRoles(models: DB, req: Request, res: Response) {
             ['member', 'moderator', 'admin'].includes(p as string),
           ) as Role[])
       : undefined;
+  if (!filteredPermissions) {
+    throw new AppError(Errors.InvalidPermissions);
+  }
 
-  const roles = await findAllRoles(
-    models,
-    {
-      include: [models.Address],
+  const adminsAndMods = await models.Address.findAll({
+    where: {
+      community_id: req.chain.id,
+      role: {
+        [Op.in]: filteredPermissions,
+      },
     },
-    req.chain.id,
-    filteredPermissions,
-  );
+  });
 
-  return res.json({ status: 'Success', result: roles });
+  return res.json({ status: 'Success', result: adminsAndMods });
 }

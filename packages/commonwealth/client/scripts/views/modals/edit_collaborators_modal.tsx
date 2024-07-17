@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import React, { useState } from 'react';
-import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { useDebounce } from 'usehooks-ts';
 import {
   notifyError,
@@ -25,6 +24,7 @@ import { User } from '../components/user/user';
 
 import useUserStore from 'state/ui/user';
 import '../../../styles/modals/edit_collaborators_modal.scss';
+import { MemberResult } from '../pages/search/helpers';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -60,18 +60,16 @@ export const EditCollaboratorsModal = ({
     searchTerm: debouncedSearchTerm,
     communityId: app.activeChainId(),
     limit: 30,
-    includeRoles: true,
     enabled: debouncedSearchTerm.length >= 3,
   });
 
-  const searchResults: Array<RoleInstanceWithPermissionAttributes> = profiles
-    ?.pages?.[0]?.results
-    ? profiles.pages[0].results
-        .map((profile) => ({
-          ...profile!.roles?.[0],
-          Address: profile.addresses[0],
-        }))
-        .filter((role) => role.Address.address !== user.activeAccount?.address)
+  const searchResults: Array<MemberResult> = profiles?.pages?.[0]?.results
+    ? profiles.pages[0].results.filter(
+        (addr) =>
+          !addr.addresses.some(
+            (a) => a.address === user.activeAccount?.address,
+          ),
+      )
     : [];
 
   const handleUpdateCollaborators = (c: IThreadCollaboratorWithId) => {
@@ -104,24 +102,18 @@ export const EditCollaboratorsModal = ({
                   className="collaborator-row"
                   onClick={() =>
                     handleUpdateCollaborators({
-                      // @ts-expect-error <StrictNullChecks/>
-                      id: c.Address.id,
-                      // @ts-expect-error <StrictNullChecks/>
-                      address: c.Address.address,
-                      // @ts-expect-error <StrictNullChecks/>
-                      community_id: c.Address.community_id,
+                      id: c.addresses[0]?.id,
+                      address: c.addresses[0]?.address,
+                      community_id: c.addresses[0]?.community_id,
                       // @ts-expect-error <StrictNullChecks/>
                       User: null,
                     })
                   }
                 >
                   <User
-                    // @ts-expect-error <StrictNullChecks/>
-                    userAddress={c?.Address?.address}
-                    userCommunityId={c?.community_id}
-                    shouldShowAsDeleted={
-                      !c?.Address?.address && !c?.community_id
-                    }
+                    userAddress={c.addresses[0]?.address}
+                    userCommunityId={c.addresses[0]?.community_id}
+                    shouldShowAsDeleted={!c.addresses}
                   />
                 </div>
               ))

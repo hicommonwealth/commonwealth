@@ -215,6 +215,7 @@ export type MemberResult = {
     id: number;
     community_id: string;
     address: string;
+    role?: string;
     stake_balance?: string;
   }[];
   group_ids?: [];
