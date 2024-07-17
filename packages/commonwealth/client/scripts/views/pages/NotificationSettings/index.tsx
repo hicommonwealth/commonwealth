@@ -12,6 +12,7 @@ import {
 import { PageNotFound } from 'views/pages/404';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
+import { supportsPushNotifications } from 'views/pages/NotificationSettings/supportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -61,7 +62,7 @@ const NotificationSettings = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
-        {enableKnockPushNotifications && (
+        {enableKnockPushNotifications && supportsPushNotifications() && (
           <div>
             <CWText type="h5">Push Notifications</CWText>
 
