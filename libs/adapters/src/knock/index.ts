@@ -1,4 +1,5 @@
 import {
+  logger,
   NotificationsProvider,
   NotificationsProviderGetMessagesOptions,
   NotificationsProviderGetMessagesReturn,
@@ -8,7 +9,11 @@ import {
 } from '@hicommonwealth/core';
 import { Knock, Schedule } from '@knocklabs/node';
 import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
+import { fileURLToPath } from 'url';
 import { config } from '../config';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 function formatScheduleResponse(
   schedules: Schedule[],
@@ -45,14 +50,10 @@ export function KnockProvider(): NotificationsProvider {
       );
       return channelData.data.tokens;
     } catch (e) {
-      // if (e instanceof KnockError && e.statusCode === 404) {
-      //   console.error('Channel data not found (404)');
-      //   // Handle 404 error specifically
-
       // the knock SDK says it returns '404' if the user does not have channel
       // data but the typescript SDK doesn't provide the status so there's no
-      // way to find
-      console.warn('Unable to fetch existing tokens: ', e);
+      // way to find out what type of error this is...
+      log.error('Unable to fetch existing tokens: ', e as Error);
       return [];
     }
   }
@@ -119,8 +120,6 @@ export function KnockProvider(): NotificationsProvider {
       token: string,
       channelType: 'FCM' | 'APNS',
     ): Promise<boolean> {
-      // TODO: this is wrong too because we support Apple too.
-
       const channelId = computeChannelId(channelType);
 
       if (channelId) {
@@ -135,7 +134,7 @@ export function KnockProvider(): NotificationsProvider {
         });
         return true;
       } else {
-        console.warn('Push notifications not enabled');
+        log.warn('Push notifications not enabled');
         return false;
       }
     },
@@ -162,7 +161,7 @@ export function KnockProvider(): NotificationsProvider {
         });
         return true;
       } else {
-        console.warn('Push notifications not enabled');
+        log.warn('Push notifications not enabled');
         return false;
       }
     },
