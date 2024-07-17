@@ -1,6 +1,17 @@
-# PSQL Schema Inspection
+# Database Monitoring
 
-## How to Connect
+_See also the [Datadog](./Datadog.md) and [Heroku](./Heroku.md) entries._
+
+## Contents
+
+- [Heroku Database Monitoring](#heroku-database-monitoring)
+- [Schema Inspection](#schema-inspection)
+- [Local Database Monitoring](#local-database-monitoring)
+  * [PGAdmin4](#pgadmin4)
+  * [Helper Queries](#helper-queries)
+- [Change Log](#change-log)
+
+## Heroku Database Monitoring
 
 To connect to the PSQL schema, use the following command:
 
@@ -8,23 +19,23 @@ To connect to the PSQL schema, use the following command:
 heroku pg:psql postgresql-clear-46785 -a commonwealth-staging
 ```
 
-## About the Database
+As of 240711, the current database being used is Postgres 15.7. Major versions will not progress without a manual update, but minor versions may be updated automatically by Heroku.
 
-The current database being used is Postgres 13.10. You can retrieve general information and uptime using the following SQL queries:
+You can retrieve general information and uptime using the following SQL queries:
 
-### General Info
+General Info:
 
 ```SQL
 SELECT current_database(), current_user, inet_server_addr(), inet_server_port(), version()
 ```
 
-### Uptime
+Uptime:
 
 ```SQL
 SELECT extract(epoch from current_timestamp - pg_postmaster_start_time()) as uptime
 ```
 
-## Schema
+## Schema Inspection
 
 To inspect the definition of a particular object in the schema, use the following command:
 
@@ -35,11 +46,13 @@ To inspect the definition of a particular object in the schema, use the followin
 To view all foreign keys in the schema, use the following query:
 
 ```SQL
-SELECT conrelid::regclass AS table_name,  
-conname AS foreign_key, 
-pg_get_constraintdef(oid)  
-FROM pg_constraint                                                                                                                                                                                        WHERE  contype = 'f'                                                                                                                                                                                        AND    connamespace = 'public'::regnamespace                                                                                                                                                                
-ORDER  BY conrelid::regclass::text, contype DESC;
+SELECT conrelid::regclass
+AS table_name, conname
+AS foreign_key, pg_get_constraintdef(oid)  
+FROM pg_constraint
+WHERE contype = 'f'
+AND connamespace = 'public'::regnamespace
+ORDER BY conrelid::regclass::text, contype DESC;
 ```
 
 To view all indexes in the schema, use the following query:
@@ -47,30 +60,9 @@ To view all indexes in the schema, use the following query:
 ```SQL
 SELECT tablename, indexname, indexdef 
 FROM pg_indexes
-WHERE schemaname = 'public'                                                                                                                                                                                   ORDER BY tablename, indexname;
+WHERE schemaname = 'public'
+ORDER BY tablename, indexname;
 ```
-
-## Setup Datadog-Heroku Postgres Monitoring
-
-To set up Datadog monitoring for Heroku Postgres, follow the [Heroku Postgres Datadog Setup Guide](https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle). Additionally, a new Datadog folder with Postgres configuration (`datadog/conf.d/postgres.yaml`) and `prerun.sh` script has been added. This script retrieves the correct credentials for Datadog at runtime.
-
-A helper script is available to complete the setup from a local machine logged into Heroku via CLI. It creates new Datadog user credentials for the DATABASE_URL and creates a new DATADOG schema in Postgres to collect metrics. Use the following command to run the script:
-
-```bash
-pnpm --packages/commonwealth datadog-db-setup commonwealth-staging packages/commonwealth/datadog
-```
-
-## Datadog Postgres Dashboards
-
-There are two Dashboards available in Datadog for monitoring Postgres:
-
-### Postgres Metrics Dashboard
-
-This dashboard provides metrics related to Postgres performance, such as CPU usage, disk I/O, connections, cache hit rate, and more. You can access it using the following link: [Postgres Metrics Dashboard](https://us5.datadoghq.com/dash/integration/150/postgres---metrics).
-
-### Postgres Overview
-
-The Postgres Overview dashboard provides an overview of the Postgres database, including resource utilization, locks, throughput, replication, checkpoints, and logs. However, it seems that there is currently no data available in these sections. You can access the dashboard using the following link: [Postgres Overview Dashboard](https://us5.datadoghq.com/dash/integration/149/postgres---overview).
 
 ## Local Database Monitoring
 
@@ -84,13 +76,9 @@ You can use PGAdmin4 for local database monitoring. It provides various features
 
 ### Helper Queries
 
-Here are some helpful queries for monitoring the database:
-
-#### Major Tables
+Major tables:
 
 ```SQL
-
-
 -- Current database activity
 SELECT * FROM pg_stat_activity;
 
@@ -106,7 +94,7 @@ FROM pg_stat_all_tables
 WHERE schemaname = 'public';
 ```
 
-#### Queries Using Tables Above
+Queries using the tables above:
 
 ```SQL
 -- Top 10 queries by total execution time
@@ -171,5 +159,6 @@ SELECT mode, COUNT(mode) FROM pg_locks GROUP BY mode ORDER BY mode;
 
 ## Change Log
 
+- 240702: Outdated Datadog information removed by Graham Johnson
 - 230627: Updated and certified fresh by Nakul Manchanda.
 - 230413: Authored by Nakul Manchanda.

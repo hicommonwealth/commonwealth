@@ -11,10 +11,22 @@ export async function getActivityFeed(models: DB, id = 0) {
   const query = `
       WITH 
       user_communities AS (SELECT community_id FROM "Addresses" WHERE user_id = :id),
+      top_threads AS (
+          SELECT T.*
+          FROM "Threads" T
+                   ${
+                     id > 0
+                       ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
+                       : ''
+                   }
+          WHERE T.deleted_at IS NULL
+          ORDER BY T.activity_rank_date DESC NULLS LAST
+          LIMIT 50
+      ),
       ranked_threads AS (
         SELECT 
           T.id AS thread_id,
-          T.updated_at as updated_at,
+          T.activity_rank_date,
           json_build_object(
             'id', T.id,
             'body', T.body,
@@ -40,18 +52,11 @@ export async function getActivityFeed(models: DB, id = 0) {
             'community_id', T.community_id
           ) as thread
         FROM
-          "Threads" T
+          top_threads T
           JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
           JOIN "Users" U ON U.id = A.user_id
           JOIN "Topics" Tp ON Tp.id = T.topic_id
-            ${
-              id > 0
-                ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
-                : ''
-            }
-        WHERE T.deleted_at IS NULL
-        ORDER BY T.updated_at DESC
-        LIMIT 50),
+        ${id > 0 ? 'WHERE U.id != :id' : ''}),
       recent_comments AS ( -- get the recent comments data associated with the thread
         SELECT 
           C.thread_id as thread_id,
@@ -71,9 +76,10 @@ export async function getActivityFeed(models: DB, id = 0) {
           ))) as "recentComments"
         FROM (
           Select tempC.*
-          FROM "Comments" tempC JOIN ranked_threads tempRTS ON tempRTS.thread_id = tempC.thread_id
-            WHERE deleted_at IS NULL
-            ORDER BY created_at DESC
+          FROM "Comments" tempC 
+          JOIN top_threads tt ON tt.id = tempC.thread_id
+            WHERE tempC.deleted_at IS NULL
+            ORDER BY tempC.created_at DESC
             LIMIT 3 -- Optionally a prop can be added for this
           ) C
           JOIN "Addresses" A ON A.id = C.address_id
@@ -87,7 +93,7 @@ export async function getActivityFeed(models: DB, id = 0) {
         ranked_threads RTS
         LEFT JOIN recent_comments RC ON RTS.thread_id = RC.thread_id
       ORDER BY
-        RTS.updated_at DESC;
+        RTS.activity_rank_date DESC NULLS LAST;
   `;
 
   const threads: any = await models.sequelize.query(query, {

@@ -44,22 +44,23 @@ export function oneToOne<Source extends State, Target extends State>(
   const foreignKey = options?.foreignKey ?? getDefaultFK(this, target);
 
   // sequelize is not creating fk when fk = pk
-  foreignKey === target.primaryKeyAttribute
-    ? mapFk(
-        target,
-        this,
-        { primaryKey: [this.primaryKeyAttribute], foreignKey: [foreignKey] },
-        {
-          onUpdate: options?.onUpdate ?? 'NO ACTION',
-          onDelete: options?.onDelete ?? 'NO ACTION',
-        },
-      )
-    : target.belongsTo(this, {
-        foreignKey,
-        as: options?.as,
+  if (foreignKey === target.primaryKeyAttribute)
+    mapFk(
+      target,
+      this,
+      { primaryKey: [this.primaryKeyAttribute], foreignKey: [foreignKey] },
+      {
         onUpdate: options?.onUpdate ?? 'NO ACTION',
         onDelete: options?.onDelete ?? 'NO ACTION',
-      });
+      },
+    );
+
+  target.belongsTo(this, {
+    foreignKey,
+    as: options?.as,
+    onUpdate: options?.onUpdate ?? 'NO ACTION',
+    onDelete: options?.onDelete ?? 'NO ACTION',
+  });
 
   options?.targeyKey &&
     this.belongsTo(target, {
