@@ -291,7 +291,6 @@ export async function __getBulkThreads(
       responseThreadsQuery,
       numVotingThreadsQuery,
     ]);
-    console.log(threads);
 
     return {
       limit: replacements.limit,

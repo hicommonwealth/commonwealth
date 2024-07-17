@@ -19,6 +19,7 @@ const getLastEdited = (post: CommentAttributes) => {
   return lastEdited;
 };
 
+// TODO: improve type safety (avoid using any)
 export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
   return {
     ...schemas.GetBulkThreads,
