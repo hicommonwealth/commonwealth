@@ -110,6 +110,7 @@ describe('ServerTopicsController', () => {
     const { controller, chain } = createMockedTopicsController();
     const topics = await controller.getTopics({
       community: chain,
+      with_contest_managers: false,
     });
     expect(topics).to.have.length(1);
   });
