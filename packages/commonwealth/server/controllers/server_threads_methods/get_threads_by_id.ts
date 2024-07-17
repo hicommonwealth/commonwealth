@@ -145,7 +145,6 @@ export async function __getThreadsById(
           },
         ];
     });
-    console.log(t);
     return t;
   });
   return result;
