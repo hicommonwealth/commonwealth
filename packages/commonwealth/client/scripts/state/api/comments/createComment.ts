@@ -2,7 +2,6 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { signComment } from 'controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
@@ -68,7 +67,6 @@ const useCreateCommentMutation = ({
   threadId,
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     // @ts-expect-error StrictNullChecks
@@ -103,14 +101,12 @@ const useCreateCommentMutation = ({
         'combineAndRemoveDups',
       );
 
-      if (userOnboardingEnabled) {
-        const profileId = user.addresses?.[0]?.profile?.id;
-        profileId &&
-          markTrainingActionAsComplete(
-            UserTrainingCardTypes.CreateContent,
-            profileId,
-          );
-      }
+      const profileId = user.addresses?.[0]?.profile?.id;
+      profileId &&
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
+        );
 
       return newComment;
     },

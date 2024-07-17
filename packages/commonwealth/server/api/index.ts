@@ -7,6 +7,7 @@ import * as contest from './contest';
 import * as email from './emails';
 import * as feed from './feed';
 import * as integrations from './integrations';
+import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as thread from './threads';
 
@@ -20,6 +21,7 @@ const artifacts = {
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
   subscription: subscription.trpcRouter,
+  loadTest: loadTest.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

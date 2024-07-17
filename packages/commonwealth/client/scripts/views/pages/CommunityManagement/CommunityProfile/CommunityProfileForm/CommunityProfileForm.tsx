@@ -30,13 +30,11 @@ import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { useFlag } from '../../../../../hooks/useFlag';
 import './CommunityProfileForm.scss';
 import { getCommunityTags } from './helpers';
-import { CommunityTags, FormSubmitValues } from './types';
+import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
 
 const CommunityProfileForm = () => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityStakeEnabled = useFlag('communityStake');
-  const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
 
   const [communityId] = useState(
@@ -72,8 +70,6 @@ const CommunityProfileForm = () => {
         .filter(({ 1: value }) => value)
         .map(({ 0: key }, index) => ({ id: index, tag: key })),
     );
-  const [deprecatedSelectedCommunityTags, setDeprecatedSelectedCommunityTags] =
-    useState(deprecatedCurrentCommunityTags);
   const areTagsInitiallySet = useRef(false);
   const {
     isLoadingTags,
@@ -158,33 +154,18 @@ const CommunityProfileForm = () => {
       await editTags({
         communityId: community.id,
         selectedTags: {
-          ...(userOnboardingEnabled
-            ? {
-                DAO: !!preferenceTags.find(
-                  ({ item, isSelected }) =>
-                    item.tag.toLowerCase() === 'dao' && isSelected,
-                ),
-                DeFi: !!preferenceTags.find(
-                  ({ item, isSelected }) =>
-                    item.tag.toLowerCase() === 'defi' && isSelected,
-                ),
-              }
-            : {
-                DAO: !!deprecatedSelectedCommunityTags.find(
-                  ({ tag }) => tag === 'DAO',
-                ),
-                DeFi: !!deprecatedSelectedCommunityTags.find(
-                  ({ tag }) => tag === 'DeFi',
-                ),
-              }),
+          DAO: !!preferenceTags.find(
+            ({ item, isSelected }) =>
+              item.tag.toLowerCase() === 'dao' && isSelected,
+          ),
+          DeFi: !!preferenceTags.find(
+            ({ item, isSelected }) =>
+              item.tag.toLowerCase() === 'defi' && isSelected,
+          ),
         },
-        ...(userOnboardingEnabled
-          ? {
-              tagIds: preferenceTags
-                .filter((pt) => pt.isSelected)
-                .map((pt) => pt.item.id),
-            }
-          : {}),
+        tagIds: preferenceTags
+          .filter((pt) => pt.isSelected)
+          .map((pt) => pt.item.id),
       });
 
       await editBanner({
@@ -219,15 +200,13 @@ const CommunityProfileForm = () => {
         canDisable: true,
       });
       setDeprecatedCurrentCommunityTags(
-        userOnboardingEnabled
-          ? preferenceTags
-              .filter((t) => t.isSelected)
-              .filter((t) => ['defi', 'dao'].includes(t.item.tag.toLowerCase()))
-              .map((t) => ({
-                id: t.item.id,
-                tag: t.item.tag,
-              }))
-          : [...deprecatedSelectedCommunityTags],
+        preferenceTags
+          .filter((t) => t.isSelected)
+          .filter((t) => ['defi', 'dao'].includes(t.item.tag.toLowerCase()))
+          .map((t) => ({
+            id: t.item.id,
+            tag: t.item.tag,
+          })),
       );
       const updatedLinks = links.map((link) => ({
         value: link.value.trim(),
@@ -383,14 +362,7 @@ const CommunityProfileForm = () => {
           <section className="tags-section">
             <div className="header">
               <CWText type="h4">
-                Tags
-                {userOnboardingEnabled ? (
-                  <>
-                    &nbsp;<CWText type="b1">(select up to 4)</CWText>
-                  </>
-                ) : (
-                  <></>
-                )}
+                Tags &nbsp;<CWText type="b1">(select up to 4)</CWText>
               </CWText>
               <CWText type="b1">
                 Tags help new members find your community
@@ -398,37 +370,11 @@ const CommunityProfileForm = () => {
             </div>
 
             <div className="controls">
-              {userOnboardingEnabled ? (
-                <PreferenceTags
-                  preferenceTags={preferenceTags}
-                  onTagClick={toggleTagFromSelection}
-                  maxSelectableTags={4}
-                />
-              ) : (
-                communityTagOptions.map((option) => (
-                  <CWButton
-                    key={option}
-                    type="button"
-                    label={option}
-                    buttonWidth="narrow"
-                    buttonType={
-                      deprecatedSelectedCommunityTags.find(
-                        ({ tag }) => tag === option,
-                      )
-                        ? 'primary'
-                        : 'secondary'
-                    }
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setDeprecatedSelectedCommunityTags((prevTags) =>
-                        prevTags.find(({ tag }) => tag === option)
-                          ? [...prevTags].filter(({ tag }) => tag !== option)
-                          : [...prevTags, { id: 1, tag: option }],
-                      );
-                    }}
-                  />
-                ))
-              )}
+              <PreferenceTags
+                preferenceTags={preferenceTags}
+                onTagClick={toggleTagFromSelection}
+                maxSelectableTags={4}
+              />
             </div>
           </section>
 
@@ -507,11 +453,9 @@ const CommunityProfileForm = () => {
               type="button"
               disabled={
                 !formState.isDirty &&
-                (userOnboardingEnabled
-                  ? (community.CommunityTags || []).length ===
-                    preferenceTags.filter(({ isSelected }) => isSelected).length
-                  : deprecatedCurrentCommunityTags.length ===
-                    deprecatedSelectedCommunityTags.length) &&
+                (community.CommunityTags || []).length ===
+                  preferenceTags.filter(({ isSelected }) => isSelected)
+                    .length &&
                 links.filter((x) => x.value).length ===
                   (community.socialLinks || []).length &&
                 links.every((x) =>
@@ -528,14 +472,8 @@ const CommunityProfileForm = () => {
 
                 // TODO: this reset state is a bit buggy for the tags section, update this
                 // when api is updated to use newer tags schema
-                if (userOnboardingEnabled) {
-                  // this reset selected preference tags to original state
-                  updatePreferenceTags();
-                } else {
-                  setDeprecatedSelectedCommunityTags(
-                    deprecatedCurrentCommunityTags,
-                  );
-                }
+                // this reset selected preference tags to original state
+                updatePreferenceTags();
               }}
             />
             <CWButton

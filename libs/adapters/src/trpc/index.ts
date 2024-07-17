@@ -2,7 +2,6 @@ import * as core from '@hicommonwealth/core';
 import {
   AuthStrategies,
   Events,
-  ExternalServiceUserIds,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   logger,
@@ -45,8 +44,14 @@ const authenticate = async (
       switch (req.headers['authorization']) {
         case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
           req.user = {
-            id: ExternalServiceUserIds.Knock,
+            id: authStrategy.userId,
             email: 'hello@knock.app',
+          };
+          break;
+        case config.LOAD_TESTING.AUTH_TOKEN:
+          req.user = {
+            id: authStrategy.userId,
+            email: 'info@grafana.com',
           };
           break;
         default:
@@ -113,6 +118,7 @@ export enum Tag {
   Query = 'Query',
   Integration = 'Integration',
   Subscription = 'Subscription',
+  LoadTest = 'LoadTest',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
@@ -135,7 +141,8 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
     .mutation(async ({ ctx, input }) => {
       // md.secure must explicitly be false if the route requires no authentication
       // if we provide any authorization method we force authentication as well
-      if (md.secure !== false || md.auth?.length) await authenticate(ctx.req);
+      if (md.secure !== false || md.auth?.length)
+        await authenticate(ctx.req, md.authStrategy);
       try {
         return await core.command(
           md,

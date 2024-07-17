@@ -1,7 +1,6 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -78,7 +77,6 @@ const ModalBase = ({
   onSignInClick,
   onChangeModalType,
 }: ModalBaseProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const copy = MODAL_COPY[layoutType];
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
@@ -240,7 +238,7 @@ const ModalBase = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
-      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
+      if (layoutType === AuthModalType.SignIn) {
         setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
       }
 
@@ -262,7 +260,7 @@ const ModalBase = ({
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
-      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
+      if (layoutType === AuthModalType.SignIn) {
         setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
       }
 
