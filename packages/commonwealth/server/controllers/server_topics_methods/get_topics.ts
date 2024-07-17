@@ -9,13 +9,14 @@ export type GetTopicsOptions = {
   with_contest_managers: boolean;
 };
 
-const ContestManagerWithActions = schemas.ContestManager.extend({
-  actions: z.array(schemas.ContestAction),
+const ActiveContestManagers = z.object({
+  content: z.array(schemas.ContestAction),
+  contest_manager: schemas.ContestManager,
 });
 
 type TopicWithTotalThreads = TopicAttributes & {
   total_threads: number;
-  active_contest_managers: Array<z.infer<typeof ContestManagerWithActions>>;
+  active_contest_managers: Array<z.infer<typeof ActiveContestManagers>>;
 };
 
 export type GetTopicsResult = TopicWithTotalThreads[];
