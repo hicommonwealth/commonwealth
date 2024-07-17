@@ -46,7 +46,7 @@ describe('userMentioned Event Handler', () => {
     [authorProfile] = await tester.seed('Profile', {
       // @ts-expect-error StrictNullChecks
       user_id: author.id,
-      profile_name: author?.profile.name!,
+      profile_name: author?.profile.name ?? '',
     });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
