@@ -85,15 +85,21 @@ export const NewThreadForm = () => {
 
   const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
 
+  const user = useUserStore();
+
   const contestTopicError = threadTopic?.activeContestManagers?.length
     ? threadTopic?.activeContestManagers
-        ?.map((acm) => acm.content?.length || 0)
+        ?.map(
+          (acm) =>
+            acm?.content?.filter(
+              (c) => c.actor_address === user.activeAccount?.address,
+            ).length || 0,
+        )
         ?.every((n) => n >= 2)
     : false;
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
-  const user = useUserStore();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -294,7 +300,11 @@ export const NewThreadForm = () => {
                     return {
                       name: acm?.contest_manager?.name,
                       address: acm?.contest_manager?.contest_address,
-                      submittedEntries: acm?.content?.length || 0,
+                      submittedEntries:
+                        acm?.content?.filter(
+                          (c) =>
+                            c.actor_address === user.activeAccount?.address,
+                        ).length || 0,
                     };
                   })}
                 />

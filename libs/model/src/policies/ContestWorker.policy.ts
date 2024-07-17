@@ -1,9 +1,7 @@
 import { Actor, events, logger, Policy } from '@hicommonwealth/core';
-import { BalanceSourceType } from '@hicommonwealth/shared';
-import { BigNumber } from 'ethers';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { config, Contest, tokenBalanceCache } from '..';
+import { config, Contest } from '..';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
 import { buildThreadContentUrl } from '../utils';
@@ -49,25 +47,6 @@ export function ContestWorker(): Policy<typeof inputs> {
         }
 
         const chainNodeUrl = activeContestManagers[0]!.url;
-
-        // ensure that user has non-dust ETH value
-        const balances = await tokenBalanceCache.getBalances({
-          balanceSourceType: BalanceSourceType.ETHNative,
-          addresses: [userAddress],
-          sourceOptions: {
-            evmChainId: activeContestManagers[0]!.eth_chain_id,
-          },
-          cacheRefresh: true,
-        });
-        const minUserEthBigNumber = BigNumber.from(
-          (config.CONTESTS.MIN_USER_ETH * 1e18).toFixed(),
-        );
-        if (BigNumber.from(balances[userAddress]).lt(minUserEthBigNumber)) {
-          log.warn(
-            `ThreadCreated: user ETH balance insufficient (${balances[userAddress]} of ${minUserEthBigNumber})`,
-          );
-          return;
-        }
 
         const addressesToProcess = activeContestManagers
           .filter((c) => {

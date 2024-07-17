@@ -9,8 +9,14 @@ import {
   ThreadAttributes,
   UserInstance,
   config,
+  tokenBalanceCache,
 } from '@hicommonwealth/model';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  NotificationCategories,
+  ProposalType,
+} from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
@@ -120,6 +126,27 @@ export async function __createThread(
     },
   });
   if (activeContestManagers && activeContestManagers.length > 0) {
+    // ensure that user has non-dust ETH value
+    const balances = await tokenBalanceCache.getBalances({
+      balanceSourceType: BalanceSourceType.ETHNative,
+      addresses: [address.address],
+      sourceOptions: {
+        evmChainId: activeContestManagers[0]!.eth_chain_id,
+      },
+      cacheRefresh: true,
+    });
+    const minUserEthBigNumber = BigNumber.from(
+      (config.CONTESTS.MIN_USER_ETH * 1e18).toFixed(),
+    );
+    if (BigNumber.from(balances[address.address]).lt(minUserEthBigNumber)) {
+      throw new AppError(
+        `user ETH balance insufficient (${
+          balances[address.address]
+        } of ${minUserEthBigNumber})`,
+      );
+    }
+
+    // ensure post limit not reached on all contests
     const validActiveContests = activeContestManagers.filter((c) => {
       const userPostsInContest = c.actions.filter(
         (action) =>
