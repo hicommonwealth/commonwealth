@@ -119,7 +119,7 @@ export async function __createThread(
       topic_id: topicId!,
     },
   });
-  if (activeContestManagers.length > 0) {
+  if (activeContestManagers && activeContestManagers.length > 0) {
     const validActiveContests = activeContestManagers.filter((c) => {
       const userPostsInContest = c.actions.filter(
         (action) =>
