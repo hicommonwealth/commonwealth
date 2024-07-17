@@ -9,6 +9,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
@@ -40,6 +41,8 @@ import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+
+const MIN_ETH_FOR_CONTEST_THREAD = 0.005;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -113,6 +116,19 @@ export const NewThreadForm = () => {
   const { RevalidationModal } = useSessionRevalidationModal({
     handleClose: resetCreateThreadMutation,
     error: createThreadError,
+  });
+
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+
+  const { data: userEthBalance } = useGetUserEthBalanceQuery({
+    chainRpc,
+    walletAddress: user.activeAccount?.address || '',
+    apiEnabled:
+      isContestAvailable &&
+      !!user.activeAccount?.address &&
+      Number(ethChainId) > 0,
+    ethChainId: ethChainId || 0,
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -219,7 +235,10 @@ export const NewThreadForm = () => {
   const contestTopicBannerVisible =
     contestsEnabled && isContestAvailable && hasTopicOngoingContest;
 
-  const walletBalanaceError = false;
+  const walletBalanceError =
+    isContestAvailable &&
+    hasTopicOngoingContest &&
+    parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
   return (
     <>
@@ -310,7 +329,7 @@ export const NewThreadForm = () => {
               )}
 
               <MessageRow
-                hasFeedback={walletBalanaceError}
+                hasFeedback={walletBalanceError}
                 statusMessage="Ensure that your connected wallet has at least 0.005 ETH to participate."
                 validationStatus="failure"
               />
@@ -331,7 +350,7 @@ export const NewThreadForm = () => {
                     isDisabled ||
                     !user.activeAccount ||
                     isDisabledBecauseOfContestsConsent ||
-                    walletBalanaceError ||
+                    walletBalanceError ||
                     contestTopicError
                   }
                   onClick={handleNewThreadCreation}
