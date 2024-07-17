@@ -18,7 +18,7 @@ const ContestThreadBanner = ({
   return (
     <CWBanner
       className="ContestThreadBanner"
-      title="This topic has an ongoing contest. Submit thread to contest?"
+      title="This topic has an ongoing contest(s). Submit thread to contest?"
       body="Once a post is submitted it cannot be edited.
       The post with the most upvotes will win the contest prize."
       type="info"

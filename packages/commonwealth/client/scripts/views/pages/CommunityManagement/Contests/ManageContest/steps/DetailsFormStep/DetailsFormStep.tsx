@@ -433,12 +433,18 @@ const DetailsFormStep = ({
                   Only threads posted to these topics will be eligible for the
                   contest prizes.
                 </CWText>
+
+                <CWText type="b1">
+                  Community members are limited to 2 entries per contest round.
+                  Keep this in mind when selecting your topics.
+                </CWText>
+
                 <div className="topics-list">
                   <div className="list-header">
                     <CWText>Topic</CWText>
                     <CWText>Eligible</CWText>
                   </div>
-                  {toggledTopicList.length &&
+                  {!!toggledTopicList.length &&
                     sortedTopics.map((topic) => (
                       <div key={topic.id} className="list-row">
                         <CWText>{topic.name}</CWText>
