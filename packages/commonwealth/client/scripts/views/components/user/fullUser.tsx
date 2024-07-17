@@ -31,7 +31,6 @@ export const FullUser = ({
   shouldShowAvatarOnly,
   shouldShowAddressWithDisplayName,
   avatarSize = 16,
-  role,
   showSkeleton,
   popoverPlacement,
   profile,

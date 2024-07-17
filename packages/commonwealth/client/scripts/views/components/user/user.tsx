@@ -31,7 +31,6 @@ export const User = ({
   shouldShowAvatarOnly,
   shouldShowAddressWithDisplayName,
   avatarSize = 16,
-  role,
   showSkeleton,
   popoverPlacement,
 }: UserAttrsWithSkeletonProp) => {

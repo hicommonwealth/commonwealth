@@ -123,11 +123,6 @@ const useJoinCommunity = () => {
           }),
         });
 
-        // get newly added address info
-        const addressInfo = user.addresses.find(
-          (a) => a.address === encodedAddress && a.community.id === communityId,
-        );
-
         // set verification token for the newly created account
         const account = app?.chain?.accounts?.get?.(encodedAddress);
         if (account && app.chain) {

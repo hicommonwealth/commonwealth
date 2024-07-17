@@ -11,7 +11,7 @@ interface FetchAdminProps {
 
 // admins/mods are Address objects
 const fetchAdmin = async ({ communityId }: FetchAdminProps) => {
-  const memberAdmins: any[] = [];
+  const memberAdmins: any[] = []; // TODO: type should be AddressAttributes
   const memberMods: any[] = [];
 
   const res = await axios.get(`${app.serverUrl()}${ApiEndpoints.FETCH_ADMIN}`, {

@@ -63,7 +63,7 @@ describe('get roles Integration Tests', () => {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
       chain: server.e2eTestEntities.testAddresses[0].community_id,
-      permission: ['member', 'moderator', 'admin'],
+      permissions: ['member', 'moderator', 'admin'],
     };
 
     const response = await get('/api/roles', validRequest, true, server.app);
