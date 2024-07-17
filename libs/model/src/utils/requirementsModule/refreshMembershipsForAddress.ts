@@ -1,22 +1,18 @@
-import { type DB } from '../../models/factories';
-
+import {
+  AddressAttributes,
+  DB,
+  GroupAttributes,
+  MembershipAttributes,
+  MembershipInstance,
+  OptionsWithBalances,
+  tokenBalanceCache,
+} from '@hicommonwealth/model';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
 import { config } from '../../config';
-
-import { AddressAttributes } from '../../models/address';
-import { GroupAttributes } from '../../models/group';
-import {
-  MembershipAttributes,
-  MembershipInstance,
-} from '../../models/membership';
-
-import { OptionsWithBalances } from '../../services/tokenBalanceCache/types';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import { validateGroupMembership } from './validateGroupMembership';
-
-import { getBalances } from '../../services/tokenBalanceCache';
 
 /**
  * refreshMembershipsForAddress refreshes the memberships for the given address
@@ -98,7 +94,7 @@ export async function refreshMembershipsForAddress(
     getBalancesOptions.map(async (options) => {
       return {
         options,
-        balances: await getBalances({
+        balances: await tokenBalanceCache.getBalances({
           ...options,
           cacheRefresh,
         }),
