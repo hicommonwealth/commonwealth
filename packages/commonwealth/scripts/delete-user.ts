@@ -44,6 +44,12 @@ async function deleteUser(user_id: number) {
       },
       transaction,
     });
+    await models.Subscription.destroy({
+      where: {
+        subscriber_id: user_id,
+      },
+      transaction,
+    });
     await models.ProfileTags.destroy({
       where: {
         user_id,
