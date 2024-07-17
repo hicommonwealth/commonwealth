@@ -157,6 +157,8 @@ export const LinkedProposalsCard = ({
           <UpdateProposalStatusModal
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
+            snapshotProposalConnected={showSnapshot}
+            initialSnapshotLinks={initialSnapshotLinks}
           />
         }
         onClose={() => setIsModalOpen(false)}
