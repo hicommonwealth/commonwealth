@@ -22,11 +22,12 @@ const PrivacyPage = () => {
           information.
         </p>
         <p>
-          Please read this Privacy Policy, which is part of our Terms of
-          Service, before using our Service. If you do not agree with the Terms
-          of Service and/or this Privacy Policy, you must refrain from using our
-          Service. By accessing or using our Service you agree to our use of
-          your information consistent with the Terms of Service and this Privacy
+          Please read this Privacy Policy, which is part of our{' '}
+          <a href="https://commonwealth.im/terms">Terms of Service</a>, before
+          using our Service. If you do not agree with the Terms of Service
+          and/or this Privacy Policy, you must refrain from using our Service.
+          By accessing or using our Service you agree to our use of your
+          information consistent with the Terms of Service and this Privacy
           Policy, subject to your rights described below.
         </p>
         <h2>
@@ -1215,7 +1216,7 @@ const PrivacyPage = () => {
         <p>
           We encourage you to understand privacy implications when using the
           Service. If you have any questions, concerns, or comments about this
-          Privacy Policy or our privacy practices, please send us an email to
+          Privacy Policy or our privacy practices, please send us an email to{' '}
           <a href="mailto:compliance@common.xyz">compliance@common.xyz</a>.
         </p>
       </div>
