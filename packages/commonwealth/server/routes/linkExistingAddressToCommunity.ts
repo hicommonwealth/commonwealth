@@ -128,7 +128,6 @@ const linkExistingAddressToCommunity = async (
       where: { user_id: userId },
     });
     existingAddress.profile_id = profileId?.id;
-    existingAddress.keytype = req.body.keytype;
     existingAddress.verification_token = verificationToken;
     existingAddress.verification_token_expires = verificationTokenExpires;
     existingAddress.last_active = new Date();
@@ -157,7 +156,6 @@ const linkExistingAddressToCommunity = async (
           verification_token: verificationToken,
           verification_token_expires: verificationTokenExpires,
           verified: originalAddress.verified,
-          keytype: originalAddress.keytype,
           wallet_id: originalAddress.wallet_id,
           wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),

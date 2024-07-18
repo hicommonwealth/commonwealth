@@ -22,7 +22,6 @@ type CreateAddressReq = {
   community_id?: string;
   wallet_id: WalletId;
   wallet_sso_source: WalletSsoSource;
-  keytype?: string;
   block_info?: string;
 };
 
@@ -153,7 +152,6 @@ export async function createAddressHelper(
       });
       existingAddress.profile_id = profileId?.id;
     }
-    existingAddress.keytype = req.keytype;
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
@@ -231,7 +229,6 @@ export async function createAddressHelper(
           verification_token,
           verification_token_expires,
           block_info: req.block_info,
-          keytype: req.keytype,
           last_active,
           wallet_id: req.wallet_id,
           wallet_sso_source: req.wallet_sso_source,
