@@ -1,6 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import IWebWallet from 'client/scripts/models/IWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
+import IWebWallet from 'models/IWebWallet';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 

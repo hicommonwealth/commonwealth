@@ -1,6 +1,6 @@
 import { check } from 'k6';
-import { browser } from 'k6/experimental/browser';
-import { SERVER_URL } from '../../src/config';
+import { browser } from 'k6/browser';
+import { SERVER_URL } from '../util/config.ts';
 
 export const options = {
   scenarios: {
@@ -41,55 +41,58 @@ export const options = {
 };
 
 export async function dashboard() {
-  const page = browser.newPage();
+  const page = await browser.newPage();
 
   try {
     await page.goto(SERVER_URL);
-    page.waitForLoadState('load');
+    await page.waitForLoadState('load');
 
-    check(page, {
-      'Page title': (page) => page.title() == 'Common',
+    const pageTitle = await page.title();
+    check(pageTitle, {
+      'Page title': (pageTitle) => pageTitle == 'Common',
     });
   } finally {
-    page.close();
+    await page.close();
   }
 }
 
 export async function layer_zero() {
-  const page = browser.newPage();
+  const page = await browser.newPage();
 
   try {
     await page.goto(`${SERVER_URL}/layerzero/discussion`);
-    page.waitForLoadState('load');
+    await page.waitForLoadState('load');
 
-    check(page, {
-      'Page title': (page) => page.title() == 'Common',
+    const pageTitle = await page.title();
+    check(pageTitle, {
+      'Page title': (pageTitle) => pageTitle == 'Common',
     });
   } finally {
-    page.close();
+    await page.close();
   }
 }
 
 export async function search() {
-  const page = browser.newPage();
+  const page = await browser.newPage();
 
   try {
     await page.goto(`${SERVER_URL}/dashboard/global`);
-    page.waitForLoadState('load');
+    await page.waitForLoadState('load');
     const searchParm = ['Proto', 'Common', 'Layer0', 'Discussion', 'Dashboard'];
     const randomParm =
       searchParm[Math.floor(Math.random() * searchParm.length)];
 
     // Random search
     const searchBox = page.locator('input[placeholder="Search Common"]');
-    searchBox.type(randomParm);
-    searchBox.press('Enter');
-    page.waitForLoadState('load');
+    await searchBox.type(randomParm);
+    await searchBox.press('Enter');
+    await page.waitForLoadState('load');
     console.log(page.url());
-    check(page, {
-      'Page title': (page) => page.title() == 'Common',
+    const pageTitle = await page.title();
+    check(pageTitle, {
+      'Page title': (pageTitle) => pageTitle == 'Common',
     });
   } finally {
-    page.close();
+    await page.close();
   }
 }

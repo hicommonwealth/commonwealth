@@ -1,7 +1,3 @@
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
-import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
-import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import {
@@ -10,13 +6,17 @@ import {
 } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
+import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';

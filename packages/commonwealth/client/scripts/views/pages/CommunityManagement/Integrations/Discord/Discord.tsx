@@ -1,4 +1,3 @@
-import { useFetchTopicsQuery } from 'client/scripts/state/api/topics';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -7,6 +6,7 @@ import {
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
 } from 'state/api/discord';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';

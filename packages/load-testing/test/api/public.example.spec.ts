@@ -1,7 +1,7 @@
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { check } from 'k6';
 import http from 'k6/http';
-import { LEGACY_API_URL } from '../../src/config';
+import { LEGACY_API_URL } from '../util/config.ts';
 
 const JWT_token = '';
 
@@ -11,31 +11,31 @@ export const options = {
       executor: 'constant-vus',
       exec: 'threads',
       vus: 3,
-      duration: '3s',
+      duration: '1m',
     },
     communities: {
       executor: 'constant-vus',
       exec: 'communities',
       vus: 3,
-      duration: '3s',
+      duration: '1m',
     },
     groups: {
       executor: 'constant-vus',
       exec: 'groups',
       vus: 3,
-      duration: '3s',
+      duration: '1m',
     },
     status: {
       executor: 'constant-vus',
       exec: 'status',
       vus: 3,
-      duration: '3s',
+      duration: '30s',
     },
     nodes: {
       executor: 'constant-vus',
       exec: 'nodes',
       vus: 3,
-      duration: '3s',
+      duration: '1m',
     },
   },
 };

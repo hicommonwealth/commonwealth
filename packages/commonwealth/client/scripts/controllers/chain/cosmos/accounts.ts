@@ -1,7 +1,7 @@
 import type CosmosChain from 'controllers/chain/cosmos/chain';
-import type { IAccountsModule } from '../../../models/interfaces';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import type { IAccountsModule } from '../../../models/interfaces';
 import CosmosAccount from './account';
 
 export default class CosmosAccounts implements IAccountsModule<CosmosAccount> {

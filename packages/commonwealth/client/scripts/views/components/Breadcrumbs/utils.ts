@@ -1,7 +1,7 @@
 import { To } from 'react-router-dom';
 import { breadCrumbURLS } from './data';
 
-type currentDiscussion = {
+type CurrentDiscussion = {
   currentThreadName: string;
   currentTopic: string;
   topicURL: string;
@@ -47,7 +47,7 @@ export const generateBreadcrumbs = (
   profileId: number,
   navigate: (val: To) => void,
   customDomain: string,
-  currentDiscussion?: currentDiscussion,
+  currentDiscussion?: CurrentDiscussion,
 ) => {
   let link: string;
   let label: string;

@@ -1,6 +1,7 @@
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
@@ -66,7 +67,6 @@ const Profile = ({ profileId }: ProfileProps) => {
               id: a.id,
               address: a.address,
               communityId: a.community_id,
-              keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
               ghostAddress: a.ghost_address,
@@ -134,6 +134,13 @@ const Profile = ({ profileId }: ProfileProps) => {
       >
         <div className="fixed-slug-header"></div>
         <CWPageLayout>
+          <Helmet>
+            <link
+              rel="canonical"
+              href={`https://commonwealth.im/profile/id/${profileId}`}
+            />
+          </Helmet>
+
           <div className="header">
             <CWText type="h2" fontWeight="medium">
               {profile.name

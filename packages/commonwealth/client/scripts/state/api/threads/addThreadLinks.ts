@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread, { Link } from 'models/Thread';
 import app from 'state';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface AddThreadLinksProps {
@@ -21,7 +22,7 @@ const addThreadLinks = async ({
     {
       thread_id: threadId,
       links,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
     {
       headers: {

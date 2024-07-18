@@ -4,6 +4,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 
@@ -15,8 +16,10 @@ type ProfileRedirectProps = {
 const ProfileRedirect = (props: ProfileRedirectProps) => {
   const [profileNotFound, setProfileNotFound] = useState<boolean>(false);
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const { address, scope } = props;
+  const profileAddress = address || user.activeAccount?.address;
   const communityId = scope || app.activeChainId();
   const {
     data: users,
@@ -24,7 +27,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
     isLoading,
   } = useFetchProfilesByAddressesQuery({
     profileChainIds: [communityId],
-    profileAddresses: [address || app.user.activeAccount?.address],
+    profileAddresses: profileAddress ? [profileAddress] : [],
     currentChainId: communityId,
     apiCallEnabled: !!address && !!communityId,
   });

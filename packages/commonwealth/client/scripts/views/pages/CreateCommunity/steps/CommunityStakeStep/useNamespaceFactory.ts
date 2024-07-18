@@ -1,13 +1,15 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
-import app from 'state';
+import { useFetchNodesQuery } from 'state/api/nodes';
 
 const useNamespaceFactory = (ethChainId: number) => {
   const chainFactoryAddress =
     commonProtocol.factoryContracts[ethChainId]?.factory;
-  const chainRpc = app.config.nodes
-    .getAll()
-    .find((node) => node.ethChainId === ethChainId)?.url;
+
+  const { data: nodes } = useFetchNodesQuery();
+
+  const chainRpc = nodes?.find((node) => node.ethChainId === ethChainId)?.url;
+
   // @ts-expect-error StrictNullChecks
   const namespaceFactory = new NamespaceFactory(chainFactoryAddress, chainRpc);
 

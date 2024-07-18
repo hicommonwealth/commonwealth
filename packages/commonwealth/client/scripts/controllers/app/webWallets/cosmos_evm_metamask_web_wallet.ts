@@ -5,7 +5,8 @@ import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import type Web3 from 'web3';
 
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import { CosmosSignerCW } from '@hicommonwealth/shared';
+import { userStore } from 'state/ui/user';
 import { Transaction, Web3BaseProvider } from 'web3';
 import IWebWallet from '../../../models/IWebWallet';
 import { getCosmosChains } from './utils';
@@ -156,9 +157,9 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
         const encodedAccounts = accounts.map((a) =>
           encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a),
         );
-        const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === encodedAccounts[0],
-        );
+        const updatedAddress = userStore
+          .getState()
+          .accounts.find((addr) => addr.address === encodedAccounts[0]);
         if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
       },

@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { extractDomain } from 'helpers';
-import useForceRerender from 'hooks/useForceRerender';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
 import type { AnyProposal } from 'models/types';
 import 'pages/view_proposal/proposal_components.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import {
   getStatusClass,
@@ -21,18 +21,9 @@ type ProposalSubheaderProps = {
 
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { proposal } = props;
-  const forceRerender = useForceRerender();
   const [linkedThreads, setLinkedThreads] =
     // @ts-expect-error <StrictNullChecks/>
     useState<{ id: number; title: string }[]>(null);
-
-  useEffect(() => {
-    app.proposalEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.proposalEmitter.removeAllListeners();
-    };
-  }, [forceRerender]);
 
   useNecessaryEffect(() => {
     if (!linkedThreads) {
@@ -42,7 +33,7 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
             source: LinkSource.Proposal,
             identifier: proposal.identifier,
           },
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
         })
         .then((response) => {
           setLinkedThreads(response.data.result.threads);

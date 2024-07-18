@@ -1,21 +1,20 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import app from 'client/scripts/state';
-import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
-import AuthButton from 'client/scripts/views/components/AuthButton';
+import clsx from 'clsx';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import app from 'state';
+import useAuthModalStore from 'state/ui/modals/authModal';
+import AuthButton from 'views/components/AuthButton';
 import {
   AuthTypes,
   AuthWallets,
   EVMWallets,
-} from 'client/scripts/views/components/AuthButton/types';
+} from 'views/components/AuthButton/types';
 import {
   CWTab,
   CWTabsRow,
-} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
-import clsx from 'clsx';
-import React, { Fragment, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+} from 'views/components/component_kit/new_designs/CWTabs';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import {
@@ -78,7 +77,6 @@ const ModalBase = ({
   onSignInClick,
   onChangeModalType,
 }: ModalBaseProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const copy = MODAL_COPY[layoutType];
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
@@ -240,7 +238,7 @@ const ModalBase = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
-      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
+      if (layoutType === AuthModalType.SignIn) {
         setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
       }
 
@@ -262,7 +260,7 @@ const ModalBase = ({
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
-      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
+      if (layoutType === AuthModalType.SignIn) {
         setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
       }
 

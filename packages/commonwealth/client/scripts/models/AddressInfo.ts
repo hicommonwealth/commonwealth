@@ -4,7 +4,6 @@ import app from 'state';
 import Account from './Account';
 
 class AddressInfo extends Account {
-  public readonly keytype: string;
   public readonly id: number;
   public readonly profileId: number;
 
@@ -12,7 +11,6 @@ class AddressInfo extends Account {
     id,
     address,
     communityId,
-    keytype,
     walletId,
     walletSsoSource,
     ghostAddress,
@@ -22,7 +20,6 @@ class AddressInfo extends Account {
     id: number | null | undefined;
     address: string;
     communityId: string;
-    keytype?: string;
     walletId?: WalletId;
     walletSsoSource?: WalletSsoSource;
     ghostAddress?: boolean;
@@ -44,8 +41,6 @@ class AddressInfo extends Account {
     });
     // @ts-expect-error StrictNullChecks
     this.id = id;
-    // @ts-expect-error StrictNullChecks
-    this.keytype = keytype;
     // @ts-expect-error StrictNullChecks
     this.profileId = profileId;
   }

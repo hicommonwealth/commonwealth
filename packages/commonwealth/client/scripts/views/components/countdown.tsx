@@ -1,8 +1,8 @@
-import React from 'react';
 import moment from 'moment';
+import React from 'react';
 import { useCountdown } from 'usehooks-ts';
 
-import { blocknumToDuration, formatDuration } from 'helpers';
+import { formatDuration } from 'helpers';
 
 type CountdownProps = {
   duration: number;
@@ -11,7 +11,7 @@ type CountdownProps = {
 export const Countdown = (props: CountdownProps) => {
   const { duration } = props;
 
-  const [count, { startCountdown }] = useCountdown({
+  const [, { startCountdown }] = useCountdown({
     countStart: duration,
     intervalMs: 1000,
   });
@@ -24,12 +24,8 @@ export const Countdown = (props: CountdownProps) => {
     <span>
       {formatDuration(
         moment.duration(moment().add(duration, 'ms').diff(moment())),
-        false
+        false,
       )}
     </span>
   );
-};
-
-type CountdownUntilBlockProps = {
-  block: number;
 };

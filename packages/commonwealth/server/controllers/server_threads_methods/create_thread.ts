@@ -178,6 +178,18 @@ export async function __createThread(
         transaction,
       });
 
+      await this.models.ThreadVersionHistory.create(
+        {
+          thread_id: thread.id!,
+          body,
+          address: address.address!,
+          timestamp: thread.created_at!,
+        },
+        {
+          transaction,
+        },
+      );
+
       address.last_active = new Date();
       await address.save({ transaction });
 

@@ -23,6 +23,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { User } from '../components/user/user';
 
+import useUserStore from 'state/ui/user';
 import '../../../styles/modals/edit_collaborators_modal.scss';
 
 type EditCollaboratorsModalProps = {
@@ -42,6 +43,7 @@ export const EditCollaboratorsModal = ({
 }: EditCollaboratorsModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+  const user = useUserStore();
 
   const [collaborators, setCollaborators] = useState<
     IThreadCollaboratorWithId[]
@@ -69,9 +71,7 @@ export const EditCollaboratorsModal = ({
           ...profile!.roles?.[0],
           Address: profile.addresses[0],
         }))
-        .filter(
-          (role) => role.Address.address !== app.user.activeAccount?.address,
-        )
+        .filter((role) => role.Address.address !== user.activeAccount?.address)
     : [];
 
   const handleUpdateCollaborators = (c: IThreadCollaboratorWithId) => {
@@ -192,7 +192,7 @@ export const EditCollaboratorsModal = ({
                 const updatedThread = await editThread({
                   threadId: thread.id,
                   communityId: app.activeChainId(),
-                  address: app.user.activeAccount.address,
+                  address: user.activeAccount?.address || '',
                   collaborators: {
                     ...(newCollaborators.length > 0 && {
                       toAdd: newCollaborators.map((x) => x.id),

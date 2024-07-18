@@ -18,7 +18,6 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { config } from './server/config';
@@ -42,13 +41,11 @@ export async function main(
     port,
     noGlobalActivityCache = true,
     withLoggingMiddleware = false,
-    withStatsMiddleware = false,
     withPrerender = false,
   }: {
     port: number;
     noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
-    withStatsMiddleware?: boolean;
     withPrerender?: boolean;
   },
 ) {
@@ -132,7 +129,6 @@ export async function main(
           },
         }),
       );
-    withStatsMiddleware && app.use(expressStatsInit());
 
     app.use(json({ limit: '1mb' }) as RequestHandler);
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
@@ -174,8 +170,13 @@ export async function main(
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
+
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
 
   app.use(

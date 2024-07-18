@@ -1,12 +1,17 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB, UserInstance } from '@hicommonwealth/model';
 import { AddressInstance } from '@hicommonwealth/model';
-import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  WalletId,
+  WalletSsoSource,
+  addressSwapper,
+} from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { addressSwapper, bech32ToHex } from '../../shared/utils';
+import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { Errors } from '../routes/createAddress';
@@ -17,7 +22,6 @@ type CreateAddressReq = {
   community_id?: string;
   wallet_id: WalletId;
   wallet_sso_source: WalletSsoSource;
-  keytype?: string;
   block_info?: string;
 };
 
@@ -148,7 +152,6 @@ export async function createAddressHelper(
       });
       existingAddress.profile_id = profileId?.id;
     }
-    existingAddress.keytype = req.keytype;
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
@@ -226,7 +229,6 @@ export async function createAddressHelper(
           verification_token,
           verification_token_expires,
           block_info: req.block_info,
-          keytype: req.keytype,
           last_active,
           wallet_id: req.wallet_id,
           wallet_sso_source: req.wallet_sso_source,

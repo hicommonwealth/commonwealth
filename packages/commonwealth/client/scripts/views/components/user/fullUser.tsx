@@ -5,6 +5,7 @@ import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPopover, {
@@ -37,6 +38,7 @@ export const FullUser = ({
   className,
 }: FullUserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
+  const loggedInUser = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (showSkeleton) {
@@ -64,7 +66,7 @@ export const FullUser = ({
   const friendlyCommunityName =
     app.config.chains.getById(userCommunityId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-  const isGhostAddress = app.user.addresses.some(
+  const isGhostAddress = loggedInUser.addresses.some(
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
@@ -85,7 +87,7 @@ export const FullUser = ({
     </>
   );
 
-  const isSelfSelected = app.user.addresses
+  const isSelfSelected = loggedInUser.addresses
     .map((a) => a.address)
     .includes(userAddress);
 

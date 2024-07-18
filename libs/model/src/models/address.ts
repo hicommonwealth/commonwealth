@@ -1,9 +1,10 @@
 import { Role, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
+import { decrementProfileCount } from '../utils';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
+import type { SsoTokenInstance } from './sso_token';
 import type { ModelInstance } from './types';
 import type { UserAttributes, UserInstance } from './user';
 
@@ -16,7 +17,6 @@ export type AddressAttributes = {
   id?: number;
   verification_token_expires?: Date;
   verified?: Date;
-  keytype?: string;
   block_info?: string;
   last_active?: Date;
   created_at?: Date;
@@ -36,7 +36,6 @@ export type AddressAttributes = {
   Community?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  SsoToken?: SsoTokenAttributes;
   Memberships?: MembershipAttributes[];
 };
 
@@ -69,7 +68,6 @@ export default (
       verification_token: { type: Sequelize.STRING, allowNull: false },
       verification_token_expires: { type: Sequelize.DATE, allowNull: true },
       verified: { type: Sequelize.DATE, allowNull: true },
-      keytype: { type: Sequelize.STRING, allowNull: true },
       last_active: { type: Sequelize.DATE, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -159,6 +157,13 @@ export default (
             where: { id: address.community_id },
             transaction: options.transaction,
           });
+
+          await decrementProfileCount(
+            sequelize.models,
+            address.community_id,
+            address.user_id!,
+            options.transaction!,
+          );
         },
       },
     },

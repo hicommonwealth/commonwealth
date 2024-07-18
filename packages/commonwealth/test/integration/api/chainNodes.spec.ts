@@ -22,7 +22,7 @@ describe('ChainNode Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 1, isAdmin: true },
+      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
     }) as UserInstance;
     const resp = await controller.createChainNode({
       user,
@@ -199,7 +199,7 @@ describe('ChainNode Tests', () => {
 
       const user: UserInstance = buildUser({
         models,
-        userAttributes: { email: '', id: 1, isAdmin: true },
+        userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
       }) as UserInstance;
 
       await controller.updateChainNode({
@@ -230,7 +230,7 @@ describe('ChainNode Tests', () => {
       const controller = new ServerCommunitiesController(models, null);
       const user: UserInstance = buildUser({
         models,
-        userAttributes: { email: '', id: 1, isAdmin: true },
+        userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
       }) as UserInstance;
 
       assert.equal(

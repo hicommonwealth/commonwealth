@@ -16,20 +16,20 @@ import {
   sequelize,
 } from '@hicommonwealth/model';
 import {
+  CANVAS_TOPIC,
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
+  deserializeCanvas,
+  getSessionSignerForAddress,
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
-import { CANVAS_TOPIC } from 'shared/canvas';
-import { deserializeCanvas } from 'shared/canvas/types';
 import { fileURLToPath } from 'url';
-import { getSessionSignerForAddress } from '../../shared/canvas/verify';
 import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
@@ -137,6 +137,7 @@ async function createNewMagicUser({
         // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
         // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
         emailVerified: !!magicUserMetadata.email,
+        profile: {},
       },
       { transaction },
     );
@@ -237,7 +238,6 @@ async function loginExistingMagicUser({
     let malformedSsoToken: SsoTokenInstance;
     if (ssoToken) {
       // login user if they registered via magic
-      // @ts-expect-error StrictNullChecks
       if (decodedMagicToken.claim.iat <= ssoToken.issued_at) {
         log.warn('Replay attack detected.');
         throw new Error(
@@ -253,7 +253,6 @@ async function loginExistingMagicUser({
       // - they only have profile_id set, no issuer or address_id
       // we will locate an existing SsoToken by profile_id, and migrate it to use addresses instead.
       // if none exists, we will create it
-      // @ts-expect-error StrictNullChecks
       malformedSsoToken = await models.SsoToken.scope(
         'withPrivateData',
       ).findOne({
@@ -265,15 +264,12 @@ async function loginExistingMagicUser({
       });
       if (malformedSsoToken) {
         log.trace('DETECTED LEGACY / MALFORMED SSO TOKEN');
-        // @ts-expect-error StrictNullChecks
         if (decodedMagicToken.claim.iat <= malformedSsoToken.issued_at) {
           log.warn('Replay attack detected.');
           throw new Error(
             `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
           );
         }
-        // @ts-expect-error StrictNullChecks
-        malformedSsoToken.profile_id = null;
         (malformedSsoToken.issuer = decodedMagicToken.issuer),
           (malformedSsoToken.issued_at = decodedMagicToken.claim.iat);
         malformedSsoToken.updated_at = new Date();
@@ -360,7 +356,7 @@ async function loginExistingMagicUser({
           { where: { address_id: ghost.id }, transaction },
         );
         await models.SsoToken.destroy({
-          where: { id: ghost.id },
+          where: { address_id: ghost.id },
           transaction,
         });
         await models.Address.destroy({

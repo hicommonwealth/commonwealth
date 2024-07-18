@@ -9,6 +9,7 @@ import { CWButton } from './new_designs/CWButton';
 import axios from 'axios';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
@@ -67,6 +68,7 @@ export const CWCoverImageUploader = ({
   onImageBehaviourChange,
   onImageProcessStatusChange = () => {},
 }: CoverImageUploaderProps) => {
+  const user = useUserStore();
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
   const [uploadStatus, setUploadStatus] = React.useState<
@@ -142,7 +144,7 @@ export const CWCoverImageUploader = ({
           name: file.name,
           mimetype: file.type,
           auth: true,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         },
       );
       if (signatureResponse.data.status !== 'Success') throw new Error();
@@ -170,7 +172,7 @@ export const CWCoverImageUploader = ({
       setImageURL('');
       const res = await axios.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
-        jwt: app.user.jwt,
+        jwt: user.jwt,
       });
 
       const generatedImageURL = res.data.result.imageUrl;
