@@ -36,15 +36,23 @@ export const applyCanvasSignedData = async (
   ed25519.verify(data.actionMessageSignature, data.actionMessage);
   console.log('verified using scheme directly');
 
-  app.messageLog.verifySignature(
+  await app.messageLog.verifySignature(
     data.sessionMessageSignature,
     data.sessionMessage,
   );
-  app.messageLog.verifySignature(
+  await app.messageLog.verifySignature(
     data.actionMessageSignature,
     data.actionMessage,
   );
   console.log('verified using log');
+
+  await app.messageLog.insert(
+    app.messageLog.encode(data.sessionMessageSignature, data.sessionMessage),
+  );
+  await app.messageLog.insert(
+    app.messageLog.encode(data.actionMessageSignature, data.actionMessage),
+  );
+  console.log('verified using insert');
 
   try {
     const { id: idSession } = await app.insert(

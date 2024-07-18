@@ -55,7 +55,7 @@ function parseAddress(address: string): [chain: string, walletAddress: string] {
  * since we don't know the chain ID, but also don't want to reencode the chain address
  */
 export class CosmosSignerCW extends CosmosSigner {
-  public async getDid(): Promise<string> {
+  public async getDid(): Promise<DidIdentifier> {
     const chainId = await this._signer.getChainId();
     const walletAddress = await this._signer.getAddress(chainId);
     const { data } = fromBech32(walletAddress);

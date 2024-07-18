@@ -1,3 +1,4 @@
+import { SignedMessage } from '@canvas-js/gossiplog'; // TODO: tree shake?
 import type { Action, Message, Session } from '@canvas-js/interfaces';
 import {
   CANVAS_TOPIC,
@@ -162,16 +163,17 @@ async function sign(
       }
 
       const sessionMessage: Message<Session> = {
-        clock: 0,
+        clock: 1,
         parents: [],
         topic: CANVAS_TOPIC,
         payload: session,
       };
 
+      const sessionMessageId = SignedMessage.encode(sessionMessage).id;
       const sessionMessageSignature = await messageSigner.sign(sessionMessage);
 
       const actionMessage: Message<Action> = {
-        clock: 1,
+        clock: 2,
         parents: [],
         topic: CANVAS_TOPIC,
         payload: {
@@ -185,6 +187,7 @@ async function sign(
         },
       };
 
+      const actionMessageId = SignedMessage.encode(actionMessage).id;
       const actionMessageSignature = await messageSigner.sign(actionMessage);
 
       return {
@@ -194,7 +197,7 @@ async function sign(
           actionMessage,
           actionMessageSignature,
         },
-        canvasHash: Buffer.from(sha256(encode(actionMessage))).toString('hex'),
+        canvasHash: Buffer.from(sha256(encode(actionMessage))).toString('hex'), // TODO
       };
     }
   }
