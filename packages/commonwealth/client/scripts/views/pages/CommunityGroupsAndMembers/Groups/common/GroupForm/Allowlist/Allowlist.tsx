@@ -127,7 +127,7 @@ const Allowlist = ({
   const formattedMembers: Member[] = useMemo(() => {
     return (
       (members?.results?.map((p) => ({
-        id: p.id,
+        id: p.addresses[0].profile_id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
         // @ts-expect-error StrictNullChecks
