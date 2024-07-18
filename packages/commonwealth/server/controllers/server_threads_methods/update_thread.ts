@@ -107,9 +107,6 @@ export async function __updateThread(
   if (discordMeta) {
     threadWhere.discord_meta = discordMeta;
   }
-  if (!body) {
-    throw new AppError(Errors.NoBody);
-  }
 
   const thread = await this.models.Thread.findOne({
     where: threadWhere,
@@ -269,7 +266,7 @@ export async function __updateThread(
       { transaction },
     );
 
-    if (versionHistory) {
+    if (versionHistory && body) {
       // The update above doesn't work because it can't detect array changes so doesn't write it to db
       await this.models.Thread.update(
         {
