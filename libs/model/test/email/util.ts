@@ -52,7 +52,6 @@ export function generateDiscussionData(
     author: authorProfile.profile_name!,
     author_address: authorAddress.address,
     author_address_id: authorAddress.id!,
-    author_profile_id: authorProfile.id,
     author_user_id: authorUser.id!,
     community_id: community.id!,
     community_name: community.name,
@@ -74,14 +73,14 @@ export function generateDiscussionData(
     typeof EnrichedUserMentionedNotification
   > = {
     ...userMentionedNotification,
-    author_avatar_url: authorProfile.avatar_url!,
+    author_avatar_url: authorUser.profile.avatar_url!,
   };
 
   const enrichedCommentCreatedNotification: z.infer<
     typeof EnrichedCommentCreatedNotification
   > = {
     ...commentCreatedNotification,
-    author_avatar_url: authorProfile.avatar_url!,
+    author_avatar_url: authorUser.profile.avatar_url!,
   };
 
   const date = new Date();

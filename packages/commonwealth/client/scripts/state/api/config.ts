@@ -29,11 +29,16 @@ export const ApiEndpoints = {
   REFRESH_MEMBERSHIP: '/refresh-membership',
   FETCH_WEBHOOKS: '/getWebhooks',
   FETCH_TAGS: '/tags',
+  UPDATE_USER_EMAIL: '/updateEmail',
+  UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
+  UPDATE_USER_ACTIVE_COMMUNTY: '/selectCommunity',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   REMOVE_DISCORD_BOT_CONFIG: '/removeDiscordBotConfig',
+  FETCH_USER_ACTIVITY: '/viewUserActivity',
+  FETCH_GLOBAL_ACTIVITY: '/viewGlobalActivity',
 };
 
 export const ContractMethods = {

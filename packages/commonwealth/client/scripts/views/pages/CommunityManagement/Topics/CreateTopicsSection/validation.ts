@@ -1,4 +1,4 @@
-import { pluralizeWithoutNumberPrefix } from 'client/scripts/helpers';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
 import z from 'zod';
 import { VALIDATION_MESSAGES } from '../../../../../helpers/formValidations/messages';
 

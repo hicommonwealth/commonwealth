@@ -1,18 +1,137 @@
-import { InvalidState, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import _ from 'lodash';
-import moment from 'moment';
-import { Op, QueryTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../database';
-import { contractHelpers } from '../services/commonProtocol';
 
-const uniq = _.uniq;
+const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
+  switch (by) {
+    case 'name':
+      return `profile_name ${direction}`;
 
-const Errors = {
-  StakeNotFound: 'Stake not found',
-  StakeholderGroup: 'Stakeholder group not found',
-  ChainNodeNotFound: 'Chain node not found',
-  CommunityNotFound: 'Community not found',
+    // - Add stake balance to address migration (stake_balance, updated_date)
+    // - Project stake balances in separate process
+    // case 'stakeBalance': // TODO: fix when stake balance is available
+    //   return `addresses[0].stake_balance ${direction}`;
+
+    default:
+      return `last_active ${direction}`;
+  }
+};
+
+type Filters = {
+  joins: string;
+  filters: string;
+};
+
+const buildFilters = (memberships: string, addresses: string[]): Filters => {
+  const ids = parseInt((memberships.match(/in-group:(\d+)/) || [`0`, `0`])[1]);
+  switch (memberships) {
+    case 'in-group':
+      return {
+        joins: `JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL`,
+        filters: '',
+      };
+
+    case `in-group:${ids}`:
+      return {
+        joins: `JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL AND M.group_id IN (${ids})`,
+        filters: '',
+      };
+
+    case 'not-in-group':
+      return {
+        joins: `LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL`,
+        filters: 'AND M.address_id IS NULL',
+      };
+
+    case 'allow-specified-addresses':
+      return {
+        joins: '',
+        filters: addresses.length ? `AND A.address IN(:addresses)` : '',
+      };
+
+    case 'not-allow-specified-addresses':
+      return {
+        joins: '',
+        filters: addresses.length ? `AND A.address NOT IN(:addresses)` : '',
+      };
+
+    default:
+      return { joins: '', filters: '' };
+  }
+};
+
+const buildFilteredQuery = (
+  search: string,
+  { joins: groupsJoin, filters: addressFilter }: Filters,
+) => {
+  // TODO: Temporarily removing option to search by address until product team decides what to do with it
+  // Using UNION instead of OR when combining search terms to
+  // force trigram indexes in profile->>name and Addresses.address
+  // return search
+  //   ? `
+  //   SELECT
+  //     A.id
+  //   FROM
+  //     "Users" U
+  //     JOIN "Addresses" A ON U.id = A.user_id
+  //     ${groupsJoin}
+  //   WHERE
+  //     A.community_id = :community_id
+  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
+  //     AND U.profile->>'name' ILIKE :search
+  //     ${addressFilter}
+
+  //   UNION
+
+  //   SELECT
+  //     A.id
+  //   FROM
+  //     "Addresses" A
+  //     ${groupsJoin}
+  //   WHERE
+  //     A.community_id = :community_id
+  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
+  //     AND A.address ILIKE :search
+  //     ${addressFilter}
+  // `
+  //   : `
+  //   SELECT
+  //     A.id
+  //   FROM
+  //     "Addresses" A
+  //     ${groupsJoin}
+  //   WHERE
+  //     A.community_id = :community_id
+  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
+  //     ${addressFilter}
+  // `;
+  return search
+    ? `
+    SELECT
+      A.id
+    FROM
+      "Users" U
+      JOIN "Addresses" A ON U.id = A.user_id
+      ${groupsJoin}
+    WHERE
+      A.community_id = :community_id
+      AND A.profile_id IS NOT NULL -- TO BE REMOVED
+      AND U.profile->>'name' ILIKE :search
+      ${addressFilter}
+    `
+    : `
+    SELECT
+      A.id
+    FROM
+      "Addresses" A
+      ${groupsJoin}
+    WHERE
+      A.community_id = :community_id
+      AND A.profile_id IS NOT NULL -- TO BE REMOVED
+      ${addressFilter}
+  `;
 };
 
 export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
@@ -21,288 +140,79 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const community = await models.Community.findByPk(payload.community_id);
-      if (!community) {
-        throw new InvalidState(Errors.CommunityNotFound);
-      }
+      const {
+        community_id,
+        search,
+        allowedAddresses,
+        memberships,
+        cursor,
+        limit,
+        order_by,
+        order_direction,
+      } = payload;
 
-      const addressBinding: string[] | undefined = payload?.allowedAddresses
-        ?.split(',')
-        .map((a) => a.trim());
-      const replacements: any = {
-        searchTerm: `%${payload.search || ''}%`,
-        addressBinding,
+      const offset = limit * (cursor - 1);
+      const addresses = allowedAddresses?.split(',').map((a) => a.trim()) ?? [];
+
+      const replacements = {
+        community_id,
+        search: search ? `%${search}%` : '',
+        addresses,
       };
-      if (community) {
-        replacements.community_id = community.id;
-      }
 
-      const communityWhere = replacements.community_id
-        ? `"Addresses".community_id = :community_id AND`
-        : '';
-
-      const groupIdFromMemberships = parseInt(
-        ((payload.memberships || '').match(/in-group:(\d+)/) || [`0`, `0`])[1],
+      const cte = buildFilteredQuery(
+        search ?? '',
+        buildFilters(memberships ?? '', addresses),
       );
-      let membershipsWhere = payload.memberships
-        ? `SELECT 1 FROM "Memberships"
-    JOIN "Groups" ON "Groups".id = "Memberships".group_id
-    WHERE "Memberships".address_id = "Addresses".id
-    AND "Groups".community_id = :community_id
-    ${
-      groupIdFromMemberships
-        ? `AND "Groups".id = ${groupIdFromMemberships}`
-        : ''
-    }
-    `
-        : '';
 
-      if (payload.memberships) {
-        switch (payload.memberships) {
-          case 'in-group':
-          case `in-group:${groupIdFromMemberships}`:
-            membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
-            break;
-          case 'not-in-group':
-            membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
-            break;
-          case 'allow-specified-addresses':
-            membershipsWhere =
-              addressBinding && addressBinding.length > 0
-                ? `AND "Addresses".address IN(:addressBinding)`
-                : '';
-            break;
-          case 'not-allow-specified-addresses':
-            membershipsWhere =
-              addressBinding && addressBinding.length > 0
-                ? `AND "Addresses".address NOT IN(:addressBinding)`
-                : '';
-            break;
-          default:
-            throw new InvalidState(
-              `unsupported memberships param: ${payload.memberships}`,
-            );
-        }
-      }
+      const orderBy = buildOrderBy(
+        order_by ?? 'name',
+        order_direction ?? 'DESC',
+      );
 
-      // This query is overly complex in order to entice the query planner to use the trigram indices
-      const sqlWithoutPagination = `
-    SELECT
-      "Profiles".id,
-      "Profiles".user_id,
-      "Profiles".profile_name,
-      "Profiles".avatar_url,
-      "Profiles".created_at,
-      array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".community_id) as community_ids,
-      array_agg("Addresses".address) as addresses,
-      MAX("Addresses".last_active) as last_active
-      FROM "Profiles"
-      RIGHT JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
-      WHERE ${communityWhere} 
-      ("Profiles".profile_name ILIKE '%' || :searchTerm || '%')
-      ${membershipsWhere}
-      GROUP BY "Profiles".id
-
-      UNION
-
+      const sql = `
+      WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
       SELECT
-      "Profiles".id,
-      "Profiles".user_id,
-      "Profiles".profile_name,
-      "Profiles".avatar_url,
-      "Profiles".created_at,
-      array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".community_id) as community_ids,
-      array_agg("Addresses".address) as addresses,
-      MAX("Addresses".last_active) as last_active
-      FROM "Profiles"
-      JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
-      WHERE ${communityWhere} 
-      ("Addresses".address ILIKE '%' || :searchTerm || '%')
-      ${membershipsWhere}
-      GROUP BY "Profiles".id
-  `;
+        U.id AS user_id,
+        U.profile->>'name' AS profile_name,
+        U.profile->>'avatar_url' AS avatar_url,
+        U.created_at,
+        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
+        JSONB_AGG(JSON_BUILD_OBJECT(
+          'id', A.id,
+          'address', A.address,
+          'community_id', A.community_id,
+          'stake_balance', 0, -- TODO: project stake balance here
+          'profile_id', A.profile_id -- TO BE REMOVED
+        )) AS addresses,
+        ARRAY_AGG(A.role) AS roles,
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
+        T.total
+      FROM 
+        F 
+        JOIN "Addresses" A ON F.id = A.id
+        JOIN "Users" U ON A.user_id = U.id
+        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
+        JOIN T ON true
+      GROUP BY U.id, T.total
+      ORDER BY ${orderBy}
+      LIMIT ${limit} OFFSET ${offset};
+      `;
 
-      const allCommunityProfiles = await models.sequelize.query<{
-        id: number;
-        user_id: number;
-        profile_name: string;
-        avatar_url: string;
-        created_at: string;
-        address_ids: string[];
-        community_ids: string[];
-        addresses: string[];
-        stake_balances: string[];
-        last_active: string;
-      }>(`${sqlWithoutPagination}`, {
+      const members = await models.sequelize.query<
+        z.infer<typeof schemas.CommunityMember> & { total: number }
+      >(sql, {
         replacements,
         type: QueryTypes.SELECT,
       });
-      const totalResults = allCommunityProfiles.length;
 
-      if (payload.include_stake_balances) {
-        const stake = await models.CommunityStake.findOne({
-          where: { community_id: community.id },
-        });
-        if (!stake) {
-          throw new InvalidState(Errors.StakeNotFound);
-        }
-        const stakeholderGroup = await models.Group.findOne({
-          where: {
-            community_id: community.id,
-            is_system_managed: true,
-          },
-        });
-        if (!stakeholderGroup) {
-          throw new InvalidState(Errors.StakeholderGroup);
-        }
-        const node = await models.ChainNode.findByPk(community.chain_node_id);
-        if (!node || !node.eth_chain_id) {
-          throw new InvalidState(Errors.ChainNodeNotFound);
-        }
-        const addresses = allCommunityProfiles.map((p) => p.addresses).flat();
-        const balances = await contractHelpers.getNamespaceBalance(
-          community.namespace_address!,
-          stake.stake_id,
-          node.eth_chain_id,
-          addresses,
-        );
-        // add balances to profiles
-        for (const profile of allCommunityProfiles) {
-          for (const address of profile.addresses) {
-            profile.stake_balances ||= [];
-            profile.stake_balances.push(balances[address] || '0');
-          }
-        }
-      }
-
-      const paginatedResults = allCommunityProfiles
-        .slice()
-        .sort((a, b) => {
-          let comparison = 0;
-          switch (payload.order_by) {
-            case 'name':
-              {
-                const nameA = a.profile_name || '';
-                const nameB = b.profile_name || '';
-                comparison = nameA.localeCompare(nameB);
-              }
-              break;
-            case 'stakeBalance':
-              {
-                const balanceA = a.stake_balances?.[0] || 0;
-                const balanceB = b.stake_balances?.[0] || 0;
-                comparison =
-                  balanceA === balanceB ? 0 : balanceA < balanceB ? 1 : -1;
-              }
-              break;
-            case 'lastActive':
-            default: {
-              const lastActiveA = moment(a.last_active);
-              const lastActiveB = moment(b.last_active);
-              comparison = lastActiveA.isSame(lastActiveB)
-                ? 0
-                : lastActiveA.isAfter(lastActiveB)
-                ? 1
-                : -1;
-            }
-          }
-          return payload.order_direction === 'ASC' ? -comparison : comparison;
-        })
-        .slice(
-          (payload.cursor - 1) * payload.limit,
-          payload.cursor * payload.limit,
-        );
-
-      const profilesWithAddresses = paginatedResults.map((profile) => {
-        return {
-          id: profile.id,
-          user_id: profile.user_id,
-          profile_name: profile.profile_name,
-          avatar_url: profile.avatar_url,
-          addresses: profile.address_ids.map((_, i) => {
-            const address: any = {
-              id: profile.address_ids[i],
-              community_id: profile.community_ids[i],
-              address: profile.addresses[i],
-            };
-            if (profile.stake_balances) {
-              address.stake_balance = profile.stake_balances?.[i] || '0';
-            }
-            return address;
-          }),
-          roles: [] as string[],
-          group_ids: [] as number[],
-          last_active: profile.last_active,
-        };
-      });
-
-      if (payload.include_roles) {
-        const profileAddressIds = uniq(
-          profilesWithAddresses
-            .map((p) => p.addresses.map((address) => address.id))
-            .flat(),
-        );
-
-        const addressesWithRoles = await models.Address.findAll({
-          where: {
-            id: {
-              [Op.in]: profileAddressIds,
-            },
-            community_id: payload.community_id,
-          },
-        });
-
-        const addressIdRoles: Record<number, string> =
-          addressesWithRoles.reduce((acc, address) => {
-            return {
-              ...acc,
-              [`${address.id!}`]: address.role,
-            };
-          }, {});
-
-        // add roles to associated profiles in response
-        for (const profile of profilesWithAddresses) {
-          for (const address of profile.addresses) {
-            profile.roles ||= [];
-            profile.roles.push(addressIdRoles[address.id]);
-          }
-        }
-      }
-
-      if (payload.include_group_ids) {
-        const profileAddressIds = uniq(
-          profilesWithAddresses
-            .map((p) => p.addresses.map((address) => address.id))
-            .flat(),
-        );
-
-        const existingMemberships = await models.Membership.findAll({
-          where: {
-            address_id: {
-              [Op.in]: profileAddressIds,
-            },
-            reject_reason: null,
-          },
-        });
-        // add group IDs to profiles
-        for (const profile of profilesWithAddresses) {
-          profile.group_ids = uniq(
-            existingMemberships
-              .filter((m) => {
-                return !!profile.addresses.find((a) => a.id === m.address_id);
-              })
-              .map((m) => m.group_id),
-          );
-        }
-      }
+      // console.log(members, payload);
       return schemas.buildPaginatedResponse(
-        profilesWithAddresses,
-        totalResults,
+        members,
+        members.at(0)?.total ?? 0,
         {
-          limit: payload.limit,
-          offset: payload.limit * (payload.cursor - 1),
+          limit,
+          offset,
         },
       );
     },

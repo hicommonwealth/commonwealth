@@ -575,6 +575,9 @@ describe('ServerCommentsController', () => {
           findOne: async () => data,
           update: () => (data.text = 'Hello'),
         },
+        CommentVersionHistory: {
+          create: () => null,
+        },
         sequelize: {
           transaction: (callback?: () => Promise<void>) => {
             if (callback) return callback();

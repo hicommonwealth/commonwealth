@@ -1,6 +1,5 @@
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo, useState } from 'react';
@@ -8,6 +7,7 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
@@ -121,13 +121,13 @@ export const CWContentPage = ({
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -216,7 +216,7 @@ export const CWContentPage = ({
   );
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,

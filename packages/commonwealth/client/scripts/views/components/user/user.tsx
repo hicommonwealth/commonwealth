@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import CWPopover, {
   usePopover,
@@ -35,12 +36,15 @@ export const User = ({
   popoverPlacement,
 }: UserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
+  const loggedInUser = useUserStore();
+
   const { data: users } = useFetchProfilesByAddressesQuery({
     currentChainId: app.activeChainId(),
     profileAddresses: [userAddress],
     profileChainIds: [userCommunityId],
     apiCallEnabled: !!(userAddress && userCommunityId),
   });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (showSkeleton) {
@@ -70,7 +74,7 @@ export const User = ({
   const friendlyCommunityName =
     app.config.chains.getById(userCommunityId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-  const isGhostAddress = app.user.addresses.some(
+  const isGhostAddress = loggedInUser.addresses.some(
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
@@ -91,7 +95,7 @@ export const User = ({
     </>
   );
 
-  const isSelfSelected = app.user.addresses
+  const isSelfSelected = loggedInUser.addresses
     .map((a) => a.address)
     .includes(userAddress);
 

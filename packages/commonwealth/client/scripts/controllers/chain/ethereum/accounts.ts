@@ -1,7 +1,6 @@
-import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import type { IAccountsModule } from '../../../models/interfaces';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import type { IAccountsModule } from '../../../models/interfaces';
 import EthereumAccount from './account';
 import type EthereumChain from './chain';
 
@@ -21,7 +20,7 @@ class EthereumAccounts implements IAccountsModule<EthereumAccount> {
 
   private _Chain: EthereumChain;
 
-  public get(address: string, keytype?: string, ignoreProfiles = true) {
+  public get(address: string, ignoreProfiles = true) {
     return this.fromAddress(address, ignoreProfiles);
   }
 
@@ -53,7 +52,7 @@ class EthereumAccounts implements IAccountsModule<EthereumAccount> {
         this._Chain,
         this,
         address,
-        ignoreProfiles
+        ignoreProfiles,
       );
     }
   }

@@ -1,11 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import { DB, incrementProfileCount } from '@hicommonwealth/model';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import type { Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { addressSwapper, bech32ToHex } from '../../shared/utils';
+import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
@@ -128,7 +128,6 @@ const linkExistingAddressToCommunity = async (
       where: { user_id: userId },
     });
     existingAddress.profile_id = profileId?.id;
-    existingAddress.keytype = req.body.keytype;
     existingAddress.verification_token = verificationToken;
     existingAddress.verification_token_expires = verificationTokenExpires;
     existingAddress.last_active = new Date();
@@ -157,7 +156,6 @@ const linkExistingAddressToCommunity = async (
           verification_token: verificationToken,
           verification_token_expires: verificationTokenExpires,
           verified: originalAddress.verified,
-          keytype: originalAddress.keytype,
           wallet_id: originalAddress.wallet_id,
           wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),

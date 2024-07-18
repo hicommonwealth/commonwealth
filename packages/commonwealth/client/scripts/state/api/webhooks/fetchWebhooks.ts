@@ -3,6 +3,7 @@ import axios from 'axios';
 import Webhook from 'models/Webhook';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 const WEBHOOKS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -20,7 +21,7 @@ const fetchWebhooks = async ({
       params: {
         chain: communityId || app.activeChainId(),
         auth: true,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       },
     },
   );

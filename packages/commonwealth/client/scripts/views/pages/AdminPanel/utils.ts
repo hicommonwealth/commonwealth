@@ -1,6 +1,7 @@
 import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 
 export const createChainNode = async ({
   url,
@@ -24,7 +25,7 @@ export const createChainNode = async ({
     balance_type,
     eth_chain_id,
     cosmos_chain_id,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 
@@ -52,21 +53,21 @@ export const updateChainNode = async ({
     balance_type,
     eth_chain_id,
     cosmos_chain_id,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 
 export const deleteCommunity = async ({ id }: { id: string }) => {
   await axios.delete(`${app.serverUrl()}/communities/${id}`, {
     data: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
   });
 };
 
 export const updateCommunityId = async ({ community_id, new_community_id }) => {
   await axios.patch(`${app.serverUrl()}/communities/update_id`, {
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     community_id,
     new_community_id,
     redirect: true,
@@ -81,7 +82,7 @@ export const updateCommunityCustomDomain = async ({
   custom_domain: string;
 }) => {
   await axios.patch(`${app.serverUrl()}/communities/${community_id}`, {
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     id: community_id,
     custom_domain,
   });
@@ -97,14 +98,14 @@ export const updateSiteAdmin = async ({
   await axios.post(`${app.serverUrl()}/updateSiteAdmin`, {
     address,
     siteAdmin,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 
 export const getCSVContent = async ({ id }: { id: string }) => {
   const res = await axios.post(`${app.serverUrl()}/exportMembersList`, {
     communityId: id,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return res.data.result.data[0];
@@ -113,7 +114,7 @@ export const getCSVContent = async ({ id }: { id: string }) => {
 export const getTopUsersList = async () => {
   const res = await axios.get(`${app.serverUrl()}/admin/top-users`, {
     params: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
   });
   return res.data.result;

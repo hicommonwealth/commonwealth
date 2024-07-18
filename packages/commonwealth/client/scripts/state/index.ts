@@ -20,6 +20,7 @@ import { queryClient, QueryKeys } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { ChainStore } from 'stores';
+import { userStore } from './ui/user';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -236,13 +237,11 @@ export async function initAppState(
       app.loginStateEmitter.emit('redraw');
     }
 
-    app.user.setStarredCommunities(
-      statusRes.result.user?.starredCommunities
-        ? statusRes.result.user?.starredCommunities.map(
-            (c) => new StarredCommunity(c),
-          )
-        : [],
-    );
+    userStore.getState().setData({
+      starredCommunities: (statusRes.result.user?.starredCommunities || []).map(
+        (c) => new StarredCommunity(c),
+      ),
+    });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
     if (
@@ -250,9 +249,11 @@ export async function initAppState(
       statusRes.result.user &&
       statusRes.result.user.selectedCommunity
     ) {
-      app.user.setSelectedCommunity(
-        ChainInfo.fromJSON(statusRes.result.user.selectedCommunity),
-      );
+      userStore.getState().setData({
+        activeCommunity: ChainInfo.fromJSON(
+          statusRes.result.user.selectedCommunity,
+        ),
+      });
     }
 
     if (statusRes.result.user) {

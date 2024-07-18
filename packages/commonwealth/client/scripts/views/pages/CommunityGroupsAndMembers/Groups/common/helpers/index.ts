@@ -1,4 +1,5 @@
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
@@ -18,7 +19,7 @@ export const makeGroupDataBaseAPIPayload = (
   const extraRequrirements = allowedAddresses?.length > 0 ? 1 : 0;
   const payload = {
     communityId: app.activeChainId(),
-    address: app.user.activeAccount.address,
+    address: userStore.getState().activeAccount?.address || '',
     groupName: formSubmitValues.groupName.trim(),
     groupDescription: (formSubmitValues.groupDescription || '').trim(),
     topicIds: formSubmitValues.topics.map((x) => parseInt(x.value)),

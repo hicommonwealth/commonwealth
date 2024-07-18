@@ -13,6 +13,7 @@ import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
+  version_history_updated?: boolean;
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
@@ -102,12 +103,23 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      activity_rank_date: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: new Date(),
+      },
 
       //notifications
       max_notif_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
+      },
+
+      version_history_updated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     },
     {

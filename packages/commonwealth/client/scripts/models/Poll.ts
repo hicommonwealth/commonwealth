@@ -2,6 +2,7 @@ import axios from 'axios';
 import type moment from 'moment';
 import { notifyError } from '../controllers/app/notifications';
 import app from '../state';
+import { userStore } from '../state/ui/user';
 import Vote from './Vote';
 
 class Poll {
@@ -53,7 +54,7 @@ class Poll {
 
   public getUserVote(chain: string, address: string) {
     return (this.votes || []).find(
-      (vote) => vote.address === address && vote.authorCommunityId === chain
+      (vote) => vote.address === address && vote.authorCommunityId === chain,
     );
   }
 
@@ -64,7 +65,7 @@ class Poll {
   public async submitVote(
     authorChain: string,
     address: string,
-    option: string
+    option: string,
   ) {
     const selectedOption = this.options.find((o: string) => o === option);
     if (!selectedOption) {
@@ -78,15 +79,15 @@ class Poll {
         author_chain: authorChain,
         option: selectedOption,
         address,
-        jwt: app.user.jwt,
-      }
+        jwt: userStore.getState().jwt,
+      },
     );
     // TODO Graham 5/3/22: We should have a dedicated controller + store
     // to handle logic like this
     const vote = new Vote(response.data.result);
     // Remove existing vote
     const existingVoteIndex = this.votes.findIndex(
-      (v) => v.address === address && v.authorCommunityId === authorChain
+      (v) => v.address === address && v.authorCommunityId === authorChain,
     );
     if (existingVoteIndex !== -1) {
       this.votes.splice(existingVoteIndex, 1);

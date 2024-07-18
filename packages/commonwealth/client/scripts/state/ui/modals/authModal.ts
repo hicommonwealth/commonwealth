@@ -1,5 +1,5 @@
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal/types';
 import { createBoundedUseStore } from 'state/ui/utils';
+import { AuthModalType } from 'views/modals/AuthModal/types';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 

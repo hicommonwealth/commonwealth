@@ -1,5 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';
@@ -25,13 +26,21 @@ export const checkNewThreadErrors = (
   }
 };
 
-export const checkIsTopicInContest = (data: Contest[], topicId?: number) => {
+export const checkIsTopicInContest = (
+  data: Contest[],
+  topicId?: number,
+  checkOnlyActiveContest = false,
+) => {
   if (!topicId) {
     return false;
   }
 
-  return (data || []).some(
-    (item) =>
-      item?.topics && item?.topics.some((topic) => topic?.id === topicId),
-  );
+  return (data || [])
+    .filter((item) =>
+      checkOnlyActiveContest ? isContestActive({ contest: item }) : true,
+    )
+    .some(
+      (item) =>
+        item?.topics && item?.topics.some((topic) => topic?.id === topicId),
+    );
 };

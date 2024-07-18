@@ -178,6 +178,18 @@ export async function __createThread(
         transaction,
       });
 
+      await this.models.ThreadVersionHistory.create(
+        {
+          thread_id: thread.id!,
+          body,
+          address: address.address!,
+          timestamp: thread.created_at!,
+        },
+        {
+          transaction,
+        },
+      );
+
       address.last_active = new Date();
       await address.save({ transaction });
 
@@ -187,8 +199,6 @@ export async function __createThread(
         // @ts-expect-error StrictNullChecks
         authorUserId: user.id,
         authorAddress: address.address,
-        // @ts-expect-error StrictNullChecks
-        authorProfileId: address.profile_id,
         mentions: mentionedAddresses,
         thread,
       });
