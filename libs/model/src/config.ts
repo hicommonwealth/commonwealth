@@ -14,6 +14,7 @@ const {
   TBC_BALANCE_TTL_SECONDS,
   ALLOWED_EVENTS,
   INIT_TEST_DB,
+  MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
 } = process.env;
 
@@ -46,6 +47,12 @@ export const config = configure(
     OUTBOX: {
       ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
     },
+    CONTESTS: {
+      MIN_USER_ETH: 0.0005,
+      MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
+        ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
+        : 2,
+    },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
       SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
@@ -67,6 +74,10 @@ export const config = configure(
     }),
     OUTBOX: z.object({
       ALLOWED_EVENTS: z.array(z.string()),
+    }),
+    CONTESTS: z.object({
+      MIN_USER_ETH: z.number(),
+      MAX_USER_POSTS_PER_CONTEST: z.number().int(),
     }),
     AUTH: z
       .object({

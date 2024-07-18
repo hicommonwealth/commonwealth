@@ -6,9 +6,10 @@ import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
@@ -21,6 +22,7 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
@@ -36,12 +38,11 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import ContestThreadBanner from './ContestThreadBanner';
+import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
-import {
-  checkIsTopicInContest,
-  checkNewThreadErrors,
-  useNewThreadForm,
-} from './helpers';
+import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+
+const MIN_ETH_FOR_CONTEST_THREAD = 0.005;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -52,11 +53,12 @@ export const NewThreadForm = () => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const { data: topics = [] } = useFetchTopicsQuery({
+  const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
+    includeContestData: contestsEnabled,
   });
 
-  const { contestsData, isContestAvailable } = useCommunityContests();
+  const { isContestAvailable } = useCommunityContests();
 
   const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
   const communityId = app.chain.id;
@@ -81,15 +83,23 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
-  const isTopicInContest = checkIsTopicInContest(
-    contestsData,
-    threadTopic?.id,
-    true,
-  );
+  const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
+
+  const user = useUserStore();
+
+  const contestTopicError = threadTopic?.activeContestManagers?.length
+    ? threadTopic?.activeContestManagers
+        ?.map(
+          (acm) =>
+            acm?.content?.filter(
+              (c) => c.actor_address === user.activeAccount?.address,
+            ).length || 0,
+        )
+        ?.every((n) => n >= 2)
+    : false;
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
-  const user = useUserStore();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -112,6 +122,19 @@ export const NewThreadForm = () => {
   const { RevalidationModal } = useSessionRevalidationModal({
     handleClose: resetCreateThreadMutation,
     error: createThreadError,
+  });
+
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+
+  const { data: userEthBalance } = useGetUserEthBalanceQuery({
+    chainRpc,
+    walletAddress: user.activeAccount?.address || '',
+    apiEnabled:
+      isContestAvailable &&
+      !!user.activeAccount?.address &&
+      Number(ethChainId) > 0,
+    ethChainId: ethChainId || 0,
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -180,6 +203,14 @@ export const NewThreadForm = () => {
       if (err instanceof SessionKeyError) {
         return;
       }
+
+      if (err?.message?.includes('limit')) {
+        notifyError(
+          'Limit of submitted threads in selected contest has been exceeded.',
+        );
+        return;
+      }
+
       console.error(err.response.data.error || err?.message);
       notifyError('Failed to create thread');
     } finally {
@@ -203,9 +234,21 @@ export const NewThreadForm = () => {
   });
 
   const contestThreadBannerVisible =
-    contestsEnabled && isContestAvailable && isTopicInContest;
+    contestsEnabled && isContestAvailable && hasTopicOngoingContest;
   const isDisabledBecauseOfContestsConsent =
     contestThreadBannerVisible && !submitEntryChecked;
+
+  const contestTopicBannerVisible =
+    contestsEnabled && isContestAvailable && hasTopicOngoingContest;
+
+  const walletBalanceError =
+    isContestAvailable &&
+    hasTopicOngoingContest &&
+    parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
+
+  useEffect(() => {
+    refreshTopics().catch(console.error);
+  }, [refreshTopics]);
 
   return (
     <>
@@ -240,6 +283,11 @@ export const NewThreadForm = () => {
                       },
                     })}
                   placeholder="Select topic"
+                  customError={
+                    contestTopicError
+                      ? 'Can no longer post in this topic while contest is active.'
+                      : ''
+                  }
                   onChange={(topic) => {
                     setCanShowGatingBanner(true);
                     setThreadTopic(
@@ -247,6 +295,22 @@ export const NewThreadForm = () => {
                       topicsForSelector.find((t) => `${t.id}` === topic.value),
                     );
                   }}
+                />
+              )}
+
+              {contestTopicBannerVisible && (
+                <ContestTopicBanner
+                  contests={threadTopic?.activeContestManagers.map((acm) => {
+                    return {
+                      name: acm?.contest_manager?.name,
+                      address: acm?.contest_manager?.contest_address,
+                      submittedEntries:
+                        acm?.content?.filter(
+                          (c) =>
+                            c.actor_address === user.activeAccount?.address,
+                        ).length || 0,
+                    };
+                  })}
                 />
               )}
 
@@ -278,6 +342,12 @@ export const NewThreadForm = () => {
                 />
               )}
 
+              <MessageRow
+                hasFeedback={walletBalanceError}
+                statusMessage="Ensure that your connected wallet has at least 0.005 ETH to participate."
+                validationStatus="failure"
+              />
+
               <div className="buttons-row">
                 {isPopulated && user.activeAccount && (
                   <CWButton
@@ -293,7 +363,9 @@ export const NewThreadForm = () => {
                   disabled={
                     isDisabled ||
                     !user.activeAccount ||
-                    isDisabledBecauseOfContestsConsent
+                    isDisabledBecauseOfContestsConsent ||
+                    walletBalanceError ||
+                    contestTopicError
                   }
                   onClick={handleNewThreadCreation}
                   tabIndex={4}

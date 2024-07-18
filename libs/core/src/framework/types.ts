@@ -147,7 +147,7 @@ export type CommandHandler<
  */
 export type QueryHandler<Input extends ZodSchema, Output extends ZodSchema> = (
   context: QueryContext<Input>,
-) => Promise<Partial<z.infer<Output>> | undefined>;
+) => Promise<z.infer<Output> | undefined>;
 
 /**
  * Event handler
