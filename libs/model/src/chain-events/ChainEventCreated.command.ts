@@ -56,12 +56,14 @@ export function verifyAlchemySignature(req: any) {
  * This function makes an API request to Alchemy to add the specified contract address to the GraphQL query of the
  * relevant webhook. If the contract address already exists in the query filter this function does nothing.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function addContractAddressToWebhook() {}
 
 export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
   return {
     ...schemas.ChainEventCreated,
     auth: [],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     body: async ({ id, payload }) => {
       // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/ChainEventCreated/BaseSepolia)
       // let chain = id!;
