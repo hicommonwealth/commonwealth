@@ -36,6 +36,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const [authModalType, setAuthModalType] = useState<AuthModalType>();
   const [profileId, setProfileId] = useState<null | number>(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
@@ -46,8 +47,16 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const { authModalType, setAuthModalType } = useAuthModalStore();
+  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
   const user = useUserStore();
+
+  useEffect(() => {
+    if (triggerOpenModalType) {
+      setAuthModalType(triggerOpenModalType);
+      // @ts-expect-error StrictNullChecks
+      setTriggerOpenModalType(undefined);
+    }
+  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
