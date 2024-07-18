@@ -1,11 +1,11 @@
-import {
-  AddressAttributes,
-  DB,
-  GroupInstance,
-  MembershipRejectReason,
-} from '@hicommonwealth/model';
 import { GroupPermissionAction } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+import {
+  type AddressAttributes,
+  type DB,
+  type GroupInstance,
+  type MembershipRejectReason,
+} from '../..';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 /**

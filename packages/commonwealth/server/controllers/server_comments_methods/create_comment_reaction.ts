@@ -4,12 +4,12 @@ import {
   ReactionAttributes,
   UserInstance,
   commonProtocol as commonProtocolService,
+  validateTopicGroupsMembership,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
-import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommentsController } from '../server_comments_controller';
@@ -91,8 +91,7 @@ export async function __createCommentReaction(
     try {
       const { isValid } = await validateTopicGroupsMembership(
         this.models,
-        // @ts-expect-error StrictNullChecks
-        thread.topic_id,
+        thread.topic_id!,
         thread.community_id,
         address,
         PermissionEnum.CREATE_COMMENT_REACTION,

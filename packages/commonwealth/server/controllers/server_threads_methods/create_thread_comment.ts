@@ -4,6 +4,7 @@ import {
   CommentAttributes,
   CommentInstance,
   UserInstance,
+  validateTopicGroupsMembership,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
@@ -19,7 +20,6 @@ import {
   queryMentionedUsers,
   uniqueMentions,
 } from '../../util/parseUserMentions';
-import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';

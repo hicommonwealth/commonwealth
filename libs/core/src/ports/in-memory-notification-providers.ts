@@ -1,5 +1,5 @@
-import { NotificationsProvider } from '@hicommonwealth/core';
 import sinon from 'sinon';
+import { NotificationsProvider } from '..';
 
 export function SpyNotificationsProvider(
   sandbox: sinon.SinonSandbox,

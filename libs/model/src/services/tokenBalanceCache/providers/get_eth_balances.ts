@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
+import { ChainNodeInstance } from '../../../models';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,

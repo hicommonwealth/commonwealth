@@ -4,9 +4,9 @@ import {
   GetDigestEmailData,
   Query,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
+import { models } from '../database';
 
 export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
   return {

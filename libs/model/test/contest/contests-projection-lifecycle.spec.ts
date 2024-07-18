@@ -7,7 +7,6 @@ import {
   handleEvent,
   query,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
 import { AbiType, commonProtocol, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
@@ -17,6 +16,7 @@ import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
+import { models } from '../../src/database';
 import {
   contestHelper,
   contractHelpers,

@@ -1,6 +1,6 @@
-import { safeTruncateBody } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { describe, test } from 'vitest';
+import { safeTruncateBody } from '../../src/utils';
 
 const spliceUserMentionIndex = 12;
 const spliceUrlIndex = 38;

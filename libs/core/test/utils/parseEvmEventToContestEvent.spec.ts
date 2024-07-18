@@ -1,7 +1,7 @@
-import { EventNames } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import ethers from 'ethers';
 import { describe, test } from 'vitest';
+import { EventNames } from '../../src';
 import {
   ContestContentAdded,
   ContestContentUpvoted,
