@@ -13,10 +13,16 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies = {
-  name: 'jwt' | 'authtoken';
-  userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
-};
+export type AuthStrategies =
+  | {
+      name: 'jwt' | 'authtoken';
+      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+    }
+  | {
+      name: 'custom';
+      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+      customStrategyFn: (req: any) => void;
+    };
 
 /**
  * Deep partial utility
