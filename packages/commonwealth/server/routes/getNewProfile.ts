@@ -148,7 +148,6 @@ const getNewProfile = async (
         model: models.Tags,
       },
     ],
-    logging: true,
   });
 
   return success(res, {
