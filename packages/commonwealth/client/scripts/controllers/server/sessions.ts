@@ -169,12 +169,15 @@ async function sign(
         payload: session,
       };
 
-      const sessionMessageId = SignedMessage.encode(sessionMessage).id;
       const sessionMessageSignature = await messageSigner.sign(sessionMessage);
+      const sessionMessageId = SignedMessage.encode(
+        sessionMessageSignature,
+        sessionMessage,
+      ).id;
 
       const actionMessage: Message<Action> = {
         clock: 2,
-        parents: [],
+        parents: [sessionMessageId],
         topic: CANVAS_TOPIC,
         payload: {
           type: 'action' as const,
@@ -187,8 +190,11 @@ async function sign(
         },
       };
 
-      const actionMessageId = SignedMessage.encode(actionMessage).id;
       const actionMessageSignature = await messageSigner.sign(actionMessage);
+      const actionMessageId = SignedMessage.encode(
+        actionMessageSignature,
+        actionMessage,
+      ).id;
 
       return {
         canvasSignedData: {
