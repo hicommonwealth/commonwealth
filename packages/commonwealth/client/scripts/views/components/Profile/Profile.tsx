@@ -67,7 +67,6 @@ const Profile = ({ profileId }: ProfileProps) => {
               id: a.id,
               address: a.address,
               communityId: a.community_id,
-              keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
               ghostAddress: a.ghost_address,

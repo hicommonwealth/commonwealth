@@ -1,64 +1,32 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
 
-import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
-
 import { PageNotFound } from '../pages/404';
-import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
+import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
-import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
 import { getThreadActionTooltipText } from 'helpers/threads';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
-import Topic from 'models/Topic';
-import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import {
+  useFetchGlobalActivityQuery,
+  useFetchUserActivityQuery,
+} from 'state/api/feeds';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import { DashboardViews } from 'views/pages/user_dashboard';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
-type ActivityResponse = {
-  thread: {
-    id: number;
-    body: string;
-    plaintext: string;
-    title: string;
-    numberOfComments: number;
-    created_at: string;
-    updated_at: string;
-    deleted_at?: string;
-    archived_at?: string;
-    locked_at?: string;
-    read_only: boolean;
-    has_poll: boolean;
-    kind: ThreadKind;
-    stage: ThreadStage;
-    marked_as_spam_at?: string;
-    discord_meta?: string;
-    profile_id: number;
-    profile_name: string;
-    profile_avatar_url?: string;
-    user_id: number;
-    user_address: string;
-    topic: Topic;
-    community_id: string;
-  };
-  recentcomments?: [];
-};
-
 type FeedProps = {
-  fetchData: () => Promise<any>;
+  dashboardView: DashboardViews;
   noFeedMessage: string;
   defaultCount?: number;
-  onFetchedDataCallback?: (data: any) => DashboardActivityNotification;
   customScrollParent?: HTMLElement;
-  isChainEventsRow?: boolean;
 };
 
 const DEFAULT_COUNT = 10;
@@ -136,147 +104,41 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
 // eslint-disable-next-line react/no-multi-comp
 export const Feed = ({
-  defaultCount,
-  fetchData,
+  dashboardView,
   noFeedMessage,
-  onFetchedDataCallback,
   customScrollParent,
-  isChainEventsRow,
 }: FeedProps) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
-  const [data, setData] = useState<
-    DashboardActivityNotification[] | Thread[]
-  >();
-  const [labels, setLabels] = useState<(IEventLabel | undefined)[]>();
-  const [currentCount, setCurrentCount] = useState<number>(
-    defaultCount || DEFAULT_COUNT,
-  );
-  const { isLoggedIn } = useUserLoggedIn();
+  const userActivityRes = useFetchUserActivityQuery({
+    apiEnabled: DashboardViews.ForYou === dashboardView,
+  });
 
-  const loadMore = useCallback(() => {
-    return setTimeout(() => {
-      setCurrentCount(
-        (prevState) => prevState + (defaultCount || DEFAULT_COUNT),
-      );
-    }, 500);
-  }, [setCurrentCount, defaultCount]);
+  const globalActivityRes = useFetchGlobalActivityQuery({
+    apiEnabled: DashboardViews.Global === dashboardView,
+  });
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await fetchData();
+  const queryData = (() => {
+    if (DashboardViews.Global === dashboardView) return globalActivityRes;
+    else return userActivityRes;
+  })();
 
-        if (isChainEventsRow) {
-          const notifications: DashboardActivityNotification[] =
-            onFetchedDataCallback
-              ? response.result.map((activity) =>
-                  onFetchedDataCallback(activity),
-                )
-              : response.result;
-          const filteredNotifs: DashboardActivityNotification[] = [];
-          const labelsArr: (IEventLabel | undefined)[] = [];
-
-          for (const notif of notifications) {
-            if (notif.categoryId === 'chain-event') {
-              try {
-                const chainEvent = {
-                  network: notif.eventNetwork,
-                  data: notif.eventData,
-                };
-                // @ts-expect-error <StrictNullChecks/>
-                const label = ChainEventLabel(notif.communityId, chainEvent);
-                filteredNotifs.push(notif);
-                labelsArr.push(label);
-              } catch (e) {
-                console.warn(e);
-              }
-            } else {
-              filteredNotifs.push(notif);
-              labelsArr.push(undefined);
-            }
-          }
-
-          setData(filteredNotifs);
-          setLabels(labelsArr);
-        } else {
-          const threads = (response?.result || []).map(
-            (x: ActivityResponse) =>
-              new Thread({
-                id: x.thread.id,
-                profile_id: x.thread.profile_id,
-                // @ts-expect-error <StrictNullChecks/>
-                avatar_url: x.thread.profile_avatar_url,
-                profile_name: x.thread.profile_name,
-                community_id: x.thread.community_id,
-                kind: x.thread.kind,
-                last_edited: x.thread.updated_at,
-                // @ts-expect-error <StrictNullChecks/>
-                marked_as_spam_at: x.thread.marked_as_spam_at,
-                // @ts-expect-error <StrictNullChecks/>
-                recentComments: x.recentcomments,
-                stage: x.thread.stage,
-                title: x.thread.title,
-                created_at: x.thread.created_at,
-                updated_at: x.thread.updated_at,
-                body: x.thread.body,
-                discord_meta: x.thread.discord_meta,
-                numberOfComments: x.thread.numberOfComments,
-                plaintext: x.thread.plaintext,
-                read_only: x.thread.read_only,
-                archived_at: x.thread.archived_at,
-                // @ts-expect-error <StrictNullChecks/>
-                locked_at: x.thread.locked_at,
-                has_poll: x.thread.has_poll,
-                Address: {
-                  address: x.thread.user_address,
-                  community_id: x.thread.community_id,
-                },
-                topic: x?.thread?.topic,
-                // filler values
-                // @ts-expect-error <StrictNullChecks/>
-                version_history: null,
-                last_commented_on: '',
-                address_last_active: '',
-                reaction_weights_sum: 0,
-              }),
-          );
-          setData(threads);
-        }
-      } catch (err) {
-        setError(true);
-      }
-      setLoading(false);
-    };
-
-    getData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (loading) {
+  if (queryData?.isLoading) {
     return (
       <div className="Feed">
         <Virtuoso
           customScrollParent={customScrollParent}
           totalCount={4}
           style={{ height: '100%' }}
-          itemContent={(i) => (
-            <UserDashboardRow
-              key={i}
-              isChainEventsRow={isChainEventsRow}
-              showSkeleton
-            />
-          )}
+          itemContent={(i) => <UserDashboardRowSkeleton key={i} />}
         />
       </div>
     );
   }
 
-  if (error) {
+  if (queryData?.isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
 
-  if (!data || data?.length === 0) {
+  if (queryData?.data?.length === 0) {
     return (
       <div className="Feed">
         <div className="no-feed-message">{noFeedMessage}</div>
@@ -284,29 +146,14 @@ export const Feed = ({
     );
   }
 
-  if (currentCount > data.length) setCurrentCount(data.length);
-
   return (
     <div className="Feed">
       <Virtuoso
         customScrollParent={customScrollParent}
-        totalCount={currentCount}
-        endReached={loadMore}
+        totalCount={queryData?.data?.length || DEFAULT_COUNT}
         style={{ height: '100%' }}
         itemContent={(i) => {
-          if (isChainEventsRow) {
-            return (
-              <UserDashboardRow
-                key={i}
-                notification={data[i]}
-                // @ts-expect-error <StrictNullChecks/>
-                label={labels[i]}
-                isLoggedIn={isLoggedIn}
-              />
-            );
-          }
-
-          return <FeedThread key={1} thread={data[i] as Thread} />;
+          return <FeedThread key={1} thread={queryData.data[i] as Thread} />;
         }}
       />
     </div>

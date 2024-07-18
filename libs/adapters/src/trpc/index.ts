@@ -2,7 +2,6 @@ import * as core from '@hicommonwealth/core';
 import {
   AuthStrategies,
   Events,
-  ExternalServiceUserIds,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   logger,
@@ -45,13 +44,13 @@ const authenticate = async (
       switch (req.headers['authorization']) {
         case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
           req.user = {
-            id: ExternalServiceUserIds.Knock,
+            id: authStrategy.userId,
             email: 'hello@knock.app',
           };
           break;
         case config.LOAD_TESTING.AUTH_TOKEN:
           req.user = {
-            id: ExternalServiceUserIds.K6,
+            id: authStrategy.userId,
             email: 'info@grafana.com',
           };
           break;
@@ -119,6 +118,7 @@ export enum Tag {
   Query = 'Query',
   Integration = 'Integration',
   Subscription = 'Subscription',
+  LoadTest = 'LoadTest',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(

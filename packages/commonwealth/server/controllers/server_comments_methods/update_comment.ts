@@ -149,8 +149,6 @@ export async function __updateComment(
       // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
-      // @ts-expect-error StrictNullChecks
-      authorProfileId: address.profile_id,
       mentions: mentionedAddresses,
       comment,
     });

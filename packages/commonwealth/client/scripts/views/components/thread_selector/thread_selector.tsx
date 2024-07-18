@@ -100,7 +100,7 @@ export const ThreadSelector = ({
         placeholder="Search thread titles..."
         iconRightonClick={handleClearButtonClick}
         value={searchTerm}
-        iconRight="close"
+        iconRight={searchTerm ? 'close' : 'magnifyingGlass'}
         onInput={handleInputChange}
       />
 
