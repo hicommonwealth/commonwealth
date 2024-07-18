@@ -253,8 +253,6 @@ export async function __createThread(
         // @ts-expect-error StrictNullChecks
         authorUserId: user.id,
         authorAddress: address.address,
-        // @ts-expect-error StrictNullChecks
-        authorProfileId: address.profile_id,
         mentions: mentionedAddresses,
         thread,
       });

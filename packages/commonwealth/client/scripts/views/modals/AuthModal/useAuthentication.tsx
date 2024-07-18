@@ -38,7 +38,6 @@ import { setDarkMode } from '../../../helpers/darkMode';
 import { getAddressFromWallet } from '../../../helpers/wallet';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import { useFlag } from '../../../hooks/useFlag';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import {
@@ -61,7 +60,6 @@ type UseAuthenticationProps = {
 type Wallet = IWebWallet<any>;
 
 const useAuthentication = (props: UseAuthenticationProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [username, setUsername] = useState<string>('Anonymous');
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<Wallet>>();
@@ -172,7 +170,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // then open the user auth type guidance modal
       // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
       if (
-        userOnboardingEnabled &&
         isAddressNew &&
         !isAttemptingToConnectAddressToCommunity &&
         !app.isLoggedIn()
@@ -425,35 +422,33 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       return;
     }
 
-    if (userOnboardingEnabled) {
-      // check if address exists
-      const profileAddresses = await fetchProfilesByAddress({
-        currentChainId: '',
-        profileAddresses: [
-          wallet.chain === ChainBase.Substrate
-            ? addressSwapper({
-                address: selectedAddress,
-                currentPrefix: parseInt(
-                  (app.chain as Substrate)?.meta.ss58Prefix,
-                  10,
-                ),
-              })
-            : selectedAddress,
-        ],
-        profileChainIds: [app.activeChainId() ?? wallet.chain],
-        initiateProfilesAfterFetch: false,
-      });
-      const addressExists = profileAddresses?.length > 0;
-      const isAttemptingToConnectAddressToCommunity =
-        app.isLoggedIn() && app.activeChainId();
-      if (
-        !addressExists &&
-        !isAttemptingToConnectAddressToCommunity &&
-        props.onUnrecognizedAddressReceived
-      ) {
-        const shouldContinue = props.onUnrecognizedAddressReceived();
-        if (!shouldContinue) return;
-      }
+    // check if address exists
+    const profileAddresses = await fetchProfilesByAddress({
+      currentChainId: '',
+      profileAddresses: [
+        wallet.chain === ChainBase.Substrate
+          ? addressSwapper({
+              address: selectedAddress,
+              currentPrefix: parseInt(
+                (app.chain as Substrate)?.meta.ss58Prefix,
+                10,
+              ),
+            })
+          : selectedAddress,
+      ],
+      profileChainIds: [app.activeChainId() ?? wallet.chain],
+      initiateProfilesAfterFetch: false,
+    });
+    const addressExists = profileAddresses?.length > 0;
+    const isAttemptingToConnectAddressToCommunity =
+      app.isLoggedIn() && app.activeChainId();
+    if (
+      !addressExists &&
+      !isAttemptingToConnectAddressToCommunity &&
+      props.onUnrecognizedAddressReceived
+    ) {
+      const shouldContinue = props.onUnrecognizedAddressReceived();
+      if (!shouldContinue) return;
     }
 
     if (props.useSessionKeyLoginFlow) {

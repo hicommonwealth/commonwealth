@@ -2,7 +2,6 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { signThread } from 'controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
@@ -82,7 +81,6 @@ const createThread = async ({
 const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -108,14 +106,12 @@ const useCreateThreadMutation = ({
       // increment communities thread count
       if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
-      if (userOnboardingEnabled) {
-        const profileId = user.addresses?.[0]?.profile?.id;
-        profileId &&
-          markTrainingActionAsComplete(
-            UserTrainingCardTypes.CreateContent,
-            profileId,
-          );
-      }
+      const profileId = user.addresses?.[0]?.profile?.id;
+      profileId &&
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
+        );
 
       return newThread;
     },

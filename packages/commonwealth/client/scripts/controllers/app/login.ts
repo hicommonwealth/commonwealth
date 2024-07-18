@@ -19,7 +19,6 @@ import { Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC, serializeCanvas } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { OAuthExtension } from '@magic-ext/oauth';
-import { OpenFeature } from '@openfeature/web-sdk';
 import { Magic } from 'magic-sdk';
 
 import axios from 'axios';
@@ -185,11 +184,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
       .addresses // @ts-expect-error StrictNullChecks
       .filter((a) => a.community.id === chain.id)
       .map((addr) => {
-        const tempAddr = app.chain?.accounts.get(
-          addr.address,
-          addr.keytype,
-          false,
-        );
+        const tempAddr = app.chain?.accounts.get(addr.address, false);
         tempAddr.profile = addr.profile;
         tempAddr.lastActive = addr.lastActive;
         return tempAddr;
@@ -285,7 +280,6 @@ export function updateActiveUser(data) {
           id: a.id,
           address: a.address,
           communityId: a.community_id,
-          keytype: a.keytype,
           walletId: a.wallet_id,
           walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,
@@ -516,31 +510,24 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  const client = OpenFeature.getClient();
-  const userOnboardingEnabled = client.getBooleanValue(
-    'userOnboardingEnabled',
-    false,
-  );
   let isAddressNew = false;
-  if (userOnboardingEnabled) {
-    // check if this address exists in db
-    const profileAddresses = await fetchProfilesByAddress({
-      currentChainId: '',
-      profileAddresses: [magicAddress],
-      profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
-      initiateProfilesAfterFetch: false,
-    });
+  // check if this address exists in db
+  const profileAddresses = await fetchProfilesByAddress({
+    currentChainId: '',
+    profileAddresses: [magicAddress],
+    profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
+    initiateProfilesAfterFetch: false,
+  });
 
-    isAddressNew = profileAddresses?.length === 0;
-    const isAttemptingToConnectAddressToCommunity =
-      app.isLoggedIn() && app.activeChainId();
-    if (
-      isAddressNew &&
-      !isAttemptingToConnectAddressToCommunity &&
-      returnEarlyIfNewAddress
-    ) {
-      return { address: magicAddress, isAddressNew };
-    }
+  isAddressNew = profileAddresses?.length === 0;
+  const isAttemptingToConnectAddressToCommunity =
+    app.isLoggedIn() && app.activeChainId();
+  if (
+    isAddressNew &&
+    !isAttemptingToConnectAddressToCommunity &&
+    returnEarlyIfNewAddress
+  ) {
+    return { address: magicAddress, isAddressNew };
   }
 
   let session: Session | null = null;
@@ -628,25 +615,23 @@ export async function handleSocialLoginCallback({
       await updateActiveAddresses({ chain: c });
     }
 
-    if (userOnboardingEnabled) {
-      const { Profiles: profiles, email: ssoEmail } = response.data.result;
+    const { Profiles: profiles, email: ssoEmail } = response.data.result;
 
-      // if email is not set, set the SSO email as the default email
-      // only if its a standalone account (no account linking)
-      if (!userStore.getState().email && ssoEmail && profiles?.length === 1) {
-        await updateEmail({ email: ssoEmail })
-          .then(onUpdateEmailSuccess)
-          .catch(() => onUpdateEmailError(false));
-      }
+    // if email is not set, set the SSO email as the default email
+    // only if its a standalone account (no account linking)
+    if (!userStore.getState().email && ssoEmail && profiles?.length === 1) {
+      await updateEmail({ email: ssoEmail })
+        .then(onUpdateEmailSuccess)
+        .catch(() => onUpdateEmailError(false));
+    }
 
-      // if account is newly created and user has not completed onboarding flow
-      // then open the welcome modal.
-      const profileId = profiles?.[0]?.id;
-      if (profileId && !userStore.getState().isWelcomeOnboardFlowComplete) {
-        setTimeout(() => {
-          welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
-        }, 1000);
-      }
+    // if account is newly created and user has not completed onboarding flow
+    // then open the welcome modal.
+    const profileId = profiles?.[0]?.id;
+    if (profileId && !userStore.getState().isWelcomeOnboardFlowComplete) {
+      setTimeout(() => {
+        welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
+      }, 1000);
     }
 
     return { address: magicAddress, isAddressNew };

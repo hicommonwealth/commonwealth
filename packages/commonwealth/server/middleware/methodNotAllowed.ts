@@ -24,6 +24,7 @@ const statsMiddleware = (method: string, path: string) => (req, res, next) => {
       const latency = Date.now() - start;
       stats().histogram(`cw.path.latency`, latency, {
         path: routePattern,
+        statusCode: `${res.statusCode}`,
       });
     });
   } catch (err) {

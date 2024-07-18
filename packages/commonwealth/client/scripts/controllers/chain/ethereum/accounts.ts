@@ -20,7 +20,7 @@ class EthereumAccounts implements IAccountsModule<EthereumAccount> {
 
   private _Chain: EthereumChain;
 
-  public get(address: string, keytype?: string, ignoreProfiles = true) {
+  public get(address: string, ignoreProfiles = true) {
     return this.fromAddress(address, ignoreProfiles);
   }
 
