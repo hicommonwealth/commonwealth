@@ -247,7 +247,7 @@ export const NewThreadForm = () => {
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
   useEffect(() => {
-    refreshTopics();
+    refreshTopics().catch(console.error);
   }, [refreshTopics]);
 
   return (
