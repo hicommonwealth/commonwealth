@@ -16,8 +16,9 @@ export function addressToUserProfile(address): UserProfile {
   }
   return {
     id: address.profile_id,
-    avatarUrl: profile?.avatar_url,
-    name: profile?.name,
+    // TODO: let's agreed on a single model (UserProfile, MinimumProfile)
+    avatarUrl: profile?.avatar_url ?? profile?.avatarUrl,
+    name: profile?.name ?? profile?.profile_name,
     address: address?.address,
     lastActive: address?.last_active,
   };

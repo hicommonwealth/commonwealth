@@ -343,15 +343,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -363,15 +355,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -389,15 +373,7 @@ export async function __updateThread(
                 model: this.models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: this.models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
+                attributes: ['id', 'profile'],
               },
             ],
           },
@@ -424,13 +400,8 @@ export async function __updateThread(
             attributes: ['address'],
             include: [
               {
-                model: this.models.Profile,
-                attributes: [
-                  ['id', 'profile_id'],
-                  'profile_name',
-                  ['avatar_url', 'profile_avatar_url'],
-                  'user_id',
-                ],
+                model: this.models.User,
+                attributes: ['profile'],
               },
             ],
           },

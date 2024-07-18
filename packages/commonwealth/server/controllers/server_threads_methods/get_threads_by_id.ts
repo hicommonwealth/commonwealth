@@ -1,4 +1,4 @@
-import { ThreadAttributes, UserAttributes } from '@hicommonwealth/model';
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -106,46 +106,9 @@ export async function __getThreadsById(
     ],
   });
 
-  const result = threads.map((thread) => {
+  return threads.map((thread) => {
     const t = thread.toJSON();
     (t as any).numberOfComments = t.comment_count || 0;
-
-    // TO BE REMOVED - mappings to Profiles[] as expected UI response
-    // @ts-expect-error StrictNullChecks
-    const u: UserAttributes = t.Address.User;
-    if (u) {
-      u.Profiles = [
-        {
-          user_id: u.id!,
-          id: t.Address?.profile_id ?? undefined,
-          profile_name: u.profile.name ?? undefined,
-          avatar_url: u.profile.avatar_url ?? undefined,
-        },
-      ];
-    }
-    t.collaborators?.forEach((c) => {
-      if (c.User)
-        c.User.Profiles = [
-          {
-            user_id: c.User.id!,
-            id: c.profile_id,
-            profile_name: c.User.profile.name ?? undefined,
-            avatar_url: c.User.profile.avatar_url ?? undefined,
-          },
-        ];
-    });
-    t.reactions?.forEach((r) => {
-      if (r.Address?.User)
-        r.Address.User.Profiles = [
-          {
-            user_id: r.Address.User.id!,
-            id: r.Address?.profile_id,
-            profile_name: r.Address?.User.profile.name ?? undefined,
-            avatar_url: r.Address?.User.profile.avatar_url ?? undefined,
-          },
-        ];
-    });
     return t;
   });
-  return result;
 }
