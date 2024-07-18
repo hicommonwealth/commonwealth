@@ -47,7 +47,6 @@ export default (
       verification_token: { type: Sequelize.STRING, allowNull: false },
       verification_token_expires: { type: Sequelize.DATE, allowNull: true },
       verified: { type: Sequelize.DATE, allowNull: true },
-      keytype: { type: Sequelize.STRING, allowNull: true },
       last_active: { type: Sequelize.DATE, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },

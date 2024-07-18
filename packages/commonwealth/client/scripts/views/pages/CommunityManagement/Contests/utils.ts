@@ -8,3 +8,6 @@ export const isContestActive = ({ contest }: { contest: Contest }) => {
   const hasEnded = moment(end_time) < moment();
   return contest?.cancelled ? false : !hasEnded;
 };
+
+export const CONTEST_FAQ_URL =
+  'https://docs.common.xyz/commonwealth/for-admins-and-mods/enabling-and-running-contests';

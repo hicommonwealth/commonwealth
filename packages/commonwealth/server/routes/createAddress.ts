@@ -17,7 +17,6 @@ export type CreateAddressReq = {
   community_id?: string;
   wallet_id: WalletId;
   wallet_sso_source: WalletSsoSource;
-  keytype?: string;
   block_info?: string;
 };
 

@@ -88,9 +88,13 @@ export default (
               where: { id: thread_id },
             });
             if (thread) {
-              await thread.increment('comment_count', {
-                transaction: options.transaction,
-              });
+              await thread.update(
+                {
+                  comment_count: Sequelize.literal('comment_count + 1'),
+                  activity_rank_date: comment.created_at,
+                },
+                { transaction: options.transaction },
+              );
               stats().increment('cw.hook.comment-count', {
                 thread_id: String(thread_id),
               });

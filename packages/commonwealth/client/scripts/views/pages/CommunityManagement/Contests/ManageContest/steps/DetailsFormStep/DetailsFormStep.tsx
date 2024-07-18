@@ -19,6 +19,7 @@ import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
   ContestFormData,
@@ -184,7 +185,13 @@ const DetailsFormStep = ({
               create engagement incentives.{' '}
               <CWText fontWeight="medium">Contests last 7 days</CWText> in
               blockchain time.{' '}
-              <a href="https://blog.commonwealth.im">Learn more</a>
+              <a
+                href={CONTEST_FAQ_URL}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Learn more
+              </a>
             </CWText>
           </>
         )
