@@ -133,7 +133,6 @@ export async function main(
       );
 
     app.use((req, res, next) => {
-      console.log(req.path, req.url);
       if (req.path.startsWith('/api/v1/rest/chainevent/')) next();
       else parseJson(req, res, next);
     });

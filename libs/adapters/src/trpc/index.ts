@@ -61,7 +61,6 @@ const authenticate = async (
       authStrategy.customStrategyFn(req);
       req.user = {
         id: authStrategy.userId,
-        email: 'support@alchemy.com',
       };
     } else {
       await passport.authenticate(authStrategy.name, { session: false });
@@ -125,7 +124,6 @@ export enum Tag {
   Integration = 'Integration',
   Subscription = 'Subscription',
   LoadTest = 'LoadTest',
-  ChainEvent = 'ChainEvent',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(

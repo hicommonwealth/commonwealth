@@ -11,7 +11,6 @@ export const INVALID_STATE_ERROR = 'Invalid State Error';
 export const ExternalServiceUserIds = {
   Knock: -1,
   K6: -2,
-  Alchemy: -3,
 } as const;
 
 export type AuthStrategies =
