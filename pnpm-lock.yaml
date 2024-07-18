@@ -733,29 +733,29 @@ importers:
   libs/shared:
     dependencies:
       '@canvas-js/chain-cosmos':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-ethereum':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-solana':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-substrate':
-        specifier: 0.10.2
-        version: 0.10.2(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/core':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
       '@canvas-js/gossiplog':
-        specifier: 0.10.2
-        version: 0.10.2(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
       '@canvas-js/interfaces':
-        specifier: 0.10.2
-        version: 0.10.2
+        specifier: 0.10.3
+        version: 0.10.3
       '@canvas-js/signatures':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@ipld/dag-json':
         specifier: ^10.2.0
         version: 10.2.0
@@ -812,26 +812,26 @@ importers:
         specifier: ^0.2.2
         version: 0.2.3
       '@canvas-js/chain-cosmos':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-ethereum':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-solana':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-substrate':
-        specifier: 0.10.2
-        version: 0.10.2(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/gossiplog':
-        specifier: 0.10.2
-        version: 0.10.2(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
       '@canvas-js/interfaces':
-        specifier: 0.10.2
-        version: 0.10.2
+        specifier: 0.10.3
+        version: 0.10.3
       '@canvas-js/signatures':
-        specifier: 0.10.2
-        version: 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.3
+        version: 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@cosmjs/amino':
         specifier: ^0.31.3
         version: 0.31.3
@@ -2556,47 +2556,47 @@ packages:
   '@brillout/import@0.2.3':
     resolution: {integrity: sha512-1T8WlD75eeFSMrptGy8jiLHmfHgMmSjWvLOIUvHmSVZt+6k0eQqYUoK4KbmE4T9pVLIfxvZSOm2D68VEqKRHRw==}
 
-  '@canvas-js/chain-cosmos@0.10.2':
-    resolution: {integrity: sha512-jpk18JF5CF6/vGLcQlQ/m30pfrzp++yMHJ8rgmOZv6ZtuvG02t9ima9V5xOMWXPbSNcte55gF/Sq4lB0mLy5uA==}
+  '@canvas-js/chain-cosmos@0.10.3':
+    resolution: {integrity: sha512-Z+PIhm6ArJ5ILqXRwuphzO4frvdqkE5Q2I6sWx7mPEIomFgyCNzUzcBSQCFu/AUv1n0cRNi3by20ihRDSGxsaA==}
 
-  '@canvas-js/chain-ethereum@0.10.2':
-    resolution: {integrity: sha512-YFZjbfCx25QvdpPdHoNPm6bT2Dp1cGsCr8qjf4fzyxMPUXaxNG8kAAoKQ4s2GVLZhy55NMcDv6kWHyg0VeNv7Q==}
+  '@canvas-js/chain-ethereum@0.10.3':
+    resolution: {integrity: sha512-6g1T0uuIoiwa2BCaLDvjYXs81aHanQCiPBNdKFu7pvWCIctCgrQb0NU14ILW8tlnufavQeKGsuQlem+M8XsJDg==}
 
-  '@canvas-js/chain-solana@0.10.2':
-    resolution: {integrity: sha512-zp3rJmg29lPB8LpwaQVco/esGFMno2IdCl2ICVXrZweQX6G/FxG3glLy4uNS8df0jTBVz/yfjEN1IuD6NaZmBg==}
+  '@canvas-js/chain-solana@0.10.3':
+    resolution: {integrity: sha512-tUp1hLMbsY2OX5ROEZ3u+zgs/deJx+OBvpeaSMP7CgGUxdxcA9GWNXOxy9aGePJ6b3a4nzX+9m+y+hO8riG/zA==}
 
-  '@canvas-js/chain-substrate@0.10.2':
-    resolution: {integrity: sha512-xtkVlXwRbHMvI2rI8+jvgepOkCtUCy+SJzVHZbgwnYo149NBNCs3lYrYM9qHBN5hLPK6wVDsHHfvPPmQ9+U9CA==}
+  '@canvas-js/chain-substrate@0.10.3':
+    resolution: {integrity: sha512-PwsW+BZV5FeczgtuXodKppmtE2M69NVZa9QkE56YrJzM/DwSV64qR74NeckLJ9wIjME6VYkDumoCCDiFRGJd0g==}
 
-  '@canvas-js/core@0.10.2':
-    resolution: {integrity: sha512-DYm+pV2CPIlOA6QMAN/M9qlzA+QaYjplp02F+fSoqxVTs332n9OzC9aR/TWXLxosQM8o7JjKHLi/OkQE1hDHfg==}
+  '@canvas-js/core@0.10.3':
+    resolution: {integrity: sha512-orT6Q91F5EGg2qc0orCToqNHBP36iVewP5HdJU05SZe/hIK3ecNM2qdxDcCkQFXA/zYWAfIvfcGJ8wA4YaxALQ==}
     engines: {node: '>=18.0.0'}
 
-  '@canvas-js/gossiplog@0.10.2':
-    resolution: {integrity: sha512-n0nPzJdmHGErGjW32vgvsuzwBFYdzmwU9nDFqA71aVumMULefYH8r+3bTyHAfwem7kzLeZKYU1mywQeRgeShpg==}
+  '@canvas-js/gossiplog@0.10.3':
+    resolution: {integrity: sha512-pySQ3im0ZMcRU8ZRCzDRlLtbsc6QHIvKTfBAkDbHEbk4B/SRJFCEJaC+e/Bn8/Bz3AKGHPmMiHoeM0WL//udWA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@chainsafe/libp2p-gossipsub': ^13.1.0
 
-  '@canvas-js/interfaces@0.10.2':
-    resolution: {integrity: sha512-JPZfrCDhELxVvklg7cDEZ4wyPvx6ENN889pyaFc+AXwiWgSNVZpvfE3bRa1P60Wqlhfvyjc5nBpS2Ze7+nCYsg==}
+  '@canvas-js/interfaces@0.10.3':
+    resolution: {integrity: sha512-wKeCSGUCA0/j7WseNVqqDSCZRv3fvXa8B2MMTzBCUD3+SiKrfS//uQbHFPJxBvjWvXLLWUVwhOVM80w70ZxBvw==}
 
-  '@canvas-js/modeldb-idb@0.10.2':
-    resolution: {integrity: sha512-fdV57WkL78FCjxbJ4yhrXMJTu44NAF8pxScQxJfmPLuypxHlmIYxmRy3l2ZEuJfjY/lU1Hyzb52Kogzm0hYJwQ==}
+  '@canvas-js/modeldb-idb@0.10.3':
+    resolution: {integrity: sha512-C/rgTNoDSjvnQIWK85QDW5F0NyFWlDDxm+xkAgfUhY31hrsYxl0JfUKhWgMm96LGaULh6J6MCdmrYwKXsamGoA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^18.3.1
 
-  '@canvas-js/modeldb-pg@0.10.2':
-    resolution: {integrity: sha512-o85df94JWhZi25u10xzhmkQX1j0L9yIsX1r+tY78qfvor+ZcIJOvMR6ApiSBonzDrY2KXi8atwDuLMAV2Tmaew==}
+  '@canvas-js/modeldb-pg@0.10.3':
+    resolution: {integrity: sha512-TmZVIE0SkLf/xg8YquN/dZiLmzUvO8ADh+6n4XQ1tZj/7G03gbQ0nGiHGyZE1ikUajxnCmAKzcDG3VbhmDTrOw==}
     engines: {node: '>=18.0.0'}
 
-  '@canvas-js/modeldb-sqlite@0.10.2':
-    resolution: {integrity: sha512-FNQydqSKKukzMONaa22TXyW8xN4U6eyqy7QFmVmTo+02eW6Wd1PT8avia2L0hKhLdTIAuEE/aWRbA6hefhXQVA==}
+  '@canvas-js/modeldb-sqlite@0.10.3':
+    resolution: {integrity: sha512-8DPLx9tZYpO4ce3d/xRyDQDR6I30vqLC2QbHffST2AaZr/bzBuXHkgadokivaG54zHp/rUnuT9ICOPgXBzLMCg==}
     engines: {node: '>=18.0.0'}
 
-  '@canvas-js/modeldb@0.10.2':
-    resolution: {integrity: sha512-JvKJEXmoPbWld4M4OWnI9aYv+kyfs14tYrZyhgBZgPX/0OcHquRgysqC6KHZp7wNiImGawD8/eIrYmjDv33cKw==}
+  '@canvas-js/modeldb@0.10.3':
+    resolution: {integrity: sha512-8lJz49MhY6TbDE16fUyA+OOAuMiD4aLpVAtd8nUliuJd43Hd6/Hk/PCQBjdyTyRTDR5HYfaL/TY7od86/8HX1w==}
     engines: {node: '>=18.0.0'}
 
   '@canvas-js/okra-lmdb@0.1.2':
@@ -2609,16 +2609,16 @@ packages:
   '@canvas-js/okra@0.4.4':
     resolution: {integrity: sha512-YNCeU86KIUIBqJX1Ncs26dSHg3997uptLSBIJbDxAbY6+U2bhdcH+ic4+CS0PYlt72oV5Y1Z9cQFiEYAfvRGNg==}
 
-  '@canvas-js/signatures@0.10.2':
-    resolution: {integrity: sha512-LdxB11+dBo5mdQR7Ry/yaO5eeHhdRwSbo9lQox/bt2cPMJTdEbbBQSafoFxwkrPvX/kkxi/4t0DO6GGJNDmLGQ==}
+  '@canvas-js/signatures@0.10.3':
+    resolution: {integrity: sha512-Hw4IctEuqfansGJRGPJlKxVfK6XowzhUWsMJcfInGwihX7sD7nYXvWyK+V9g5AWs7Bw4OHVlCrmasclDxiTyog==}
     engines: {node: '>=18.0.0'}
 
-  '@canvas-js/utils@0.10.2':
-    resolution: {integrity: sha512-ko6fQ3RcyDf0Da+Az4sNLSXBffzQvm24ynoXZ+xb9SUKFqQCrYKieDWKhHYKT7GK1LoAoLINIa2KJQ5XbI9G2A==}
+  '@canvas-js/utils@0.10.3':
+    resolution: {integrity: sha512-NDNCF7yApP9gXYCH3b2Tp2m5o6wmg+MS/HRbs7fVSek+7ErL4orNZYYn1lSRiOvnQbhmCzIylBvLtKJFkWKxsA==}
     engines: {node: '>=18.0.0'}
 
-  '@canvas-js/vm@0.10.2':
-    resolution: {integrity: sha512-H9F3WN7VoLXgcpdYnlPoBLY7nbAD29/YgXiPbjHAG/NpddSI81+I4VnrbCFeKvlTt5aMsBGMoyCsiC2mYbG/Sg==}
+  '@canvas-js/vm@0.10.3':
+    resolution: {integrity: sha512-0Cixmj3WLi0qSSRzyl1+R1rzharsl36Gyv33a43ze7TuHgqXUE8kN1P5ILOAMuaE+hVlZSlzk+DRieXvzTClKQ==}
     engines: {node: '>=18.0.0'}
 
   '@chainsafe/as-chacha20poly1305@0.1.0':
@@ -15293,11 +15293,11 @@ snapshots:
 
   '@brillout/import@0.2.3': {}
 
-  '@canvas-js/chain-cosmos@0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-cosmos@0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.2
-      '@canvas-js/signatures': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/interfaces': 0.10.3
+      '@canvas-js/signatures': 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.3
       '@cosmjs/amino': 0.32.3
       '@cosmjs/crypto': 0.32.3
       '@cosmjs/encoding': 0.32.3
@@ -15315,11 +15315,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/chain-ethereum@0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-ethereum@0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.2
-      '@canvas-js/signatures': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/interfaces': 0.10.3
+      '@canvas-js/signatures': 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-json': 10.2.2
       '@libp2p/logger': 4.0.17
       ethers: 6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -15330,11 +15330,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/chain-solana@0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-solana@0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.2
-      '@canvas-js/signatures': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/interfaces': 0.10.3
+      '@canvas-js/signatures': 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-json': 10.2.2
       '@libp2p/logger': 4.0.17
       '@noble/curves': 1.4.2
@@ -15346,11 +15346,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/chain-substrate@0.10.2(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-substrate@0.10.3(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.2
-      '@canvas-js/signatures': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/interfaces': 0.10.3
+      '@canvas-js/signatures': 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-json': 10.2.2
       '@libp2p/logger': 4.0.17
       '@noble/curves': 1.4.2
@@ -15366,18 +15366,18 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/core@0.10.2(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)':
+  '@canvas-js/core@0.10.3(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/chain-ethereum': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/gossiplog': 0.10.2(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
-      '@canvas-js/interfaces': 0.10.2
-      '@canvas-js/modeldb': 0.10.2
-      '@canvas-js/modeldb-idb': 0.10.2(react@18.3.1)
-      '@canvas-js/modeldb-pg': 0.10.2
-      '@canvas-js/modeldb-sqlite': 0.10.2
-      '@canvas-js/signatures': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.2
-      '@canvas-js/vm': 0.10.2
+      '@canvas-js/chain-ethereum': 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/gossiplog': 0.10.3(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+      '@canvas-js/interfaces': 0.10.3
+      '@canvas-js/modeldb': 0.10.3
+      '@canvas-js/modeldb-idb': 0.10.3(react@18.3.1)
+      '@canvas-js/modeldb-pg': 0.10.3
+      '@canvas-js/modeldb-sqlite': 0.10.3
+      '@canvas-js/signatures': 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.3
+      '@canvas-js/vm': 0.10.3
       '@chainsafe/libp2p-gossipsub': 13.1.0
       '@ipld/dag-cbor': 9.2.1
       '@ipld/dag-json': 10.2.2
@@ -15411,18 +15411,18 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/gossiplog@0.10.2(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)':
+  '@canvas-js/gossiplog@0.10.3(@chainsafe/libp2p-gossipsub@13.1.0)(bufferutil@4.0.8)(react-native@0.74.3(@babel/core@7.24.5)(@babel/preset-env@7.24.8(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.2
-      '@canvas-js/modeldb': 0.10.2
-      '@canvas-js/modeldb-idb': 0.10.2(react@18.3.1)
-      '@canvas-js/modeldb-pg': 0.10.2
-      '@canvas-js/modeldb-sqlite': 0.10.2
+      '@canvas-js/interfaces': 0.10.3
+      '@canvas-js/modeldb': 0.10.3
+      '@canvas-js/modeldb-idb': 0.10.3(react@18.3.1)
+      '@canvas-js/modeldb-pg': 0.10.3
+      '@canvas-js/modeldb-sqlite': 0.10.3
       '@canvas-js/okra': 0.4.4
       '@canvas-js/okra-lmdb': 0.1.2
       '@canvas-js/okra-memory': 0.4.4
-      '@canvas-js/signatures': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/signatures': 0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.3
       '@chainsafe/libp2p-gossipsub': 13.1.0
       '@chainsafe/libp2p-noise': 15.1.0
       '@chainsafe/libp2p-yamux': 6.0.2
@@ -15465,12 +15465,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/interfaces@0.10.2': {}
+  '@canvas-js/interfaces@0.10.3': {}
 
-  '@canvas-js/modeldb-idb@0.10.2(react@18.3.1)':
+  '@canvas-js/modeldb-idb@0.10.3(react@18.3.1)':
     dependencies:
-      '@canvas-js/modeldb': 0.10.2
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/modeldb': 0.10.3
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-json': 10.2.2
       '@libp2p/logger': 4.0.17
       '@types/react': 18.3.3
@@ -15480,10 +15480,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@canvas-js/modeldb-pg@0.10.2':
+  '@canvas-js/modeldb-pg@0.10.3':
     dependencies:
-      '@canvas-js/modeldb': 0.10.2
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/modeldb': 0.10.3
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-json': 10.2.2
       '@types/pg': 8.11.6
       '@types/pg-cursor': 2.7.2
@@ -15493,19 +15493,19 @@ snapshots:
       - pg-native
       - supports-color
 
-  '@canvas-js/modeldb-sqlite@0.10.2':
+  '@canvas-js/modeldb-sqlite@0.10.3':
     dependencies:
-      '@canvas-js/modeldb': 0.10.2
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/modeldb': 0.10.3
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-json': 10.2.2
       '@types/better-sqlite3': 7.6.11
       better-sqlite3: 11.1.2
     transitivePeerDependencies:
       - supports-color
 
-  '@canvas-js/modeldb@0.10.2':
+  '@canvas-js/modeldb@0.10.3':
     dependencies:
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-json': 10.2.2
       '@libp2p/logger': 4.0.17
       uint8arrays: 5.1.0
@@ -15544,10 +15544,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@canvas-js/signatures@0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/signatures@0.10.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.2
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/interfaces': 0.10.3
+      '@canvas-js/utils': 0.10.3
       '@ipld/dag-cbor': 9.2.1
       '@ipld/dag-json': 10.2.2
       '@libp2p/logger': 4.0.17
@@ -15560,11 +15560,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/utils@0.10.2': {}
+  '@canvas-js/utils@0.10.3': {}
 
-  '@canvas-js/vm@0.10.2':
+  '@canvas-js/vm@0.10.3':
     dependencies:
-      '@canvas-js/utils': 0.10.2
+      '@canvas-js/utils': 0.10.3
       '@libp2p/logger': 4.0.17
       '@noble/hashes': 1.4.0
       quickjs-emscripten: 0.26.0
