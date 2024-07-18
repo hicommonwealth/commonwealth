@@ -106,7 +106,7 @@ export async function __searchProfiles(
       MAX("Addresses".last_active) as last_active
     FROM
       "Users"
-      JOIN "Addresses" ON "Users".id = "Addresses".user_id
+      JOIN "Addresses" ON "Users".id = "Addresses".user_id AND "Addresses".profile_id IS NOT NULL -- TO BE REMOVED
     WHERE
       ${communityWhere}
       (
