@@ -3,7 +3,6 @@ import {
   EvmNamespaceFactoryEventSignatures,
   EvmRecurringContestEventSignatures,
   EvmSingleContestEventSignatures,
-  ExternalServiceUserIds,
   logger as loggerFactory,
   type Command,
 } from '@hicommonwealth/core';
@@ -28,18 +27,16 @@ function anyAddressEqual(
   return false;
 }
 
-function verifyAlchemySignature(req: any) {
-  console.log(req, '\n\n--------------------------------------------\n\n');
+export function verifyAlchemySignature(req: any) {
   const signature = req.headers['x-alchemy-signature'];
   let hmac: Hmac | undefined;
-  if (req.url.includes('Base')) {
-    hmac = createHmac('sha256', config.ALCHEMY.BASE_WEBHOOK_SIGNING_KEY!);
-  } else if (req.url.includes('BaseSepolia')) {
-    console.log('BASE SEPOLIA SIGNATURE CHECKING');
+  if (req.url.includes('BaseSepolia')) {
     hmac = createHmac(
       'sha256',
       config.ALCHEMY.BASE_SEPOLIA_WEBHOOK_SIGNING_KEY!,
     );
+  } else if (req.url.includes('Base')) {
+    hmac = createHmac('sha256', config.ALCHEMY.BASE_WEBHOOK_SIGNING_KEY!);
   } else if (req.url.includes('EthSepolia')) {
     hmac = createHmac(
       'sha256',
@@ -49,7 +46,7 @@ function verifyAlchemySignature(req: any) {
 
   if (!hmac) throw new Error('Unauthorized');
 
-  hmac.update(Buffer.from(JSON.stringify(req.body)).toString('utf-8'), 'utf-8');
+  hmac.update(req.body.toString(), 'utf-8');
   const digest = hmac.digest('hex');
   if (signature !== digest) throw new Error('Invalid signature');
 }
@@ -65,15 +62,9 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
   return {
     ...schemas.ChainEventCreated,
     auth: [],
-    secure: true,
-    authStrategy: {
-      name: 'custom',
-      userId: ExternalServiceUserIds.Alchemy,
-      customStrategyFn: verifyAlchemySignature,
-    },
     body: async ({ id, payload }) => {
-      // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/BaseSepolia/ChainEventCreated)
-      let chain = id!;
+      // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/ChainEventCreated/BaseSepolia)
+      // let chain = id!;
 
       // TODO: modify event parsing functions + emit events to Outbox
       for (const log of payload.event.data.block.logs) {
