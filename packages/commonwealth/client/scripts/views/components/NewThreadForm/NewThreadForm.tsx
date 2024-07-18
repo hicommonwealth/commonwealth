@@ -6,7 +6,7 @@ import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -53,7 +53,7 @@ export const NewThreadForm = () => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const { data: topics = [] } = useFetchTopicsQuery({
+  const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
     includeContestData: contestsEnabled,
   });
@@ -245,6 +245,10 @@ export const NewThreadForm = () => {
     isContestAvailable &&
     hasTopicOngoingContest &&
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
+
+  useEffect(() => {
+    refreshTopics();
+  }, [refreshTopics]);
 
   return (
     <>
