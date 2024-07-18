@@ -16,7 +16,6 @@ export type TopicAttributes = {
   updated_at?: Date;
   deleted_at?: Date;
   default_offchain_template?: string;
-  group_ids?: number[];
   telegram?: string;
 
   // associations
@@ -57,11 +56,6 @@ export default (
         allowNull: true,
       },
       channel_id: { type: Sequelize.STRING, allowNull: true },
-      group_ids: {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
-        allowNull: false,
-        defaultValue: [],
-      },
       telegram: { type: Sequelize.STRING, allowNull: true },
     },
     {

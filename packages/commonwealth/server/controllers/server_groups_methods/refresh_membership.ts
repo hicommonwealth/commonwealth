@@ -1,10 +1,10 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core/src/index';
 import {
   AddressInstance,
   MembershipRejectReason,
   UserInstance,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -27,21 +27,25 @@ export async function __refreshMembership(
   this: ServerGroupsController,
   { address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  // get all groups in the community
-  let groups = await this.models.Group.findAll({
-    where: {
-      community_id: address.community_id,
+  // get all groups in the community with the topic_ids if the topicId is passed in
+  const groups = await this.models.sequelize.query(
+    `
+    SELECT G.* FROM "Groups" G
+    LEFT JOIN "GroupPermissions" GP ON :topicId IS NOT NULL AND G.id = GP.group_id 
+    WHERE community_id = :communityId AND (:topicId IS NULL OR GP.topic_id = :topicId)
+    `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: {
+        communityId: address.community_id,
+        topicId: topicId ?? null,
+      },
     },
-  });
+  );
 
-  // optionally filter to only groups associated with topic
-  if (topicId) {
-    const topic = await this.models.Topic.findByPk(topicId);
-    if (!topic) {
-      throw new AppError(Errors.TopicNotFound);
-    }
-    // @ts-expect-error StrictNullChecks
-    groups = groups.filter((g) => topic.group_ids.includes(g.id));
+  if (groups.length === 0 && topicId) {
+    throw new AppError(Errors.TopicNotFound);
   }
 
   const memberships = await refreshMembershipsForAddress(
@@ -51,21 +55,13 @@ export async function __refreshMembership(
     true, // use fresh balances
   );
 
-  const topics = await this.models.Topic.findAll({
-    where: {
-      group_ids: {
-        [Op.overlap]: groups.map((g) => g.id),
-      },
-    },
-    attributes: ['id', 'group_ids'],
-  });
-
   // transform memberships to result shape
   const results = memberships.map((membership) => ({
     groupId: membership.group_id,
-    topicIds: topics
+    topicIds: groups
       // @ts-expect-error StrictNullChecks
-      .filter((t) => t.group_ids.includes(membership.group_id))
+      .filter((g) => g.group_id === membership.group_id)
+      .map((g) => g.topic_id)
       .map((t) => t.id),
     allowed: !membership.reject_reason,
     rejectReason: membership.reject_reason,

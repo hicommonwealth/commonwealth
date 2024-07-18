@@ -18,7 +18,6 @@ import validateGroupMembership from './validateGroupMembership';
  * refreshMembershipsForAddress refreshes the memberships for the given address
  * @param address Address associated with memberships
  * @param groups Groups to check requirements from
- * @param topics Topics associated with groups
  * @param cacheRefresh if true, forces TBC cache to refresh and force updates membership
  * @returns MembershipInstance[]
  */
