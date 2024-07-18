@@ -15,6 +15,9 @@ const {
   ALLOWED_EVENTS,
   INIT_TEST_DB,
   JWT_SECRET,
+  ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
+  ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
+  ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
 } = process.env;
 
 const NAME =
@@ -49,6 +52,12 @@ export const config = configure(
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
       SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
+    },
+    ALCHEMY: {
+      BASE_WEBHOOK_SIGNING_KEY: ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
+      BASE_SEPOLIA_WEBHOOK_SIGNING_KEY:
+        ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
+      ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
     },
   },
   z.object({
@@ -86,5 +95,10 @@ export const config = configure(
           path: ['JWT_SECRET'],
         },
       ),
+    ALCHEMY: z.object({
+      BASE_WEBHOOK_SIGNING_KEY: z.string().optional(),
+      BASE_SEPOLIA_WEBHOOK_SIGNING_KEY: z.string().optional(),
+      ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: z.string().optional(),
+    }), // TODO: make these mandatory in production before chain-event v3 (Alchemy Webhooks) goes live
   }),
 );

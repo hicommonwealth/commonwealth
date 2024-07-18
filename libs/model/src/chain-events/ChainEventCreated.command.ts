@@ -3,12 +3,14 @@ import {
   EvmNamespaceFactoryEventSignatures,
   EvmRecurringContestEventSignatures,
   EvmSingleContestEventSignatures,
+  ExternalServiceUserIds,
   logger as loggerFactory,
   type Command,
 } from '@hicommonwealth/core';
-import { equalEvmAddresses } from '@hicommonwealth/model';
+import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol as cp } from '@hicommonwealth/shared';
+import { Hmac, createHmac } from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,6 +28,32 @@ function anyAddressEqual(
   return false;
 }
 
+function verifyAlchemySignature(req: any) {
+  console.log(req, '\n\n--------------------------------------------\n\n');
+  const signature = req.headers['x-alchemy-signature'];
+  let hmac: Hmac | undefined;
+  if (req.url.includes('Base')) {
+    hmac = createHmac('sha256', config.ALCHEMY.BASE_WEBHOOK_SIGNING_KEY!);
+  } else if (req.url.includes('BaseSepolia')) {
+    console.log('BASE SEPOLIA SIGNATURE CHECKING');
+    hmac = createHmac(
+      'sha256',
+      config.ALCHEMY.BASE_SEPOLIA_WEBHOOK_SIGNING_KEY!,
+    );
+  } else if (req.url.includes('EthSepolia')) {
+    hmac = createHmac(
+      'sha256',
+      config.ALCHEMY.ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY!,
+    );
+  }
+
+  if (!hmac) throw new Error('Unauthorized');
+
+  hmac.update(Buffer.from(JSON.stringify(req.body)).toString('utf-8'), 'utf-8');
+  const digest = hmac.digest('hex');
+  if (signature !== digest) throw new Error('Invalid signature');
+}
+
 // TODO: this function will be moved to a util for the Contest project handler (replaces EvmEventSource.create)
 /**
  * This function makes an API request to Alchemy to add the specified contract address to the GraphQL query of the
@@ -37,7 +65,12 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
   return {
     ...schemas.ChainEventCreated,
     auth: [],
-    secure: false,
+    secure: true,
+    authStrategy: {
+      name: 'custom',
+      userId: ExternalServiceUserIds.Alchemy,
+      customStrategyFn: verifyAlchemySignature,
+    },
     body: async ({ id, payload }) => {
       // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/BaseSepolia/ChainEventCreated)
       let chain = id!;

@@ -11,12 +11,19 @@ export const INVALID_STATE_ERROR = 'Invalid State Error';
 export const ExternalServiceUserIds = {
   Knock: -1,
   K6: -2,
+  Alchemy: -3,
 } as const;
 
-export type AuthStrategies = {
-  name: 'jwt' | 'authtoken';
-  userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
-};
+export type AuthStrategies =
+  | {
+      name: 'jwt' | 'authtoken';
+      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+    }
+  | {
+      name: 'custom';
+      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+      customStrategyFn: (req: any) => void;
+    };
 
 /**
  * Deep partial utility
