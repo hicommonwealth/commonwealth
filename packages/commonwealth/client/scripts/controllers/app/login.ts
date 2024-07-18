@@ -515,7 +515,7 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let isAddressNew: boolean;
+  let isAddressNew = false;
   // check if this address exists in db
   const profileAddresses = await fetchProfilesByAddress({
     currentChainId: '',
@@ -523,18 +523,17 @@ export async function handleSocialLoginCallback({
     profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
     initiateProfilesAfterFetch: false,
   });
+
   isAddressNew = profileAddresses?.length === 0;
-
-  // const isAttemptingToConnectAddressToCommunity =
-  //   app.isLoggedIn() && app.activeChainId();
-
-  // if (
-  //   isAddressNew &&
-  //   !isAttemptingToConnectAddressToCommunity &&
-  //   returnEarlyIfNewAddress
-  // ) {
-  //   return { address: magicAddress, isAddressNew };
-  // }
+  const isAttemptingToConnectAddressToCommunity =
+    app.isLoggedIn() && app.activeChainId();
+  if (
+    isAddressNew &&
+    !isAttemptingToConnectAddressToCommunity &&
+    returnEarlyIfNewAddress
+  ) {
+    return { address: magicAddress, isAddressNew };
+  }
 
   let session: Session | null = null;
   try {
