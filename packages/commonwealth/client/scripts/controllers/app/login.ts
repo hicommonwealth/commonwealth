@@ -184,11 +184,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
       .addresses // @ts-expect-error StrictNullChecks
       .filter((a) => a.community.id === chain.id)
       .map((addr) => {
-        const tempAddr = app.chain?.accounts.get(
-          addr.address,
-          addr.keytype,
-          false,
-        );
+        const tempAddr = app.chain?.accounts.get(addr.address, false);
         tempAddr.profile = addr.profile;
         tempAddr.lastActive = addr.lastActive;
         return tempAddr;
@@ -284,7 +280,6 @@ export function updateActiveUser(data) {
           id: a.id,
           address: a.address,
           communityId: a.community_id,
-          keytype: a.keytype,
           walletId: a.wallet_id,
           walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,

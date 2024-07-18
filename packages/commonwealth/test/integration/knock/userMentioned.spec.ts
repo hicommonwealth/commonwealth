@@ -46,6 +46,7 @@ describe('userMentioned Event Handler', () => {
     [authorProfile] = await tester.seed('Profile', {
       // @ts-expect-error StrictNullChecks
       user_id: author.id,
+      profile_name: author?.profile.name ?? '',
     });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
@@ -111,7 +112,6 @@ describe('userMentioned Event Handler', () => {
         authorUserId: author!.id,
         // @ts-expect-error StrictNullChecks
         authorAddress: community!.Addresses[0].address,
-        authorProfileId: authorProfile!.id,
         mentionedUserId: user!.id,
         // @ts-expect-error StrictNullChecks
         communityId: community!.id,
@@ -135,7 +135,6 @@ describe('userMentioned Event Handler', () => {
         author_address_id: community!.Addresses![0].id,
         author_user_id: author!.id,
         author_address: community!.Addresses![0].address,
-        author_profile_id: authorProfile!.id,
         community_id: community!.id,
         community_name: community!.name,
         author: authorProfile!.profile_name,
@@ -159,7 +158,6 @@ describe('userMentioned Event Handler', () => {
           authorUserId: author!.id,
           // @ts-expect-error StrictNullChecks
           authorAddress: community!.Addresses[0].address,
-          authorProfileId: authorProfile!.id,
           mentionedUserId: user!.id,
           // @ts-expect-error StrictNullChecks
           communityId: community!.id,

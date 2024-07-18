@@ -20,7 +20,6 @@ export const UserMentioned = z.object({
   authorAddressId: z.number(),
   authorUserId: z.number(),
   authorAddress: z.string(),
-  authorProfileId: z.number(),
   mentionedUserId: z.number(),
   communityId: z.string(),
   thread: Thread.optional(),
