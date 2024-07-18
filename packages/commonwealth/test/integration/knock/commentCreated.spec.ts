@@ -57,7 +57,7 @@ describe('CommentCreated Event Handler', () => {
     [authorProfile] = await tester.seed('Profile', {
       // @ts-expect-error StrictNullChecks
       user_id: author.id,
-      profile_name: author?.profile.name!,
+      profile_name: author?.profile.name ?? '',
     });
     [subscriberProfile] = await tester.seed('Profile', {
       // @ts-expect-error StrictNullChecks
