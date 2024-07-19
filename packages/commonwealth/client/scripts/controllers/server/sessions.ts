@@ -110,7 +110,9 @@ async function sign(
       let lookupDid = did;
 
       const [
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _did,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _pkh,
         chainBaseFromAddress,
         chainIdFromAddress,
@@ -123,11 +125,12 @@ async function sign(
           address: walletAddress,
           currentPrefix: 42,
         });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         lookupDid = `did:pkh:polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
       }
 
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
-        did,
+        did, // TODO: lookupDid?
       });
 
       const config = fetchCachedConfiguration();
