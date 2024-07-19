@@ -1,6 +1,6 @@
 import { Contract } from "@canvas-js/core";
 
-export const topic = 'v1.common.xyz';
+export const topic = 'common.xyz';
 
 export const contract = {
   models: {

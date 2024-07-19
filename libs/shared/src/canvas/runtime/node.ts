@@ -11,7 +11,7 @@ export const startCanvasNode = async () => {
   const app = await Canvas.initialize({
     topic,
     path:
-      process.env.DATABASE_URL_P2P ??
+      process.env.DATABASE_URL_CANVAS ??
       'postgresql://commonwealth:edgeware@localhost/canvas',
     contract,
     signers: getSessionSigners(),
