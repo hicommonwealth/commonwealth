@@ -60,7 +60,6 @@ export const Address = z.object({
   verification_token: z.string().max(255).optional(),
   verification_token_expires: z.date().nullable().optional(),
   verified: z.date().nullable().optional(),
-  keytype: z.string().max(255).optional(),
   last_active: z.date().nullable().optional(),
   is_councillor: z.boolean().optional(),
   is_validator: z.boolean().optional(),
@@ -86,19 +85,19 @@ export const SsoToken = z.object({
 });
 
 export const CommunityMember = z.object({
-  id: PG_INT,
   user_id: PG_INT,
-  profile_name: z.string().optional().nullable(),
-  avatar_url: z.string().optional().nullable(),
+  profile_name: z.string().nullish(),
+  avatar_url: z.string().nullish(),
   addresses: z.array(
     z.object({
       id: PG_INT,
       community_id: z.string(),
       address: z.string(),
-      stake_balance: z.string().optional(),
+      stake_balance: z.number().nullish(),
+      profile_id: z.number(),
     }),
   ),
-  roles: z.array(z.string()).optional(),
+  roles: z.array(z.string()).nullish(),
   group_ids: z.array(PG_INT),
-  last_active: z.any().optional().nullable().describe('string or date'),
+  last_active: z.any().nullish().describe('string or date'),
 });

@@ -174,7 +174,6 @@ type EmitMentionsData = {
   authorAddressId: number;
   authorUserId: number;
   authorAddress: string;
-  authorProfileId: number;
   mentions: UserMentionQuery;
 } & (
   | {
@@ -200,7 +199,6 @@ export const emitMentions = async (
         authorAddressId: data.authorAddressId,
         authorUserId: data.authorUserId,
         authorAddress: data.authorAddress,
-        authorProfileId: data.authorProfileId,
         mentionedUserId: user_id,
         communityId:
           'comment' in data

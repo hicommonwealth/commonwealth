@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import React, { useState } from 'react';
-import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { useDebounce } from 'usehooks-ts';
 import {
   notifyError,
@@ -64,14 +63,10 @@ export const EditCollaboratorsModal = ({
     enabled: debouncedSearchTerm.length >= 3,
   });
 
-  const searchResults: Array<RoleInstanceWithPermissionAttributes> = profiles
-    ?.pages?.[0]?.results
+  const searchResults = profiles?.pages?.[0]?.results
     ? profiles.pages[0].results
-        .map((profile) => ({
-          ...profile!.roles?.[0],
-          Address: profile.addresses[0],
-        }))
-        .filter((role) => role.Address.address !== user.activeAccount?.address)
+        .map((p) => p.addresses[0])
+        .filter((a) => a.address !== user.activeAccount?.address)
     : [];
 
   const handleUpdateCollaborators = (c: IThreadCollaboratorWithId) => {
@@ -104,24 +99,18 @@ export const EditCollaboratorsModal = ({
                   className="collaborator-row"
                   onClick={() =>
                     handleUpdateCollaborators({
-                      // @ts-expect-error <StrictNullChecks/>
-                      id: c.Address.id,
-                      // @ts-expect-error <StrictNullChecks/>
-                      address: c.Address.address,
-                      // @ts-expect-error <StrictNullChecks/>
-                      community_id: c.Address.community_id,
+                      id: c.id,
+                      address: c.address,
+                      community_id: c.community_id,
                       // @ts-expect-error <StrictNullChecks/>
                       User: null,
                     })
                   }
                 >
                   <User
-                    // @ts-expect-error <StrictNullChecks/>
-                    userAddress={c?.Address?.address}
-                    userCommunityId={c?.community_id}
-                    shouldShowAsDeleted={
-                      !c?.Address?.address && !c?.community_id
-                    }
+                    userAddress={c.address}
+                    userCommunityId={c.community_id}
+                    shouldShowAsDeleted={!c.address && !c.community_id}
                   />
                 </div>
               ))

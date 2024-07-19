@@ -4,12 +4,12 @@ import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface AuthModalStore {
+  authModalType: AuthModalType | undefined;
+  setAuthModalType: (type: AuthModalType | undefined) => void;
   shouldOpenGuidanceModalAfterMagicSSORedirect: boolean;
   setShouldOpenGuidanceModalAfterMagicSSORedirect: (
     shouldOpen: boolean,
   ) => void;
-  triggerOpenModalType: AuthModalType;
-  setTriggerOpenModalType: (modalType: AuthModalType) => void;
   validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived: () => void;
 }
 
@@ -17,6 +17,15 @@ export const authModal = createStore<AuthModalStore>()(
   devtools(
     persist(
       (set) => ({
+        authModalType: undefined,
+        setAuthModalType: (type) => {
+          set((state) => {
+            return {
+              ...state,
+              authModalType: type,
+            };
+          });
+        },
         shouldOpenGuidanceModalAfterMagicSSORedirect: false,
         setShouldOpenGuidanceModalAfterMagicSSORedirect: (shouldOpen) => {
           set((state) => {
@@ -26,22 +35,12 @@ export const authModal = createStore<AuthModalStore>()(
             };
           });
         },
-        // @ts-expect-error StrictNullChecks
-        triggerOpenModalType: null,
-        setTriggerOpenModalType: (modalType) => {
-          set((state) => {
-            return {
-              ...state,
-              triggerOpenModalType: modalType,
-            };
-          });
-        },
         validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived: () => {
           set((state) => {
             if (state.shouldOpenGuidanceModalAfterMagicSSORedirect) {
               return {
                 ...state,
-                triggerOpenModalType: AuthModalType.AccountTypeGuidance,
+                authModalType: AuthModalType.AccountTypeGuidance,
                 shouldOpenGuidanceModalAfterMagicSSORedirect: false,
               };
             }
