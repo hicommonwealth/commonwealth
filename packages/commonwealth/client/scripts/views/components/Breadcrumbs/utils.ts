@@ -44,7 +44,7 @@ const findMatchedBreadcrumb = (index: number, pathSegments: Array<string>) => {
 
 export const generateBreadcrumbs = (
   locationPath: string,
-  profileId: number,
+  userId: number,
   navigate: (val: To) => void,
   customDomain: string,
   currentDiscussion?: CurrentDiscussion,
@@ -70,7 +70,7 @@ export const generateBreadcrumbs = (
     // Generate the link based on the current path segment.
     switch (pathSegment) {
       case 'profile':
-        link = `profile/id/${profileId}`;
+        link = `profile/id/${userId}`;
         break;
       case 'members':
         link = 'members';

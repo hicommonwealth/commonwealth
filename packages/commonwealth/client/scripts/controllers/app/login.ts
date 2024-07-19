@@ -37,6 +37,13 @@ import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 
+function storeActiveAccount(account: Account) {
+  const user = userStore.getState();
+  user.setData({ activeAccount: account });
+  !user.accounts.some((a) => isSameAccount(a, account)) &&
+    user.setData({ accounts: [...user.accounts, account] });
+}
+
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   community: string,
@@ -55,17 +62,7 @@ export async function setActiveAccount(account: Account): Promise<void> {
   const role = app.roles.getRoleInCommunity({ account, community });
 
   if (!role) {
-    userStore.getState().setData({
-      activeAccount: account,
-    });
-    if (
-      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
-        .length === 0
-    ) {
-      userStore.getState().setData({
-        accounts: [...userStore.getState().accounts, account],
-      });
-    }
+    storeActiveAccount(account);
 
     // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
     // Emit a force re-render on cosmos chains to make sure
@@ -98,17 +95,7 @@ export async function setActiveAccount(account: Account): Promise<void> {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
 
-    userStore.getState().setData({
-      activeAccount: account,
-    });
-    if (
-      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
-        .length === 0
-    ) {
-      userStore.getState().setData({
-        accounts: [...userStore.getState().accounts, account],
-      });
-    }
+    storeActiveAccount(account);
   } catch (err) {
     // Failed to set the user's active address to this account.
     // This might be because this address isn't `verified`,
@@ -120,23 +107,24 @@ export async function setActiveAccount(account: Account): Promise<void> {
 
 export async function completeClientLogin(account: Account) {
   try {
-    let addressInfo = userStore
-      .getState()
-      .addresses.find(
-        (a) =>
-          a.address === account.address &&
-          a.community.id === account.community.id,
-      );
+    const user = userStore.getState();
+
+    let addressInfo = user.addresses.find(
+      (a) =>
+        a.address === account.address &&
+        a.community.id === account.community.id,
+    );
 
     if (!addressInfo && account.addressId) {
       addressInfo = new AddressInfo({
+        userId: user.id,
         id: account.addressId,
         address: account.address,
         communityId: account.community.id,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
-      userStore.getState().addresses.push(addressInfo);
+      user.addresses.push(addressInfo);
     }
 
     // link the address to the community
@@ -162,14 +150,6 @@ export async function completeClientLogin(account: Account) {
 
     // set the address as active
     await setActiveAccount(account);
-    if (
-      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
-        .length === 0
-    ) {
-      userStore.getState().setData({
-        accounts: [...userStore.getState().accounts, account],
-      });
-    }
   } catch (e) {
     console.trace(e);
   }
@@ -256,8 +236,10 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
 
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
+  const user = userStore.getState();
+
   if (!data || data.loggedIn === false) {
-    userStore.getState().setData({
+    user.setData({
       id: 0,
       email: '',
       emailNotificationInterval: '',
@@ -277,6 +259,7 @@ export function updateActiveUser(data) {
     const addresses = data.addresses.map(
       (a) =>
         new AddressInfo({
+          userId: user.id,
           id: a.id,
           address: a.address,
           communityId: a.community_id,
@@ -302,7 +285,7 @@ export function updateActiveUser(data) {
       return communityIds;
     })();
 
-    userStore.getState().setData({
+    user.setData({
       id: data.id || 0,
       email: data.email || '',
       emailNotificationInterval: data.emailInterval || '',

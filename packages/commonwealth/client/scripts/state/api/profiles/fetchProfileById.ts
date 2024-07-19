@@ -9,23 +9,23 @@ const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
 type UseFetchProfileByIdQueryCommonProps =
   | {
-      profileId: string;
+      userId: number;
       shouldFetchSelfProfile?: never;
     }
   | {
-      profileId?: never;
+      userId?: never;
       shouldFetchSelfProfile: boolean;
     };
 
 const fetchProfileById = async ({
-  profileId,
+  userId,
 }: UseFetchProfileByIdQueryCommonProps) => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ID}`,
     {
       params: {
-        ...(profileId
-          ? { profileId }
+        ...(userId
+          ? { userId }
           : {
               jwt: userStore.getState().jwt,
             }),
@@ -36,6 +36,7 @@ const fetchProfileById = async ({
   response.data.result.addresses.map((a) => {
     try {
       return new AddressInfo({
+        userId: userStore.getState().id,
         id: a.id,
         address: a.address,
         communityId: a.community_id,
@@ -57,7 +58,7 @@ interface UseFetchProfileByIdQuery {
 }
 
 const useFetchProfileByIdQuery = ({
-  profileId,
+  userId,
   shouldFetchSelfProfile,
   apiCallEnabled = true,
 }: UseFetchProfileByIdQuery & UseFetchProfileByIdQueryCommonProps) => {
@@ -65,32 +66,27 @@ const useFetchProfileByIdQuery = ({
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [ApiEndpoints.FETCH_PROFILES_BY_ID, profileId],
+    queryKey: [ApiEndpoints.FETCH_PROFILES_BY_ID, userId],
     queryFn: () =>
       fetchProfileById({
-        profileId,
+        userId,
         shouldFetchSelfProfile,
       } as UseFetchProfileByIdQueryCommonProps),
     // eslint-disable-next-line @tanstack/query/no-deprecated-options
     onSuccess: (response) => {
-      // update user addresses when
-      // - self profile is fetched
-      // - or `profileId` is matches auth user's profile id
-      const userProfileId = user.addresses?.[0]?.profile?.id;
-      const doesProfileIdMatch =
-        userProfileId && userProfileId === response?.profile?.id;
+      // update user addresses when self profile is fetched
       if (
         response?.addresses &&
         response?.addresses?.length > 0 &&
-        (shouldFetchSelfProfile || doesProfileIdMatch)
+        (shouldFetchSelfProfile || userId === user.id)
       ) {
         user.setData({
           addresses: response.addresses.map(
             (a) =>
               new AddressInfo({
+                userId: user.id,
                 id: a?.id,
                 walletId: a?.wallet_id,
-                profileId: a?.profile_id,
                 communityId: a?.community_id,
                 address: a?.address,
                 ghostAddress: a?.ghost_address,

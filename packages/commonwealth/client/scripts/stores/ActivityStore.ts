@@ -104,7 +104,8 @@ export class ActiveAddressesStore {
     const communityStore = this._addressesByCommunity[parentEntity];
     if (!communityStore[id]) {
       const addressInfo = new AddressInfo({
-        id: null,
+        userId: 0, // TODO: do we need a real user id here?
+        id,
         address: address.address,
         communityId: chain,
       });

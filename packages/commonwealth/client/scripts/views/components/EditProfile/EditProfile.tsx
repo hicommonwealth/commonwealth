@@ -124,6 +124,7 @@ const EditProfile = () => {
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
+              userId: a.User.id,
               id: a.id,
               address: a.address,
               communityId: a.community_id,
@@ -160,8 +161,6 @@ const EditProfile = () => {
         addresses[0].address,
         avatarUrl,
         // @ts-expect-error <StrictNullChecks/>
-        profile.id,
-        // @ts-expect-error <StrictNullChecks/>
         addresses[0].community.name,
         null,
       );
@@ -182,7 +181,7 @@ const EditProfile = () => {
     }
   }, [addresses, avatarUrl, profile]);
 
-  if (isLoadingProfile || isUpdatingProfile || !profile?.id) {
+  if (isLoadingProfile || isUpdatingProfile) {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
@@ -223,17 +222,16 @@ const EditProfile = () => {
         tagIds: preferenceTags
           .filter((tag) => tag.isSelected)
           .map((tag) => tag.item.id),
-        profileId: profile?.id,
         address: user.activeAccount?.address || '',
         chain: user.activeAccount?.community?.id || '',
       })
         .then(() => {
-          navigate(`/profile/id/${profile.id}`);
+          navigate(`/profile/id/${user.id}`);
 
           if (links?.length > 0) {
             markTrainingActionAsComplete(
               UserTrainingCardTypes.FinishProfile,
-              profile.id,
+              user.id,
             );
           }
         })
@@ -251,7 +249,7 @@ const EditProfile = () => {
             buttonType="secondary"
             buttonWidth="wide"
             disabled={isUploadingProfileImage || isUploadingCoverImage}
-            onClick={() => navigate(`/profile/id/${profile.id}`)}
+            onClick={() => navigate(`/profile/id/${user.id}`)}
           />
           <CWButton
             type="submit"
