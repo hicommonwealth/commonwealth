@@ -17,15 +17,15 @@ export const contract = {
     comments: {
       id: 'primary',
       author: 'string',
-      thread_id: '@threads',
+      thread_id: 'number', // TODO: this should be @threads or the cid of the thread
       body: 'string',
-      parent_comment_id: '@comments',
+      parent_comment_id: 'string?', // TODO: this should be @comments or the cid of the comment
       updated_at: 'integer',
       $indexes: [['thread_id', 'author']],
     },
     thread_reactions: {
       id: 'primary',
-      thread_id: '@threads',
+      thread_id: 'number', // TODO: this should be @threads or the cid of the thread
       author: 'string',
       value: 'integer',
       updated_at: 'integer',
@@ -41,7 +41,7 @@ export const contract = {
     },
   },
   actions: {
-    thread(db, { community, title, body, link, topic }, { address, id }) {
+    thread(db, { community, title, body, link, topic }, { address, id, timestamp }) {
       db.set("threads", {
         id: id,
         author: address,
@@ -49,7 +49,8 @@ export const contract = {
         title,
         body,
         link,
-        topic,
+        // topic,
+        updated_at: timestamp,
       });
     },
     // TODO: not implemented (packages/commonwealth/server/routes/threads/update_thread_handler.ts)
@@ -64,13 +65,14 @@ export const contract = {
       if (!t || !t.id) throw new Error("invalid thread");
       db.delete("threads", t.id.toString());
     },
-    comment(db, { thread_id, body, parent_comment_id }, { address, id }) {
+    comment(db, { thread_id, body, parent_comment_id }, { address, id, timestamp }) {
       db.set("comments", {
         id: id,
         author: address,
-        thread_id,
+        thread_id, // TODO: this should be the thread's canvas_hash/cid
         body,
         parent_comment_id,
+        updated_at: timestamp
       });
     },
     // TODO: not implemented (packages/commonwealth/server/routes/comments/update_comment_handler.ts)
