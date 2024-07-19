@@ -82,10 +82,13 @@ type AccountSelectorProps = {
 };
 
 // eslint-disable-next-line react/no-multi-comp
-export const AccountSelector = (props: AccountSelectorProps) => {
-  const { accounts, onModalClose, walletNetwork, walletChain, onSelect } =
-    props;
-
+export const AccountSelector = ({
+  accounts,
+  onModalClose,
+  walletNetwork,
+  walletChain,
+  onSelect,
+}: AccountSelectorProps) => {
   return (
     <div className="AccountSelector">
       <CWModalHeader

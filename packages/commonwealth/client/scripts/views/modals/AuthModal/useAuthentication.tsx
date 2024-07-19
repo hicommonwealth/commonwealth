@@ -164,7 +164,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         openConfirmation({
           title: 'Address Mismatch',
           description: (
-            <React.Fragment>
+            <>
               You tried to sign in as
               {formatAddress(sessionKeyValidationError?.address || '')} but your
               wallet has the address {formatAddress(authAddress || '')}.
@@ -180,7 +180,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
                   wallet to continue.
                 </p>
               )}
-            </React.Fragment>
+            </>
           ),
           buttons: [
             {
