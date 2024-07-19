@@ -33,7 +33,7 @@ export const applyCanvasSignedData = async (
       data.sessionMessageSignature,
       data.sessionMessage,
     );
-    if (await app.messageLog.has(encodedSessionMessage.id)) {
+    if (!(await app.messageLog.has(encodedSessionMessage.id))) {
       const { id: idSession } = await app.insert(
         data.sessionMessageSignature,
         data.sessionMessage,
@@ -49,7 +49,7 @@ export const applyCanvasSignedData = async (
       data.actionMessageSignature,
       data.actionMessage,
     );
-    if (await app.messageLog.has(encodedActionMessage.id)) {
+    if (!(await app.messageLog.has(encodedActionMessage.id))) {
       const { id: idAction } = await app.insert(
         data.actionMessageSignature,
         data.actionMessage,
