@@ -13,10 +13,16 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies = {
-  name: 'jwt' | 'authtoken';
-  userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
-};
+export type AuthStrategies =
+  | {
+      name: 'jwt' | 'authtoken';
+      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+    }
+  | {
+      name: 'custom';
+      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+      customStrategyFn: (req: any) => void;
+    };
 
 /**
  * Deep partial utility
@@ -147,7 +153,7 @@ export type CommandHandler<
  */
 export type QueryHandler<Input extends ZodSchema, Output extends ZodSchema> = (
   context: QueryContext<Input>,
-) => Promise<Partial<z.infer<Output>> | undefined>;
+) => Promise<z.infer<Output> | undefined>;
 
 /**
  * Event handler
