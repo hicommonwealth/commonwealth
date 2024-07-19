@@ -106,6 +106,7 @@ const EditProfile = () => {
 
     if (data) {
       setProfile(new NewProfile(data.profile));
+      // @ts-expect-error <StrictNullChecks/>
       setAvatarUrl(data.profile.avatar_url);
       setPreferenceTags((tags) =>
         [...(tags || [])].map((t) => ({
@@ -121,13 +122,14 @@ const EditProfile = () => {
         })),
       );
       setAddresses(
+        // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
               userId: a.User.id,
               id: a.id,
               address: a.address,
-              communityId: a.community_id,
+              communityId: a.community_id!,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
               ghostAddress: a.ghost_address,
@@ -267,10 +269,10 @@ const EditProfile = () => {
         <div className="EditProfile">
           <CWForm
             initialValues={{
-              username: data?.profile?.profile_name || '',
+              username: data?.profile?.name || '',
               email: data?.profile?.email || '',
               backgroundImg: data?.profile?.background_image?.url || '',
-              bio: deserializeDelta(data?.profile?.bio),
+              bio: deserializeDelta(data?.profile?.bio ?? ''),
             }}
             onSubmit={handleSubmit}
             validationSchema={editProfileValidation}
