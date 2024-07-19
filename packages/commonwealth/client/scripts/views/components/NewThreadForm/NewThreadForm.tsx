@@ -23,7 +23,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
@@ -111,17 +110,8 @@ export const NewThreadForm = () => {
     apiEnabled: !!user.activeAccount?.address,
   });
 
-  const {
-    mutateAsync: createThread,
-    error: createThreadError,
-    reset: resetCreateThreadMutation,
-  } = useCreateThreadMutation({
+  const { mutateAsync: createThread } = useCreateThreadMutation({
     communityId: app.activeChainId(),
-  });
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetCreateThreadMutation,
-    error: createThreadError,
   });
 
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
@@ -393,7 +383,6 @@ export const NewThreadForm = () => {
         </div>
       </CWPageLayout>
       {JoinCommunityModals}
-      {RevalidationModal}
     </>
   );
 };

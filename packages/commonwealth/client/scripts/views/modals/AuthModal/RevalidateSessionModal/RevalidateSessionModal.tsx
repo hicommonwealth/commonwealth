@@ -1,9 +1,9 @@
 import React from 'react';
 import { ModalBase } from '../common/ModalBase';
 import { AuthModalType, ModalVariantProps } from '../types';
-import './SignInModal.scss';
+import './RevalidateSessionModal.scss';
 
-const SignInModal = ({
+const RevalidateSessionModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
@@ -14,16 +14,16 @@ const SignInModal = ({
   return (
     <ModalBase
       onClose={onClose}
-      layoutType={AuthModalType.SignIn}
+      layoutType={AuthModalType.RevalidateSession}
       onSuccess={onSuccess}
       showAuthOptionTypesFor={['wallets', 'sso']}
       showWalletsFor={showWalletsFor}
       showAuthOptionFor={showAuthOptionFor}
-      bodyClassName="SignInModal"
+      bodyClassName="RevalidateSessionModal"
       onSignInClick={onSignInClick}
       onChangeModalType={onChangeModalType}
     />
   );
 };
 
-export { SignInModal };
+export { RevalidateSessionModal };
