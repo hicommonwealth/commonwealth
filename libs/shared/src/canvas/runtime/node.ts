@@ -1,5 +1,4 @@
 import { Canvas } from '@canvas-js/core';
-import { ed25519 } from '@canvas-js/signatures';
 
 import { getSessionSigners } from '../signers';
 import { CanvasSignedData } from '../types';
@@ -18,7 +17,6 @@ export const startCanvasNode = async () => {
     signers: getSessionSigners(),
     bootstrapList: [], // TODO
   });
-  console.log('canvas:', app);
 
   // TODO
   // app.libp2p.start()
@@ -30,44 +28,33 @@ export const applyCanvasSignedData = async (
   app: Canvas,
   data: CanvasSignedData,
 ) => {
-  console.log(data);
-
-  ed25519.verify(data.sessionMessageSignature, data.sessionMessage);
-  ed25519.verify(data.actionMessageSignature, data.actionMessage);
-  console.log('verified using scheme directly');
-
-  await app.messageLog.verifySignature(
-    data.sessionMessageSignature,
-    data.sessionMessage,
-  );
-  await app.messageLog.verifySignature(
-    data.actionMessageSignature,
-    data.actionMessage,
-  );
-  console.log('verified using log');
-
-  await app.messageLog.insert(
-    app.messageLog.encode(data.sessionMessageSignature, data.sessionMessage),
-  );
-  await app.messageLog.insert(
-    app.messageLog.encode(data.actionMessageSignature, data.actionMessage),
-  );
-  console.log('verified using insert');
-
   try {
-    const { id: idSession } = await app.insert(
+    const encodedSessionMessage = app.messageLog.encode(
       data.sessionMessageSignature,
-      data.actionMessage,
+      data.sessionMessage,
     );
+    if (await app.messageLog.has(encodedSessionMessage.id)) {
+      const { id: idSession } = await app.insert(
+        data.sessionMessageSignature,
+        data.sessionMessage,
+      );
+    }
     console.log('applied canvas session:', idSession);
   } catch (err) {
     console.log('could not apply canvas session:', err);
   }
+
   try {
-    const { id: idAction } = await app.insert(
+    const encodedActionMessage = app.messageLog.encode(
       data.actionMessageSignature,
       data.actionMessage,
     );
+    if (await app.messageLog.has(encodedActionMessage.id)) {
+      const { id: idAction } = await app.insert(
+        data.actionMessageSignature,
+        data.actionMessage,
+      );
+    }
     console.log('applied canvas action:', idAction);
   } catch (err) {
     console.log('could not apply canvas action:', err);
