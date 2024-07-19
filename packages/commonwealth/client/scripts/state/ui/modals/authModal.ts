@@ -63,7 +63,7 @@ export const authModal = createStore<AuthModalStore>()(
               return {
                 ...state,
                 sessionKeyValidationError: sessionKeyValidationError,
-                triggerOpenModalType: AuthModalType.RevalidateSession,
+                authModalType: AuthModalType.RevalidateSession,
               };
             });
           }
