@@ -57,6 +57,11 @@ const authenticate = async (
         default:
           throw new Error('Not authenticated');
       }
+    } else if (authStrategy.name === 'custom') {
+      authStrategy.customStrategyFn(req);
+      req.user = {
+        id: authStrategy.userId,
+      };
     } else {
       await passport.authenticate(authStrategy.name, { session: false });
     }

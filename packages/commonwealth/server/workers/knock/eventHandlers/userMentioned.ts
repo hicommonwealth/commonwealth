@@ -33,13 +33,13 @@ export const processUserMentioned: EventHandler<
     return false;
   }
 
-  const profile = await models.Profile.findOne({
+  const user = await models.User.findOne({
     where: {
-      id: payload.authorProfileId,
+      id: payload.authorUserId,
     },
   });
 
-  if (!profile) {
+  if (!user) {
     log.error('Author profile not found', undefined, payload);
     return false;
   }
@@ -51,10 +51,9 @@ export const processUserMentioned: EventHandler<
       author_address_id: payload.authorAddressId,
       author_user_id: payload.authorUserId,
       author_address: payload.authorAddress,
-      author_profile_id: payload.authorProfileId,
       community_id: payload.communityId,
       community_name: community.name,
-      author: profile.profile_name || payload.authorAddress.substring(255),
+      author: user.profile.name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
           ? // @ts-expect-error StrictNullChecks
