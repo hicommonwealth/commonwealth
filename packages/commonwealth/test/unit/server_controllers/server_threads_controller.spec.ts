@@ -538,6 +538,9 @@ describe('ServerThreadsController', () => {
             };
           },
         },
+        CommentVersionHistory: {
+          create: () => null,
+        },
         Subscription: {
           bulkCreate: async () => ({}),
         },
@@ -1294,6 +1297,12 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        CommentVersionHistory: {
+          create: () => null,
+        },
+        ThreadVersionHistory: {
+          create: () => null,
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');

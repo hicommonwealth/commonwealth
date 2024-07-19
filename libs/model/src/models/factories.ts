@@ -7,6 +7,7 @@ import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
 import CommentSubscription from './comment_subscriptions';
+import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
 import CommunityBanner from './community_banner';
@@ -42,6 +43,7 @@ import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
+import ThreadVersionHistory from './thread_version_history';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
@@ -53,6 +55,7 @@ export const Factories = {
   ChainNode,
   Collaboration,
   Comment,
+  CommentVersionHistory,
   CommentSubscription,
   Community,
   CommunityAlert,
@@ -88,6 +91,7 @@ export const Factories = {
   Tags,
   SubscriptionPreference,
   Thread,
+  ThreadVersionHistory,
   ThreadSubscription,
   Topic,
   User,

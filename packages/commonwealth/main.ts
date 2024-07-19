@@ -18,7 +18,6 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { config } from './server/config';
@@ -32,6 +31,8 @@ import ViewCountCache from './server/util/viewCountCache';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const parseJson = json({ limit: '1mb' });
+
 /**
  * Bootstraps express app
  */
@@ -42,13 +43,11 @@ export async function main(
     port,
     noGlobalActivityCache = true,
     withLoggingMiddleware = false,
-    withStatsMiddleware = false,
     withPrerender = false,
   }: {
     port: number;
     noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
-    withStatsMiddleware?: boolean;
     withPrerender?: boolean;
   },
 ) {
@@ -132,9 +131,12 @@ export async function main(
           },
         }),
       );
-    withStatsMiddleware && app.use(expressStatsInit());
 
-    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use((req, res, next) => {
+      if (req.path.startsWith('/api/v1/rest/chainevent/')) next();
+      else parseJson(req, res, next);
+    });
+
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);

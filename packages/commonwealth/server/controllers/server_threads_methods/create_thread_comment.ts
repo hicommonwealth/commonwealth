@@ -200,14 +200,23 @@ export async function __createThreadComment(
         transaction,
       });
 
+      await this.models.CommentVersionHistory.create(
+        {
+          comment_id: comment.id!,
+          text: comment.text!,
+          timestamp: comment.created_at!,
+        },
+        {
+          transaction,
+        },
+      );
+
       await emitMentions(this.models, transaction, {
         // @ts-expect-error StrictNullChecks
         authorAddressId: address.id,
         // @ts-expect-error StrictNullChecks
         authorUserId: user.id,
         authorAddress: address.address,
-        // @ts-expect-error StrictNullChecks
-        authorProfileId: address.profile_id,
         mentions: mentionedAddresses,
         comment,
       });

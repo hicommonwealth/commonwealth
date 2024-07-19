@@ -19,6 +19,7 @@ import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
   ContestFormData,
@@ -184,7 +185,13 @@ const DetailsFormStep = ({
               create engagement incentives.{' '}
               <CWText fontWeight="medium">Contests last 7 days</CWText> in
               blockchain time.{' '}
-              <a href="https://blog.commonwealth.im">Learn more</a>
+              <a
+                href={CONTEST_FAQ_URL}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Learn more
+              </a>
             </CWText>
           </>
         )
@@ -433,12 +440,18 @@ const DetailsFormStep = ({
                   Only threads posted to these topics will be eligible for the
                   contest prizes.
                 </CWText>
+
+                <CWText type="b1">
+                  Community members are limited to 2 entries per contest round.
+                  Keep this in mind when selecting your topics.
+                </CWText>
+
                 <div className="topics-list">
                   <div className="list-header">
                     <CWText>Topic</CWText>
                     <CWText>Eligible</CWText>
                   </div>
-                  {toggledTopicList.length &&
+                  {!!toggledTopicList.length &&
                     sortedTopics.map((topic) => (
                       <div key={topic.id} className="list-row">
                         <CWText>{topic.name}</CWText>

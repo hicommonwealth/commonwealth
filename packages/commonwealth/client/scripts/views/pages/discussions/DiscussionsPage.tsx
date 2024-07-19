@@ -21,7 +21,6 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
@@ -41,7 +40,6 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
@@ -249,7 +247,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           Header: () => (
             <>
               <Breadcrumbs />
-              {userOnboardingEnabled && <UserTrainingSlider />}
+              <UserTrainingSlider />
               <AdminOnboardingSlider />
 
               <HeaderWithFilters

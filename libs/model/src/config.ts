@@ -1,6 +1,10 @@
 import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
+const DEFAULTS = {
+  JWT_SECRET: 'my secret',
+};
+
 const {
   TEST_DB_NAME,
   DATABASE_URL,
@@ -10,6 +14,11 @@ const {
   TBC_BALANCE_TTL_SECONDS,
   ALLOWED_EVENTS,
   INIT_TEST_DB,
+  MAX_USER_POSTS_PER_CONTEST,
+  JWT_SECRET,
+  ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
+  ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
+  ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
 } = process.env;
 
 const NAME =
@@ -41,6 +50,22 @@ export const config = configure(
     OUTBOX: {
       ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
     },
+    CONTESTS: {
+      MIN_USER_ETH: 0.0005,
+      MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
+        ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
+        : 2,
+    },
+    AUTH: {
+      JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
+      SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
+    },
+    ALCHEMY: {
+      BASE_WEBHOOK_SIGNING_KEY: ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
+      BASE_SEPOLIA_WEBHOOK_SIGNING_KEY:
+        ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
+      ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+    },
   },
   z.object({
     DB: z.object({
@@ -59,5 +84,32 @@ export const config = configure(
     OUTBOX: z.object({
       ALLOWED_EVENTS: z.array(z.string()),
     }),
+    CONTESTS: z.object({
+      MIN_USER_ETH: z.number(),
+      MAX_USER_POSTS_PER_CONTEST: z.number().int(),
+    }),
+    AUTH: z
+      .object({
+        JWT_SECRET: z.string(),
+        SESSION_EXPIRY_MILLIS: z.number().int(),
+      })
+      .refine(
+        (data) => {
+          if (target.NODE_ENV === 'production') {
+            return !!JWT_SECRET && data.JWT_SECRET !== DEFAULTS.JWT_SECRET;
+          }
+          return true;
+        },
+        {
+          message:
+            'JWT_SECRET must be set to a non-default value in production environments',
+          path: ['JWT_SECRET'],
+        },
+      ),
+    ALCHEMY: z.object({
+      BASE_WEBHOOK_SIGNING_KEY: z.string().optional(),
+      BASE_SEPOLIA_WEBHOOK_SIGNING_KEY: z.string().optional(),
+      ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: z.string().optional(),
+    }), // TODO: make these mandatory in production before chain-event v3 (Alchemy Webhooks) goes live
   }),
 );

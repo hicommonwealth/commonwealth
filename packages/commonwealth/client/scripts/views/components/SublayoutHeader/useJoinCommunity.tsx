@@ -118,7 +118,6 @@ const useJoinCommunity = () => {
               id: a.id,
               address: a.address,
               communityId: a.community_id,
-              keytype: a.keytype,
               walletId: a.wallet_id,
             });
           }),
@@ -130,11 +129,7 @@ const useJoinCommunity = () => {
         );
 
         // set verification token for the newly created account
-        const account = app?.chain?.accounts?.get?.(
-          encodedAddress,
-          // @ts-expect-error <StrictNullChecks/>
-          addressInfo.keytype,
-        );
+        const account = app?.chain?.accounts?.get?.(encodedAddress);
         if (account && app.chain) {
           account?.setValidationToken?.(verification_token);
         }
