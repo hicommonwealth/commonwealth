@@ -37,6 +37,7 @@ export const ApiEndpoints = {
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   REMOVE_DISCORD_BOT_CONFIG: '/removeDiscordBotConfig',
+  VIEW_COUNT: '/viewCount',
   FETCH_USER_ACTIVITY: '/viewUserActivity',
   FETCH_GLOBAL_ACTIVITY: '/viewGlobalActivity',
 };
