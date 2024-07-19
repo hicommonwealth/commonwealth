@@ -97,7 +97,6 @@ describe('getAddressProfile tests', () => {
     chai.assert.equal(resp['result'].length, 3);
 
     const results = resp['result'];
-    console.log(results);
     const findAddressProfileResult = (testAddress: AddressInstance) => {
       const matchingProfile = server.e2eTestEntities.testProfiles.find(
         (p) => p.id === testAddress.profile_id,

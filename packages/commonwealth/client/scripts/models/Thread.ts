@@ -464,7 +464,6 @@ export class Thread implements IUniqueId {
       associatedContests,
       ContestActions,
     );
-    console.log(recentComments);
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({
