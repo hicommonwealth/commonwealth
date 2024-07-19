@@ -38,8 +38,8 @@ export const applyCanvasSignedData = async (
         data.sessionMessageSignature,
         data.sessionMessage,
       );
+      console.log('applied canvas session:', idSession);
     }
-    console.log('applied canvas session:', idSession);
   } catch (err) {
     console.log('could not apply canvas session:', err);
   }
@@ -54,8 +54,8 @@ export const applyCanvasSignedData = async (
         data.actionMessageSignature,
         data.actionMessage,
       );
+      console.log('applied canvas action:', idAction);
     }
-    console.log('applied canvas action:', idAction);
   } catch (err) {
     console.log('could not apply canvas action:', err);
   }
