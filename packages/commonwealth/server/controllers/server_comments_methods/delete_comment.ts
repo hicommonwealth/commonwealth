@@ -69,7 +69,7 @@ export async function __deleteComment(
   // find and delete all associated subscriptions
   await this.models.Subscription.destroy({
     where: {
-      comment_id: comment.id,
+      comment_id: comment.id!,
     },
   });
 

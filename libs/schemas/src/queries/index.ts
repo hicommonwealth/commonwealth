@@ -5,3 +5,4 @@ export * from './feed.schemas';
 export * from './pagination';
 export * from './subscription.schemas';
 export * from './thread.schemas';
+export * from './user.schemas';
