@@ -103,6 +103,11 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      activity_rank_date: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: new Date(),
+      },
 
       //notifications
       max_notif_id: {

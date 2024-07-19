@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export function CreateJWTsCommand(): Command<typeof schemas.CreateJWTs> {
+export function CreateJWTs(): Command<typeof schemas.CreateJWTs> {
   return {
     ...schemas.CreateJWTs,
     auth: [],
@@ -31,7 +31,7 @@ export function CreateJWTsCommand(): Command<typeof schemas.CreateJWTs> {
       );
 
       const jwts: string[] = [];
-      for (const id of userIds) {
+      for (const { id } of userIds) {
         jwts.push(
           jwt.sign({ id }, config.AUTH.JWT_SECRET, {
             expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
