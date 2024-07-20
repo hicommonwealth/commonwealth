@@ -21,6 +21,21 @@ async function setupDb() {
       `,
       { transaction },
     );
+
+    await models.sequelize.query(
+      `
+        UPDATE "Threads"
+        SET exported = false;
+      `,
+      { transaction },
+    );
+    await models.sequelize.query(
+      `
+        UPDATE "Comments"
+        SET exported = false;
+      `,
+      { transaction },
+    );
   });
 }
 
@@ -48,7 +63,7 @@ async function getThreadWithComments(): Promise<
         FROM "Threads" T
                  JOIN "Addresses" A ON T.address_id = A.id
         WHERE exported = false
-          AND T.community_id = 'layerzero' AND T.topic_id = 4741
+          AND T.community_id = 'layerzero' AND T.topic_id = 4741 AND T.deleted_at IS NULL
         LIMIT 1;
     `,
     { type: QueryTypes.SELECT, raw: true },
@@ -66,7 +81,8 @@ async function getThreadWithComments(): Promise<
                  JOIN "Addresses" A ON C.address_id = A.id
         WHERE exported = false
           AND thread_id = :threadId
-          AND C.community_id = 'layerzero';
+          AND C.community_id = 'layerzero'
+          AND C.deleted_at is NULL;
     `,
     {
       type: QueryTypes.SELECT,
