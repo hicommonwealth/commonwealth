@@ -30,7 +30,7 @@ export const processCommentCreated: EventHandler<
     where: {
       id: payload.address_id,
     },
-    include: [{ model: models.Profile, required: true }],
+    include: [{ model: models.User, required: true, attributes: ['profile'] }],
   });
 
   if (!author || !author.user_id) {
@@ -84,7 +84,7 @@ export const processCommentCreated: EventHandler<
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
         // @ts-expect-error StrictNullChecks
-        author: author.Profile.profile_name || author.address.substring(0, 8),
+        author: author.User.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
         comment_body: safeTruncateBody(decodeURIComponent(payload.text), 255),

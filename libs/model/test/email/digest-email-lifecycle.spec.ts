@@ -19,7 +19,7 @@ describe('Digest email lifecycle', () => {
       isAdmin: false,
       selected_community_id: null,
     });
-    const [authorProfile] = await seed('Profile', {
+    await seed('Profile', {
       user_id: authorUser!.id,
     });
 

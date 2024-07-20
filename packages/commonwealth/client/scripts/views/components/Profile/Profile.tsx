@@ -89,7 +89,7 @@ const Profile = ({ userId }: ProfileProps) => {
       setIsOwner(data.isOwner);
       setErrorCode(ProfileError.None);
     }
-  }, [userId, data, isLoading, error]);
+  }, [userId, data, isLoading, error, isOwner]);
 
   if (isLoading)
     return (

@@ -35,12 +35,11 @@ const proposalId = '0x1';
 describe('snapshotProposalCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
-  let userProfile: z.infer<typeof schemas.Profile> | undefined,
-    sandbox: sinon.SinonSandbox;
+  let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
     [user] = await tester.seed('User', {});
-    [userProfile] = await tester.seed('Profile', {
+    await tester.seed('Profile', {
       user_id: user!.id,
     });
     [community] = await tester.seed('Community', {

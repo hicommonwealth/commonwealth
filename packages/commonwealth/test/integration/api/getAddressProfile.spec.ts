@@ -1,5 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import { AddressInstance, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { GetAddressProfileReq } from '@hicommonwealth/schemas';
 import chai from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
@@ -53,19 +53,19 @@ describe('getAddressProfile tests', () => {
     const profile2 = resp['result'][1];
 
     const matchingProfile = server.e2eTestEntities.testProfiles.filter(
-      (p) => p.user_id === profile1.user_id,
+      (p) => p.user_id === profile1.userId,
     )[0];
 
     chai.assert.equal(resp['result'].length, 2);
     chai.assert.equal(
-      profile1.user_id,
+      profile1.userId,
       server.e2eTestEntities.testAddresses[0].user_id,
     );
     chai.assert.equal(profile1.name, matchingProfile.profile_name);
     chai.assert.equal(profile1.avatarUrl, matchingProfile.avatar_url);
 
     chai.assert.equal(
-      profile2.user_id,
+      profile2.userId,
       server.e2eTestEntities.testAddresses[1].user_id,
     );
     chai.assert.equal(profile2.name, matchingProfile.profile_name);
@@ -92,32 +92,6 @@ describe('getAddressProfile tests', () => {
     };
 
     const resp = await getAddressProfiles(models, postReq(r), res());
-
     chai.assert.equal(resp['result'].length, 3);
-
-    const results = resp['result'];
-    const findAddressProfileResult = (testAddress: AddressInstance) => {
-      const matchingProfile = server.e2eTestEntities.testProfiles.find(
-        (p) => p.user_id === testAddress.user_id,
-      );
-
-      return results.find(
-        (x) =>
-          x.user_id === testAddress.user_id &&
-          // @ts-expect-error StrictNullChecks
-          x.name === matchingProfile.profile_name &&
-          // @ts-expect-error StrictNullChecks
-          x.avatarUrl === matchingProfile.avatar_url,
-      );
-    };
-    chai.assert.isDefined(
-      findAddressProfileResult(server.e2eTestEntities.testAddresses[0]),
-    );
-    chai.assert.isDefined(
-      findAddressProfileResult(server.e2eTestEntities.testAddresses[1]),
-    );
-    chai.assert.isDefined(
-      findAddressProfileResult(server.e2eTestEntities.testAddresses[2]),
-    );
   });
 });

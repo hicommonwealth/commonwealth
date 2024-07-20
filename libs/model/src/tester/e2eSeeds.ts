@@ -6,7 +6,7 @@ import type {
   CommentInstance,
   CommunityInstance,
   DB,
-  ProfileAttributes,
+  ProfileInstance,
   ReactionAttributes,
   ThreadInstance,
   TopicAttributes,
@@ -23,7 +23,7 @@ export type E2E_TestEntities = {
   testReactions: ReactionAttributes[];
   testChainNodes: ChainNodeAttributes[];
   testTopics: TopicAttributes[];
-  testProfiles: ProfileAttributes[];
+  testProfiles: ProfileInstance[];
 };
 
 export const e2eTestEntities = async function (
@@ -38,7 +38,7 @@ export const e2eTestEntities = async function (
   const testReactions: ReactionAttributes[] = [];
   const testChainNodes: ChainNodeAttributes[] = [];
   const testTopics: TopicAttributes[] = [];
-  const testProfiles: ProfileAttributes[] = [];
+  const testProfiles: ProfileInstance[] = [];
 
   try {
     testUsers.push(
@@ -53,9 +53,9 @@ export const e2eTestEntities = async function (
                   emailVerified: true,
                   isAdmin: true,
                   profile: {
-                    name: `testName-${i < 2 ? 1 : 2}`,
-                    avatar_url: `testAvatarUrl-${i < 2 ? 1 : 2}`,
-                    email: `test-${i < 2 ? 1 : 2}@gmail.com`,
+                    name: `testName${-i - 1}`,
+                    avatar_url: `testAvatarUrl${-i - 1}`,
+                    email: `test${-i - 1}@gmail.com`,
                   },
                 },
               })
@@ -180,7 +180,7 @@ export const e2eTestEntities = async function (
               await testDb.Address.findOrCreate({
                 where: {
                   id: -i - 1,
-                  user_id: -i - 1,
+                  user_id: i < 2 ? -1 : -2,
                   address: addresses[i],
                   community_id: 'cmntest',
                   verification_token: '',
