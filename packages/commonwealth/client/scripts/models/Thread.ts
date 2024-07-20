@@ -182,7 +182,7 @@ const ContestActionZ = ContestAction.pick({
 type ContestActionT = z.infer<typeof ContestActionZ>;
 
 export interface VersionHistory {
-  author?: MinimumProfile & { profile_id: number };
+  author?: MinimumProfile;
   timestamp: Moment;
   body: string;
 }
@@ -232,7 +232,6 @@ type RecentComment = {
   marked_as_spam_at?: string;
   deleted_at?: string;
   discord_meta?: string;
-  profile_id: number;
   profile_name?: string;
   profile_avatar_url?: string;
   user_id: string;
@@ -346,7 +345,7 @@ export class Thread implements IUniqueId {
     canvasHash,
     links,
     discord_meta,
-    profile_id,
+    userId,
     profile_name,
     avatar_url,
     address_last_active,
@@ -392,7 +391,7 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
-    profile_id: number;
+    userId: number;
     profile_name: string;
     avatar_url: string;
     address_last_active: string;
@@ -506,7 +505,7 @@ export class Thread implements IUniqueId {
       this.profile = addressToUserProfile(Address);
     } else {
       this.profile = {
-        id: profile_id,
+        userId,
         name: profile_name,
         address: Address?.address,
         lastActive: address_last_active,

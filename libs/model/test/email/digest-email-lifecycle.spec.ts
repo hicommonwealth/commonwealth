@@ -29,7 +29,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -39,7 +38,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -50,7 +48,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });

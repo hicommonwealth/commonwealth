@@ -48,10 +48,10 @@ const updateProfileByAddress = async ({
   const responseProfile = response.data.result.profile;
   const updatedProfile = new MinimumProfile(address, chain);
   updatedProfile.initialize(
+    userId,
     responseProfile.name || responseProfile.profile_name,
     address,
     responseProfile.avatarUrl,
-    userId,
     chain,
     responseProfile.lastActive,
   );
@@ -86,7 +86,7 @@ const useUpdateProfileByAddressMutation = ({
         }
       });
 
-      // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
+      // if `userId` matches auth user's id, refetch profile-by-id query for auth user.
       if (user.id === updatedProfile.userId) {
         const keys = [
           [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
@@ -97,7 +97,7 @@ const useUpdateProfileByAddressMutation = ({
           queryClient.refetchQueries(key).catch(console.error);
         });
 
-        // if `profileId` matches auth user's profile id, and user profile has a defined name, then
+        // if `userId` matches auth user's id, and user profile has a defined name, then
         // set welcome onboard step as complete
         if (
           updatedProfile.name &&

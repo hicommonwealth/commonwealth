@@ -50,7 +50,6 @@ describe('snapshotProposalCreated Event Handler', () => {
         {
           role: 'member',
           user_id: user!.id,
-          profile_id: userProfile!.id,
         },
       ],
       snapshot_spaces: [space],

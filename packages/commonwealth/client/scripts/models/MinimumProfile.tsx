@@ -1,37 +1,39 @@
+import { Address } from '@hicommonwealth/schemas';
 import jdenticon from 'jdenticon';
+import { z } from 'zod';
 
 export type UserProfile = {
-  id: number;
+  userId: number;
   name: string;
   address: string;
   lastActive: string;
   avatarUrl: string;
 };
 
-export function addressToUserProfile(address): UserProfile {
-  const profile = address?.User?.profile;
-  if (!profile) {
-    // @ts-expect-error <StrictNullChecks/>
-    return undefined;
-  }
+export function addressToUserProfile(
+  address: z.infer<typeof Address>,
+): UserProfile {
   return {
-    id: address.profile_id,
-    // TODO: let's agreed on a single model (UserProfile, MinimumProfile)
-    avatarUrl: profile?.avatar_url ?? profile?.avatarUrl,
-    name: profile?.name ?? profile?.profile_name,
+    userId: address.user_id!,
+    avatarUrl: address.User?.profile.avatar_url ?? '',
+    name: address.User?.profile.name ?? 'Anonymous',
     address: address?.address,
-    lastActive: address?.last_active,
+    lastActive: address?.last_active ?? address.User?.created_at,
   };
 }
 
 class MinimumProfile {
+  private _userId: number;
   private _name: string;
   private _address: string;
   private _avatarUrl: string;
-  private _id: number;
   private _chain: string;
-  private _lastActive: Date;
+  private _lastActive: Date | null;
   private _initialized: boolean;
+
+  get userId() {
+    return this._userId;
+  }
 
   get name() {
     if (!this._initialized) return 'Loading...';
@@ -44,10 +46,6 @@ class MinimumProfile {
 
   get avatarUrl() {
     return this._avatarUrl;
-  }
-
-  get id() {
-    return this._id;
   }
 
   get lastActive() {
@@ -67,11 +65,18 @@ class MinimumProfile {
     this._chain = chain;
   }
 
-  public initialize(name, address, avatarUrl, id, chain, lastActive) {
+  public initialize(
+    userId: number,
+    name: string,
+    address: string,
+    avatarUrl: string,
+    chain: string,
+    lastActive: Date | null,
+  ) {
+    this._userId = userId;
     this._name = name;
     this._address = address;
     this._avatarUrl = avatarUrl;
-    this._id = id;
     this._chain = chain;
     this._lastActive = lastActive;
     this._initialized = true;
@@ -83,6 +88,16 @@ class MinimumProfile {
 
   public static getSVGAvatar(address, size) {
     return jdenticon.toSvg(address, size);
+  }
+
+  public toUserProfile(): UserProfile {
+    return {
+      userId: this._userId,
+      name: this._name,
+      address: this._address,
+      lastActive: this._lastActive?.toString() ?? '',
+      avatarUrl: this._avatarUrl,
+    };
   }
 }
 

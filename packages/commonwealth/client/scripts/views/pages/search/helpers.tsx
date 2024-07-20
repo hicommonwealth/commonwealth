@@ -224,7 +224,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   const profile: MinimumProfile = users?.[0];
 
   const handleClick = () => {
-    setRoute(`/profile/id/${profile?.id}`, {}, null);
+    setRoute(`/profile/id/${profile?.userId}`, {}, null);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== community_id) {

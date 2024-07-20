@@ -67,7 +67,7 @@ const useReserveCommunityNamespace = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,
         community: chainId,
-        userId: user.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.userId,
         userAddress: userAddress,
         isPWA: isAddedToHomeScreen,
       });

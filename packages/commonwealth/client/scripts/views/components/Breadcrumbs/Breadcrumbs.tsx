@@ -57,10 +57,10 @@ export const Breadcrumbs = () => {
   const user = userData.addresses?.[0];
   const pathnames = generateBreadcrumbs(
     location.pathname,
-    user.userId,
     navigate,
     app.isCustomDomain() ? app.activeChainId() : '',
     currentDiscussion,
+    user?.userId,
   );
 
   //Gets the tooltip copy based on the current page.

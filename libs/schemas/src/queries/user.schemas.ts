@@ -5,10 +5,11 @@ import { Thread } from '../entities/thread.schemas';
 import { Address, UserProfile } from '../entities/user.schemas';
 
 export const GetNewProfileReq = z.object({
-  profileId: z.string().optional(),
+  userId: z.string().optional(),
 });
 
 export const GetNewProfileResp = z.object({
+  userId: z.number(),
   profile: UserProfile,
   totalUpvotes: z.number().int(),
   addresses: z.array(Address),
@@ -25,7 +26,7 @@ export const GetAddressProfileReq = z.object({
 });
 
 export const GetAddressProfileResp = z.object({
-  profileId: z.number(),
+  userId: z.number(),
   name: z.string(),
   address: z.string(),
   lastActive: z.date(),

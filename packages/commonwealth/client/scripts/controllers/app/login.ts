@@ -599,6 +599,7 @@ export async function handleSocialLoginCallback({
     }
 
     const { Profiles: profiles, email: ssoEmail } = response.data.result;
+    console.log(response.data.result);
 
     // if email is not set, set the SSO email as the default email
     // only if its a standalone account (no account linking)
@@ -610,8 +611,8 @@ export async function handleSocialLoginCallback({
 
     // if account is newly created and user has not completed onboarding flow
     // then open the welcome modal.
-    const profileId = profiles?.[0]?.id;
-    if (profileId && !userStore.getState().isWelcomeOnboardFlowComplete) {
+    const userId = profiles?.[0]?.id;
+    if (userId && !userStore.getState().isWelcomeOnboardFlowComplete) {
       setTimeout(() => {
         welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
       }, 1000);

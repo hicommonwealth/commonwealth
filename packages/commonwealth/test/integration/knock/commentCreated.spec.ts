@@ -68,12 +68,10 @@ describe('CommentCreated Event Handler', () => {
         {
           role: 'member',
           user_id: author!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',
           user_id: subscriber!.id,
-          profile_id: subscriberProfile!.id,
         },
       ],
     });

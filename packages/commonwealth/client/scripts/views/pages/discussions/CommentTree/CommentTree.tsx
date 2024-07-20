@@ -353,11 +353,11 @@ export const CommentTree = ({
         parentCommentId: comment.parentComment,
         communityId: app.activeChainId(),
         profile: {
-          id: user.activeAccount?.profile?.id || 0,
+          userId: user.activeAccount?.profile?.userId || 0,
           address: user.activeAccount?.address || '',
           avatarUrl: user.activeAccount?.profile?.avatarUrl || '',
           name: user.activeAccount?.profile?.name || '',
-          lastActive: user.activeAccount?.profile?.lastActive.toString() || '',
+          lastActive: user.activeAccount?.profile?.lastActive?.toString() || '',
         },
       });
       setEdits((p) => ({

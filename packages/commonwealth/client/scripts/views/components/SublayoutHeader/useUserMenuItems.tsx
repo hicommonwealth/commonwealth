@@ -94,8 +94,6 @@ const useUserMenuItems = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const user = userData.addresses?.[0];
-  // @ts-expect-error <StrictNullChecks/>
-  const profileId = user?.profileId || user?.profile.id;
 
   const uniqueChainAddresses = getUniqueUserAddresses({
     forChain: app?.chain?.base,
@@ -230,7 +228,7 @@ const useUserMenuItems = ({
       {
         type: 'default',
         label: 'View profile',
-        onClick: () => navigate(`/profile/id/${profileId}`, {}, null),
+        onClick: () => navigate(`/profile/id/${user.userId}`, {}, null),
       },
       {
         type: 'default',

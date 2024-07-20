@@ -1,4 +1,4 @@
-import { GetNewProfileResp, UserProfile } from '@hicommonwealth/schemas';
+import { GetNewProfileResp } from '@hicommonwealth/schemas';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import AddressInfo from 'models/AddressInfo';
@@ -20,18 +20,11 @@ type UseFetchProfileByIdQueryCommonProps =
       shouldFetchSelfProfile: boolean;
     };
 
-export type MappedProfile = z.infer<typeof UserProfile> & {
-  id: number;
-  profile_name: string;
-  is_owner: boolean;
-};
-type MappedResponse = z.infer<typeof GetNewProfileResp> & {
-  profile: MappedProfile;
-};
-
 const fetchProfileById = async ({
   userId,
-}: UseFetchProfileByIdQueryCommonProps): Promise<MappedResponse> => {
+}: UseFetchProfileByIdQueryCommonProps): Promise<
+  z.infer<typeof GetNewProfileResp>
+> => {
   const response = await axios.get<{
     result: z.infer<typeof GetNewProfileResp>;
   }>(`${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ID}`, {
@@ -61,20 +54,7 @@ const fetchProfileById = async ({
     }
   });
 
-  // TO BE REMOVED
-  const profile: MappedResponse = {
-    ...response.data.result,
-    ...{
-      profile: {
-        // this is a temporary mapping until we finish the migration to the new model/schemas
-        id: response.data.result.addresses.at(0)!.profile_id!,
-        profile_name: response.data.result.profile.name!,
-        is_owner: false,
-        ...response.data.result.profile,
-      },
-    },
-  };
-  return profile;
+  return response.data.result;
 };
 
 interface UseFetchProfileByIdQuery {
@@ -108,9 +88,9 @@ const useFetchProfileByIdQuery = ({
             (a) =>
               new AddressInfo({
                 userId: user.id,
-                id: a?.id,
+                id: a.id!,
                 walletId: a?.wallet_id,
-                communityId: a?.community_id,
+                communityId: a.community_id!,
                 address: a?.address,
                 ghostAddress: a?.ghost_address,
                 lastActive: a.last_active ? moment(a.last_active) : undefined,

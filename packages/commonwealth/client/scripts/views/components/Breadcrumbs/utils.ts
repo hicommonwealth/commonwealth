@@ -44,10 +44,10 @@ const findMatchedBreadcrumb = (index: number, pathSegments: Array<string>) => {
 
 export const generateBreadcrumbs = (
   locationPath: string,
-  userId: number,
   navigate: (val: To) => void,
   customDomain: string,
   currentDiscussion?: CurrentDiscussion,
+  userId?: number,
 ) => {
   let link: string;
   let label: string;

@@ -495,7 +495,6 @@ export async function __createCommunity(
 
     const newAddress = await this.models.Address.create({
       user_id: user.id,
-      profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       community_id: createdCommunity.id,
       hex,

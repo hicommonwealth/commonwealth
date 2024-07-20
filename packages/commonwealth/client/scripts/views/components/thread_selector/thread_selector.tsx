@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { userStore } from 'client/scripts/state/ui/user';
 import 'components/thread_selector.scss';
 import AddressInfo from 'models/AddressInfo';
 import app from 'state';
@@ -51,6 +52,7 @@ export const ThreadSelector = ({
           title: t.title,
           community_id: t.community_id,
           Address: new AddressInfo({
+            userId: userStore.getState().id,
             id: t.address_id,
             address: t.address,
             communityId: t.address_community_id,
