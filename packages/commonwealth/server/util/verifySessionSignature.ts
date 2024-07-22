@@ -49,7 +49,6 @@ const verifySessionSignature = async (
     addressModel.verified = new Date();
     if (!addressModel.user_id) {
       const existingAddress = await models.Address.findOne({
-        // @ts-expect-error StrictNullChecks
         where: {
           address: addressModel.address,
           user_id: { [Sequelize.Op.ne]: null },

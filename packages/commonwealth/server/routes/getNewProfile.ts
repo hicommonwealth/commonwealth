@@ -39,7 +39,7 @@ const getNewProfile = async (
       },
       attributes: ['user_id'],
     });
-    user_id = address?.user_id;
+    user_id = address?.user_id!;
   }
 
   const user = await models.User.findOne({ where: { id: user_id } });

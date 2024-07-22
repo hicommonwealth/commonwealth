@@ -234,7 +234,6 @@ const verifyAddress = async (
       // @ts-expect-error StrictNullChecks
       where: { id: newAddress.user_id },
     });
-    // @ts-expect-error StrictNullChecks
     req.login(user, (err) => {
       const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
@@ -249,7 +248,6 @@ const verifyAddress = async (
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          // @ts-expect-error StrictNullChecks
           userId: user.id,
         },
         req,

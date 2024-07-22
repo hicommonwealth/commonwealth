@@ -218,7 +218,6 @@ export async function createAddressHelper(
     const newObj = await models.sequelize.transaction(async (transaction) => {
       return models.Address.create(
         {
-          // @ts-expect-error StrictNullChecks
           user_id,
           profile_id,
           community_id: req.community_id,
@@ -230,6 +229,7 @@ export async function createAddressHelper(
           last_active,
           wallet_id: req.wallet_id,
           wallet_sso_source: req.wallet_sso_source,
+          role: 'member',
         },
         { transaction },
       );
