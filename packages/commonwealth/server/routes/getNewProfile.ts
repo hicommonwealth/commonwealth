@@ -39,6 +39,7 @@ const getNewProfile = async (
       },
       attributes: ['user_id'],
     });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     user_id = address?.user_id!;
   }
 
