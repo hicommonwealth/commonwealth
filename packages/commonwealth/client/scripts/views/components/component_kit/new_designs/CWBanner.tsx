@@ -33,7 +33,7 @@ export type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
 interface CWBannerProps {
   type?: BannerType;
   title: string;
-  body?: string;
+  body?: string | ReactNode;
   buttons?: ButtonProps[];
   className?: string;
   onClose?: () => void;

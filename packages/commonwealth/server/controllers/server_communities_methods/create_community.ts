@@ -496,7 +496,6 @@ export async function __createCommunity(
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      // @ts-expect-error StrictNullChecks
       community_id: createdCommunity.id,
       hex,
       verification_token: addressToBeAdmin.verification_token,

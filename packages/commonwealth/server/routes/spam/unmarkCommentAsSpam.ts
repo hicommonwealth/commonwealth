@@ -44,7 +44,6 @@ export default async (models: DB, req: Request, res: Response) => {
   }
 
   await comment.update({
-    // @ts-expect-error StrictNullChecks
     marked_as_spam_at: null,
   });
 

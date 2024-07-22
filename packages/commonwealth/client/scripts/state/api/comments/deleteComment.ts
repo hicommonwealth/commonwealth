@@ -6,6 +6,7 @@ import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
@@ -72,6 +73,8 @@ const useDeleteCommentMutation = ({
     threadId,
   });
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteComment,
     onSuccess: async (response) => {
@@ -110,6 +113,7 @@ const useDeleteCommentMutation = ({
       );
       return response;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

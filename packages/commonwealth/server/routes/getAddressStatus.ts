@@ -32,7 +32,6 @@ const getAddressStatus = async (
   }
 
   const existingAddress = await models.Address.findOne({
-    // @ts-expect-error StrictNullChecks
     where: {
       community_id: req.body.community_id,
       address: req.body.address,

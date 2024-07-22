@@ -1,9 +1,9 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
+import { Comment } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
-import { IDiscordMeta } from '../types';
+import { z } from 'zod';
 import { emitEvent } from '../utils';
-import type { AddressAttributes } from './address';
 import { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes } from './community';
 import type { ReactionAttributes } from './reaction';
@@ -13,38 +13,12 @@ import type { ModelInstance } from './types';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-export type CommentAttributes = {
-  thread_id: number;
-  address_id: number;
-  text: string;
-  plaintext: string;
-  id?: number;
-  community_id: string;
-  parent_id?: string;
-  version_history?: string[];
-
-  // canvas-related columns
-  canvas_signed_data: string;
-  canvas_hash: string;
-
-  created_by: string;
-  created_at?: Date;
-  updated_at?: Date;
-  deleted_at?: Date;
-  marked_as_spam_at?: Date;
-  discord_meta?: IDiscordMeta;
-  version_history_updated?: boolean;
-
+export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
   Community?: CommunityAttributes;
-  Address?: AddressAttributes;
   Thread?: ThreadAttributes;
   reactions?: ReactionAttributes[];
   subscriptions?: CommentSubscriptionAttributes[];
-
-  //counts
-  reaction_count: number;
-  reaction_weights_sum: number;
 };
 
 export type CommentInstance = ModelInstance<CommentAttributes>;

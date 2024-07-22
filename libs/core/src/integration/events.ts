@@ -27,6 +27,8 @@ export enum EventNames {
 export const EvmNamespaceFactoryEventSignatures = {
   NewContest:
     '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
+  NewNamespace:
+    '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
 };
 
 export const EvmRecurringContestEventSignatures = {
@@ -45,4 +47,8 @@ export const EvmSingleContestEventSignatures = {
     '0x2f0d66b98c7708890a982e2194479b066a117a6f9a8f418f7f14c6001965b78b',
   VoterVoted:
     '0xba2ce2b4fab99c4186fd3e0a8e93ffb61e332d0c4709bd01d01e7ac60631437a',
+};
+
+export const EvmCommunityStakingEventSignatures = {
+  trade: '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
 };

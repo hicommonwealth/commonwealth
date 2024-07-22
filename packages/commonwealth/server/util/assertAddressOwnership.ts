@@ -11,7 +11,6 @@ export default async function assertAddressOwnership(
   address: string,
 ) {
   const addressUsers = await models.Address.findAll({
-    // @ts-expect-error StrictNullChecks
     where: {
       address,
       verified: { [Op.ne]: null },
