@@ -151,6 +151,7 @@ export async function __getBulkThreads(
                 'address', A.address,
                 'community_id', A.community_id
             ) as "Address",
+            U.id as user_id,
             A.last_active as address_last_active,
             U.profile->>'avatar_url' as avatar_url, 
             U.profile->>'name' as profile_name
@@ -168,6 +169,7 @@ export async function __getBulkThreads(
                     'User', json_build_object(
                       'id', editor_profiles.id,
                       'profile', json_build_object(
+                        'userId', editor_profiles.id,
                         'name', editor_profiles.profile->>'name',
                         'address', A.address,
                         'lastActive', A.last_active::text,
