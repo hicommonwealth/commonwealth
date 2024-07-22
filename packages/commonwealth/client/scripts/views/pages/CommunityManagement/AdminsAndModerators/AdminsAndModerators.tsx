@@ -10,7 +10,6 @@ import {
 } from '../../../../../scripts/helpers/constants';
 import useSearchProfilesQuery from '../../../../../scripts/state/api/profiles/searchProfiles';
 import { ComponentType } from '../../../components/component_kit/types';
-import { MemberResult } from '../../search/helpers';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import ManageRoles from './ManageRoles';
 import UpgradeRolesForm from './UpgradeRolesForm';
@@ -39,7 +38,7 @@ const AdminsAndModerators = () => {
     orderDirection: APIOrderDirection.Desc,
   });
 
-  const roleData = useMemo<MemberResult[]>(() => {
+  const roleData = useMemo(() => {
     if (!searchResults?.pages?.length) {
       return [];
     }

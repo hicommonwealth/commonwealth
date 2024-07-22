@@ -9,12 +9,11 @@ import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_grou
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../../../components/members_search_bar';
-import { MemberResult } from '../../../search/helpers';
 import './UpgradeRolesForm.scss';
 
 type UpgradeRolesFormProps = {
   onRoleUpdate: (oldRole: AddressRole, newRole: AddressRole) => void;
-  roleData: MemberResult[];
+  roleData: AddressRole[];
   searchTerm: string;
   setSearchTerm: (v: string) => void;
 };
