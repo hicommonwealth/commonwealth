@@ -346,6 +346,7 @@ export class Thread implements IUniqueId {
     links,
     discord_meta,
     userId,
+    user_id,
     profile_name,
     avatar_url,
     address_last_active,
@@ -392,6 +393,7 @@ export class Thread implements IUniqueId {
     Address: any; // TODO: fix type
     discord_meta?: any;
     userId: number;
+    user_id: number;
     profile_name: string;
     avatar_url: string;
     address_last_active: string;
@@ -476,6 +478,7 @@ export class Thread implements IUniqueId {
           plaintext: rc?.plainText,
           text: rc?.text,
           Address: {
+            user_id: rc?.user_id,
             address: rc?.address,
             User: {
               profile: {
@@ -505,7 +508,7 @@ export class Thread implements IUniqueId {
       this.profile = addressToUserProfile(Address);
     } else {
       this.profile = {
-        userId,
+        userId: userId ?? user_id,
         name: profile_name,
         address: Address?.address,
         lastActive: address_last_active,
