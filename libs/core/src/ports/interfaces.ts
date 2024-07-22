@@ -5,7 +5,7 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
 } from '../framework';
-import { Events } from '../integration/events';
+import { EventNames, Events } from '../integration/events';
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,
@@ -206,6 +206,20 @@ export enum BrokerSubscriptions {
 /**
  * Broker Port
  */
+export enum RoutingKeyTags {
+  Contest = 'contest',
+}
+
+type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
+
+type EventNamesType = `${EventNames}`;
+
+type RoutingKeyTagsType = `${RoutingKeyTags}`;
+
+export type RoutingKey =
+  | EventNamesType
+  | Concat<EventNamesType, RoutingKeyTagsType>;
+
 export interface Broker extends Disposable {
   publish<Name extends Events>(
     topic: BrokerPublications,
@@ -221,8 +235,13 @@ export interface Broker extends Disposable {
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
+
+  getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
 
+/**
+ * Notifications
+ */
 export enum WorkflowKeys {
   CommentCreation = 'comment-creation',
   SnapshotProposals = 'snapshot-proposals',
