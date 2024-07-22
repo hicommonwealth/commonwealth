@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import { NotificationCategories } from '@hicommonwealth/shared';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
 import app from 'state';
@@ -30,6 +31,9 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     active: Array<SnapshotProposal>;
     ended: Array<SnapshotProposal>;
   }>({ active: [], ended: [] });
+
+  const knockInAppNotifications = useFlag('knockInAppNotifications');
+
   const proposalsToDisplay =
     activeTab === 1 ? proposals.active : proposals.ended;
 
@@ -110,18 +114,20 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
               />
             ))}
           </CWTabsRow>
-          <div>
-            <CWButton
-              label={
-                hasSubscription
-                  ? 'Remove Subscription'
-                  : 'Subscribe to Notifications'
-              }
-              iconLeft={hasSubscription ? 'mute' : 'bell'}
-              onClick={updateSubscription}
-              buttonHeight="sm"
-            />
-          </div>
+          {!knockInAppNotifications && (
+            <div>
+              <CWButton
+                label={
+                  hasSubscription
+                    ? 'Remove Subscription'
+                    : 'Subscribe to Notifications'
+                }
+                iconLeft={hasSubscription ? 'mute' : 'bell'}
+                onClick={updateSubscription}
+                buttonHeight="sm"
+              />
+            </div>
+          )}
         </div>
         {!isSnapshotProposalsLoading ? (
           proposalsToDisplay.length > 0 ? (
