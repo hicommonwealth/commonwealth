@@ -1,5 +1,8 @@
 import { CommunityInstance } from '@hicommonwealth/model';
-import { NotificationCategories } from '@hicommonwealth/shared';
+import {
+  DISCORD_BOT_NAME,
+  NotificationCategories,
+} from '@hicommonwealth/shared';
 import request from 'superagent';
 import { config } from '../../../config';
 import {
@@ -87,7 +90,7 @@ export async function sendDiscordWebhook(
   data: ForumWebhookData | ChainEventWebhookData,
   chain?: CommunityInstance,
 ) {
-  if ('profileName' in data && data.profileName === 'Discord Bot') {
+  if ('profileName' in data && data.profileName === DISCORD_BOT_NAME) {
     if (!chain) return;
     else if (chain && !chain.discord_bot_webhooks_enabled) return;
   }
