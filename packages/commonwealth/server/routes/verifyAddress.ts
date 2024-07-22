@@ -158,7 +158,7 @@ const processAddress = async (
         `Sent address move email: ${address} transferred to a new account`,
       );
     } catch (e) {
-      log.error(`Could not send address move email for: ${address}`);
+      log.error(`Could not send address move email for: ${address}`, e);
     }
   }
 };

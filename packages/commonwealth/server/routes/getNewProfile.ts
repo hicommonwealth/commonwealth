@@ -25,10 +25,10 @@ const getNewProfile = async (
   next: NextFunction,
 ) => {
   const user_id = req.query.userId ? +req.query.userId : req.user?.id;
-  if (!user_id) throw new AppError('Invalid user id');
+  if (!user_id) return next(new AppError(Errors.NoIdentifierProvided));
 
   const user = await models.User.findOne({ where: { id: user_id } });
-  if (!user) return next(new Error(Errors.NoProfileFound));
+  if (!user) return next(new AppError(Errors.NoProfileFound));
 
   // TODO: We can actually query all user activity in a single statement
   // Activity is defined as user addresses (ids) with votes, threads, comments in active communities
