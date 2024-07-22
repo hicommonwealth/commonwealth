@@ -75,7 +75,6 @@ export async function __updateCommunityId(
     //  and then delete the old data once redirect from old to new community
     //  is enabled
     const models: ModelStatic<ModelInstance<{ community_id?: string }>>[] = [
-      // @ts-expect-error StrictNullChecks
       this.models.Address,
       // @ts-expect-error StrictNullChecks
       this.models.Ban,

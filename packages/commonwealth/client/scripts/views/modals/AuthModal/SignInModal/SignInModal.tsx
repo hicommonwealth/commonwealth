@@ -7,6 +7,7 @@ const SignInModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
+  showAuthOptionFor,
   onSignInClick,
   onChangeModalType,
 }: ModalVariantProps) => {
@@ -15,8 +16,9 @@ const SignInModal = ({
       onClose={onClose}
       layoutType={AuthModalType.SignIn}
       onSuccess={onSuccess}
-      showAuthenticationOptionsFor={['wallets', 'sso']}
+      showAuthOptionTypesFor={['wallets', 'sso']}
       showWalletsFor={showWalletsFor}
+      showAuthOptionFor={showAuthOptionFor}
       bodyClassName="SignInModal"
       onSignInClick={onSignInClick}
       onChangeModalType={onChangeModalType}

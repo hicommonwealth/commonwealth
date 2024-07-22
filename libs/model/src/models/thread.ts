@@ -2,7 +2,7 @@ import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
@@ -152,12 +152,22 @@ export default (
             transaction: options.transaction,
           });
 
+          const { topic_id, community_id } = thread.get({
+            plain: true,
+          });
+          const contestManagers = !topic_id
+            ? []
+            : await getThreadContestManagers(sequelize, topic_id, community_id);
+
           await emitEvent(
             Outbox,
             [
               {
                 event_name: EventNames.ThreadCreated,
-                event_payload: thread.get({ plain: true }),
+                event_payload: {
+                  ...thread.get({ plain: true }),
+                  contestManagers,
+                },
               },
             ],
             options.transaction,
