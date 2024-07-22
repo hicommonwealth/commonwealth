@@ -117,26 +117,10 @@ export default (
         withPrivateData: {},
       },
       hooks: {
-        afterCreate: async (
-          address: AddressInstance,
-          options: Sequelize.CreateOptions<AddressAttributes>,
-        ) => {
-          await sequelize.models.Community.increment('address_count', {
-            by: 1,
-            where: { id: address.community_id },
-            transaction: options.transaction,
-          });
-        },
         afterDestroy: async (
           address: AddressInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
-          await sequelize.models.Community.decrement('address_count', {
-            by: 1,
-            where: { id: address.community_id },
-            transaction: options.transaction,
-          });
-
           await decrementProfileCount(
             sequelize.models,
             address.community_id!,

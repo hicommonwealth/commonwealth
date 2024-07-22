@@ -18,7 +18,7 @@ class ChainInfo {
   public CommunityTags: Tag[];
   public readonly tokenName: string;
   public threadCount: number;
-  public readonly addressCount: number;
+  public readonly profileCount: number;
   public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -94,7 +94,7 @@ class ChainInfo {
     namespace,
     redirect,
     thread_count,
-    address_count,
+    profile_count,
     snapshot_spaces,
   }) {
     this.id = id;
@@ -135,7 +135,7 @@ class ChainInfo {
     this.namespace = namespace;
     this.redirect = redirect;
     this.threadCount = thread_count;
-    this.addressCount = address_count;
+    this.profileCount = profile_count;
     this.snapshot = snapshot_spaces || [];
   }
 
@@ -174,7 +174,7 @@ class ChainInfo {
     namespace,
     redirect,
     thread_count,
-    address_count,
+    profile_count,
     CommunityStakes,
     CommunityTags,
     snapshot_spaces,
@@ -233,7 +233,7 @@ class ChainInfo {
       namespace,
       redirect,
       thread_count,
-      address_count,
+      profile_count,
       snapshot_spaces,
     });
   }

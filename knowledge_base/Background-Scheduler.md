@@ -88,10 +88,6 @@ heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
 - **UI Dependency**: Jobs can only be added through the UI.
 - **Package Installation**: All required packages are installed automatically similarly to the main app dyno. Tasks can be executed using npm scripts, for example:
 
-```bash
-pnpm --cwd packages/commonwealth recompute-counts
-```
-
 ## Scheduling externally vs in-memory
 
 In general, scheduling externally is better than using javascript `settimeout`

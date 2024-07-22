@@ -36,7 +36,7 @@ export async function __getActiveCommunities(
     SELECT
         c.id,
         COUNT(DISTINCT t.id) AS topic_count,
-        COUNT(DISTINCT a.id) AS address_count,
+        c.profile_count,
         COUNT(DISTINCT cs.community_id) AS community_stake_count
     FROM
         "Communities" c
