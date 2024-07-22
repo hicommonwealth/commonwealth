@@ -208,8 +208,10 @@ const CommunityResultRow = ({
   );
 };
 
+export type MemberResult = z.infer<typeof CommunityMember>;
+
 type MemberResultRowProps = {
-  addr: z.infer<typeof CommunityMember>;
+  addr: MemberResult;
   setRoute: any;
 };
 // eslint-disable-next-line react/no-multi-comp

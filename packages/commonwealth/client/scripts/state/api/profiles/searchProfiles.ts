@@ -100,7 +100,7 @@ const useSearchProfilesQuery = ({
         return undefined;
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
-      enabled: enabled && searchTerm.length >= 3,
+      enabled: enabled,
     },
   );
 };

@@ -182,10 +182,10 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           'id', A.id,
           'address', A.address,
           'community_id', A.community_id,
+          'role', A.role,
           'stake_balance', 0, -- TODO: project stake balance here
           'profile_id', A.profile_id -- TO BE REMOVED
         )) AS addresses,
-        ARRAY_AGG(A.role) AS roles,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
         T.total
       FROM 

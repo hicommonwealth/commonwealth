@@ -161,7 +161,7 @@ const SearchPage = () => {
     // @ts-expect-error <StrictNullChecks/>
   } = useSearchProfilesQuery({
     ...sharedQueryOptions,
-    enabled: activeTab === SearchScope.Members,
+    enabled: activeTab === SearchScope.Members && queryParams.q?.length >= 3,
   });
 
   const results = useMemo(() => {
