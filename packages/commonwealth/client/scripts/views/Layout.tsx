@@ -76,6 +76,7 @@ const LayoutComponent = ({
       if (shouldSelectChain) {
         setIsLoading(true);
         setScopeToLoad(selectedScope);
+        console.log('?????????????????????', scopeMatchesCommunity);
         if (await loadCommunityChainInfo(scopeMatchesCommunity)) {
           // Update default community on server if logged in
           if (app.isLoggedIn()) {
