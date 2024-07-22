@@ -264,13 +264,3 @@ export const parseEvmEventToContestEvent = <
   }
   throw new Error(`No valid mapper found for event: ${chainEventName}`);
 };
-
-// All events should carry this common metadata
-export const EventMetadata = z.object({
-  created_at: z.date().nullish().describe('When the event was emitted'),
-  // TODO: TBD
-  // aggregateType: z.enum(Aggregates).describe("Event emitter aggregate type")
-  // aggregateId: z.string().describe("Event emitter aggregate id")
-  // correlation: z.string().describe("Event correlation key")
-  // causation: z.object({}).describe("Event causation")
-});

@@ -297,7 +297,8 @@ export class RabbitMQAdapter implements Broker {
     if (
       (event.name === EventNames.ThreadCreated ||
         event.name === EventNames.ThreadUpvoted) &&
-      'contestManagers' in event.payload
+      'contestManagers' in event.payload &&
+      event.payload.contestManagers?.length
     ) {
       return `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}`;
     } else {

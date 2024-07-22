@@ -17,7 +17,7 @@ import {
   GovBravoProposalQueued,
   NamespaceDeployed,
 } from './chain-event.schemas';
-import { EventMetadata } from './events.utils';
+import { EventMetadata } from './util.schemas';
 
 export const ThreadCreated = Thread.extend({
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
