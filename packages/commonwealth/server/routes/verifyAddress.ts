@@ -150,7 +150,7 @@ const processAddress = async (
     try {
       // send email to the old user (should only ever be one)
       const oldUser = await models.User.scope('withPrivateData').findOne({
-        where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
+        where: { id: addressToTransfer.user_id!, email: { [Op.ne]: null } },
       });
       if (!oldUser?.email) {
         throw new AppError(Errors.NoEmail);

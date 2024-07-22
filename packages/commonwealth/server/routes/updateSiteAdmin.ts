@@ -42,7 +42,7 @@ const updateSiteAdmin = async (
 
   const user = await models.User.findOne({
     where: {
-      id: userAddress.user_id,
+      id: userAddress.user_id!,
     },
   });
 
