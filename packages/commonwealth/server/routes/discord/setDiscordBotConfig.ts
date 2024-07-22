@@ -1,6 +1,6 @@
 import { AppError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { DISCORD_BOT_ADDRESS } from '@hicommonwealth/shared';
+import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import { validateCommunity } from '../../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../../types';
@@ -121,8 +121,12 @@ const setDiscordBotConfig = async (
   }
 
   await models.sequelize.transaction(async (transaction) => {
+    const user = await models.User.findOne({
+      where: { email: DISCORD_BOT_EMAIL },
+    });
     const [address, created] = await models.Address.findOrCreate({
       where: {
+        user_id: user?.id,
         address: DISCORD_BOT_ADDRESS,
         community_id,
       },
