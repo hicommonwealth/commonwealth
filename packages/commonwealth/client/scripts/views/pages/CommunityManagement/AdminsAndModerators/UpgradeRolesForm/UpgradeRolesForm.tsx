@@ -53,7 +53,7 @@ export const UpgradeRolesForm = ({
         : '';
       // TODO: we don't actually know if this is the right address?
       const fullText = `${profile_name} - ${formatAddressShort(
-        addresses[0].address,
+        addresses?.[0].address,
       )} ${roletext}`;
       return fullText;
     },
