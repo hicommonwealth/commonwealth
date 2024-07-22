@@ -4,6 +4,7 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 
+import { CONTEST_FAQ_URL } from 'views/pages/CommunityManagement/Contests/utils';
 import './ContestTopicBanner.scss';
 
 interface ContestTopicBannerProps {
@@ -46,11 +47,7 @@ const ContestTopicBanner = ({ contests }: ContestTopicBannerProps) => {
       }
       type="info"
       footer={
-        <a
-          href="https://blog.commonwealth.im"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href={CONTEST_FAQ_URL} target="_blank" rel="noopener noreferrer">
           Learn more about contests
         </a>
       }
