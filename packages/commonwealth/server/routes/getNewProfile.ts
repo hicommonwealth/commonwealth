@@ -1,14 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
 import type {
-  AddressAttributes,
-  CommentAttributes,
   DB,
-  ProfileInstance,
   ProfileTagsAttributes,
   TagsAttributes,
-  ThreadAttributes,
 } from '@hicommonwealth/model';
-import { Tag } from '@hicommonwealth/schemas';
+import { GetNewProfileReq, GetNewProfileResp } from '@hicommonwealth/schemas';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import z from 'zod';
@@ -20,106 +16,73 @@ export const Errors = {
   NoProfileFound: 'No profile found',
 };
 
-type GetNewProfileReq = {
-  profileId?: string;
-};
-type GetNewProfileResp = {
-  profile: ProfileInstance;
-  totalUpvotes: number;
-  addresses: AddressAttributes[];
-  threads: ThreadAttributes[];
-  comments: CommentAttributes[];
-  commentThreads: ThreadAttributes[];
-  isOwner: boolean;
-  tags: z.infer<typeof Tag>[];
-};
-
 type ProfileWithTags = ProfileTagsAttributes & { Tag: TagsAttributes };
 
 const getNewProfile = async (
   models: DB,
-  req: TypedRequestQuery<GetNewProfileReq>,
-  res: TypedResponse<GetNewProfileResp>,
+  req: TypedRequestQuery<z.infer<typeof GetNewProfileReq>>,
+  res: TypedResponse<z.infer<typeof GetNewProfileResp>>,
   next: NextFunction,
 ) => {
   const { profileId } = req.query;
+  let user_id = req.user?.id;
 
-  let profile: ProfileInstance;
-
+  // TO BE REMOVED
   if (profileId) {
     const parsedInt = parseInt(profileId);
     if (isNaN(parsedInt) || parsedInt !== parseFloat(profileId)) {
       throw new AppError('Invalid profile id');
     }
-
-    // @ts-expect-error StrictNullChecks
-    profile = await models.Profile.findOne({
+    const address = await models.Address.findOne({
       where: {
-        id: profileId,
+        profile_id: profileId,
       },
+      attributes: ['user_id'],
     });
-  } else {
-    // @ts-expect-error StrictNullChecks
-    profile = await models.Profile.findOne({
-      where: {
-        // @ts-expect-error StrictNullChecks
-        user_id: req.user.id,
-      },
-    });
+    user_id = address?.user_id;
   }
 
-  if (!profile) return next(new Error(Errors.NoProfileFound));
+  const user = await models.User.findOne({ where: { id: user_id } });
+  if (!user) return next(new Error(Errors.NoProfileFound));
 
-  const inActiveCommunities = (
-    await models.Community.findAll({
-      where: {
-        active: false,
-      },
-      attributes: ['id'],
-    })
-  ).map((c) => c.id);
+  // TODO: We can actually query all user activity in a single statement
+  // Activity is defined as user addresses (ids) with votes, threads, comments in active communities
 
-  const addresses = await profile.getAddresses({
-    where: {
-      community_id: {
-        [Op.notIn]: inActiveCommunities,
+  const addresses = await models.Address.findAll({
+    where: { user_id },
+    include: [
+      {
+        model: models.Community,
+        required: true,
+        where: { active: true },
+        attributes: ['id'],
       },
-    },
+    ],
   });
 
-  // @ts-expect-error StrictNullChecks
-  const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
+  const addressIds = [...new Set<number>(addresses.map((a) => a.id!))];
+  const communityIds = [
+    ...new Set<string>(addresses.map((a) => a.community_id!)),
+  ];
 
   const totalUpvotes = await models.Reaction.count({
     where: {
-      address_id: {
-        [Op.in]: addressIds,
-      },
+      address_id: { [Op.in]: addressIds },
     },
   });
 
   const threads = await models.Thread.findAll({
-    // @ts-expect-error StrictNullChecks
     where: {
-      address_id: {
-        [Op.in]: addressIds,
-      },
-      community_id: {
-        [Op.notIn]: inActiveCommunities,
-      },
+      address_id: { [Op.in]: addressIds },
+      community_id: { [Op.in]: communityIds },
     },
     include: [{ model: models.Address, as: 'Address' }],
   });
 
   const comments = await models.Comment.findAll({
-    // @ts-expect-error StrictNullChecks
     where: {
-      address_id: {
-        [Op.in]: addressIds,
-      },
-      community_id: {
-        [Op.notIn]: inActiveCommunities,
-      },
+      address_id: { [Op.in]: addressIds },
+      community_id: { [Op.in]: communityIds },
     },
     include: [{ model: models.Address, as: 'Address' }],
   });
@@ -128,37 +91,25 @@ const getNewProfile = async (
     ...new Set<number>(comments.map((c) => c.thread_id, 10)),
   ];
   const commentThreads = await models.Thread.findAll({
-    // @ts-expect-error StrictNullChecks
     where: {
-      id: {
-        [Op.in]: commentThreadIds,
-      },
-      community_id: {
-        [Op.notIn]: inActiveCommunities,
-      },
+      id: { [Op.in]: commentThreadIds },
+      community_id: { [Op.in]: communityIds },
     },
   });
 
   const profileTags = await models.ProfileTags.findAll({
-    where: {
-      user_id: profile.user_id,
-    },
-    include: [
-      {
-        model: models.Tags,
-      },
-    ],
-    logging: true,
+    where: { user_id },
+    include: [{ model: models.Tags }],
   });
 
   return success(res, {
-    profile,
+    profile: user.profile,
     totalUpvotes,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
-    isOwner: req.user?.id === profile.user_id,
+    isOwner: req.user?.id === user_id,
     tags: profileTags
       .map((t) => t.toJSON())
       .map((t) => (t as ProfileWithTags).Tag),

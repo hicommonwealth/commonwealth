@@ -190,7 +190,7 @@ export interface VersionHistory {
 export interface IThreadCollaborator {
   address: string;
   community_id: string;
-  User: { Profiles: UserProfile[] };
+  User: { profile: UserProfile };
 }
 
 export type AssociatedReaction = {
@@ -479,13 +479,10 @@ export class Thread implements IUniqueId {
           Address: {
             address: rc?.address,
             User: {
-              Profiles: [
-                {
-                  id: rc?.profile_id,
-                  profile_name: rc?.profile_name,
-                  avatar_url: rc?.profile_avatar_url,
-                },
-              ],
+              profile: {
+                name: rc?.profile_name,
+                avatar_url: rc?.profile_avatar_url,
+              },
             },
           },
           discord_meta: rc?.discord_meta,

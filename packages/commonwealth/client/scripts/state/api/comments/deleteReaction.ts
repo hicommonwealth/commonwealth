@@ -4,6 +4,7 @@ import axios from 'axios';
 import { signDeleteCommentReaction } from 'controllers/server/sessions';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -23,6 +24,7 @@ const deleteReaction = async ({
   const canvasSignedData = await signDeleteCommentReaction(address, {
     comment_id: canvasHash,
   });
+
   return await axios
     .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
       data: {
@@ -62,6 +64,8 @@ const useDeleteCommentReactionMutation = ({
     threadId,
   });
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
@@ -83,6 +87,7 @@ const useDeleteCommentReactionMutation = ({
         });
       });
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

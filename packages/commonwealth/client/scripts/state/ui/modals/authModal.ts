@@ -1,22 +1,34 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { AuthModalType } from 'views/modals/AuthModal/types';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface AuthModalStore {
+  authModalType: AuthModalType | undefined;
+  setAuthModalType: (type: AuthModalType | undefined) => void;
   shouldOpenGuidanceModalAfterMagicSSORedirect: boolean;
   setShouldOpenGuidanceModalAfterMagicSSORedirect: (
     shouldOpen: boolean,
   ) => void;
-  triggerOpenModalType: AuthModalType;
-  setTriggerOpenModalType: (modalType: AuthModalType) => void;
   validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived: () => void;
+  sessionKeyValidationError?: SessionKeyError;
+  checkForSessionKeyRevalidationErrors: (error: unknown) => void;
 }
 
 export const authModal = createStore<AuthModalStore>()(
   devtools(
     persist(
       (set) => ({
+        authModalType: undefined,
+        setAuthModalType: (type) => {
+          set((state) => {
+            return {
+              ...state,
+              authModalType: type,
+            };
+          });
+        },
         shouldOpenGuidanceModalAfterMagicSSORedirect: false,
         setShouldOpenGuidanceModalAfterMagicSSORedirect: (shouldOpen) => {
           set((state) => {
@@ -26,22 +38,12 @@ export const authModal = createStore<AuthModalStore>()(
             };
           });
         },
-        // @ts-expect-error StrictNullChecks
-        triggerOpenModalType: null,
-        setTriggerOpenModalType: (modalType) => {
-          set((state) => {
-            return {
-              ...state,
-              triggerOpenModalType: modalType,
-            };
-          });
-        },
         validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived: () => {
           set((state) => {
             if (state.shouldOpenGuidanceModalAfterMagicSSORedirect) {
               return {
                 ...state,
-                triggerOpenModalType: AuthModalType.AccountTypeGuidance,
+                authModalType: AuthModalType.AccountTypeGuidance,
                 shouldOpenGuidanceModalAfterMagicSSORedirect: false,
               };
             }
@@ -51,6 +53,20 @@ export const authModal = createStore<AuthModalStore>()(
               shouldOpenGuidanceModalAfterMagicSSORedirect: false,
             };
           });
+        },
+        checkForSessionKeyRevalidationErrors: (error) => {
+          const sessionKeyValidationError =
+            error instanceof SessionKeyError && error;
+
+          if (sessionKeyValidationError) {
+            set((state) => {
+              return {
+                ...state,
+                sessionKeyValidationError: sessionKeyValidationError,
+                authModalType: AuthModalType.RevalidateSession,
+              };
+            });
+          }
         },
       }),
       {

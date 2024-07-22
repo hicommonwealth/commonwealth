@@ -3,8 +3,10 @@ import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
+import { CommunityMember } from '@hicommonwealth/schemas';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import { z } from 'zod';
 import CommunityInfo from '../../../models/ChainInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
@@ -206,24 +208,8 @@ const CommunityResultRow = ({
   );
 };
 
-export type MemberResult = {
-  id: number;
-  user_id: string;
-  profile_name: string;
-  avatar_url: string;
-  addresses: {
-    id: number;
-    community_id: string;
-    address: string;
-    role?: string;
-    stake_balance?: string;
-  }[];
-  group_ids?: [];
-  roles?: any[];
-  last_active: string;
-};
 type MemberResultRowProps = {
-  addr: MemberResult;
+  addr: z.infer<typeof CommunityMember>;
   setRoute: any;
 };
 // eslint-disable-next-line react/no-multi-comp

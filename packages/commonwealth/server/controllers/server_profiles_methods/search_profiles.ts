@@ -35,6 +35,7 @@ type Profile = {
 };
 export type SearchProfilesResult = TypedPaginatedResult<Profile>;
 
+// TODO: is this deprecated by /profiles/v2?
 export async function __searchProfiles(
   this: ServerProfilesController,
   {
@@ -58,13 +59,13 @@ export async function __searchProfiles(
     case 'created_at':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Profiles".created_at`,
+        orderBy: `"Users".created_at`,
       };
       break;
     case 'profile_name':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Profiles".profile_name`,
+        orderBy: `"Users".profile->>'name'`,
       };
       break;
     default:
@@ -91,29 +92,29 @@ export async function __searchProfiles(
 
   const sqlWithoutPagination = `
     SELECT
-      "Profiles".id,
-      "Profiles".user_id,
-      "Profiles".profile_name,
-      "Profiles".avatar_url,
-      "Profiles".created_at,
+      "Addresses".profile_id, -- TO BE REMOVED
+      "Users".id AS user_id,
+      "Users".profile->>'name' AS profile_name,
+      "Users".profile->>'avatar_url' AS avatar_url,
+      "Users".created_at,
       array_agg("Addresses".id) as address_ids,
       array_agg("Addresses".community_id) as community_ids,
       array_agg("Addresses".address) as addresses,
       array_agg("Addresses".role) as roles,
       MAX("Addresses".last_active) as last_active
     FROM
-      "Profiles"
-    JOIN
-      "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      "Users"
+      JOIN "Addresses" ON "Users".id = "Addresses".user_id AND "Addresses".profile_id IS NOT NULL -- TO BE REMOVED
     WHERE
       ${communityWhere}
       (
-        "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
+        "Users".profile->>'name' ILIKE '%' || $searchTerm || '%'
         OR
         "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
     GROUP BY
-      "Profiles".id
+      "Users".id,
+      "Addresses".profile_id
   `;
 
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([
@@ -135,13 +136,14 @@ export async function __searchProfiles(
 
   const totalResults = parseInt(count, 10);
 
-  const profilesWithAddresses: Profile[] = results.map((profile: any) => {
+  // TODO: return addresses JSON instead
+  const profilesWithAddresses: Profile[] = results.map((profile) => {
     return {
       id: profile.id,
       user_id: profile.user_id,
       profile_name: profile.profile_name,
       avatar_url: profile.avatar_url,
-      addresses: profile.address_ids.map((unused1, i) => ({
+      addresses: profile.address_ids.map((__, i) => ({
         id: profile.address_ids[i],
         community_id: profile.community_ids[i],
         address: profile.addresses[i],

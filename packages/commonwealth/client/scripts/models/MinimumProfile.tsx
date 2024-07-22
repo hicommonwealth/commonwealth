@@ -9,16 +9,16 @@ export type UserProfile = {
 };
 
 export function addressToUserProfile(address): UserProfile {
-  const profile = address?.User?.Profiles[0];
+  const profile = address?.User?.profile;
   if (!profile) {
     // @ts-expect-error <StrictNullChecks/>
     return undefined;
   }
-
   return {
-    id: profile.id,
-    avatarUrl: profile?.avatar_url,
-    name: profile?.profile_name || profile?.name,
+    id: address.profile_id,
+    // TODO: let's agreed on a single model (UserProfile, MinimumProfile)
+    avatarUrl: profile?.avatar_url ?? profile?.avatarUrl,
+    name: profile?.name ?? profile?.profile_name,
     address: address?.address,
     lastActive: address?.last_active,
   };

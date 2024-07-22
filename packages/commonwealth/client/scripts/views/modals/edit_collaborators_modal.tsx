@@ -24,7 +24,6 @@ import { User } from '../components/user/user';
 
 import useUserStore from 'state/ui/user';
 import '../../../styles/modals/edit_collaborators_modal.scss';
-import { MemberResult } from '../pages/search/helpers';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -63,13 +62,10 @@ export const EditCollaboratorsModal = ({
     enabled: debouncedSearchTerm.length >= 3,
   });
 
-  const searchResults: Array<MemberResult> = profiles?.pages?.[0]?.results
-    ? profiles.pages[0].results.filter(
-        (addr) =>
-          !addr.addresses.some(
-            (a) => a.address === user.activeAccount?.address,
-          ),
-      )
+  const searchResults = profiles?.pages?.[0]?.results
+    ? profiles.pages[0].results
+        .map((p) => p.addresses[0])
+        .filter((a) => a.address !== user.activeAccount?.address)
     : [];
 
   const handleUpdateCollaborators = (c: IThreadCollaboratorWithId) => {
@@ -102,18 +98,18 @@ export const EditCollaboratorsModal = ({
                   className="collaborator-row"
                   onClick={() =>
                     handleUpdateCollaborators({
-                      id: c.addresses[0]?.id,
-                      address: c.addresses[0]?.address,
-                      community_id: c.addresses[0]?.community_id,
+                      id: c.id,
+                      address: c.address,
+                      community_id: c.community_id,
                       // @ts-expect-error <StrictNullChecks/>
                       User: null,
                     })
                   }
                 >
                   <User
-                    userAddress={c.addresses[0]?.address}
-                    userCommunityId={c.addresses[0]?.community_id}
-                    shouldShowAsDeleted={!c.addresses}
+                    userAddress={c.address}
+                    userCommunityId={c.community_id}
+                    shouldShowAsDeleted={!c.address && !c.community_id}
                   />
                 </div>
               ))
@@ -194,16 +190,6 @@ export const EditCollaboratorsModal = ({
                     }),
                   },
                 });
-                updatedThread.collaborators?.forEach((c) =>
-                  c.User.Profiles.forEach((p) => {
-                    p.avatarUrl = (
-                      p as unknown as { avatar_url: string }
-                    ).avatar_url;
-                    p.name = (
-                      p as unknown as { profile_name: string }
-                    ).profile_name;
-                  }),
-                );
                 notifySuccess('Collaborators updated');
                 onCollaboratorsUpdated &&
                   // @ts-expect-error <StrictNullChecks/>

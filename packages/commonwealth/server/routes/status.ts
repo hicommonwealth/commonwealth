@@ -297,15 +297,9 @@ export const status = async (
     } else {
       // user is logged in
       const userStatusPromise = getUserStatus(models, reqUser);
-      const profilePromise = models.Profile.findOne({
-        where: {
-          user_id: reqUser.id,
-        },
-      });
-      const [communityStatus, userStatus, profileInstance] = await Promise.all([
+      const [communityStatus, userStatus] = await Promise.all([
         communityStatusPromise,
         userStatusPromise,
-        profilePromise,
       ]);
       const { communityCategories, threadCountQueryData } = communityStatus;
       const { user, id } = userStatus;
@@ -324,7 +318,7 @@ export const status = async (
         recentThreads: threadCountQueryData,
         loggedIn: true,
         // @ts-expect-error StrictNullChecks
-        user: { ...user, profileId: profileInstance.id },
+        user: { ...user, profileId: user.addresses.at(0)?.profile_id },
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,

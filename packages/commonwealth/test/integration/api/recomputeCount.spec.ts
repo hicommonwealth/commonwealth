@@ -22,7 +22,6 @@ describe('recomputeCounts', () => {
 
   async function calcAllCountsFromSourceTables() {
     const retCommentCounts = (await server.models.Comment.count({
-      // @ts-expect-error StrictNullChecks
       where: {
         deleted_at: null,
       },
@@ -137,7 +136,6 @@ describe('recomputeCounts', () => {
     commentId: number,
   ) {
     const commentCount = await server.models.Comment.count({
-      // @ts-expect-error StrictNullChecks
       where: {
         thread_id: threadId,
         deleted_at: null,
@@ -527,7 +525,7 @@ describe('recomputeCounts', () => {
         address: testVerifiedChainAddress.address,
         jwt: testJwtToken,
         reaction: 'like',
-        comment_id: server.e2eTestEntities.testComments[0].id,
+        comment_id: server.e2eTestEntities.testComments[0].id!,
         author_chain: chain,
         session: testVerifiedChainAddress.session,
         sign: testVerifiedChainAddress.sign,

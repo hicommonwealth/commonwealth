@@ -42,16 +42,11 @@ export async function __getActiveThreads(
     {
       model: this.models.Address,
       as: 'Address',
-      attributes: ['id', 'address', 'community_id'],
+      attributes: ['id', 'address', 'community_id', 'profile_id'],
       include: [
         {
-          model: this.models.Profile,
-          attributes: [
-            ['id', 'profile_id'],
-            'profile_name',
-            ['avatar_url', 'profile_avatar_url'],
-            'user_id',
-          ],
+          model: this.models.User,
+          attributes: ['id', 'profile'],
         },
       ],
     },
@@ -78,16 +73,12 @@ export async function __getActiveThreads(
       include: [
         {
           model: this.models.Address,
-          attributes: ['address'],
+          as: 'Address',
+          attributes: ['address', 'profile_id'],
           include: [
             {
-              model: this.models.Profile,
-              attributes: [
-                ['id', 'profile_id'],
-                'profile_name',
-                ['avatar_url', 'profile_avatar_url'],
-                'user_id',
-              ],
+              model: this.models.User,
+              attributes: ['id', 'profile'],
             },
           ],
         },
@@ -117,27 +108,31 @@ export async function __getActiveThreads(
 
   const allRecentTopicThreads = allRecentTopicThreadsRaw.map((thread) => {
     // @ts-expect-error StrictNullChecks
-    let tempThread = thread.toJSON();
-    tempThread = {
-      ...tempThread,
-      numberOfComments: tempThread.comment_count || 0,
-      ...(tempThread?.Address?.Profile || {}),
-    };
-    if (tempThread?.Address?.Profile) delete tempThread.Address.Profile;
+    const tempThread = thread.toJSON();
+    tempThread.numberOfComments = tempThread.comment_count || 0;
+    tempThread.profile_id = tempThread.Address.profile_id;
+    if (tempThread.Address.User) {
+      tempThread.user_id = tempThread.Address.User.id;
+      tempThread.profile_name = tempThread.Address.User.profile.name;
+      tempThread.avatar_url = tempThread.Address.User.profile.avatar_url;
+      delete tempThread.Address.User;
+    }
 
     if (withXRecentComments) {
       tempThread.recentComments = (tempThread.Comments || []).map((c) => {
         const temp = {
           ...c,
-          ...(c?.Address?.Profile || {}),
           address: c?.Address?.address || '',
         };
-
-        if (temp.Address) delete temp.Address;
-
+        if (temp.Address) {
+          temp.user_id = temp.Address.User?.id;
+          temp.profile_id = temp.Address.profile_id;
+          temp.profile_name = temp.Address.User?.profile.name;
+          temp.profile_avatar_url = temp.Address.User?.profile.avatar_url;
+          delete temp.Address;
+        }
         return temp;
       });
-
       delete tempThread.Comments;
     }
     return tempThread;

@@ -47,7 +47,6 @@ const linkExistingAddressToCommunity = async (
   // check if the original address is verified and is owned by the user
   const originalAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      // @ts-expect-error StrictNullChecks
       where: {
         address: req.body.address,
         user_id: userId,
@@ -140,17 +139,16 @@ const linkExistingAddressToCommunity = async (
       await incrementProfileCount(
         models,
         community!.id!,
-        originalAddress.user_id,
+        originalAddress.user_id!,
         transaction,
       );
 
       return await models.Address.create(
         {
-          user_id: originalAddress.user_id,
-          profile_id: originalAddress.profile_id,
+          user_id: originalAddress.user_id!,
+          profile_id: originalAddress.profile_id!,
           address: encodedAddress,
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
+          community_id: community!.id,
           hex,
           verification_token: verificationToken,
           verification_token_expires: verificationTokenExpires,
@@ -158,6 +156,7 @@ const linkExistingAddressToCommunity = async (
           wallet_id: originalAddress.wallet_id,
           wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),
+          role: 'member',
         },
         { transaction },
       );
