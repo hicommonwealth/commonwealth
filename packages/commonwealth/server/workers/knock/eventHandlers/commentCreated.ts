@@ -27,9 +27,7 @@ export const processCommentCreated: EventHandler<
   typeof output
 > = async ({ payload }) => {
   const author = await models.Address.findOne({
-    where: {
-      id: payload.address_id,
-    },
+    where: { id: payload.address_id },
     include: [{ model: models.User, required: true, attributes: ['profile'] }],
   });
 
@@ -41,9 +39,7 @@ export const processCommentCreated: EventHandler<
   }
 
   const community = await models.Community.findOne({
-    where: {
-      id: payload.community_id,
-    },
+    where: { id: payload.community_id },
   });
 
   if (!community) {
@@ -78,7 +74,6 @@ export const processCommentCreated: EventHandler<
   if (users.length > 0) {
     const provider = notificationsProvider();
 
-    // TODO: error handling -> Ryan's event handling utility?
     return await provider.triggerWorkflow({
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
