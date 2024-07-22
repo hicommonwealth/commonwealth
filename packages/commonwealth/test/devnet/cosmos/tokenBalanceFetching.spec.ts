@@ -19,7 +19,6 @@ import {
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
-  DISCORD_BOT_ADDRESS,
   delay,
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
@@ -52,7 +51,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
   const cosmosChainId = 'csdkv1local';
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
   const addressTwo = 'cosmos1f85wzgz83gkq09g9gj79c6w9gydu87a7e6hax7';
-  const discobotAddress = DISCORD_BOT_ADDRESS;
+  const discobotAddress = '0xdiscordbot';
   const addressOneBalance = '50000000000';
   const addressTwoBalance = '30000000000';
 
