@@ -1,3 +1,4 @@
+import { Roles } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
@@ -11,8 +12,8 @@ interface FetchAdminProps {
 
 // admins/mods are Address objects
 const fetchAdmin = async ({ communityId }: FetchAdminProps) => {
-  const memberAdmins: any[] = []; // TODO: type should be AddressAttributes
-  const memberMods: any[] = [];
+  const memberAdmins: Roles[] = []; // TODO: type should be AddressAttributes
+  const memberMods: Roles[] = [];
 
   const res = await axios.get(`${app.serverUrl()}${ApiEndpoints.FETCH_ADMIN}`, {
     params: {

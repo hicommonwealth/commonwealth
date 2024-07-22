@@ -138,7 +138,7 @@ export const ManageRoles = ({
                   handleDeleteRole({
                     address,
                     role,
-                  })
+                  }).catch((e) => console.log('Failed to delete role:', e))
                 }
               />
             </div>

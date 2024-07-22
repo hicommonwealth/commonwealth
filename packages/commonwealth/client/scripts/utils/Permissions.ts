@@ -16,10 +16,9 @@ const isSiteAdmin = () => {
   );
 };
 
-const isCommunityMember = (communityId?: string) => {
+const isCommunityMember = (communityId = app.activeChainId()) => {
   if (!communityId) {
-    communityId = app.activeChainId();
-    if (!communityId) return false; // TODO: is this correct?
+    return false; // TODO: is this correct?
   }
   return userStore
     .getState()
