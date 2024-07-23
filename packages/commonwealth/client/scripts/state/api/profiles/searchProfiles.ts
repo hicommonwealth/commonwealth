@@ -1,14 +1,18 @@
+import { CommunityMember } from '@hicommonwealth/schemas';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from 'client/scripts/helpers/constants';
 import app from 'state';
-import { MemberResult } from 'views/pages/search/helpers';
+import { z } from 'zod';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
 
 export type SearchProfilesResponse = {
-  results: MemberResult[];
+  results: z.infer<typeof CommunityMember>[];
   limit: number;
   page: number;
   totalPages: number;

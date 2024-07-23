@@ -1,7 +1,13 @@
 import { EventNames, events, logger } from '@hicommonwealth/core';
 import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
-import { Model, ModelStatic, Transaction } from 'sequelize';
+import {
+  Model,
+  ModelStatic,
+  QueryTypes,
+  Sequelize,
+  Transaction,
+} from 'sequelize';
 import { fileURLToPath } from 'url';
 import { isAddress } from 'web3-validator';
 import { z } from 'zod';
@@ -229,4 +235,45 @@ export function equalEvmAddresses(
   const normalizedAddress2 = validAddress2.toLowerCase();
 
   return normalizedAddress1 === normalizedAddress2;
+}
+
+/**
+ * Returns all contest managers associated with a thread by topic and community
+ * @param sequelize - The sequelize instance
+ * @param topicId - The topic ID of the thread
+ * @param communityId - the community ID of the thread
+ * @returns array of contest manager
+ */
+export async function getThreadContestManagers(
+  sequelize: Sequelize,
+  topicId: number,
+  communityId: string,
+): Promise<
+  {
+    contest_address: string;
+  }[]
+> {
+  const contestManagers = await sequelize.query<{
+    contest_address: string;
+  }>(
+    `
+            SELECT
+              cm.contest_address
+            FROM "Communities" c
+            JOIN "ContestManagers" cm ON cm.community_id = c.id
+            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
+            WHERE ct.topic_id = :topic_id
+            AND cm.community_id = :community_id
+            AND cm.cancelled = false
+            AND cm.ended = false
+          `,
+    {
+      type: QueryTypes.SELECT,
+      replacements: {
+        topic_id: topicId,
+        community_id: communityId,
+      },
+    },
+  );
+  return contestManagers;
 }

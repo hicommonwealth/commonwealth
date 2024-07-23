@@ -9,22 +9,14 @@ import { IAccountsModule } from '../../../models/interfaces';
 export class SubstrateAccount extends Account {
   private _Accounts: SubstrateAccounts;
 
-  public readonly isEd25519: boolean;
-
   // CONSTRUCTORS
-  constructor(
-    app: IApp,
-    Accounts: SubstrateAccounts,
-    address: string,
-    isEd25519 = false,
-  ) {
+  constructor(app: IApp, Accounts: SubstrateAccounts, address: string) {
     if (!app.isModuleReady) {
       // defer chain initialization
       super({ community: app.chain.meta, address });
     } else {
       super({ community: app.chain.meta, address });
     }
-    this.isEd25519 = isEd25519;
     this._Accounts = Accounts;
     this._Accounts.store.add(this);
   }
@@ -43,12 +35,8 @@ class SubstrateAccounts implements IAccountsModule<SubstrateAccount> {
     return this._store;
   }
 
-  public get(address: string, keytype?: string) {
-    if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {
-      throw new Error(`invalid keytype: ${keytype}`);
-    }
-    // @ts-expect-error StrictNullChecks
-    return this.fromAddress(address, keytype && keytype === 'ed25519');
+  public get(address: string) {
+    return this.fromAddress(address);
   }
 
   private _app: IApp;
@@ -65,7 +53,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateAccount> {
     return decoded.every((v) => v === 0);
   }
 
-  public fromAddress(address: string, isEd25519 = false): SubstrateAccount {
+  public fromAddress(address: string): SubstrateAccount {
     try {
       decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
@@ -75,14 +63,9 @@ class SubstrateAccounts implements IAccountsModule<SubstrateAccount> {
     }
     try {
       const acct = this._store.getByAddress(address);
-      // update account key type if created with incorrect settings
-      if (acct.isEd25519 !== isEd25519) {
-        return new SubstrateAccount(this.app, this, address, isEd25519);
-      } else {
-        return acct;
-      }
+      return acct;
     } catch (e) {
-      return new SubstrateAccount(this.app, this, address, isEd25519);
+      return new SubstrateAccount(this.app, this, address);
     }
   }
 

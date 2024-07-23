@@ -22,7 +22,6 @@ type CreateAddressReq = {
   community_id?: string;
   wallet_id: WalletId;
   wallet_sso_source: WalletSsoSource;
-  keytype?: string;
   block_info?: string;
 };
 
@@ -83,12 +82,11 @@ export async function createAddressHelper(
       const existingHexes = await models.Address.scope(
         'withPrivateData',
       ).findAll({
-        // @ts-expect-error StrictNullChecks
         where: { hex: addressHex, verified: { [Op.ne]: null } },
       });
       const existingHexesSorted = existingHexes.sort((a, b) => {
         // sort by latest last_active
-        return +b.dataValues.last_active - +a.dataValues.last_active;
+        return +b.dataValues.last_active! - +a.dataValues.last_active!;
       });
 
       // use the latest active address with this hex to assign profile
@@ -153,7 +151,6 @@ export async function createAddressHelper(
       });
       existingAddress.profile_id = profileId?.id;
     }
-    existingAddress.keytype = req.keytype;
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
@@ -215,7 +212,7 @@ export async function createAddressHelper(
 
     // @ts-expect-error StrictNullChecks
     if (existingAddressWithHex && !profile_id) {
-      profile_id = existingAddressWithHex.profile_id;
+      profile_id = existingAddressWithHex.profile_id!;
     }
 
     const newObj = await models.sequelize.transaction(async (transaction) => {
@@ -224,14 +221,12 @@ export async function createAddressHelper(
           // @ts-expect-error StrictNullChecks
           user_id,
           profile_id,
-          // @ts-expect-error StrictNullChecks
           community_id: req.community_id,
           address: encodedAddress,
           hex: addressHex,
           verification_token,
           verification_token_expires,
           block_info: req.block_info,
-          keytype: req.keytype,
           last_active,
           wallet_id: req.wallet_id,
           wallet_sso_source: req.wallet_sso_source,

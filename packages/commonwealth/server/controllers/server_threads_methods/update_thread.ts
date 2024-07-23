@@ -107,9 +107,6 @@ export async function __updateThread(
   if (discordMeta) {
     threadWhere.discord_meta = discordMeta;
   }
-  if (!body) {
-    throw new AppError(Errors.NoBody);
-  }
 
   const thread = await this.models.Thread.findOne({
     where: threadWhere,
@@ -269,7 +266,7 @@ export async function __updateThread(
       { transaction },
     );
 
-    if (versionHistory) {
+    if (versionHistory && body) {
       // The update above doesn't work because it can't detect array changes so doesn't write it to db
       await this.models.Thread.update(
         {
@@ -310,8 +307,6 @@ export async function __updateThread(
       // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
-      // @ts-expect-error StrictNullChecks
-      authorProfileId: address.profile_id,
       mentions: mentionedAddresses,
       thread,
     });
@@ -345,15 +340,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -365,15 +352,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -391,15 +370,7 @@ export async function __updateThread(
                 model: this.models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: this.models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
+                attributes: ['id', 'profile'],
               },
             ],
           },
@@ -426,13 +397,8 @@ export async function __updateThread(
             attributes: ['address'],
             include: [
               {
-                model: this.models.Profile,
-                attributes: [
-                  ['id', 'profile_id'],
-                  'profile_name',
-                  ['avatar_url', 'profile_avatar_url'],
-                  'user_id',
-                ],
+                model: this.models.User,
+                attributes: ['profile'],
               },
             ],
           },
@@ -482,7 +448,6 @@ export async function __updateThread(
   ).map((c) => {
     const temp = {
       ...c,
-      ...(c?.Address?.Profile || {}),
       address: c?.Address?.address || '',
     };
 

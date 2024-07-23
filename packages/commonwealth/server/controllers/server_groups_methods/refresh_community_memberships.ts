@@ -117,7 +117,6 @@ async function paginateAddresses(
   callback: (addresses: AddressAttributes[]) => Promise<void>,
 ): Promise<void> {
   const addresses = await models.Address.findAll({
-    // @ts-expect-error StrictNullChecks
     where: {
       community_id: communityId,
       verified: {
@@ -146,7 +145,7 @@ async function paginateAddresses(
   return paginateAddresses(
     models,
     communityId,
-    addresses[addresses.length - 1].id,
+    addresses[addresses.length - 1].id!,
     callback,
   );
 }

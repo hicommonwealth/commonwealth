@@ -6,6 +6,7 @@ import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
@@ -47,7 +48,7 @@ const editComment = async ({
   );
 
   response.data.result.Address.User = {
-    Profiles: [profile],
+    profile,
   };
 
   return new Comment(response.data.result);
@@ -67,6 +68,8 @@ const useEditCommentMutation = ({
     communityId,
     threadId,
   });
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: editComment,
@@ -90,6 +93,7 @@ const useEditCommentMutation = ({
 
       return updatedComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 
