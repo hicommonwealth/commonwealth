@@ -15,7 +15,7 @@ export const UserTrainingSlider = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
   const user = useUserStore();
-  const userId = user.addresses?.[0]?.profile?.userId;
+  const userId = user.id.toString();
 
   const [cardToDismiss, setCardToDismiss] = useState<
     UserTrainingCardTypes | 'all'
@@ -43,14 +43,12 @@ export const UserTrainingSlider = () => {
       UserTrainingCardTypes.CreateContent,
       UserTrainingCardTypes.FinishProfile,
       UserTrainingCardTypes.ExploreCommunities,
-      // @ts-expect-error <StrictNullChecks/>
     ].map((card) => markTrainingActionAsPermanentlyHidden(card, userId));
   };
 
   const isCardVisible = (cardName: UserTrainingCardTypes) => {
     return (
       completedActions.includes(cardName) ||
-      // @ts-expect-error <StrictNullChecks/>
       !trainingActionPermanentlyHidden?.[userId]?.includes(cardName)
     );
   };
