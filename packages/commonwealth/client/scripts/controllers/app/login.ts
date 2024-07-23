@@ -599,7 +599,6 @@ export async function handleSocialLoginCallback({
     }
 
     const { Profiles: profiles, email: ssoEmail } = response.data.result;
-    // @mzparacha can you check this flow below? striggling a bit with the lack of typing in the reponses
 
     // if email is not set, set the SSO email as the default email
     // only if its a standalone account (no account linking)

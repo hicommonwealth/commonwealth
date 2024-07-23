@@ -23,6 +23,7 @@ export type ThreadResult = {
   title: string;
   body: string;
   address_id: number;
+  address_user_id: number;
   address: string;
   address_community_id: string;
   created_at: string;
