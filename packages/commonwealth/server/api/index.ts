@@ -1,5 +1,6 @@
 import { express, trpc } from '@hicommonwealth/adapters';
 import { ChainEvents } from '@hicommonwealth/model';
+import cors from 'cors';
 import { Router, raw } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { config } from '../config';
@@ -36,6 +37,7 @@ export type ApiV1 = typeof apiV1;
  * API v1 - Express Router
  */
 const router = Router();
+router.use(cors());
 
 /**
  * OpenAPI spec
