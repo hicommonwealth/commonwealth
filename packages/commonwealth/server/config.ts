@@ -48,7 +48,7 @@ export const config = configure(
     // Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
     // Risks sending webhooks/emails to real users if incorrectly set to true
     SEND_WEBHOOKS_EMAILS:
-      model_config.NODE_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
+      model_config.APP_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     // limit logins in the last 5 minutes
@@ -91,7 +91,7 @@ export const config = configure(
     },
     TELEGRAM: {
       BOT_TOKEN:
-        model_config.NODE_ENV === 'production'
+        model_config.APP_ENV === 'production'
           ? TELEGRAM_BOT_TOKEN
           : TELEGRAM_BOT_TOKEN_DEV,
     },

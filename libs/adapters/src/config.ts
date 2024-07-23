@@ -34,10 +34,7 @@ export const config = configure(
       DISABLE_CACHE: DISABLE_CACHE === 'true',
     },
     BROKER: {
-      RABBITMQ_URI:
-        target.NODE_ENV === 'development' || !CLOUDAMQP_URL
-          ? 'amqp://127.0.0.1'
-          : CLOUDAMQP_URL,
+      RABBITMQ_URI: CLOUDAMQP_URL ?? 'amqp://127.0.0.1',
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:

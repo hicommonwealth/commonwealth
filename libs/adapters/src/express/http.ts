@@ -60,6 +60,6 @@ export const InternalServerError = (
   statusText: 'Internal Server Error',
   error: {
     message: message ?? 'Internal Server Error',
-    stack: config.NODE_ENV !== 'production' ? stack : undefined,
+    stack: config.APP_ENV === 'local' ? stack : undefined,
   },
 });

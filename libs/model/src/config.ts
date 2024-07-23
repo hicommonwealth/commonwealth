@@ -29,9 +29,7 @@ export const config = configure(
   {
     DB: {
       URI:
-        target.NODE_ENV === 'production'
-          ? DATABASE_URL!
-          : `postgresql://commonwealth:edgeware@localhost/${NAME}`,
+        DATABASE_URL ?? `postgresql://commonwealth:edgeware@localhost/${NAME}`,
       NAME,
       NO_SSL: NO_SSL === 'true',
       CLEAN_HOUR: DATABASE_CLEAN_HOUR

@@ -1,12 +1,17 @@
+import { createHash } from 'crypto';
 import * as dotenv from 'dotenv';
 import _ from 'lodash';
 import { ZodType, z } from 'zod';
 
 dotenv.config({ path: '../../.env' });
 
+const APP_ENV_PASSWORD_HASH =
+  '7f5c0fe24e27b24fcab364f319e488fffe99104b8f82bec64b6bc82c3a729090';
+
 const Environments = ['development', 'test', 'staging', 'production'] as const;
 const AppEnvironments = [
   'local',
+  'CI',
   'frick',
   'frack',
   'beta',
@@ -33,6 +38,7 @@ export const configure = <T, E extends Record<string, unknown>>(
 
 const {
   APP_ENV,
+  APP_ENV_PASSWORD,
   NODE_ENV,
   IS_CI,
   SERVER_URL,
@@ -48,12 +54,10 @@ export const config = configure(
   {},
   {
     APP_ENV: APP_ENV as AppEnvironment,
+    APP_ENV_PASSWORD: APP_ENV_PASSWORD || 'development',
     NODE_ENV: (NODE_ENV || 'development') as Environment,
     IS_CI: IS_CI === 'true',
-    SERVER_URL:
-      SERVER_URL ?? NODE_ENV === 'production'
-        ? 'https://commonwealth.im'
-        : `http://localhost:${PORT}`,
+    SERVER_URL: SERVER_URL ?? `http://localhost:${PORT}`,
     PORT,
     LOGGING: {
       ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN || '',
@@ -62,7 +66,18 @@ export const config = configure(
     },
   },
   z.object({
-    APP_ENV: z.enum(AppEnvironments),
+    APP_ENV: z.enum(AppEnvironments).refine((data) => {
+      // prevent APP_ENV from being set to 'production' without the correct password
+      if (APP_ENV === 'production' && !APP_ENV_PASSWORD) return false;
+      else if (APP_ENV === 'production' && APP_ENV_PASSWORD) {
+        return (
+          createHash('sha256').update(APP_ENV_PASSWORD).digest('hex') ===
+          APP_ENV_PASSWORD_HASH
+        );
+      }
+      return true;
+    }),
+    APP_ENV_PASSWORD: z.string().optional(),
     NODE_ENV: z.enum(Environments),
     IS_CI: z.boolean(),
     SERVER_URL: z.string(),
