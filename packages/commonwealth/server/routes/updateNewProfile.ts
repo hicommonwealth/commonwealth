@@ -1,8 +1,14 @@
 import type { DB } from '@hicommonwealth/model';
-import { ProfileAttributes } from '@hicommonwealth/model';
-import type { NextFunction } from 'express';
+import {
+  Image,
+  UpdateNewProfileReq,
+  User,
+  UserProfile,
+} from '@hicommonwealth/schemas';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { updateTags } from 'server/util/updateTags';
+import { z } from 'zod';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
@@ -14,108 +20,89 @@ export const Errors = {
   InvalidTagIds: 'Some tag ids are invalid',
 };
 
-type UpdateNewProfileReq = {
-  email: string;
-  slug: string;
-  name: string;
-  bio: string;
-  website: string;
-  avatarUrl: string;
-  socials: string;
-  backgroundImage: string;
-  promotionalEmailsEnabled?: boolean;
-  tag_ids?: number[];
-};
-type UpdateNewProfileResp = {
-  status: string;
-  profile: ProfileAttributes;
-};
-
 const updateNewProfile = async (
   models: DB,
-  req: TypedRequestBody<UpdateNewProfileReq>,
-  res: TypedResponse<UpdateNewProfileResp>,
-  next: NextFunction,
+  req: TypedRequestBody<z.infer<typeof UpdateNewProfileReq>>,
+  res: TypedResponse<z.infer<typeof UserProfile>>,
 ) => {
-  const profile = await models.Profile.findOne({
-    where: {
-      // @ts-expect-error StrictNullChecks
-      user_id: req.user.id,
-    },
-  });
-
-  if (!profile) return next(new Error(Errors.NoProfileFound));
-
+  const user = req.user!;
   const {
     email,
     slug,
     name,
     website,
-    avatarUrl,
+    avatar_url,
     socials,
+    bio: rawBio,
     backgroundImage,
     promotionalEmailsEnabled,
     tag_ids,
   } = req.body;
 
-  let { bio } = req.body;
-  bio = sanitizeQuillText(bio);
-
-  // @ts-expect-error StrictNullChecks
-  if (profile.user_id !== req.user.id) {
-    return next(new Error(Errors.NotAuthorized));
-  }
-
-  const [updateStatus, rows] = await models.Profile.update(
-    {
-      ...((email || email === '') && { email }),
-      ...(slug && { slug }),
-      ...(name && { profile_name: name }),
-      ...((bio || bio === '') && { bio }),
-      ...(website && { website }),
-      ...(avatarUrl && { avatar_url: avatarUrl }),
-      ...(socials && { socials: JSON.parse(socials) }),
-      ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
-      ...(typeof promotionalEmailsEnabled === 'boolean' && {
-        promotional_emails_enabled: promotionalEmailsEnabled,
-      }),
-    },
-    {
-      where: {
-        // @ts-expect-error StrictNullChecks
-        user_id: req.user.id,
-      },
-      returning: true,
-    },
-  );
-
-  // @ts-expect-error StrictNullChecks
-  await updateTags(tag_ids, models, profile.user_id, 'user_id');
-
-  const DEFAULT_NAME = 'Anonymous';
-  const isProfileNameUnset =
-    !profile.profile_name || profile.profile_name === DEFAULT_NAME;
-
-  if (
+  const new_name =
     name &&
     name !== DEFAULT_NAME &&
-    isProfileNameUnset &&
-    req.user &&
-    !req.user.is_welcome_onboard_flow_complete
-  ) {
-    req.user.is_welcome_onboard_flow_complete = true;
-    await req.user.save();
+    (!user.profile.name || user.profile.name === DEFAULT_NAME);
+  const is_welcome_onboard_flow_complete =
+    !!new_name && !user.is_welcome_onboard_flow_complete;
+  const promotional_emails_enabled =
+    typeof promotionalEmailsEnabled === 'boolean' && promotionalEmailsEnabled;
+  const user_delta: Partial<z.infer<typeof User>> = {
+    ...(is_welcome_onboard_flow_complete !==
+      user.is_welcome_onboard_flow_complete && {
+      is_welcome_onboard_flow_complete,
+    }),
+    ...(promotional_emails_enabled !== user.promotional_emails_enabled && {
+      promotional_emails_enabled,
+    }),
+  };
+
+  const bio = rawBio && sanitizeQuillText(rawBio);
+  const background_image: z.infer<typeof Image> | undefined =
+    backgroundImage && JSON.parse(backgroundImage);
+  const profile_delta: z.infer<typeof UserProfile> = {
+    ...(email && email !== user.profile.email && { email }),
+    ...(slug && slug !== user.profile.slug && { slug }),
+    ...(new_name && name !== user.profile.name && { name }),
+    ...(bio && bio !== user.profile.bio && { bio }),
+    ...(website && website !== user.profile.website && { website }),
+    ...(avatar_url && avatar_url !== user.profile.avatar_url && { avatar_url }),
+    ...(socials &&
+      JSON.stringify(socials) !== JSON.stringify(user.profile.socials) && {
+        socials,
+      }),
+    ...(background_image &&
+      JSON.stringify(background_image) !==
+        JSON.stringify(user.profile.background_image) && { background_image }),
+  };
+
+  const update =
+    Object.keys(user_delta).length || Object.keys(profile_delta).length;
+  if (update || tag_ids) {
+    const updated = await models.sequelize.transaction(async (transaction) => {
+      if (tag_ids)
+        await updateTags(tag_ids, models, user.id!, 'user_id', transaction);
+      if (update) {
+        console.log({ user_delta, profile_delta }); // TODO: remove this
+        const profile = { ...user.profile, ...profile_delta };
+        const [, rows] = await models.User.update(
+          { ...user_delta, profile },
+          {
+            where: { id: user.id },
+            returning: true,
+            transaction,
+          },
+        );
+        return rows.at(0);
+      } else return user;
+    });
+
+    if (!updated) return failure(res.status(400), {});
+    return success(res, updated.profile);
   }
 
-  if (!updateStatus || !rows) {
-    return failure(res.status(400), {
-      status: 'Failed',
-    });
-  }
-  return success(res, {
-    status: 'Success',
-    profile: rows[0].toJSON(),
-  });
+  // nothing changed
+  return success(res, user.profile);
 };
 
 export default updateNewProfile;
