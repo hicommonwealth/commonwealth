@@ -134,13 +134,14 @@ export const ManageRoles = ({
               <CWIcon
                 iconName="close"
                 iconSize="small"
-                onClick={
-                  void (() =>
-                    handleDeleteRole({
+                onClick={() => {
+                  void (async () => {
+                    await handleDeleteRole({
                       address,
                       role,
-                    }))
-                }
+                    });
+                  })();
+                }}
               />
             </div>
           );
