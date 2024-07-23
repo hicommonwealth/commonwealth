@@ -75,13 +75,12 @@ export async function __updateCommunity(
 
   const communityAdmins = await user.getAddresses({
     where: {
-      verified: true,
       community_id: community.id,
       role: 'admin',
     },
   });
 
-  if (!user.isAdmin && !communityAdmins) {
+  if (!user.isAdmin && communityAdmins.length === 0) {
     throw new AppError(Errors.NotAdmin);
   }
 
