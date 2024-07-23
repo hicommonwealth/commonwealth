@@ -65,7 +65,6 @@ export const Address = z.object({
   is_councillor: z.boolean().optional(),
   is_validator: z.boolean().optional(),
   ghost_address: z.boolean().optional(),
-  profile_id: PG_INT.nullish().optional(),
   wallet_id: z.nativeEnum(WalletId).optional(),
   block_info: z.string().max(255).optional(),
   is_user_default: z.boolean().optional(),
@@ -74,6 +73,7 @@ export const Address = z.object({
   hex: z.string().max(64).optional(),
   created_at: z.any(),
   updated_at: z.any(),
+  User: User.optional(),
 });
 
 export const SsoToken = z.object({
@@ -95,7 +95,6 @@ export const CommunityMember = z.object({
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.number().nullish(),
-      profile_id: z.number(),
     }),
   ),
   roles: z.array(z.string()).nullish(),

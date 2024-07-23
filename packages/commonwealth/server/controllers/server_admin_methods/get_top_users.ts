@@ -24,7 +24,6 @@ export async function __getTopUsers(
   const sql = `
   WITH Stats as (
     SELECT
-      a.profile_id as profile_id, -- TO BE REMOVED
       u.profile->>'name' AS profile_name,
       p.user_id as user_id,
       COUNT(DISTINCT t.id) AS thread_count,
@@ -46,7 +45,7 @@ export async function __getTopUsers(
     LIMIT 150
   )
   SELECT
-    profile_id as "Profile ID", -- TO BE REMOVED
+    user_id as "User ID",
     profile_name as "Profile Name",
     CAST(thread_count as INTEGER) as "Threads Count",
     CAST(comment_count as INTEGER) as "Comments Count",

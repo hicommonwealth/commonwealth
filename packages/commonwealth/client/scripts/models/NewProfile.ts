@@ -1,7 +1,8 @@
-import { Image } from '@hicommonwealth/schemas';
+import { Image, UserProfile } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { MappedProfile } from '../state/api/profiles/fetchProfileById';
+
 class NewProfile {
+  private _userId: number;
   private _name: string;
   private _email: string;
   private _website: string;
@@ -9,9 +10,12 @@ class NewProfile {
   private _avatarUrl: string;
   private _slug: string;
   private _socials: string[];
-  private _id: number;
   private _isOwner: boolean;
   private _backgroundImage: z.infer<typeof Image>;
+
+  get userId() {
+    return this._userId;
+  }
 
   get name() {
     return this._name;
@@ -41,10 +45,6 @@ class NewProfile {
     return this._socials;
   }
 
-  get id() {
-    return this._id;
-  }
-
   get isOwner() {
     return this._isOwner;
   }
@@ -54,26 +54,26 @@ class NewProfile {
   }
 
   constructor({
-    profile_name,
+    userId,
+    isOwner,
+    name,
     email,
     website,
     bio,
     avatar_url,
     slug,
     socials,
-    id,
-    is_owner,
     background_image,
-  }: MappedProfile) {
-    this._name = profile_name;
+  }: z.infer<typeof UserProfile> & { userId: number; isOwner: boolean }) {
+    this._userId = userId;
+    this._isOwner = isOwner;
+    this._name = name!;
     this._email = email!;
     this._website = website!;
     this._bio = bio!;
     this._avatarUrl = avatar_url!;
     this._slug = slug!;
     this._socials = socials!;
-    this._id = id;
-    this._isOwner = is_owner;
     this._backgroundImage = background_image ?? { url: '', imageBehavior: '' };
   }
 
