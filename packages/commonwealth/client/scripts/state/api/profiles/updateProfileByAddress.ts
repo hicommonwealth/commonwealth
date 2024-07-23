@@ -1,8 +1,10 @@
+import { UpdateNewProfileReq, UserProfile } from '@hicommonwealth/schemas';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { z } from 'zod';
 import useUserStore, { userStore } from '../../ui/user';
 
 interface UpdateProfileByAddressProps {
@@ -30,30 +32,31 @@ const updateProfileByAddress = async ({
   socials,
   tagIds,
 }: UpdateProfileByAddressProps) => {
-  // TODO: ideally this should return a response
-  const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
-    userId,
+  const body: z.infer<typeof UpdateNewProfileReq> = {
     bio,
     name,
     email,
     backgroundImage,
-    avatarUrl,
-    socials,
+    avatar_url: avatarUrl,
+    socials: socials ? (JSON.parse(socials) as string[]) : undefined,
     ...(tagIds && {
       tag_ids: tagIds,
     }),
+  };
+
+  const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
+    ...body,
     jwt: userStore.getState().jwt,
   });
-
-  const responseProfile = response.data.result.profile;
+  const updated = response.data.result as z.infer<typeof UserProfile>;
   const updatedProfile = new MinimumProfile(address, chain);
   updatedProfile.initialize(
     userId,
-    responseProfile.name || responseProfile.profile_name,
+    updated.name!,
     address,
-    responseProfile.avatarUrl,
+    updated.avatar_url!,
     chain,
-    responseProfile.lastActive,
+    null,
   );
   return updatedProfile;
 };

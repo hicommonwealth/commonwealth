@@ -40,18 +40,19 @@ const updateNewProfile = async (
   } = req.body;
 
   const new_name =
-    name &&
-    name !== DEFAULT_NAME &&
-    (!user.profile.name || user.profile.name === DEFAULT_NAME);
-  const is_welcome_onboard_flow_complete =
-    !!new_name && !user.is_welcome_onboard_flow_complete;
+    name && name !== DEFAULT_NAME && name !== user.profile.name ? true : false;
+  const is_welcome_onboard_flow_complete = name && new_name ? true : false;
   const promotional_emails_enabled =
-    typeof promotionalEmailsEnabled === 'boolean' && promotionalEmailsEnabled;
+    !user.promotional_emails_enabled &&
+    typeof promotionalEmailsEnabled === 'boolean' &&
+    promotionalEmailsEnabled
+      ? true
+      : false;
   const user_delta: Partial<z.infer<typeof User>> = {
-    ...(is_welcome_onboard_flow_complete !==
-      user.is_welcome_onboard_flow_complete && {
-      is_welcome_onboard_flow_complete,
-    }),
+    ...(is_welcome_onboard_flow_complete &&
+      !user.is_welcome_onboard_flow_complete && {
+        is_welcome_onboard_flow_complete,
+      }),
     ...(promotional_emails_enabled !== user.promotional_emails_enabled && {
       promotional_emails_enabled,
     }),
@@ -79,11 +80,12 @@ const updateNewProfile = async (
   const update =
     Object.keys(user_delta).length || Object.keys(profile_delta).length;
   if (update || tag_ids) {
+    console.log({ user_delta, profile_delta, tag_ids }); // TODO: remove this
+
     const updated = await models.sequelize.transaction(async (transaction) => {
       if (tag_ids)
         await updateTags(tag_ids, models, user.id!, 'user_id', transaction);
       if (update) {
-        console.log({ user_delta, profile_delta }); // TODO: remove this
         const profile = { ...user.profile, ...profile_delta };
         const [, rows] = await models.User.update(
           { ...user_delta, profile },

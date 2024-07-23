@@ -125,8 +125,7 @@ async function createNewMagicUser({
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
-    // @ts-expect-error StrictNullChecks
-    const newUser = await models.User.createWithProfile(
+    const newUser = await models.User.create(
       {
         // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
         // so it is safe to set emails from magic as part of User data, even though they may be unverified.

@@ -84,9 +84,9 @@ const processAddress = async (
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
-      // @ts-expect-error StrictNullChecks
-      const newUser = await models.User.createWithProfile({
+      const newUser = await models.User.create({
         email: null,
+        profile: {},
       });
       await models.Subscription.create({
         // @ts-expect-error StrictNullChecks
