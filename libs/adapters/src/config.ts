@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 const DEFAULTS = {
   LOAD_TESTING_AUTH_TOKEN: 'testing',
+  RABBITMQ_URI: 'amqp://127.0.0.1',
 };
 
 const {
@@ -34,7 +35,7 @@ export const config = configure(
       DISABLE_CACHE: DISABLE_CACHE === 'true',
     },
     BROKER: {
-      RABBITMQ_URI: CLOUDAMQP_URL ?? 'amqp://127.0.0.1',
+      RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -61,13 +62,27 @@ export const config = configure(
     },
   },
   z.object({
-    CACHE: z.object({
-      REDIS_URL: z.string().optional(),
-      DISABLE_CACHE: z.boolean(),
-    }),
-    BROKER: z.object({
-      RABBITMQ_URI: z.string(),
-    }),
+    CACHE: z
+      .object({
+        REDIS_URL: z.string().optional(),
+        DISABLE_CACHE: z.boolean(),
+      })
+      .refine((data) => {
+        return !(
+          ['production', 'beta', 'demo'].includes(target.APP_ENV) &&
+          !data.REDIS_URL
+        );
+      }),
+    BROKER: z
+      .object({
+        RABBITMQ_URI: z.string(),
+      })
+      .refine((data) => {
+        return !(
+          ['production', 'beta', 'demo'].includes(target.APP_ENV) &&
+          data.RABBITMQ_URI === DEFAULTS.RABBITMQ_URI
+        );
+      }),
     NOTIFICATIONS: z
       .object({
         KNOCK_AUTH_TOKEN: z
@@ -191,7 +206,10 @@ export const config = configure(
         },
       ),
     ANALYTICS: z.object({
-      MIXPANEL_PROD_TOKEN: z.string().optional(),
+      MIXPANEL_PROD_TOKEN: z
+        .string()
+        .optional()
+        .refine((data) => !(target.APP_ENV === 'production' && !data)),
       MIXPANEL_DEV_TOKEN: z.string().optional(),
     }),
     LOAD_TESTING: z
@@ -200,7 +218,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (target.APP_ENV !== 'local') {
+          if (target.APP_ENV !== 'local' && target.APP_ENV !== 'CI') {
             return (
               !!LOAD_TESTING_AUTH_TOKEN &&
               data.AUTH_TOKEN !== DEFAULTS.LOAD_TESTING_AUTH_TOKEN

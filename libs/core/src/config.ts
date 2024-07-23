@@ -48,20 +48,29 @@ const {
   TEST_WITHOUT_LOGS,
 } = process.env;
 
-const PORT = _PORT ? parseInt(_PORT, 10) : 8080;
+const DEFAULTS = {
+  NODE_ENV: 'development',
+  PORT: 8080,
+  get SERVER_URL() {
+    return `http://localhost:${this.PORT}`;
+  },
+  ROLLBAR_ENV: 'local',
+  ROLLBAR_SERVER_TOKEN: '',
+};
 
 export const config = configure(
   {},
   {
     APP_ENV: APP_ENV as AppEnvironment,
-    APP_ENV_PASSWORD: APP_ENV_PASSWORD || 'development',
-    NODE_ENV: (NODE_ENV || 'development') as Environment,
+    APP_ENV_PASSWORD: APP_ENV_PASSWORD,
+    NODE_ENV: (NODE_ENV || DEFAULTS.NODE_ENV) as Environment,
     IS_CI: IS_CI === 'true',
-    SERVER_URL: SERVER_URL ?? `http://localhost:${PORT}`,
-    PORT,
+    SERVER_URL: SERVER_URL ?? DEFAULTS.SERVER_URL,
+    PORT: _PORT ? parseInt(_PORT, 10) : DEFAULTS.PORT,
     LOGGING: {
-      ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN || '',
-      ROLLBAR_ENV: _ROLLBAR_ENV || 'local',
+      ROLLBAR_SERVER_TOKEN:
+        _ROLLBAR_SERVER_TOKEN || DEFAULTS.ROLLBAR_SERVER_TOKEN,
+      ROLLBAR_ENV: _ROLLBAR_ENV || DEFAULTS.ROLLBAR_ENV,
       TEST_WITHOUT_LOGS: TEST_WITHOUT_LOGS === 'true',
     },
   },
@@ -77,15 +86,53 @@ export const config = configure(
       }
       return true;
     }),
-    APP_ENV_PASSWORD: z.string().optional(),
+    APP_ENV_PASSWORD: z
+      .string()
+      .optional()
+      .refine((data) => !(APP_ENV === 'production' && !APP_ENV_PASSWORD)),
     NODE_ENV: z.enum(Environments),
     IS_CI: z.boolean(),
-    SERVER_URL: z.string(),
+    SERVER_URL: z
+      .string()
+      .refine(
+        (data) =>
+          !(
+            APP_ENV !== 'local' &&
+            APP_ENV !== 'CI' &&
+            data === DEFAULTS.SERVER_URL
+          ),
+      ),
     PORT: z.number().int().min(1000).max(65535),
-    LOGGING: z.object({
-      ROLLBAR_SERVER_TOKEN: z.string(),
-      ROLLBAR_ENV: z.string(),
-      TEST_WITHOUT_LOGS: z.boolean(),
-    }),
+    LOGGING: z
+      .object({
+        ROLLBAR_SERVER_TOKEN: z.string(),
+        ROLLBAR_ENV: z.string(),
+        TEST_WITHOUT_LOGS: z.boolean(),
+      })
+      .refine(
+        (data) => {
+          if (
+            APP_ENV !== 'production' &&
+            data.ROLLBAR_SERVER_TOKEN !== DEFAULTS.ROLLBAR_SERVER_TOKEN
+          )
+            return false;
+          else if (
+            APP_ENV === 'production' &&
+            data.ROLLBAR_SERVER_TOKEN === DEFAULTS.ROLLBAR_SERVER_TOKEN
+          )
+            return false;
+          else if (
+            APP_ENV === 'production' &&
+            data.ROLLBAR_SERVER_TOKEN !== DEFAULTS.ROLLBAR_SERVER_TOKEN &&
+            data.ROLLBAR_ENV === DEFAULTS.ROLLBAR_ENV
+          )
+            return false;
+          return true;
+        },
+        {
+          message:
+            'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.',
+        },
+      ),
   }),
 );
