@@ -50,15 +50,14 @@ export class RolesController {
       options.address.address &&
       this.addRole({
         address: options.address.address,
-        address_chain: options.community,
-        address_id: options.address.addressId,
+        address_chain: options.community!,
+        address_id: options.address.addressId!,
         allow: 0,
-        community_id: options.community,
-        community_role_id: options.address.addressId,
+        community_id: options.community!,
         deny: 0,
         is_user_default: true,
         permission: AccessLevel.Member,
-      } as any);
+      });
   }
 
   public deleteRole(options: { address: AddressInfo; community: string }): any {
