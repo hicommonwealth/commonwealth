@@ -95,7 +95,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (target.NODE_ENV === 'production') {
+          if (target.APP_ENV !== 'local') {
             return !!JWT_SECRET && data.JWT_SECRET !== DEFAULTS.JWT_SECRET;
           }
           return true;

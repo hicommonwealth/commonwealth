@@ -203,7 +203,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (target.NODE_ENV === 'production') {
+          if (target.APP_ENV !== 'local') {
             return (
               !!LOAD_TESTING_AUTH_TOKEN &&
               data.AUTH_TOKEN !== DEFAULTS.LOAD_TESTING_AUTH_TOKEN

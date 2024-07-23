@@ -5,7 +5,16 @@ import { ZodType, z } from 'zod';
 dotenv.config({ path: '../../.env' });
 
 const Environments = ['development', 'test', 'staging', 'production'] as const;
+const AppEnvironments = [
+  'local',
+  'frick',
+  'frack',
+  'beta',
+  'demo',
+  'production',
+] as const;
 type Environment = typeof Environments[number];
+type AppEnvironment = typeof AppEnvironments[number];
 
 /**
  * Extends target config with payload after validating schema
@@ -23,6 +32,7 @@ export const configure = <T, E extends Record<string, unknown>>(
   _.merge(target || {}, schema.parse(extend)) as Readonly<T & E>;
 
 const {
+  APP_ENV,
   NODE_ENV,
   IS_CI,
   SERVER_URL,
@@ -37,6 +47,7 @@ const PORT = _PORT ? parseInt(_PORT, 10) : 8080;
 export const config = configure(
   {},
   {
+    APP_ENV: APP_ENV as AppEnvironment,
     NODE_ENV: (NODE_ENV || 'development') as Environment,
     IS_CI: IS_CI === 'true',
     SERVER_URL:
@@ -51,6 +62,7 @@ export const config = configure(
     },
   },
   z.object({
+    APP_ENV: z.enum(AppEnvironments),
     NODE_ENV: z.enum(Environments),
     IS_CI: z.boolean(),
     SERVER_URL: z.string(),
