@@ -330,7 +330,7 @@ export const UpdateProposalStatusModal = ({
     setTempCosmosProposals(updatedProposals);
     setVotingStage();
   };
-  console.log('tempSnapshotProposals: ', tempSnapshotProposals);
+
   return (
     <div className="UpdateProposalStatusModal">
       <CWModalHeader
