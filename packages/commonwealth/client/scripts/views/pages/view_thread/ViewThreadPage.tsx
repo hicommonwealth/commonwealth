@@ -1,5 +1,4 @@
 import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
-import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -17,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
@@ -83,8 +83,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
-  // @ts-expect-error <StrictNullChecks/>
-  const [viewCount, setViewCount] = useState<number>(null);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -94,7 +92,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
-  const [isViewMarked, setIsViewMarked] = useState(false);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
@@ -146,6 +143,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     communityId: app.activeChainId(),
     address: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address,
+  });
+
+  const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
+    communityId: app.activeChainId(),
+    objectId: thread?.id || '',
+    apiCallEnabled: !!thread?.id,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -247,28 +250,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         setPolls([]);
       });
   }, [thread, arePollsFetched]);
-
-  useNecessaryEffect(() => {
-    if (!thread || (thread && isViewMarked)) {
-      return;
-    }
-
-    // load view count
-    axios
-      .post(`${app.serverUrl()}/viewCount`, {
-        community_id: app.activeChainId(),
-        object_id: thread.id,
-      })
-      .then((response) => {
-        setViewCount(response?.data?.result?.view_count || 0);
-      })
-      .catch(() => {
-        setViewCount(0);
-      })
-      .finally(() => {
-        setIsViewMarked(true);
-      });
-  }, [thread, isViewMarked]);
 
   useManageDocumentTitle('View thread', thread?.title);
 

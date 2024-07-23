@@ -9,6 +9,8 @@
   },
   "type": "module",
   "scripts": {
+    "async-migrate-comment-version-history": "tsx ./scripts/async-migrate-comment-version-history.ts",
+    "async-migrate-thread-version-history": "tsx ./scripts/async-migrate-thread-version-history.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
     "archive-outbox": "node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/scripts/archive-outbox.js",
     "async-migrate-community-counts": "tsx ./scripts/async-migrate-community-count.ts",
@@ -26,6 +28,7 @@
     "create-migration": "npx sequelize migration:generate --name",
     "db-all": "chmod u+x scripts/db-all.sh && ./scripts/db-all.sh",
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
+    "delete-user": "chmod u+x scripts/delete-user.sh && ./scripts/delete-user.sh",
     "dump-db": "chmod u+x scripts/dump-db.sh && ./scripts/dump-db.sh",
     "e2e-start-server": "pnpm bootstrap-test-db && NODE_ENV=test ETH_RPC=e2e-test pnpm start",
     "emit-notification": "tsx server/scripts/emitTestNotification.ts",

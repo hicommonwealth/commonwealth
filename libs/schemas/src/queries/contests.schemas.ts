@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ContestManager } from '../entities';
-import { Contest } from '../projections';
+import { Contest, ContestAction } from '../projections';
 import { PG_INT, zDate } from '../utils';
 
 export const ContestResults = ContestManager.extend({
@@ -25,6 +25,22 @@ export const GetAllContests = {
   output: z.array(ContestResults),
 };
 
+export const GetActiveContestManagers = {
+  input: z.object({
+    community_id: z.string(),
+    topic_id: z.number(),
+  }),
+  output: z.array(
+    z.object({
+      eth_chain_id: z.number().int(),
+      url: z.string(),
+      contest_address: z.string(),
+      max_contest_id: z.number(),
+      actions: z.array(ContestAction),
+    }),
+  ),
+};
+
 export const ContestLogEntry = z.object({
   event_name: z.string(),
   event_payload: z.object({}),
@@ -43,4 +59,16 @@ export const GetContestLog = {
     contest_address: z.string(),
   }),
   output: z.array(ContestLogEntry),
+};
+
+export const GetThreadContestManagers = {
+  input: z.object({
+    topic_id: z.number().nullish(),
+    community_id: z.string(),
+  }),
+  output: z.array(
+    z.object({
+      contest_address: z.string(),
+    }),
+  ),
 };

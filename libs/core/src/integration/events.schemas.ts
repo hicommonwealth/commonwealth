@@ -9,8 +9,12 @@ import {
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-export const ThreadCreated = Thread;
-export const ThreadUpvoted = Reaction;
+export const ThreadCreated = Thread.extend({
+  contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
+});
+export const ThreadUpvoted = Reaction.extend({
+  contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
+});
 export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
@@ -20,7 +24,6 @@ export const UserMentioned = z.object({
   authorAddressId: z.number(),
   authorUserId: z.number(),
   authorAddress: z.string(),
-  authorProfileId: z.number(),
   mentionedUserId: z.number(),
   communityId: z.string(),
   thread: Thread.optional(),

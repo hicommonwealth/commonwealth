@@ -3,8 +3,10 @@ import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
+import { CommunityMember } from '@hicommonwealth/schemas';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import { z } from 'zod';
 import CommunityInfo from '../../../models/ChainInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
@@ -22,7 +24,7 @@ export type ThreadResult = {
   body: string;
   address_id: number;
   address: string;
-  address_chain: string;
+  address_community_id: string;
   created_at: string;
 };
 type ThreadResultRowProps = {
@@ -64,8 +66,10 @@ const ThreadResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={thread?.address}
-            userCommunityId={thread?.address_chain}
-            shouldShowAsDeleted={!thread?.address && !thread?.address_chain}
+            userCommunityId={thread?.address_community_id}
+            shouldShowAsDeleted={
+              !thread?.address && !thread?.address_community_id
+            }
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -101,6 +105,7 @@ type ReplyResultRowProps = {
   searchTerm: string;
   setRoute: any;
 };
+// eslint-disable-next-line react/no-multi-comp
 const ReplyResultRow = ({
   comment,
   searchTerm,
@@ -181,6 +186,7 @@ type CommunityResultRowProps = {
   searchTerm: string;
   setRoute: any;
 };
+// eslint-disable-next-line react/no-multi-comp
 const CommunityResultRow = ({
   community,
   setRoute,
@@ -202,25 +208,11 @@ const CommunityResultRow = ({
   );
 };
 
-export type MemberResult = {
-  id: number;
-  user_id: string;
-  profile_name: string;
-  avatar_url: string;
-  addresses: {
-    id: number;
-    community_id: string;
-    address: string;
-    stake_balance?: string;
-  }[];
-  group_ids?: [];
-  roles?: any[];
-  last_active: string;
-};
 type MemberResultRowProps = {
-  addr: MemberResult;
+  addr: z.infer<typeof CommunityMember>;
   setRoute: any;
 };
+// eslint-disable-next-line react/no-multi-comp
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   const { community_id, address } = addr.addresses[0];
   const { data: users } = useFetchProfilesByAddressesQuery({

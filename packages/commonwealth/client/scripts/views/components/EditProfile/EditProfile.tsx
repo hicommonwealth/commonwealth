@@ -1,7 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
-import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -46,7 +45,6 @@ export type Image = {
 };
 
 const EditProfile = () => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
@@ -108,6 +106,7 @@ const EditProfile = () => {
 
     if (data) {
       setProfile(new NewProfile(data.profile));
+      // @ts-expect-error <StrictNullChecks/>
       setAvatarUrl(data.profile.avatar_url);
       setPreferenceTags((tags) =>
         [...(tags || [])].map((t) => ({
@@ -123,13 +122,13 @@ const EditProfile = () => {
         })),
       );
       setAddresses(
+        // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
               id: a.id,
               address: a.address,
-              communityId: a.community_id,
-              keytype: a.keytype,
+              communityId: a.community_id!,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
               ghostAddress: a.ghost_address,
@@ -233,7 +232,7 @@ const EditProfile = () => {
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
 
-          if (userOnboardingEnabled && links?.length > 0) {
+          if (links?.length > 0) {
             markTrainingActionAsComplete(
               UserTrainingCardTypes.FinishProfile,
               profile.id,
@@ -272,10 +271,10 @@ const EditProfile = () => {
         <div className="EditProfile">
           <CWForm
             initialValues={{
-              username: data?.profile?.profile_name || '',
+              username: data?.profile?.name || '',
               email: data?.profile?.email || '',
               backgroundImg: data?.profile?.background_image?.url || '',
-              bio: deserializeDelta(data?.profile?.bio),
+              bio: deserializeDelta(data?.profile?.bio ?? ''),
             }}
             onSubmit={handleSubmit}
             validationSchema={editProfileValidation}
@@ -410,23 +409,21 @@ const EditProfile = () => {
                 community
               </CWText>
             </ProfileSection>
-            {userOnboardingEnabled && (
-              <ProfileSection
-                title="Preferences"
-                description="Set your preferences to enhance your experience"
-              >
-                <div className="preferences-header">
-                  <CWText type="h4" fontWeight="semiBold">
-                    What are you interested in?
-                  </CWText>
-                  <CWText type="h5">(Select all that apply)</CWText>
-                </div>
-                <PreferenceTags
-                  preferenceTags={preferenceTags}
-                  onTagClick={toggleTagFromSelection}
-                />
-              </ProfileSection>
-            )}
+            <ProfileSection
+              title="Preferences"
+              description="Set your preferences to enhance your experience"
+            >
+              <div className="preferences-header">
+                <CWText type="h4" fontWeight="semiBold">
+                  What are you interested in?
+                </CWText>
+                <CWText type="h5">(Select all that apply)</CWText>
+              </div>
+              <PreferenceTags
+                preferenceTags={preferenceTags}
+                onTagClick={toggleTagFromSelection}
+              />
+            </ProfileSection>
             {actionButtons}
           </CWForm>
         </div>

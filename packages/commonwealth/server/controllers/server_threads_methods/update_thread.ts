@@ -54,7 +54,7 @@ export type UpdateThreadOptions = {
   address: AddressInstance;
   threadId?: number;
   title?: string;
-  body?: string;
+  body: string;
   stage?: string;
   url?: string;
   locked?: boolean;
@@ -201,7 +201,6 @@ export async function __updateThread(
   const community = await this.models.Community.findByPk(thread.community_id);
 
   const previousDraftMentions = parseUserMentions(latestVersion);
-  // @ts-expect-error StrictNullChecks
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
@@ -267,7 +266,7 @@ export async function __updateThread(
       { transaction },
     );
 
-    if (versionHistory) {
+    if (versionHistory && body) {
       // The update above doesn't work because it can't detect array changes so doesn't write it to db
       await this.models.Thread.update(
         {
@@ -275,6 +274,18 @@ export async function __updateThread(
         },
         {
           where: { id: threadId },
+          transaction,
+        },
+      );
+
+      await this.models.ThreadVersionHistory.create(
+        {
+          thread_id: threadId!,
+          address: address.address,
+          body,
+          timestamp: new Date(),
+        },
+        {
           transaction,
         },
       );
@@ -296,8 +307,6 @@ export async function __updateThread(
       // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
-      // @ts-expect-error StrictNullChecks
-      authorProfileId: address.profile_id,
       mentions: mentionedAddresses,
       thread,
     });
@@ -331,15 +340,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -351,15 +352,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -377,15 +370,7 @@ export async function __updateThread(
                 model: this.models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: this.models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
+                attributes: ['id', 'profile'],
               },
             ],
           },
@@ -412,13 +397,8 @@ export async function __updateThread(
             attributes: ['address'],
             include: [
               {
-                model: this.models.Profile,
-                attributes: [
-                  ['id', 'profile_id'],
-                  'profile_name',
-                  ['avatar_url', 'profile_avatar_url'],
-                  'user_id',
-                ],
+                model: this.models.User,
+                attributes: ['profile'],
               },
             ],
           },
@@ -468,7 +448,6 @@ export async function __updateThread(
   ).map((c) => {
     const temp = {
       ...c,
-      ...(c?.Address?.Profile || {}),
       address: c?.Address?.address || '',
     };
 

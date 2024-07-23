@@ -54,7 +54,6 @@ export enum ComponentType {
   TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
-  WalletOptionRow = 'WalletOptionRow',
   SelectList = 'SelectList',
 }
 

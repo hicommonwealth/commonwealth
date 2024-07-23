@@ -1,4 +1,3 @@
-import { OpenFeature } from '@openfeature/web-sdk';
 import { handleSocialLoginCallback } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -15,11 +14,6 @@ const validate = async (setRoute: (route: string) => void) => {
   if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
   const authModalState = authModal.getState();
-  const client = OpenFeature.getClient();
-  const userOnboardingEnabled = client.getBooleanValue(
-    'userOnboardingEnabled',
-    false,
-  );
 
   try {
     const isAttemptingToConnectAddressToCommunity =
@@ -30,8 +24,7 @@ const validate = async (setRoute: (route: string) => void) => {
       // @ts-expect-error <StrictNullChecks/>
       walletSsoSource,
       returnEarlyIfNewAddress:
-        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect &&
-        userOnboardingEnabled,
+        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
     });
     await initAppState();
 
@@ -48,11 +41,7 @@ const validate = async (setRoute: (route: string) => void) => {
     // and the user isn't trying to link address to community,
     // then open the user auth type guidance modal
     // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-    if (
-      isAddressNew &&
-      !isAttemptingToConnectAddressToCommunity &&
-      userOnboardingEnabled
-    ) {
+    if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
       authModalState.validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
     }
   } catch (error) {

@@ -8,7 +8,7 @@ import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import { AccountSelector } from 'views/components/component_kit/AccountSelector/AccountSelector';
 import TOSModal from 'views/modals/TOSModal';
 import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
@@ -118,7 +118,6 @@ const useJoinCommunity = () => {
               id: a.id,
               address: a.address,
               communityId: a.community_id,
-              keytype: a.keytype,
               walletId: a.wallet_id,
             });
           }),
@@ -130,11 +129,7 @@ const useJoinCommunity = () => {
         );
 
         // set verification token for the newly created account
-        const account = app?.chain?.accounts?.get?.(
-          encodedAddress,
-          // @ts-expect-error <StrictNullChecks/>
-          addressInfo.keytype,
-        );
+        const account = app?.chain?.accounts?.get?.(encodedAddress);
         if (account && app.chain) {
           account?.setValidationToken?.(verification_token);
         }

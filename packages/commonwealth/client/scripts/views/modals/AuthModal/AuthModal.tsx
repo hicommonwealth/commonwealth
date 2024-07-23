@@ -1,11 +1,13 @@
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'helpers/user';
-import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
-import { useWelcomeOnboardModal } from 'state/ui/modals';
+import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
+import { AuthTypes } from '../../components/AuthButton/types';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
 import { AuthTypeGuidanceModal } from './AuthTypeGuidanceModal';
 import { CreateAccountModal } from './CreateAccountModal';
+import { RevalidateSessionModal } from './RevalidateSessionModal';
 import { SignInModal } from './SignInModal';
 import { AuthModalProps, AuthModalType } from './types';
 
@@ -15,10 +17,9 @@ const AuthModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
-  onSignInClick,
 }: AuthModalProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [modalType, setModalType] = useState(type);
+  const { sessionKeyValidationError } = useAuthModalStore();
   const { setIsWelcomeOnboardModalOpen } = useWelcomeOnboardModal();
 
   useEffect(() => {
@@ -31,20 +32,13 @@ const AuthModal = ({
     if (modalType === AuthModalType.CreateAccount) {
       setModalType(AuthModalType.SignIn);
     }
-
-    // @ts-expect-error StrictNullChecks
-    onSignInClick();
   };
 
   const handleSuccess = (isNewlyCreated) => {
     const userUniqueAddresses = getUniqueUserAddresses({});
 
     // open welcome modal only if there is a single connected address
-    if (
-      userOnboardingEnabled &&
-      isNewlyCreated &&
-      userUniqueAddresses.length === 1
-    ) {
+    if (isNewlyCreated && userUniqueAddresses.length === 1) {
       // using timeout to make the modal transition smooth
       setTimeout(() => {
         setIsWelcomeOnboardModalOpen(true);
@@ -54,35 +48,36 @@ const AuthModal = ({
   };
 
   const getActiveModalComponent = () => {
+    const commonVariantProps = {
+      onClose,
+      onSuccess: handleSuccess,
+      showWalletsFor,
+      onSignInClick: handleOnSignInClick,
+      onChangeModalType: (selectedType) => setModalType(selectedType),
+    };
+
     switch (modalType) {
       case AuthModalType.AccountTypeGuidance: {
-        return (
-          <AuthTypeGuidanceModal
-            onClose={onClose}
-            onSuccess={handleSuccess}
-            onSignInClick={handleOnSignInClick}
-            onChangeModalType={(selectedType) => setModalType(selectedType)}
-          />
-        );
+        return <AuthTypeGuidanceModal {...commonVariantProps} />;
       }
       case AuthModalType.CreateAccount: {
-        return (
-          <CreateAccountModal
-            onClose={onClose}
-            onSuccess={handleSuccess}
-            onSignInClick={handleOnSignInClick}
-            onChangeModalType={(selectedType) => setModalType(selectedType)}
-          />
-        );
+        return <CreateAccountModal {...commonVariantProps} />;
       }
       case AuthModalType.SignIn: {
+        return <SignInModal {...commonVariantProps} />;
+      }
+      case AuthModalType.RevalidateSession: {
         return (
-          <SignInModal
-            onClose={onClose}
-            onSuccess={handleSuccess}
-            showWalletsFor={showWalletsFor}
-            onSignInClick={handleOnSignInClick}
-            onChangeModalType={(selectedType) => setModalType(selectedType)}
+          <RevalidateSessionModal
+            {...commonVariantProps}
+            // TODO: session keys should support all wallet types, atm they only work with sso
+            // this is broken in master branch, create a ticket for fix
+            {...(sessionKeyValidationError?.ssoSource &&
+              sessionKeyValidationError?.ssoSource !==
+                WalletSsoSource.Unknown && {
+                showAuthOptionFor:
+                  sessionKeyValidationError?.ssoSource as AuthTypes,
+              })}
           />
         );
       }

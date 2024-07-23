@@ -84,7 +84,6 @@ const processAddress = async (
 
   if (!user?.id) {
     // user is not logged in
-    // @ts-expect-error StrictNullChecks
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
@@ -111,7 +110,6 @@ const processAddress = async (
     }
   } else {
     // user is already logged in => verify the newly created address
-    // @ts-expect-error StrictNullChecks
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     addressInstance.user_id = user.id;
@@ -126,7 +124,6 @@ const processAddress = async (
   // if address has already been previously verified, update all other addresses
   // to point to the new user = "transfer ownership".
   const addressToTransfer = await models.Address.findOne({
-    // @ts-expect-error StrictNullChecks
     where: {
       address,
       user_id: { [Op.ne]: addressInstance.user_id },
@@ -142,7 +139,6 @@ const processAddress = async (
         profile_id: addressInstance.profile_id,
       },
       {
-        // @ts-expect-error StrictNullChecks
         where: {
           address,
           user_id: { [Op.ne]: addressInstance.user_id },

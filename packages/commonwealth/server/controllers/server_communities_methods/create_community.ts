@@ -496,13 +496,11 @@ export async function __createCommunity(
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      // @ts-expect-error StrictNullChecks
       community_id: createdCommunity.id,
       hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
-      keytype: addressToBeAdmin.keytype,
       wallet_id: addressToBeAdmin.wallet_id,
       is_user_default: true,
       role: 'admin',

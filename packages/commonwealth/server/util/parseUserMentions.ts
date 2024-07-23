@@ -101,11 +101,17 @@ export const queryMentionedUsers = async (
       profile_name: string;
     }>(
       `
-          SELECT a.id as address_id, a.address, a.user_id, p.id as profile_id, p.profile_name
-          FROM "Addresses" as a
-                   INNER JOIN "Profiles" as p ON a.profile_id = p.id
-          WHERE a.user_id IS NOT NULL
-            AND (p.id, p.profile_name) IN (:tuples)
+      SELECT
+        a.id as address_id,
+        a.address,
+        a.user_id,
+        a.profile_id,
+        u.profile->>'name' as profile_name
+      FROM 
+        "Addresses" as a
+        JOIN "Users" as u ON a.user_id = u.id
+      WHERE
+        (a.profile_id, u.profile->>'name') IN (:tuples)
       `,
       {
         type: QueryTypes.SELECT,
@@ -174,7 +180,6 @@ type EmitMentionsData = {
   authorAddressId: number;
   authorUserId: number;
   authorAddress: string;
-  authorProfileId: number;
   mentions: UserMentionQuery;
 } & (
   | {
@@ -200,7 +205,6 @@ export const emitMentions = async (
         authorAddressId: data.authorAddressId,
         authorUserId: data.authorUserId,
         authorAddress: data.authorAddress,
-        authorProfileId: data.authorProfileId,
         mentionedUserId: user_id,
         communityId:
           'comment' in data

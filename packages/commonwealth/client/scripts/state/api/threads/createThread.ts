@@ -2,7 +2,6 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { signThread } from 'controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
@@ -10,6 +9,7 @@ import { ThreadStage } from 'models/types';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import useUserStore, { userStore } from '../../ui/user';
 import { addThreadInAllCaches } from './helpers/cache';
@@ -82,9 +82,10 @@ const createThread = async ({
 const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const user = useUserStore();
 
@@ -108,17 +109,16 @@ const useCreateThreadMutation = ({
       // increment communities thread count
       if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
-      if (userOnboardingEnabled) {
-        const profileId = user.addresses?.[0]?.profile?.id;
-        profileId &&
-          markTrainingActionAsComplete(
-            UserTrainingCardTypes.CreateContent,
-            profileId,
-          );
-      }
+      const profileId = user.addresses?.[0]?.profile?.id;
+      profileId &&
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
+        );
 
       return newThread;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 
