@@ -134,11 +134,12 @@ export const ManageRoles = ({
               <CWIcon
                 iconName="close"
                 iconSize="small"
-                onClick={() =>
-                  handleDeleteRole({
-                    address,
-                    role,
-                  }).catch((e) => console.log('Failed to delete role:', e))
+                onClick={
+                  void (() =>
+                    handleDeleteRole({
+                      address,
+                      role,
+                    }))
                 }
               />
             </div>
