@@ -11,10 +11,6 @@ export interface IIdScopedAddressCountAndInfo {
   [addressId: string]: IAddressCountAndInfo;
 }
 
-interface ICommunityAddresses {
-  [parentEntity: string]: IIdScopedAddressCountAndInfo;
-}
-
 interface ICommunityThreads {
   [parentEntity: string]: Array<AbridgedThread>;
 }
