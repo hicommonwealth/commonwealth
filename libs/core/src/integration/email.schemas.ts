@@ -20,17 +20,17 @@ export const EnrichedUserMentionedNotification =
 
 export const EnrichedCommunityStakeNotification =
   CommunityStakeNotification.extend({
-    community_icon_url: z.string(),
+    community_icon_url: z.string().nullish(),
   });
 
 export const EnrichedChainProposalsNotification =
   ChainProposalsNotification.extend({
-    community_icon_url: z.string(),
+    community_icon_url: z.string().nullish(),
   });
 
 export const EnrichedSnapshotProposalCreatedNotification =
   SnapshotProposalCreatedNotification.extend({
-    community_icon_url: z.string(),
+    community_icon_url: z.string().nullish(),
   });
 
 export const GetRecapEmailData = {

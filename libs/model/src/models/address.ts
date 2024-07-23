@@ -2,7 +2,7 @@ import { Address } from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { decrementProfileCount } from '../utils';
+import { decrementProfileCount } from '../utils/denormalizedCountUtils';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
