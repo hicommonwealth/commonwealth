@@ -60,3 +60,15 @@ export const GetContestLog = {
   }),
   output: z.array(ContestLogEntry),
 };
+
+export const GetThreadContestManagers = {
+  input: z.object({
+    topic_id: z.number().nullish(),
+    community_id: z.string(),
+  }),
+  output: z.array(
+    z.object({
+      contest_address: z.string(),
+    }),
+  ),
+};

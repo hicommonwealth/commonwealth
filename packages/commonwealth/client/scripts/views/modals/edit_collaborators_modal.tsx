@@ -191,16 +191,6 @@ export const EditCollaboratorsModal = ({
                     }),
                   },
                 });
-                updatedThread.collaborators?.forEach((c) =>
-                  c.User.Profiles.forEach((p) => {
-                    p.avatarUrl = (
-                      p as unknown as { avatar_url: string }
-                    ).avatar_url;
-                    p.name = (
-                      p as unknown as { profile_name: string }
-                    ).profile_name;
-                  }),
-                );
                 notifySuccess('Collaborators updated');
                 onCollaboratorsUpdated &&
                   // @ts-expect-error <StrictNullChecks/>

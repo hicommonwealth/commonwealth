@@ -8,6 +8,7 @@ import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
@@ -55,9 +56,7 @@ const createComment = async ({
     },
   );
 
-  response.data.result.Address.User = {
-    Profiles: [profile],
-  };
+  response.data.result.Address.User = { profile };
 
   return new Comment(response.data.result);
 };
@@ -79,6 +78,8 @@ const useCreateCommentMutation = ({
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: createComment,
@@ -110,6 +111,7 @@ const useCreateCommentMutation = ({
 
       return newComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -11,7 +11,6 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
@@ -72,22 +71,12 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
-
   const user = useUserStore();
 
-  const {
-    mutateAsync: deleteThread,
-    reset: resetDeleteThreadMutation,
-    error: deleteThreadError,
-  } = useDeleteThreadMutation({
+  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
-  });
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetDeleteThreadMutation,
-    error: deleteThreadError,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -488,7 +477,6 @@ export const AdminActions = ({
         onClose={() => setIsArchiveThreadModalOpen(false)}
         open={isArchiveThreadModalOpen}
       />
-      {RevalidationModal}
     </>
   );
 };

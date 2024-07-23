@@ -72,13 +72,14 @@ async function createMagicAddressInstances(
         wallet_id: WalletId.Magic,
       },
       defaults: {
+        address,
         user_id,
         profile_id,
         verification_token: decodedMagicToken.claim.tid, // to prevent re-use
-        // @ts-expect-error StrictNullChecks
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
+        role: 'member',
       },
       transaction: t,
     });
@@ -622,7 +623,7 @@ async function magicLoginRoute(
           // note that discourse imports not supported on cosmos
           generatedAddresses.push({
             address: canonicalAddress,
-            community_id: ghost.community_id,
+            community_id: ghost.community_id!,
           });
         }
       }

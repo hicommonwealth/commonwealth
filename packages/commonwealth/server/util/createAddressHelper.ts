@@ -82,12 +82,11 @@ export async function createAddressHelper(
       const existingHexes = await models.Address.scope(
         'withPrivateData',
       ).findAll({
-        // @ts-expect-error StrictNullChecks
         where: { hex: addressHex, verified: { [Op.ne]: null } },
       });
       const existingHexesSorted = existingHexes.sort((a, b) => {
         // sort by latest last_active
-        return +b.dataValues.last_active - +a.dataValues.last_active;
+        return +b.dataValues.last_active! - +a.dataValues.last_active!;
       });
 
       // use the latest active address with this hex to assign profile
@@ -213,7 +212,7 @@ export async function createAddressHelper(
 
     // @ts-expect-error StrictNullChecks
     if (existingAddressWithHex && !profile_id) {
-      profile_id = existingAddressWithHex.profile_id;
+      profile_id = existingAddressWithHex.profile_id!;
     }
 
     const newObj = await models.sequelize.transaction(async (transaction) => {
@@ -222,7 +221,6 @@ export async function createAddressHelper(
           // @ts-expect-error StrictNullChecks
           user_id,
           profile_id,
-          // @ts-expect-error StrictNullChecks
           community_id: req.community_id,
           address: encodedAddress,
           hex: addressHex,
