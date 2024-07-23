@@ -3,7 +3,7 @@ import {
   CommunityTagsAttributes,
   TagsAttributes,
 } from '@hicommonwealth/model';
-import { Includeable, Op } from 'sequelize';
+import { Includeable } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {
@@ -36,13 +36,6 @@ export async function __getCommunities(
           model: this.models.Tags,
         },
       ],
-    },
-    {
-      model: this.models.Address,
-      where: {
-        [Op.or]: [{ role: 'admin' }, { role: 'moderator' }],
-      },
-      attributes: ['address', 'role'],
     },
   ];
   if (hasGroups) {
