@@ -170,8 +170,14 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         order_direction ?? 'DESC',
       );
 
+      // If search query is present count the number of members in the SQL query itself, Otherwise, pull the total
+      // members from the cached value in the Communities table in a subsequent query.
       const sql = `
-      WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
+      ${
+        search
+          ? `WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)`
+          : ''
+      }
       SELECT
         U.id AS user_id,
         U.profile->>'name' AS profile_name,
@@ -186,27 +192,33 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           'profile_id', A.profile_id -- TO BE REMOVED
         )) AS addresses,
         ARRAY_AGG(A.role) AS roles,
-        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
-        T.total
-      FROM 
-        F 
-        JOIN "Addresses" A ON F.id = A.id
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
+        ${search ? `, T.total` : ''}
+      FROM ${search ? `F JOIN "Addresses" A ON F.id = A.id` : '"Addresses" A'}
         JOIN "Users" U ON A.user_id = U.id
         LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
-        JOIN T ON true
-      GROUP BY U.id, T.total
+        ${search ? `JOIN T ON true` : ''}
+      GROUP BY U.id ${search ? ', T.total' : ''}
       ORDER BY ${orderBy}
       LIMIT ${limit} OFFSET ${offset};
       `;
 
       const members = await models.sequelize.query<
-        z.infer<typeof schemas.CommunityMember> & { total: number }
+        z.infer<typeof schemas.CommunityMember> & { total?: number }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
+        logging: true,
       });
 
-      // console.log(members, payload);
+      if (!search) {
+        const total = await models.Community.findOne({
+          where: { id: community_id },
+          attributes: ['profile_count'],
+        });
+        members.forEach((m) => (m.total = total.profile_count));
+      }
+
       return schemas.buildPaginatedResponse(
         members,
         members.at(0)?.total ?? 0,
