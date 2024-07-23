@@ -66,47 +66,6 @@ const buildFilteredQuery = (
   search: string,
   { joins: groupsJoin, filters: addressFilter }: Filters,
 ) => {
-  // TODO: Temporarily removing option to search by address until product team decides what to do with it
-  // Using UNION instead of OR when combining search terms to
-  // force trigram indexes in profile->>name and Addresses.address
-  // return search
-  //   ? `
-  //   SELECT
-  //     A.id
-  //   FROM
-  //     "Users" U
-  //     JOIN "Addresses" A ON U.id = A.user_id
-  //     ${groupsJoin}
-  //   WHERE
-  //     A.community_id = :community_id
-  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
-  //     AND U.profile->>'name' ILIKE :search
-  //     ${addressFilter}
-
-  //   UNION
-
-  //   SELECT
-  //     A.id
-  //   FROM
-  //     "Addresses" A
-  //     ${groupsJoin}
-  //   WHERE
-  //     A.community_id = :community_id
-  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
-  //     AND A.address ILIKE :search
-  //     ${addressFilter}
-  // `
-  //   : `
-  //   SELECT
-  //     A.id
-  //   FROM
-  //     "Addresses" A
-  //     ${groupsJoin}
-  //   WHERE
-  //     A.community_id = :community_id
-  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
-  //     ${addressFilter}
-  // `;
   return search
     ? `
     SELECT
@@ -216,7 +175,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           where: { id: community_id },
           attributes: ['profile_count'],
         });
-        members.forEach((m) => (m.total = total.profile_count));
+        members.forEach((m) => (m.total = total?.profile_count));
       }
 
       return schemas.buildPaginatedResponse(
