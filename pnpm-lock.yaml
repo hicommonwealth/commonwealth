@@ -1448,6 +1448,9 @@ importers:
 
   packages/scripts:
     dependencies:
+      '@hicommonwealth/adapters':
+        specifier: workspace:*
+        version: link:../../libs/adapters
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../../libs/core

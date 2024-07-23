@@ -79,7 +79,7 @@ export const ManageRoles = ({
 
     const userAdminsAndMods = adminsAndMods.filter((role_) => {
       const belongsToUser = !!user.addresses.filter(
-        (addr_) => addr_.id === role_.address_id,
+        (addr_) => addr_.addressId === role_.address_id,
       ).length;
       return belongsToUser;
     });

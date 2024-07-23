@@ -2,7 +2,13 @@ import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Model, type ModelStatic } from 'sequelize';
-import z, { ZodNullable, ZodObject, ZodUnknown } from 'zod';
+import z, {
+  ZodArray,
+  ZodNullable,
+  ZodObject,
+  ZodOptional,
+  ZodUnknown,
+} from 'zod';
 import type { State } from '../models';
 import { bootstrap_testing } from './bootstrap';
 
@@ -21,6 +27,11 @@ function isNullable(value: ZodUnknown) {
   if (value instanceof ZodNullable) return true;
   if (!('innerType' in value._def)) return false;
   return isNullable(value._def.innerType as ZodUnknown);
+}
+
+function isArray(value: ZodUnknown | ZodOptional<ZodUnknown>) {
+  if (value instanceof ZodOptional) return isArray(value._def.innerType);
+  return value instanceof ZodArray;
 }
 
 /**
@@ -59,8 +70,10 @@ async function _seed(
     const undefs = {} as State;
     Object.entries(schema.shape).forEach(([key, value]) => {
       if (key !== 'id' && typeof values[key] === 'undefined') {
-        if (model.associations[key]) undefs[key] = [];
-        else if (isNullable(value)) undefs[key] = null;
+        if (model.associations[key]) {
+          if (isArray(value)) undefs[key] = [];
+          else undefs[key] = undefined;
+        } else if (isNullable(value)) undefs[key] = null;
       }
     });
     values = { ...mocked, ...undefs, ...values };

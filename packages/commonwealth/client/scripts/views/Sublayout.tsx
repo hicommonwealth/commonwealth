@@ -34,7 +34,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const [profileId, setProfileId] = useState<null | number>(null);
+  const [userId, setUserId] = useState<null | number>(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: true,
@@ -54,11 +54,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     let timeout: ReturnType<typeof setTimeout> | null = null;
     if (isLoggedIn) {
       timeout = setTimeout(() => {
-        user.addresses?.[0]?.profile?.id &&
-          setProfileId(user.addresses?.[0]?.profile?.id);
+        user.addresses?.[0]?.profile?.userId &&
+          setUserId(user.addresses?.[0]?.profile?.userId);
       }, 100);
     } else {
-      setProfileId(null);
+      setUserId(null);
     }
 
     return () => {
@@ -71,7 +71,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     if (
       isLoggedIn &&
       !isWelcomeOnboardModalOpen &&
-      profileId &&
+      userId &&
       !userStore.getState().isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
@@ -81,7 +81,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
-    profileId,
+    userId,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
     isLoggedIn,
