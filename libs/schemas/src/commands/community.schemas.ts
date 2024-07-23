@@ -107,5 +107,5 @@ export const ImportDiscourseCommunity = {
     accountsClaimable: z.boolean(),
     dumpUrl: z.string(),
   }),
-  output: z.void(),
+  output: Community,
 };

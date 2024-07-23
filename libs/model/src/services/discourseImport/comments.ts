@@ -1,4 +1,4 @@
-import { groupBy, sortBy } from 'lodash';
+import lo from 'lodash';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
@@ -112,12 +112,12 @@ export const createAllCommentsInCW = async (
 ) => {
   const parentComments: Record<any, any> = {};
   const discoursePosts = await fetchPosts(discourseConnection);
-  const postsByThread = groupBy(discoursePosts, ({ topic_id }) => topic_id);
+  const postsByThread = lo.groupBy(discoursePosts, ({ topic_id }) => topic_id);
   const threadIds = Object.keys(postsByThread);
   const createdComments: any[] = [];
   for (let i = 0; i < threadIds.length; i++) {
     const discourseThreadId = parseInt(threadIds[i]);
-    const posts = sortBy(
+    const posts = lo.sortBy(
       postsByThread[discourseThreadId],
       ({ post_number }) => post_number,
     );

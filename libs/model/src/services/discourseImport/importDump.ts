@@ -1,6 +1,8 @@
 import { logger } from '@hicommonwealth/core';
 import { exec } from 'child_process';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export function importDump(dumpUrl: string, dbUri: string): Promise<void> {
