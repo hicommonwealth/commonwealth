@@ -42,7 +42,7 @@ import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
-const MIN_ETH_FOR_CONTEST_THREAD = 0.005;
+const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
