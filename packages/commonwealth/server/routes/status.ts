@@ -8,7 +8,6 @@ import type {
   UserInstance,
 } from '@hicommonwealth/model';
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
-import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
@@ -43,25 +42,9 @@ type StatusResp = {
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
-  communityCategoryMap: { [communityId: string]: CommunityCategoryType[] };
 };
 
 const getCommunityStatus = async (models: DB) => {
-  const communities = await models.Community.findAll({
-    where: { active: true },
-  });
-
-  const communityCategories: {
-    [communityId: string]: CommunityCategoryType[];
-  } = {};
-  for (const community of communities) {
-    if (community.category !== null) {
-      // @ts-expect-error StrictNullChecks
-      communityCategories[community.id] =
-        community.category as CommunityCategoryType[];
-    }
-  }
-
   const thirtyDaysAgo = new Date(
     (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
   );
@@ -79,7 +62,6 @@ const getCommunityStatus = async (models: DB) => {
     );
 
   return {
-    communityCategories,
     threadCountQueryData,
   };
 };
@@ -299,14 +281,12 @@ export const status = async (
     const communityStatusPromise = getCommunityStatus(models);
     const { user: reqUser } = req;
     if (!reqUser) {
-      const { communityCategories, threadCountQueryData } =
-        await communityStatusPromise;
+      const { threadCountQueryData } = await communityStatusPromise;
 
       return success(res, {
         recentThreads: threadCountQueryData,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
-        communityCategoryMap: communityCategories,
       });
     } else {
       // user is logged in
@@ -315,7 +295,7 @@ export const status = async (
         communityStatusPromise,
         userStatusPromise,
       ]);
-      const { communityCategories, threadCountQueryData } = communityStatus;
+      const { threadCountQueryData } = communityStatus;
       const { roles, user, id } = userStatus;
 
       const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
@@ -336,7 +316,6 @@ export const status = async (
         user,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
-        communityCategoryMap: communityCategories,
       });
     }
   } catch (error) {
