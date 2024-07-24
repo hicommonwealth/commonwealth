@@ -4,7 +4,6 @@ import { Sequelize } from 'sequelize';
 import { URL, fileURLToPath } from 'url';
 import { config } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
-import { isSuperAdmin } from '../middleware';
 import {
   createAllAddressesInCW,
   createAllCategoriesInCW,
@@ -30,7 +29,8 @@ export function ImportDiscourseCommunity(): Command<
 > {
   return {
     ...schemas.ImportDiscourseCommunity,
-    auth: [isSuperAdmin],
+    secure: false, // TODO: remove this
+    auth: [], // TODO: add super admin middleware
     body: async ({ id: communityId, payload }) => {
       // TODO: use global lock to limit concurrency on this command?
 
