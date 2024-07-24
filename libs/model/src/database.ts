@@ -16,22 +16,13 @@ export const sequelize = new Sequelize(config.DB.URI, {
       : (msg) => {
           log.trace(msg);
         },
-  dialectOptions: () => {
-    if (
-      config.DB.NO_SSL ||
-      config.APP_ENV === 'local' ||
-      config.APP_ENV === 'CI'
-    ) {
-      return { requestTimeout: 40000 };
-    } else if (
-      config.DB.URI ===
-      'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    ) {
-      return { requestTimeout: 40000, ssl: false };
-    } else {
-      return { requestTimeout: 40000, ssl: { rejectUnauthorized: false } };
-    }
-  },
+  dialectOptions:
+    config.NODE_ENV !== 'production' || config.DB.NO_SSL
+      ? { requestTimeout: 40000 }
+      : config.DB.URI ===
+        'postgresql://commonwealth:edgeware@localhost/commonwealth'
+      ? { requestTimeout: 40000, ssl: false }
+      : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
     max: 10,
     min: 0,
