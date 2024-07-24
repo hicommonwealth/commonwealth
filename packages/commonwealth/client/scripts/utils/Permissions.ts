@@ -18,7 +18,7 @@ const isSiteAdmin = () => {
 
 const isCommunityMember = (communityId = app.activeChainId()) => {
   if (!communityId) {
-    return false; // TODO: is this correct?
+    return false;
   }
   return userStore
     .getState()
