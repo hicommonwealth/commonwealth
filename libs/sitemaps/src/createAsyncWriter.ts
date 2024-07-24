@@ -2,7 +2,7 @@ import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { formatS3Url } from '@hicommonwealth/model';
 
-const BUCKET_NAME = 'common-sitemap';
+const BUCKET_NAME = 'sitemap.commonwealth.im';
 const s3 = new S3();
 
 export interface Resource {

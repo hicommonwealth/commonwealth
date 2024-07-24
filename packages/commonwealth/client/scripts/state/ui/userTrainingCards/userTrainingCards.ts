@@ -7,15 +7,15 @@ interface UserTrainingCardsStore {
   completedActions: UserTrainingCardTypes[];
   markTrainingActionAsComplete: (
     action: UserTrainingCardTypes,
-    profileId: string | number,
+    userId: string | number,
   ) => void;
   clearCompletedActionsState: () => void;
   trainingActionPermanentlyHidden: {
-    [profileId: string]: UserTrainingCardTypes[]; // a list of cards to hide
+    [userId: string]: UserTrainingCardTypes[]; // a list of cards to hide
   };
   markTrainingActionAsPermanentlyHidden: (
     action: UserTrainingCardTypes,
-    profileId: string | number,
+    userId: string | number,
   ) => void;
 }
 
@@ -24,10 +24,10 @@ export const UserTrainingCardsStore = createStore<UserTrainingCardsStore>()(
     persist(
       (set) => ({
         completedActions: [],
-        markTrainingActionAsComplete: (action, profileId) => {
+        markTrainingActionAsComplete: (action, userId) => {
           set((state) => {
             const isAlreadyCompleted = (
-              state?.trainingActionPermanentlyHidden?.[profileId] || []
+              state?.trainingActionPermanentlyHidden?.[userId] || []
             )?.includes(action);
 
             return {
@@ -43,11 +43,11 @@ export const UserTrainingCardsStore = createStore<UserTrainingCardsStore>()(
               // and the next time, the page is reloaded it shouldn't be visible
               trainingActionPermanentlyHidden: {
                 ...state.trainingActionPermanentlyHidden,
-                [profileId]: [
-                  ...(state.trainingActionPermanentlyHidden[profileId] || []),
-                  ...(state.trainingActionPermanentlyHidden?.[
-                    profileId
-                  ]?.includes(action)
+                [userId]: [
+                  ...(state.trainingActionPermanentlyHidden[userId] || []),
+                  ...(state.trainingActionPermanentlyHidden?.[userId]?.includes(
+                    action,
+                  )
                     ? []
                     : [action]),
                 ],
@@ -64,7 +64,7 @@ export const UserTrainingCardsStore = createStore<UserTrainingCardsStore>()(
           });
         },
         trainingActionPermanentlyHidden: {},
-        markTrainingActionAsPermanentlyHidden: (action, profileId) => {
+        markTrainingActionAsPermanentlyHidden: (action, userId) => {
           // hide the action card even if it is showed with a completed checkmark
           set((state) => {
             return {
@@ -74,11 +74,11 @@ export const UserTrainingCardsStore = createStore<UserTrainingCardsStore>()(
               ),
               trainingActionPermanentlyHidden: {
                 ...state.trainingActionPermanentlyHidden,
-                [profileId]: [
-                  ...(state.trainingActionPermanentlyHidden[profileId] || []),
-                  ...(state.trainingActionPermanentlyHidden?.[
-                    profileId
-                  ]?.includes(action)
+                [userId]: [
+                  ...(state.trainingActionPermanentlyHidden[userId] || []),
+                  ...(state.trainingActionPermanentlyHidden?.[userId]?.includes(
+                    action,
+                  )
                     ? []
                     : [action]),
                 ],

@@ -82,7 +82,6 @@ async function resizeChains() {
 
   const getNthChain = async (n) =>
     await models.Community.findAll({
-      // @ts-expect-error StrictNullChecks
       where: {
         icon_url: {
           [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],

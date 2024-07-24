@@ -1,12 +1,26 @@
 @import '../../../../styles/shared';
 
 .NotificationSettings {
+  .setting-container {
+    display: flex;
+  }
+
+  .setting-container-right {
+    justify-content: flex-start;
+    display: flex;
+    margin-left: auto;
+  }
+
   .page-header-text.Text {
     margin-bottom: 8px;
   }
 
   .section-header.Text {
     margin-top: 16px;
+  }
+
+  .text-muted {
+    color: $neutral-500;
   }
 
   .page-subheader-text {
