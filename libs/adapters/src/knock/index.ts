@@ -60,10 +60,10 @@ export function KnockProvider(): NotificationsProvider {
 
   function computeChannelId(channelType: 'FCM' | 'APNS'): string | undefined {
     switch (channelType) {
-      case 'APNS':
+      case 'FCM':
         return config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID;
 
-      case 'FCM':
+      case 'APNS':
         return config.PUSH_NOTIFICATIONS.KNOCK_APNS_CHANNEL_ID;
     }
   }
