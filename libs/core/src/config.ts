@@ -30,6 +30,8 @@ const {
   ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN,
   ROLLBAR_ENV: _ROLLBAR_ENV,
   TEST_WITHOUT_LOGS,
+  HEROKU_APP_NAME,
+  HEROKU_API_TOKEN,
 } = process.env;
 
 const PORT = _PORT ? parseInt(_PORT, 10) : 8080;
@@ -44,6 +46,10 @@ export const config = configure(
         ? 'https://commonwealth.im'
         : `http://localhost:${PORT}`,
     PORT,
+    HEROKU: {
+      HEROKU_APP_NAME,
+      HEROKU_API_TOKEN,
+    },
     LOGGING: {
       ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN || '',
       ROLLBAR_ENV: _ROLLBAR_ENV || 'local',
@@ -55,6 +61,10 @@ export const config = configure(
     IS_CI: z.boolean(),
     SERVER_URL: z.string(),
     PORT: z.number().int().min(1000).max(65535),
+    HEROKU: z.object({
+      HEROKU_APP_NAME: z.string().optional(),
+      HEROKU_API_TOKEN: z.string().optional(),
+    }),
     LOGGING: z.object({
       ROLLBAR_SERVER_TOKEN: z.string(),
       ROLLBAR_ENV: z.string(),

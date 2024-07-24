@@ -84,6 +84,27 @@ export const CreateStakeTransaction = {
   output: StakeTransaction,
 };
 
+export const RefreshCustomDomain = {
+  input: z.object({
+    custom_domain: z.string(),
+  }),
+  output: z.object({
+    hostname: z.string(),
+    cname: z.string(),
+    cert_status: z.string(),
+    status: z.string(),
+    reason: z.string().optional(),
+  }),
+};
+
+export const UpdateCustomDomain = {
+  input: z.object({
+    community_id: z.string(),
+    custom_domain: z.string(),
+  }),
+  output: z.string(),
+};
+
 export const UpdateCommunity = {
   input: z.object({
     namespace: z.string(),
