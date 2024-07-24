@@ -115,7 +115,7 @@ const GroupCard = ({
                     <div className="table-spacing">
                       <Link
                         // @ts-expect-error <StrictNullChecks/>
-                        to={`/profile/id/${profiles.get(address)?.id}`}
+                        to={`/profile/id/${profiles.get(address)?.userId}`}
                         className="user-info"
                       >
                         <Avatar
@@ -123,7 +123,7 @@ const GroupCard = ({
                           url={profiles.get(address)?.avatarUrl}
                           size={24}
                           // @ts-expect-error <StrictNullChecks/>
-                          address={profiles.get(address)?.id}
+                          address={profiles.get(address)?.userId}
                         />
                         <CWText type="b2">
                           {/* @ts-expect-error StrictNullChecks*/}

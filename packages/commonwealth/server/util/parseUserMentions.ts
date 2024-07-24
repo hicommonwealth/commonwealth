@@ -7,7 +7,7 @@ import z from 'zod';
 import { EmitOptions } from '../controllers/server_notifications_methods/emit';
 
 export type UserMention = {
-  profileId: string;
+  userId: string;
   profileName: string;
 };
 
@@ -15,12 +15,11 @@ export type UserMentionQuery = {
   address_id: number;
   address: string;
   user_id: number;
-  profile_id: number;
   profile_name: string;
 }[];
 
 const hash = (mention: UserMention) =>
-  `name:${mention.profileName}id:${mention.profileId}`;
+  `name:${mention.profileName}id:${mention.userId}`;
 
 // Will return unique mentions of the diff between current and previous mentions
 export const findMentionDiff = (
@@ -65,15 +64,15 @@ export const parseUserMentions = (text: string): UserMention[] => {
         const refIdx = chunks.indexOf('account');
         return {
           profileName: chunks[refIdx - 1],
-          profileId: chunks[refIdx + 1],
+          userId: chunks[refIdx + 1],
         };
       });
   } catch (e) {
     // matches profileName and number in [@${profileName}](/profile/id/${number})
     const regex = /\[@([^[]+)]\(\/profile\/id\/(\d+)\)/g;
     const matches = [...text.matchAll(regex)];
-    return matches.map(([, profileName, profileId]) => {
-      return { profileName, profileId };
+    return matches.map(([, profileName, userId]) => {
+      return { profileName, userId };
     });
   }
 };
@@ -88,8 +87,8 @@ export const queryMentionedUsers = async (
 
   try {
     // Create an array of tuples for the replacements
-    const tuples = mentions.map(({ profileId, profileName }) => [
-      profileId,
+    const tuples = mentions.map(({ userId, profileName }) => [
+      userId,
       profileName,
     ]);
 
@@ -97,7 +96,6 @@ export const queryMentionedUsers = async (
       address_id: number;
       address: string;
       user_id: number;
-      profile_id: number;
       profile_name: string;
     }>(
       `
@@ -105,13 +103,12 @@ export const queryMentionedUsers = async (
         a.id as address_id,
         a.address,
         a.user_id,
-        a.profile_id,
         u.profile->>'name' as profile_name
       FROM 
         "Addresses" as a
         JOIN "Users" as u ON a.user_id = u.id
       WHERE
-        (a.profile_id, u.profile->>'name') IN (:tuples)
+        (a.user_id, u.profile->>'name') IN (:tuples)
       `,
       {
         type: QueryTypes.SELECT,

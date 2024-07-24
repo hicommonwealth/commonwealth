@@ -3,11 +3,7 @@ import { fileURLToPath } from 'url';
 
 import { Session } from '@canvas-js/interfaces';
 import { AppError, logger } from '@hicommonwealth/core';
-import type {
-  CommunityInstance,
-  DB,
-  ProfileAttributes,
-} from '@hicommonwealth/model';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   DynamicTemplate,
@@ -92,8 +88,6 @@ const processAddress = async (
       const newUser = await models.User.createWithProfile({
         email: null,
       });
-      addressInstance.profile_id = // @ts-expect-error StrictNullChecks
-        (newUser.Profiles[0] as ProfileAttributes).id;
       await models.Subscription.create({
         // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
@@ -113,11 +107,6 @@ const processAddress = async (
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     addressInstance.user_id = user.id;
-    const profile = await models.Profile.findOne({
-      where: { user_id: user.id },
-    });
-    // @ts-expect-error StrictNullChecks
-    addressInstance.profile_id = profile.id;
   }
   await addressInstance.save();
 
@@ -136,7 +125,6 @@ const processAddress = async (
     await models.Address.update(
       {
         user_id: addressInstance.user_id,
-        profile_id: addressInstance.profile_id,
       },
       {
         where: {
@@ -170,7 +158,7 @@ const processAddress = async (
         `Sent address move email: ${address} transferred to a new account`,
       );
     } catch (e) {
-      log.error(`Could not send address move email for: ${address}`);
+      log.error(`Could not send address move email for: ${address}`, e);
     }
   }
 };

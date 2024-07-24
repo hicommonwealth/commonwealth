@@ -56,7 +56,7 @@ export const CreateComment = ({
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const { data: profile } = useFetchProfilesByAddressesQuery({
+  const { data } = useFetchProfilesByAddressesQuery({
     profileChainIds: user.activeAccount?.community?.id
       ? [user.activeAccount?.community?.id]
       : [],
@@ -66,9 +66,8 @@ export const CreateComment = ({
     currentChainId: app.activeChainId(),
     apiCallEnabled: !!user.activeAccount?.profile,
   });
-
   if (user.activeAccount) {
-    user.activeAccount.profile = profile?.[0];
+    user.activeAccount.profile = data?.[0];
   }
   const author = user.activeAccount;
 
@@ -85,23 +84,14 @@ export const CreateComment = ({
     setSendingComment(true);
 
     const communityId = app.activeChainId();
-    const { address = '', profile: userProfile } = user.activeAccount;
-
     const asyncHandle = async () => {
       try {
         const newComment = await createComment({
-          threadId: rootThread.id,
           communityId,
-          profile: {
-            address,
-            id: userProfile?.id || 0,
-            avatarUrl: userProfile?.avatarUrl || '',
-            name: userProfile?.name || '',
-            lastActive: userProfile?.lastActive?.toString() || '',
-          },
-          // @ts-expect-error <StrictNullChecks/>
-          parentCommentId: parentCommentId,
+          profile: user.activeAccount!.profile!.toUserProfile(),
+          threadId: rootThread.id,
           unescapedText: serializeDelta(contentDelta),
+          parentCommentId: parentCommentId ?? null,
           existingNumberOfComments: rootThread.numberOfComments || 0,
           isPWA: isAddedToHomeScreen,
         });

@@ -46,23 +46,25 @@ export class RolesController {
     address: AddressInfo | Omit<AddressInfo, 'community'>;
     community?: string;
   }): any {
-    this.addRole({
-      address: options.address.address,
-      address_chain: options.community,
-      address_id: options.address.id,
-      allow: 0,
-      community_id: options.community,
-      community_role_id: options.address.id,
-      deny: 0,
-      is_user_default: true,
-      permission: AccessLevel.Member,
-    } as any);
+    options.address &&
+      options.address.address &&
+      this.addRole({
+        address: options.address.address,
+        address_chain: options.community!,
+        address_id: options.address.addressId!,
+        allow: 0,
+        community_id: options.community!,
+        deny: 0,
+        is_user_default: true,
+        permission: AccessLevel.Member,
+      });
   }
 
   public deleteRole(options: { address: AddressInfo; community: string }): any {
     this.removeRole((r) => {
       return (
-        r.chain_id === options.community && r.address_id === options.address.id
+        r.chain_id === options.community &&
+        r.address_id === options.address.addressId
       );
     });
   }
@@ -86,7 +88,7 @@ export class RolesController {
       return (
         a.address === account.address && a.community.id === account.community.id
       );
-    })?.id;
+    })?.addressId;
 
     // @ts-expect-error StrictNullChecks
     return this.roles.find((r) => {
@@ -118,7 +120,7 @@ export class RolesController {
       const permission = r.permission === options.role;
       const referencedAddress = userStore
         .getState()
-        .addresses.find((address) => address.id === r.address_id);
+        .addresses.find((address) => address.addressId === r.address_id);
       if (!referencedAddress) return;
       const isSame =
         userStore.getState().activeAccount?.address ===
@@ -192,7 +194,7 @@ export class RolesController {
           )
         : options.account;
     const roles = this.roles.filter((role) =>
-      addressinfo ? role.address_id === addressinfo.id : true,
+      addressinfo ? role.address_id === addressinfo.addressId : true,
     );
     if (options.community) {
       return roles.map((r) => r.community_id).indexOf(options.community) !== -1;

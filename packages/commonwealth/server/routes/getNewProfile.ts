@@ -24,27 +24,11 @@ const getNewProfile = async (
   res: TypedResponse<z.infer<typeof GetNewProfileResp>>,
   next: NextFunction,
 ) => {
-  const { profileId } = req.query;
-  let user_id = req.user?.id;
-
-  // TO BE REMOVED
-  if (profileId) {
-    const parsedInt = parseInt(profileId);
-    if (isNaN(parsedInt) || parsedInt !== parseFloat(profileId)) {
-      throw new AppError('Invalid profile id');
-    }
-    const address = await models.Address.findOne({
-      where: {
-        profile_id: profileId,
-      },
-      attributes: ['user_id'],
-    });
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    user_id = address?.user_id!;
-  }
+  const user_id = req.query.userId ? +req.query.userId : req.user?.id;
+  if (!user_id) return next(new AppError(Errors.NoIdentifierProvided));
 
   const user = await models.User.findOne({ where: { id: user_id } });
-  if (!user) return next(new Error(Errors.NoProfileFound));
+  if (!user) return next(new AppError(Errors.NoProfileFound));
 
   // TODO: We can actually query all user activity in a single statement
   // Activity is defined as user addresses (ids) with votes, threads, comments in active communities
@@ -104,6 +88,7 @@ const getNewProfile = async (
   });
 
   return success(res, {
+    userId: user_id!,
     profile: user.profile,
     totalUpvotes,
     addresses: addresses.map((a) => a.toJSON()),

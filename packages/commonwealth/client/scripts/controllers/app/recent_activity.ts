@@ -15,7 +15,6 @@ export interface IAbridgedThreadFromServer {
 
 class RecentActivityController {
   // private _threadsStore = new ActiveThreadsStore();
-  // private _addressStore = new ActiveAddressesStore();
   private _communityThreadCount = {};
   private _activeUsers = [];
 

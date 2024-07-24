@@ -34,7 +34,6 @@ describe('CommentCreated Event Handler', () => {
     author: z.infer<typeof schemas.User> | undefined,
     subscriber: z.infer<typeof schemas.User> | undefined,
     authorProfile: z.infer<typeof schemas.Profile> | undefined,
-    subscriberProfile: z.infer<typeof schemas.Profile> | undefined,
     thread: z.infer<typeof schemas.Thread> | undefined,
     rootComment: z.infer<typeof schemas.Comment> | undefined,
     replyComment: z.infer<typeof schemas.Comment> | undefined,
@@ -57,8 +56,9 @@ describe('CommentCreated Event Handler', () => {
     [authorProfile] = await tester.seed('Profile', {
       // @ts-expect-error StrictNullChecks
       user_id: author.id,
+      profile_name: author?.profile.name ?? '',
     });
-    [subscriberProfile] = await tester.seed('Profile', {
+    await tester.seed('Profile', {
       // @ts-expect-error StrictNullChecks
       user_id: subscriber.id,
     });
@@ -68,12 +68,10 @@ describe('CommentCreated Event Handler', () => {
         {
           role: 'member',
           user_id: author!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',
           user_id: subscriber!.id,
-          profile_id: subscriberProfile!.id,
         },
       ],
     });

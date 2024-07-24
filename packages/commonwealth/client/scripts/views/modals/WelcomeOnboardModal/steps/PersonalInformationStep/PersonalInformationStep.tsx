@@ -122,6 +122,7 @@ const PersonalInformationStep = ({
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
     await updateProfile({
+      userId: user.id,
       address: user.activeAccount?.profile?.address || '',
       chain: user.activeAccount?.profile?.chain || '',
       name: values.username,
