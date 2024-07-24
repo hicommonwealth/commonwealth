@@ -259,7 +259,7 @@ export async function initAppState(
     if (statusRes.result.user) {
       try {
         window.FS('setIdentity', {
-          uid: statusRes.result.user.profileId,
+          uid: statusRes.result.user.id,
         });
       } catch (e) {
         console.error('FullStory not found.');

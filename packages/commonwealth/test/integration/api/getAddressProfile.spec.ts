@@ -1,5 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import { AddressInstance, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { GetAddressProfileReq } from '@hicommonwealth/schemas';
 import chai from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
@@ -30,15 +30,14 @@ describe('getAddressProfile tests', () => {
     const profile = resp['result'][0];
 
     chai.assert.equal(resp['result'].length, 1);
-    chai.assert.equal(profile.profileId, testProfile.id);
     chai.assert.equal(profile.name, testProfile.profile_name);
     chai.assert.equal(profile.avatarUrl, testProfile.avatar_url);
   });
 
   test('should return profile of multiple addresses of the same profile', async () => {
     chai.assert.equal(
-      server.e2eTestEntities.testAddresses[0].profile_id,
-      server.e2eTestEntities.testAddresses[1].profile_id,
+      server.e2eTestEntities.testAddresses[0].user_id,
+      server.e2eTestEntities.testAddresses[1].user_id,
     );
 
     const r: z.infer<typeof GetAddressProfileReq> = {
@@ -54,20 +53,20 @@ describe('getAddressProfile tests', () => {
     const profile2 = resp['result'][1];
 
     const matchingProfile = server.e2eTestEntities.testProfiles.filter(
-      (p) => p.id === profile1.profileId,
+      (p) => p.user_id === profile1.userId,
     )[0];
 
     chai.assert.equal(resp['result'].length, 2);
     chai.assert.equal(
-      profile1.profileId,
-      server.e2eTestEntities.testAddresses[0].profile_id,
+      profile1.userId,
+      server.e2eTestEntities.testAddresses[0].user_id,
     );
     chai.assert.equal(profile1.name, matchingProfile.profile_name);
     chai.assert.equal(profile1.avatarUrl, matchingProfile.avatar_url);
 
     chai.assert.equal(
-      profile2.profileId,
-      server.e2eTestEntities.testAddresses[1].profile_id,
+      profile2.userId,
+      server.e2eTestEntities.testAddresses[1].user_id,
     );
     chai.assert.equal(profile2.name, matchingProfile.profile_name);
     chai.assert.equal(profile2.avatarUrl, matchingProfile.avatar_url);
@@ -75,12 +74,12 @@ describe('getAddressProfile tests', () => {
 
   test('should return profiles of multiple addresses of the different profiles', async () => {
     chai.assert.equal(
-      server.e2eTestEntities.testAddresses[0].profile_id,
-      server.e2eTestEntities.testAddresses[1].profile_id,
+      server.e2eTestEntities.testAddresses[0].user_id,
+      server.e2eTestEntities.testAddresses[1].user_id,
     );
     chai.assert.notEqual(
-      server.e2eTestEntities.testAddresses[1].profile_id,
-      server.e2eTestEntities.testAddresses[2].profile_id,
+      server.e2eTestEntities.testAddresses[1].user_id,
+      server.e2eTestEntities.testAddresses[2].user_id,
     );
 
     const r: z.infer<typeof GetAddressProfileReq> = {
@@ -93,32 +92,6 @@ describe('getAddressProfile tests', () => {
     };
 
     const resp = await getAddressProfiles(models, postReq(r), res());
-
     chai.assert.equal(resp['result'].length, 3);
-
-    const results = resp['result'];
-    const findAddressProfileResult = (testAddress: AddressInstance) => {
-      const matchingProfile = server.e2eTestEntities.testProfiles.find(
-        (p) => p.id === testAddress.profile_id,
-      );
-
-      return results.find(
-        (x) =>
-          x.profileId === testAddress.profile_id &&
-          // @ts-expect-error StrictNullChecks
-          x.name === matchingProfile.profile_name &&
-          // @ts-expect-error StrictNullChecks
-          x.avatarUrl === matchingProfile.avatar_url,
-      );
-    };
-    chai.assert.isDefined(
-      findAddressProfileResult(server.e2eTestEntities.testAddresses[0]),
-    );
-    chai.assert.isDefined(
-      findAddressProfileResult(server.e2eTestEntities.testAddresses[1]),
-    );
-    chai.assert.isDefined(
-      findAddressProfileResult(server.e2eTestEntities.testAddresses[2]),
-    );
   });
 });

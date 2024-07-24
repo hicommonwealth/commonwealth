@@ -440,6 +440,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       if (username) {
         await updateProfile({
+          userId: user.id,
           // @ts-expect-error <StrictNullChecks>
           address: account.profile.address,
           // @ts-expect-error <StrictNullChecks>
