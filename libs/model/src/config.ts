@@ -77,6 +77,7 @@ export const config = configure(
               target.APP_ENV !== 'CI' &&
               data === DEFAULTS.DATABASE_URL
             ),
+          'DATABASE_URL must be set to a non-default value in Heroku apps.',
         ),
       NAME: z.string(),
       NO_SSL: z.boolean(),
@@ -89,6 +90,7 @@ export const config = configure(
         .refine(
           (data) =>
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
+          'PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
     TBC: z.object({

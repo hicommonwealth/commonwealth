@@ -164,6 +164,7 @@ export const config = configure(
               model_config.APP_ENV,
             ) && !data
           ),
+        'CW_BOT_KEY is required in frick, production, beta (QA), and demo',
       ),
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
@@ -175,11 +176,15 @@ export const config = configure(
               model_config.APP_ENV === 'production' &&
               data === DEFAULTS.SESSION_SECRET
             ),
+          'SESSION_SECRET must be a non-default value in production',
         ),
       MAGIC_API_KEY: z
         .string()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data)),
+        .refine(
+          (data) => !(model_config.APP_ENV === 'production' && !data),
+          'MAGIC_API_KEY is required in production',
+        ),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
       ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
@@ -188,13 +193,19 @@ export const config = configure(
       API_KEY: z
         .string()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data)),
+        .refine(
+          (data) => !(model_config.APP_ENV === 'production' && !data),
+          'SENDGRID_API_KEY is required in production',
+        ),
     }),
     TELEGRAM: z.object({
       BOT_TOKEN: z
         .string()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data)),
+        .refine(
+          (data) => !(model_config.APP_ENV === 'production' && !data),
+          'TELEGRAM_BOT_TOKEN is required in production',
+        ),
     }),
     DISCORD: z.object({
       CLIENT_ID: z
@@ -203,9 +214,11 @@ export const config = configure(
         .refine(
           (data) =>
             !(
-              ['production', 'frick', 'beta'].includes(model_config.APP_ENV) &&
-              !data
+              ['production', 'frick', 'beta', 'demo'].includes(
+                model_config.APP_ENV,
+              ) && !data
             ),
+          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
         ),
       BOT_TOKEN: z
         .string()
@@ -213,18 +226,22 @@ export const config = configure(
         .refine(
           (data) =>
             !(
-              ['production', 'frick', 'beta'].includes(model_config.APP_ENV) &&
-              !data
+              ['production', 'frick', 'beta', 'demo'].includes(
+                model_config.APP_ENV,
+              ) && !data
             ),
+          'DISCORD_BOT_TOKEN is required in production, frick, beta (QA), and demo',
         ),
       BOT_SUCCESS_URL: z
         .string()
         .refine(
           (data) =>
             !(
-              ['production', 'frick', 'beta'].includes(model_config.APP_ENV) &&
-              !data
+              ['production', 'frick', 'beta', 'demo'].includes(
+                model_config.APP_ENV,
+              ) && data === DEFAULTS.DISCORD_BOT_SUCCESS_URL
             ),
+          'DISCROD_BOT_SUCCESS_URL must be a non-default value in production, rfick, beta (QA), and demo',
         ),
     }),
     WORKERS: z.object({

@@ -87,7 +87,7 @@ export const config = configure(
         );
       }
       return true;
-    }),
+    }, 'APP_ENV_PASSWORD must be correct to set APP_ENV to production.'),
     APP_ENV_PASSWORD: z
       .string()
       .optional()
@@ -103,6 +103,7 @@ export const config = configure(
             APP_ENV !== 'CI' &&
             data === DEFAULTS.SERVER_URL
           ),
+        'SERVER_URL cannot be set to a default value in non-local or CI environments (i.e. Heroku apps).',
       ),
     PORT: z.number().int().min(1000).max(65535),
     LOGGING: z
@@ -111,30 +112,24 @@ export const config = configure(
         ROLLBAR_ENV: z.string(),
         TEST_WITHOUT_LOGS: z.boolean(),
       })
-      .refine(
-        (data) => {
-          if (
-            APP_ENV !== 'production' &&
-            data.ROLLBAR_SERVER_TOKEN !== DEFAULTS.ROLLBAR_SERVER_TOKEN
-          )
-            return false;
-          else if (
-            APP_ENV === 'production' &&
-            data.ROLLBAR_SERVER_TOKEN === DEFAULTS.ROLLBAR_SERVER_TOKEN
-          )
-            return false;
-          else if (
-            APP_ENV === 'production' &&
-            data.ROLLBAR_SERVER_TOKEN !== DEFAULTS.ROLLBAR_SERVER_TOKEN &&
-            data.ROLLBAR_ENV === DEFAULTS.ROLLBAR_ENV
-          )
-            return false;
-          return true;
-        },
-        {
-          message:
-            'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.',
-        },
-      ),
+      .refine((data) => {
+        if (
+          APP_ENV !== 'production' &&
+          data.ROLLBAR_SERVER_TOKEN !== DEFAULTS.ROLLBAR_SERVER_TOKEN
+        )
+          return false;
+        else if (
+          APP_ENV === 'production' &&
+          data.ROLLBAR_SERVER_TOKEN === DEFAULTS.ROLLBAR_SERVER_TOKEN
+        )
+          return false;
+        else if (
+          APP_ENV === 'production' &&
+          data.ROLLBAR_SERVER_TOKEN !== DEFAULTS.ROLLBAR_SERVER_TOKEN &&
+          data.ROLLBAR_ENV === DEFAULTS.ROLLBAR_ENV
+        )
+          return false;
+        return true;
+      }, 'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.'),
   }),
 );

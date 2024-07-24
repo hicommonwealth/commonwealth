@@ -64,27 +64,26 @@ export const config = configure(
     },
   },
   z.object({
-    CACHE: z
-      .object({
-        REDIS_URL: z.string().optional(),
-        DISABLE_CACHE: z.boolean(),
-      })
-      .refine((data) => {
+    CACHE: z.object({
+      REDIS_URL: z
+        .string()
+        .optional()
+        .refine((data) => {
+          return !(
+            ['production', 'beta', 'demo', 'frick'].includes(target.APP_ENV) &&
+            !data
+          );
+        }, 'REDIS_URL is required in production, beta (QA), demo, and frick Heroku apps'),
+      DISABLE_CACHE: z.boolean(),
+    }),
+    BROKER: z.object({
+      RABBITMQ_URI: z.string().refine((data) => {
         return !(
-          ['production', 'beta', 'demo'].includes(target.APP_ENV) &&
-          !data.REDIS_URL
+          ['production', 'beta', 'demo', 'frick'].includes(target.APP_ENV) &&
+          data === DEFAULTS.RABBITMQ_URI
         );
-      }),
-    BROKER: z
-      .object({
-        RABBITMQ_URI: z.string(),
-      })
-      .refine((data) => {
-        return !(
-          ['production', 'beta', 'demo'].includes(target.APP_ENV) &&
-          data.RABBITMQ_URI === DEFAULTS.RABBITMQ_URI
-        );
-      }),
+      }, 'RABBITMQ_URI is require in production, beta (QA), demo, and frick Heroku apps'),
+    }),
     NOTIFICATIONS: z
       .object({
         KNOCK_AUTH_TOKEN: z
@@ -238,7 +237,7 @@ export const config = configure(
         },
         {
           message:
-            'LOAD_TESTING_AUTH_TOKEN must be set in production environments',
+            'LOAD_TESTING_AUTH_TOKEN must be set in all publicly accessible Common API instances.',
           path: ['AUTH_TOKEN'],
         },
       ),
