@@ -9,4 +9,5 @@ export * from './GetCommunityAlerts.query';
 export * from './GetSubscriptionPreferences.query';
 export * from './GetThreadSubscriptions.query';
 export * from './RegisterClientRegistrationToken.command';
+export * from './UnregisterClientRegistrationToken.command';
 export * from './UpdateSubscriptionPreferences.command';

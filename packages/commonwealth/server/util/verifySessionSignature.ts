@@ -12,7 +12,6 @@ import {
   incrementProfileCount,
   type AddressInstance,
   type DB,
-  type ProfileAttributes,
 } from '@hicommonwealth/model';
 
 /**
@@ -49,7 +48,6 @@ const verifySessionSignature = async (
     addressModel.verified = new Date();
     if (!addressModel.user_id) {
       const existingAddress = await models.Address.findOne({
-        // @ts-expect-error StrictNullChecks
         where: {
           address: addressModel.address,
           user_id: { [Sequelize.Op.ne]: null },
@@ -57,7 +55,6 @@ const verifySessionSignature = async (
       });
       if (existingAddress) {
         addressModel.user_id = existingAddress.user_id;
-        addressModel.profile_id = existingAddress.profile_id;
       } else {
         const user = await models.sequelize.transaction(async (transaction) => {
           const userEntity = await models.User.createWithProfile?.(
@@ -78,7 +75,6 @@ const verifySessionSignature = async (
           return userEntity;
         });
         if (!user || !user.id) throw new Error('Failed to create user');
-        addressModel.profile_id = (user!.Profiles?.[0] as ProfileAttributes).id;
         await models.Subscription.create({
           subscriber_id: user.id,
           category_id: NotificationCategories.NewMention,
@@ -97,8 +93,6 @@ const verifySessionSignature = async (
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     addressModel.user_id = user_id;
-    const profile = await models.Profile.findOne({ where: { user_id } });
-    addressModel.profile_id = profile?.id;
   }
   await addressModel.save();
 };

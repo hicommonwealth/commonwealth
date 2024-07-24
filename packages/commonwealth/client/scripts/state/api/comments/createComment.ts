@@ -18,7 +18,7 @@ interface CreateCommentProps {
   threadId: number;
   communityId: string;
   unescapedText: string;
-  parentCommentId: number;
+  parentCommentId: number | null;
   existingNumberOfComments: number;
   isPWA?: boolean;
 }
@@ -28,7 +28,6 @@ const createComment = async ({
   profile,
   threadId,
   unescapedText,
-  // @ts-expect-error StrictNullChecks
   parentCommentId = null,
   isPWA,
 }: CreateCommentProps) => {
@@ -56,8 +55,14 @@ const createComment = async ({
     },
   );
 
-  response.data.result.Address.User = { profile };
-
+  // map profile to server schema
+  response.data.result.Address.User = {
+    profile: {
+      ...profile,
+      avatar_url: profile.avatarUrl,
+      last_active: profile.lastActive,
+    },
+  };
   return new Comment(response.data.result);
 };
 
@@ -102,11 +107,11 @@ const useCreateCommentMutation = ({
         'combineAndRemoveDups',
       );
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          profileId,
+          userId,
         );
 
       return newComment;

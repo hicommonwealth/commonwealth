@@ -53,7 +53,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         ) : (
           <img
             src={`data:image/svg+xml;utf8,${encodeURIComponent(
-              jdenticon.toSvg(profile.id, 90),
+              jdenticon.toSvg(profile.userId, 90),
             )}`}
           />
         )}

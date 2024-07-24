@@ -34,10 +34,10 @@ export const fetchProfilesByAddress = async ({
   return response.data.result.map((t) => {
     const profile = new MinimumProfile(t.address, currentChainId);
     profile.initialize(
+      t.userId,
       t.name,
       t.address,
       t.avatarUrl,
-      t.profileId,
       currentChainId,
       t.lastActive,
     );

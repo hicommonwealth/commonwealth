@@ -67,7 +67,7 @@ const useLaunchCommunityStake = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.LAUNCHED_COMMUNITY_STAKE,
         community: chainId,
-        userId: user.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.userId,
         userAddress: selectedAddress,
         isPWA: isAddedToHomeScreen,
       });

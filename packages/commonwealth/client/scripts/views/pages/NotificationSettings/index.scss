@@ -1,12 +1,29 @@
 @import '../../../../styles/shared';
 
 .NotificationSettings {
+  max-width: 650px;
+
+  .setting-container {
+    display: flex;
+    margin-block: 8px;
+  }
+
+  .setting-container-right {
+    justify-content: flex-start;
+    display: flex;
+    margin-left: auto;
+  }
+
   .page-header-text.Text {
     margin-bottom: 8px;
   }
 
   .section-header.Text {
     margin-top: 16px;
+  }
+
+  .text-muted {
+    color: $neutral-500;
   }
 
   .page-subheader-text {
@@ -46,5 +63,9 @@
 
   .CommunityEntry .toggle {
     margin-left: auto;
+  }
+
+  .left-content-container {
+    width: 650px;
   }
 }
