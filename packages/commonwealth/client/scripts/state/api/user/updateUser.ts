@@ -19,7 +19,7 @@ const useUpdateUserMutation = ({
   const user = useUserStore();
 
   return trpc.user.updateUser.useMutation({
-    onSuccess: async (updated) => {
+    onSuccess: (updated) => {
       addressesWithChainsToUpdate?.map(({ address, chain }) => {
         const key = [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chain, address];
         const existingProfile = queryClient.getQueryData(key);

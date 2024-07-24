@@ -1,4 +1,4 @@
-import { type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../database';
@@ -9,7 +9,11 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
   return {
     ...schemas.UpdateUser,
     auth: [],
-    body: async ({ payload }) => {
+    body: async ({ actor, payload }) => {
+      // comparing number to string since command convention requires string id
+      if (actor.user.id != payload.id)
+        throw new InvalidInput('Invalid user id');
+
       const { id, profile, promotional_emails_enabled, tag_ids } = payload;
       const {
         slug,
