@@ -6,6 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export function importDump(dumpUrl: string, dbUri: string): Promise<void> {
+  // TODO: validate the dump URL
   const command = `curl -s ${dumpUrl} | psql ${dbUri}`;
   log.debug(`running command: ${command}`);
   return new Promise((resolve, reject) => {

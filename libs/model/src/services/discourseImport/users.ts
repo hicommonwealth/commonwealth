@@ -1,4 +1,6 @@
+import { User } from '@hicommonwealth/schemas';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { z } from 'zod';
 
 type DiscourseUser = {
   id: number;
@@ -60,25 +62,12 @@ export const fetchUsersWithAddress = async (
   );
 };
 
-export type ExistingUser = {
-  id: number;
-  email: string;
-  emailVerified: boolean;
-  profile_id: number;
-};
+export type ExistingUser = z.infer<typeof User>;
 export const fetchUsersAlreadyInCW = async (
   session: Sequelize,
   emails: string[],
 ): Promise<ExistingUser[]> => {
-  return session.query<ExistingUser>(
-    `
-        select U.id, U.email, U."emailVerified", P.id as profile_id
-        FROM "Users" U
-        JOIN "Profiles" P ON P.user_id = U.id
-        WHERE U.email in (${emails});
-    `,
-    { raw: true, type: QueryTypes.SELECT },
-  );
+  return;
 };
 
 const createUser = async (
@@ -114,16 +103,12 @@ const createUser = async (
   return { user, isAdmin, isModerator, username, name };
 };
 
-export type UserObject = {
+export type UserObject = z.infer<typeof User> & {
   discourseUserId: number;
-  id: number;
-  email: string;
-  isAdmin: boolean;
   isModerator: boolean;
   username: string;
   name: string;
-  emailVerified: boolean;
-  profile_id?: number;
+  profile_id;
 };
 
 export const createAllUsersInCW = async (
