@@ -1,12 +1,12 @@
 import { notificationsProvider, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 
-export function RegisterClientRegistrationToken(): Command<
-  typeof schemas.RegisterClientRegistrationToken
+export function UnregisterClientRegistrationToken(): Command<
+  typeof schemas.UnregisterClientRegistrationToken
 > {
   const notifications = notificationsProvider();
   return {
-    ...schemas.RegisterClientRegistrationToken,
+    ...schemas.UnregisterClientRegistrationToken,
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
@@ -14,7 +14,7 @@ export function RegisterClientRegistrationToken(): Command<
         throw new Error('No user id.');
       }
 
-      await notifications.registerClientRegistrationToken(
+      await notifications.unregisterClientRegistrationToken(
         actor.user.id,
         payload.token,
         payload.channelType,
