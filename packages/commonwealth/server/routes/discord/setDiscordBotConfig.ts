@@ -131,8 +131,6 @@ const setDiscordBotConfig = async (
       where: {
         // @ts-expect-error StrictNullChecks
         user_id: profile.user_id,
-        // @ts-expect-error StrictNullChecks
-        profile_id: profile.id,
         address: '0xdiscordbot',
         community_id,
       },

@@ -477,7 +477,7 @@ const CommunityProfileForm = () => {
               }}
             />
             <CWButton
-              label="Save Changes"
+              label="Save changes"
               buttonWidth="narrow"
               buttonType="primary"
               type="submit"

@@ -14,9 +14,6 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  // TODO: to be deprecated by #5564
-  db.Profile.withMany(db.Address);
-
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
     onUpdate: 'CASCADE',

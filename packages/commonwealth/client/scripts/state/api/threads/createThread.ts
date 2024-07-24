@@ -109,11 +109,11 @@ const useCreateThreadMutation = ({
       // increment communities thread count
       if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          profileId,
+          userId,
         );
 
       return newThread;

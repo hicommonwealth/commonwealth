@@ -74,7 +74,6 @@ async function createMagicAddressInstances(
       defaults: {
         address,
         user_id,
-        profile_id,
         verification_token: decodedMagicToken.claim.tid, // to prevent re-use
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic

@@ -54,7 +54,6 @@ describe('userMentioned Event Handler', () => {
         {
           role: 'member',
           user_id: author!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',

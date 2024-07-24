@@ -52,7 +52,6 @@ export async function getActorProfile(
   >,
 ): Promise<{
   user_id: number;
-  profile_id: number; // TO BE REMOVED
   profile_name?: string | null;
   avatar_url?: string | null;
 } | null> {
@@ -61,7 +60,7 @@ export async function getActorProfile(
   }
 
   const address = await models.Address.findOne({
-    attributes: ['profile_id'], // TO BE REMOVED
+    attributes: ['id'],
     where: {
       address: notif.data.author_address,
       community_id: notif.data.community_id,
@@ -82,7 +81,7 @@ export async function getActorProfile(
     return null;
   }
 
-  if (!address.User || !address.User.id || !address.profile_id) {
+  if (!address.User || !address.User.id) {
     // TODO: rollbar?
     log.warn(`Could not find profile for address ${JSON.stringify(address)}`);
     return null;
@@ -90,7 +89,6 @@ export async function getActorProfile(
 
   return {
     user_id: address.User.id,
-    profile_id: address.profile_id, // TO BE REMOVED
     profile_name: address.User.profile.name,
     avatar_url: address.User.profile.avatar_url,
   };

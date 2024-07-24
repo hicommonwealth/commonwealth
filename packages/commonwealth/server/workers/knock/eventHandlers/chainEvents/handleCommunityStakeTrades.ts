@@ -37,10 +37,10 @@ export async function handleCommunityStakeTrades(
 
   const users = await models.sequelize.query<{ id: string }>(
     `
-        SELECT DISTINCT(user_id)::TEXT as id
-        FROM "Addresses"
-        WHERE community_id = :communityId
-          AND role = 'admin';
+        SELECT DISTINCT(U.id)::TEXT as id
+        FROM "Users" U
+        JOIN "Addresses" A ON A.user_id = U.id
+        WHERE A.community_id = :communityId AND (A.role = 'admin' OR U."isAdmin" = true);
     `,
     {
       raw: true,

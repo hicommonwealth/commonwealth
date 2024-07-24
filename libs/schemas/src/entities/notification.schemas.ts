@@ -63,7 +63,6 @@ export const ThreadSubscription = z.object({
         }),
         Address: Address.pick({
           id: true,
-          profile_id: true,
           user_id: true,
           address: true,
         }),

@@ -39,9 +39,6 @@ const generateSchemas = async () => {
         'FOREIGN KEY Notifications(notification_id) UPDATE NO ACTION DELETE CASCADE',
         'FOREIGN KEY Subscriptions(subscription_id) UPDATE NO ACTION DELETE CASCADE',
       ],
-      Addresses: [
-        'FOREIGN KEY Profiles(profile_id) UPDATE NO ACTION DELETE NO ACTION',
-      ],
 
       // Removed in migration
       Outbox: ['PRIMARY KEY(event_id)'],

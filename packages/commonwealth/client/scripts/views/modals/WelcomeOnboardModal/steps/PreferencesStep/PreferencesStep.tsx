@@ -24,6 +24,7 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
     if (isUpdatingProfile) return;
 
     updateProfile({
+      userId: user.id,
       address: user.activeAccount?.profile?.address || '',
       chain: user.activeAccount?.profile?.chain || '',
       tagIds: preferenceTags
