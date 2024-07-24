@@ -77,7 +77,7 @@ export const config = configure(
     },
   },
   z.object({
-    APP_ENV: z.enum(AppEnvironments).refine((data) => {
+    APP_ENV: z.enum(AppEnvironments).refine(() => {
       // prevent APP_ENV from being set to 'production' without the correct password
       if (APP_ENV === 'production' && !APP_ENV_PASSWORD) return false;
       else if (APP_ENV === 'production' && APP_ENV_PASSWORD) {
@@ -91,7 +91,7 @@ export const config = configure(
     APP_ENV_PASSWORD: z
       .string()
       .optional()
-      .refine((data) => !(APP_ENV === 'production' && !APP_ENV_PASSWORD)),
+      .refine(() => !(APP_ENV === 'production' && !APP_ENV_PASSWORD)),
     NODE_ENV: z.enum(Environments),
     IS_CI: z.boolean(),
     SERVER_URL: z
