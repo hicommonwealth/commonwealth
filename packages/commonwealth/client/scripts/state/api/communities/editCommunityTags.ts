@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { userStore } from '../../ui/user';
+import { ApiEndpoints, queryClient } from '../config';
 
 interface EditCommunityTagsProps {
   communityId: string;
@@ -31,6 +32,11 @@ const useEditCommunityTagsMutation = () => {
     onSuccess: ({ CommunityTags = [], community_id }) => {
       const community = app.config.chains.getById(community_id);
       if (community) community.updateTags(CommunityTags);
+
+      // reset active communities cache
+      const key = [ApiEndpoints.FETCH_ACTIVE_COMMUNITIES];
+      queryClient.cancelQueries(key).catch(console.error);
+      queryClient.refetchQueries(key).catch(console.error);
     },
   });
 };

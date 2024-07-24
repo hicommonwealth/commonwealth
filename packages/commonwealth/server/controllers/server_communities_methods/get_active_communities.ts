@@ -7,6 +7,7 @@ import {
 import { Op, QueryTypes } from 'sequelize';
 import { config } from '../../config';
 import { ServerCommunitiesController } from '../server_communities_controller';
+import { CommunityWithTags } from './get_communities';
 
 const CACHE_KEY = 'active-communities';
 
@@ -43,6 +44,7 @@ export async function __getActiveCommunities(
         LEFT JOIN "Topics" t ON c.id = t.community_id
         LEFT JOIN "Addresses" a ON c.id = a.community_id
         LEFT JOIN "CommunityStakes" cs ON c.id = cs.community_id
+        LEFT JOIN "CommunityTags" ct ON c.id = ct.community_id
     WHERE
       c.active = true
     GROUP BY
@@ -72,6 +74,14 @@ export async function __getActiveCommunities(
         include: [
           { model: this.models.CommunityStake },
           {
+            model: this.models.CommunityTags,
+            include: [
+              {
+                model: this.models.Tags,
+              },
+            ],
+          },
+          {
             model: this.models.Topic,
             required: true,
             as: 'topics',
@@ -87,7 +97,12 @@ export async function __getActiveCommunities(
     ]);
 
   const result = {
-    communities,
+    communities: communities.map((c) => ({
+      ...c.toJSON(),
+      CommunityTags: (c.toJSON().CommunityTags || []).map(
+        (ct) => (ct as unknown as CommunityWithTags).Tag,
+      ),
+    })),
     totalCommunitiesCount,
   };
 
