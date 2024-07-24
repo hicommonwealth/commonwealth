@@ -1,5 +1,5 @@
 import React from 'react';
-import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import { useUpdateUserMutation } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import {
   PreferenceTags,
@@ -17,16 +17,15 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
   const { preferenceTags, toggleTagFromSelection } = usePreferenceTags();
   const user = useUserStore();
 
-  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
-    useUpdateProfileByAddressMutation();
+  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+    useUpdateUserMutation();
 
   const handleSavePreferences = () => {
     if (isUpdatingProfile) return;
 
-    updateProfile({
-      userId: user.id,
-      address: user.activeAccount?.profile?.address || '',
-      chain: user.activeAccount?.profile?.chain || '',
+    updateUser({
+      id: user.id.toString(),
+      profile: {},
       tagIds: preferenceTags
         .filter((tag) => tag.isSelected)
         .map((tag) => tag.item.id),

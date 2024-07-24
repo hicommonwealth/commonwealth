@@ -4,11 +4,11 @@ import {
   CommentAttributes,
   CommentInstance,
   UserInstance,
+  sanitizeQuillText,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';

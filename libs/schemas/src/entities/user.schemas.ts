@@ -3,8 +3,8 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export const Image = z.object({
-  url: z.string(),
-  imageBehavior: z.string(),
+  url: z.string().optional(),
+  imageBehavior: z.string().optional(),
 });
 
 export const UserProfile = z.object({
@@ -16,6 +16,13 @@ export const UserProfile = z.object({
   slug: z.string().max(255).nullish(),
   socials: z.array(z.string()).nullish(),
   background_image: Image.nullish(),
+});
+
+export const ProfileTags = z.object({
+  user_id: z.number(),
+  tag_id: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 
 export const User = z.object({
@@ -34,6 +41,7 @@ export const User = z.object({
   profile: UserProfile,
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
+  ProfileTags: z.array(ProfileTags).optional(),
 });
 
 export const Profile = z.object({

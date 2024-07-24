@@ -9,6 +9,7 @@ import {
   ThreadAttributes,
   UserInstance,
   config,
+  sanitizeQuillText,
   tokenBalanceCache,
 } from '@hicommonwealth/model';
 import {
@@ -17,7 +18,6 @@ import {
   ProposalType,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {

@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, WalletId } from '@hicommonwealth/shared';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,
-  useUpdateProfileByAddressMutation,
+  useUpdateUserMutation,
 } from 'state/api/profiles';
 import {
   useUpdateUserEmailMutation,
@@ -36,8 +36,8 @@ const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
   const formMethodsRef = useRef<CWFormRef>();
-  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
-    useUpdateProfileByAddressMutation();
+  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+    useUpdateUserMutation();
   const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
 
   const [currentUsername, setCurrentUsername] = useState('');
@@ -61,7 +61,7 @@ const PersonalInformationStep = ({
         : '';
 
     if (formMethodsRef.current) {
-      if (defaultSSOUsername && defaultSSOUsername !== 'Anonymous') {
+      if (defaultSSOUsername && defaultSSOUsername !== DEFAULT_NAME) {
         formMethodsRef.current.setValue('username', defaultSSOUsername, {
           shouldDirty: true,
         });
@@ -121,14 +121,13 @@ const PersonalInformationStep = ({
   ) => {
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
-    await updateProfile({
-      userId: user.id,
-      address: user.activeAccount?.profile?.address || '',
-      chain: user.activeAccount?.profile?.chain || '',
+    await updateUser({
+      id: user.id.toString(),
       name: values.username,
       ...(values.email && {
         email: values.email,
       }),
+      profile: {},
     });
 
     // set email for notifications

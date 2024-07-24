@@ -10,7 +10,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import {
   useFetchProfileByIdQuery,
-  useUpdateProfileByAddressMutation,
+  useUpdateUserMutation,
 } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -75,8 +75,8 @@ const EditProfile = () => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
-    useUpdateProfileByAddressMutation({
+  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+    useUpdateUserMutation({
       addressesWithChainsToUpdate: addresses?.map((a) => ({
         address: a.address,
         chain: a.community.id,
@@ -212,24 +212,25 @@ const EditProfile = () => {
             imageBehavior: backgroundImageBehaviour,
           })
         : null;
-      updateProfile({
-        userId: user.id,
-        name: values.username.trim(),
-        ...(backgroundImage && { backgroundImage }),
-        avatarUrl,
-        email: values.email.trim(),
-        socials: JSON.stringify(
-          (links || [])
-            .filter((link) => link.value.trim())
-            .map((link) => link.value.trim()),
-        ),
-        bio: serializeDelta(values.bio),
-        tagIds: preferenceTags
+
+      const updates = {
+        id: user.id.toString(),
+        profile: {
+          name: values.username.trim(),
+          email: values.email.trim(),
+          bio: serializeDelta(values.bio),
+          background_image: backgroundImage && JSON.parse(backgroundImage),
+          avatar_url: avatarUrl,
+          socials: (links || [])
+            .filter((l) => l.value.trim())
+            .map((l) => l.value.trim()),
+        },
+        tag_ids: preferenceTags
           .filter((tag) => tag.isSelected)
           .map((tag) => tag.item.id),
-        address: user.activeAccount?.address || '',
-        chain: user.activeAccount?.community?.id || '',
-      })
+      };
+
+      updateUser(updates)
         .then(() => {
           navigate(`/profile/id/${user.id}`);
 
