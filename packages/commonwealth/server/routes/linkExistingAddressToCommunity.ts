@@ -122,10 +122,6 @@ const linkExistingAddressToCommunity = async (
     //   we can just update with userId. this covers both edge case (1) & (2)
     // Address.updateWithTokenProvided
     existingAddress.user_id = userId;
-    const profileId = await models.Profile.findOne({
-      where: { user_id: userId },
-    });
-    existingAddress.profile_id = profileId?.id;
     existingAddress.verification_token = verificationToken;
     existingAddress.verification_token_expires = verificationTokenExpires;
     existingAddress.last_active = new Date();
@@ -146,7 +142,6 @@ const linkExistingAddressToCommunity = async (
       return await models.Address.create(
         {
           user_id: originalAddress.user_id!,
-          profile_id: originalAddress.profile_id!,
           address: encodedAddress,
           community_id: community!.id,
           hex,

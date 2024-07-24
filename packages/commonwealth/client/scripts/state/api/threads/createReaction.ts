@@ -77,12 +77,9 @@ const useCreateThreadReactionMutation = ({
         'combineAndRemoveDups',
       );
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          profileId,
-        );
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

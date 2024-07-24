@@ -23,6 +23,7 @@ export type ThreadResult = {
   title: string;
   body: string;
   address_id: number;
+  address_user_id: number;
   address: string;
   address_community_id: string;
   created_at: string;
@@ -226,7 +227,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   const profile: MinimumProfile = users?.[0];
 
   const handleClick = () => {
-    setRoute(`/profile/id/${profile?.id}`, {}, null);
+    setRoute(`/profile/id/${profile?.userId}`, {}, null);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== community_id) {

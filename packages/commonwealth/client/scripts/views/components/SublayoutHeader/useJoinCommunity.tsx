@@ -115,6 +115,7 @@ const useJoinCommunity = () => {
         user.setData({
           addresses: addresses.map((a) => {
             return new AddressInfo({
+              userId: user.id,
               id: a.id,
               address: a.address,
               communityId: a.community_id,

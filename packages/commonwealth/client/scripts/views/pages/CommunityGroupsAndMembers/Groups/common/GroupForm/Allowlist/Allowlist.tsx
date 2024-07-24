@@ -127,7 +127,7 @@ const Allowlist = ({
   const formattedMembers: Member[] = useMemo(() => {
     return (
       (members?.results?.map((p) => ({
-        id: p.addresses[0].profile_id,
+        userId: p.user_id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
         role: p.addresses[0].role,

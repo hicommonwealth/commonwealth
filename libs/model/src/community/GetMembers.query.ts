@@ -79,7 +79,6 @@ const buildFilteredQuery = (
   //     ${groupsJoin}
   //   WHERE
   //     A.community_id = :community_id
-  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
   //     AND U.profile->>'name' ILIKE :search
   //     ${addressFilter}
 
@@ -92,7 +91,6 @@ const buildFilteredQuery = (
   //     ${groupsJoin}
   //   WHERE
   //     A.community_id = :community_id
-  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
   //     AND A.address ILIKE :search
   //     ${addressFilter}
   // `
@@ -104,7 +102,6 @@ const buildFilteredQuery = (
   //     ${groupsJoin}
   //   WHERE
   //     A.community_id = :community_id
-  //     AND A.profile_id IS NOT NULL -- TO BE REMOVED
   //     ${addressFilter}
   // `;
   return search
@@ -117,7 +114,6 @@ const buildFilteredQuery = (
       ${groupsJoin}
     WHERE
       A.community_id = :community_id
-      AND A.profile_id IS NOT NULL -- TO BE REMOVED
       AND U.profile->>'name' ILIKE :search
       ${addressFilter}
     `
@@ -129,7 +125,6 @@ const buildFilteredQuery = (
       ${groupsJoin}
     WHERE
       A.community_id = :community_id
-      AND A.profile_id IS NOT NULL -- TO BE REMOVED
       ${addressFilter}
   `;
 };
@@ -183,8 +178,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           'address', A.address,
           'community_id', A.community_id,
           'role', A.role,
-          'stake_balance', 0, -- TODO: project stake balance here
-          'profile_id', A.profile_id -- TO BE REMOVED
+          'stake_balance', 0 -- TODO: project stake balance here
         )) AS addresses,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
         T.total

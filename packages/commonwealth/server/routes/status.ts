@@ -37,7 +37,6 @@ type StatusResp = {
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [communityId: string]: number };
-    profileId?: number;
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
@@ -318,7 +317,7 @@ export const status = async (
         recentThreads: threadCountQueryData,
         loggedIn: true,
         // @ts-expect-error StrictNullChecks
-        user: { ...user, profileId: user.addresses.at(0)?.profile_id },
+        user,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,

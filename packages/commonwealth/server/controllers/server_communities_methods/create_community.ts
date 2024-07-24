@@ -369,7 +369,6 @@ export async function __createCommunity(
     id,
     name,
     default_symbol,
-    // @ts-expect-error StrictNullChecks
     icon_url,
     description,
     network: network as ChainNetwork,
@@ -492,7 +491,6 @@ export async function __createCommunity(
 
     await this.models.Address.create({
       user_id: user.id,
-      profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       community_id: createdCommunity.id,
       hex,

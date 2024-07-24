@@ -92,7 +92,6 @@ export async function __searchProfiles(
 
   const sqlWithoutPagination = `
     SELECT
-      "Addresses".profile_id, -- TO BE REMOVED
       "Users".id AS user_id,
       "Users".profile->>'name' AS profile_name,
       "Users".profile->>'avatar_url' AS avatar_url,
@@ -104,7 +103,7 @@ export async function __searchProfiles(
       MAX("Addresses".last_active) as last_active
     FROM
       "Users"
-      JOIN "Addresses" ON "Users".id = "Addresses".user_id AND "Addresses".profile_id IS NOT NULL -- TO BE REMOVED
+      JOIN "Addresses" ON "Users".id = "Addresses".user_id 
     WHERE
       ${communityWhere}
       (
@@ -113,8 +112,7 @@ export async function __searchProfiles(
         "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
     GROUP BY
-      "Users".id,
-      "Addresses".profile_id
+      "Users".id
   `;
 
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([

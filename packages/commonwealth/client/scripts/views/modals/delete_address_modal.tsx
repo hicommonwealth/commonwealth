@@ -71,7 +71,7 @@ export const DeleteAddressModal = ({
   };
 
   const { name } = profile;
-  const defaultAvatar = jdenticon.toSvg(profile.id, 90);
+  const defaultAvatar = jdenticon.toSvg(profile.userId, 90);
 
   return (
     <div className="DeleteAddressModal">

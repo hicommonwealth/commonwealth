@@ -93,7 +93,7 @@ export const FullUser = ({
         ) : (
           'Anonymous'
         )
-      ) : !profile?.id ? (
+      ) : !profile?.userId ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
         profile?.name
@@ -112,12 +112,14 @@ export const FullUser = ({
       <Avatar
         url={profile?.avatarUrl}
         size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
-        address={profile?.id}
+        address={profile?.userId}
       />
     </div>
   ) : (
     <div
-      className={`User${shouldLinkProfile && profile?.id ? ' linkified' : ''}`}
+      className={`User${
+        shouldLinkProfile && profile?.userId ? ' linkified' : ''
+      }`}
       key={profile?.address || '-'}
     >
       {showAvatar && (
@@ -125,7 +127,7 @@ export const FullUser = ({
           // @ts-expect-error <StrictNullChecks/>
           to={
             profile && shouldLinkProfile
-              ? `/profile/id/${profile?.id}`
+              ? `/profile/id/${profile?.userId}`
               : undefined
           }
           className="user-avatar"
@@ -134,17 +136,17 @@ export const FullUser = ({
           <Avatar
             url={profile?.avatarUrl}
             size={avatarSize}
-            address={profile?.id}
+            address={profile?.userId}
           />
         </Link>
       )}
       {
         <>
           {/* non-substrate name */}
-          {shouldLinkProfile && profile?.id ? (
+          {shouldLinkProfile && profile?.userId ? (
             <Link
               className="user-display-name username"
-              to={`/profile/id/${profile?.id}`}
+              to={`/profile/id/${profile?.userId}`}
               onClick={(e) => e.stopPropagation()}
             >
               {userBasisInfo}
@@ -173,7 +175,7 @@ export const FullUser = ({
             <Avatar
               url={profile?.avatarUrl}
               size={profile?.avatarUrl ? 36 : 32}
-              address={profile?.id}
+              address={profile?.userId}
             />
           </div>
           <div className="user-name">
@@ -181,10 +183,10 @@ export const FullUser = ({
               <Link
                 className="user-display-name substrate@"
                 // @ts-expect-error <StrictNullChecks/>
-                to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
+                to={profile?.id ? `/profile/id/${profile?.userId}` : undefined}
               >
-                {!profile || !profile?.id ? (
-                  !profile?.id && userAddress ? (
+                {!profile || !profile?.userId ? (
+                  !profile?.userId && userAddress ? (
                     `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
                     redactedAddress
