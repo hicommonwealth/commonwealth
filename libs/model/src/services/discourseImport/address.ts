@@ -15,7 +15,6 @@ const createAddress = async (
     address,
     communityId,
     email,
-    profileId,
     isAdmin,
     isModerator,
   }: {
@@ -25,7 +24,6 @@ const createAddress = async (
     address: string;
     communityId: string;
     email: string;
-    profileId: number;
     isAdmin: boolean;
     isModerator: boolean;
   },
@@ -43,8 +41,8 @@ const createAddress = async (
     `
     INSERT INTO "Addresses"(id, address, community_id, created_at,
     updated_at, user_id, verification_token,
-    verification_token_expires, verified, keytype, last_active,
-    is_councillor, is_validator, ghost_address, profile_id, wallet_id, role)
+    verification_token_expires, verified, last_active,
+    is_councillor, is_validator, ghost_address, wallet_id, role)
     VALUES (default,
     '${address}',
     '${communityId}',
@@ -55,11 +53,9 @@ const createAddress = async (
     '${verification_token_expires}',
     NOW(),
     null,
-    null,
     false,
     false,
-    true,
-    ${profileId}, null, '${
+    true, null, '${
       isAdmin ? 'admin' : isModerator ? 'moderator' : 'member'
     }') RETURNING id, address, community_id;
     `,
@@ -112,11 +108,6 @@ export const createAllAddressesInCW = async (
         const web3 = new Web3();
         ghostAddress = web3.eth.accounts.create().address;
       }
-      let profileId = profile_id;
-      if (!profileId) {
-        profileId = profiles.find((p) => p.user_id === cwUserId)?.profile_id;
-        if (!profileId) throw new Error('Profile not found');
-      }
 
       return createAddress(
         cwConnection,
@@ -127,7 +118,6 @@ export const createAllAddressesInCW = async (
           address: ghostAddress,
           communityId,
           email,
-          profileId,
           isAdmin,
           isModerator,
         },
