@@ -169,7 +169,7 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
         community: communityId,
-        userId: user.activeAccount?.profile?.id || 0,
+        userId: user.activeAccount?.profile?.userId || 0,
         userAddress: selectedAddress?.value,
         isPWA: isAddedToHomeScreen,
       });
@@ -205,7 +205,7 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_SOLD,
         community: communityId,
-        userId: user.activeAccount?.profile?.id || 0,
+        userId: user.activeAccount?.profile?.userId || 0,
         userAddress: selectedAddress?.value,
         isPWA: isAddedToHomeScreen,
       });

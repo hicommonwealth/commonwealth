@@ -9,15 +9,15 @@ import {
 describe('User mention utils', () => {
   test('parseUserMentions', () => {
     let userMentions = parseUserMentions('[@user](/profile/id/10)');
-    expect(userMentions).deep.equal([{ profileId: '10', profileName: 'user' }]);
+    expect(userMentions).deep.equal([{ userId: '10', profileName: 'user' }]);
 
     userMentions = parseUserMentions(
       'random text [@user](/profile/id/10) random text [@user2](/profile/id/11)',
     );
     expect(userMentions).deep.equal([
-      { profileId: '10', profileName: 'user' },
+      { userId: '10', profileName: 'user' },
       {
-        profileId: '11',
+        userId: '11',
         profileName: 'user2',
       },
     ]);
@@ -26,9 +26,9 @@ describe('User mention utils', () => {
       '[@u*()ser!](/profile/id/10)[@us%^er2!](/profile/id/11)',
     );
     expect(userMentions).deep.equal([
-      { profileId: '10', profileName: 'u*()ser!' },
+      { userId: '10', profileName: 'u*()ser!' },
       {
-        profileId: '11',
+        userId: '11',
         profileName: 'us%^er2!',
       },
     ]);
@@ -54,8 +54,8 @@ describe('User mention utils', () => {
   });
 
   test('findMentionDiff', () => {
-    const userMentionsBefore = [{ profileId: '10', profileName: 'user' }];
-    const newUserMention = { profileId: '11', profileName: 'user2' };
+    const userMentionsBefore = [{ userId: '10', profileName: 'user' }];
+    const newUserMention = { userId: '11', profileName: 'user2' };
     const mentionDiff = findMentionDiff(userMentionsBefore, [
       ...userMentionsBefore,
       newUserMention,
@@ -65,7 +65,7 @@ describe('User mention utils', () => {
   });
 
   test('uniqueMentions', () => {
-    const userMentions = [{ profileId: '10', profileName: 'user' }];
+    const userMentions = [{ userId: '10', profileName: 'user' }];
 
     expect(
       uniqueMentions([...userMentions, ...userMentions, ...userMentions]),

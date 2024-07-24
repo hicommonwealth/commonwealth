@@ -23,11 +23,7 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
   const navigate = useCommonNavigate();
 
   const handleClick = () => {
-    navigate(
-      `/profile/id/${searchResult.addresses.at(0)?.profile_id}`,
-      {},
-      null,
-    );
+    navigate(`/profile/id/${searchResult.user_id}`, {}, null);
     onSearchItemClick?.();
   };
 

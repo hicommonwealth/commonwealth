@@ -4,9 +4,6 @@ import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useCallback, useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
-// eslint-disable-next-line max-len
-import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
@@ -14,7 +11,8 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from 'views/pages/404';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
-import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
+import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
+import { supportsPushNotifications } from 'views/pages/NotificationSettings/supportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -29,8 +27,6 @@ const NotificationSettings = () => {
   const communityAlerts = useCommunityAlertsQuery();
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const { isLoggedIn } = useUserLoggedIn();
-  const registerClientRegistrationToken =
-    useRegisterClientRegistrationTokenMutation();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     (communityAlerts.data as unknown as ReadonlyArray<
@@ -49,22 +45,6 @@ const NotificationSettings = () => {
     [threadsFilter],
   );
 
-  const handlePushNotificationSubscription = useCallback(() => {
-    async function doAsync() {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        console.log('Notification permission granted.');
-        const token = await getFirebaseMessagingToken();
-        await registerClientRegistrationToken.mutateAsync({
-          id: 'none',
-          token,
-        });
-      }
-    }
-
-    doAsync().catch(console.error);
-  }, [registerClientRegistrationToken]);
-
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
   } else if (!isLoggedIn) {
@@ -82,16 +62,21 @@ const NotificationSettings = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
-        {enableKnockPushNotifications && (
+        {enableKnockPushNotifications && supportsPushNotifications() && (
           <div>
             <CWText type="h5">Push Notifications</CWText>
 
-            <p>
-              <CWButton
-                label="Subscribe to Push Notifications"
-                onClick={handlePushNotificationSubscription}
-              />
-            </p>
+            <div className="setting-container">
+              <div className="setting-container-left">
+                <CWText className="text-muted">
+                  Turn on notifications to receive alerts on your device.
+                </CWText>
+              </div>
+
+              <div className="setting-container-right">
+                <PushNotificationsToggle />
+              </div>
+            </div>
           </div>
         )}
 

@@ -6,9 +6,9 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
 import useUserStore, { userStore } from '../../ui/user';
 
 interface UpdateProfileByAddressProps {
+  userId: number;
   address: string;
   chain: string;
-  profileId?: number;
   name?: string;
   email?: string;
   bio?: string;
@@ -19,9 +19,9 @@ interface UpdateProfileByAddressProps {
 }
 
 const updateProfileByAddress = async ({
+  userId,
   address,
   chain,
-  profileId,
   bio,
   name,
   email,
@@ -32,7 +32,7 @@ const updateProfileByAddress = async ({
 }: UpdateProfileByAddressProps) => {
   // TODO: ideally this should return a response
   const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
-    profileId,
+    userId,
     bio,
     name,
     email,
@@ -48,10 +48,10 @@ const updateProfileByAddress = async ({
   const responseProfile = response.data.result.profile;
   const updatedProfile = new MinimumProfile(address, chain);
   updatedProfile.initialize(
+    userId,
     responseProfile.name || responseProfile.profile_name,
     address,
     responseProfile.avatarUrl,
-    profileId || responseProfile.id,
     chain,
     responseProfile.lastActive,
   );
@@ -86,21 +86,18 @@ const useUpdateProfileByAddressMutation = ({
         }
       });
 
-      const userProfileId = user.addresses?.[0]?.profile?.id;
-      const doesProfileIdMatch =
-        userProfileId && userProfileId === updatedProfile?.id;
-      if (doesProfileIdMatch) {
-        // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
+      // if `userId` matches auth user's id, refetch profile-by-id query for auth user.
+      if (user.id === updatedProfile.userId) {
         const keys = [
           [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
-          [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],
+          [ApiEndpoints.FETCH_PROFILES_BY_ID, user.id],
         ];
         keys.map((key) => {
           queryClient.cancelQueries(key).catch(console.error);
           queryClient.refetchQueries(key).catch(console.error);
         });
 
-        // if `profileId` matches auth user's profile id, and user profile has a defined name, then
+        // if `userId` matches auth user's id, and user profile has a defined name, then
         // set welcome onboard step as complete
         if (
           updatedProfile.name &&

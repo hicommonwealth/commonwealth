@@ -205,7 +205,7 @@ const CommunityMembersPage = () => {
         return [...acc, ...page.results];
       }, [] as SearchProfilesResponse['results'])
       .map((p) => ({
-        id: p.addresses[0].profile_id,
+        userId: p.user_id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
         // @ts-expect-error <StrictNullChecks/>
