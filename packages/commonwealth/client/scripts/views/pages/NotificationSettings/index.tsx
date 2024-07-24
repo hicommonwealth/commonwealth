@@ -100,7 +100,8 @@ const NotificationSettings = () => {
             </CWText>
 
             <CWText className="page-subheader-text">
-              Get updates on new threads and discussions from these communities
+              Get updates on onchain activity and proposals in these
+              communities.
             </CWText>
 
             {getUniqueCommunities().map((community) => {

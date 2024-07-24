@@ -1,8 +1,12 @@
 @import '../../../../styles/shared';
 
 .NotificationSettings {
+  max-width: 650px;
+
   .setting-container {
     display: flex;
+    margin-top: 8px;
+    margin-bottom: 8px;
   }
 
   .setting-container-right {
@@ -60,5 +64,9 @@
 
   .CommunityEntry .toggle {
     margin-left: auto;
+  }
+
+  .left-content-container {
+    width: 650px;
   }
 }
