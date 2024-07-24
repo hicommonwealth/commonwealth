@@ -219,7 +219,7 @@ export const config = configure(
       .refine(
         (data) => {
           if (
-            !['local', 'ci', 'discobot', 'snapshot'].includes(target.APP_ENV)
+            !['local', 'CI', 'discobot', 'snapshot'].includes(target.APP_ENV)
           ) {
             return (
               !!LOAD_TESTING_AUTH_TOKEN &&
