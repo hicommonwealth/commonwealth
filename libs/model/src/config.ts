@@ -108,7 +108,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (target.APP_ENV !== 'local') {
+          if (!['local', 'ci'].includes(target.APP_ENV)) {
             return !!JWT_SECRET && data.JWT_SECRET !== DEFAULTS.JWT_SECRET;
           }
           return true;
