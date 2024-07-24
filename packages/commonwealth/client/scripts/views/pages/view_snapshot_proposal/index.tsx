@@ -85,7 +85,8 @@ export const ViewSnapshotProposalPage = ({
       return null;
     }
     return new AddressInfo({
-      id: null,
+      userId: 0, // TODO: is this OK?
+      id: 0, // TODO: is this OK?
       address: proposal.author,
       communityId: activeCommunityId,
     });

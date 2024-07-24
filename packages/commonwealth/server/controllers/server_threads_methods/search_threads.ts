@@ -92,6 +92,7 @@ export async function __searchThreads(
       ${threadTitleOnly ? '' : `"Threads".body,`}
       'thread' as type,
       "Addresses".id as address_id,
+      "Addresses".user_id as address_user_id,
       "Addresses".address,
       "Addresses".community_id as address_community_id,
       "Threads".created_at,

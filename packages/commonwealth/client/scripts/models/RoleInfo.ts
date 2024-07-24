@@ -18,7 +18,7 @@ export type RoleInfoData = {
 };
 
 class RoleInfo {
-  public readonly id: number;
+  public readonly id?: number;
   public readonly Address?: AddressInfo;
   public readonly address_id: number;
   public readonly address: string;
