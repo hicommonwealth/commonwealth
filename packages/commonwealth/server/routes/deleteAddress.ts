@@ -43,7 +43,6 @@ const deleteAddress = async (
     return next(new AppError(Errors.CannotDeleteMagic));
   }
 
-  // @ts-expect-error StrictNullChecks
   addressObj.user_id = null;
   addressObj.verified = null;
   await addressObj.save();

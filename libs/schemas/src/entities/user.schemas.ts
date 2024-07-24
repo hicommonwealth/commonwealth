@@ -57,7 +57,7 @@ export const Address = z.object({
   id: PG_INT.optional(),
   address: z.string().max(255),
   community_id: z.string().max(255).optional(),
-  user_id: PG_INT.optional(),
+  user_id: PG_INT.nullish(),
   verification_token: z.string().max(255).optional(),
   verification_token_expires: z.date().nullable().optional(),
   verified: z.date().nullable().optional(),

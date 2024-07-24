@@ -121,7 +121,7 @@ const processAddress = async (
   });
 
   if (addressToTransfer) {
-    // reassign the users and profiles of the transferred addresses
+    // reassign the users of the transferred addresses
     await models.Address.update(
       {
         user_id: addressInstance.user_id,
@@ -138,7 +138,7 @@ const processAddress = async (
     try {
       // send email to the old user (should only ever be one)
       const oldUser = await models.User.scope('withPrivateData').findOne({
-        where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
+        where: { id: addressToTransfer.user_id!, email: { [Op.ne]: null } },
       });
       if (!oldUser?.email) {
         throw new AppError(Errors.NoEmail);
@@ -222,7 +222,6 @@ const verifyAddress = async (
       // @ts-expect-error StrictNullChecks
       where: { id: newAddress.user_id },
     });
-    // @ts-expect-error StrictNullChecks
     req.login(user, (err) => {
       const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
@@ -237,7 +236,6 @@ const verifyAddress = async (
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          // @ts-expect-error StrictNullChecks
           userId: user.id,
         },
         req,

@@ -28,7 +28,6 @@ const updateSiteAdmin = async (
   }
 
   const userAddress = await models.Address.findOne({
-    // @ts-expect-error StrictNullChecks
     where: {
       address,
       user_id: {
@@ -43,7 +42,7 @@ const updateSiteAdmin = async (
 
   const user = await models.User.findOne({
     where: {
-      id: userAddress.user_id,
+      id: userAddress.user_id!,
     },
   });
 
