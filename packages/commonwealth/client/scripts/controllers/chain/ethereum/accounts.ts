@@ -44,7 +44,7 @@ class EthereumAccounts implements IAccountsModule<EthereumAccount> {
         if (address.length !== 40) {
           console.error(`Invalid address length! ${address}`);
         }
-        /* eslint-disable no-param-reassign */
+        // eslint-disable-next-line no-param-reassign
         address = `0x${address}`;
       }
     }
