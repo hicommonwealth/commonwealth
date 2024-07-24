@@ -5,9 +5,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
-        `
-ALTER TABLE public."Communities" DROP COLUMN IF EXISTS "category";
-        `,
+        `ALTER TABLE public."Communities" DROP COLUMN IF EXISTS "category";`,
         {
           transaction: t,
         },
@@ -18,9 +16,7 @@ ALTER TABLE public."Communities" DROP COLUMN IF EXISTS "category";
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
-        `
-ALTER TABLE public."Communities" ADD COLUMN "category" JSONB;
-        `,
+        `ALTER TABLE public."Communities" ADD COLUMN "category" JSONB;`,
         {
           transaction: t,
         },
