@@ -57,11 +57,9 @@ export default class DatabaseValidationService {
     if (req.body.auth !== config.CW_BOT_KEY) {
       return next(new AppError('Approved Bot Only Endpoint'));
     }
-    req.user = (
-      await this.models.User.findOne({
-        where: { email: DISCORD_BOT_EMAIL },
-      })
-    )?.toJSON();
+    req.user = (await this.models.User.findOne({
+      where: { email: DISCORD_BOT_EMAIL },
+    }))!;
     next();
   };
 
