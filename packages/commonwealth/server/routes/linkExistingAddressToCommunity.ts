@@ -141,8 +141,7 @@ const linkExistingAddressToCommunity = async (
           verified: originalAddress.verified,
           hex,
         },
-        { where: { id: existingAddress.id } },
-        { transaction },
+        { where: { id: existingAddress.id }, transaction },
       );
       // @ts-expect-error StrictNullChecks
       addressId = updatedObj.id;
