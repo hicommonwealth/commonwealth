@@ -190,15 +190,15 @@ describe('CommentCreated Event Handler', () => {
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: authorUser.profile.name,
+        author: author?.profile.name,
         comment_parent_name: 'thread',
-        // @ts-expect-error StrictNullChecks
-        community_name: community.name,
-        // @ts-expect-error StrictNullChecks
-        comment_body: rootComment.text.substring(0, 255),
-        // @ts-expect-error StrictNullChecks
-        comment_url: getCommentUrl(community.id, thread.id, rootComment.id),
+        community_name: community?.name,
+        comment_body: rootComment?.text.substring(0, 255),
+        comment_url: getCommentUrl(
+          community?.id ?? '',
+          thread?.id ?? 0,
+          rootComment?.id ?? 0,
+        ),
         comment_created_event: rootComment,
       },
       // @ts-expect-error StrictNullChecks
@@ -236,15 +236,15 @@ describe('CommentCreated Event Handler', () => {
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: authorUser.profile.name,
+        author: author?.profile.name,
         comment_parent_name: 'comment',
-        // @ts-expect-error StrictNullChecks
-        community_name: community.name,
-        // @ts-expect-error StrictNullChecks
-        comment_body: replyComment.text.substring(0, 255),
-        // @ts-expect-error StrictNullChecks
-        comment_url: getCommentUrl(community.id, thread.id, replyComment.id),
+        community_name: community?.name,
+        comment_body: replyComment?.text.substring(0, 255),
+        comment_url: getCommentUrl(
+          community?.id ?? '',
+          thread?.id ?? 0,
+          replyComment?.id ?? 0,
+        ),
         comment_created_event: replyComment,
       },
       // @ts-expect-error StrictNullChecks
