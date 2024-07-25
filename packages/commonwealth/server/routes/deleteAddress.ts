@@ -56,7 +56,7 @@ const deleteAddress = async (
     );
     await decrementProfileCount(
       models,
-      community!.id,
+      community.id!,
       req!.user!.id,
       transaction,
     );

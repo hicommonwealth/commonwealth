@@ -116,7 +116,7 @@ const linkExistingAddressToCommunity = async (
     hex = await bech32ToHex(req.body.address);
   }
 
-  let addressId: number;
+  let addressId = -1;
   if (existingAddress) {
     // refer edge case 2)
     // either if the existing address is owned by someone else or this user,
