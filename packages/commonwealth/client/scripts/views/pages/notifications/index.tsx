@@ -5,6 +5,7 @@ import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import PageError from 'views/pages/error';
 import { KnockNotificationsContent } from 'views/pages/notifications/KnockNotificationsContent';
+import { LegacyNotificationsContent } from 'views/pages/notifications/LegacyNotificationsContent';
 
 const NotificationsPage = () => {
   const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
@@ -15,9 +16,8 @@ const NotificationsPage = () => {
 
   return (
     <CWPageLayout>
-      {/*{enableKnockInAppNotifications && <LegacyNotificationsContent />}*/}
-      {/*{! enableKnockInAppNotifications && <KnockNotificationsContent />}*/}
-      <KnockNotificationsContent />
+      {!enableKnockInAppNotifications && <LegacyNotificationsContent />}
+      {enableKnockInAppNotifications && <KnockNotificationsContent />}
     </CWPageLayout>
   );
 };
