@@ -442,7 +442,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (username) {
         await updateUser({
           id: user.id.toString(),
-          name: username,
+          name: username.trim(),
           profile: {},
           // @mzparacha do we need to uupdate address and chain?
           //address: account?.profile?.address,

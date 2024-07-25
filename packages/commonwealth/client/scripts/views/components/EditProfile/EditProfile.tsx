@@ -216,7 +216,7 @@ const EditProfile = () => {
         profile: {
           name: values.username.trim(),
           email: values.email.trim(),
-          bio: serializeDelta(values.bio),
+          bio: serializeDelta(values.bio).trim(),
           background_image: backgroundImage && JSON.parse(backgroundImage),
           avatar_url: avatarUrl,
           socials: (links || [])

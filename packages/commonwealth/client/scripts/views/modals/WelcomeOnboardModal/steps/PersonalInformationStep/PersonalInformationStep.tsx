@@ -123,9 +123,9 @@ const PersonalInformationStep = ({
 
     await updateUser({
       id: user.id.toString(),
-      name: values.username,
+      name: values.username.trim(),
       ...(values.email && {
-        email: values.email,
+        email: values.email.trim(),
       }),
       profile: {},
     });

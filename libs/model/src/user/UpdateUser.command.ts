@@ -38,7 +38,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
 
       const is_welcome_onboard_flow_complete =
         user.is_welcome_onboard_flow_complete ||
-        name ||
+        !!name ||
         user.profile.name !== DEFAULT_NAME
           ? true
           : false;
@@ -55,7 +55,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           email,
           slug,
           name,
-          bio: rawBio && sanitizeQuillText(rawBio),
+          bio: rawBio && sanitizeQuillText(rawBio).toString(),
           website,
           avatar_url,
           socials,
