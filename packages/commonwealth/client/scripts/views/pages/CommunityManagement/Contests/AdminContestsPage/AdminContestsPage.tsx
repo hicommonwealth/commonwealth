@@ -10,8 +10,8 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 
-import useAppStatus from 'client/scripts/hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
+import useAppStatus from 'hooks/useAppStatus';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
