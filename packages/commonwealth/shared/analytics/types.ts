@@ -83,6 +83,11 @@ export const enum MixpanelGovernanceEvents {
   COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
 }
 
+export const enum MixpanelContestEvents {
+  CREATE_CONTEST_BUTTON_PRESSED = 'Create Contest Button Pressed',
+  CONTEST_CREATED = 'Contest Created',
+}
+
 export const enum MixpanelPWAEvent {
   PWA_USED = 'PWA in use',
   PWA_NOT_USED = 'PWA NOT in use',
@@ -99,6 +104,7 @@ export type MixpanelEvents =
   | MixpanelErrorCaptureEvent
   | MixpanelClickthroughEvent
   | MixpanelGovernanceEvents
+  | MixpanelContestEvents
   | MixpanelPWAEvent;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
