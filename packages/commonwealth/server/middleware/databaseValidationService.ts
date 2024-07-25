@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { config } from '../config';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
@@ -53,18 +54,12 @@ export default class DatabaseValidationService {
     res: Response,
     next: NextFunction,
   ) => {
-    //1. Check for bot token
     if (req.body.auth !== config.CW_BOT_KEY) {
       return next(new AppError('Approved Bot Only Endpoint'));
     }
-    //2. Get Bot User and inject
-    const profile = await this.models.Profile.findOne({
-      where: {
-        profile_name: 'Discord Bot',
-      },
-    });
-    // @ts-expect-error StrictNullChecks
-    req.user = await profile.getUser();
+    req.user = (await this.models.User.findOne({
+      where: { email: DISCORD_BOT_EMAIL },
+    }))!;
     next();
   };
 
