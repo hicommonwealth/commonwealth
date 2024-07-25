@@ -5,7 +5,6 @@ import type { DB } from './factories';
  */
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
-    .withMany(db.Profile, { onUpdate: 'CASCADE' })
     .withMany(db.ProfileTags)
     .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
     .withMany(db.NotificationsRead)

@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
 import { ServerError, logger } from '@hicommonwealth/core';
-import type {
-  DB,
-  ProfileAttributes,
-  ProfileInstance,
-} from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model';
 import {
   AddressAttributes,
   AddressInstance,
@@ -474,11 +470,6 @@ async function magicLoginRoute(
       // @ts-expect-error StrictNullChecks
       loggedInUser = await models.User.findOne({
         where: { id },
-        include: [
-          {
-            model: models.Profile,
-          },
-        ],
       });
       log.trace(
         `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
@@ -577,9 +568,6 @@ async function magicLoginRoute(
           },
           required: true,
         },
-        {
-          model: models.Profile,
-        },
       ],
     },
   );
@@ -597,9 +585,6 @@ async function magicLoginRoute(
     existingUserInstance = await models.User.scope('withPrivateData').findOne({
       where: { email: magicUserMetadata.email },
       include: [
-        {
-          model: models.Profile,
-        },
         {
           // guarantee that we only access ghost addresses as part of this query
           model: models.Address,
