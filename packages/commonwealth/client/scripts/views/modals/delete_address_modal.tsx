@@ -51,8 +51,14 @@ export const DeleteAddressModal = ({
         chain,
         jwt: user.jwt,
       });
-      // TODO: need to update userStore?
+
       if (response?.data.status === 'Success') {
+        user.setData({
+          accounts: user.accounts.filter(
+            (a) => a.address !== address && a.community.id !== chain,
+          ),
+        });
+
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {

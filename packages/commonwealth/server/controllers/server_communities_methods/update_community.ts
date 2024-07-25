@@ -209,8 +209,7 @@ export async function __updateCommunity(
       throw new AppError(Errors.InvalidTransactionHash);
     }
 
-    // XXX: we only permit the community admin and not the site admin to create namespace
-    //   is this correct?
+    // we only permit the community admin and not the site admin to create namespace
     if (!communityAdmin) {
       throw new AppError(Errors.NotAdmin);
     }
