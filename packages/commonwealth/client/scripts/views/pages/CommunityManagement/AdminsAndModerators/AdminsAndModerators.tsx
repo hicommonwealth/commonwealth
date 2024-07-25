@@ -1,3 +1,4 @@
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import useFetchAdminQuery from 'state/api/members/fetchAdmin';
@@ -49,7 +50,7 @@ const AdminsAndModerators = () => {
         ...(profile.roles[0] || {}),
         Address: profile.addresses[0],
         id: profile.addresses[0].id,
-        displayName: profile.profile_name || 'Anonymous',
+        displayName: profile.profile_name || DEFAULT_NAME,
       };
     });
   }, [searchResults]);

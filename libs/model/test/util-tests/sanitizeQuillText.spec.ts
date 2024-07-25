@@ -1,5 +1,5 @@
+import { sanitizeQuillText } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { describe, test } from 'vitest';
 
 const encode = (input: { ops: any }): string =>

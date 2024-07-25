@@ -1,3 +1,4 @@
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -153,7 +154,7 @@ const Profile = ({ userId }: ProfileProps) => {
             <CWText type="h2" fontWeight="medium">
               {profile.name
                 ? `${profile.name}'s Profile`
-                : `Anonymous user's Profile`}
+                : `${DEFAULT_NAME} user's Profile`}
             </CWText>
           </div>
           <div

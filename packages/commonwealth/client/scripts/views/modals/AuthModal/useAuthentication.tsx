@@ -2,10 +2,12 @@ import type { Session } from '@canvas-js/interfaces';
 import {
   addressSwapper,
   ChainBase,
+  DEFAULT_NAME,
   verifySession,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -26,7 +28,6 @@ import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
-import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import {
   BaseMixpanelPayload,
@@ -65,7 +66,7 @@ type UseAuthenticationProps = {
 type Wallet = IWebWallet<any>;
 
 const useAuthentication = (props: UseAuthenticationProps) => {
-  const [username, setUsername] = useState<string>('Anonymous');
+  const [username, setUsername] = useState<string>(DEFAULT_NAME);
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<Wallet>>();
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
@@ -95,7 +96,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onAction: true,
   });
 
-  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
+  const { mutateAsync: updateUser } = useUpdateUserMutation();
 
   const { sessionKeyValidationError } = useAuthModalStore();
 
@@ -439,13 +440,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   ) => {
     try {
       if (username) {
-        await updateProfile({
-          userId: user.id,
-          // @ts-expect-error <StrictNullChecks>
-          address: account.profile.address,
-          // @ts-expect-error <StrictNullChecks>
-          chain: account.profile.chain,
+        await updateUser({
+          id: user.id.toString(),
           name: username,
+          profile: {},
+          // @mzparacha do we need to uupdate address and chain?
+          //address: account?.profile?.address,
+          //chain: account?.profile?.chain,
         });
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');

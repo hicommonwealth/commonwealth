@@ -57,7 +57,7 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
       } else {
         const user = await models.sequelize.transaction(async (transaction) => {
-          const userEntity = await models.User.createWithProfile?.(
+          const userEntity = await models.User.create(
             {
               email: null,
               profile: {},

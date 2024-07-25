@@ -60,7 +60,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 
 import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
-import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 
 import { getCanvasData, postCanvasData } from '../routes/canvas';
@@ -764,15 +763,6 @@ function setupRouter(
     '/setDefaultRole',
     passport.authenticate('jwt', { session: false }),
     setDefaultRole.bind(this, models),
-  );
-
-  // new profile
-  registerRoute(
-    router,
-    'post',
-    '/updateProfile/v2',
-    passport.authenticate('jwt', { session: false }),
-    updateProfileNew.bind(this, models),
   );
 
   // viewCount
