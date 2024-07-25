@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
 import { AppError } from '@hicommonwealth/core';
@@ -159,7 +159,7 @@ export async function __createThread(
       topicId,
       community.id,
       address,
-      PermissionEnum.CREATE_THREAD,
+      ForumActionsEnum.CREATE_THREAD,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateThread}: ${message}`);

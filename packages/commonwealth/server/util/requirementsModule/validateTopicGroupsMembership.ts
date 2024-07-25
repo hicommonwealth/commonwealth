@@ -4,7 +4,7 @@ import {
   GroupInstance,
   MembershipRejectReason,
 } from '@hicommonwealth/model';
-import { GroupPermissionAction } from '@hicommonwealth/schemas';
+import { ForumActions } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
@@ -23,14 +23,14 @@ export async function validateTopicGroupsMembership(
   topicId: number,
   communityId: string,
   address: AddressAttributes,
-  action: GroupPermissionAction,
+  action: ForumActions,
 ): Promise<{ isValid: boolean; message?: string }> {
   const groups: (GroupInstance & {
-    allowed_actions?: GroupPermissionAction[];
+    allowed_actions?: ForumActions[];
   })[] = await models.sequelize.query(
     `
         SELECT g.*, gp.allowed_actions FROM "Groups" as g LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
-        WHERE g.community_id = :communityId AND g.topic_id = :topicId;
+        WHERE g.community_id = :communityId AND gp.topic_id = :topicId;
       `,
     {
       type: QueryTypes.SELECT,

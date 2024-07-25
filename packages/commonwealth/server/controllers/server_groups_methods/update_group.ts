@@ -1,14 +1,20 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
+  DB,
   GroupAttributes,
+  sequelize,
   TopicInstance,
   UserInstance,
-  sequelize,
 } from '@hicommonwealth/model';
-import { GroupMetadata } from '@hicommonwealth/schemas';
+import { GroupPermissionInstance } from '@hicommonwealth/model/src/models/groupPermission';
+import {
+  ForumActions,
+  ForumActionsEnum,
+  GroupMetadata,
+} from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
@@ -30,6 +36,7 @@ export type UpdateGroupOptions = {
   user: UserInstance;
   address: AddressInstance;
   groupId: number;
+  allowedActions?: ForumActions;
   metadata?: z.infer<typeof GroupMetadata>;
   requirements?: Requirement[];
   topics?: number[];
@@ -40,7 +47,14 @@ export type UpdateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __updateGroup(
   this: ServerGroupsController,
-  { user, groupId, metadata, requirements, topics }: UpdateGroupOptions,
+  {
+    user,
+    groupId,
+    metadata,
+    requirements,
+    topics,
+    allowedActions,
+  }: UpdateGroupOptions,
 ): Promise<UpdateGroupResult> {
   const group = await this.models.Group.findByPk(groupId);
   if (!group) {
@@ -100,6 +114,7 @@ export async function __updateGroup(
   if (typeof metadata !== 'undefined') {
     toUpdate.metadata = metadata;
   }
+
   if (typeof requirements !== 'undefined') {
     toUpdate.requirements = requirements;
   }
@@ -118,53 +133,14 @@ export async function __updateGroup(
     // update group
     await group.update(toUpdate, { transaction });
 
-    if (topicsToAssociate) {
-      // add group to all specified topics
-      await this.models.Topic.update(
-        {
-          group_ids: sequelize.fn(
-            'array_append',
-            sequelize.col('group_ids'),
-            group.id,
-          ),
-        },
-        {
-          // @ts-expect-error StrictNullChecks
-          where: {
-            id: {
-              [Op.in]: topicsToAssociate.map(({ id }) => id),
-            },
-            [Op.not]: {
-              group_ids: {
-                [Op.contains]: [group.id],
-              },
-            },
-          },
-          transaction,
-        },
-      );
-
-      // remove group from existing group topics
-      await this.models.Topic.update(
-        {
-          group_ids: sequelize.fn(
-            'array_remove',
-            sequelize.col('group_ids'),
-            group.id,
-          ),
-        },
-        {
-          // @ts-expect-error StrictNullChecks
-          where: {
-            id: {
-              [Op.notIn]: topicsToAssociate.map(({ id }) => id),
-            },
-            group_ids: {
-              [Op.contains]: [group.id],
-            },
-          },
-          transaction,
-        },
+    // if associated with some topics, update the groupPermissions
+    if (topics) {
+      group.groupPermissions = await updateGroupPermissions(
+        topics,
+        allowedActions ?? (Object.values(ForumActionsEnum) as ForumActions),
+        group.id,
+        this.models,
+        transaction,
       );
     }
   });
@@ -176,4 +152,72 @@ export async function __updateGroup(
   };
 
   return [group.toJSON(), analyticsOptions];
+}
+
+async function updateGroupPermissions(
+  topics: number[],
+  allowed_actions: ForumActions,
+  group_id: number,
+  models: DB,
+  transaction: Transaction,
+): Promise<GroupPermissionInstance[]> {
+  const existingGroupPermissions = await models.GroupPermission.findAll({
+    where: { group_id },
+  });
+
+  const existingTopicIds = existingGroupPermissions.map(
+    (permission) => permission.topic_id,
+  );
+
+  const permissionsToRemove = existingTopicIds.filter(
+    (id) => !topics.includes(id),
+  );
+  const permissionsToUpsert = topics.filter(
+    (id) => !permissionsToRemove.includes(id),
+  );
+
+  if (permissionsToRemove.length > 0) {
+    await models.GroupPermission.destroy({
+      where: {
+        group_id,
+        topic_id: { [Op.in]: permissionsToRemove },
+      },
+      transaction,
+    });
+  }
+
+  if (permissionsToUpsert.length === 0) {
+    return;
+  }
+
+  const upsertGroupPermissions = permissionsToUpsert.map((topic_id) => ({
+    group_id,
+    topic_id,
+    allowed_actions,
+  }));
+
+  const upsertPromises = upsertGroupPermissions.map((p) =>
+    models.sequelize.query(
+      `
+            INSERT INTO "GroupPermissions" (group_id, topic_id, allowed_actions, created_at, updated_at) VALUES
+            (:groupId, :topicId, Array[:allowedActions]::"enum_GroupPermissions_allowed_actions"[], NOW(), NOW())
+            ON CONFLICT (group_id, topic_id) DO UPDATE
+            SET
+                allowed_actions = EXCLUDED.allowed_actions,
+                updated_at = EXCLUDED.updated_at
+            RETURNING *;
+          `,
+      {
+        raw: true,
+        replacements: {
+          groupId: p.group_id,
+          topicId: p.topic_id,
+          allowedActions: p.allowed_actions,
+        },
+        transaction,
+      },
+    ),
+  );
+
+  return await Promise.all(upsertPromises);
 }

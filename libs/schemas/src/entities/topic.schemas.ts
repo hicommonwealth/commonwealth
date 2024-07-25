@@ -12,6 +12,5 @@ export const Topic = z.object({
   default_offchain_template: z.string().optional().nullable(),
   order: PG_INT.nullish(),
   channel_id: z.string().max(255).optional().nullable(),
-  group_ids: z.array(PG_INT).default([]),
   default_offchain_template_backup: z.string().optional().nullable(),
 });

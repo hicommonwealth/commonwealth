@@ -2,6 +2,7 @@ import { Group } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import z from 'zod';
 import type { CommunityAttributes } from './community';
+import { GroupPermissionAttributes } from './groupPermission';
 import type { MembershipAttributes } from './membership';
 import type { ModelInstance } from './types';
 
@@ -9,6 +10,7 @@ export type GroupAttributes = z.infer<typeof Group> & {
   // associations
   community?: CommunityAttributes;
   memberships?: MembershipAttributes[];
+  groupPermissions?: GroupPermissionAttributes[];
 };
 
 export type GroupInstance = ModelInstance<GroupAttributes>;

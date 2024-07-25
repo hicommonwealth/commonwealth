@@ -5,7 +5,7 @@ import {
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
@@ -88,7 +88,7 @@ export async function __createThreadReaction(
       thread.topic_id,
       thread.community_id,
       address,
-      PermissionEnum.CREATE_THREAD_REACTION,
+      ForumActionsEnum.CREATE_THREAD_REACTION,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);

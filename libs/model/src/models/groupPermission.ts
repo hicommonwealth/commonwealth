@@ -27,6 +27,11 @@ export default (
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
       },
+      topic_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
     },
     {
       tableName: 'GroupPermissions',

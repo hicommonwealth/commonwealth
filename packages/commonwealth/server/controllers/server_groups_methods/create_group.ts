@@ -4,7 +4,7 @@ import {
   GroupAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { GroupMetadata, PermissionEnum } from '@hicommonwealth/schemas';
+import { ForumActionsEnum, GroupMetadata } from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import z from 'zod';
@@ -116,21 +116,19 @@ export async function __createGroup(
       { transaction: t },
     );
     if (topicsToAssociate.length > 0) {
-      // Create an array of promises
       const createPermissionsPromises = topicsToAssociate.map((topic) => {
         return this.models.GroupPermission.create(
           {
             group_id: group.id,
             topic_id: topic.id,
-            allowed_actions: Object.values(PermissionEnum),
+            allowed_actions: Object.values(ForumActionsEnum),
           },
           {
-            transaction,
+            transaction: t,
           },
         );
       });
 
-      // Await all promises to complete
       await Promise.all(createPermissionsPromises);
     }
     return group.toJSON();

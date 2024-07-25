@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/core/src/index';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   MembershipRejectReason,
