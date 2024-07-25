@@ -1,7 +1,7 @@
 import { getBrowserType } from 'helpers/browser';
 import useAppStatus from 'hooks/useAppStatus';
 
-export function useSupportsPushNotifications() {
+export const useSupportsPushNotifications = () => {
   const { isAddedToHomeScreen } = useAppStatus();
 
   const browserType = getBrowserType();
@@ -12,4 +12,4 @@ export function useSupportsPushNotifications() {
   }
 
   return browserType === 'chrome';
-}
+};
