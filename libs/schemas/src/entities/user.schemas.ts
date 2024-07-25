@@ -28,16 +28,16 @@ export const ProfileTags = z.object({
 export const User = z.object({
   id: PG_INT.optional(),
   email: z.string().max(255).email().nullish(),
-  isAdmin: z.boolean().default(false).optional(),
-  disableRichText: z.boolean().default(false).optional(),
-  emailVerified: z.boolean().default(false).optional(),
+  isAdmin: z.boolean().default(false).nullish(),
+  disableRichText: z.boolean().default(false).nullish(),
+  emailVerified: z.boolean().default(false).nullish(),
   selected_community_id: z.string().max(255).optional().nullish(),
   emailNotificationInterval: z
     .enum(['weekly', 'never'])
     .default('never')
-    .optional(),
-  promotional_emails_enabled: z.boolean().optional(),
-  is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+    .nullish(),
+  promotional_emails_enabled: z.boolean().nullish(),
+  is_welcome_onboard_flow_complete: z.boolean().default(false).nullish(),
   profile: UserProfile,
   created_at: z.any().optional(),
   updated_at: z.any().optional(),

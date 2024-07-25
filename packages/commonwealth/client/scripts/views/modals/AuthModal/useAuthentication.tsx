@@ -416,15 +416,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (!currentUserUpdatedProfile) {
         console.log('No profile yet.');
       } else {
-        // @ts-expect-error <StrictNullChecks>
-        account.profile.initialize(
-          currentUserUpdatedProfile?.name,
+        account?.profile?.initialize(
+          currentUserUpdatedProfile.userId,
+          currentUserUpdatedProfile.name,
           currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile?.avatarUrl,
-          currentUserUpdatedProfile.id,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          currentUserUpdatedProfile?.lastActive,
+          currentUserUpdatedProfile.avatarUrl,
+          account?.profile?.chain,
+          currentUserUpdatedProfile.lastActive,
         );
       }
     } catch (e) {
@@ -439,9 +437,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     newelyCreated?: boolean,
   ) => {
     try {
-      if (username) {
+      if (username && account?.profile) {
         await updateUser({
-          id: user.id.toString(),
+          id: account.profile.userId.toString(),
           name: username.trim(),
           profile: {},
           // @mzparacha do we need to uupdate address and chain?
