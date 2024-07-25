@@ -11,7 +11,6 @@ export enum CreateCommunityStep {
 export const getFormSteps = (
   createCommunityStep: CreateCommunityStep,
   showCommunityStakeStep: boolean,
-  communityStakeEnabled: boolean,
 ): CWFormStepsProps['steps'] => {
   return [
     {
@@ -30,7 +29,7 @@ export const getFormSteps = (
           ? 'active'
           : 'completed',
     },
-    ...((communityStakeEnabled && showCommunityStakeStep
+    ...((showCommunityStakeStep
       ? [
           {
             label: 'Community Stake',
@@ -53,7 +52,6 @@ export const handleChangeStep = (
     React.SetStateAction<CreateCommunityStep>
   >,
   showCommunityStakeStep: boolean,
-  communityStakeEnabled: boolean,
 ) => {
   switch (createCommunityStep) {
     case CreateCommunityStep.CommunityTypeSelection:
@@ -62,7 +60,7 @@ export const handleChangeStep = (
     case CreateCommunityStep.BasicInformation:
       setCreateCommunityStep(
         forward
-          ? communityStakeEnabled && showCommunityStakeStep
+          ? showCommunityStakeStep
             ? CreateCommunityStep.CommunityStake
             : CreateCommunityStep.Success
           : CreateCommunityStep.CommunityTypeSelection,
