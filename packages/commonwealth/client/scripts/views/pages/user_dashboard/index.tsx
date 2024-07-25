@@ -92,7 +92,7 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   return (
     <CWPageLayout ref={containerRef} className="UserDashboard">
-      <div className="UserDashboard" key={`${isLoggedIn}`}>
+      <div key={`${isLoggedIn}`}>
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
