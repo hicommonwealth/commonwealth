@@ -26,7 +26,6 @@ const {
   MEMBERSHIP_REFRESH_TTL_SECONDS,
   DISCORD_CLIENT_ID,
   DISCORD_BOT_TOKEN,
-  DISCORD_BOT_SUCCESS_URL,
   REACTION_WEIGHT_OVERRIDE,
   CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
@@ -49,7 +48,6 @@ const DEFAULTS = {
   MAGIC_SUPPORTED_BASES: [ChainBase.Ethereum],
   MAGIC_DEFAULT_CHAIN: ChainBase.Ethereum,
   ADDRESS_TOKEN_EXPIRES_IN: '10',
-  DISCORD_BOT_SUCCESS_URL: 'http://localhost:3000',
   MESSAGE_RELAYER_TIMEOUT_MS: '200',
   MESSAGE_RELAYER_PREFETCH: '50',
   EVM_CE_POLL_INTERVAL: '120000',
@@ -115,8 +113,6 @@ export const config = configure(
     DISCORD: {
       CLIENT_ID: DISCORD_CLIENT_ID,
       BOT_TOKEN: DISCORD_BOT_TOKEN,
-      BOT_SUCCESS_URL:
-        DISCORD_BOT_SUCCESS_URL || DEFAULTS.DISCORD_BOT_SUCCESS_URL,
     },
     WORKERS: {
       /*
@@ -231,17 +227,6 @@ export const config = configure(
               ) && !data
             ),
           'DISCORD_BOT_TOKEN is required in production, frick, beta (QA), and demo',
-        ),
-      BOT_SUCCESS_URL: z
-        .string()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                model_config.APP_ENV,
-              ) && data === DEFAULTS.DISCORD_BOT_SUCCESS_URL
-            ),
-          'DISCROD_BOT_SUCCESS_URL must be a non-default value in production, rfick, beta (QA), and demo',
         ),
     }),
     WORKERS: z.object({
