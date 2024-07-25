@@ -36,7 +36,6 @@ interface CommunitySectionProps {
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const communityHomepageEnabled = useFlag('communityHomepage');
-  const communityStakeEnabled = useFlag('communityStake');
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
@@ -83,7 +82,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               address={user.activeAccount?.address || ''}
             />
 
-            {communityStakeEnabled && stakeEnabled && (
+            {stakeEnabled && (
               <VoteWeightModule
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
