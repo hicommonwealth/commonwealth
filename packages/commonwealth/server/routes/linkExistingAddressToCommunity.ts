@@ -186,14 +186,14 @@ const linkExistingAddressToCommunity = async (
 
   const role = await findOneRole(
     models,
-    { where: { address_id: addressId } },
+    { where: { address_id: addressId! } },
     // @ts-expect-error StrictNullChecks
     community.id,
   );
 
   if (!role) {
     // @ts-expect-error StrictNullChecks
-    await createRole(models, addressId, community.id, 'member');
+    await createRole(models, addressId!, community.id, 'member');
   }
 
   const serverAnalyticsController = new ServerAnalyticsController();
