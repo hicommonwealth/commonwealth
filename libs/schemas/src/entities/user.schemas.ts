@@ -35,7 +35,7 @@ export const User = z.object({
   emailNotificationInterval: z
     .enum(['weekly', 'never'])
     .default('never')
-    .nullish(),
+    .optional(),
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).nullish(),
   profile: UserProfile,
