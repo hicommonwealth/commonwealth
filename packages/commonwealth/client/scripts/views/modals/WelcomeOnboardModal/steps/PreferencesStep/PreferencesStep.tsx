@@ -1,5 +1,5 @@
 import React from 'react';
-import { useUpdateUserMutation } from 'state/api/profiles';
+import { useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
   PreferenceTags,

@@ -1,3 +1,4 @@
+import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
@@ -8,10 +9,7 @@ import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import {
-  useFetchProfileByIdQuery,
-  useUpdateUserMutation,
-} from 'state/api/profiles';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';

@@ -5,8 +5,8 @@ export const TodoUserCommands = z.object({});
 
 export const UpdateUser = {
   input: User.extend({
-    promotional_emails_enabled: z.boolean().optional(),
-    tag_ids: z.number().array().optional(),
+    promotional_emails_enabled: z.boolean().nullish(),
+    tag_ids: z.number().array().nullish(),
   }),
   output: User,
 };

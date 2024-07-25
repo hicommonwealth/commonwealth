@@ -1,4 +1,3 @@
-import useUpdateUserMutation from '../user/updateUser';
 import useBanProfileByAddressMutation from './banProfileByAddress';
 import useFetchProfileByIdQuery from './fetchProfileById';
 import useFetchProfilesByAddressesQuery from './fetchProfilesByAddress';
@@ -9,5 +8,4 @@ export {
   useFetchProfileByIdQuery,
   useFetchProfilesByAddressesQuery,
   useSearchProfilesQuery,
-  useUpdateUserMutation,
 };

@@ -14,7 +14,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       if (actor.user.id != payload.id)
         throw new InvalidInput('Invalid user id');
 
-      const { id, profile, promotional_emails_enabled, tag_ids } = payload;
+      const { id, profile, tag_ids } = payload;
       const {
         slug,
         name,
@@ -42,6 +42,11 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         user.profile.name !== DEFAULT_NAME
           ? true
           : false;
+
+      const promotional_emails_enabled =
+        payload.promotional_emails_enabled ??
+        user.promotional_emails_enabled ??
+        false;
 
       const user_delta = getDelta(user, {
         is_welcome_onboard_flow_complete,

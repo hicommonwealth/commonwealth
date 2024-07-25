@@ -376,7 +376,10 @@ class ChainInfo {
           categorizedLinks.telegrams.push(link);
         } else if (link.includes('://matrix.to')) {
           categorizedLinks.elements.push(link);
-        } else if (link.includes('://twitter.com')) {
+        } else if (
+          link.includes('://twitter.com') ||
+          link.includes('://x.com')
+        ) {
           categorizedLinks.twitters.push(link);
         } else {
           categorizedLinks.remainingLinks.push(link);

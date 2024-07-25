@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom';
 import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,
-  useUpdateUserMutation,
 } from 'state/api/profiles';
 import {
   useUpdateUserEmailMutation,
   useUpdateUserEmailSettingsMutation,
+  useUpdateUserMutation,
 } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { generateUsername } from 'unique-username-generator';

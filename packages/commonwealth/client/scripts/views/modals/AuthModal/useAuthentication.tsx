@@ -7,7 +7,7 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { useUpdateUserMutation } from 'client/scripts/state/api/profiles';
+import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import {
   completeClientLogin,
   createUserWithAddress,

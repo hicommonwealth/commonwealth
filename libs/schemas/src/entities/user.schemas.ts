@@ -21,8 +21,8 @@ export const UserProfile = z.object({
 export const ProfileTags = z.object({
   user_id: z.number(),
   tag_id: z.number(),
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const User = z.object({
