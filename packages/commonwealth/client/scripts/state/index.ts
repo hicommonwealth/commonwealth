@@ -93,9 +93,6 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
-
-  // bandaid fix to skip next deinit chain on layout.tsx transition
-  skipDeinitChain: boolean;
 }
 
 // INJECT DEPENDENCIES
@@ -158,7 +155,6 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
-  skipDeinitChain: false,
 };
 //allows for FS.identify to be used
 declare const window: any;
