@@ -9,7 +9,7 @@ import useUserStore from 'state/ui/user';
 const KNOCK_PUBLIC_API_KEY = process.env.KNOCK_PUBLIC_API_KEY;
 const KNOCK_IN_APP_FEED_ID = process.env.KNOCK_IN_APP_FEED_ID;
 
-export function KnockNotificationsContent() {
+export const KnockNotificationsContent = () => {
   const user = useUserStore();
 
   return (
@@ -23,4 +23,4 @@ export function KnockNotificationsContent() {
       </KnockFeedProvider>
     </KnockProvider>
   );
-}
+};

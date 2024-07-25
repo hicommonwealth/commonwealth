@@ -6,7 +6,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { NotificationRow } from 'views/pages/notifications/notification_row';
 
-export function LegacyNotificationsContent() {
+export const LegacyNotificationsContent = () => {
   const [allRead, setAllRead] = useState<boolean>(false);
 
   const discussionNotifications =
@@ -69,4 +69,4 @@ export function LegacyNotificationsContent() {
       </div>
     </div>
   );
-}
+};
