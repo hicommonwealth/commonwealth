@@ -116,7 +116,7 @@ class ChainInfo {
     this.defaultOverview = defaultOverview;
     this.defaultPage = defaultPage;
     this.hasHomepage = hasHomepage;
-    this.adminsAndMods = adminsAndMods || []; // TODO: should never default here
+    this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
