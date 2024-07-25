@@ -28,12 +28,14 @@ export const LegacyNotificationsContent = () => {
           label="Mark all as read"
           onClick={(e) => {
             e.preventDefault();
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/no-floating-promises
             app.user.notifications.markAsRead(mostRecentFirst);
             setAllRead(true);
           }}
         />
         <CWButton
           label="Clear chain events"
+          // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-misused-promises
           onClick={async (e) => {
             e.preventDefault();
 
@@ -41,6 +43,8 @@ export const LegacyNotificationsContent = () => {
               return;
             }
 
+            // eslint-disable-next-line max-len
+            // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-misused-promises, @typescript-eslint/no-floating-promises
             app.user.notifications.delete(
               app.user.notifications.chainEventNotifications,
             );
