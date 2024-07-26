@@ -1,5 +1,8 @@
-import { useCallback, useState } from 'react';
+import { CommentSubscription } from '@hicommonwealth/schemas';
+import React, { useCallback, useState } from 'react';
+import { CommentSubscriptionEntry } from 'views/pages/NotificationSettings/CommentSubscriptionEntry';
 import { useCommentSubscriptions } from 'views/pages/NotificationSettings/useCommentSubscriptions';
+import { z } from 'zod';
 
 export const CommentSubscriptions = () => {
   const commentSubscriptions = useCommentSubscriptions();
@@ -14,26 +17,18 @@ export const CommentSubscriptions = () => {
     [threadsFilter],
   );
 
-  console.log(
-    'FIXME: commentSubscriptions: ',
-    JSON.stringify(commentSubscriptions, null, 2),
+  return (
+    <>
+      {(commentSubscriptions.data || [])
+        .filter((current) => current.Comment)
+        .filter((current) => !threadsFilter.includes(current.Comment!.id!))
+        .map((current) => (
+          <CommentSubscriptionEntry
+            key={current.Comment!.id!}
+            subscription={current as z.infer<typeof CommentSubscription>}
+            onUnsubscribe={handleUnsubscribe}
+          />
+        ))}
+    </>
   );
-
-  return null;
-
-  // return (
-  //   <>
-  //     {(commentSubscriptions.data || [])
-  //       .filter((current) => current.Comment)
-  //       .filter((current) => !threadsFilter.includes(current.Thread!.id!))
-  //       .map((current) => (
-  //           <ThreadSubscriptionEntry
-  //             key={current.Thread!.id!}
-  //             subscription={current as z.infer<typeof ThreadSubscription>}
-  //             onUnsubscribe={handleUnsubscribe}
-  //           />
-  //           {/*<ThreadCard thread={current.Thread!}/>*/}
-  //       ))}
-  //   </>
-  // );
 };
