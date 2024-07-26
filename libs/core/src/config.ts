@@ -113,7 +113,9 @@ export const config = configure(
     PORT: z.number().int().min(1000).max(65535),
     LOGGING: z
       .object({
-        LOG_LEVEL: z.enum(LogLevels),
+        LOG_LEVEL: z
+          .enum(LogLevels)
+          .refine((data) => !(APP_ENV === 'production' && data !== 'info')),
         ROLLBAR_SERVER_TOKEN: z.string(),
         ROLLBAR_ENV: z.string(),
         TEST_WITHOUT_LOGS: z.boolean(),
