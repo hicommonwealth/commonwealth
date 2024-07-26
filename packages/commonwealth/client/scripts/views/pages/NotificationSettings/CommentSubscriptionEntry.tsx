@@ -1,9 +1,17 @@
 import { CommentSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
+import { getRelativeTimestamp } from 'helpers/dates';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
+import { getCommunityUrl } from 'utils';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { User } from 'views/components/user/user';
 import { z } from 'zod';
 
 interface CommentSubscriptionEntryProps {
@@ -54,69 +62,64 @@ export const CommentSubscriptionEntry = (
     navigate(threadUrl);
   }, [navigate, threadUrl]);
 
-  return null;
+  return (
+    <div className="SubscriptionEntry">
+      <div className="SubscriptionHeader">
+        <div>
+          <CWCommunityAvatar
+            community={{
+              iconUrl: thread.Community.icon_url!,
+              name: thread.Community.name,
+            }}
+            size="small"
+          />
+        </div>
+        <div>
+          <Link to={getCommunityUrl(thread.Community.name)}>
+            <CWText fontWeight="semiBold">{thread.Community.name}</CWText>
+          </Link>
+        </div>
 
-  //
-  //
-  //
-  // return (
-  //   <div className="SubscriptionEntry">
-  //     <div className="SubscriptionHeader">
-  //       <div>
-  //         <CWCommunityAvatar
-  //           community={{
-  //             iconUrl: comment.Community.icon_url!,
-  //             name: comment.Community.name,
-  //           }}
-  //           size="small"
-  //         />
-  //       </div>
-  //       <div>
-  //         <Link to={getCommunityUrl(comment.Community.name)}>
-  //           <CWText fontWeight="semiBold">{comment.Community.name}</CWText>
-  //         </Link>
-  //       </div>
-  //
-  //       <div>•</div>
-  //
-  //       <div>
-  //         <User
-  //           userAddress={comment.Address.address}
-  //           userCommunityId={comment.Community!.id!}
-  //         />
-  //       </div>
-  //
-  //       <div>•</div>
-  //
-  //       <div>{getRelativeTimestamp(comment.created_at!.getTime())}</div>
-  //     </div>
-  //     <div>
-  //       <CWText type="h4" fontWeight="semiBold">
-  //         <Link to={threadUrl}>
-  //           <CWText type="h4">{decodeURIComponent(comment.title)}</CWText>
-  //         </Link>
-  //       </CWText>
-  //     </div>
-  //
-  //     <div className="SubscriptionFooter">
-  //       <CWThreadAction
-  //         label={pluralize(comment.comment_count, 'Comment')}
-  //         action="comment"
-  //         onClick={(e) => {
-  //           e.preventDefault();
-  //           handleComment();
-  //         }}
-  //       />
-  //
-  //       <CWThreadAction
-  //         label="Unsubscribe"
-  //         action="subscribe"
-  //         onClick={(e) => {
-  //           e.preventDefault();
-  //           handleDeleteSubscription();
-  //         }}
-  //       />
-  //     </div>
-  //   </div>
-  // );
+        <div>•</div>
+
+        <div>
+          <User
+            userAddress={thread.Address.address}
+            userCommunityId={thread.Community!.id!}
+          />
+        </div>
+
+        <div>•</div>
+
+        <div>{getRelativeTimestamp(comment.created_at!.getTime())}</div>
+      </div>
+      <div>
+        <CWText type="h4" fontWeight="semiBold">
+          <Link to={threadUrl}>
+            <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
+          </Link>
+        </CWText>
+      </div>
+
+      <div className="SubscriptionFooter">
+        <CWThreadAction
+          label={pluralize(thread.comment_count, 'Comment')}
+          action="comment"
+          onClick={(e) => {
+            e.preventDefault();
+            handleNavigateToThread();
+          }}
+        />
+
+        <CWThreadAction
+          label="Unsubscribe"
+          action="subscribe"
+          onClick={(e) => {
+            e.preventDefault();
+            handleDeleteSubscription();
+          }}
+        />
+      </div>
+    </div>
+  );
 };

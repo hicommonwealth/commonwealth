@@ -80,6 +80,8 @@ export const CommentSubscription = z.object({
   updated_at: z.coerce.date().optional(),
   Comment: Comment.pick({
     id: true,
+    created_at: true,
+    updated_at: true,
   })
     .merge(
       z.object({
@@ -87,7 +89,23 @@ export const CommentSubscription = z.object({
           id: true,
           community_id: true,
           title: true,
-        }),
+          comment_count: true,
+          created_at: true,
+          url: true,
+        }).merge(
+          z.object({
+            Community: Community.pick({
+              id: true,
+              name: true,
+              icon_url: true,
+            }),
+            Address: Address.pick({
+              id: true,
+              user_id: true,
+              address: true,
+            }),
+          }),
+        ),
       }),
     )
     .optional(),
