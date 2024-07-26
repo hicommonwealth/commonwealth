@@ -42,7 +42,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETH_RPC](#eth_rpc)
 - [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
-- [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
@@ -233,10 +232,6 @@ API key for Ethereum data.
 Optional. Defaults to 5 minutes (300 seconds).
 This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
 After this time, the server will try the original DB endpoint again.
-
-## FLAG_COMMUNITY_HOMEPAGE
-
-Boolean toggle to display side-wide homepage feature for communities. Temporary flag for 2.0 work.
 
 
 ## FLAG_NEW_CREATE_COMMUNITY
