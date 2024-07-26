@@ -2,15 +2,16 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  EnrichedNotificationNames,
   ExternalServiceUserIds,
   GetRecapEmailData,
   KnockChannelIds,
-  logger,
-  notificationsProvider,
   Query,
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
   WorkflowKeys,
+  logger,
+  notificationsProvider,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -20,18 +21,26 @@ import { config, models } from '..';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+type AdditionalMetaData<Key extends keyof typeof EnrichedNotificationNames> = {
+  event_name: typeof EnrichedNotificationNames[Key];
+  inserted_at: string;
+};
+
 type DiscussionNotifications = Array<
-  | (z.infer<typeof CommentCreatedNotification> & { inserted_at: string })
-  | (z.infer<typeof UserMentionedNotification> & { inserted_at: string })
+  | (z.infer<typeof CommentCreatedNotification> &
+      AdditionalMetaData<'CommentCreated'>)
+  | (z.infer<typeof UserMentionedNotification> &
+      AdditionalMetaData<'UserMentioned'>)
 >;
 type GovernanceNotifications = Array<
-  | (z.infer<typeof ChainProposalsNotification> & { inserted_at: string })
-  | (z.infer<typeof SnapshotProposalCreatedNotification> & {
-      inserted_at: string;
-    })
+  | (z.infer<typeof ChainProposalsNotification> &
+      AdditionalMetaData<'ChainProposal'>)
+  | (z.infer<typeof SnapshotProposalCreatedNotification> &
+      AdditionalMetaData<'SnapshotProposalCreated'>)
 >;
 type ProtocolNotifications = Array<
-  z.infer<typeof CommunityStakeNotification> & { inserted_at: string }
+  z.infer<typeof CommunityStakeNotification> &
+    AdditionalMetaData<'CommunityStakeTrade'>
 >;
 
 async function getMessages(userId: string): Promise<{
@@ -73,21 +82,39 @@ async function getMessages(userId: string): Promise<{
 
       switch (message.source.key) {
         case WorkflowKeys.CommentCreation:
+          discussion.push({
+            event_name: EnrichedNotificationNames.CommentCreated,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
+          break;
         case WorkflowKeys.UserMentioned:
           discussion.push({
+            event_name: EnrichedNotificationNames.UserMentioned,
             ...message.data,
             inserted_at: message.inserted_at,
           });
           break;
         case WorkflowKeys.ChainProposals:
+          governance.push({
+            event_name: EnrichedNotificationNames.ChainProposal,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
+          break;
         case WorkflowKeys.SnapshotProposals:
           governance.push({
+            event_name: EnrichedNotificationNames.SnapshotProposalCreated,
             ...message.data,
             inserted_at: message.inserted_at,
           });
           break;
         case WorkflowKeys.CommunityStake:
-          protocol.push({ ...message.data, inserted_at: message.inserted_at });
+          protocol.push({
+            event_name: EnrichedNotificationNames.CommunityStakeTrade,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
           break;
       }
     }

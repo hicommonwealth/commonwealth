@@ -8,8 +8,17 @@ import {
   UserMentionedNotification,
 } from './notifications.schemas';
 
+export const EnrichedNotificationNames = {
+  CommentCreated: 'CommentCreated',
+  UserMentioned: 'UserMentioned',
+  CommunityStakeTrade: 'CommunityStakeTrade',
+  ChainProposal: 'ChainProposal',
+  SnapshotProposalCreated: 'SnapshotProposalCreated',
+} as const;
+
 export const EnrichedCommentCreatedNotification =
   CommentCreatedNotification.extend({
+    event_name: z.literal(EnrichedNotificationNames.CommentCreated),
     author_avatar_url: z.string(),
     inserted_at: z
       .string()
@@ -20,7 +29,8 @@ export const EnrichedCommentCreatedNotification =
 
 export const EnrichedUserMentionedNotification =
   UserMentionedNotification.extend({
-    author_avatar_url: z.string(),
+    event_name: z.literal(EnrichedNotificationNames.UserMentioned),
+    author_avatar_url: z.string().nullish(),
     inserted_at: z
       .string()
       .describe(
@@ -30,6 +40,7 @@ export const EnrichedUserMentionedNotification =
 
 export const EnrichedCommunityStakeNotification =
   CommunityStakeNotification.extend({
+    event_name: z.literal(EnrichedNotificationNames.CommunityStakeTrade),
     community_icon_url: z.string().nullish(),
     inserted_at: z
       .string()
@@ -40,6 +51,7 @@ export const EnrichedCommunityStakeNotification =
 
 export const EnrichedChainProposalsNotification =
   ChainProposalsNotification.extend({
+    event_name: z.literal(EnrichedNotificationNames.ChainProposal),
     community_icon_url: z.string().nullish(),
     inserted_at: z
       .string()
@@ -50,6 +62,7 @@ export const EnrichedChainProposalsNotification =
 
 export const EnrichedSnapshotProposalCreatedNotification =
   SnapshotProposalCreatedNotification.extend({
+    event_name: z.literal(EnrichedNotificationNames.SnapshotProposalCreated),
     community_icon_url: z.string().nullish(),
     inserted_at: z
       .string()
