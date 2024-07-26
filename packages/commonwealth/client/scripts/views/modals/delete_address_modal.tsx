@@ -51,15 +51,14 @@ export const DeleteAddressModal = ({
         chain,
         jwt: user.jwt,
       });
-      // remove deleted role from app.roles
-      const foundAddressInfo = addresses.find((a) => a.address === address);
-      app.roles.deleteRole({
-        // @ts-expect-error <StrictNullChecks/>
-        address: foundAddressInfo,
-        community: chain,
-      });
 
       if (response?.data.status === 'Success') {
+        user.setData({
+          accounts: user.accounts.filter(
+            (a) => a.address !== address && a.community.id !== chain,
+          ),
+        });
+
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {

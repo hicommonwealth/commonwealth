@@ -15,7 +15,6 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { Errors } from '../routes/createAddress';
-import { createRole, findOneRole } from './roles';
 
 type CreateAddressReq = {
   address: string;
@@ -161,26 +160,10 @@ export async function createAddressHelper(
 
     const updatedObj = await existingAddress.save();
 
-    // even if this is the existing address, there is a case to login to community through this address's chain
-    // if community is valid, then we should create a role between this community vs address
-
-    let isRole = true;
-    if (req.community_id) {
-      const role = await findOneRole(
-        models,
-        { where: { address_id: updatedObj.id } },
-        req.community_id,
-      );
-      if (!role) {
-        // @ts-expect-error StrictNullChecks
-        await createRole(models, updatedObj.id, req.community_id, 'member');
-        isRole = false;
-      }
-    }
     return {
       ...updatedObj.toJSON(),
       newly_created: false,
-      joined_community: !isRole,
+      joined_community: false,
     };
   } else {
     // address doesn't exist, add it to the database
@@ -215,13 +198,6 @@ export async function createAddressHelper(
         { transaction },
       );
     });
-
-    // if user.id is undefined, the address is being used to create a new user,
-    // and we should automatically give it a Role in its native chain (or community)
-    if (!user) {
-      // @ts-expect-error StrictNullChecks
-      await createRole(models, newObj.id, req.community_id, 'member');
-    }
 
     serverAnalyticsController.track(
       {
