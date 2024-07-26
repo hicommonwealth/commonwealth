@@ -15,7 +15,7 @@ import {
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import z from 'zod';
-import { models } from '..';
+import { config, models } from '..';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -235,6 +235,11 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
       return {
         discussion: enrichedDiscussion,
         ...enrichedGovernanceAndProtocol,
+        num_notifications:
+          enrichedDiscussion.length +
+          enrichedGovernanceAndProtocol.governance.length +
+          enrichedGovernanceAndProtocol.protocol.length,
+        notifications_link: config.SERVER_URL,
       };
     },
   };

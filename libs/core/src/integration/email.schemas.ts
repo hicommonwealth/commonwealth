@@ -51,6 +51,8 @@ export const GetRecapEmailData = {
         EnrichedSnapshotProposalCreatedNotification,
       ]),
     ),
+    num_notifications: z.number(),
+    notifications_link: z.string(),
   }),
 };
 
