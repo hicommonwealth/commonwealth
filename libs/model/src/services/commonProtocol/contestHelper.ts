@@ -411,7 +411,7 @@ export const rollOverContest = async (
   });
 };
 
-const estimateGas = async (web3: Web3): Promise<BigInt | null> => {
+const estimateGas = async (web3: Web3): Promise<bigint | null> => {
   try {
     const latestBlock = await web3.eth.getBlock('latest');
 

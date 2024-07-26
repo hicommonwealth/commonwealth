@@ -68,7 +68,7 @@ abstract class ContractBase {
     );
   }
 
-  async estimateGas(): Promise<BigInt | null> {
+  async estimateGas(): Promise<bigint | null> {
     try {
       const latestBlock = await this.web3.eth.getBlock('latest');
 
