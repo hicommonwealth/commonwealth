@@ -17,7 +17,7 @@
 
 ✅: Fully supported in production.
 
-🟡: Would require some engineering effort to add support.
+🟡: Adding support would require some engineering effort but is generally feasible.
 
 ❌: Adding support is not feasible or desirable from an engineering perspective.
 
