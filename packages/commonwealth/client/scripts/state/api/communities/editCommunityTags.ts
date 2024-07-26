@@ -3,6 +3,7 @@ import axios from 'axios';
 import app from 'state';
 import { userStore } from '../../ui/user';
 import { ApiEndpoints, queryClient } from '../config';
+import { FetchActiveCommunitiesResponse } from './fetchActiveCommunities';
 
 interface EditCommunityTagsProps {
   communityId: string;
@@ -33,10 +34,20 @@ const useEditCommunityTagsMutation = () => {
       const community = app.config.chains.getById(community_id);
       if (community) community.updateTags(CommunityTags);
 
-      // reset active communities cache
+      // update active communities cache
       const key = [ApiEndpoints.FETCH_ACTIVE_COMMUNITIES];
-      queryClient.cancelQueries(key).catch(console.error);
-      queryClient.refetchQueries(key).catch(console.error);
+      const existingActiveCommunities:
+        | FetchActiveCommunitiesResponse
+        | undefined = queryClient.getQueryData(key);
+      if (existingActiveCommunities) {
+        const foundCommunity = existingActiveCommunities.communities.find(
+          (c) => c.id === community_id,
+        );
+        if (foundCommunity) {
+          foundCommunity.CommunityTags = CommunityTags;
+          queryClient.setQueryData(key, () => existingActiveCommunities);
+        }
+      }
     },
   });
 };
