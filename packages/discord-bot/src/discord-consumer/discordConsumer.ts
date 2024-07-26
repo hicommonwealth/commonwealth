@@ -115,7 +115,7 @@ const processDiscordMessageCreated: EventHandler<
 };
 
 async function main() {
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
 
   let brokerInstance: Broker;
   try {
