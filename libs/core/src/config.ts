@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import _ from 'lodash';
 import { ZodType, z } from 'zod';
+import { LogLevel, LogLevels } from './ports/enums';
 
 dotenv.config({ path: '../../.env' });
 
@@ -27,6 +28,7 @@ const {
   IS_CI,
   SERVER_URL,
   PORT: _PORT,
+  LOG_LEVEL,
   ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN,
   ROLLBAR_ENV: _ROLLBAR_ENV,
   TEST_WITHOUT_LOGS,
@@ -45,6 +47,9 @@ export const config = configure(
         : `http://localhost:${PORT}`,
     PORT,
     LOGGING: {
+      LOG_LEVEL:
+        (LOG_LEVEL as LogLevel) ||
+        (NODE_ENV === 'production' ? 'info' : 'debug'),
       ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN || '',
       ROLLBAR_ENV: _ROLLBAR_ENV || 'local',
       TEST_WITHOUT_LOGS: TEST_WITHOUT_LOGS === 'true',
@@ -56,6 +61,7 @@ export const config = configure(
     SERVER_URL: z.string(),
     PORT: z.number().int().min(1000).max(65535),
     LOGGING: z.object({
+      LOG_LEVEL: z.enum(LogLevels),
       ROLLBAR_SERVER_TOKEN: z.string(),
       ROLLBAR_ENV: z.string(),
       TEST_WITHOUT_LOGS: z.boolean(),

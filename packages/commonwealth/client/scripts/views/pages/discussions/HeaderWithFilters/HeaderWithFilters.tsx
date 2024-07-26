@@ -11,6 +11,7 @@ import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManager
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -366,9 +367,7 @@ export const HeaderWithFilters = ({
                       : []),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
-                  canEditOption={app.roles?.isAdminOfEntity({
-                    community: app.activeChainId(),
-                  })}
+                  canEditOption={Permissions.isCommunityAdmin()}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
                       // @ts-expect-error <StrictNullChecks/>

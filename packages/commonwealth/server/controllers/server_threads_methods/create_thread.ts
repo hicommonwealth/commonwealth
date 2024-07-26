@@ -21,10 +21,8 @@ import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
-  createThreadMentionNotifications,
   emitMentions,
   parseUserMentions,
-  queryMentionedUsers,
   uniqueMentions,
 } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -222,7 +220,6 @@ export async function __createThread(
 
   const bodyText = decodeURIComponent(body);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   // begin essential database changes within transaction
   const newThreadId = await this.models.sequelize.transaction(
@@ -253,7 +250,7 @@ export async function __createThread(
         // @ts-expect-error StrictNullChecks
         authorUserId: user.id,
         authorAddress: address.address,
-        mentions: mentionedAddresses,
+        mentions: mentions,
         thread,
       });
 
@@ -300,10 +297,6 @@ export async function __createThread(
   ]);
 
   const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push(
-    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
-  );
 
   allNotificationOptions.push({
     notification: {

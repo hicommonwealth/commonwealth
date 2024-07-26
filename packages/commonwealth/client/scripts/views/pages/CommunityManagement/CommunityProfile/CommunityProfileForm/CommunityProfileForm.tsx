@@ -27,14 +27,12 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
-import { useFlag } from '../../../../../hooks/useFlag';
 import './CommunityProfileForm.scss';
 import { getCommunityTags } from './helpers';
 import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
 
 const CommunityProfileForm = () => {
-  const communityStakeEnabled = useFlag('communityStake');
   const community = app.config.chains.getById(app.activeChainId());
 
   const [communityId] = useState(
@@ -293,24 +291,22 @@ const CommunityProfileForm = () => {
               placeholder="Community URL"
               value={`${window.location.origin}/${communityId}`}
             />
-            {communityStakeEnabled && (
-              <>
-                <CWTextInput
-                  disabled
-                  fullWidth
-                  label="Community Namespace"
-                  placeholder="Community Namespace"
-                  value={community.namespace}
-                />
-                <CWTextInput
-                  disabled
-                  fullWidth
-                  label="Community Symbol"
-                  placeholder="Community Symbol"
-                  value={community.default_symbol || ''}
-                />
-              </>
-            )}
+
+            <CWTextInput
+              disabled
+              fullWidth
+              label="Community Namespace"
+              placeholder="Community Namespace"
+              value={community.namespace}
+            />
+            <CWTextInput
+              disabled
+              fullWidth
+              label="Community Symbol"
+              placeholder="Community Symbol"
+              value={community.default_symbol || ''}
+            />
+
             <CWTextArea
               hookToForm
               name="communityDescription"
@@ -477,7 +473,7 @@ const CommunityProfileForm = () => {
               }}
             />
             <CWButton
-              label="Save Changes"
+              label="Save changes"
               buttonWidth="narrow"
               buttonType="primary"
               type="submit"

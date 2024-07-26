@@ -25,7 +25,6 @@ import Web3 from 'web3';
 import { z } from 'zod';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { config } from '../../config';
-import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -400,8 +399,6 @@ export async function __createCommunity(
   });
 
   // try to make admin one of the user's addresses
-  // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (user_address) {
@@ -492,7 +489,7 @@ export async function __createCommunity(
       hex = await bech32ToHex(addressToBeAdmin.address);
     }
 
-    const newAddress = await this.models.Address.create({
+    await this.models.Address.create({
       user_id: user.id,
       address: addressToBeAdmin.address,
       community_id: createdCommunity.id,
@@ -505,15 +502,6 @@ export async function __createCommunity(
       role: 'admin',
       last_active: new Date(),
     });
-
-    role = new RoleInstanceWithPermission(
-      // @ts-expect-error StrictNullChecks
-      { community_role_id: 0, address_id: newAddress.id },
-      createdCommunity.id,
-      'admin',
-      0,
-      0,
-    );
 
     await this.models.Subscription.findOrCreate({
       where: {
@@ -528,8 +516,6 @@ export async function __createCommunity(
   return {
     community: createdCommunity.toJSON(),
     node: nodeJSON,
-    // @ts-expect-error StrictNullChecks
-    role: role?.toJSON(),
     // @ts-expect-error StrictNullChecks
     admin_address: addressToBeAdmin?.address,
   };

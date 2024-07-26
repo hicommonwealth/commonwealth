@@ -3,6 +3,11 @@ import { ThresholdData } from './protocol';
 export const Roles = ['admin', 'moderator', 'member'] as const;
 export type Role = typeof Roles[number];
 
+export type AddressRole = {
+  address: string;
+  role: Role;
+};
+
 export enum DefaultPage {
   Discussions = 'default_all_discussions_view',
   Overview = 'default_summary_view',
@@ -36,12 +41,6 @@ export type Requirement =
       rule: 'allow';
       data: AllowlistData;
     };
-
-export enum AccessLevel {
-  Admin = 'admin',
-  Moderator = 'moderator',
-  Member = 'member',
-}
 
 export enum ContentType {
   Thread = 'thread',

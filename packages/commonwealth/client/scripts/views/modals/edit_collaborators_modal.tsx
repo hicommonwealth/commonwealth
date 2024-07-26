@@ -59,7 +59,6 @@ export const EditCollaboratorsModal = ({
     searchTerm: debouncedSearchTerm,
     communityId: app.activeChainId(),
     limit: 30,
-    includeRoles: true,
     enabled: debouncedSearchTerm.length >= 3,
   });
 

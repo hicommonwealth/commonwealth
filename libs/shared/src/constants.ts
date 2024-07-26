@@ -8,3 +8,7 @@ export const MIN_SCHEMA_BIGINT = BigInt(0);
 export const MAX_SCHEMA_BIGINT = BigInt('9223372036854775807');
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const DISCORD_BOT_NAME = 'Discord Bot';
+export const DISCORD_BOT_EMAIL = 'discord@common.xyz';
+export const DISCORD_BOT_ADDRESS = '0xdiscordbot';

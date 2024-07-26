@@ -46,7 +46,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin(undefined, thread.communityId);
+    Permissions.isCommunityAdmin(thread.communityId);
 
   const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
@@ -78,6 +78,8 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     isThreadTopicGated: isRestrictedMembership,
   });
 
+  // edge case for deleted communities with orphaned posts
+  if (!chain) return;
   return (
     <ThreadCard
       thread={thread}

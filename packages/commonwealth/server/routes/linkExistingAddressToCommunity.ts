@@ -9,7 +9,6 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import { createRole, findOneRole } from '../util/roles';
 
 const { Op } = Sequelize;
 
