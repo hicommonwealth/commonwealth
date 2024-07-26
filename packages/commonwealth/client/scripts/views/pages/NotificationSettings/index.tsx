@@ -119,8 +119,8 @@ const NotificationSettings = () => {
             <CWText className="page-subheader-text">
               Manage your subscriptions to these discussions
             </CWText>
-
             <ThreadSubscriptions />
+
             <CommentSubscriptions />
           </>
         )}

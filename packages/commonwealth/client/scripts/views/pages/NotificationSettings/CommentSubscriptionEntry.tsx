@@ -1,5 +1,5 @@
 import { CommentSubscription } from '@hicommonwealth/schemas';
-import { getThreadUrl } from '@hicommonwealth/shared';
+import { getThreadUrl, safeTruncateBody } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
@@ -96,7 +96,7 @@ export const CommentSubscriptionEntry = (
       <div>
         <CWText type="h4" fontWeight="semiBold">
           <Link to={threadUrl}>
-            <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
+            <CWText type="h4">{safeTruncateBody(comment.plaintext)}</CWText>
           </Link>
         </CWText>
       </div>
