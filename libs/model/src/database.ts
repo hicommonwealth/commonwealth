@@ -46,7 +46,7 @@ export const createDiscourseDBConnection = (databaseUri: string) => {
       multipleStatements: true,
       requestTimeout: 40_000,
       ssl: {
-        rejectUnauthorized: false, // TODO: handle ssl in prod?
+        rejectUnauthorized: !config.DB.NO_SSL,
       },
     },
     pool: {

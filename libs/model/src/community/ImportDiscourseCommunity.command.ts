@@ -31,7 +31,6 @@ export function ImportDiscourseCommunity(): Command<
       // and invoked after everything is done
       const cleanupStack: CleanupFn[] = [];
 
-      const cwConnection: Sequelize = models.sequelize;
       let restrictedDiscourseConnection: Sequelize | null = null;
 
       try {
@@ -42,27 +41,29 @@ export function ImportDiscourseCommunity(): Command<
         const restrictedDiscourseDbPass = `temp_discourse_importer_pass_${now}`;
 
         // create discourse DB user
-        await cwConnection.query(
+        await models.sequelize.query(
           `CREATE ROLE ${restrictedDiscourseDbUser} WITH LOGIN PASSWORD '${restrictedDiscourseDbPass}';`,
         );
         cleanupStack.push({
           description: 'Drop discourse DB user',
           fn: async () => {
-            await cwConnection.query(`DROP ROLE ${restrictedDiscourseDbUser};`);
+            await models.sequelize.query(
+              `DROP ROLE ${restrictedDiscourseDbUser};`,
+            );
           },
         });
 
         // create discourse DB
-        await cwConnection.query(`CREATE DATABASE ${discourseDbName};`);
+        await models.sequelize.query(`CREATE DATABASE ${discourseDbName};`);
         cleanupStack.push({
           description: 'Drop discourse DB',
           fn: async () => {
-            await cwConnection.query(`
+            await models.sequelize.query(`
             SELECT pg_terminate_backend(pid)
             FROM pg_stat_activity
             WHERE datname = '${discourseDbName}' AND pid <> pg_backend_pid();
           `);
-            await cwConnection.query(`DROP DATABASE ${discourseDbName};`);
+            await models.sequelize.query(`DROP DATABASE ${discourseDbName};`);
           },
         });
 
@@ -137,7 +138,6 @@ export function ImportDiscourseCommunity(): Command<
         // insert users
         const { newUsers, existingUsers } = await createAllUsersInCW(
           restrictedDiscourseConnection,
-          cwConnection,
           { communityId: communityId! },
           { transaction },
         );
@@ -146,7 +146,6 @@ export function ImportDiscourseCommunity(): Command<
 
         // // insert profiles
         // const profiles = await createAllProfilesInCW(
-        //   cwConnection,
         //   restrictedDiscourseConnection,
         //   { newUsers },
         //   { transaction },
@@ -157,7 +156,6 @@ export function ImportDiscourseCommunity(): Command<
         // // insert addresses
         // const addresses = await createAllAddressesInCW(
         //   restrictedDiscourseConnection,
-        //   cwConnection,
         //   {
         //     users: newUsers.concat(...existingUsers),
         //     profiles,
@@ -172,7 +170,6 @@ export function ImportDiscourseCommunity(): Command<
         // // insert categories (topics)
         // const categories = await createAllCategoriesInCW(
         //   restrictedDiscourseConnection,
-        //   cwConnection,
         //   { communityId: communityId! },
         //   { transaction },
         // );
@@ -182,7 +179,6 @@ export function ImportDiscourseCommunity(): Command<
         // // insert topics (threads)
         // const threads = await createAllThreadsInCW(
         //   restrictedDiscourseConnection,
-        //   cwConnection,
         //   {
         //     users: newUsers.concat(existingUsers),
         //     categories,
@@ -196,7 +192,6 @@ export function ImportDiscourseCommunity(): Command<
         // // insert posts (comments)
         // const comments = await createAllCommentsInCW(
         //   restrictedDiscourseConnection,
-        //   cwConnection,
         //   { communityId: communityId!, addresses, threads },
         //   { transaction },
         // );
@@ -206,7 +201,6 @@ export function ImportDiscourseCommunity(): Command<
         // // insert reactions
         // const reactions = await createAllReactionsInCW(
         //   restrictedDiscourseConnection,
-        //   cwConnection,
         //   { addresses, communityId: communityId!, threads, comments },
         //   { transaction },
         // );
@@ -216,7 +210,6 @@ export function ImportDiscourseCommunity(): Command<
         // // insert subscriptions
         // const subscriptions = await createAllSubscriptionsInCW(
         //   restrictedDiscourseConnection,
-        //   cwConnection,
         //   {
         //     communityId: communityId!,
         //     users: newUsers.concat(existingUsers),
