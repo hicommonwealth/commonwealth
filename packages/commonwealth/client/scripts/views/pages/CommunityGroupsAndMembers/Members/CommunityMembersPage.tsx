@@ -208,8 +208,7 @@ const CommunityMembersPage = () => {
         userId: p.user_id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
-        // @ts-expect-error <StrictNullChecks/>
-        role: p.roles[0],
+        role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map(
             (groupId) =>
