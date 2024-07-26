@@ -10,6 +10,7 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from 'views/pages/404';
+import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
@@ -120,7 +121,7 @@ const NotificationSettings = () => {
             </CWText>
 
             <ThreadSubscriptions />
-            {/*<CommentSubscriptions />*/}
+            <CommentSubscriptions />
           </>
         )}
       </div>

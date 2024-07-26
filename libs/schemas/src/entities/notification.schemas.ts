@@ -1,7 +1,6 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT, zDate } from '../utils';
-import { Comment } from './comment.schemas';
 import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
@@ -76,11 +75,11 @@ export const CommentSubscription = z.object({
   id: PG_INT.optional(),
   user_id: PG_INT,
   comment_id: PG_INT,
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  Comment: Comment.pick({
-    id: true,
-  }).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  // Comment: Comment.pick({
+  //   id: true,
+  // }).optional(),
 });
 
 export const CommunityAlert = z
