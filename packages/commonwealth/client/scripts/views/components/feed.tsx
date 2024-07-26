@@ -152,9 +152,9 @@ export const Feed = ({
         customScrollParent={customScrollParent}
         totalCount={queryData?.data?.length || DEFAULT_COUNT}
         style={{ height: '100%' }}
-        itemContent={(i) => {
-          return <FeedThread key={1} thread={queryData.data[i] as Thread} />;
-        }}
+        itemContent={(i) => (
+          <FeedThread key={1} thread={queryData.data[i] as Thread} />
+        )}
       />
     </div>
   );
