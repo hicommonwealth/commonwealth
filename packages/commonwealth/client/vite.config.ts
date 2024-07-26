@@ -97,7 +97,6 @@ export default defineConfig(({ mode }) => {
       ),
       'process.env.FLAG_CONTEST': JSON.stringify(env.FLAG_CONTEST),
       'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
-      'process.env.FLAG_ALLOWLIST': JSON.stringify(env.FLAG_ALLOWLIST),
       'process.env.IS_PRODUCTION': JSON.stringify(env.IS_PRODUCTION),
       'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
         env.UNLEASH_FRONTEND_SERVER_URL,
