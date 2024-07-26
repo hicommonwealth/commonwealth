@@ -123,11 +123,11 @@ const PersonalInformationStep = ({
 
     await updateUser({
       id: user.id.toString(),
-      name: values.username.trim(),
-      ...(values.email && {
+      promotional_emails_enabled: values.enableProductUpdates,
+      profile: {
+        name: values.username.trim(),
         email: values.email.trim(),
-      }),
-      profile: {},
+      },
     });
 
     // set email for notifications

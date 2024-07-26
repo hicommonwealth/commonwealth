@@ -26,7 +26,7 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
     updateUser({
       id: user.id.toString(),
       profile: {},
-      tagIds: preferenceTags
+      tag_ids: preferenceTags
         .filter((tag) => tag.isSelected)
         .map((tag) => tag.item.id),
     })

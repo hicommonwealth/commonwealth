@@ -440,12 +440,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (username && account?.profile) {
         await updateUser({
           id: account.profile.userId.toString(),
-          name: username.trim(),
-          profile: {},
-          // @mzparacha do we need to uupdate address and chain?
-          //address: account?.profile?.address,
-          //chain: account?.profile?.chain,
+          profile: {
+            name: username.trim(),
+          },
         });
+        // @mzparacha can't find these attributes in user state
+        //address: account?.profile?.address,
+        //chain: account?.profile?.chain,
+
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
       }
