@@ -59,8 +59,6 @@ const start = async () => {
     port: config.PORT,
     noGlobalActivityCache: config.NO_GLOBAL_ACTIVITY_CACHE,
     withLoggingMiddleware: true,
-    withStatsMiddleware: true,
-    withFrontendBuild: !config.NO_CLIENT,
     withPrerender:
       config.NODE_ENV === 'production' &&
       !config.NO_PRERENDER &&

@@ -1,3 +1,4 @@
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import ContractBase from './ContractBase';
@@ -147,7 +148,7 @@ class Contest extends ContractBase {
 
     let txReceipt;
     const weiAmount = this.web3.utils.toWei(amount, 'ether');
-    if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+    if (tokenAddress === ZERO_ADDRESS) {
       //ETH funding route
       try {
         txReceipt = await this.contract.methods.deposit(weiAmount).send({
@@ -204,7 +205,7 @@ class Contest extends ContractBase {
     }
     this.reInitContract();
     const tokenAddress = await this.contract.methods.contestToken().call();
-    if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+    if (tokenAddress === ZERO_ADDRESS) {
       const balance = await this.web3.eth.getBalance(this.contractAddress);
       return parseFloat(this.web3.utils.fromWei(balance, 'ether'));
     } else {

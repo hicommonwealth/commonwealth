@@ -1,3 +1,10 @@
+import { isHex, isU8a } from '@polkadot/util';
+import {
+  checkAddress,
+  decodeAddress,
+  encodeAddress,
+} from '@polkadot/util-crypto';
+
 export function foo() {}
 
 /**
@@ -35,18 +42,25 @@ export const getThreadUrl = (
     title?: string;
   },
   comment?: string | number,
+  relative?: boolean,
 ): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
   const cId = comment ? `?comment=${comment}` : '';
 
+  const relativePath = `/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+
+  if (relative) {
+    return relativePath;
+  }
+
   // TODO: Should we relocate this?
   // - cannot use config util in libs/shared
   // - duplicate found in knock utils
   return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+    ? `https://commonwealth.im${relativePath}`
+    : `http://localhost:8080${relativePath}`;
 };
 
 export function timeoutPromise(timeout: number) {
@@ -82,3 +96,38 @@ export async function getFileSizeBytes(url: string): Promise<number> {
     return 0;
   }
 }
+
+export const addressSwapper = (options: {
+  address: string;
+  currentPrefix: number;
+}): string => {
+  if (!options.address) throw new Error('No address provided to swap');
+
+  if (!options.currentPrefix) return options.address;
+
+  if (isU8a(options.address) || isHex(options.address)) {
+    throw new Error('address not in SS58 format');
+  }
+
+  // check if it is valid as an address
+  let decodedAddress: Uint8Array;
+
+  try {
+    decodedAddress = decodeAddress(options.address);
+  } catch (e) {
+    throw new Error('failed to decode address');
+  }
+
+  // check if it is valid with the current prefix & reencode if needed
+  const [valid] = checkAddress(options.address, options.currentPrefix);
+
+  if (!valid) {
+    try {
+      return encodeAddress(decodedAddress, options.currentPrefix);
+    } catch (e) {
+      throw new Error('failed to reencode address');
+    }
+  } else {
+    return options.address;
+  }
+};

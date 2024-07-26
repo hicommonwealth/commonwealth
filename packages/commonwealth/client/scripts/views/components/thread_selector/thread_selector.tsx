@@ -51,9 +51,10 @@ export const ThreadSelector = ({
           title: t.title,
           community_id: t.community_id,
           Address: new AddressInfo({
+            userId: t.address_user_id,
             id: t.address_id,
             address: t.address,
-            communityId: t.address_chain,
+            communityId: t.address_community_id,
           }),
         } as ConstructorParameters<typeof Thread>[0]),
     );
@@ -94,24 +95,25 @@ export const ThreadSelector = ({
     [linkedThreadsToSet, onSelect],
   );
 
-  const EmptyComponent = () => (
-    <div className="empty-component">{getEmptyContentMessage()}</div>
-  );
-
   return (
     <div className="ThreadSelector">
       <CWTextInput
         placeholder="Search thread titles..."
         iconRightonClick={handleClearButtonClick}
         value={searchTerm}
-        iconRight="close"
+        iconRight={searchTerm ? 'close' : 'magnifyingGlass'}
         onInput={handleInputChange}
       />
 
       <QueryList
         loading={queryEnabled ? isLoading : false}
         options={options}
-        components={{ EmptyPlaceholder: EmptyComponent }}
+        components={{
+          // eslint-disable-next-line react/no-multi-comp
+          EmptyPlaceholder: () => (
+            <div className="empty-component">{getEmptyContentMessage()}</div>
+          ),
+        }}
         renderItem={renderItem}
       />
     </div>

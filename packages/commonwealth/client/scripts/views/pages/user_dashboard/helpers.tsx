@@ -1,10 +1,10 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
-import getFetch from 'helpers/getFetch';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 import axios from 'axios';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import { DashboardViews } from '.';
 
 // Subscriptions
@@ -51,47 +51,13 @@ export const fetchActivity = async (requestType: DashboardViews) => {
   let activity;
   if (requestType === DashboardViews.ForYou) {
     const response = await axios.post(`${app.serverUrl()}/viewUserActivity`, {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     });
 
     activity = response.data;
-  } else if (requestType === DashboardViews.Chain) {
-    const events = await getFetch(`${app.serverUrl()}/viewChainActivity`);
-
-    if (!Array.isArray(events)) {
-      return { status: 'Failure', result: [] };
-    }
-
-    const communities: any = new Set();
-    for (const event of events) {
-      communities.add(event.chain);
-    }
-
-    const response = await axios.post(`${app.serverUrl()}/viewChainIcons`, {
-      communities: JSON.stringify(Array.from(communities)),
-    });
-
-    const communityIconUrls = {};
-    for (const item of response.data.result) {
-      communityIconUrls[item.id] = item.icon_url;
-    }
-
-    activity = {
-      status: 'Success',
-      result: events,
-    };
   } else if (requestType === DashboardViews.Global) {
     const response = await axios.post(`${app.serverUrl()}/viewGlobalActivity`);
     activity = response.data;
-  }
-
-  if (activity.result && requestType === DashboardViews.Chain) {
-    const uniqueActivity: number[] = [];
-    activity.result = activity?.result?.filter(
-      (x) =>
-        !uniqueActivity.includes(x?.thread_id) &&
-        uniqueActivity.push(x?.thread_id),
-    );
   }
 
   return activity;

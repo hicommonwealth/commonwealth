@@ -12,26 +12,22 @@ import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
-  proposalTemplatesEnabled: boolean;
-  communityHomepageEnabled: boolean;
   contestEnabled: boolean;
+  knockInAppNotifications: boolean;
 };
 
 const Router = (customDomain: string) => {
   const client = OpenFeature.getClient();
-  const proposalTemplatesEnabled = client.getBooleanValue(
-    'proposalTemplates',
-    false,
-  );
-  const communityHomepageEnabled = client.getBooleanValue(
-    'communityHomepage',
-    false,
-  );
   const contestEnabled = client.getBooleanValue('contest', false);
+
+  const knockInAppNotifications = client.getBooleanValue(
+    'knockInAppNotifications',
+    false,
+  );
+
   const flags = {
-    proposalTemplatesEnabled,
-    communityHomepageEnabled,
     contestEnabled,
+    knockInAppNotifications,
   };
 
   return createBrowserRouter(

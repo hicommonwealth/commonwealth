@@ -1,4 +1,4 @@
-import Comment from 'client/scripts/models/Comment';
+import Comment from 'models/Comment';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
 import { ViewUpvotesDrawer } from './ViewUpvotesDrawer';
@@ -21,9 +21,9 @@ export const ViewCommentUpvotesDrawer = ({
     );
 
     return {
-      name: reactor.profile.name,
-      avatarUrl: reactor.profile.avatarUrl,
-      address: reactor.profile.address,
+      name: reactor.profile?.name,
+      avatarUrl: reactor.profile?.avatarUrl,
+      address: reactor.profile?.address,
       updated_at: reactorMiscData?.updatedAt,
       voting_weight: reactorMiscData?.calculatedVotingWeight || 1,
     };

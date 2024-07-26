@@ -15,9 +15,10 @@
   },
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
-    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test NODE_OPTIONS='--import tsx/esm --conditions=devmode' mocha 'test/**/*.spec.ts'"
+    "test": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false --coverage run test",
+    "test-select": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run"
   },
   "dependencies": {
     "@alchemy/aa-alchemy": "^3.17.0",
@@ -34,7 +35,9 @@
     "@hicommonwealth/shared": "workspace:*",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.6",
+    "async-mutex": "^0.5.0",
     "ethers": "5.7.2",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",
     "node-fetch": "2",
@@ -48,12 +51,12 @@
     "web3-core": "^4.3.2",
     "web3-eth-abi": "^4.2.1",
     "web3-utils": "^4.2.2",
+    "web3-validator": "2.0.5",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/moment": "^2.13.0",
     "@types/sinon": "^17.0.3",
-    "mocha-steps": "^1.3.0",
     "sinon": "^17.0.2",
     "tsx": "^4.7.2"
   }

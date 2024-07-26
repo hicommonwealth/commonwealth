@@ -197,6 +197,7 @@ export const notificationsProvider = port(function notificationsProvider(
       deleteSchedules: ({ schedule_ids }) =>
         Promise.resolve(new Set(schedule_ids)),
       registerClientRegistrationToken: () => Promise.resolve(false),
+      unregisterClientRegistrationToken: () => Promise.resolve(false),
     }
   );
 });

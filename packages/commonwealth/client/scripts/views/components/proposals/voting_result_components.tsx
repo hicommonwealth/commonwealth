@@ -5,11 +5,6 @@ import type {
   CosmosProposal,
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
-import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import type { NearSputnikVote } from 'controllers/chain/near/sputnik/types';
-import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
@@ -68,6 +63,7 @@ type CompletedProposalVotingResultProps = {
   yesResults: string;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CompletedProposalVotingResult = (
   props: CompletedProposalVotingResultProps,
 ) => {
@@ -116,6 +112,7 @@ type SimpleYesApprovalVotingResultProps = {
   approvedCount: number;
 } & BaseVotingResultProps;
 
+// eslint-disable-next-line react/no-multi-comp
 export const SimpleYesApprovalVotingResult = (
   props: SimpleYesApprovalVotingResultProps,
 ) => {
@@ -133,70 +130,12 @@ export const SimpleYesApprovalVotingResult = (
   );
 };
 
-type AaveVotingResultProps = {
-  noBalanceString: string;
-  noVotesCount: number;
-  proposal: AaveProposal;
-  votes: Array<AaveProposalVote>;
-  yesBalanceString: string;
-  yesVotesCount: number;
-};
-
-export const AaveVotingResult = (props: AaveVotingResultProps) => {
-  const {
-    noBalanceString,
-    noVotesCount,
-    proposal,
-    votes,
-    yesBalanceString,
-    yesVotesCount,
-  } = props;
-
-  return (
-    <div className="VotingResult">
-      <div className="results-column-yes">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Yes (${yesBalanceString} ${yesVotesCount}) voters`}
-        </CWText>
-        <div className="results-subheader">
-          <CWText type="h5" fontWeight="medium">
-            User
-          </CWText>
-          <CWText type="h5" fontWeight="medium">
-            Power
-          </CWText>
-        </div>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => !!v.choice)}
-        />
-      </div>
-      <div className="results-column-no">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`No (${noBalanceString} ${noVotesCount}) voters`}
-        </CWText>
-        <div className="results-subheader">
-          <CWText type="h5" fontWeight="medium">
-            User
-          </CWText>
-          <CWText type="h5" fontWeight="medium">
-            Power
-          </CWText>
-        </div>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => !v.choice)}
-        />
-      </div>
-    </div>
-  );
-};
-
 type YesNoAbstainVetoVotingResultProps = {
   proposal: CosmosProposal;
   votes: Array<CosmosVote>;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const YesNoAbstainVetoVotingResult = (
   props: YesNoAbstainVetoVotingResultProps,
 ) => {
@@ -246,60 +185,6 @@ export const YesNoAbstainVetoVotingResult = (
           // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           votes={votes.filter((v) => v.choice === 'NoWithVeto')}
-        />
-      </div>
-    </div>
-  );
-};
-
-type YesNoRejectVotingResultProps = {
-  proposal: NearSputnikProposal;
-  votes: Array<NearSputnikVote>;
-};
-
-export const YesNoRejectVotingResult = (
-  props: YesNoRejectVotingResultProps,
-) => {
-  const { proposal, votes } = props;
-
-  return (
-    <div className="VotingResult">
-      <div className="results-column">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted approve (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
-              .length
-          })`}
-        </CWText>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter(
-            (v) => v.choice === NearSputnikVoteString.Approve,
-          )}
-        />
-      </div>
-      <div className="results-column">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted reject (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
-              .length
-          })`}
-        </CWText>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === NearSputnikVoteString.Reject)}
-        />
-      </div>
-      <div className="results-column">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted remove (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
-              .length
-          })`}
-        </CWText>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === NearSputnikVoteString.Remove)}
         />
       </div>
     </div>

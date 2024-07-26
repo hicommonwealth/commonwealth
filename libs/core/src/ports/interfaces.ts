@@ -216,6 +216,10 @@ export interface Broker extends Disposable {
     topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
+    hooks?: {
+      beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      afterHandleEvent: (topic: string, content: any, context: any) => void;
+    },
   ): Promise<boolean>;
 }
 
@@ -372,5 +376,12 @@ export interface NotificationsProvider extends Disposable {
   registerClientRegistrationToken(
     userId: number,
     token: string,
+    channelType: 'FCM' | 'APNS',
+  ): Promise<boolean>;
+
+  unregisterClientRegistrationToken(
+    userId: number,
+    token: string,
+    channelType: 'FCM' | 'APNS',
   ): Promise<boolean>;
 }

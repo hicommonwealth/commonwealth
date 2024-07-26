@@ -1,10 +1,9 @@
-import { ServerError, logger } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,
   DB,
   EmailNotificationInterval,
-  NotificationCategoryInstance,
   StarredCommunityAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
@@ -12,7 +11,6 @@ import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
-import { fileURLToPath } from 'node:url';
 import { Op, QueryTypes } from 'sequelize';
 import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
@@ -20,16 +18,12 @@ import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
-
 type ThreadCountQueryData = {
   communityId: string;
   count: number;
 };
 
 type StatusResp = {
-  notificationCategories: NotificationCategoryInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
@@ -46,7 +40,6 @@ type StatusResp = {
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [communityId: string]: number };
-    profileId?: number;
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
@@ -54,12 +47,9 @@ type StatusResp = {
 };
 
 const getCommunityStatus = async (models: DB) => {
-  const [communities, notificationCategories] = await Promise.all([
-    models.Community.findAll({
-      where: { active: true },
-    }),
-    models.NotificationCategory.findAll(),
-  ]);
+  const communities = await models.Community.findAll({
+    where: { active: true },
+  });
 
   const communityCategories: {
     [communityId: string]: CommunityCategoryType[];
@@ -89,7 +79,6 @@ const getCommunityStatus = async (models: DB) => {
     );
 
   return {
-    notificationCategories,
     communityCategories,
     threadCountQueryData,
   };
@@ -286,6 +275,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
       promotional_emails_enabled: user.promotional_emails_enabled,
+      is_welcome_onboard_flow_complete: user.is_welcome_onboard_flow_complete,
       jwt: '',
       knockJwtToken: '',
       addresses,
@@ -309,14 +299,10 @@ export const status = async (
     const communityStatusPromise = getCommunityStatus(models);
     const { user: reqUser } = req;
     if (!reqUser) {
-      const {
-        notificationCategories,
-        communityCategories,
-        threadCountQueryData,
-      } = await communityStatusPromise;
+      const { communityCategories, threadCountQueryData } =
+        await communityStatusPromise;
 
       return success(res, {
-        notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
@@ -325,21 +311,11 @@ export const status = async (
     } else {
       // user is logged in
       const userStatusPromise = getUserStatus(models, reqUser);
-      const profilePromise = models.Profile.findOne({
-        where: {
-          user_id: reqUser.id,
-        },
-      });
-      const [communityStatus, userStatus, profileInstance] = await Promise.all([
+      const [communityStatus, userStatus] = await Promise.all([
         communityStatusPromise,
         userStatusPromise,
-        profilePromise,
       ]);
-      const {
-        notificationCategories,
-        communityCategories,
-        threadCountQueryData,
-      } = communityStatus;
+      const { communityCategories, threadCountQueryData } = communityStatus;
       const { roles, user, id } = userStatus;
 
       const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
@@ -350,15 +326,14 @@ export const status = async (
       const knockJwtToken = await computeKnockJwtToken(user.id);
 
       user.jwt = jwtToken as string;
-      user.knockJwtToken = knockJwtToken;
+      user.knockJwtToken = knockJwtToken!;
 
       return success(res, {
-        notificationCategories,
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
         // @ts-expect-error StrictNullChecks
-        user: { ...user, profileId: profileInstance.id },
+        user,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
@@ -379,9 +354,6 @@ async function computeKnockJwtToken(userId: number) {
       signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
       expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
     });
-  } else {
-    log.warn('No process.env.KNOCK_SIGNING_KEY defined');
-    return '';
   }
 }
 

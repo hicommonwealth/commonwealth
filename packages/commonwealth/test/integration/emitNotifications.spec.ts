@@ -10,6 +10,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from 'server-test';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { config } from '../../server/config';
 import emitNotifications from '../../server/util/emitNotifications';
 import { JoinCommunityArgs } from '../util/modelUtils';
@@ -40,7 +41,7 @@ describe('emitNotifications tests', () => {
 
   let server: TestServer;
 
-  before('Reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     // creates 2 ethereum users
@@ -123,12 +124,12 @@ describe('emitNotifications tests', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('Forum Notifications', () => {
-    it('should generate a notification and notification reads for a new thread', async () => {
+    test('should generate a notification and notification reads for a new thread', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewThread,
@@ -187,7 +188,7 @@ describe('emitNotifications tests', () => {
       expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
-    it('should generate a notification and notification reads for a thread comment', async () => {
+    test('should generate a notification and notification reads for a thread comment', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewComment,
@@ -246,7 +247,7 @@ describe('emitNotifications tests', () => {
       expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
-    it('should generate a notification and notification reads for a new thread reaction', async () => {
+    test('should generate a notification and notification reads for a new thread reaction', async () => {
       let updatedThread = await server.models.Thread.findOne({
         where: {
           id: thread.id,
@@ -312,7 +313,7 @@ describe('emitNotifications tests', () => {
       expect(updatedThread.max_notif_id).to.equal(before_thread_max_notif_id);
     });
 
-    it('should generate a notification and notification read for a new mention', async () => {
+    test('should generate a notification and notification read for a new mention', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewMention,
@@ -355,7 +356,7 @@ describe('emitNotifications tests', () => {
       expect(notifRead).to.not.be.null;
     });
 
-    it('should generate a notification and notification read for a new collaboration', async () => {
+    test('should generate a notification and notification read for a new collaboration', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewCollaboration,
@@ -400,7 +401,7 @@ describe('emitNotifications tests', () => {
   });
 
   describe('Snapshot Notifications', () => {
-    it('should generate a notification for a new snapshot proposal', async () => {
+    test('should generate a notification for a new snapshot proposal', async () => {
       const space = 'plutusclub.eth';
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
@@ -451,7 +452,7 @@ describe('emitNotifications tests', () => {
   });
 
   describe('Chain Event Notifications', () => {
-    it('should generate a notification and notification reads for a new chain event', async () => {
+    test('should generate a notification and notification reads for a new chain event', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.ChainEvent,

@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
@@ -30,9 +30,8 @@ export type CreateThreadReactionOptions = {
   address: AddressInstance;
   reaction: string;
   threadId: number;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
 };
 
 export type CreateThreadReactionResult = [
@@ -48,8 +47,7 @@ export async function __createThreadReaction(
     address,
     reaction,
     threadId,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
   }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
@@ -116,16 +114,16 @@ export async function __createThreadReaction(
       const node = await this.models.ChainNode.findByPk(
         community.chain_node_id,
       );
+
+      if (!node || !node.eth_chain_id) {
+        throw new ServerError(`Invalid chain node ${node ? node.id : ''}`);
+      }
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          // @ts-expect-error StrictNullChecks
-          community.namespace_address,
+          community.namespace_address!,
           stake.stake_id,
-          // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
-          // @ts-expect-error StrictNullChecks
-          node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
         stakeBalances[address.address],
@@ -146,8 +144,7 @@ export async function __createThreadReaction(
     ...reactionWhere,
     // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
   };
 
@@ -169,7 +166,7 @@ export async function __createThreadReaction(
         root_type: 'discussion',
         community_id: thread.community_id,
         author_address: address.address,
-        author_community_id: address.community_id,
+        author_community_id: address.community_id!,
       },
     },
     excludeAddresses: [address.address],

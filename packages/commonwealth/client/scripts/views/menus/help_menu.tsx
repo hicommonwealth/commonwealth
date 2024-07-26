@@ -9,13 +9,7 @@ import {
 } from 'views/menus/utils';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-interface HelpMenuPopoverProps {
-  onFeedbackModalOpen: (open: boolean) => void;
-}
-
-export const HelpMenuPopover = ({
-  onFeedbackModalOpen,
-}: HelpMenuPopoverProps) => {
+export const HelpMenuPopover = () => {
   return (
     <>
       <PopoverMenu
@@ -24,10 +18,6 @@ export const HelpMenuPopover = ({
             label: 'Help documentation',
             onClick: () =>
               window.open('https://docs.commonwealth.im/commonwealth/'),
-          },
-          {
-            label: 'Send feedback',
-            onClick: () => onFeedbackModalOpen(true),
           },
         ]}
         renderTrigger={(onClick, isMenuOpen) => (

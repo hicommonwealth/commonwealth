@@ -1,7 +1,7 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
-import { emitEvent } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
@@ -20,8 +20,8 @@ export type ReactionAttributes = {
 
   calculated_voting_weight: number;
 
-  canvas_action: string;
-  canvas_session: string;
+  // canvas-related columns
+  canvas_signed_data: string;
   canvas_hash: string;
 
   created_at?: Date;
@@ -47,9 +47,8 @@ export default (
       address_id: { type: Sequelize.INTEGER, allowNull: false },
       reaction: { type: Sequelize.ENUM('like'), allowNull: false },
       calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
-      // signed data
-      canvas_action: { type: Sequelize.JSONB, allowNull: true },
-      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      // canvas-related columns
+      canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_hash: { type: Sequelize.STRING, allowNull: true },
     },
     {
@@ -74,6 +73,17 @@ export default (
                   });
                 }
                 if (reaction.reaction === 'like') {
+                  const { topic_id, community_id } = thread.get({
+                    plain: true,
+                  });
+                  const contestManagers = !topic_id
+                    ? []
+                    : await getThreadContestManagers(
+                        sequelize,
+                        topic_id,
+                        community_id,
+                      );
+
                   await emitEvent(
                     Outbox,
                     [
@@ -82,6 +92,7 @@ export default (
                         event_payload: {
                           ...reaction.get({ plain: true }),
                           reaction: 'like',
+                          contestManagers,
                         },
                       },
                     ],

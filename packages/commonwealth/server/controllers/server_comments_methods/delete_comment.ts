@@ -69,18 +69,10 @@ export async function __deleteComment(
   // find and delete all associated subscriptions
   await this.models.Subscription.destroy({
     where: {
-      comment_id: comment.id,
+      comment_id: comment.id!,
     },
   });
 
   // actually delete
   await comment.destroy();
-
-  // use callbacks so route returns and this completes in the background
-  if (this.globalActivityCache) {
-    this.globalActivityCache.deleteActivityFromCache(
-      comment.thread_id,
-      comment.id,
-    );
-  }
 }

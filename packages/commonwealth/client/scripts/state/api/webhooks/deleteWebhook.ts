@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface DeleteWebhookProps {
   communityId: string;
@@ -16,7 +17,7 @@ const deleteWebhook = async ({
     chain: communityId,
     webhookUrl,
     auth: true,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 

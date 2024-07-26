@@ -15,12 +15,11 @@
   },
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
-    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test"
   },
   "dependencies": {
-    "@canvas-js/interfaces": "0.5.0-alpha4",
     "@cosmjs/amino": "^0.31.3",
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
@@ -30,7 +29,6 @@
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/constants": "^5.7.0",
-    "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/hash": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/strings": "^5.7.0",

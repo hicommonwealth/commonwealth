@@ -150,7 +150,6 @@ export async function __deleteCommunity(
             this.models.Notification,
             // @ts-expect-error StrictNullChecks
             this.models.Group,
-            // @ts-expect-error StrictNullChecks
             this.models.Address,
           ];
 
@@ -166,13 +165,6 @@ export async function __deleteCommunity(
             // @ts-expect-error StrictNullChecks
             where: {
               thread_id: { [Op.in]: threads.map((thread) => thread.id) },
-            },
-            transaction: t,
-          });
-
-          await this.models.Template.destroy({
-            where: {
-              created_for_community: community.id,
             },
             transaction: t,
           });

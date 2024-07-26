@@ -21,8 +21,6 @@ export enum ComponentType {
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
   Drawer = 'Drawer',
-  Form = 'Form',
-  FormSection = 'FormSection',
   FormSteps = 'FormSteps',
   FilterMenu = 'FilterMenu',
   Growl = 'Growl',
@@ -43,7 +41,6 @@ export enum ComponentType {
   RelatedCommunityCard = 'RelatedCommunityCard',
   Searchbar = 'Searchbar',
   SidebarMenu = 'SidebarMenu',
-  Socials = 'Socials',
   Spinner = 'Spinner',
   Tab = 'Tab',
   Table = 'Table',
@@ -57,7 +54,6 @@ export enum ComponentType {
   TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
-  WalletOptionRow = 'WalletOptionRow',
   SelectList = 'SelectList',
 }
 

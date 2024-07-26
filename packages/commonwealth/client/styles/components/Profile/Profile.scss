@@ -9,6 +9,16 @@
   .breadcrumbs {
     padding-left: 32px;
   }
+  .fixed-slug-header {
+    height: 52px;
+    width: 100%;
+    background-color: white;
+    position: fixed;
+
+    @include extraSmall {
+      display: none;
+    }
+  }
 
   .header {
     margin-bottom: 24px;

@@ -1,6 +1,7 @@
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
@@ -20,10 +21,10 @@ enum ProfileError {
 }
 
 type ProfileProps = {
-  profileId: string;
+  userId: number;
 };
 
-const Profile = ({ profileId }: ProfileProps) => {
+const Profile = ({ userId }: ProfileProps) => {
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
   const [profile, setProfile] = useState<NewProfile>();
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -32,8 +33,8 @@ const Profile = ({ profileId }: ProfileProps) => {
   const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
 
   const { data, error, isLoading } = useFetchProfileByIdQuery({
-    apiCallEnabled: !!profileId,
-    profileId,
+    userId,
+    apiCallEnabled: !!userId,
   });
 
   useEffect(() => {
@@ -47,26 +48,33 @@ const Profile = ({ profileId }: ProfileProps) => {
       setComments([]);
     }
     if (data) {
-      setProfile(new NewProfile(data.profile));
+      setProfile(
+        new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
+      );
+      // @ts-expect-error <StrictNullChecks/>
       setThreads(data.threads.map((t) => new Thread(t)));
 
+      // @ts-expect-error <StrictNullChecks/>
       const responseComments = data.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = data.commentThreads.find(
+          // @ts-expect-error <StrictNullChecks/>
           (t) => t.id === parseInt(c.threadId, 10),
         );
         return { ...c, thread };
       });
+      // @ts-expect-error <StrictNullChecks/>
       setComments(commentsWithAssociatedThread);
 
       setAddresses(
+        // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
-              id: a.id,
+              userId,
+              id: a.id!,
               address: a.address,
-              communityId: a.community_id,
-              keytype: a.keytype,
+              communityId: a.community_id!,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
               ghostAddress: a.ghost_address,
@@ -81,7 +89,7 @@ const Profile = ({ profileId }: ProfileProps) => {
       setIsOwner(data.isOwner);
       setErrorCode(ProfileError.None);
     }
-  }, [data, isLoading, error]);
+  }, [userId, data, isLoading, error, isOwner]);
 
   if (isLoading)
     return (
@@ -108,31 +116,39 @@ const Profile = ({ profileId }: ProfileProps) => {
     }
 
     return (
-      <CWPageLayout>
-        <div
-          className="Profile"
-          style={
-            profile.backgroundImage
-              ? {
-                  backgroundImage: `url(${backgroundUrl})`,
-                  backgroundRepeat: `${
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'no-repeat'
-                      : 'repeat'
-                  }`,
-                  backgroundSize:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'cover'
-                      : '100px',
-                  backgroundPosition:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'center'
-                      : '56px 56px',
-                  backgroundAttachment: 'fixed',
-                }
-              : {}
-          }
-        >
+      <div
+        className="Profile"
+        style={
+          profile.backgroundImage
+            ? {
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundRepeat: `${
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
+                }`,
+                backgroundSize:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'cover'
+                    : '100px',
+                backgroundPosition:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'center'
+                    : '56px 56px',
+                backgroundAttachment: 'fixed',
+              }
+            : {}
+        }
+      >
+        <div className="fixed-slug-header"></div>
+        <CWPageLayout>
+          <Helmet>
+            <link
+              rel="canonical"
+              href={`https://commonwealth.im/profile/id/${userId}`}
+            />
+          </Helmet>
+
           <div className="header">
             <CWText type="h2" fontWeight="medium">
               {profile.name
@@ -156,8 +172,8 @@ const Profile = ({ profileId }: ProfileProps) => {
               addresses={addresses}
             />
           </div>
-        </div>
-      </CWPageLayout>
+        </CWPageLayout>
+      </div>
     );
   } else {
     return (

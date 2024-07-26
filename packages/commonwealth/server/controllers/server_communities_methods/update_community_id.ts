@@ -4,6 +4,7 @@ import {
   CommunityInstance,
   ModelInstance,
 } from '@hicommonwealth/model';
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { type ModelStatic } from 'sequelize';
 import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -60,6 +61,9 @@ export async function __updateCommunityId(
         id: new_community_id,
         ...communityData,
         redirect: community_id,
+        network: (communityData.network === id
+          ? new_community_id
+          : communityData.network) as ChainNetwork,
       },
       { transaction },
     );
@@ -71,7 +75,6 @@ export async function __updateCommunityId(
     //  and then delete the old data once redirect from old to new community
     //  is enabled
     const models: ModelStatic<ModelInstance<{ community_id?: string }>>[] = [
-      // @ts-expect-error StrictNullChecks
       this.models.Address,
       // @ts-expect-error StrictNullChecks
       this.models.Ban,
@@ -117,18 +120,6 @@ export async function __updateCommunityId(
         },
       );
     }
-
-    await this.models.Template.update(
-      {
-        created_for_community: new_community_id,
-      },
-      {
-        where: {
-          created_for_community: community_id,
-        },
-        transaction,
-      },
-    );
 
     await this.models.User.update(
       {

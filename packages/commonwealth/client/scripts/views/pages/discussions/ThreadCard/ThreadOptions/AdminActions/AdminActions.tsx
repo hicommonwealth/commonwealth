@@ -6,11 +6,11 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
@@ -37,6 +37,7 @@ export type AdminActionsProps = {
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
   hasPendingEdits?: boolean;
+  editingDisabled?: boolean;
 };
 
 export const AdminActions = ({
@@ -52,6 +53,7 @@ export const AdminActions = ({
   onEditCancel,
   onEditConfirm,
   hasPendingEdits,
+  editingDisabled,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
@@ -69,20 +71,12 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
+  const user = useUserStore();
 
-  const {
-    mutateAsync: deleteThread,
-    reset: resetDeleteThreadMutation,
-    error: deleteThreadError,
-  } = useDeleteThreadMutation({
+  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
-  });
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetDeleteThreadMutation,
-    error: deleteThreadError,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -106,7 +100,7 @@ export const AdminActions = ({
               await deleteThread({
                 threadId: thread.id,
                 communityId: app.activeChainId(),
-                address: app.user.activeAccount.address,
+                address: user.activeAccount?.address || '',
               });
               onDelete?.();
             } catch (err) {
@@ -177,7 +171,7 @@ export const AdminActions = ({
                 communityId: app.activeChainId(),
                 threadId: thread.id,
                 spam: isSpam,
-                address: app.user?.activeAccount?.address,
+                address: user.activeAccount?.address || '',
               })
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
                 .catch(() => {
@@ -196,7 +190,7 @@ export const AdminActions = ({
 
   const handleThreadLockToggle = () => {
     editThread({
-      address: app.user.activeAccount.address,
+      address: user.activeAccount?.address || '',
       threadId: thread.id,
       readOnly: !thread.readOnly,
       communityId: app.activeChainId(),
@@ -213,7 +207,7 @@ export const AdminActions = ({
 
   const handleThreadPinToggle = () => {
     editThread({
-      address: app.user.activeAccount.address,
+      address: user.activeAccount?.address || '',
       threadId: thread.id,
       communityId: app.activeChainId(),
       pinned: !thread.pinned,
@@ -274,7 +268,7 @@ export const AdminActions = ({
         threadId: thread.id,
         communityId: app.activeChainId(),
         archived: !thread.archivedAt,
-        address: app.user?.activeAccount?.address,
+        address: user.activeAccount?.address || '',
       })
         .then(() => {
           notifySuccess(
@@ -309,12 +303,14 @@ export const AdminActions = ({
               ? [
                   {
                     label: 'Edit',
+                    disabled: editingDisabled,
                     iconLeft: 'write' as const,
                     iconLeftWeight: 'bold' as const,
                     onClick: handleEditThread,
                   },
                   {
                     label: 'Edit collaborators',
+                    disabled: editingDisabled,
                     iconLeft: 'write' as const,
                     iconLeftWeight: 'bold' as const,
                     onClick: () => {
@@ -343,6 +339,7 @@ export const AdminActions = ({
                         },
                         {
                           onClick: () => setIsChangeTopicModalOpen(true),
+                          disabled: editingDisabled,
                           label: 'Change topic',
                           iconLeft: 'filter' as const,
                           iconLeftWeight: 'bold' as const,
@@ -413,6 +410,7 @@ export const AdminActions = ({
                   {
                     onClick: handleDeleteThread,
                     label: 'Delete',
+                    disabled: editingDisabled,
                     iconLeft: 'trash' as const,
                     iconLeftWeight: 'bold' as const,
                     className: 'danger',
@@ -479,7 +477,6 @@ export const AdminActions = ({
         onClose={() => setIsArchiveThreadModalOpen(false)}
         open={isArchiveThreadModalOpen}
       />
-      {RevalidationModal}
     </>
   );
 };

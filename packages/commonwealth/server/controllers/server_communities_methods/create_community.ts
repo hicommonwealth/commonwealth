@@ -350,9 +350,7 @@ export async function __createCommunity(
           : base === ChainBase.Ethereum
           ? BalanceType.Ethereum
           : // beyond here should never really happen, but just to make sure...
-          base === ChainBase.NEAR
-          ? BalanceType.NEAR
-          : base === ChainBase.Solana
+          base === ChainBase.Solana
           ? BalanceType.Solana
           : undefined,
       // use first chain name as node name
@@ -372,7 +370,6 @@ export async function __createCommunity(
     id,
     name,
     default_symbol,
-    // @ts-expect-error StrictNullChecks
     icon_url,
     description,
     network: network as ChainNetwork,
@@ -445,24 +442,7 @@ export async function __createCommunity(
       ],
     });
   } else if (createdCommunity.base === ChainBase.NEAR) {
-    // @ts-expect-error StrictNullChecks
-    addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData',
-    ).findOne({
-      where: {
-        user_id: user.id,
-        address: {
-          [Op.endsWith]: '.near',
-        },
-      },
-      include: [
-        {
-          model: this.models.Community,
-          where: { base: createdCommunity.base },
-          required: true,
-        },
-      ],
-    });
+    throw new AppError(Errors.InvalidBase);
   } else if (createdCommunity.base === ChainBase.Solana) {
     // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
@@ -514,15 +494,12 @@ export async function __createCommunity(
 
     const newAddress = await this.models.Address.create({
       user_id: user.id,
-      profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      // @ts-expect-error StrictNullChecks
       community_id: createdCommunity.id,
       hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
-      keytype: addressToBeAdmin.keytype,
       wallet_id: addressToBeAdmin.wallet_id,
       is_user_default: true,
       role: 'admin',

@@ -1,5 +1,4 @@
-import { ContentType, slugify } from '@hicommonwealth/shared';
-import axios from 'axios';
+import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -8,15 +7,16 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
@@ -25,16 +25,19 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import { useFlag } from '../../../hooks/useFlag';
+import useAppStatus from '../../../hooks/useAppStatus';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
-import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
+import { Link, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -55,12 +58,9 @@ import { getTextFromDelta } from '../../components/react_quill_editor/';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import ViewTemplate from '../view_template/view_template';
 import { LinkedUrlCard } from './LinkedUrlCard';
-import { TemplateActionCard } from './TemplateActionCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
-import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -72,7 +72,6 @@ type ViewThreadPageProps = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const threadId = identifier.split('-')[0];
 
   const navigate = useCommonNavigate();
@@ -84,8 +83,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
-  // @ts-expect-error <StrictNullChecks/>
-  const [viewCount, setViewCount] = useState<number>(null);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -95,13 +92,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
-  const [isViewMarked, setIsViewMarked] = useState(false);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const user = useUserStore();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -123,6 +122,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
+  const { contestsData } = useCommunityContests();
+  const isTopicInContest = checkIsTopicInContest(
+    contestsData,
+    thread?.topic?.id,
+  );
+
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
       communityId: app.activeChainId(),
@@ -136,8 +141,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
+  });
+
+  const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
+    communityId: app.activeChainId(),
+    objectId: thread?.id || '',
+    apiCallEnabled: !!thread?.id,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -195,6 +206,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -239,28 +251,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       });
   }, [thread, arePollsFetched]);
 
-  useNecessaryEffect(() => {
-    if (!thread || (thread && isViewMarked)) {
-      return;
-    }
-
-    // load view count
-    axios
-      .post(`${app.serverUrl()}/viewCount`, {
-        community_id: app.activeChainId(),
-        object_id: thread.id,
-      })
-      .then((response) => {
-        setViewCount(response?.data?.result?.view_count || 0);
-      })
-      .catch(() => {
-        setViewCount(0);
-      })
-      .finally(() => {
-        setIsViewMarked(true);
-      });
-  }, [thread, isViewMarked]);
-
   useManageDocumentTitle('View thread', thread?.title);
 
   if (typeof identifier !== 'string') {
@@ -284,7 +274,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // @ts-expect-error <StrictNullChecks/>
     thread.communityId !== app.activeChainId()
   ) {
-    return <PageNotFound />;
+    return <PageNotFound message="Thread not found" />;
   }
 
   // Original posters have full editorial control, while added collaborators
@@ -299,8 +289,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   // @ts-expect-error <StrictNullChecks/>
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
-  // @ts-expect-error <StrictNullChecks/>
-  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -315,18 +303,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
-  const showTemplateOptions =
-    proposalTemplatesEnabled && (isAuthor || isAdminOrMod);
-  const showLinkedTemplateOptions =
-    proposalTemplatesEnabled && linkedTemplates.length > 0;
-
   // @ts-expect-error <StrictNullChecks/>
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
+  const canComment = !!user.activeAccount && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -371,7 +354,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     .filter((c) => !c.parentComment)
     .sort((a, b) => commentsByDate(a, b, commentSortType));
 
-  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const showBanner = !user.activeAccount && isBannerVisible;
   const fromDiscordBot =
     // @ts-expect-error <StrictNullChecks/>
     thread.discord_meta !== null && thread.discord_meta !== undefined;
@@ -396,7 +379,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
@@ -493,6 +476,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
         ]}
       />
+
+      <Helmet>
+        <link
+          rel="canonical"
+          href={getThreadUrl({
+            chain: thread?.communityId || '',
+            id: threadId,
+            title: thread?.title,
+          })}
+        />
+      </Helmet>
+
       <CWPageLayout>
         <CWContentPage
           showTabs={isCollapsedSize && tabsShouldBePresent}
@@ -610,18 +605,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     doc={threadBody ?? thread?.body}
                     cutoffLines={50}
                   />
-                  {showLinkedTemplateOptions &&
-                    linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
-                      <ViewTemplate
-                        contract_address={
-                          linkedTemplates[0]?.identifier.split('/')[1]
-                        }
-                        slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                        // @ts-expect-error <StrictNullChecks/>
-                        setTemplateNickname={null}
-                        isForm
-                      />
-                    )}
                   {/* @ts-expect-error StrictNullChecks*/}
                   {thread.readOnly || fromDiscordBot ? (
                     <>
@@ -740,6 +723,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               />
             </>
           }
+          editingDisabled={isTopicInContest}
           sidebarComponents={
             [
               ...(showLinkedProposalOptions || showLinkedThreadOptions
@@ -836,37 +820,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 onPollCreate={() => setInitializedPolls(false)}
                               />
                             )}
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(showLinkedTemplateOptions &&
-              linkedTemplates[0]?.display !== LinkDisplay.inline
-                ? [
-                    {
-                      label: 'View Template',
-                      item: (
-                        <div className="cards-column">
-                          <ViewTemplateFormCard
-                            address={
-                              linkedTemplates[0]?.identifier.split('/')[1]
-                            }
-                            slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                          />
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(showTemplateOptions
-                ? [
-                    {
-                      label: 'Template',
-                      item: (
-                        <div className="cards-column">
-                          {/* @ts-expect-error StrictNullChecks*/}
-                          <TemplateActionCard thread={thread} />
                         </div>
                       ),
                     },

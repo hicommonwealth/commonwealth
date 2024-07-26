@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import app from 'state';
 import {
   useCreateContestMutation,
@@ -25,7 +25,14 @@ import {
   LaunchContestStep,
 } from '../../types';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
+import useAppStatus from 'client/scripts/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
+import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
@@ -35,7 +42,7 @@ interface SignTransactionsStepProps {
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
-const FIVE_MINS_IN_SECONDS = 60 * 5;
+const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
@@ -53,6 +60,13 @@ const SignTransactionsStep = ({
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
+  const user = useUserStore();
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
+    onAction: true,
+  });
 
   const isContestRecurring =
     contestFormData.contestRecurring === ContestRecurringType.Yes;
@@ -66,19 +80,19 @@ const SignTransactionsStep = ({
     const chainRpc = app?.chain?.meta?.ChainNode?.url;
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
-      ? FIVE_MINS_IN_SECONDS
+      ? ONE_HOUR_IN_SECONDS
       : SEVEN_DAYS_IN_SECONDS;
     const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = stakeData?.vote_weight;
     const contestInterval = devContest
-      ? FIVE_MINS_IN_SECONDS
+      ? ONE_HOUR_IN_SECONDS
       : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
-    const walletAddress = app.user.activeAccount?.address;
+    const walletAddress = user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
-      ? contestFormData?.fundingTokenAddress
+      ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
       : stakeData?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
 
@@ -135,7 +149,7 @@ const SignTransactionsStep = ({
           ? contestFormData?.prizePercentage
           : 0,
         payout_structure: contestFormData?.payoutStructure,
-        interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
+        interval: isContestRecurring ? contestInterval : 0,
         topic_ids: contestFormData?.toggledTopicList
           .filter((t) => t.checked)
           .map((t) => t.id),
@@ -143,6 +157,10 @@ const SignTransactionsStep = ({
 
       onSetLaunchContestStep('ContestLive');
       onSetCreatedContestAddress(contestAddress);
+      trackAnalytics({
+        event: MixpanelContestEvents.CONTEST_CREATED,
+        isPWA: isAddedToHomeScreen,
+      });
     } catch (error) {
       console.log('error', error);
       setLaunchContestData((prevState) => ({

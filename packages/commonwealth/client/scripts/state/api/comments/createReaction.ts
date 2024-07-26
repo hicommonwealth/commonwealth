@@ -1,11 +1,14 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { useFlag } from 'hooks/useFlag';
+import { signCommentReaction } from 'controllers/server/sessions';
 import Reaction from 'models/Reaction';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
+import useUserStore, { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateReactionProps {
@@ -22,11 +25,7 @@ const createReaction = async ({
   communityId,
   commentId,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signCommentReaction(address, {
+  const canvasSignedData = await signCommentReaction(address, {
     comment_id: commentId,
     like: reactionType === 'like',
   });
@@ -34,14 +33,12 @@ const createReaction = async ({
   return await axios.post(
     `${app.serverUrl()}/comments/${commentId}/reactions`,
     {
-      author_community_id: app.user.activeAccount.community.id,
+      author_community_id: userStore.getState().activeAccount?.community?.id,
       community_id: communityId,
       address,
       reaction: reactionType,
-      jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
       comment_id: commentId,
     },
   );
@@ -52,7 +49,6 @@ const useCreateCommentReactionMutation = ({
   commentId,
   communityId,
 }: Partial<CreateReactionProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     // @ts-expect-error StrictNullChecks
@@ -60,9 +56,12 @@ const useCreateCommentReactionMutation = ({
     // @ts-expect-error StrictNullChecks
     threadId,
   });
+  const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: createReaction,
@@ -76,23 +75,19 @@ const useCreateCommentReactionMutation = ({
         const tempComments = [...comments];
         const commentToUpdate = tempComments.find((x) => x.id === commentId);
         reaction.Address.User = {
-          Profiles: [commentToUpdate.profile],
+          profile: commentToUpdate.profile,
         };
         commentToUpdate.reactions.push(new Reaction(reaction));
         return tempComments;
       });
 
-      if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          // @ts-expect-error StrictNullChecks
-          profileId,
-        );
-      }
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
 
       return reaction;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

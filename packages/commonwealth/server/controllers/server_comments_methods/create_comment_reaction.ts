@@ -30,9 +30,8 @@ export type CreateCommentReactionOptions = {
   address: AddressInstance;
   reaction: string;
   commentId: number;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
 };
 
 export type CreateCommentReactionResult = [
@@ -48,8 +47,7 @@ export async function __createCommentReaction(
     address,
     reaction,
     commentId,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
   }: CreateCommentReactionOptions,
 ): Promise<CreateCommentReactionResult> {
@@ -129,14 +127,11 @@ export async function __createCommentReaction(
       );
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          // @ts-expect-error StrictNullChecks
-          community.namespace_address,
+          community.namespace_address!,
           stake.stake_id,
           // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
-          // @ts-expect-error StrictNullChecks
-          node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
         stakeBalances[address.address],
@@ -150,15 +145,14 @@ export async function __createCommentReaction(
     reaction,
     address_id: address.id,
     community_id: thread.community_id,
-    comment_id: comment.id,
+    comment_id: comment.id!,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
     // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
     canvas_hash: canvasHash,
+    canvas_signed_data: canvasSignedData,
   };
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({
@@ -184,7 +178,7 @@ export async function __createCommentReaction(
         root_type: null, // What is this for?
         community_id: thread.community_id,
         author_address: address.address,
-        author_community_id: address.community_id,
+        author_community_id: address.community_id!,
       },
     },
     excludeAddresses: [address.address],

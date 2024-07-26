@@ -1,10 +1,12 @@
 declare let window: any;
 
-import type { SessionPayload } from '@canvas-js/interfaces';
-import bs58 from 'bs58';
-
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import Account from '../../../models/Account';
+import { SolanaSigner } from '@canvas-js/chain-solana';
+import {
+  ChainBase,
+  ChainNetwork,
+  SOLANA_MAINNET_CHAIN_ID,
+  WalletId,
+} from '@hicommonwealth/shared';
 import IWebWallet from '../../../models/IWebWallet';
 
 class PhantomWebWalletController implements IWebWallet<string> {
@@ -35,28 +37,20 @@ class PhantomWebWalletController implements IWebWallet<string> {
   }
 
   public getChainId() {
-    return 'mainnet';
+    // 5ey... is the solana mainnet genesis hash
+    return SOLANA_MAINNET_CHAIN_ID;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-expect-error StrictNullChecks
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    const canvas = await import('@canvas-js/interfaces');
-    const encodedMessage = new TextEncoder().encode(
-      canvas.serializeSessionPayload(canvasSessionPayload),
-    );
-    const { signature } = await window.solana.signMessage(
-      encodedMessage,
-      'utf8',
-    );
-    return bs58.encode(signature as Uint8Array);
+  public getSessionSigner() {
+    return new SolanaSigner({
+      signer: window.solana,
+      chainId: this.getChainId(),
+    });
   }
 
   // ACTIONS
@@ -78,6 +72,11 @@ class PhantomWebWalletController implements IWebWallet<string> {
       this._enabled = true;
     } catch (err) {
       this._enabling = false;
+      if (!window.solana.isConnected) {
+        throw new Error(
+          'No Phantom accounts found! Please setup your Phantom wallet and try again.',
+        );
+      }
       throw new Error('Could not connect to Phantom wallet!');
     }
   }

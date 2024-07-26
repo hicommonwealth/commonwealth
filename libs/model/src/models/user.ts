@@ -69,6 +69,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
         allowNull: false,
       },
       promotional_emails_enabled: { type: Sequelize.BOOLEAN, allowNull: true },
+      is_welcome_onboard_flow_complete: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
       isAdmin: { type: Sequelize.BOOLEAN, defaultValue: false },
       disableRichText: {
         type: Sequelize.BOOLEAN,
@@ -76,6 +81,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
         allowNull: false,
       },
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
+      profile: { type: Sequelize.JSONB, allowNull: false },
     },
     {
       timestamps: true,
@@ -102,7 +108,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
   );
 
   User.createWithProfile = async (attrs, options) => {
-    const user = await User.create(attrs, options);
+    const user = await User.create({ ...attrs, profile: {} }, options);
     if (user) {
       user.Profiles = user.Profiles || [];
       const profile = await sequelize.models.Profile.create(

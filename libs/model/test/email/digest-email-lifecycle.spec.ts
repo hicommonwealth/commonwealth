@@ -2,9 +2,10 @@ import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
+import { bootstrap_testing, seed } from 'model/src/tester';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/emails';
-import { seed } from '../../src/tester';
 import { generateThreads } from './util';
 
 describe('Digest email lifecycle', () => {
@@ -12,12 +13,13 @@ describe('Digest email lifecycle', () => {
   let communityTwo: z.infer<typeof Community> | undefined;
   let communityThree: z.infer<typeof Community> | undefined;
 
-  before(async () => {
+  beforeAll(async () => {
+    await bootstrap_testing(true);
     const [authorUser] = await seed('User', {
       isAdmin: false,
       selected_community_id: null,
     });
-    const [authorProfile] = await seed('Profile', {
+    await seed('Profile', {
       user_id: authorUser!.id,
     });
 
@@ -27,7 +29,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -37,7 +38,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -48,7 +48,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -68,11 +67,11 @@ describe('Digest email lifecycle', () => {
     await models.sequelize.query(`DELETE FROM "Threads";`);
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should return an empty object if there are no relevant communities', async () => {
+  test('should return an empty object if there are no relevant communities', async () => {
     await generateThreads(communityOne!, communityTwo!, communityThree!);
     const res = await query(GetDigestEmailDataQuery(), {
       actor: {
@@ -96,7 +95,7 @@ describe('Digest email lifecycle', () => {
     );
   });
 
-  it('should return an empty object if there are no relevant threads', async () => {
+  test('should return an empty object if there are no relevant threads', async () => {
     await models.Community.update(
       {
         include_in_digest_email: true,
@@ -120,7 +119,7 @@ describe('Digest email lifecycle', () => {
     expect(res).to.deep.equal({});
   });
 
-  it('should return enriched threads for each community', async () => {
+  test('should return enriched threads for each community', async () => {
     const { threadOne, threadTwo, threadFour } = await generateThreads(
       communityOne!,
       communityTwo!,

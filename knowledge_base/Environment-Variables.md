@@ -20,6 +20,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [COSMOS_REGISTRY_API](#cosmos_registry_api)
 - [CW_BOT_KEY](#cw_bot_key)
 - [DATABASE_CLEAN_HOUR](#database_clean_hour)
+- [DATABASE_LOG_TRACE](#database_log_trace)
 - [DATABASE_URI](#database_uri)
 - [DATABASE_URL](#database_url)
 - [DD_AGENT_MAJOR_VERSION](#dd_agent_major_version)
@@ -42,12 +43,12 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
 - [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
-- [FLAG_COMMUNITY_STAKE](#flag_community_stake)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
 - [JWT_SECRET](#jwt_secret)
+- [LOG_LEVEL](#log_level)
 - [MAGIC_API_KEY](#magic_api_key)
 - [MAGIC_DEFAULT_CHAIN](#magic_default_chain)
 - [MAGIC_PUBLISHABLE_KEY](#magic_publishable_key)
@@ -56,7 +57,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [MIXPANEL_PROD_TOKEN](#mixpanel_prod_token)
 - [NEXT_PUBLIC_RSA_PRIVATE_KEY](#next_public_rsa_private_key)
 - [NEXT_PUBLIC_RSA_PUBLIC_KEY](#next_public_rsa_public_key)
-- [NO_CLIENT](#no_client)
 - [NO_GLOBAL_ACTIVITY_CACHE](#no_global_activity_cache)
 - [NO_PRERENDER](#no_prerender)
 - [NO_SSL](#no_ssl)
@@ -76,7 +76,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SESSION_SECRET](#session_secret)
 - [SL_BUILD](#sl_build)
 - [SL_PORT](#sl_port)
-- [SLACK_FEEDBACK_WEBHOOK](#slack_feedback_webhook)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
 - [SUPER_ADMIN_EMAIL](#super_admin_email)
@@ -136,6 +135,12 @@ Required for Common bots, e.g. Discobot. In development, can be set to any rando
 When the cleaner runs is determined by the DATABASE_CLEAN_HOUR env var. The env var is a simple number between 0 and 24 indicating (in 24hr format) at what time the cleaner should execute the cleaning functions. If env var is not set, the database cleaner will not run.
 
 Owner: Timothee Legros.
+
+## DATABASE_LOG_TRACE
+
+Logs traces of sequelize SQL statements when LOG_LEVEL=trace
+
+Owner: Roger Torres.
 
 ## DATABASE_URI
 
@@ -233,9 +238,6 @@ After this time, the server will try the original DB endpoint again.
 
 Boolean toggle to display side-wide homepage feature for communities. Temporary flag for 2.0 work.
 
-## FLAG_COMMUNITY_STAKE
-
-Boolean toggle to enable [community stake](./Stake.md) for local development.
 
 ## FLAG_NEW_CREATE_COMMUNITY
 
@@ -258,6 +260,13 @@ Owner: Kurtis Assad.
 ## JWT_SECRET
 
 Required in production. The JWT seed secret that is used to generate all user JWTs.
+
+## LOG_LEVEL
+
+Sets console logger level. May be set 'trace', 'debug', 'info', 'warn', 'error', or 'fatal'.
+Defaults to 'info' in production mode, 'debug' otherwise.
+
+Owner: Roger Torres.
 
 ## MAGIC_API_KEY
 
@@ -290,10 +299,6 @@ Mixpanel analytics tracking token for our live production site.
 ## NEXT_PUBLIC_RSA_PUBLIC_KEY
 
 <!-- Likely deprecated; flagged for removal with closing of #6185. -->
-
-## NO_CLIENT
-
-If `true`, disables the front-end build.
 
 ## NO_GLOBAL_ACTIVITY_CACHE
 
@@ -374,10 +379,6 @@ Boolean triggering our `snapshot-listener` package to build.
 ## SL_PORT
 
 Port used for the `snapshot-listener` package. We use the default value `8001`.
-
-## SLACK_FEEDBACK_WEBHOOK
-
-Enables Common users to share feedback on the app to our Slack. As of 240109, we still hook into the previous Commonwealth Slack, but this is liable to change soon.
 
 ## SLACK_WEBHOOK_URL_DEV
 

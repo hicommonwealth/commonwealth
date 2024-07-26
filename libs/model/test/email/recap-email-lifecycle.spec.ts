@@ -19,6 +19,7 @@ import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { GetRecapEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
@@ -40,7 +41,7 @@ describe('Recap email lifecycle', () => {
 
   let sandbox: sinon.SinonSandbox;
 
-  before(async () => {
+  beforeAll(async () => {
     [recipientUser] = await seed('User', {
       isAdmin: false,
       selected_community_id: null,
@@ -65,7 +66,6 @@ describe('Recap email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',
@@ -99,11 +99,11 @@ describe('Recap email lifecycle', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should return enriched discussion notifications', async () => {
+  test('should return enriched discussion notifications', async () => {
     const discussionData = generateDiscussionData(
       authorUser!,
       authorProfile!,
@@ -141,7 +141,7 @@ describe('Recap email lifecycle', () => {
     expect(res?.discussion).to.deep.equal(discussionData.enrichedNotifications);
   });
 
-  it('should return enriched governance notifications', async () => {
+  test('should return enriched governance notifications', async () => {
     const governanceData = generateGovernanceData(
       {
         id: '0x5ed0465ba58b442f1e671789797d5e36b538a27603549639a34f95451b59ad32',
@@ -178,7 +178,7 @@ describe('Recap email lifecycle', () => {
     expect(res?.governance).to.deep.equal(governanceData.enrichedNotifications);
   });
 
-  it('should return enriched protocol notifications', async () => {
+  test('should return enriched protocol notifications', async () => {
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(new Date().getDate() - 2);
     const protocolData = generateProtocolData(
@@ -215,7 +215,7 @@ describe('Recap email lifecycle', () => {
     expect(res?.protocol).to.deep.equal(protocolData.enrichedNotifications);
   });
 
-  it.skip('should throw if the notifications provider fails', async () => {
+  test.skip('should throw if the notifications provider fails', async () => {
     sandbox = sinon.createSandbox();
     notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 

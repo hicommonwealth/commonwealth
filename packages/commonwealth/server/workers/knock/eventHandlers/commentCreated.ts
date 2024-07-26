@@ -4,7 +4,7 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, safeTruncateBody } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
 import z from 'zod';
@@ -27,10 +27,8 @@ export const processCommentCreated: EventHandler<
   typeof output
 > = async ({ payload }) => {
   const author = await models.Address.findOne({
-    where: {
-      id: payload.address_id,
-    },
-    include: [{ model: models.Profile, required: true }],
+    where: { id: payload.address_id },
+    include: [{ model: models.User, required: true, attributes: ['profile'] }],
   });
 
   if (!author || !author.user_id) {
@@ -41,9 +39,7 @@ export const processCommentCreated: EventHandler<
   }
 
   const community = await models.Community.findOne({
-    where: {
-      id: payload.community_id,
-    },
+    where: { id: payload.community_id },
   });
 
   if (!community) {
@@ -78,16 +74,15 @@ export const processCommentCreated: EventHandler<
   if (users.length > 0) {
     const provider = notificationsProvider();
 
-    // TODO: error handling -> Ryan's event handling utility?
     return await provider.triggerWorkflow({
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
         // @ts-expect-error StrictNullChecks
-        author: author.Profile.profile_name || author.address.substring(0, 8),
+        author: author.User.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
-        comment_body: decodeURIComponent(payload.text).substring(0, 255),
+        comment_body: safeTruncateBody(decodeURIComponent(payload.text), 255),
         comment_url: getCommentUrl(
           payload.community_id,
           payload.thread_id,

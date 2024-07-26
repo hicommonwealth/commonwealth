@@ -7,6 +7,7 @@ import { useCreateGroupMutation } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import { PageNotFound } from '../../../404';
 import { GroupForm } from '../common/GroupForm';
 import { makeGroupDataBaseAPIPayload } from '../common/helpers';
@@ -22,8 +23,13 @@ const CreateCommunityGroupPage = () => {
     communityId: app.activeChainId(),
   });
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.GROUPS_CREATION_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.GROUPS_CREATION_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
+    },
   });
 
   if (
@@ -39,21 +45,24 @@ const CreateCommunityGroupPage = () => {
       initialValues={{
         requirementsToFulfill: 'ALL',
       }}
-      onSubmit={(values) => {
-        const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
+      onSubmit={async (values) => {
+        const payload = makeGroupDataBaseAPIPayload(
+          values,
+          isAddedToHomeScreen,
+          allowedAddresses,
+        );
 
-        createGroup(payload)
-          .then(() => {
-            notifySuccess('Group Created');
-            setShouldShowGroupMutationBannerForCommunity(
-              app.activeChainId(),
-              true,
-            );
-            navigate(`/members?tab=groups`);
-          })
-          .catch(() => {
-            notifyError('Failed to create group');
-          });
+        try {
+          await createGroup(payload);
+          notifySuccess('Group Created');
+          setShouldShowGroupMutationBannerForCommunity(
+            app.activeChainId(),
+            true,
+          );
+          navigate(`/members?tab=groups`);
+        } catch (error) {
+          notifyError('Failed to create group');
+        }
       }}
       allowedAddresses={allowedAddresses}
       setAllowedAddresses={setAllowedAddresses}

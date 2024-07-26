@@ -4,9 +4,11 @@ import { formatNumberShort } from 'adapters/currency';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useUserStore from 'state/ui/user';
 import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';
+import useAppStatus from '../../hooks/useAppStatus';
 import app from '../../state';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
@@ -41,9 +43,13 @@ export const ConfirmSnapshotVoteModal = (
     totalScore,
   } = props;
 
-  const author = app.user.activeAccount;
+  const user = useUserStore();
+
+  const author = user.activeAccount;
 
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
@@ -58,13 +64,16 @@ export const ConfirmSnapshotVoteModal = (
       metadata: JSON.stringify({}),
     };
     try {
-      castVote(author.address, votePayload).then(async () => {
-        await app.snapshot.refreshProposals();
-        onModalClose();
-        successCallback();
-      });
+      castVote(author?.address || '', votePayload)
+        .then(async () => {
+          await app.snapshot.refreshProposals();
+          onModalClose();
+          successCallback();
+        })
+        .catch(console.error);
       trackAnalytics({
         event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log(err);

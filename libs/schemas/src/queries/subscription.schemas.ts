@@ -8,7 +8,7 @@ import {
 
 export const GetSubscriptionPreferences = {
   input: z.object({}),
-  output: SubscriptionPreference,
+  output: z.union([SubscriptionPreference, z.object({})]),
 };
 
 export const GetCommunityAlerts = {

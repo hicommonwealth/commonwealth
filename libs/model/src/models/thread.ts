@@ -2,7 +2,7 @@ import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
@@ -13,6 +13,7 @@ import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
+  version_history_updated?: boolean;
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
@@ -70,9 +71,8 @@ export default (
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
       has_poll: { type: Sequelize.BOOLEAN, allowNull: true },
 
-      // signed data
-      canvas_action: { type: Sequelize.JSONB, allowNull: true },
-      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      // canvas-related columns
+      canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_hash: { type: Sequelize.STRING, allowNull: true },
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
@@ -103,12 +103,23 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      activity_rank_date: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: new Date(),
+      },
 
       //notifications
       max_notif_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
+      },
+
+      version_history_updated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     },
     {
@@ -141,12 +152,22 @@ export default (
             transaction: options.transaction,
           });
 
+          const { topic_id, community_id } = thread.get({
+            plain: true,
+          });
+          const contestManagers = !topic_id
+            ? []
+            : await getThreadContestManagers(sequelize, topic_id, community_id);
+
           await emitEvent(
             Outbox,
             [
               {
                 event_name: EventNames.ThreadCreated,
-                event_payload: thread.get({ plain: true }),
+                event_payload: {
+                  ...thread.get({ plain: true }),
+                  contestManagers,
+                },
               },
             ],
             options.transaction,

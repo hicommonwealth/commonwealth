@@ -107,7 +107,7 @@ export const useMention = ({
             });
             const profiles = data?.result?.results;
             formattedMatches = profiles.map((p: any) => {
-              const profileId = p.id;
+              const userId = p.user_id;
               const profileAddress = p.addresses[0]?.address;
               const profileName = p.profile_name;
               const profileCommunity = p.addresses[0]?.community_id;
@@ -118,10 +118,10 @@ export const useMention = ({
                 profileCommunity,
               );
               profile.initialize(
+                userId,
                 profileName,
                 profileAddress,
                 avatarUrl,
-                profileId,
                 profileCommunity,
                 null,
               );
@@ -170,7 +170,7 @@ export const useMention = ({
               node.appendChild(textWrap);
 
               return {
-                link: `/profile/id/${profileId}`,
+                link: `/profile/id/${userId}`,
                 name: profileName,
                 component: node.outerHTML,
               };

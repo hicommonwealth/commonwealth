@@ -1,6 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { Sequelize } from 'sequelize';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { Factories } from '../../src/models/factories';
 import {
   bootstrap_testing,
@@ -38,9 +39,6 @@ const generateSchemas = async () => {
         'FOREIGN KEY Notifications(notification_id) UPDATE NO ACTION DELETE CASCADE',
         'FOREIGN KEY Subscriptions(subscription_id) UPDATE NO ACTION DELETE CASCADE',
       ],
-      Addresses: [
-        'FOREIGN KEY Profiles(profile_id) UPDATE NO ACTION DELETE NO ACTION',
-      ],
 
       // Removed in migration
       Outbox: ['PRIMARY KEY(event_id)'],
@@ -73,11 +71,11 @@ const generateSchemas = async () => {
 describe('Model schema', () => {
   let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
 
-  before(async () => {
+  beforeAll(async () => {
     schemas = await generateSchemas();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -89,7 +87,7 @@ describe('Model schema', () => {
   });
   Object.values(Factories).forEach((factory) => {
     const m = factory(s);
-    it(`Should match ${m.tableName}`, async () => {
+    test(`Should match ${m.tableName}`, async () => {
       const { model, migration } = schemas[m.tableName];
 
       //console.log(model.columns, migration.columns);

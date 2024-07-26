@@ -1,6 +1,9 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { PG_INT } from '../utils';
+import { PG_INT, zDate } from '../utils';
+import { Community } from './community.schemas';
+import { Thread } from './thread.schemas';
+import { Address } from './user.schemas';
 
 export const NotificationCategory = z.object({
   name: z.string().max(255),
@@ -40,8 +43,32 @@ export const ThreadSubscription = z.object({
   id: PG_INT.optional(),
   user_id: PG_INT,
   thread_id: PG_INT,
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  Thread: Thread.pick({
+    id: true,
+    community_id: true,
+    address_id: true,
+    title: true,
+    comment_count: true,
+    created_at: true,
+    url: true,
+  })
+    .merge(
+      z.object({
+        Community: Community.pick({
+          id: true,
+          name: true,
+          icon_url: true,
+        }),
+        Address: Address.pick({
+          id: true,
+          user_id: true,
+          address: true,
+        }),
+      }),
+    )
+    .optional(),
 });
 
 export const CommentSubscription = z.object({
@@ -52,10 +79,19 @@ export const CommentSubscription = z.object({
   updated_at: z.date().optional(),
 });
 
-export const CommunityAlert = z.object({
-  id: PG_INT.optional(),
-  user_id: PG_INT,
-  community_id: z.string(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
+export const CommunityAlert = z
+  .object({
+    user_id: PG_INT,
+    community_id: z.string(),
+    created_at: zDate.optional(),
+    updated_at: zDate.optional(),
+  })
+  .merge(
+    z.object({
+      Community: Community.pick({
+        id: true,
+        name: true,
+        icon_url: true,
+      }).optional(),
+    }),
+  );

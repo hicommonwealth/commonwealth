@@ -1,10 +1,10 @@
-import { pluralize } from 'client/scripts/helpers';
-import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
-import Permissions from 'client/scripts/utils/Permissions';
-import { ViewUpvotesDrawerTrigger } from 'client/scripts/views/components/UpvoteDrawer';
+import { pluralize } from 'helpers';
+import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useState } from 'react';
+import Permissions from 'utils/Permissions';
 import { SharePopover } from 'views/components/SharePopover';
+import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import {
   getCommentSubscription,
@@ -29,6 +29,7 @@ type OptionsProps = AdminActionsProps & {
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
   setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
+  editingDisabled?: boolean;
 };
 
 export const ThreadOptions = ({
@@ -56,6 +57,7 @@ export const ThreadOptions = ({
   upvoteDrawerBtnBelow,
   hideUpvoteDrawerButton = false,
   setIsUpvoteDrawerOpen,
+  editingDisabled,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -102,6 +104,7 @@ export const ThreadOptions = ({
               thread={thread}
               size="small"
               disabled={!canReact}
+              undoUpvoteDisabled={editingDisabled}
               tooltipText={
                 typeof disabledActionsTooltipText === 'function'
                   ? disabledActionsTooltipText?.('upvote')
@@ -154,6 +157,7 @@ export const ThreadOptions = ({
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onSpamToggle={onSpamToggle}
               hasPendingEdits={hasPendingEdits}
+              editingDisabled={editingDisabled}
             />
           )}
         </div>

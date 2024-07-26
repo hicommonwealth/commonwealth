@@ -81,13 +81,6 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Coinbase',
   },
-  near: {
-    icon: {
-      name: 'near',
-      isCustom: true,
-    },
-    label: 'Near',
-  },
   terrastation: {
     icon: {
       name: 'terrastation',

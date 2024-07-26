@@ -11,15 +11,12 @@ const {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
-  JWT_SECRET,
   SEND_EMAILS: _SEND_EMAILS,
   SEND_WEBHOOKS_EMAILS,
-  NO_CLIENT: _NO_CLIENT,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   LOGIN_RATE_LIMIT_TRIES,
   LOGIN_RATE_LIMIT_MINS,
-  SLACK_FEEDBACK_WEBHOOK,
   FLAG_COMMON_WALLET: _FLAG_COMMON_WALLET,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
@@ -42,8 +39,7 @@ const {
 } = process.env;
 
 const SEND_EMAILS = _SEND_EMAILS === 'true';
-const NO_CLIENT = _NO_CLIENT === 'true' || SEND_EMAILS;
-const NO_PRERENDER = _NO_PRERENDER || NO_CLIENT;
+const NO_PRERENDER = _NO_PRERENDER;
 const FLAG_COMMON_WALLET = _FLAG_COMMON_WALLET === ' true';
 
 export const config = configure(
@@ -55,14 +51,12 @@ export const config = configure(
     // Risks sending webhooks/emails to real users if incorrectly set to true
     SEND_WEBHOOKS_EMAILS:
       model_config.NODE_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
-    NO_CLIENT,
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     // limit logins in the last 5 minutes
     // increased because of chain waitlist registrations
     LOGIN_RATE_LIMIT_TRIES: parseInt(LOGIN_RATE_LIMIT_TRIES ?? '15', 10),
     LOGIN_RATE_LIMIT_MINS: parseInt(LOGIN_RATE_LIMIT_MINS ?? '5', 10),
-    SLACK_FEEDBACK_WEBHOOK,
     FLAG_COMMON_WALLET,
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(GENERATE_IMAGE_RATE_LIMIT ?? '10', 10),
@@ -87,8 +81,6 @@ export const config = configure(
     ),
     AUTH: {
       SESSION_SECRET: SESSION_SECRET || 'my secret',
-      JWT_SECRET: JWT_SECRET || 'my secret',
-      SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
       MAGIC_API_KEY,
       MAGIC_SUPPORTED_BASES: (MAGIC_SUPPORTED_BASES?.split(
         ',',
@@ -124,19 +116,17 @@ export const config = configure(
         10,
       ),
       MESSAGE_RELAYER_PREFETCH: parseInt(MESSAGE_RELAYER_PREFETCH ?? '50', 10),
-      EVM_CE_POLL_INTERVAL_MS: parseInt(EVM_CE_POLL_INTERVAL ?? '120_000', 10),
+      EVM_CE_POLL_INTERVAL_MS: parseInt(EVM_CE_POLL_INTERVAL ?? '120000', 10),
     },
   },
   z.object({
     ENFORCE_SESSION_KEYS: z.boolean(),
     SEND_EMAILS: z.boolean(),
     SEND_WEBHOOKS_EMAILS: z.boolean(),
-    NO_CLIENT: z.boolean(),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     LOGIN_RATE_LIMIT_TRIES: z.number().int().positive(),
     LOGIN_RATE_LIMIT_MINS: z.number().int().positive(),
-    SLACK_FEEDBACK_WEBHOOK: z.string().optional(),
     FLAG_COMMON_WALLET: z.boolean().optional(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
@@ -148,8 +138,6 @@ export const config = configure(
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
       SESSION_SECRET: z.string(),
-      JWT_SECRET: z.string(),
-      SESSION_EXPIRY_MILLIS: z.number().int(),
       MAGIC_API_KEY: z.string().optional(),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),

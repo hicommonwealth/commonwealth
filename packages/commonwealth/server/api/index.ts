@@ -1,5 +1,6 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Router } from 'express';
+import { ChainEvents } from '@hicommonwealth/model';
+import { Router, raw } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { config } from '../config';
 import * as community from './community';
@@ -7,6 +8,7 @@ import * as contest from './contest';
 import * as email from './emails';
 import * as feed from './feed';
 import * as integrations from './integrations';
+import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as thread from './threads';
 import * as wallet from './wallet';
@@ -21,10 +23,10 @@ const artifacts = {
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
   subscription: subscription.trpcRouter,
+  loadTest: loadTest.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
-  artifacts['subscription'] = subscription.trpcRouter;
   artifacts['email'] = email.trpcRouter;
 }
 
@@ -53,6 +55,22 @@ router.get('/v1/openapi.json', (req, res) => {
     }),
   );
 });
+
+router.post(
+  '/v1/rest/chainevent/ChainEventCreated/:id',
+  raw({ type: '*/*', limit: '10mb', inflate: true }),
+  (req, res, next) => {
+    ChainEvents.verifyAlchemySignature(req);
+    return next();
+  },
+  // parse body as JSON (native express.json middleware doesn't work here)
+  (req, res, next) => {
+    req.body = JSON.parse(req.body);
+    next();
+  },
+  express.command(ChainEvents.ChainEventCreated()),
+);
+
 router.use('/v1/docs', swaggerUi.serve);
 router.get(
   '/v1/docs',

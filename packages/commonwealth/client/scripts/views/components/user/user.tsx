@@ -1,9 +1,11 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import ghostSvg from 'assets/img/ghost.svg';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import CWPopover, {
   usePopover,
@@ -34,12 +36,15 @@ export const User = ({
   popoverPlacement,
 }: UserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
+  const loggedInUser = useUserStore();
+
   const { data: users } = useFetchProfilesByAddressesQuery({
     currentChainId: app.activeChainId(),
     profileAddresses: [userAddress],
     profileChainIds: [userCommunityId],
     apiCallEnabled: !!(userAddress && userCommunityId),
   });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (showSkeleton) {
@@ -69,7 +74,7 @@ export const User = ({
   const friendlyCommunityName =
     app.config.chains.getById(userCommunityId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-  const isGhostAddress = app.user.addresses.some(
+  const isGhostAddress = loggedInUser.addresses.some(
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
@@ -90,7 +95,7 @@ export const User = ({
     </>
   );
 
-  const isSelfSelected = app.user.addresses
+  const isSelfSelected = loggedInUser.addresses
     .map((a) => a.address)
     .includes(userAddress);
 
@@ -102,7 +107,7 @@ export const User = ({
         ) : (
           'Anonymous'
         )
-      ) : !profile?.id ? (
+      ) : !profile?.userId ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
         profile?.name
@@ -121,12 +126,14 @@ export const User = ({
       <Avatar
         url={profile?.avatarUrl}
         size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
-        address={profile?.id}
+        address={profile?.userId}
       />
     </div>
   ) : (
     <div
-      className={`User${shouldLinkProfile && profile?.id ? ' linkified' : ''}`}
+      className={`User${
+        shouldLinkProfile && profile?.userId ? ' linkified' : ''
+      }`}
       key={profile?.address || '-'}
     >
       {showAvatar && (
@@ -134,7 +141,7 @@ export const User = ({
           // @ts-expect-error <StrictNullChecks/>
           to={
             profile && shouldLinkProfile
-              ? `/profile/id/${profile?.id}`
+              ? `/profile/id/${profile?.userId}`
               : undefined
           }
           className="user-avatar"
@@ -143,17 +150,17 @@ export const User = ({
           <Avatar
             url={profile?.avatarUrl}
             size={avatarSize}
-            address={profile?.id}
+            address={profile?.userId}
           />
         </Link>
       )}
       {
         <>
           {/* non-substrate name */}
-          {shouldLinkProfile && profile?.id ? (
+          {shouldLinkProfile && profile?.userId ? (
             <Link
               className="user-display-name username"
-              to={`/profile/id/${profile?.id}`}
+              to={`/profile/id/${profile?.userId}`}
               onClick={(e) => e.stopPropagation()}
             >
               {userBasisInfo}
@@ -164,7 +171,7 @@ export const User = ({
           {isGhostAddress && (
             <img
               alt="ghost"
-              src="/static/img/ghost.svg"
+              src={ghostSvg}
               width="20px"
               style={{ display: 'inline-block' }}
             />
@@ -182,7 +189,7 @@ export const User = ({
             <Avatar
               url={profile?.avatarUrl}
               size={profile?.avatarUrl ? 36 : 32}
-              address={profile?.id}
+              address={profile?.userId}
             />
           </div>
           <div className="user-name">
@@ -190,10 +197,12 @@ export const User = ({
               <Link
                 className="user-display-name substrate@"
                 // @ts-expect-error <StrictNullChecks/>
-                to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
+                to={
+                  profile?.userId ? `/profile/id/${profile?.userId}` : undefined
+                }
               >
-                {!profile || !profile?.id ? (
-                  !profile?.id && userAddress ? (
+                {!profile || !profile?.userId ? (
+                  !profile?.userId && userAddress ? (
                     `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
                     redactedAddress

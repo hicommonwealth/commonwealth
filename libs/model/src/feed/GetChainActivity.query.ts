@@ -7,6 +7,7 @@ export function GetChainActivity(): Query<typeof schemas.ChainFeed> {
   return {
     ...schemas.ChainFeed,
     auth: [],
+    secure: false,
     body: async () => {
       const ceNotifs = await models.Notification.findAll({
         where: {

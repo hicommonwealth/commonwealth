@@ -76,10 +76,6 @@ export const ChainEventNotificationRow = (
   let proposalType: ProposalType;
   if (chainEvent.network === SupportedNetwork.Cosmos) {
     proposalType = ProposalType.CosmosProposal;
-  } else if (chainEvent.network === SupportedNetwork.Aave) {
-    proposalType = ProposalType.AaveProposal;
-  } else if (chainEvent.network === SupportedNetwork.Compound) {
-    proposalType = ProposalType.CompoundProposal;
   }
 
   // @ts-expect-error <StrictNullChecks/>
@@ -185,7 +181,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
           users={authorInfo.map(
             (auth) =>
               new AddressInfo({
-                id: null,
+                userId: 0, // TODO: is this OK?
+                id: 0, // TODO: is this OK?
                 address: auth[1],
                 communityId: auth[0],
               }),
