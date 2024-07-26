@@ -11,6 +11,7 @@ import { getCommunityUrl } from 'utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { User } from 'views/components/user/user';
 import { z } from 'zod';
 
@@ -96,7 +97,15 @@ export const CommentSubscriptionEntry = (
       <div>
         <CWText type="h4" fontWeight="semiBold">
           <Link to={threadUrl}>
-            <CWText type="h4">{safeTruncateBody(comment.plaintext)}</CWText>
+            <QuillRenderer
+              doc={safeTruncateBody(unescape(comment.text))}
+              cutoffLines={4}
+              customShowMoreButton={
+                <CWText type="b1" className="show-more-btn">
+                  Show more
+                </CWText>
+              }
+            />
           </Link>
         </CWText>
       </div>
