@@ -12,7 +12,7 @@ type CommunityPreviewCardProps = {
   community?: CommunityInfo;
   monthlyThreadCount?: number;
   isCommunityMember?: boolean;
-  hasUnseenPosts?: boolean;
+  hasNewContent?: boolean;
   onClick?: () => any;
   isExploreMode?: boolean;
 };
@@ -21,7 +21,7 @@ const CommunityPreviewCard = ({
   community = {} as CommunityInfo,
   monthlyThreadCount,
   isCommunityMember,
-  hasUnseenPosts,
+  hasNewContent,
   onClick,
   isExploreMode,
 }: CommunityPreviewCardProps) => {
@@ -58,7 +58,7 @@ const CommunityPreviewCard = ({
                   'new thread',
                 )} created this month`}
               </CWText>
-              {isCommunityMember && hasUnseenPosts && (
+              {isCommunityMember && hasNewContent && (
                 <CWText className="new-activity-tag">New</CWText>
               )}
             </div>

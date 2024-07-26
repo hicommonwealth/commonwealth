@@ -40,7 +40,7 @@ export const TrendingCommunitiesPreview = () => {
         monthlyThreadCount,
         isMember,
         // TODO: should we remove the new label once user visits the community? -- ask from product
-        hasUnseenPosts: user.joinedCommunitiesWithNewContent.includes(
+        hasNewContent: user.joinedCommunityIdsWithNewContent.includes(
           community.id,
         ),
         onClick: () => navigate(`/${community.id}`),
@@ -62,7 +62,7 @@ export const TrendingCommunitiesPreview = () => {
             community={sortedCommunity.community}
             monthlyThreadCount={sortedCommunity.monthlyThreadCount}
             isCommunityMember={sortedCommunity.isMember}
-            hasUnseenPosts={sortedCommunity.hasUnseenPosts}
+            hasNewContent={sortedCommunity.hasNewContent}
             onClick={sortedCommunity.onClick}
           />
         ))}
