@@ -23,14 +23,11 @@ export const ThreadSubscriptions = () => {
         .filter((current) => current.Thread)
         .filter((current) => !threadsFilter.includes(current.Thread!.id!))
         .map((current) => (
-          <>
-            <ThreadSubscriptionEntry
-              key={current.Thread!.id!}
-              subscription={current as z.infer<typeof ThreadSubscription>}
-              onUnsubscribe={handleUnsubscribe}
-            />
-            {/*<ThreadCard thread={current.Thread!}/>*/}
-          </>
+          <ThreadSubscriptionEntry
+            key={current.Thread!.id!}
+            subscription={current as z.infer<typeof ThreadSubscription>}
+            onUnsubscribe={handleUnsubscribe}
+          />
         ))}
     </>
   );

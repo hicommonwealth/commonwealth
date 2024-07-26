@@ -120,6 +120,7 @@ const NotificationSettings = () => {
             </CWText>
 
             <ThreadSubscriptions />
+            {/*<CommentSubscriptions />*/}
           </>
         )}
       </div>

@@ -7,7 +7,7 @@ import { useMemo } from 'react';
  * fix the problem with dates as strings and types being wrong. We need to fix
  * this once we fix types on the client.
  */
-export function useThreadSubscriptions() {
+export function useCommentSubscriptions() {
   const subscriptionsQuery = useCommentSubscriptionsQuery();
 
   return useMemo(() => {
