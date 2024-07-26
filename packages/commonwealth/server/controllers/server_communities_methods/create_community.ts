@@ -384,7 +384,7 @@ export async function __createCommunity(
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
-    default_page: DefaultPage.Homepage,
+    default_page: DefaultPage.Discussions,
     has_homepage: 'true',
   });
 

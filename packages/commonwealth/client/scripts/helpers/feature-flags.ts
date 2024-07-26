@@ -23,7 +23,6 @@ const buildFlag = (env: string | undefined) => {
 const featureFlags = {
   allowlist: buildFlag(process.env.FLAG_ALLOWLIST),
   contest: buildFlag(process.env.FLAG_CONTEST),
-  communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   knockInAppNotifications: buildFlag(
     process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
   ),

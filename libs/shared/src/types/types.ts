@@ -6,7 +6,6 @@ export type Role = typeof Roles[number];
 export enum DefaultPage {
   Discussions = 'default_all_discussions_view',
   Overview = 'default_summary_view',
-  Homepage = 'homepage',
 }
 
 export type HttpMethod =

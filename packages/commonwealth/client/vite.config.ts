@@ -92,9 +92,6 @@ export default defineConfig(({ mode }) => {
       'process.env.COSMOS_REGISTRY_API': JSON.stringify(
         env.COSMOS_REGISTRY_API,
       ),
-      'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
-        env.FLAG_COMMUNITY_HOMEPAGE,
-      ),
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         env.FLAG_PROPOSAL_TEMPLATES,
       ),
