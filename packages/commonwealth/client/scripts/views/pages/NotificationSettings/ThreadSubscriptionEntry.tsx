@@ -110,7 +110,7 @@ export const ThreadSubscriptionEntry = (
         />
 
         <CWThreadAction
-          label="Subscribe"
+          label="Unsubscribe"
           action="subscribe"
           onClick={(e) => {
             e.preventDefault();
