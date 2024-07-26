@@ -98,7 +98,7 @@ export const CommentSubscriptionEntry = (
         <CWText type="h4" fontWeight="semiBold">
           <Link to={threadUrl}>
             <QuillRenderer
-              doc={safeTruncateBody(unescape(comment.text))}
+              doc={safeTruncateBody(decodeURI(comment.text))}
               cutoffLines={4}
               customShowMoreButton={
                 <CWText type="b1" className="show-more-btn">
