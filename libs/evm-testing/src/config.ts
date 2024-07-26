@@ -1,13 +1,8 @@
 import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
-const {
-  ETH_ALCHEMY_API_KEY,
-  PROVIDER_URL,
-  ETH_RPC,
-  COSMOS_GOV_V1,
-  COSMOS_REGISTRY_API,
-} = process.env;
+const { ETH_ALCHEMY_API_KEY, PROVIDER_URL, ETH_RPC, COSMOS_REGISTRY_API } =
+  process.env;
 
 export const config = configure(
   target,
@@ -19,7 +14,6 @@ export const config = configure(
       ETH_ALCHEMY_API_KEY,
     },
     COSMOS: {
-      COSMOS_GOV_V1_CHAIN_IDS: COSMOS_GOV_V1 ? COSMOS_GOV_V1.split(',') : [],
       COSMOS_REGISTRY_API:
         COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro',
     },
@@ -32,7 +26,6 @@ export const config = configure(
       BASESEP_ALCHEMY_API_KEY: z.string().optional(),
     }),
     COSMOS: z.object({
-      COSMOS_GOV_V1_CHAIN_IDS: z.array(z.string()),
       COSMOS_REGISTRY_API: z.string(),
     }),
   }),
