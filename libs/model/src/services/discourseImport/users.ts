@@ -98,7 +98,7 @@ class CWQueries {
     },
     { transaction }: { transaction: Transaction },
   ) => {
-    const [user] = await models.sequelize.query<{ id: number; email: string }>(
+    const [user] = await models.sequelize.query<UserIdEmail>(
       `
        INSERT INTO "Users"(
        id, email, created_at, updated_at, "selected_community_id", "isAdmin", "disableRichText",
@@ -178,7 +178,7 @@ export const createAllUsersInCW = async (
   );
 
   // create all new users
-  const userIds = await Promise.all(
+  const createdUsers = await Promise.all(
     usersToCreate.map(({ email, admin, username, name, moderator }) =>
       CWQueries.createUser(
         { email, isAdmin: admin, isModerator: moderator, username, name },
@@ -186,7 +186,7 @@ export const createAllUsersInCW = async (
       ),
     ),
   );
-  const result = userIds.map(
+  const result = createdUsers.map(
     ({ user, isAdmin, isModerator, username, name }): z.infer<typeof User> => {
       const discourseUser = discourseUsers.find(
         ({ email }) => email === user.email,
@@ -197,14 +197,14 @@ export const createAllUsersInCW = async (
         );
       }
       return {
-        // discourseUserId: discourseUser.id,
+        discourseUserId: discourseUser.id,
         id: user.id,
         email: user.email,
         isAdmin,
-        // isModerator,
-        // username,
-        // name,
-        // alreadyHasAccountInCW: false,
+        isModerator,
+        username,
+        name,
+        alreadyHasAccountInCW: false,
         emailVerified: false,
       };
     },
