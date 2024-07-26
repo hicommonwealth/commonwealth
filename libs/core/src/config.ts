@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 import * as dotenv from 'dotenv';
 import _ from 'lodash';
 import { ZodType, z } from 'zod';
+import { LogLevel, LogLevels } from './ports/enums';
 
 dotenv.config({ path: '../../.env' });
 
@@ -45,6 +46,7 @@ const {
   IS_CI,
   SERVER_URL,
   PORT: _PORT,
+  LOG_LEVEL,
   ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN,
   ROLLBAR_ENV: _ROLLBAR_ENV,
   TEST_WITHOUT_LOGS,
@@ -70,6 +72,9 @@ export const config = configure(
     SERVER_URL: SERVER_URL ?? DEFAULTS.SERVER_URL,
     PORT: _PORT ? parseInt(_PORT, 10) : DEFAULTS.PORT,
     LOGGING: {
+      LOG_LEVEL:
+        (LOG_LEVEL as LogLevel) ||
+        (NODE_ENV === 'production' ? 'info' : 'debug'),
       ROLLBAR_SERVER_TOKEN:
         _ROLLBAR_SERVER_TOKEN || DEFAULTS.ROLLBAR_SERVER_TOKEN,
       ROLLBAR_ENV: _ROLLBAR_ENV || DEFAULTS.ROLLBAR_ENV,
@@ -108,6 +113,7 @@ export const config = configure(
     PORT: z.number().int().min(1000).max(65535),
     LOGGING: z
       .object({
+        LOG_LEVEL: z.enum(LogLevels),
         ROLLBAR_SERVER_TOKEN: z.string(),
         ROLLBAR_ENV: z.string(),
         TEST_WITHOUT_LOGS: z.boolean(),

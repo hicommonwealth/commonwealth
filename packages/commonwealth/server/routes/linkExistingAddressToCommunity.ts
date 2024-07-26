@@ -9,7 +9,6 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import { createRole, findOneRole } from '../util/roles';
 
 const { Op } = Sequelize;
 
@@ -168,18 +167,6 @@ const linkExistingAddressToCommunity = async (
   const ownedAddresses = await models.Address.findAll({
     where: { user_id: originalAddress.user_id },
   });
-
-  const role = await findOneRole(
-    models,
-    { where: { address_id: addressId } },
-    // @ts-expect-error StrictNullChecks
-    community.id,
-  );
-
-  if (!role) {
-    // @ts-expect-error StrictNullChecks
-    await createRole(models, addressId, community.id, 'member');
-  }
 
   const serverAnalyticsController = new ServerAnalyticsController();
   serverAnalyticsController.track(

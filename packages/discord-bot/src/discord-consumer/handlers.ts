@@ -6,6 +6,7 @@ import {
   models,
 } from '@hicommonwealth/model';
 import axios from 'axios';
+import { QueryTypes } from 'sequelize';
 import { config } from '../config';
 
 export async function handleThreadMessages(
@@ -60,19 +61,21 @@ export async function handleCommentMessages(
   message: IDiscordMessage,
   sharedReqData: Record<string, any>,
 ): Promise<void> {
-  const threadId: { id: number } = (
-    await models.sequelize.query(`
-        SELECT id FROM "Threads" 
-        WHERE discord_meta->>'message_id' = '${message.channel_id}'
-        AND deleted_at IS NULL
-        LIMIT 1;
-    `)
-  )[0][0]['id'];
+  const [thread] = await models.sequelize.query<{ id: number }>(
+    `
+    SELECT id FROM "Threads" 
+    WHERE discord_meta->>'message_id' = '${message.channel_id}'
+    AND deleted_at IS NULL
+    LIMIT 1;
+`,
+    { type: QueryTypes.SELECT },
+  );
+  if (!thread) return;
 
   switch (action) {
     case 'comment-create':
       await axios.post(
-        `${config.SERVER_URL}/api/bot/threads/${threadId}/comments`,
+        `${config.SERVER_URL}/api/bot/threads/${thread.id}/comments`,
         {
           ...sharedReqData,
           text: encodeURIComponent(message.content),
@@ -81,7 +84,7 @@ export async function handleCommentMessages(
       break;
     case 'comment-update':
       await axios.patch(
-        `${config.SERVER_URL}/api/bot/threads/${threadId}/comments`,
+        `${config.SERVER_URL}/api/bot/threads/${thread.id}/comments`,
         {
           ...sharedReqData,
           body: encodeURIComponent(message.content),

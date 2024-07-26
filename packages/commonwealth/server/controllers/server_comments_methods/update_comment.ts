@@ -9,11 +9,9 @@ import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
-  createCommentMentionNotifications,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  queryMentionedUsers,
 } from '../../util/parseUserMentions';
 import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
@@ -115,7 +113,6 @@ export async function __updateComment(
   );
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   await this.models.sequelize.transaction(async (transaction) => {
     await this.models.Comment.update(
@@ -149,7 +146,7 @@ export async function __updateComment(
       // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
-      mentions: mentionedAddresses,
+      mentions: mentions,
       comment,
     });
   });
@@ -186,15 +183,6 @@ export async function __updateComment(
     // @ts-expect-error StrictNullChecks
     excludeAddresses: [finalComment.Address.address],
   });
-
-  allNotificationOptions.push(
-    ...createCommentMentionNotifications(
-      mentionedAddresses,
-      finalComment,
-      // @ts-expect-error StrictNullChecks
-      finalComment.Address,
-    ),
-  );
 
   // update address last active
   address.last_active = new Date();

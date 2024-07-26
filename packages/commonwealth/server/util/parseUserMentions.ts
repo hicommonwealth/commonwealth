@@ -1,10 +1,8 @@
-import { EventNames, events, ServerError } from '@hicommonwealth/core';
+import { EventNames, events } from '@hicommonwealth/core';
 import { DB, emitEvent } from '@hicommonwealth/model';
 import { Comment, Thread } from '@hicommonwealth/schemas';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import { QueryTypes, Transaction } from 'sequelize';
+import { Transaction } from 'sequelize';
 import z from 'zod';
-import { EmitOptions } from '../controllers/server_notifications_methods/emit';
 
 export type UserMention = {
   userId: string;
@@ -77,107 +75,11 @@ export const parseUserMentions = (text: string): UserMention[] => {
   }
 };
 
-export const queryMentionedUsers = async (
-  mentions: UserMention[],
-  models: DB,
-): Promise<UserMentionQuery> => {
-  if (mentions.length === 0) {
-    return [];
-  }
-
-  try {
-    // Create an array of tuples for the replacements
-    const tuples = mentions.map(({ userId, profileName }) => [
-      userId,
-      profileName,
-    ]);
-
-    return await models.sequelize.query<{
-      address_id: number;
-      address: string;
-      user_id: number;
-      profile_name: string;
-    }>(
-      `
-      SELECT
-        a.id as address_id,
-        a.address,
-        a.user_id,
-        u.profile->>'name' as profile_name
-      FROM 
-        "Addresses" as a
-        JOIN "Users" as u ON a.user_id = u.id
-      WHERE
-        (a.user_id, u.profile->>'name') IN (:tuples)
-      `,
-      {
-        type: QueryTypes.SELECT,
-        raw: true,
-        replacements: { tuples },
-      },
-    );
-  } catch (e) {
-    throw new ServerError('Failed to query mentioned users', e);
-  }
-};
-
-export const createCommentMentionNotifications = (
-  mentions: UserMentionQuery,
-  comment,
-  address,
-): EmitOptions[] => {
-  return mentions.map(({ user_id }) => {
-    return {
-      notification: {
-        categoryId: NotificationCategories.NewMention,
-        data: {
-          mentioned_user_id: user_id,
-          created_at: new Date(),
-          thread_id: +comment.thread_id,
-          root_title: comment.root_title,
-          root_type: ProposalType.Thread,
-          comment_id: +comment.id,
-          comment_text: comment.text,
-          community_id: comment.community_id,
-          author_address: address.address,
-          author_community_id: address.community_id,
-        },
-      },
-      excludeAddresses: [address.address],
-    };
-  }) as EmitOptions[];
-};
-
-export const createThreadMentionNotifications = (
-  mentions: UserMentionQuery,
-  finalThread,
-): EmitOptions[] => {
-  return mentions.map(({ user_id }) => {
-    return {
-      notification: {
-        categoryId: NotificationCategories.NewMention,
-        data: {
-          mentioned_user_id: user_id,
-          created_at: new Date(),
-          thread_id: finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          community_id: finalThread.community_id,
-          author_address: finalThread.Address.address,
-          author_community_id: finalThread.Address.community_id,
-        },
-      },
-      excludeAddresses: [finalThread.Address.address],
-    };
-  }) as EmitOptions[];
-};
-
 type EmitMentionsData = {
   authorAddressId: number;
   authorUserId: number;
   authorAddress: string;
-  mentions: UserMentionQuery;
+  mentions: UserMention[];
 } & (
   | {
       thread: z.infer<typeof Thread>;
@@ -196,13 +98,13 @@ export const emitMentions = async (
     const values: {
       event_name: EventNames.UserMentioned;
       event_payload: z.infer<typeof events.UserMentioned>;
-    }[] = data.mentions.map(({ user_id }) => ({
+    }[] = data.mentions.map(({ userId }) => ({
       event_name: EventNames.UserMentioned,
       event_payload: {
         authorAddressId: data.authorAddressId,
         authorUserId: data.authorUserId,
         authorAddress: data.authorAddress,
-        mentionedUserId: user_id,
+        mentionedUserId: Number(userId),
         communityId:
           'comment' in data
             ? data.comment.community_id

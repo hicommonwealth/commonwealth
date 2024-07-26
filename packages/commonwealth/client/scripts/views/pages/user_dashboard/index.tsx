@@ -5,12 +5,12 @@ import useStickyHeader from 'hooks/useStickyHeader';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import app, { LoginState } from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
-  MixpanelPageViewEvent,
   MixpanelPWAEvent,
+  MixpanelPageViewEvent,
 } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -61,6 +61,8 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useBrowserAnalyticsTrack({
     payload: {
       event: isAddedToHomeScreen
@@ -89,8 +91,8 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage, subpage]);
 
   return (
-    <CWPageLayout>
-      <div className="UserDashboard" key={`${isLoggedIn}`}>
+    <CWPageLayout ref={containerRef} className="UserDashboard">
+      <div key={`${isLoggedIn}`}>
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
