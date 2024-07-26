@@ -103,9 +103,9 @@ export const CommunityMember = z.object({
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.number().nullish(),
+      role: z.string(),
     }),
   ),
-  roles: z.array(z.string()).nullish(),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
 });

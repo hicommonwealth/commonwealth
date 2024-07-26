@@ -13,10 +13,8 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import {
-  createCommentMentionNotifications,
   emitMentions,
   parseUserMentions,
-  queryMentionedUsers,
   uniqueMentions,
 } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -190,7 +188,6 @@ export async function __createThreadComment(
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   let comment: CommentInstance;
   try {
@@ -216,7 +213,7 @@ export async function __createThreadComment(
         // @ts-expect-error StrictNullChecks
         authorUserId: user.id,
         authorAddress: address.address,
-        mentions: mentionedAddresses,
+        mentions: mentions,
         comment,
       });
 
@@ -250,12 +247,7 @@ export async function __createThreadComment(
 
   const allNotificationOptions: EmitOptions[] = [];
 
-  allNotificationOptions.push(
-    // @ts-expect-error StrictNullChecks
-    ...createCommentMentionNotifications(mentionedAddresses, comment, address),
-  );
-
-  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
+  const excludedAddrs: string[] = [];
   excludedAddrs.push(address.address);
 
   const rootNotifExcludeAddresses = [...excludedAddrs];

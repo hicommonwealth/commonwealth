@@ -334,7 +334,8 @@ export const NewThreadForm = () => {
 
               <MessageRow
                 hasFeedback={walletBalanceError}
-                statusMessage="Ensure that your connected wallet has at least 0.005 ETH to participate."
+                statusMessage={`Ensure that your connected wallet has at least 
+                ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"
               />
 

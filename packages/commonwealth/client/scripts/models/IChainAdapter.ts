@@ -60,15 +60,19 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    const { admins, numVotingThreads, numTotalThreads, communityBanner } =
-      response.data.result;
+    const {
+      adminsAndMods,
+      numVotingThreads,
+      numTotalThreads,
+      communityBanner,
+    } = response.data.result;
     // Update community level thread counters variables (Store in state instead of react query here is an
     // exception case, view the threadCountersStore code for more details)
     EXCEPTION_CASE_threadCountersStore.setState({
       totalThreadsInCommunity: numTotalThreads,
       totalThreadsInCommunityForVoting: numVotingThreads,
     });
-    this.meta.setAdmins(admins);
+    this.meta.setAdminsAndMods(adminsAndMods);
     this.meta.setBanner(communityBanner);
 
     this._serverLoaded = true;

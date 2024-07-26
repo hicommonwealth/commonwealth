@@ -10,7 +10,6 @@ import {
   AddressAttributes,
   AddressInstance,
   CommunityInstance,
-  SsoTokenInstance,
   UserAttributes,
   UserInstance,
   sequelize,
@@ -206,6 +205,59 @@ async function createNewMagicUser({
   });
 }
 
+// Replaces ghost addresses once replacements have been generated
+async function replaceGhostAddresses(
+  existingUserInstance: UserInstance,
+  addressInstances: AddressInstance[],
+  models: DB,
+  transaction: Transaction,
+) {
+  const ghostAddresses = (existingUserInstance?.Addresses?.filter(
+    ({ ghost_address }: AddressAttributes) => !!ghost_address,
+  ) || []) as AddressAttributes[];
+
+  for (const ghost of ghostAddresses) {
+    const replacementAddress = addressInstances.find(
+      ({ community_id, ghost_address }) =>
+        !ghost_address && community_id === ghost.community_id,
+    );
+
+    // should always exist, but check for it to avoid null check error
+    if (replacementAddress) {
+      // update data objects and delete ghost address
+      await models.Collaboration.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      await models.Comment.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      await models.Reaction.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      await models.Thread.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      // should be no memberships or SsoTokens, but handle case for completeness sake
+      await models.Membership.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      await models.SsoToken.destroy({
+        where: { address_id: ghost.id },
+        transaction,
+      });
+      await models.Address.destroy({
+        where: { id: ghost.id },
+        transaction,
+      });
+    }
+  }
+}
+
 // User is logged out + selects magic, and provides an existing magic account. Log them in.
 async function loginExistingMagicUser({
   models,
@@ -217,7 +269,6 @@ async function loginExistingMagicUser({
   if (!existingUserInstance) {
     throw new Error('No user provided to sign in');
   }
-
   return sequelize.transaction(async (transaction) => {
     // verify login token
     const ssoToken = await models.SsoToken.scope('withPrivateData').findOne({
@@ -234,7 +285,6 @@ async function loginExistingMagicUser({
       transaction,
     });
 
-    let malformedSsoToken: SsoTokenInstance;
     if (ssoToken) {
       // login user if they registered via magic
       if (decodedMagicToken.claim.iat <= ssoToken.issued_at) {
@@ -248,61 +298,21 @@ async function loginExistingMagicUser({
       await ssoToken.save({ transaction });
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
-      // situation for legacy SsoToken instances:
-      // - they only have profile_id set, no issuer or address_id
-      // we will locate an existing SsoToken by profile_id, and migrate it to use addresses instead.
-      // if none exists, we will create it
-      malformedSsoToken = await models.SsoToken.scope(
-        'withPrivateData',
-      ).findOne({
-        where: {
-          // @ts-expect-error StrictNullChecks
-          profile_id: existingUserInstance.Profiles[0].id,
-        },
+      const addressInstances = await createMagicAddressInstances(
+        models,
+        generatedAddresses,
+        existingUserInstance,
+        walletSsoSource,
+        decodedMagicToken,
         transaction,
-      });
-      if (malformedSsoToken) {
-        log.trace('DETECTED LEGACY / MALFORMED SSO TOKEN');
-        if (decodedMagicToken.claim.iat <= malformedSsoToken.issued_at) {
-          log.warn('Replay attack detected.');
-          throw new Error(
-            `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
-          );
-        }
-        (malformedSsoToken.issuer = decodedMagicToken.issuer),
-          (malformedSsoToken.issued_at = decodedMagicToken.claim.iat);
-        malformedSsoToken.updated_at = new Date();
-        // do not save until addresses have been added
-      }
-    }
-
-    // skip replay attack verification if no SsoToken found (legacy / malformed user),
-    // as we may need to create additional addresses first (most cases, does nothing, but can
-    // function as "join" if landing on a specific community page).
-    const addressInstances = await createMagicAddressInstances(
-      models,
-      generatedAddresses,
-      existingUserInstance,
-      walletSsoSource,
-      decodedMagicToken,
-      transaction,
-    );
-
-    // once addresses have been created and/or located, we finalize the migration of malformed sso
-    // tokens, or create a new one if absent entirely
-    const canonicalAddressInstance = addressInstances.find(
-      (a) => a.community_id === DEFAULT_ETH_COMMUNITY_ID,
-    );
-    // @ts-expect-error StrictNullChecks
-    if (malformedSsoToken) {
-      // @ts-expect-error StrictNullChecks
-      malformedSsoToken.address_id = canonicalAddressInstance.id;
-      await malformedSsoToken.save({ transaction });
-      log.info(
-        `Finished migration of SsoToken for user ${existingUserInstance.id}!`,
       );
-      // @ts-expect-error StrictNullChecks
-    } else if (!ssoToken && !malformedSsoToken) {
+
+      // once addresses have been created and/or located, we finalize the migration of malformed sso
+      // tokens, or create a new one if absent entirely
+      const canonicalAddressInstance = addressInstances.find(
+        (a) => a.community_id === DEFAULT_ETH_COMMUNITY_ID,
+      );
+
       await models.SsoToken.create(
         {
           issuer: decodedMagicToken.issuer,
@@ -314,56 +324,17 @@ async function loginExistingMagicUser({
         },
         { transaction },
       );
-      log.info(
-        `Created SsoToken for invalid state user ${existingUserInstance.id}`,
+
+      // TODO: Check if ONLY after first token created for a canonical address?
+      await replaceGhostAddresses(
+        existingUserInstance,
+        addressInstances,
+        models,
+        transaction,
       );
+      log.info(`Created SsoToken for user ${existingUserInstance.id}`);
     }
 
-    // remove ghost addresses once replacements have been generated
-    const ghostAddresses =
-      existingUserInstance?.Addresses?.filter(
-        ({ ghost_address }: AddressAttributes) => !!ghost_address,
-      ) || [];
-    for (const ghost of ghostAddresses as AddressAttributes[]) {
-      const replacementAddress = addressInstances.find(
-        ({ community_id, ghost_address }: AddressAttributes) =>
-          !ghost_address && community_id === ghost.community_id,
-      );
-
-      // should always exist, but check for it to avoid null check error
-      if (replacementAddress) {
-        // update data objects and delete ghost address
-        await models.Collaboration.update(
-          { address_id: replacementAddress.id },
-          { where: { address_id: ghost.id }, transaction },
-        );
-        await models.Comment.update(
-          { address_id: replacementAddress.id },
-          { where: { address_id: ghost.id }, transaction },
-        );
-        await models.Reaction.update(
-          { address_id: replacementAddress.id },
-          { where: { address_id: ghost.id }, transaction },
-        );
-        await models.Thread.update(
-          { address_id: replacementAddress.id },
-          { where: { address_id: ghost.id }, transaction },
-        );
-        // should be no memberships or SsoTokens, but handle case for completeness sake
-        await models.Membership.update(
-          { address_id: replacementAddress.id },
-          { where: { address_id: ghost.id }, transaction },
-        );
-        await models.SsoToken.destroy({
-          where: { address_id: ghost.id },
-          transaction,
-        });
-        await models.Address.destroy({
-          where: { id: ghost.id },
-          transaction,
-        });
-      }
-    }
     return existingUserInstance;
   });
 }

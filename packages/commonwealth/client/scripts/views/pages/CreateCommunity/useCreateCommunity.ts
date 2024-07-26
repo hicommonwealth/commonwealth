@@ -2,11 +2,9 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
-import { useFlag } from '../../../hooks/useFlag';
 import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
-  const communityStakeEnabled = useFlag('communityStake');
   const [createCommunityStep, setCreateCommunityStep] =
     useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
@@ -25,7 +23,6 @@ const useCreateCommunity = () => {
       createCommunityStep,
       setCreateCommunityStep,
       showCommunityStakeStep,
-      communityStakeEnabled,
     );
   };
 

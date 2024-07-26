@@ -9,6 +9,7 @@ const {
   TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
+  DATABASE_LOG_TRACE,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
@@ -38,6 +39,7 @@ export const config = configure(
         ? parseInt(DATABASE_CLEAN_HOUR, 10)
         : undefined,
       INIT_TEST_DB: INIT_TEST_DB === 'true',
+      TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
@@ -74,6 +76,7 @@ export const config = configure(
       NO_SSL: z.boolean(),
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
       INIT_TEST_DB: z.boolean(),
+      TRACE: z.boolean(),
     }),
     WEB3: z.object({
       PRIVATE_KEY: z.string(),
