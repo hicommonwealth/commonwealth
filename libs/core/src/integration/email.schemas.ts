@@ -11,26 +11,51 @@ import {
 export const EnrichedCommentCreatedNotification =
   CommentCreatedNotification.extend({
     author_avatar_url: z.string(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedUserMentionedNotification =
   UserMentionedNotification.extend({
     author_avatar_url: z.string(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedCommunityStakeNotification =
   CommunityStakeNotification.extend({
     community_icon_url: z.string().nullish(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedChainProposalsNotification =
   ChainProposalsNotification.extend({
     community_icon_url: z.string().nullish(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedSnapshotProposalCreatedNotification =
   SnapshotProposalCreatedNotification.extend({
     community_icon_url: z.string().nullish(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const GetRecapEmailData = {

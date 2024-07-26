@@ -21,14 +21,18 @@ const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 type DiscussionNotifications = Array<
-  | z.infer<typeof CommentCreatedNotification>
-  | z.infer<typeof UserMentionedNotification>
+  | (z.infer<typeof CommentCreatedNotification> & { inserted_at: string })
+  | (z.infer<typeof UserMentionedNotification> & { inserted_at: string })
 >;
 type GovernanceNotifications = Array<
-  | z.infer<typeof ChainProposalsNotification>
-  | z.infer<typeof SnapshotProposalCreatedNotification>
+  | (z.infer<typeof ChainProposalsNotification> & { inserted_at: string })
+  | (z.infer<typeof SnapshotProposalCreatedNotification> & {
+      inserted_at: string;
+    })
 >;
-type ProtocolNotifications = Array<z.infer<typeof CommunityStakeNotification>>;
+type ProtocolNotifications = Array<
+  z.infer<typeof CommunityStakeNotification> & { inserted_at: string }
+>;
 
 async function getMessages(userId: string): Promise<{
   discussion: DiscussionNotifications;
@@ -70,14 +74,20 @@ async function getMessages(userId: string): Promise<{
       switch (message.source.key) {
         case WorkflowKeys.CommentCreation:
         case WorkflowKeys.UserMentioned:
-          discussion.push(message.data);
+          discussion.push({
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
           break;
         case WorkflowKeys.ChainProposals:
         case WorkflowKeys.SnapshotProposals:
-          governance.push(message.data);
+          governance.push({
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
           break;
         case WorkflowKeys.CommunityStake:
-          protocol.push(message.data);
+          protocol.push({ ...message.data, inserted_at: message.inserted_at });
           break;
       }
     }
@@ -115,8 +125,9 @@ async function enrichDiscussionNotifications(
     user_avatars: { [user_id: string]: string };
   }>(
     `
-        SELECT JSONB_OBJECT_AGG(A.id, U.profile->>'avatar_url') as user_avatars
-        FROM "Addresses" A JOIN "Users" U ON A.user_id = U.id
+        SELECT JSONB_OBJECT_AGG(A.id, U.profile ->> 'avatar_url') as user_avatars
+        FROM "Addresses" A
+                 JOIN "Users" U ON A.user_id = U.id
         WHERE A.id IN (:addressIds);
     `,
     {
