@@ -10,7 +10,7 @@ export async function getActivityFeed(models: DB, id = 0) {
    */
   const query = `
       WITH 
-      user_communities AS (SELECT community_id FROM "Addresses" WHERE user_id = :id),
+      user_communities AS (SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = :id),
       top_threads AS (
           SELECT T.*
           FROM "Threads" T
