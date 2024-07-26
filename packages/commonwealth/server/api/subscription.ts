@@ -10,10 +10,6 @@ export const trpcRouter = trpc.router({
     Subscription.CreateCommunityAlert,
     trpc.Tag.Subscription,
   ),
-  createThreadSubscription: trpc.command(
-    Subscription.CreateThreadSubscription,
-    trpc.Tag.Subscription,
-  ),
   deleteCommentSubscription: trpc.command(
     Subscription.DeleteCommentSubscription,
     trpc.Tag.Subscription,
@@ -22,16 +18,11 @@ export const trpcRouter = trpc.router({
     Subscription.DeleteCommunityAlerts,
     trpc.Tag.Subscription,
   ),
-  deleteThreadSubscription: trpc.command(
-    Subscription.DeleteThreadSubscription,
-    trpc.Tag.Subscription,
-  ),
   getCommentSubscriptions: trpc.query(Subscription.GetCommentSubscriptions),
   getCommunityAlerts: trpc.query(Subscription.GetCommunityAlerts),
   getSubscriptionPreferences: trpc.query(
     Subscription.GetSubscriptionPreferences,
   ),
-  getThreadSubscriptions: trpc.query(Subscription.GetThreadSubscriptions),
   updateSubscriptionPreferences: trpc.command(
     Subscription.UpdateSubscriptionPreferences,
     trpc.Tag.Subscription,
@@ -44,4 +35,17 @@ export const trpcRouter = trpc.router({
     Subscription.UnregisterClientRegistrationToken,
     trpc.Tag.Subscription,
   ),
+
+  // thread subscriptions
+  createThreadSubscription: trpc.command(
+    Subscription.CreateThreadSubscription,
+    trpc.Tag.Subscription,
+  ),
+  deleteThreadSubscription: trpc.command(
+    Subscription.DeleteThreadSubscription,
+    trpc.Tag.Subscription,
+  ),
+  getThreadSubscriptions: trpc.query(Subscription.GetThreadSubscriptions),
+
+  // comment subscriptions
 });

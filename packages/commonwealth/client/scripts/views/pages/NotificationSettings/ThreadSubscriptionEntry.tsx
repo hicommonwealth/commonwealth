@@ -14,12 +14,14 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { User } from 'views/components/user/user';
 import { z } from 'zod';
 
-interface SubscriptionEntryProps {
+interface ThreadSubscriptionEntryProps {
   readonly subscription: z.infer<typeof ThreadSubscription>;
   readonly onUnsubscribe: (id: number) => void;
 }
 
-export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
+export const ThreadSubscriptionEntry = (
+  props: ThreadSubscriptionEntryProps,
+) => {
   const { subscription, onUnsubscribe } = props;
   const thread = subscription.Thread!;
   const thread_id = thread.id!;

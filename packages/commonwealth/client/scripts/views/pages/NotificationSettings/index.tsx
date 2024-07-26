@@ -17,7 +17,7 @@ import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThre
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
-import { SubscriptionEntry } from './SubscriptionEntry';
+import { ThreadSubscriptionEntry } from './ThreadSubscriptionEntry';
 import './index.scss';
 
 type NotificationSection = 'community-alerts' | 'subscriptions';
@@ -132,7 +132,7 @@ const NotificationSettings = () => {
               .filter((current) => !threadsFilter.includes(current.Thread!.id!))
               .map((current) => (
                 <>
-                  <SubscriptionEntry
+                  <ThreadSubscriptionEntry
                     key={current.Thread!.id!}
                     subscription={current as z.infer<typeof ThreadSubscription>}
                     onUnsubscribe={handleUnsubscribe}
