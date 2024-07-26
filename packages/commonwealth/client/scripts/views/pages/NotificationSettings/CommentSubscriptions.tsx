@@ -14,7 +14,10 @@ export const CommentSubscriptions = () => {
     [threadsFilter],
   );
 
-  console.log('FIXME: commentSubscriptions: ', commentSubscriptions);
+  console.log(
+    'FIXME: commentSubscriptions: ',
+    JSON.stringify(commentSubscriptions, null, 2),
+  );
 
   return null;
 

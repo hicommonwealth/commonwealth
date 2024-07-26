@@ -10,11 +10,6 @@ import { useMemo } from 'react';
 export function useCommentSubscriptions() {
   const subscriptionsQuery = useCommentSubscriptionsQuery();
 
-  console.log(
-    'FIXME2: subscriptionsQuery: ',
-    JSON.stringify(subscriptionsQuery, null, 2),
-  );
-
   return useMemo(() => {
     return {
       ...subscriptionsQuery,
