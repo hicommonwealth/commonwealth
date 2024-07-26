@@ -80,7 +80,17 @@ export const CommentSubscription = z.object({
   updated_at: z.coerce.date().optional(),
   Comment: Comment.pick({
     id: true,
-  }).optional(),
+  })
+    .merge(
+      z.object({
+        Thread: Thread.pick({
+          id: true,
+          community_id: true,
+          title: true,
+        }),
+      }),
+    )
+    .optional(),
 });
 
 export const CommunityAlert = z

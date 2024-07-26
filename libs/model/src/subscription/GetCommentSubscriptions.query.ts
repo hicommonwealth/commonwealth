@@ -7,6 +7,11 @@ const associationParams = [
     model: models.Comment,
     as: 'Comment',
     include: [
+      {
+        model: models.Thread,
+        as: 'Thread',
+      },
+
       // {
       //   model: models.Address,
       //   as: 'Address',
