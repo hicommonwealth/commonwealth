@@ -1,4 +1,4 @@
-import { models } from 'model/src/database';
+import { models } from '@hicommonwealth/model';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
 const fetchSubscriptionsFromDiscourse = (session: Sequelize) => {

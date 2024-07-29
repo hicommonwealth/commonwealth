@@ -1,6 +1,6 @@
+import { models } from '@hicommonwealth/model';
 import { Address, User } from '@hicommonwealth/schemas';
 import crypto from 'crypto';
-import { models } from 'model/src/database';
 import { Transaction } from 'sequelize';
 import Web3 from 'web3';
 import { z } from 'zod';

@@ -139,7 +139,6 @@ export function ImportDiscourseCommunity(): Command<
         throw new Error('failed to connect to discourse DB');
       }
 
-      const tables: Record<string, any> = {};
       const transaction = await models.sequelize.transaction();
       try {
         // TODO: use accountsClaimable flag
@@ -150,7 +149,6 @@ export function ImportDiscourseCommunity(): Command<
           communityId!,
           { transaction },
         );
-        tables['users'] = users;
         log.debug(`Users: ${users.length}`);
 
         // insert addresses
@@ -164,7 +162,6 @@ export function ImportDiscourseCommunity(): Command<
           },
           { transaction },
         );
-        tables['addresses'] = addresses;
         log.debug(`Addresses: ${addresses.length}`);
 
         // insert categories (topics)
@@ -173,7 +170,6 @@ export function ImportDiscourseCommunity(): Command<
           { communityId: communityId! },
           { transaction },
         );
-        tables['categories'] = categories;
         log.debug(`Categories: ${categories.length}`);
 
         // insert topics (threads)
@@ -186,7 +182,6 @@ export function ImportDiscourseCommunity(): Command<
           },
           { transaction },
         );
-        tables['threads'] = threads;
         log.debug(`Threads: ${threads.length}`);
 
         // insert posts (comments)
@@ -195,7 +190,6 @@ export function ImportDiscourseCommunity(): Command<
           { communityId: communityId!, addresses, threads },
           { transaction },
         );
-        tables['comments'] = comments;
         log.debug(`Comments: ${comments.length}`);
 
         // insert reactions
@@ -204,7 +198,6 @@ export function ImportDiscourseCommunity(): Command<
           { addresses, communityId: communityId!, threads, comments },
           { transaction },
         );
-        tables['reactions'] = reactions;
         log.debug(`Reactions: ${reactions.length}`);
 
         // insert subscriptions
@@ -217,7 +210,6 @@ export function ImportDiscourseCommunity(): Command<
           },
           { transaction },
         );
-        tables['subscriptions'] = subscriptions;
         log.debug(`Subscriptions: ${subscriptions.length}`);
 
         await transaction.commit();

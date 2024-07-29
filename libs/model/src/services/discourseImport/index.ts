@@ -3,7 +3,6 @@ export * from './categories';
 export * from './comments';
 export * from './constants';
 export * from './importDump';
-export * from './profiles';
 export * from './reactions';
 export * from './subscriptions';
 export * from './threads';

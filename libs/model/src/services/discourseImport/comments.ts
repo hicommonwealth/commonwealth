@@ -1,5 +1,5 @@
+import { models } from '@hicommonwealth/model';
 import lo from 'lodash';
-import { models } from 'model/src/database';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
