@@ -105,19 +105,24 @@ describe('Comment subscription lifecycle', () => {
     expect(thread).to.not.be.null;
     // expect(address).to.not.be.null;
 
-    function updateStructure(comment: CommentSubscriptionInstance) {
+    function updateStructure(
+      sub: CommentSubscriptionInstance,
+      comment: z.infer<schemas.Comment>,
+    ) {
       return {
-        ...comment.toJSON(),
+        ...sub.toJSON(),
         Comment: {
-          ...commentOne,
-          Thread: null,
+          ...comment,
+          Thread: {
+            ...thread,
+          },
         },
       };
     }
 
     console.log(
       'FIXME: commentSubOne: ',
-      JSON.stringify(updateStructure(commentSubOne), null, 2),
+      JSON.stringify(updateStructure(commentSubOne, commentOne), null, 2),
     );
     console.log('FIXME: res: ', JSON.stringify(res![0], null, 2));
 
@@ -125,8 +130,8 @@ describe('Comment subscription lifecycle', () => {
     // Thread, sometimes it is null.
 
     expect(res).to.have.deep.members([
-      updateStructure(commentSubOne),
-      updateStructure(commentSubTwo),
+      updateStructure(commentSubOne, commentOne),
+      updateStructure(commentSubTwo, commentTwo),
     ]);
   });
 
