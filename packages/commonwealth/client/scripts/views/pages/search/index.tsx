@@ -161,7 +161,6 @@ const SearchPage = () => {
     // @ts-expect-error <StrictNullChecks/>
   } = useSearchProfilesQuery({
     ...sharedQueryOptions,
-    includeRoles: true,
     enabled: activeTab === SearchScope.Members,
   });
 

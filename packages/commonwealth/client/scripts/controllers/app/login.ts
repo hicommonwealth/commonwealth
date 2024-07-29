@@ -59,24 +59,6 @@ export function linkExistingAddressToChainOrCommunity(
 
 export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
-  const role = app.roles.getRoleInCommunity({ account, community });
-
-  if (!role) {
-    storeActiveAccount(account);
-
-    // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
-    // Emit a force re-render on cosmos chains to make sure
-    // that user.activeAccount (in useUserStore) is set - this is required for many actions
-    // There is a race condition b/w the app accessing user.activeAccount (in useUserStore)
-    // and updating it. A proper solution would be to fix this race condition
-    // for cosmos chains - since the issue happens only on that chain
-    if (app.chain.base === 'cosmos') {
-      app.loginStateEmitter.emit('redraw');
-    }
-
-    return;
-  }
-
   try {
     const response = await axios.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
@@ -85,11 +67,6 @@ export async function setActiveAccount(account: Account): Promise<void> {
       jwt: userStore.getState().jwt,
       auth: true,
     });
-
-    app.roles.getAllRolesInCommunity({ community }).forEach((r) => {
-      r.is_user_default = false;
-    });
-    role.is_user_default = true;
 
     if (response.data.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
@@ -127,27 +104,6 @@ export async function completeClientLogin(account: Account) {
       user.addresses.push(addressInfo);
     }
 
-    // link the address to the community
-    if (app.chain) {
-      try {
-        if (
-          !app.roles.getRoleInCommunity({
-            account,
-            community: app.activeChainId(),
-          })
-        ) {
-          await app.roles.createRole({
-            // @ts-expect-error StrictNullChecks
-            address: addressInfo,
-            community: app.activeChainId(),
-          });
-        }
-      } catch (e) {
-        // this may fail if the role already exists, e.g. if the address is being migrated from another user
-        console.error('Failed to create role');
-      }
-    }
-
     // set the address as active
     await setActiveAccount(account);
   } catch (e) {
@@ -175,7 +131,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
   // select the address that the new chain should be initialized with
   const memberAddresses = userStore.getState().accounts.filter((account) => {
     // @ts-expect-error StrictNullChecks
-    return app.roles.isMember({ community: chain.id, account });
+    return account.community.id === chain.id;
   });
 
   if (memberAddresses.length === 1) {

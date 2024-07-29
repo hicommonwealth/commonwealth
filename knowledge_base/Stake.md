@@ -12,7 +12,6 @@ The following env variables must be present. (The AWS keys are for uploading ima
 
 ```txt
 FLAG_NEW_CREATE_COMMUNITY=true
-FLAG_COMMUNITY_STAKE=true
 ETH_RPC=test
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=AKIA3JC4FJBRG5N5GLMW

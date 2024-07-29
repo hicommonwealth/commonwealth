@@ -31,6 +31,7 @@
     "delete-user": "chmod u+x scripts/delete-user.sh && ./scripts/delete-user.sh",
     "dump-db": "chmod u+x scripts/dump-db.sh && ./scripts/dump-db.sh",
     "e2e-start-server": "pnpm bootstrap-test-db && NODE_ENV=test ETH_RPC=e2e-test pnpm start",
+    "emit-event": "chmod u+x scripts/emit-event.sh && ./scripts/emit-event.sh",
     "emit-notification": "tsx server/scripts/emitTestNotification.ts",
     "emit-webhook": "tsx server/scripts/emitWebhook.ts",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",

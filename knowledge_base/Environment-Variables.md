@@ -20,6 +20,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [COSMOS_REGISTRY_API](#cosmos_registry_api)
 - [CW_BOT_KEY](#cw_bot_key)
 - [DATABASE_CLEAN_HOUR](#database_clean_hour)
+- [DATABASE_LOG_TRACE](#database_log_trace)
 - [DATABASE_URI](#database_uri)
 - [DATABASE_URL](#database_url)
 - [DD_AGENT_MAJOR_VERSION](#dd_agent_major_version)
@@ -39,15 +40,13 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ENFORCE_SESSION_KEYS](#enforce_session_keys)
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
-- [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
-- [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
-- [FLAG_COMMUNITY_STAKE](#flag_community_stake)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
 - [JWT_SECRET](#jwt_secret)
+- [LOG_LEVEL](#log_level)
 - [MAGIC_API_KEY](#magic_api_key)
 - [MAGIC_DEFAULT_CHAIN](#magic_default_chain)
 - [MAGIC_PUBLISHABLE_KEY](#magic_publishable_key)
@@ -135,6 +134,12 @@ When the cleaner runs is determined by the DATABASE_CLEAN_HOUR env var. The env 
 
 Owner: Timothee Legros.
 
+## DATABASE_LOG_TRACE
+
+Logs traces of sequelize SQL statements when LOG_LEVEL=trace
+
+Owner: Roger Torres.
+
 ## DATABASE_URI
 
 Used to initialize connections to the database. By default, set to `postgresql://commonwealth:edgeware@localhost/commonwealth`.
@@ -217,23 +222,12 @@ If set to `e2e-test`, the app will bypass usage of real ETH RPCs and use the moc
 
 Owner: Ian Rowan
 
-## ETHERSCAN_JS_API_KEY
-
-API key for Ethereum data.
-
 ## FALLBACK_NODE_DURATION_S
 
 Optional. Defaults to 5 minutes (300 seconds).
 This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
 After this time, the server will try the original DB endpoint again.
 
-## FLAG_COMMUNITY_HOMEPAGE
-
-Boolean toggle to display side-wide homepage feature for communities. Temporary flag for 2.0 work.
-
-## FLAG_COMMUNITY_STAKE
-
-Boolean toggle to enable [community stake](./Stake.md) for local development.
 
 ## FLAG_NEW_CREATE_COMMUNITY
 
@@ -256,6 +250,13 @@ Owner: Kurtis Assad.
 ## JWT_SECRET
 
 Required in production. The JWT seed secret that is used to generate all user JWTs.
+
+## LOG_LEVEL
+
+Sets console logger level. May be set 'trace', 'debug', 'info', 'warn', 'error', or 'fatal'.
+Defaults to 'info' in production mode, 'debug' otherwise.
+
+Owner: Roger Torres.
 
 ## MAGIC_API_KEY
 
@@ -280,14 +281,6 @@ Mixpanel analytics tracking token for development work. Reach out to a lead to r
 ## MIXPANEL_PROD_TOKEN
 
 Mixpanel analytics tracking token for our live production site.
-
-## NEXT_PUBLIC_RSA_PRIVATE_KEY
-
-<!-- Likely deprecated; flagged for removal with closing of #6185. -->
-
-## NEXT_PUBLIC_RSA_PUBLIC_KEY
-
-<!-- Likely deprecated; flagged for removal with closing of #6185. -->
 
 ## NO_GLOBAL_ACTIVITY_CACHE
 

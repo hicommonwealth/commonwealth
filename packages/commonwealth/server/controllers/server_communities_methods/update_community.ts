@@ -7,11 +7,9 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { ChainBase } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import { findOneRole } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -70,23 +68,24 @@ export async function __updateCommunity(
       },
     ],
   });
-  let addresses;
+
   if (!community) {
     throw new AppError(Errors.NoCommunityFound);
-  } else {
-    addresses = (await user.getAddresses()).filter((addr) => !!addr.verified);
-    const userAddressIds = addresses.map((addr) => addr.id);
-    const userMembership = await findOneRole(
-      this.models,
-      { where: { address_id: { [Op.in]: userAddressIds } } },
-      // @ts-expect-error StrictNullChecks
-      community.id,
-      ['admin'],
-    );
-    if (!user.isAdmin && !userMembership) {
-      throw new AppError(Errors.NotAdmin);
-    }
   }
+
+  const communityAdmins = await user.getAddresses({
+    where: {
+      community_id: community.id,
+      role: 'admin',
+    },
+  });
+
+  if (!user.isAdmin && communityAdmins.length === 0) {
+    throw new AppError(Errors.NotAdmin);
+  }
+
+  // TODO: what do we do to select the proper admin to deploy namespace further down?
+  const communityAdmin = communityAdmins[0];
 
   const {
     active,
@@ -210,10 +209,8 @@ export async function __updateCommunity(
       throw new AppError(Errors.InvalidTransactionHash);
     }
 
-    const ownerOfCommunity = addresses.find(
-      (a) => a.community_id === community.id && a.role === 'admin',
-    );
-    if (!ownerOfCommunity) {
+    // we only permit the community admin and not the site admin to create namespace
+    if (!communityAdmin) {
       throw new AppError(Errors.NotAdmin);
     }
 
@@ -221,7 +218,7 @@ export async function __updateCommunity(
       await commonProtocol.newNamespaceValidator.validateNamespace(
         namespace,
         transactionHash,
-        ownerOfCommunity.address,
+        communityAdmin.address,
         community,
       );
 

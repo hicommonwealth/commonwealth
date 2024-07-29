@@ -29,6 +29,7 @@ import useAppStatus from '../../hooks/useAppStatus';
 import { ThreadStage } from '../../models/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { SelectList } from '../components/component_kit/cw_select_list';
+import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
@@ -337,27 +338,31 @@ export const UpdateProposalStatusModal = ({
         onModalClose={onModalClose}
       />
       <CWModalBody allowOverflow>
-        <SelectList
-          defaultValue={
-            tempStage
-              ? { value: tempStage, label: threadStageToLabel(tempStage) }
-              : null
-          }
-          placeholder="Select a stage"
-          isSearchable={false}
-          options={stages.map((stage) => ({
-            value: stage as unknown as ThreadStage,
-            label: threadStageToLabel(stage),
-          }))}
-          className="StageSelector"
-          // @ts-expect-error <StrictNullChecks/>
-          onChange={(option) => setTempStage(option.value)}
-        />
-        {showSnapshot && (
-          <SnapshotProposalSelector
-            onSelect={handleSelectProposal}
-            snapshotProposalsToSet={tempSnapshotProposals}
-          />
+        {showSnapshot ? (
+          <>
+            <SelectList
+              defaultValue={
+                tempStage
+                  ? { value: tempStage, label: threadStageToLabel(tempStage) }
+                  : null
+              }
+              placeholder="Select a stage"
+              isSearchable={false}
+              options={stages.map((stage) => ({
+                value: stage as unknown as ThreadStage,
+                label: threadStageToLabel(stage),
+              }))}
+              className="StageSelector"
+              // @ts-expect-error <StrictNullChecks/>
+              onChange={(option) => setTempStage(option.value)}
+            />
+            <SnapshotProposalSelector
+              onSelect={handleSelectProposal}
+              snapshotProposalsToSet={tempSnapshotProposals}
+            />
+          </>
+        ) : (
+          <CWText>Please connect your Snapshot space </CWText>
         )}
         {isCosmos && (
           <CosmosProposalSelector
@@ -385,12 +390,14 @@ export const UpdateProposalStatusModal = ({
               buttonHeight="sm"
               onClick={onModalClose}
             />
-            <CWButton
-              buttonType="primary"
-              buttonHeight="sm"
-              label="Save changes"
-              onClick={handleSaveChanges}
-            />
+            {showSnapshot && (
+              <CWButton
+                buttonType="primary"
+                buttonHeight="sm"
+                label="Save changes"
+                onClick={handleSaveChanges}
+              />
+            )}
           </div>
         </div>
       </CWModalFooter>
