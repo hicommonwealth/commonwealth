@@ -15,11 +15,19 @@ module.exports = {
                 SELECT 1
                 FROM jsonb_array_elements_text(c.category) AS elem
                 WHERE elem::text LIKE '%DAO%'
+              ) AND NOT EXISTS (
+                  SELECT 1
+                  FROM "CommunityTags" ct
+                  WHERE ct.tag_id = t.id AND ct.community_id = c.id
               ))
             OR (t.name = 'DeFi' AND EXISTS (
                 SELECT 1
                 FROM jsonb_array_elements_text(c.category) AS elem
                 WHERE elem::text LIKE '%DeFi%'
+              ) AND NOT EXISTS (
+                    SELECT 1
+                    FROM "CommunityTags" ct
+                    WHERE ct.tag_id = t.id AND ct.community_id = c.id
               ))
             WHERE c.category IS NOT NULL;
         `,
