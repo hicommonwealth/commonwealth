@@ -17,8 +17,8 @@ import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
-import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
-import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
+import { useCreateCommentSubscriptionMutation } from 'state/api/trpc/subscription/useCreateCommentSubscriptionMutation';
+import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -119,7 +119,7 @@ export const CommentCard = ({
   // this is in an inner loop but trpc will batch this so it's only called once.
   const commentSubscriptions = useCommentSubscriptions();
 
-  const isSubscribed = useMemo(() => {
+  const hasCommentSubscription = useMemo(() => {
     const matching = (commentSubscriptions.data || []).filter(
       (current) => current.comment_id === comment.id,
     );
@@ -142,26 +142,28 @@ export const CommentCard = ({
 
   const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
-  const createThreadSubscriptionMutation =
-    useCreateThreadSubscriptionMutation();
-  const deleteThreadSubscriptionMutation =
-    useDeleteThreadSubscriptionMutation();
+  const createCommentSubscriptionMutation =
+    useCreateCommentSubscriptionMutation();
+  const deleteCommentSubscriptionMutation =
+    useDeleteCommentSubscriptionMutation();
 
   const doToggleSubscribe = useCallback(async () => {
-    if (isSubscribed) {
-      await deleteThreadSubscriptionMutation.mutateAsync({
-        comment_id: comment.id,
+    if (hasCommentSubscription) {
+      await deleteCommentSubscriptionMutation.mutateAsync({
+        id: `${comment.id}`,
+        comment_ids: [comment.id],
       });
     } else {
-      await createThreadSubscriptionMutation.mutateAsync({
-        comment_ids: [comment.id],
+      await createCommentSubscriptionMutation.mutateAsync({
+        id: `${comment.id}`,
+        comment_id: comment.id,
       });
     }
   }, [
-    createThreadSubscriptionMutation,
-    deleteThreadSubscriptionMutation,
-    isSubscribed,
+    hasCommentSubscription,
+    deleteCommentSubscriptionMutation,
     comment.id,
+    createCommentSubscriptionMutation,
   ]);
 
   const handleToggleSubscribe = useCallback(

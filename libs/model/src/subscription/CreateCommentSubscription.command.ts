@@ -14,7 +14,7 @@ export function CreateCommentSubscription(): Command<
         {
           where: {
             user_id: actor.user.id!,
-            ...payload,
+            comment_id: payload.comment_id,
           },
         },
       );

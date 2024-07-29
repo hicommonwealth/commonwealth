@@ -2,13 +2,20 @@ import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
-import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
-import { useCreateCommentSubscriptionMutation } from 'state/api/trpc/subscription/useCreateCommentSubscriptionMutation';
-import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
+import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
+import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import Permissions from 'utils/Permissions';
 import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -86,25 +93,38 @@ export const ThreadOptions = ({
     );
   }, [isSubscribed, thread]);
 
-  const createCommentSubscriptionMutation =
-    useCreateCommentSubscriptionMutation();
-  const deleteCommentSubscriptionMutation =
-    useDeleteCommentSubscriptionMutation();
+  const createThreadSubscriptionMutation =
+    useCreateThreadSubscriptionMutation();
+  const deleteThreadSubscriptionMutation =
+    useDeleteThreadSubscriptionMutation();
+
+  const threadSubscriptions = useThreadSubscriptions();
+
+  const hasThreadSubscription = useMemo(() => {
+    const matching = (threadSubscriptions.data || []).filter(
+      (current) => current.thread_id === thread.id,
+    );
+    return matching.length > 0;
+  }, [thread.id, threadSubscriptions.data]);
+
+  console.log('FIXME: ' + hasThreadSubscription);
 
   const doToggleSubscribe = useCallback(async () => {
-    if (isSubscribed) {
-      await deleteCommentSubscriptionMutation.mutateAsync({
-        comment_id: thread.id,
+    if (hasThreadSubscription) {
+      await deleteThreadSubscriptionMutation.mutateAsync({
+        id: `${thread.id}`,
+        thread_ids: [thread.id],
       });
     } else {
-      await createCommentSubscriptionMutation.mutateAsync({
-        comment_ids: [thread.id],
+      await createThreadSubscriptionMutation.mutateAsync({
+        id: `${thread.id}`,
+        thread_id: thread.id,
       });
     }
   }, [
-    createCommentSubscriptionMutation,
-    deleteCommentSubscriptionMutation,
-    isSubscribed,
+    createThreadSubscriptionMutation,
+    deleteThreadSubscriptionMutation,
+    hasThreadSubscription,
     thread.id,
   ]);
 
@@ -177,13 +197,25 @@ export const ThreadOptions = ({
           {/* @ts-expect-error StrictNullChecks*/}
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
-          <CWThreadAction
-            action="subscribe"
-            label="Subscribe"
-            onClick={handleToggleSubscribe}
-            selected={!isSubscribed}
-            disabled={!isCommunityMember}
-          />
+          {!enableKnockInAppNotifications && (
+            <CWThreadAction
+              action="subscribe"
+              label="Subscribe"
+              onClick={handleToggleSubscribe}
+              selected={!isSubscribed}
+              disabled={!isCommunityMember}
+            />
+          )}
+
+          {enableKnockInAppNotifications && (
+            <CWThreadAction
+              action="subscribe"
+              label="Subscribe"
+              onClick={handleToggleSubscribe}
+              selected={!hasThreadSubscription}
+              disabled={!isCommunityMember}
+            />
+          )}
 
           {canUpdateThread && thread && (
             <AdminActions
