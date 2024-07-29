@@ -18,6 +18,7 @@ export const updateTags = async (
       where: {
         id: { [Op.in]: tag_ids },
       },
+      transaction,
     });
 
     const allTagsFound = tagCount === tag_ids.length;
@@ -29,8 +30,11 @@ export const updateTags = async (
 
   // remove all existing tags
   idType === 'user_id'
-    ? await models.ProfileTags.destroy({ where: { user_id: id } })
-    : await models.CommunityTags.destroy({ where: { community_id: id } });
+    ? await models.ProfileTags.destroy({ where: { user_id: id }, transaction })
+    : await models.CommunityTags.destroy({
+        where: { community_id: id },
+        transaction,
+      });
 
   // create new tags
   if (tag_ids.length > 0) {

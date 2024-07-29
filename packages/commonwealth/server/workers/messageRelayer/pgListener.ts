@@ -53,9 +53,10 @@ export async function setupListener(): Promise<pg.Client> {
   const { config } = await import('@hicommonwealth/model');
   const client = new pg.Client({
     connectionString: config.DB.URI,
-    ssl: ['test', 'development'].includes(config.NODE_ENV)
-      ? false
-      : { rejectUnauthorized: false },
+    ssl:
+      config.APP_ENV === 'local' || config.APP_ENV === 'CI'
+        ? false
+        : { rejectUnauthorized: false },
   });
 
   client.on('notification', (payload) => {

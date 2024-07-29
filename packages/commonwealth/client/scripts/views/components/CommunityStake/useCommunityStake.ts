@@ -8,7 +8,6 @@ import {
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
-import { useFlag } from '../../../hooks/useFlag';
 import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
 
 interface UseCommunityStakeProps {
@@ -24,7 +23,6 @@ const chainIds = {
 };
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
-  const communityStakeEnabled = useFlag('communityStake');
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
   const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
@@ -46,14 +44,13 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   } = useFetchCommunityStakeQuery({
     communityId: activeCommunityId,
     stakeId,
-    apiEnabled: communityStakeEnabled && !!activeCommunityId,
+    apiEnabled: !!activeCommunityId,
   });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
   const apiEnabled = Boolean(
-    communityStakeEnabled &&
-      stakeEnabled &&
+    stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&
       isLoggedIn,

@@ -83,7 +83,6 @@ const PersonalInformationStep = ({
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
       limit: 1000,
-      includeRoles: false,
       searchTerm: debouncedSearchTerm,
       communityId: 'all_communities',
       orderBy: APIOrderBy.LastActive,
@@ -123,11 +122,11 @@ const PersonalInformationStep = ({
 
     await updateUser({
       id: user.id.toString(),
-      name: values.username,
-      ...(values.email && {
-        email: values.email,
-      }),
-      profile: {},
+      promotional_emails_enabled: values.enableProductUpdates,
+      profile: {
+        name: values.username.trim(),
+        email: values.email.trim(),
+      },
     });
 
     // set email for notifications

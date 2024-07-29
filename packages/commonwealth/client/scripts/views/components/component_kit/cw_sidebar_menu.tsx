@@ -6,7 +6,7 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
-import useUserStore from 'state/ui/user';
+import useUserStore, { userStore } from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -97,8 +97,11 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   } else if (props.type === 'community') {
     /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
-    // @ts-expect-error <StrictNullChecks/>
-    const roles = app.roles.getAllRolesInCommunity({ community: item.id });
+    const account =
+      item &&
+      userStore
+        .getState()
+        .accounts.find(({ community }) => item.id === community.id);
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
@@ -121,26 +124,19 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
       >
         {/*// @ts-expect-error <StrictNullChecks/>*/}
         <CommunityLabel community={item} />
-        {app.isLoggedIn() && roles.length > 0 && (
+        {app.isLoggedIn() && account && (
           <div className="roles-and-star">
             <User
               avatarSize={18}
               shouldShowAvatarOnly
-              userAddress={roles?.[0]?.address}
-              userCommunityId={
-                roles?.[0]?.address_chain || roles?.[0]?.community_id
-              }
-              shouldShowAsDeleted={
-                !roles?.[0]?.address &&
-                !(roles?.[0]?.address_chain || roles?.[0]?.community_id)
-              }
+              userAddress={account.address}
+              userCommunityId={account.community.id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  // @ts-expect-error <StrictNullChecks/>
                   community: item.id,
                 });
                 setIsStarred((prevState) => !prevState);

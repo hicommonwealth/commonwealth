@@ -57,9 +57,9 @@ export const processUserMentioned: EventHandler<
       object_body:
         'thread' in payload
           ? // @ts-expect-error StrictNullChecks
-            safeTruncateBody(payload.thread.body, 255)
+            safeTruncateBody(decodeURIComponent(payload.thread.body), 255)
           : // @ts-expect-error StrictNullChecks
-            safeTruncateBody(payload.comment.text, 255),
+            safeTruncateBody(decodeURIComponent(payload.comment.text), 255),
       object_url:
         'thread' in payload
           ? // @ts-expect-error StrictNullChecks

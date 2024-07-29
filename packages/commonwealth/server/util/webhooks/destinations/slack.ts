@@ -1,5 +1,6 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import request from 'superagent';
+import { config } from '../../../config';
 import {
   ChainEventWebhookData,
   ForumWebhookData,
@@ -57,7 +58,7 @@ function formatSlackMessage<C extends NotificationCategories>(
   data: WebhookDataByCategory<C>,
 ): SlackWebhookMessage {
   let textPrefix = '';
-  if (process.env.NODE_ENV !== 'production') {
+  if (config.APP_ENV !== 'production') {
     textPrefix = '[dev] ';
   }
 

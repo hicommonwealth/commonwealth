@@ -1,4 +1,3 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { trpc } from '../../../utils/trpcClient';
 import useUserStore from '../../ui/user';
@@ -20,6 +19,20 @@ const useUpdateUserMutation = ({
 
   return trpc.user.updateUser.useMutation({
     onSuccess: (updated) => {
+      const keys = [
+        [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
+        [ApiEndpoints.FETCH_PROFILES_BY_ID, user.id],
+      ];
+      keys.map((key) => {
+        queryClient.cancelQueries(key).catch(console.error);
+        queryClient.refetchQueries(key).catch(console.error);
+      });
+
+      updated.is_welcome_onboard_flow_complete &&
+        user.setData({
+          isWelcomeOnboardFlowComplete: true,
+        });
+
       addressesWithChainsToUpdate?.map(({ address, chain }) => {
         const key = [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chain, address];
         const existingProfile = queryClient.getQueryData(key);
@@ -39,27 +52,6 @@ const useUpdateUserMutation = ({
           queryClient.setQueryData(key, () => updatedProfile);
         }
       });
-
-      // if `userId` matches auth user's id, refetch profile-by-id query for auth user.
-      if (user.id === updated.id) {
-        const keys = [
-          [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
-          [ApiEndpoints.FETCH_PROFILES_BY_ID, user.id],
-        ];
-        keys.map((key) => {
-          queryClient.cancelQueries(key).catch(console.error);
-          queryClient.refetchQueries(key).catch(console.error);
-        });
-
-        // if user profile has a defined name, then set welcome onboard step as complete
-        if (
-          updated.profile.name &&
-          updated.profile.name !== DEFAULT_NAME &&
-          !user.isWelcomeOnboardFlowComplete
-        ) {
-          user.setData({ isWelcomeOnboardFlowComplete: true });
-        }
-      }
 
       return updated;
     },

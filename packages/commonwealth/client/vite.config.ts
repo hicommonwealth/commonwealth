@@ -66,64 +66,62 @@ export default defineConfig(({ mode }) => {
       ],
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
-    define: {
-      'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
-      'process.env.NODE_ENV': JSON.stringify('development'),
-      'process.env.SERVER_URL': JSON.stringify(env.SERVER_URL),
-      'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
-        env.KNOCK_PUBLIC_API_KEY,
-      ),
-      'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
-        env.KNOCK_IN_APP_FEED_ID,
-      ),
-      'process.env.MIXPANEL_DEV_TOKEN':
-        JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||
-        JSON.stringify('312b6c5fadb9a88d98dc1fb38de5d900'),
-      'process.env.MAGIC_PUBLISHABLE_KEY':
-        JSON.stringify(env.MAGIC_PUBLISHABLE_KEY) ||
-        JSON.stringify('pk_live_EF89AABAFB87D6F4'),
-      'process.env.DISCORD_CLIENT_ID':
-        JSON.stringify(env.DISCORD_CLIENT_ID) ||
-        JSON.stringify('1034502265664454776'),
-      'process.env.DISCORD_UI_URL':
-        JSON.stringify(env.DISCORD_UI_URL) ||
-        JSON.stringify('http://localhost:3000'),
-      'process.env.COSMOS_GOV_V1': JSON.stringify(env.COSMOS_GOV_V1),
-      'process.env.COSMOS_REGISTRY_API': JSON.stringify(
-        env.COSMOS_REGISTRY_API,
-      ),
-      'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
-        env.FLAG_COMMUNITY_HOMEPAGE,
-      ),
-      'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
-        env.FLAG_PROPOSAL_TEMPLATES,
-      ),
-      'process.env.FLAG_CONTEST': JSON.stringify(env.FLAG_CONTEST),
-      'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
-      'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
-        env.FLAG_COMMUNITY_STAKE,
-      ),
-      'process.env.FLAG_ALLOWLIST': JSON.stringify(env.FLAG_ALLOWLIST),
-      'process.env.IS_PRODUCTION': JSON.stringify(env.IS_PRODUCTION),
-      'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
-        env.UNLEASH_FRONTEND_SERVER_URL,
-      ),
-      'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
-        env.UNLEASH_FRONTEND_API_TOKEN,
-      ),
-      'process.env.HEROKU_APP_NAME': JSON.stringify(env.HEROKU_APP_NAME),
-      'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
-        env.FLAG_KNOCK_INTEGRATION_ENABLED,
-      ),
-      'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
-        env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
-      ),
-      'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
-      'process.env.ETH_ALCHEMY_API_KEY':
-        (env.ETH_RPC || '').trim() === 'e2e-test' &&
-        (env.NODE_ENV || '').trim() === 'test'
-          ? JSON.stringify(env.ETH_ALCHEMY_API_KEY)
-          : undefined,
-    },
+    // Vite built env var are disabled in all remote apps (only enabled in local/CI environments)
+    define: !['local', 'CI'].includes(env.APP_ENV!.trim())
+      ? {}
+      : {
+          'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
+          'process.env.APP_ENV': JSON.stringify(env.APP_ENV),
+          'process.env.NODE_ENV': JSON.stringify('development'),
+          'process.env.SERVER_URL': JSON.stringify(env.SERVER_URL),
+          'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
+            env.KNOCK_PUBLIC_API_KEY,
+          ),
+          'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
+            env.KNOCK_IN_APP_FEED_ID,
+          ),
+          'process.env.MIXPANEL_DEV_TOKEN':
+            JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||
+            JSON.stringify('312b6c5fadb9a88d98dc1fb38de5d900'),
+          'process.env.MAGIC_PUBLISHABLE_KEY':
+            JSON.stringify(env.MAGIC_PUBLISHABLE_KEY) ||
+            JSON.stringify('pk_live_EF89AABAFB87D6F4'),
+          'process.env.DISCORD_CLIENT_ID':
+            JSON.stringify(env.DISCORD_CLIENT_ID) ||
+            JSON.stringify('1034502265664454776'),
+          'process.env.DISCORD_UI_URL':
+            JSON.stringify(env.DISCORD_UI_URL) ||
+            JSON.stringify('http://localhost:3000'),
+          'process.env.COSMOS_GOV_V1': JSON.stringify(env.COSMOS_GOV_V1),
+          'process.env.COSMOS_REGISTRY_API': JSON.stringify(
+            env.COSMOS_REGISTRY_API,
+          ),
+          'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
+            env.FLAG_PROPOSAL_TEMPLATES,
+          ),
+          'process.env.FLAG_CONTEST': JSON.stringify(env.FLAG_CONTEST),
+          'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
+
+          'process.env.IS_PRODUCTION': JSON.stringify(env.IS_PRODUCTION),
+          'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
+            env.UNLEASH_FRONTEND_SERVER_URL,
+          ),
+          'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
+            env.UNLEASH_FRONTEND_API_TOKEN,
+          ),
+          'process.env.HEROKU_APP_NAME': JSON.stringify(env.HEROKU_APP_NAME),
+          'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
+            env.FLAG_KNOCK_INTEGRATION_ENABLED,
+          ),
+          'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
+            env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
+          ),
+          'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
+          'process.env.ETH_ALCHEMY_API_KEY':
+            (env.ETH_RPC || '').trim() === 'e2e-test' &&
+            (env.NODE_ENV || '').trim() === 'test'
+              ? JSON.stringify(env.ETH_ALCHEMY_API_KEY)
+              : undefined,
+        },
   };
 });

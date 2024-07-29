@@ -45,6 +45,7 @@ async function main() {
 if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
+      console.log('Success!');
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispose()('EXIT', true);
     })

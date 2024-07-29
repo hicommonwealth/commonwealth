@@ -416,15 +416,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (!currentUserUpdatedProfile) {
         console.log('No profile yet.');
       } else {
-        // @ts-expect-error <StrictNullChecks>
-        account.profile.initialize(
-          currentUserUpdatedProfile?.name,
+        account?.profile?.initialize(
+          currentUserUpdatedProfile.userId,
+          currentUserUpdatedProfile.name,
           currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile?.avatarUrl,
-          currentUserUpdatedProfile.id,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          currentUserUpdatedProfile?.lastActive,
+          currentUserUpdatedProfile.avatarUrl,
+          account?.profile?.chain,
+          currentUserUpdatedProfile.lastActive,
         );
       }
     } catch (e) {
@@ -439,14 +437,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     newelyCreated?: boolean,
   ) => {
     try {
-      if (username) {
+      if (username && account?.profile) {
         await updateUser({
-          id: user.id.toString(),
-          name: username,
-          profile: {},
-          // @mzparacha do we need to uupdate address and chain?
-          //address: account?.profile?.address,
-          //chain: account?.profile?.chain,
+          id: account.profile.userId.toString(),
+          profile: {
+            name: username.trim(),
+          },
         });
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');

@@ -1,9 +1,7 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import {
@@ -16,11 +14,8 @@ import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sideb
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { useFlag } from '../../../../hooks/useFlag';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
-import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
-import { CWText } from '../../component_kit/cw_text';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
 import { AdminSection } from '../AdminSection';
 import CreateCommunityButton from '../CreateCommunityButton';
@@ -35,10 +30,6 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
-  const communityHomepageEnabled = useFlag('communityHomepage');
-  const communityStakeEnabled = useFlag('communityStake');
-  const navigate = useCommonNavigate();
-  const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
   const {
@@ -68,7 +59,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
-  const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = isAdmin || isMod;
@@ -83,7 +73,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               address={user.activeAccount?.address || ''}
             />
 
-            {communityStakeEnabled && stakeEnabled && (
+            {stakeEnabled && (
               <VoteWeightModule
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
@@ -102,15 +92,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             <CWDivider />
             <AdminSection />
           </>
-        )}
-        {communityHomepageEnabled && app.chain?.meta.hasHomepage && (
-          <div
-            className={onHomeRoute ? 'home-button active' : 'home-button'}
-            onClick={() => navigate('/feed')}
-          >
-            <CWIcon iconName="home" iconSize="small" />
-            <CWText>Home</CWText>
-          </div>
         )}
 
         <CWDivider />

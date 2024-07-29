@@ -30,18 +30,35 @@ export const User = z.object({
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).optional(),
   disableRichText: z.boolean().default(false).optional(),
-  emailVerified: z.boolean().default(false).optional(),
-  selected_community_id: z.string().max(255).optional().nullish(),
+  emailVerified: z.boolean().default(false).nullish(),
+  selected_community_id: z.string().max(255).nullish(),
   emailNotificationInterval: z
     .enum(['weekly', 'never'])
     .default('never')
     .optional(),
-  promotional_emails_enabled: z.boolean().optional(),
+  promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
   profile: UserProfile,
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
   ProfileTags: z.array(ProfileTags).optional(),
+});
+
+export const Profile = z.object({
+  id: PG_INT,
+  user_id: PG_INT,
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+  profile_name: z.string().max(255).optional(),
+  email: z.string().max(255).optional(),
+  website: z.string().max(255).optional(),
+  bio: z.string().optional(),
+  avatar_url: z.string().max(255).optional(),
+  slug: z.string().max(255).optional(),
+  socials: z.array(z.string()).optional(),
+  background_image: z.any().optional(),
+  bio_backup: z.string().optional(),
+  profile_name_backup: z.string().max(255).optional(),
 });
 
 export const Address = z.object({
@@ -86,9 +103,9 @@ export const CommunityMember = z.object({
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.number().nullish(),
+      role: z.string(),
     }),
   ),
-  roles: z.array(z.string()).nullish(),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
 });
