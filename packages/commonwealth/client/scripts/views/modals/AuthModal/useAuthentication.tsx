@@ -444,10 +444,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
             name: username.trim(),
           },
         });
-        // @mzparacha can't find these attributes in user state
-        //address: account?.profile?.address,
-        //chain: account?.profile?.chain,
-
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
       }

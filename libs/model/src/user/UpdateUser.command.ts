@@ -37,9 +37,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       if (!mustExist('User', user)) return;
 
       const is_welcome_onboard_flow_complete =
-        user.is_welcome_onboard_flow_complete ||
-        !!name ||
-        user.profile.name !== DEFAULT_NAME
+        user.is_welcome_onboard_flow_complete || (name && name !== DEFAULT_NAME)
           ? true
           : false;
 
