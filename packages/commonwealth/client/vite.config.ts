@@ -56,19 +56,15 @@ export default defineConfig(({ mode }) => {
     'process.env.MIXPANEL_DEV_TOKEN':
       JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||
       JSON.stringify('312b6c5fadb9a88d98dc1fb38de5d900'),
+    'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(env.MIXPANEL_PROD_TOKEN),
     'process.env.MAGIC_PUBLISHABLE_KEY':
       JSON.stringify(env.MAGIC_PUBLISHABLE_KEY) ||
       JSON.stringify('pk_live_EF89AABAFB87D6F4'),
     'process.env.DISCORD_CLIENT_ID':
       JSON.stringify(env.DISCORD_CLIENT_ID) ||
       JSON.stringify('1034502265664454776'),
-    'process.env.DISCORD_UI_URL':
-      JSON.stringify(env.DISCORD_UI_URL) ||
-      JSON.stringify('http://localhost:3000'),
-    'process.env.COSMOS_GOV_V1': JSON.stringify(env.COSMOS_GOV_V1),
     'process.env.COSMOS_REGISTRY_API': JSON.stringify(env.COSMOS_REGISTRY_API),
     'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
-    'process.env.IS_PRODUCTION': JSON.stringify(env.IS_PRODUCTION),
     'process.env.ETH_ALCHEMY_API_KEY':
       (env.ETH_RPC || '').trim() === 'e2e-test' &&
       (env.NODE_ENV || '').trim() === 'test'
