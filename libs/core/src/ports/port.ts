@@ -1,3 +1,4 @@
+import { delay } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import { config } from '../config';
 import { logger, rollbar } from '../logging';
@@ -55,8 +56,10 @@ const disposeAndExit = async (
   forceExit: boolean = false,
 ): Promise<void> => {
   // don't kill process when errors are caught in production
-  if (code === 'ERROR' && config.NODE_ENV === 'production' && !forceExit)
-    return;
+  if (code === 'ERROR' && config.NODE_ENV === 'production') {
+    if (forceExit) await delay(1_000);
+    else return;
+  }
 
   // call disposers
   await Promise.all(disposers.map((disposer) => disposer()));

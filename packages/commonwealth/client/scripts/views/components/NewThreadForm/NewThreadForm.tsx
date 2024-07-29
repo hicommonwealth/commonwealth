@@ -41,7 +41,7 @@ import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
-const MIN_ETH_FOR_CONTEST_THREAD = 0.005;
+const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -334,7 +334,8 @@ export const NewThreadForm = () => {
 
               <MessageRow
                 hasFeedback={walletBalanceError}
-                statusMessage="Ensure that your connected wallet has at least 0.005 ETH to participate."
+                statusMessage={`Ensure that your connected wallet has at least 
+                ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"
               />
 

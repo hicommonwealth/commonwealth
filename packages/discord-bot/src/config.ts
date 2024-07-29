@@ -11,14 +11,12 @@ export const config = configure(
     DISCORD: {
       CW_BOT_KEY,
       DISCORD_TOKEN,
-      DISCOBOT_ADDRESS: '0xdiscordbot',
     },
   },
   z.object({
     DISCORD: z.object({
       CW_BOT_KEY: z.string().optional(),
       DISCORD_TOKEN: z.string().optional(),
-      DISCOBOT_ADDRESS: z.string(),
     }),
   }),
 );

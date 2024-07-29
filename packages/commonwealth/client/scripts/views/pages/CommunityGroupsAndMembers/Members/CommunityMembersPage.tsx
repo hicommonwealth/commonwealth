@@ -35,7 +35,6 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useAppStatus from '../../../../hooks/useAppStatus';
-import { useFlag } from '../../../../hooks/useFlag';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -52,7 +51,6 @@ const GROUP_AND_MEMBER_FILTERS = [
 ];
 
 const CommunityMembersPage = () => {
-  const allowlistEnabled = useFlag('allowlist');
   const location = useLocation();
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -208,8 +206,7 @@ const CommunityMembersPage = () => {
         userId: p.user_id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
-        // @ts-expect-error <StrictNullChecks/>
-        role: p.roles[0],
+        role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map(
             (groupId) =>
@@ -367,9 +364,7 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TABS[1].value &&
-        groups?.length === 0 &&
-        !allowlistEnabled ? (
+        {selectedTab === TABS[1].value && groups?.length === 0 ? (
           <></>
         ) : (
           <section

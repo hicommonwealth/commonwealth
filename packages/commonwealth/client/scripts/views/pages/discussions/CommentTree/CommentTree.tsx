@@ -479,6 +479,7 @@ export const CommentTree = ({
                 </div>
               )}
               <CommentCard
+                key={`${comment.id}-${comment.text}`}
                 disabledActionsTooltipText={disabledActionsTooltipText}
                 isThreadArchived={!!thread.archivedAt}
                 canReply={
