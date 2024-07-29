@@ -2,6 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
@@ -30,10 +31,7 @@ export const TrendingCommunitiesPreview = () => {
       const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
         community.id,
       );
-      const isMember = app.roles.isMember({
-        account: user.activeAccount || undefined,
-        community: community.id,
-      });
+      const isMember = Permissions.isCommunityMember(community.id);
 
       return {
         community,

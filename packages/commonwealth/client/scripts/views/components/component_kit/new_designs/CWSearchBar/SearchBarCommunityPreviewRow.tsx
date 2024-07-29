@@ -23,6 +23,7 @@ export const SearchBarCommunityPreviewRow: FC<
     onSearchItemClick?.();
   };
 
+  // XXX: only fields used here from ChainInfo are name and iconUrl
   const communityInfo = ChainInfo.fromJSON(searchResult as any);
 
   return (

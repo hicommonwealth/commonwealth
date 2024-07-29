@@ -125,6 +125,6 @@ app.listen(config.PORT, async () => {
   log.info(
     `⚡️[server]: Server is running at https://localhost:${config.PORT}`,
   );
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
   isServiceHealthy = true;
 });

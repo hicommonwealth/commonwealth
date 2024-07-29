@@ -124,11 +124,6 @@ const useJoinCommunity = () => {
           }),
         });
 
-        // get newly added address info
-        const addressInfo = user.addresses.find(
-          (a) => a.address === encodedAddress && a.community.id === communityId,
-        );
-
         // set verification token for the newly created account
         const account = app?.chain?.accounts?.get?.(encodedAddress);
         if (account && app.chain) {
@@ -137,20 +132,6 @@ const useJoinCommunity = () => {
 
         // set active address if in a community
         if (activeChainId) {
-          // set role in community
-          if (
-            !app.roles.getRoleInCommunity({
-              account,
-              community: activeChainId,
-            })
-          ) {
-            await app.roles.createRole({
-              // @ts-expect-error <StrictNullChecks/>
-              address: addressInfo,
-              community: activeChainId,
-            });
-          }
-
           account && (await setActiveAccount(account));
 
           // update active accounts
