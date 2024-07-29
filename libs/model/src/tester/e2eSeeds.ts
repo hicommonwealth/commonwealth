@@ -6,7 +6,6 @@ import type {
   CommentInstance,
   CommunityInstance,
   DB,
-  ProfileInstance,
   ReactionAttributes,
   ThreadInstance,
   TopicAttributes,
@@ -23,7 +22,6 @@ export type E2E_TestEntities = {
   testReactions: ReactionAttributes[];
   testChainNodes: ChainNodeAttributes[];
   testTopics: TopicAttributes[];
-  testProfiles: ProfileInstance[];
 };
 
 export const e2eTestEntities = async function (
@@ -38,7 +36,6 @@ export const e2eTestEntities = async function (
   const testReactions: ReactionAttributes[] = [];
   const testChainNodes: ChainNodeAttributes[] = [];
   const testTopics: TopicAttributes[] = [];
-  const testProfiles: ProfileInstance[] = [];
 
   try {
     testUsers.push(
@@ -57,25 +54,6 @@ export const e2eTestEntities = async function (
                     avatar_url: `testAvatarUrl${-i - 1}`,
                     email: `test${-i - 1}@gmail.com`,
                   },
-                },
-              })
-            )[0],
-        ),
-      )),
-    );
-
-    testProfiles.push(
-      ...(await Promise.all(
-        [...Array(2).keys()].map(
-          async (i) =>
-            (
-              await testDb.Profile.findOrCreate({
-                where: {
-                  id: -i - 1,
-                  profile_name: `testName${-i - 1}`,
-                  avatar_url: `testAvatarUrl${-i - 1}`,
-                  email: `test${i - 1}@gmail.com`,
-                  user_id: -i - 1,
                 },
               })
             )[0],
@@ -367,7 +345,6 @@ export const e2eTestEntities = async function (
       testReactions,
       testChainNodes,
       testTopics,
-      testProfiles,
     };
   } catch (e) {
     console.error('Error creating E2E test entities:', e);

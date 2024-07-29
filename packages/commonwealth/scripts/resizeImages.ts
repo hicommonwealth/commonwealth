@@ -103,18 +103,21 @@ async function resizeChains() {
 
 async function resizeProfiles() {
   const updateProfile = async (id, location, transaction) => {
-    await models.Profile.update(
-      { avatar_url: location },
-      { where: { id: id }, transaction },
-    );
+    const user = await models.User.findOne({ where: id });
+    if (user) {
+      user.profile.avatar_url = location;
+      user.changed('profile', true);
+      await user.save({ transaction });
+    }
   };
 
-  const getNthProfile = async (n) =>
-    await models.Profile.findAll({
-      // @ts-expect-error StrictNullChecks
+  const getNthUser = async (n) =>
+    await models.User.findAll({
       where: {
-        avatar_url: {
-          [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
+        profile: {
+          avatar_url: {
+            [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
+          },
         },
       },
       offset: n,
@@ -123,7 +126,7 @@ async function resizeProfiles() {
     });
 
   await uploadToS3AndReplace(
-    getNthProfile,
+    getNthUser,
     'avatar_url',
     updateProfile,
     'Profile',

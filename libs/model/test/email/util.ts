@@ -18,7 +18,6 @@ import {
   Address,
   Comment,
   Community,
-  Profile,
   Thread,
   User,
 } from '@hicommonwealth/schemas';
@@ -29,7 +28,6 @@ type ArrayItemType<T> = T extends Array<infer U> ? U : never;
 
 export function generateDiscussionData(
   authorUser: z.infer<typeof User>,
-  authorProfile: z.infer<typeof Profile>,
   authorAddress: z.infer<typeof Address>,
   recipientUser: z.infer<typeof User>,
   community: z.infer<typeof Community>,
@@ -52,7 +50,7 @@ export function generateDiscussionData(
   const date = new Date();
 
   const userMentionedNotification: z.infer<typeof UserMentionedNotification> = {
-    author: authorProfile.profile_name!,
+    author: authorUser.profile.name!,
     author_address: authorAddress.address,
     author_address_id: authorAddress.id!,
     author_user_id: authorUser.id!,
@@ -64,7 +62,7 @@ export function generateDiscussionData(
 
   const commentCreatedNotification: z.infer<typeof CommentCreatedNotification> =
     {
-      author: authorProfile.profile_name!,
+      author: authorUser.profile.name!,
       comment_parent_name: comment.parent_id ? 'comment' : 'thread',
       community_name: community.name,
       comment_body: 'Testing',
