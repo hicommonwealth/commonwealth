@@ -17,6 +17,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import axios from 'axios';
 import useUserStore from 'state/ui/user';
 import '../../../styles/modals/delete_address_modal.scss';
@@ -100,7 +101,7 @@ export const DeleteAddressModal = ({
               )}`}
             />
           )}
-          <CWText fontWeight="bold">{name || 'Anonymous user'}</CWText>
+          <CWText fontWeight="bold">{name || DEFAULT_NAME}</CWText>
         </div>
         <div className="confirmation">
           <CWText>Are you sure you want to remove this address?</CWText>

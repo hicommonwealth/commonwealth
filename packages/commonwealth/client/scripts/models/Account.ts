@@ -110,10 +110,10 @@ class Account {
           );
         } else {
           updatedProfile.initialize(
+            data?.userId,
             data?.name,
             data.address,
             data?.avatarUrl,
-            data.id,
             updatedProfile.chain,
             data?.lastActive,
           );
