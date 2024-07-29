@@ -1,12 +1,13 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import Tag from 'models/Tag';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 
 const ACTIVE_COMMUNITIES_STALE_TIME = 60 * 1_000; // 1 min
 
-interface FetchActiveCommunitiesResponse {
+export interface FetchActiveCommunitiesResponse {
   communities: {
     id: string;
     name: string;
@@ -20,6 +21,7 @@ interface FetchActiveCommunitiesResponse {
     altWalletUrl: string;
     userAddress: string;
     bech32Prefix?: string;
+    CommunityTags: Tag[];
   }[];
   totalCommunitiesCount: number;
 }

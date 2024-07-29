@@ -28,7 +28,6 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import './CommunityProfileForm.scss';
-import { getCommunityTags } from './helpers';
 import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
 
@@ -60,14 +59,6 @@ const CommunityProfileForm = () => {
     })),
   );
 
-  // TODO: this should be removed when /updateCommunityCategory route is updated to
-  // use only the newer tags schema
-  const [deprecatedCurrentCommunityTags, setDeprecatedCurrentCommunityTags] =
-    useState(
-      Object.entries(getCommunityTags(community.id))
-        .filter(({ 1: value }) => value)
-        .map(({ 0: key }, index) => ({ id: index, tag: key })),
-    );
   const areTagsInitiallySet = useRef(false);
   const {
     isLoadingTags,
@@ -77,37 +68,20 @@ const CommunityProfileForm = () => {
   } = usePreferenceTags();
 
   const updatePreferenceTags = useCallback(() => {
-    const isOlderTagSelected = (tag: string, name: string) => {
-      return (
-        tag.toLowerCase() === name &&
-        !!deprecatedCurrentCommunityTags.find(
-          (dct) => dct.tag.toLowerCase() === name,
-        )
-      );
-    };
-
     const updatedTags = [...preferenceTags].map((tag) => ({
       ...tag,
-      isSelected:
-        // if `defi` or `dao` is in older tags, mark it selected in newer ones
-        isOlderTagSelected(tag.item.tag, 'defi') ||
-        isOlderTagSelected(tag.item.tag, 'dao') ||
-        !!(community.CommunityTags || []).find((t) => t.id === tag.item.id),
+      isSelected: !!(community.CommunityTags || []).find(
+        (t) => t.id === tag.item.id,
+      ),
     }));
     setPreferenceTags(updatedTags);
-  }, [
-    preferenceTags,
-    setPreferenceTags,
-    community,
-    deprecatedCurrentCommunityTags,
-  ]);
+  }, [preferenceTags, setPreferenceTags, community]);
 
   useEffect(() => {
     if (
       !isLoadingTags &&
       preferenceTags?.length > 0 &&
       community &&
-      deprecatedCurrentCommunityTags &&
       !areTagsInitiallySet.current
     ) {
       updatePreferenceTags();
@@ -120,7 +94,6 @@ const CommunityProfileForm = () => {
     setPreferenceTags,
     community,
     updatePreferenceTags,
-    deprecatedCurrentCommunityTags,
   ]);
 
   const {
@@ -151,16 +124,6 @@ const CommunityProfileForm = () => {
 
       await editTags({
         communityId: community.id,
-        selectedTags: {
-          DAO: !!preferenceTags.find(
-            ({ item, isSelected }) =>
-              item.tag.toLowerCase() === 'dao' && isSelected,
-          ),
-          DeFi: !!preferenceTags.find(
-            ({ item, isSelected }) =>
-              item.tag.toLowerCase() === 'defi' && isSelected,
-          ),
-        },
         tagIds: preferenceTags
           .filter((pt) => pt.isSelected)
           .map((pt) => pt.item.id),
@@ -168,8 +131,7 @@ const CommunityProfileForm = () => {
 
       await editBanner({
         communityId: community.id,
-        // @ts-expect-error <StrictNullChecks/>
-        bannerText: values.communityBanner,
+        bannerText: values.communityBanner ?? '',
       });
 
       await community.updateChainData({
@@ -184,28 +146,10 @@ const CommunityProfileForm = () => {
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
 
-      community.updateTags(
-        preferenceTags
-          .filter((t) => t.isSelected)
-          .map((t) => ({
-            id: t.item.id,
-            name: t.item.tag,
-          })),
-      );
-
       setNameFieldDisabledState({
         isDisabled: true,
         canDisable: true,
       });
-      setDeprecatedCurrentCommunityTags(
-        preferenceTags
-          .filter((t) => t.isSelected)
-          .filter((t) => ['defi', 'dao'].includes(t.item.tag.toLowerCase()))
-          .map((t) => ({
-            id: t.item.id,
-            tag: t.item.tag,
-          })),
-      );
       const updatedLinks = links.map((link) => ({
         value: link.value.trim(),
         canUpdate: true,

@@ -1,31 +1,11 @@
-import { ChainBase, CommunityCategoryType } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import ChainInfo from 'models/ChainInfo';
 import app from 'state';
-import { getCommunityTags } from 'views/pages/CommunityManagement/CommunityProfile/CommunityProfileForm/helpers';
 
 type FindSuggestedCommunitiesProps = {
   userChainBase: ChainBase;
   userPreferenceTags: string[];
   maxCommunitiesToFind: number;
-};
-
-// TODO: this method should be deprecated after https://github.com/hicommonwealth/commonwealth/issues/7835
-const getAllCommunityTags = (community: ChainInfo): string[] => {
-  const deprecatedTags = getCommunityTags(community.id);
-  const aggregatedTags = [
-    // filter out `defi` and `dao` tags from newer `CommunityTags` array
-    ...community.CommunityTags.filter(
-      (t) =>
-        ![
-          CommunityCategoryType.DeFi.toLowerCase(),
-          CommunityCategoryType.DeFi.toLowerCase(),
-        ].includes(t.name.toLowerCase()),
-    ).map((t) => t.name),
-  ];
-  // add `defi`, `dao` tags from older community category map
-  deprecatedTags.DeFi && aggregatedTags.push(CommunityCategoryType.DeFi);
-  deprecatedTags.DAO && aggregatedTags.push(CommunityCategoryType.DAO);
-  return aggregatedTags;
 };
 
 export const findSuggestedCommunities = ({
@@ -50,14 +30,14 @@ export const findSuggestedCommunities = ({
     .sort((a, b) => b.addressCount - a.addressCount)
     .sort((a, b) => b.threadCount - a.threadCount)
     .map((community) => {
-      const aggregatedCommunityTags = getAllCommunityTags(community);
+      const communityTagNames = community.CommunityTags.map((t) => t.name);
 
       // We dont want this community here
       // 1. if there are no tags
       // 2. if the community tags don't overlap user preference tags
       if (
-        aggregatedCommunityTags.length === 0 ||
-        !userPreferenceTags.some((tag) => aggregatedCommunityTags.includes(tag))
+        communityTagNames.length === 0 ||
+        !userPreferenceTags.some((tag) => communityTagNames.includes(tag))
       ) {
         communityPreferenceMap.communitiesNotMatchingUserPreferences.push(
           community,
