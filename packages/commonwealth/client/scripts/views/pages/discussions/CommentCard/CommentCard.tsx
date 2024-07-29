@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 
 import {
@@ -14,8 +14,11 @@ import {
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
+import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
+import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -27,6 +30,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
+import { useCommentSubscriptions } from 'views/pages/NotificationSettings/useCommentSubscriptions';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -112,6 +116,16 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
+  // this is in an inner loop but trpc will batch this so it's only called once.
+  const commentSubscriptions = useCommentSubscriptions();
+
+  const isSubscribed = useMemo(() => {
+    const matching = (commentSubscriptions.data || []).filter(
+      (current) => current.comment_id === comment.id,
+    );
+    return matching.length > 0;
+  }, [comment.id, commentSubscriptions.data]);
+
   const { data: config } = useFetchConfigurationQuery();
 
   const doVerify = useCallback(async () => {
@@ -126,9 +140,40 @@ export const CommentCard = ({
     }
   }, [comment.canvasSignedData]);
 
-  const handleToggleSubscribe = useCallback(() => {
-    // toggle sub
-  }, []);
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
+
+  const createThreadSubscriptionMutation =
+    useCreateThreadSubscriptionMutation();
+  const deleteThreadSubscriptionMutation =
+    useDeleteThreadSubscriptionMutation();
+
+  const doToggleSubscribe = useCallback(async () => {
+    if (isSubscribed) {
+      await deleteThreadSubscriptionMutation.mutateAsync({
+        thread_id: comment.id,
+      });
+    } else {
+      await createThreadSubscriptionMutation.mutateAsync({
+        thread_ids: [comment.id],
+      });
+    }
+  }, [
+    createThreadSubscriptionMutation,
+    deleteThreadSubscriptionMutation,
+    isSubscribed,
+    comment.id,
+  ]);
+
+  const handleToggleSubscribe = useCallback(
+    (e: React.MouseEvent) => {
+      // prevent clicks from propagating to discussion row
+      e.preventDefault();
+      e.stopPropagation();
+
+      doToggleSubscribe().catch(console.error);
+    },
+    [doToggleSubscribe],
+  );
 
   useEffect(() => {
     if (!config?.enforceSessionKeys) return;
@@ -255,11 +300,13 @@ export const CommentCard = ({
                 />
               )}
 
-              <CWThreadAction
-                action="subscribe"
-                label="Subscribe"
-                onClick={handleToggleSubscribe}
-              />
+              {enableKnockInAppNotifications && (
+                <CWThreadAction
+                  action="subscribe"
+                  label="Subscribe"
+                  onClick={handleToggleSubscribe}
+                />
+              )}
 
               {!isThreadArchived && (canEdit || canDelete || canToggleSpam) && (
                 <PopoverMenu

@@ -72,55 +72,49 @@ export const ThreadOptions = ({
 
   const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
-  const doToggleSubscribeOld = useCallback(
-    async (e: React.MouseEvent) => {
-      if (!thread) {
-        return;
-      }
+  const doToggleSubscribeOld = useCallback(async () => {
+    if (!thread) {
+      return;
+    }
 
-      await handleToggleSubscription(
-        thread,
-        getCommentSubscription(thread),
-        getReactionSubscription(thread),
-        isSubscribed,
-        setIsSubscribed,
-      );
-    },
-    [isSubscribed, thread],
-  );
+    await handleToggleSubscription(
+      thread,
+      getCommentSubscription(thread),
+      getReactionSubscription(thread),
+      isSubscribed,
+      setIsSubscribed,
+    );
+  }, [isSubscribed, thread]);
 
   const createThreadSubscriptionMutation =
     useCreateThreadSubscriptionMutation();
   const deleteThreadSubscriptionMutation =
     useDeleteThreadSubscriptionMutation();
 
-  const doToggleSubscribe = useCallback(
-    async (e: React.MouseEvent) => {
-      if (isSubscribed) {
-        await deleteThreadSubscriptionMutation.mutateAsync({
-          thread_id: thread.id,
-        });
-      } else {
-        await createThreadSubscriptionMutation.mutateAsync({
-          thread_ids: [thread.id],
-        });
-      }
-    },
-    [
-      createThreadSubscriptionMutation,
-      deleteThreadSubscriptionMutation,
-      isSubscribed,
-      thread.id,
-    ],
-  );
+  const doToggleSubscribe = useCallback(async () => {
+    if (isSubscribed) {
+      await deleteThreadSubscriptionMutation.mutateAsync({
+        thread_id: thread.id,
+      });
+    } else {
+      await createThreadSubscriptionMutation.mutateAsync({
+        thread_ids: [thread.id],
+      });
+    }
+  }, [
+    createThreadSubscriptionMutation,
+    deleteThreadSubscriptionMutation,
+    isSubscribed,
+    thread.id,
+  ]);
 
   const handleToggleSubscribe = useCallback(
     (e: React.MouseEvent) => {
       async function doAsync() {
         if (enableKnockInAppNotifications) {
-          await doToggleSubscribe(e);
+          await doToggleSubscribe();
         } else {
-          await doToggleSubscribeOld(e);
+          await doToggleSubscribeOld();
         }
       }
 
