@@ -19,6 +19,15 @@ function createScriptsResolver(folder: string): Alias {
 export default defineConfig(({ mode }) => {
   const envPath = path.dirname(path.dirname(process.cwd())); // root project .env
   const env = loadEnv(mode, envPath, '');
+  const unleashConfig = {
+    'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
+      env.UNLEASH_FRONTEND_SERVER_URL,
+    ),
+    'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
+      env.UNLEASH_FRONTEND_API_TOKEN,
+    ),
+  };
+
   return {
     root: projectRootDir,
     plugins: [
@@ -68,8 +77,9 @@ export default defineConfig(({ mode }) => {
     },
     // Vite built env var are disabled in all remote apps (only enabled in local/CI environments)
     define: !['local', 'CI'].includes(env.APP_ENV!.trim())
-      ? {}
+      ? unleashConfig
       : {
+          ...unleashConfig,
           'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
           'process.env.APP_ENV': JSON.stringify(env.APP_ENV),
           'process.env.NODE_ENV': JSON.stringify('development'),
@@ -103,12 +113,6 @@ export default defineConfig(({ mode }) => {
           'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
 
           'process.env.IS_PRODUCTION': JSON.stringify(env.IS_PRODUCTION),
-          'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
-            env.UNLEASH_FRONTEND_SERVER_URL,
-          ),
-          'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
-            env.UNLEASH_FRONTEND_API_TOKEN,
-          ),
           'process.env.HEROKU_APP_NAME': JSON.stringify(env.HEROKU_APP_NAME),
           'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
             env.FLAG_KNOCK_INTEGRATION_ENABLED,
