@@ -150,11 +150,11 @@ export const CommentCard = ({
   const doToggleSubscribe = useCallback(async () => {
     if (isSubscribed) {
       await deleteThreadSubscriptionMutation.mutateAsync({
-        thread_id: comment.id,
+        comment_id: comment.id,
       });
     } else {
       await createThreadSubscriptionMutation.mutateAsync({
-        thread_ids: [comment.id],
+        comment_ids: [comment.id],
       });
     }
   }, [

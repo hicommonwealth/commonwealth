@@ -3,8 +3,8 @@ import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
-import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
-import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
+import { useCreateCommentSubscriptionMutation } from 'state/api/trpc/subscription/useCreateCommentSubscriptionMutation';
+import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
 import Permissions from 'utils/Permissions';
 import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
@@ -86,24 +86,24 @@ export const ThreadOptions = ({
     );
   }, [isSubscribed, thread]);
 
-  const createThreadSubscriptionMutation =
-    useCreateThreadSubscriptionMutation();
-  const deleteThreadSubscriptionMutation =
-    useDeleteThreadSubscriptionMutation();
+  const createCommentSubscriptionMutation =
+    useCreateCommentSubscriptionMutation();
+  const deleteCommentSubscriptionMutation =
+    useDeleteCommentSubscriptionMutation();
 
   const doToggleSubscribe = useCallback(async () => {
     if (isSubscribed) {
-      await deleteThreadSubscriptionMutation.mutateAsync({
-        thread_id: thread.id,
+      await deleteCommentSubscriptionMutation.mutateAsync({
+        comment_id: thread.id,
       });
     } else {
-      await createThreadSubscriptionMutation.mutateAsync({
-        thread_ids: [thread.id],
+      await createCommentSubscriptionMutation.mutateAsync({
+        comment_ids: [thread.id],
       });
     }
   }, [
-    createThreadSubscriptionMutation,
-    deleteThreadSubscriptionMutation,
+    createCommentSubscriptionMutation,
+    deleteCommentSubscriptionMutation,
     isSubscribed,
     thread.id,
   ]);

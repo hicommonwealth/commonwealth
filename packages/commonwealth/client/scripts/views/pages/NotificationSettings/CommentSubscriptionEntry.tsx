@@ -44,7 +44,7 @@ export const CommentSubscriptionEntry = (
   const deleteThreadSubscription = useCallback(async () => {
     await deleteCommentSubscriptionMutation.mutateAsync({
       id: `${comment_id}`,
-      thread_ids: [comment_id],
+      comment_ids: [comment_id],
     });
   }, [deleteCommentSubscriptionMutation, comment_id]);
 
