@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
     'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
       env.UNLEASH_FRONTEND_API_TOKEN,
     ),
+    'process.env.HEROKU_APP_NAME': JSON.stringify(env.HEROKU_APP_NAME),
   };
 
   return {
