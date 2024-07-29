@@ -100,50 +100,22 @@ class CWQueries {
     discourseBio: DiscourseWebsiteBio | null,
     { transaction }: { transaction: Transaction },
   ) => {
-    const [user] = await models.sequelize.query<UserIdEmail>(
-      `
-      INSERT INTO "Users"(
-          id,
-          email,
-          created_at,
-          updated_at,
-          "selected_community_id",
-          "isAdmin",
-          "disableRichText",
-          "emailVerified",
-          "emailNotificationInterval",
-          profile
-      )
-      VALUES (
-          default,
-          :email,
-          NOW(),
-          NOW(),
-          null,
-          false,
-          false,
-          false,
-          'never',
-          jsonb_build_object(
-            'username', :username,
-            'bio', :bio,
-            'website', :website
-          )
-      )
-      RETURNING id, email;
-      `,
+    return models.User.create(
       {
-        type: QueryTypes.SELECT,
-        replacements: {
-          email: discourseUser.email,
-          username: discourseUser.username || discourseUser.name,
+        email: discourseUser.email,
+        profile: {
+          name: discourseUser.username || discourseUser.name,
           bio: discourseBio?.bio_raw || null,
           website: discourseBio?.website || null,
         },
-        transaction,
+        selected_community_id: null,
+        isAdmin: false,
+        disableRichText: false,
+        emailVerified: false,
+        emailNotificationInterval: 'never',
       },
+      { transaction },
     );
-    return user;
   };
 }
 
