@@ -124,6 +124,9 @@ describe('Comment subscription lifecycle', () => {
     );
     console.log('FIXME: res: ', JSON.stringify(res![0], null, 2));
 
+    // This s giving me non-deterministic results. Sometimes the 'res' will have
+    // Thread, sometimes it is null.
+
     expect(res).to.have.deep.members([
       updateStructure(commentSubOne),
       updateStructure(commentSubTwo),
