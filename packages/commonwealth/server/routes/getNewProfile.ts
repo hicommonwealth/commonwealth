@@ -1,10 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
-import type {
-  DB,
-  ProfileTagsAttributes,
-  TagsAttributes,
-} from '@hicommonwealth/model';
-import { GetNewProfileReq, GetNewProfileResp } from '@hicommonwealth/schemas';
+import type { DB, TagsAttributes } from '@hicommonwealth/model';
+import {
+  GetNewProfileReq,
+  GetNewProfileResp,
+  ProfileTags,
+} from '@hicommonwealth/schemas';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import z from 'zod';
@@ -16,7 +16,7 @@ export const Errors = {
   NoProfileFound: 'No profile found',
 };
 
-type ProfileWithTags = ProfileTagsAttributes & { Tag: TagsAttributes };
+type ProfileWithTags = z.infer<typeof ProfileTags> & { Tag: TagsAttributes };
 
 const getNewProfile = async (
   models: DB,
@@ -24,26 +24,11 @@ const getNewProfile = async (
   res: TypedResponse<z.infer<typeof GetNewProfileResp>>,
   next: NextFunction,
 ) => {
-  const { profileId } = req.query;
-  let user_id = req.user?.id;
-
-  // TO BE REMOVED
-  if (profileId) {
-    const parsedInt = parseInt(profileId);
-    if (isNaN(parsedInt) || parsedInt !== parseFloat(profileId)) {
-      throw new AppError('Invalid profile id');
-    }
-    const address = await models.Address.findOne({
-      where: {
-        profile_id: profileId,
-      },
-      attributes: ['user_id'],
-    });
-    user_id = address?.user_id;
-  }
+  const user_id = req.query.userId ? +req.query.userId : req.user?.id;
+  if (!user_id) return next(new AppError(Errors.NoIdentifierProvided));
 
   const user = await models.User.findOne({ where: { id: user_id } });
-  if (!user) return next(new Error(Errors.NoProfileFound));
+  if (!user) return next(new AppError(Errors.NoProfileFound));
 
   // TODO: We can actually query all user activity in a single statement
   // Activity is defined as user addresses (ids) with votes, threads, comments in active communities
@@ -103,6 +88,7 @@ const getNewProfile = async (
   });
 
   return success(res, {
+    userId: user_id!,
     profile: user.profile,
     totalUpvotes,
     addresses: addresses.map((a) => a.toJSON()),

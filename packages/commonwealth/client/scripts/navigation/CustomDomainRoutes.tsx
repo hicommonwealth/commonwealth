@@ -404,8 +404,8 @@ const CustomDomainRoutes = ({
       })}
     />,
     <Route
-      key="/profile/id/:profileId"
-      path="/profile/id/:profileId"
+      key="/profile/id/:userId"
+      path="/profile/id/:userId"
       element={withLayout(NewProfilePage, {
         scoped: true,
         type: 'common',
@@ -605,10 +605,10 @@ const CustomDomainRoutes = ({
       element={<Navigate to="/account" />}
     />,
     <Route
-      key="/:scope/profile/id/:profileId"
-      path="/:scope/profile/id/:profileId"
+      key="/:scope/profile/id/:userId"
+      path="/:scope/profile/id/:userId"
       element={
-        <Navigate to={(parameters) => `/profile/id/${parameters.profileId}`} />
+        <Navigate to={(parameters) => `/profile/id/${parameters.userId}`} />
       }
     />,
     <Route

@@ -20,11 +20,9 @@ import {
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import {
-  createThreadMentionNotifications,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  queryMentionedUsers,
 } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { addVersionHistory } from '../../util/versioning';
@@ -204,7 +202,6 @@ export async function __updateThread(
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
@@ -307,7 +304,7 @@ export async function __updateThread(
       // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
-      mentions: mentionedAddresses,
+      mentions: mentions,
       thread,
     });
 
@@ -431,10 +428,6 @@ export async function __updateThread(
     },
     excludeAddresses: [address.address],
   });
-
-  allNotificationOptions.push(
-    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
-  );
 
   const updatedThreadWithComments = {
     // @ts-expect-error StrictNullChecks

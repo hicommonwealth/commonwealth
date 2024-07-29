@@ -395,5 +395,12 @@ export interface NotificationsProvider extends Disposable {
   registerClientRegistrationToken(
     userId: number,
     token: string,
+    channelType: 'FCM' | 'APNS',
+  ): Promise<boolean>;
+
+  unregisterClientRegistrationToken(
+    userId: number,
+    token: string,
+    channelType: 'FCM' | 'APNS',
   ): Promise<boolean>;
 }

@@ -15,14 +15,12 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
-import { useFlag } from '../../../../../../hooks/useFlag';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
-import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import Allowlist from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
@@ -141,8 +139,6 @@ const GroupForm = ({
   allowedAddresses,
   setAllowedAddresses,
 }: GroupFormProps) => {
-  const allowlistEnabled = useFlag('allowlist');
-
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -169,28 +165,7 @@ const GroupForm = ({
     useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
-  >(
-    !allowlistEnabled
-      ? [
-          {
-            defaultValues: {
-              requirementCondition: conditionTypes.find(
-                (x) => x.value === AMOUNT_CONDITIONS.MORE,
-              ),
-            },
-            values: {
-              requirementAmount: '',
-              requirementChain: '',
-              requirementCondition: AMOUNT_CONDITIONS.MORE,
-              requirementContractAddress: '',
-              requirementType: '',
-              requirementTokenId: '',
-            },
-            errors: {},
-          },
-        ]
-      : [],
-  );
+  >([]);
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -400,9 +375,7 @@ const GroupForm = ({
   };
 
   // + 1 for allowlists
-  const maxRequirements = allowlistEnabled
-    ? requirementSubForms.length + 1
-    : requirementSubForms.length;
+  const maxRequirements = requirementSubForms.length + 1;
 
   return (
     <CWForm
@@ -487,7 +460,7 @@ const GroupForm = ({
                   defaultValues={subForm.defaultValues}
                   errors={subForm.errors}
                   onChange={(val) => validateChangedValue(val, index)}
-                  isRemoveable={allowlistEnabled || index > 0}
+                  isRemoveable={index > 0}
                   onRemove={() => removeRequirementByIndex(index)}
                 />
               ))}
@@ -587,14 +560,10 @@ const GroupForm = ({
             </section>
           </section>
 
-          {allowlistEnabled && (
-            <Allowlist
-              allowedAddresses={allowedAddresses}
-              setAllowedAddresses={setAllowedAddresses}
-            />
-          )}
-          {(formType === 'create' || formType === 'edit') &&
-            !allowlistEnabled && <TopicGatingHelpMessage />}
+          <Allowlist
+            allowedAddresses={allowedAddresses}
+            setAllowedAddresses={setAllowedAddresses}
+          />
 
           {/* Form action buttons */}
           <div className="action-buttons">

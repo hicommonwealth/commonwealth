@@ -19,9 +19,6 @@ describe('Digest email lifecycle', () => {
       isAdmin: false,
       selected_community_id: null,
     });
-    const [authorProfile] = await seed('Profile', {
-      user_id: authorUser!.id,
-    });
 
     [communityOne] = await seed('Community', {
       chain_node_id: undefined,
@@ -29,7 +26,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -39,7 +35,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -50,7 +45,6 @@ describe('Digest email lifecycle', () => {
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });

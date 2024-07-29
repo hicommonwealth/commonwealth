@@ -36,7 +36,6 @@ describe('Contest Worker Policy', () => {
           user_id: user!.id,
           address,
           role: 'member',
-          profile_id: undefined,
         },
       ],
       contest_managers: [

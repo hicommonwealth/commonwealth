@@ -1,3 +1,4 @@
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -21,10 +22,10 @@ enum ProfileError {
 }
 
 type ProfileProps = {
-  profileId: string;
+  userId: number;
 };
 
-const Profile = ({ profileId }: ProfileProps) => {
+const Profile = ({ userId }: ProfileProps) => {
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
   const [profile, setProfile] = useState<NewProfile>();
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -33,8 +34,8 @@ const Profile = ({ profileId }: ProfileProps) => {
   const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
 
   const { data, error, isLoading } = useFetchProfileByIdQuery({
-    apiCallEnabled: !!profileId,
-    profileId,
+    userId,
+    apiCallEnabled: !!userId,
   });
 
   useEffect(() => {
@@ -48,7 +49,9 @@ const Profile = ({ profileId }: ProfileProps) => {
       setComments([]);
     }
     if (data) {
-      setProfile(new NewProfile(data.profile));
+      setProfile(
+        new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
+      );
       // @ts-expect-error <StrictNullChecks/>
       setThreads(data.threads.map((t) => new Thread(t)));
 
@@ -69,7 +72,8 @@ const Profile = ({ profileId }: ProfileProps) => {
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
-              id: a.id,
+              userId,
+              id: a.id!,
               address: a.address,
               communityId: a.community_id!,
               walletId: a.wallet_id,
@@ -86,7 +90,7 @@ const Profile = ({ profileId }: ProfileProps) => {
       setIsOwner(data.isOwner);
       setErrorCode(ProfileError.None);
     }
-  }, [data, isLoading, error]);
+  }, [userId, data, isLoading, error, isOwner]);
 
   if (isLoading)
     return (
@@ -142,7 +146,7 @@ const Profile = ({ profileId }: ProfileProps) => {
           <Helmet>
             <link
               rel="canonical"
-              href={`https://commonwealth.im/profile/id/${profileId}`}
+              href={`https://commonwealth.im/profile/id/${userId}`}
             />
           </Helmet>
 
@@ -150,7 +154,7 @@ const Profile = ({ profileId }: ProfileProps) => {
             <CWText type="h2" fontWeight="medium">
               {profile.name
                 ? `${profile.name}'s Profile`
-                : `Anonymous user's Profile`}
+                : `${DEFAULT_NAME} user's Profile`}
             </CWText>
           </div>
           <div

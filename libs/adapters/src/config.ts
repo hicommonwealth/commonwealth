@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 const DEFAULTS = {
   LOAD_TESTING_AUTH_TOKEN: 'testing',
+  RABBITMQ_URI: 'amqp://127.0.0.1',
 };
 
 const {
@@ -19,6 +20,7 @@ const {
   KNOCK_PUBLIC_API_KEY,
   FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   KNOCK_FCM_CHANNEL_ID,
+  KNOCK_APNS_CHANNEL_ID,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
   LOAD_TESTING_AUTH_TOKEN,
@@ -34,10 +36,7 @@ export const config = configure(
       DISABLE_CACHE: DISABLE_CACHE === 'true',
     },
     BROKER: {
-      RABBITMQ_URI:
-        target.NODE_ENV === 'development' || !CLOUDAMQP_URL
-          ? 'amqp://127.0.0.1'
-          : CLOUDAMQP_URL,
+      RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -56,6 +55,7 @@ export const config = configure(
       FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED:
         FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED === 'true',
       KNOCK_FCM_CHANNEL_ID,
+      KNOCK_APNS_CHANNEL_ID,
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
     },
@@ -65,11 +65,24 @@ export const config = configure(
   },
   z.object({
     CACHE: z.object({
-      REDIS_URL: z.string().optional(),
+      REDIS_URL: z
+        .string()
+        .optional()
+        .refine((data) => {
+          return !(
+            ['production', 'beta', 'demo', 'frick'].includes(target.APP_ENV) &&
+            !data
+          );
+        }, 'REDIS_URL is required in production, beta (QA), demo, and frick Heroku apps'),
       DISABLE_CACHE: z.boolean(),
     }),
     BROKER: z.object({
-      RABBITMQ_URI: z.string(),
+      RABBITMQ_URI: z.string().refine((data) => {
+        return !(
+          ['production', 'beta', 'demo', 'frick'].includes(target.APP_ENV) &&
+          data === DEFAULTS.RABBITMQ_URI
+        );
+      }, 'RABBITMQ_URI is require in production, beta (QA), demo, and frick Heroku apps'),
     }),
     NOTIFICATIONS: z
       .object({
@@ -150,6 +163,10 @@ export const config = configure(
           .describe(
             'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
           ),
+        KNOCK_APNS_CHANNEL_ID: z
+          .string()
+          .optional()
+          .describe('The Apple channel identifier for Safari/iOS users.'),
         KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY: z
           .string()
           .optional()
@@ -177,6 +194,7 @@ export const config = configure(
           if (data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED) {
             return (
               data.KNOCK_FCM_CHANNEL_ID &&
+              data.KNOCK_APNS_CHANNEL_ID &&
               data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY &&
               data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG
             );
@@ -188,13 +206,17 @@ export const config = configure(
             'FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED requires additional properties.  See paths.',
           path: [
             'KNOCK_FCM_CHANNEL_ID',
+            'KNOCK_APNS_CHANNEL_ID',
             'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY',
             'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG',
           ],
         },
       ),
     ANALYTICS: z.object({
-      MIXPANEL_PROD_TOKEN: z.string().optional(),
+      MIXPANEL_PROD_TOKEN: z
+        .string()
+        .optional()
+        .refine((data) => !(target.APP_ENV === 'production' && !data)),
       MIXPANEL_DEV_TOKEN: z.string().optional(),
     }),
     LOAD_TESTING: z
@@ -203,7 +225,9 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (target.NODE_ENV === 'production') {
+          if (
+            !['local', 'CI', 'discobot', 'snapshot'].includes(target.APP_ENV)
+          ) {
             return (
               !!LOAD_TESTING_AUTH_TOKEN &&
               data.AUTH_TOKEN !== DEFAULTS.LOAD_TESTING_AUTH_TOKEN
@@ -213,7 +237,7 @@ export const config = configure(
         },
         {
           message:
-            'LOAD_TESTING_AUTH_TOKEN must be set in production environments',
+            'LOAD_TESTING_AUTH_TOKEN must be set in all publicly accessible Common API instances.',
           path: ['AUTH_TOKEN'],
         },
       ),

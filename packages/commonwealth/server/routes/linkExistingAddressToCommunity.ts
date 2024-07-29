@@ -9,7 +9,6 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import { createRole, findOneRole } from '../util/roles';
 
 const { Op } = Sequelize;
 
@@ -123,10 +122,6 @@ const linkExistingAddressToCommunity = async (
     //   we can just update with userId. this covers both edge case (1) & (2)
     // Address.updateWithTokenProvided
     existingAddress.user_id = userId;
-    const profileId = await models.Profile.findOne({
-      where: { user_id: userId },
-    });
-    existingAddress.profile_id = profileId?.id;
     existingAddress.verification_token = verificationToken;
     existingAddress.verification_token_expires = verificationTokenExpires;
     existingAddress.last_active = new Date();
@@ -147,7 +142,6 @@ const linkExistingAddressToCommunity = async (
       return await models.Address.create(
         {
           user_id: originalAddress.user_id!,
-          profile_id: originalAddress.profile_id!,
           address: encodedAddress,
           community_id: community!.id,
           hex,
@@ -173,18 +167,6 @@ const linkExistingAddressToCommunity = async (
   const ownedAddresses = await models.Address.findAll({
     where: { user_id: originalAddress.user_id },
   });
-
-  const role = await findOneRole(
-    models,
-    { where: { address_id: addressId } },
-    // @ts-expect-error StrictNullChecks
-    community.id,
-  );
-
-  if (!role) {
-    // @ts-expect-error StrictNullChecks
-    await createRole(models, addressId, community.id, 'member');
-  }
 
   const serverAnalyticsController = new ServerAnalyticsController();
   serverAnalyticsController.track(

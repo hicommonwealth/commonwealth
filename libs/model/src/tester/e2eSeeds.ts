@@ -6,7 +6,6 @@ import type {
   CommentInstance,
   CommunityInstance,
   DB,
-  ProfileAttributes,
   ReactionAttributes,
   ThreadInstance,
   TopicAttributes,
@@ -23,7 +22,6 @@ export type E2E_TestEntities = {
   testReactions: ReactionAttributes[];
   testChainNodes: ChainNodeAttributes[];
   testTopics: TopicAttributes[];
-  testProfiles: ProfileAttributes[];
 };
 
 export const e2eTestEntities = async function (
@@ -38,7 +36,6 @@ export const e2eTestEntities = async function (
   const testReactions: ReactionAttributes[] = [];
   const testChainNodes: ChainNodeAttributes[] = [];
   const testTopics: TopicAttributes[] = [];
-  const testProfiles: ProfileAttributes[] = [];
 
   try {
     testUsers.push(
@@ -53,29 +50,10 @@ export const e2eTestEntities = async function (
                   emailVerified: true,
                   isAdmin: true,
                   profile: {
-                    name: `testName-${i < 2 ? 1 : 2}`,
-                    avatar_url: `testAvatarUrl-${i < 2 ? 1 : 2}`,
-                    email: `test-${i < 2 ? 1 : 2}@gmail.com`,
+                    name: `testName${-i - 1}`,
+                    avatar_url: `testAvatarUrl${-i - 1}`,
+                    email: `test${-i - 1}@gmail.com`,
                   },
-                },
-              })
-            )[0],
-        ),
-      )),
-    );
-
-    testProfiles.push(
-      ...(await Promise.all(
-        [...Array(2).keys()].map(
-          async (i) =>
-            (
-              await testDb.Profile.findOrCreate({
-                where: {
-                  id: -i - 1,
-                  profile_name: `testName${-i - 1}`,
-                  avatar_url: `testAvatarUrl${-i - 1}`,
-                  email: `test${i - 1}@gmail.com`,
-                  user_id: -i - 1,
                 },
               })
             )[0],
@@ -180,11 +158,10 @@ export const e2eTestEntities = async function (
               await testDb.Address.findOrCreate({
                 where: {
                   id: -i - 1,
-                  user_id: -i - 1,
+                  user_id: i < 2 ? -1 : -2,
                   address: addresses[i],
                   community_id: 'cmntest',
                   verification_token: '',
-                  profile_id: i < 2 ? -1 : -2,
                   verified: new Date(),
                 },
               })
@@ -368,7 +345,6 @@ export const e2eTestEntities = async function (
       testReactions,
       testChainNodes,
       testTopics,
-      testProfiles,
     };
   } catch (e) {
     console.error('Error creating E2E test entities:', e);

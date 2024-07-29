@@ -2,33 +2,46 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  EnrichedNotificationNames,
   ExternalServiceUserIds,
   GetRecapEmailData,
   KnockChannelIds,
-  logger,
-  notificationsProvider,
   Query,
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
   WorkflowKeys,
+  logger,
+  notificationsProvider,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import z from 'zod';
-import { models } from '..';
+import { config, models } from '..';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+type AdditionalMetaData<Key extends keyof typeof EnrichedNotificationNames> = {
+  event_name: typeof EnrichedNotificationNames[Key];
+  inserted_at: string;
+};
+
 type DiscussionNotifications = Array<
-  | z.infer<typeof CommentCreatedNotification>
-  | z.infer<typeof UserMentionedNotification>
+  | (z.infer<typeof CommentCreatedNotification> &
+      AdditionalMetaData<'CommentCreated'>)
+  | (z.infer<typeof UserMentionedNotification> &
+      AdditionalMetaData<'UserMentioned'>)
 >;
 type GovernanceNotifications = Array<
-  | z.infer<typeof ChainProposalsNotification>
-  | z.infer<typeof SnapshotProposalCreatedNotification>
+  | (z.infer<typeof ChainProposalsNotification> &
+      AdditionalMetaData<'ChainProposal'>)
+  | (z.infer<typeof SnapshotProposalCreatedNotification> &
+      AdditionalMetaData<'SnapshotProposalCreated'>)
 >;
-type ProtocolNotifications = Array<z.infer<typeof CommunityStakeNotification>>;
+type ProtocolNotifications = Array<
+  z.infer<typeof CommunityStakeNotification> &
+    AdditionalMetaData<'CommunityStakeTrade'>
+>;
 
 async function getMessages(userId: string): Promise<{
   discussion: DiscussionNotifications;
@@ -69,15 +82,39 @@ async function getMessages(userId: string): Promise<{
 
       switch (message.source.key) {
         case WorkflowKeys.CommentCreation:
+          discussion.push({
+            event_name: EnrichedNotificationNames.CommentCreated,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
+          break;
         case WorkflowKeys.UserMentioned:
-          discussion.push(message.data);
+          discussion.push({
+            event_name: EnrichedNotificationNames.UserMentioned,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
           break;
         case WorkflowKeys.ChainProposals:
+          governance.push({
+            event_name: EnrichedNotificationNames.ChainProposal,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
+          break;
         case WorkflowKeys.SnapshotProposals:
-          governance.push(message.data);
+          governance.push({
+            event_name: EnrichedNotificationNames.SnapshotProposalCreated,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
           break;
         case WorkflowKeys.CommunityStake:
-          protocol.push(message.data);
+          protocol.push({
+            event_name: EnrichedNotificationNames.CommunityStakeTrade,
+            ...message.data,
+            inserted_at: message.inserted_at,
+          });
           break;
       }
     }
@@ -115,8 +152,9 @@ async function enrichDiscussionNotifications(
     user_avatars: { [user_id: string]: string };
   }>(
     `
-        SELECT JSONB_OBJECT_AGG(A.id, U.profile->>'avatar_url') as user_avatars
-        FROM "Addresses" A JOIN "Users" U ON A.user_id = U.id
+        SELECT JSONB_OBJECT_AGG(A.id, U.profile ->> 'avatar_url') as user_avatars
+        FROM "Addresses" A
+                 JOIN "Users" U ON A.user_id = U.id
         WHERE A.id IN (:addressIds);
     `,
     {
@@ -235,6 +273,11 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
       return {
         discussion: enrichedDiscussion,
         ...enrichedGovernanceAndProtocol,
+        num_notifications:
+          enrichedDiscussion.length +
+          enrichedGovernanceAndProtocol.governance.length +
+          enrichedGovernanceAndProtocol.protocol.length,
+        notifications_link: config.SERVER_URL,
       };
     },
   };

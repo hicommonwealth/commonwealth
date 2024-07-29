@@ -12,7 +12,6 @@ export type ProfileWithAddress = MinimumProfile & {
     address: string;
     community_id: string;
     id: number;
-    profile_id: number;
   }[];
 };
 

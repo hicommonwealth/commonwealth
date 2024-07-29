@@ -23,12 +23,4 @@ export default async function assertAddressOwnership(
       throw new ServerError('Address failed assertion check');
     }
   }
-
-  const numProfileIds = new Set(addressUsers.map((au) => au.profile_id)).size;
-  if (numProfileIds !== 1) {
-    log.error(`Address ${address} relates to multiple profiles!`);
-    if (process.env.NODE_ENV !== 'production') {
-      throw new ServerError('Address failed assertion check');
-    }
-  }
 }

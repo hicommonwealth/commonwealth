@@ -3,8 +3,8 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export const Image = z.object({
-  url: z.string(),
-  imageBehavior: z.string(),
+  url: z.string().optional(),
+  imageBehavior: z.string().optional(),
 });
 
 export const UserProfile = z.object({
@@ -18,22 +18,30 @@ export const UserProfile = z.object({
   background_image: Image.nullish(),
 });
 
+export const ProfileTags = z.object({
+  user_id: z.number(),
+  tag_id: z.number(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
+
 export const User = z.object({
   id: PG_INT.optional(),
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).optional(),
   disableRichText: z.boolean().default(false).optional(),
-  emailVerified: z.boolean().default(false).optional(),
-  selected_community_id: z.string().max(255).optional().nullish(),
+  emailVerified: z.boolean().default(false).nullish(),
+  selected_community_id: z.string().max(255).nullish(),
   emailNotificationInterval: z
     .enum(['weekly', 'never'])
     .default('never')
     .optional(),
-  promotional_emails_enabled: z.boolean().optional(),
+  promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
   profile: UserProfile,
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
+  ProfileTags: z.array(ProfileTags).optional(),
 });
 
 export const Profile = z.object({
@@ -57,7 +65,7 @@ export const Address = z.object({
   id: PG_INT.optional(),
   address: z.string().max(255),
   community_id: z.string().max(255).optional(),
-  user_id: PG_INT.optional(),
+  user_id: PG_INT.nullish(),
   verification_token: z.string().max(255).optional(),
   verification_token_expires: z.date().nullable().optional(),
   verified: z.date().nullable().optional(),
@@ -65,7 +73,6 @@ export const Address = z.object({
   is_councillor: z.boolean().optional(),
   is_validator: z.boolean().optional(),
   ghost_address: z.boolean().optional(),
-  profile_id: PG_INT.nullish().optional(),
   wallet_id: z.nativeEnum(WalletId).optional(),
   block_info: z.string().max(255).optional(),
   is_user_default: z.boolean().optional(),
@@ -74,6 +81,7 @@ export const Address = z.object({
   hex: z.string().max(64).optional(),
   created_at: z.any(),
   updated_at: z.any(),
+  User: User.optional(),
 });
 
 export const SsoToken = z.object({
@@ -95,10 +103,9 @@ export const CommunityMember = z.object({
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.number().nullish(),
-      profile_id: z.number(),
+      role: z.string(),
     }),
   ),
-  roles: z.array(z.string()).nullish(),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
 });

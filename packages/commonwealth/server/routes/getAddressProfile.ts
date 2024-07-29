@@ -3,6 +3,7 @@ import {
   GetAddressProfileReq,
   GetAddressProfileResp,
 } from '@hicommonwealth/schemas';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -39,25 +40,27 @@ const getAddressProfiles = async (
       community_id: { [Op.in]: req.body.communities },
       ...userWhere,
     },
-    attributes: ['profile_id', 'address', 'last_active'],
+    attributes: ['address', 'last_active'],
     include: [
       {
         model: models.User,
-        attributes: ['profile', 'created_at'],
+        attributes: ['id', 'profile', 'created_at'],
         required: true,
       },
     ],
   });
 
-  const profiles = addressEntities.map((address) => {
-    return {
-      profileId: address.profile_id!, // TO BE REMOVED
-      name: address.User?.profile.name ?? 'Anonymous',
-      address: address.address,
-      lastActive: address.last_active ?? address.User?.created_at,
-      avatarUrl: address.User?.profile.avatar_url ?? undefined,
-    };
-  });
+  const profiles: z.infer<typeof GetAddressProfileResp>[] = addressEntities.map(
+    (address) => {
+      return {
+        userId: address.User!.id!,
+        name: address.User?.profile.name ?? DEFAULT_NAME,
+        address: address.address,
+        lastActive: address.last_active ?? address.User?.created_at,
+        avatarUrl: address.User?.profile.avatar_url ?? undefined,
+      };
+    },
+  );
 
   return res.json({
     status: 'Success',

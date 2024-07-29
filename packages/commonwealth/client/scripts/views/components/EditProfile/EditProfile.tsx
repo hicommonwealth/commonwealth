@@ -1,3 +1,4 @@
+import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
@@ -8,10 +9,7 @@ import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import {
-  useFetchProfileByIdQuery,
-  useUpdateProfileByAddressMutation,
-} from 'state/api/profiles';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -75,8 +73,8 @@ const EditProfile = () => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
-    useUpdateProfileByAddressMutation({
+  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+    useUpdateUserMutation({
       addressesWithChainsToUpdate: addresses?.map((a) => ({
         address: a.address,
         chain: a.community.id,
@@ -105,7 +103,13 @@ const EditProfile = () => {
     }
 
     if (data) {
-      setProfile(new NewProfile(data.profile));
+      setProfile(
+        new NewProfile({
+          ...data.profile,
+          userId: data.userId,
+          isOwner: data.userId === user.id,
+        }),
+      );
       // @ts-expect-error <StrictNullChecks/>
       setAvatarUrl(data.profile.avatar_url);
       setPreferenceTags((tags) =>
@@ -126,7 +130,8 @@ const EditProfile = () => {
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
-              id: a.id,
+              userId: a.user_id!,
+              id: a.id!,
               address: a.address,
               communityId: a.community_id!,
               walletId: a.wallet_id,
@@ -141,7 +146,7 @@ const EditProfile = () => {
       );
       return;
     }
-  }, [data, isLoadingProfile, error, setPreferenceTags, setLinks]);
+  }, [data, isLoadingProfile, error, setPreferenceTags, setLinks, user.id]);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload
@@ -149,31 +154,25 @@ const EditProfile = () => {
     // should refactor AvatarUpload to make it work with new profiles
     // @ts-expect-error <StrictNullChecks/>
     if (addresses?.length > 0) {
+      const address = addresses![0];
       const oldProfile = new MinimumProfile(
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].community.name,
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].address,
+        address.address,
+        address.community.name,
       );
 
       oldProfile.initialize(
-        name,
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].address,
-        avatarUrl,
-        // @ts-expect-error <StrictNullChecks/>
-        profile.id,
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].community.name,
+        profile!.userId,
+        profile!.name,
+        address.address,
+        avatarUrl!,
+        address.community.name,
         null,
       );
 
       setAccount(
         new Account({
-          // @ts-expect-error <StrictNullChecks/>
-          community: addresses[0].community,
-          // @ts-expect-error <StrictNullChecks/>
-          address: addresses[0].address,
+          community: address.community,
+          address: address.address,
           profile: oldProfile,
           ignoreProfile: false,
         }),
@@ -184,7 +183,7 @@ const EditProfile = () => {
     }
   }, [addresses, avatarUrl, profile]);
 
-  if (isLoadingProfile || isUpdatingProfile || !profile?.id) {
+  if (isLoadingProfile || isUpdatingProfile) {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
@@ -211,31 +210,32 @@ const EditProfile = () => {
             imageBehavior: backgroundImageBehaviour,
           })
         : null;
-      updateProfile({
-        name: values.username.trim(),
-        ...(backgroundImage && { backgroundImage }),
-        avatarUrl,
-        email: values.email.trim(),
-        socials: JSON.stringify(
-          (links || [])
-            .filter((link) => link.value.trim())
-            .map((link) => link.value.trim()),
-        ),
-        bio: serializeDelta(values.bio),
-        tagIds: preferenceTags
+
+      const updates = {
+        id: user.id.toString(),
+        profile: {
+          name: values.username.trim(),
+          email: values.email.trim(),
+          bio: serializeDelta(values.bio).trim(),
+          background_image: backgroundImage && JSON.parse(backgroundImage),
+          avatar_url: avatarUrl,
+          socials: (links || [])
+            .filter((l) => l.value.trim())
+            .map((l) => l.value.trim()),
+        },
+        tag_ids: preferenceTags
           .filter((tag) => tag.isSelected)
           .map((tag) => tag.item.id),
-        profileId: profile?.id,
-        address: user.activeAccount?.address || '',
-        chain: user.activeAccount?.community?.id || '',
-      })
+      };
+
+      updateUser(updates)
         .then(() => {
-          navigate(`/profile/id/${profile.id}`);
+          navigate(`/profile/id/${user.id}`);
 
           if (links?.length > 0) {
             markTrainingActionAsComplete(
               UserTrainingCardTypes.FinishProfile,
-              profile.id,
+              user.id,
             );
           }
         })
@@ -253,7 +253,7 @@ const EditProfile = () => {
             buttonType="secondary"
             buttonWidth="wide"
             disabled={isUploadingProfileImage || isUploadingCoverImage}
-            onClick={() => navigate(`/profile/id/${profile.id}`)}
+            onClick={() => navigate(`/profile/id/${user.id}`)}
           />
           <CWButton
             type="submit"

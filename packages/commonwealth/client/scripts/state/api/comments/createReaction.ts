@@ -81,12 +81,9 @@ const useCreateCommentReactionMutation = ({
         return tempComments;
       });
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          profileId,
-        );
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
 
       return reaction;
     },

@@ -127,6 +127,7 @@ class CommunityStakes extends ContractBase {
     const totalPrice = await this.contract.methods
       .getBuyPriceAfterFee(namespaceAddress, id.toString(), amount.toString())
       .call();
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
@@ -134,8 +135,9 @@ class CommunityStakes extends ContractBase {
         .send({
           value: totalPrice,
           from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
       try {
         // @ts-expect-error StrictNullChecks
@@ -176,14 +178,16 @@ class CommunityStakes extends ContractBase {
     }
 
     const namespaceAddress = await this.getNamespaceAddress(name);
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
         .sellStake(namespaceAddress, id.toString(), amount.toString())
         .send({
           from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch {
       throw new Error('Transaction failed');
