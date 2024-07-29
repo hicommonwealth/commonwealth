@@ -43,6 +43,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
+- [HEROKU_API_TOKEN](#heroku_api_token)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
 - [JWT_SECRET](#jwt_secret)
@@ -237,9 +238,13 @@ Boolean toggle allowing the creation of new communities during local development
 
 Boolean toggle to display side-wide sidebar proposal templates. Temporary flag for 2.0 work.
 
+## HEROKU_API_TOKEN
+
+Required locally when updating custom domains via the API.
+
 ## HEROKU_APP_NAME
 
-Automatically in Heroku; the respective app name. Required when using the DataDog PSQL integration.
+Automatically set by [Heroku](./Heroku.md); the respective app name (e.g. `common-app`, `commonbot`). Required locally when using the DataDog PSQL integration or updating custom domains via the API.
 
 ## IS_CI
 
