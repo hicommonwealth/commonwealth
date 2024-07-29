@@ -23,17 +23,6 @@ const associationParams = [
           },
         ],
       },
-
-      // {
-      //   model: models.Address,
-      //   as: 'Address',
-      // },
-      // {
-      //   model: models.Community,
-      //   as: 'Community',
-      //   required: true,
-      //   where: { active: true },
-      // },
     ],
   },
 ];
