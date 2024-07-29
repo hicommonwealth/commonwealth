@@ -100,14 +100,16 @@ export const ThreadOptions = ({
 
   const threadSubscriptions = useThreadSubscriptions();
 
-  const hasThreadSubscription = useMemo(() => {
+  const hasThreadSubscriptionDefault = useMemo(() => {
     const matching = (threadSubscriptions.data || []).filter(
       (current) => current.thread_id === thread.id,
     );
     return matching.length > 0;
   }, [thread.id, threadSubscriptions.data]);
 
-  console.log('FIXME: ' + hasThreadSubscription);
+  const [hasThreadSubscription, setHasThreadSubscription] = useState(
+    hasThreadSubscriptionDefault,
+  );
 
   const doToggleSubscribe = useCallback(async () => {
     if (hasThreadSubscription) {
@@ -121,6 +123,7 @@ export const ThreadOptions = ({
         thread_id: thread.id,
       });
     }
+    setHasThreadSubscription(!hasThreadSubscription);
   }, [
     createThreadSubscriptionMutation,
     deleteThreadSubscriptionMutation,
