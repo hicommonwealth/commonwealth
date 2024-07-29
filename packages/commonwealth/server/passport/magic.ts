@@ -56,8 +56,6 @@ async function createMagicAddressInstances(
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
-  // @ts-expect-error StrictNullChecks
-  const profile_id = (user.Profiles[0] as ProfileAttributes).id;
 
   for (const { community_id, address } of generatedAddresses) {
     log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
@@ -137,16 +135,14 @@ async function createNewMagicUser({
     );
 
     // update profile with metadata if exists
-    // @ts-expect-error StrictNullChecks
-    const newProfile = newUser.Profiles[0] as ProfileInstance;
     if (profileMetadata?.username) {
-      newProfile.profile_name = profileMetadata.username;
+      newUser.profile.name = profileMetadata.username;
     }
     if (profileMetadata?.avatarUrl) {
-      newProfile.avatar_url = profileMetadata.avatarUrl;
+      newUser.profile.avatar_url = profileMetadata.avatarUrl;
     }
     if (profileMetadata?.username || profileMetadata?.avatarUrl) {
-      await newProfile.save({ transaction });
+      await newUser.save({ transaction });
     }
 
     const addressInstances: AddressAttributes[] =
@@ -346,10 +342,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
   // to be owned by currently logged in user
   await models.Address.update(
     {
-      // @ts-expect-error StrictNullChecks
-      user_id: loggedInUser.id,
-      // @ts-expect-error StrictNullChecks
-      profile_id: loggedInUser.Profiles[0].id,
+      user_id: loggedInUser?.id,
       verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
