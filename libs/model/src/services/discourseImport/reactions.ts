@@ -1,3 +1,4 @@
+import { models } from 'model/src/database';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
 const fetchThreadsReactionsFromDiscourse = async (session: Sequelize) => {
@@ -46,7 +47,6 @@ const fetchCommentsReactionsFromDiscourse = async (session: Sequelize) => {
 };
 
 const createReaction = async (
-  session: Sequelize,
   {
     communityId,
     addressId,
@@ -60,7 +60,7 @@ const createReaction = async (
   },
   { transaction }: { transaction: Transaction },
 ) => {
-  const [reaction] = await session.query<{
+  const [reaction] = await models.sequelize.query<{
     id: number;
   }>(
     `
@@ -83,7 +83,6 @@ const createReaction = async (
 
 export const createAllReactionsInCW = async (
   discourseConnection: Sequelize,
-  cwConnection: Sequelize,
   {
     addresses,
     communityId,
@@ -112,7 +111,6 @@ export const createAllReactionsInCW = async (
         ) || {};
       if (threadId || commentId) {
         return createReaction(
-          cwConnection,
           { communityId: communityId, addressId, threadId, commentId },
           { transaction },
         );

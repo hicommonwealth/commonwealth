@@ -1,138 +1,93 @@
+import { Address, User } from '@hicommonwealth/schemas';
 import crypto from 'crypto';
-import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { models } from 'model/src/database';
+import { Transaction } from 'sequelize';
 import Web3 from 'web3';
+import { z } from 'zod';
 import { BASES } from './constants';
-import { ProfileObject } from './profiles';
-import { UserObject } from './users';
 import { createCosmosAddress } from './utils';
 
 const createAddress = async (
-  session: Sequelize,
   {
-    discourseUserId,
-    cwUserId,
-    // username,
+    userId,
     address,
     communityId,
-    email,
     isAdmin,
     isModerator,
   }: {
-    discourseUserId: any;
-    cwUserId: number;
-    username: string;
+    userId: number;
     address: string;
     communityId: string;
-    email: string;
     isAdmin: boolean;
     isModerator: boolean;
   },
   { transaction }: { transaction: Transaction },
 ) => {
-  const verified_token = crypto.randomBytes(18).toString('hex');
-  const verification_token_expires = new Date(
-    +new Date() + 7 * 24 * 60 * 60 * 1000,
-  ).toISOString();
-  const [createdAddress] = await session.query<{
-    id: number;
-    address: string;
-    community_id: string;
-  }>(
-    `
-    INSERT INTO "Addresses"(id, address, community_id, created_at,
-    updated_at, user_id, verification_token,
-    verification_token_expires, verified, last_active,
-    is_councillor, is_validator, ghost_address, wallet_id, role)
-    VALUES (default,
-    '${address}',
-    '${communityId}',
-    NOW(),
-    NOW(),
-    (SELECT id FROM "Users" WHERE email = '${email}'),
-    '${verified_token}',
-    '${verification_token_expires}',
-    NOW(),
-    null,
-    false,
-    false,
-    true, null, '${
-      isAdmin ? 'admin' : isModerator ? 'moderator' : 'member'
-    }') RETURNING id, address, community_id;
-    `,
-    { type: QueryTypes.SELECT, transaction },
+  return models.Address.create(
+    {
+      address,
+      community_id: communityId,
+      user_id: userId,
+      verification_token: crypto.randomBytes(18).toString('hex'),
+      verification_token_expires: new Date(
+        +new Date() + 7 * 24 * 60 * 60 * 1000,
+      ),
+      verified: new Date(),
+      last_active: null,
+      is_councillor: false,
+      is_validator: false,
+      ghost_address: true,
+      role: isAdmin ? 'admin' : isModerator ? 'moderator' : 'member',
+    },
+    { transaction },
   );
-  return { createdAddress, discourseUserId, cwUserId };
-};
-
-export type AddressObject = {
-  id: number;
-  address: string;
-  discourseUserId: number;
-  cwUserId: number;
 };
 
 export const createAllAddressesInCW = async (
-  discourseConnection: Sequelize,
-  cwConnection: Sequelize,
   {
     users,
-    profiles,
+    admins,
+    moderators,
     communityId,
     base,
   }: {
-    users: UserObject[];
-    profiles: ProfileObject[];
+    users: Array<z.infer<typeof User>>;
+    admins: Record<number, boolean>;
+    moderators: Record<number, boolean>;
     communityId: string;
     base: string;
   },
   { transaction }: { transaction: Transaction },
-): Promise<AddressObject[]> => {
-  const addressPromises = users.map(
-    ({
-      id: cwUserId,
-      discourseUserId,
-      username,
-      email,
-      isAdmin,
-      isModerator,
-      profile_id,
-    }) => {
-      let ghostAddress;
-      if (base.toUpperCase() === BASES.COSMOS) {
-        ghostAddress = createCosmosAddress();
-      } else if (base.toUpperCase() === BASES.NEAR) {
-        const parsedName = username.toLowerCase().replace(/[\W_]+/g, '-');
-        ghostAddress = `${parsedName}.ghost`;
-      } else {
-        // default to ETH ghost address creation
-        const web3 = new Web3();
-        ghostAddress = web3.eth.accounts.create().address;
+): Promise<Array<z.infer<typeof Address>>> => {
+  const addressPromises = users.map((user) => {
+    let ghostAddress;
+    if (base.toUpperCase() === BASES.COSMOS) {
+      ghostAddress = createCosmosAddress();
+    } else if (base.toUpperCase() === BASES.NEAR) {
+      const parsedName = user.profile.name
+        ?.toLowerCase()
+        .replace(/[\W_]+/g, '-');
+      if (!parsedName) {
+        throw new Error(`failed to generate parsed name for user: ${user.id}`);
       }
+      ghostAddress = `${parsedName}.ghost`;
+    } else {
+      // default to ETH ghost address creation
+      const web3 = new Web3();
+      ghostAddress = web3.eth.accounts.create().address;
+    }
 
-      return createAddress(
-        cwConnection,
-        {
-          discourseUserId,
-          cwUserId,
-          username,
-          address: ghostAddress,
-          communityId,
-          email,
-          isAdmin,
-          isModerator,
-        },
-        { transaction },
-      );
-    },
-  );
+    return createAddress(
+      {
+        userId: user.id!,
+        address: ghostAddress,
+        communityId,
+        isAdmin: admins[user.id!],
+        isModerator: moderators[user.id!],
+      },
+      { transaction },
+    );
+  });
 
-  const createdAddresses = await Promise.all(addressPromises);
-  return createdAddresses.map(
-    ({ createdAddress, discourseUserId, cwUserId }) => ({
-      id: createdAddress.id,
-      address: createdAddress.address,
-      discourseUserId,
-      cwUserId,
-    }),
-  );
+  return Promise.all(addressPromises);
 };

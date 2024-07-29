@@ -1,3 +1,4 @@
+import { models } from 'model/src/database';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
@@ -101,7 +102,6 @@ const createThread = async (
 
 export const createAllThreadsInCW = async (
   discourseConnection: Sequelize,
-  cwConnection: Sequelize,
   {
     users,
     categories,
@@ -111,7 +111,7 @@ export const createAllThreadsInCW = async (
 ) => {
   const topics = await fetchThreadsFromDiscourse(discourseConnection);
   const generalCwTopicId = (
-    await cwConnection.query<{ id: number }>(
+    await models.sequelize.query<{ id: number }>(
       `
     SELECT id FROM "Topics" WHERE name = 'General' and community_id = '${communityId}';
   `,
@@ -185,7 +185,7 @@ export const createAllThreadsInCW = async (
       if (!options) {
         return null;
       }
-      return createThread(cwConnection, options, { transaction });
+      return createThread(models.sequelize, options, { transaction });
     });
 
   const createdThreads = await Promise.all(threadPromises);

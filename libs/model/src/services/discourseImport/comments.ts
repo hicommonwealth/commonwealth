@@ -1,4 +1,5 @@
 import lo from 'lodash';
+import { models } from 'model/src/database';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
@@ -32,7 +33,6 @@ export const fetchPosts = async (session: Sequelize) => {
 };
 
 const createComment = async (
-  session: Sequelize,
   {
     discourseThreadId,
     post_number,
@@ -58,7 +58,7 @@ const createComment = async (
   },
   { transaction }: { transaction: Transaction },
 ) => {
-  const [createdComment] = await session.query<{
+  const [createdComment] = await models.sequelize.query<{
     id: number;
     communityId: string;
     parent_id: number;
@@ -102,7 +102,6 @@ const createComment = async (
 
 export const createAllCommentsInCW = async (
   discourseConnection: Sequelize,
-  cwConnection: Sequelize,
   {
     addresses,
     communityId,
@@ -160,7 +159,6 @@ export const createAllCommentsInCW = async (
             );
           }
           const { createdComment } = await createComment(
-            cwConnection,
             {
               discourseThreadId,
               post_number,

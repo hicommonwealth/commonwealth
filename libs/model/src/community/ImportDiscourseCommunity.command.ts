@@ -4,7 +4,16 @@ import { Sequelize } from 'sequelize';
 import { URL, fileURLToPath } from 'url';
 import { config } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
-import { createAllUsersInCW, importDump } from '../services/discourseImport';
+import {
+  createAllAddressesInCW,
+  createAllCategoriesInCW,
+  createAllCommentsInCW,
+  createAllReactionsInCW,
+  createAllSubscriptionsInCW,
+  createAllThreadsInCW,
+  createAllUsersInCW,
+  importDump,
+} from '../services/discourseImport';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -136,89 +145,80 @@ export function ImportDiscourseCommunity(): Command<
         // TODO: use accountsClaimable flag
 
         // insert users
-        const { newUsers, existingUsers } = await createAllUsersInCW(
+        const { users, admins, moderators } = await createAllUsersInCW(
+          restrictedDiscourseConnection,
+          communityId!,
+          { transaction },
+        );
+        tables['users'] = users;
+        log.debug(`Users: ${users.length}`);
+
+        // insert addresses
+        const addresses = await createAllAddressesInCW(
+          {
+            users,
+            admins,
+            moderators,
+            communityId: communityId!,
+            base,
+          },
+          { transaction },
+        );
+        tables['addresses'] = addresses;
+        log.debug(`Addresses: ${addresses.length}`);
+
+        // insert categories (topics)
+        const categories = await createAllCategoriesInCW(
           restrictedDiscourseConnection,
           { communityId: communityId! },
           { transaction },
         );
-        tables['users'] = newUsers;
-        log.debug(`Users: ${newUsers.length}`);
+        tables['categories'] = categories;
+        log.debug(`Categories: ${categories.length}`);
 
-        // // insert profiles
-        // const profiles = await createAllProfilesInCW(
-        //   restrictedDiscourseConnection,
-        //   { newUsers },
-        //   { transaction },
-        // );
-        // tables['profiles'] = profiles;
-        // log.debug(`Profiles: ${profiles.length}`);
+        // insert topics (threads)
+        const threads = await createAllThreadsInCW(
+          restrictedDiscourseConnection,
+          {
+            users,
+            categories,
+            communityId: communityId!,
+          },
+          { transaction },
+        );
+        tables['threads'] = threads;
+        log.debug(`Threads: ${threads.length}`);
 
-        // // insert addresses
-        // const addresses = await createAllAddressesInCW(
-        //   restrictedDiscourseConnection,
-        //   {
-        //     users: newUsers.concat(...existingUsers),
-        //     profiles,
-        //     communityId: communityId!,
-        //     base,
-        //   },
-        //   { transaction },
-        // );
-        // tables['addresses'] = addresses;
-        // log.debug(`Addresses: ${addresses.length}`);
+        // insert posts (comments)
+        const comments = await createAllCommentsInCW(
+          restrictedDiscourseConnection,
+          { communityId: communityId!, addresses, threads },
+          { transaction },
+        );
+        tables['comments'] = comments;
+        log.debug(`Comments: ${comments.length}`);
 
-        // // insert categories (topics)
-        // const categories = await createAllCategoriesInCW(
-        //   restrictedDiscourseConnection,
-        //   { communityId: communityId! },
-        //   { transaction },
-        // );
-        // tables['categories'] = categories;
-        // log.debug(`Categories: ${categories.length}`);
+        // insert reactions
+        const reactions = await createAllReactionsInCW(
+          restrictedDiscourseConnection,
+          { addresses, communityId: communityId!, threads, comments },
+          { transaction },
+        );
+        tables['reactions'] = reactions;
+        log.debug(`Reactions: ${reactions.length}`);
 
-        // // insert topics (threads)
-        // const threads = await createAllThreadsInCW(
-        //   restrictedDiscourseConnection,
-        //   {
-        //     users: newUsers.concat(existingUsers),
-        //     categories,
-        //     communityId: communityId!,
-        //   },
-        //   { transaction },
-        // );
-        // tables['threads'] = threads;
-        // log.debug(`Threads: ${threads.length}`);
-
-        // // insert posts (comments)
-        // const comments = await createAllCommentsInCW(
-        //   restrictedDiscourseConnection,
-        //   { communityId: communityId!, addresses, threads },
-        //   { transaction },
-        // );
-        // tables['comments'] = comments;
-        // log.debug(`Comments: ${comments.length}`);
-
-        // // insert reactions
-        // const reactions = await createAllReactionsInCW(
-        //   restrictedDiscourseConnection,
-        //   { addresses, communityId: communityId!, threads, comments },
-        //   { transaction },
-        // );
-        // tables['reactions'] = reactions;
-        // log.debug(`Reactions: ${reactions.length}`);
-
-        // // insert subscriptions
-        // const subscriptions = await createAllSubscriptionsInCW(
-        //   restrictedDiscourseConnection,
-        //   {
-        //     communityId: communityId!,
-        //     users: newUsers.concat(existingUsers),
-        //     threads,
-        //   },
-        //   { transaction },
-        // );
-        // tables['subscriptions'] = subscriptions;
-        // log.debug(`Subscriptions: ${subscriptions.length}`);
+        // insert subscriptions
+        const subscriptions = await createAllSubscriptionsInCW(
+          restrictedDiscourseConnection,
+          {
+            communityId: communityId!,
+            users,
+            threads,
+          },
+          { transaction },
+        );
+        tables['subscriptions'] = subscriptions;
+        log.debug(`Subscriptions: ${subscriptions.length}`);
 
         await transaction.commit();
       } catch (err) {

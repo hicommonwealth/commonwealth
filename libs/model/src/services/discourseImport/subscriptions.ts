@@ -1,3 +1,4 @@
+import { models } from 'model/src/database';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
 const fetchSubscriptionsFromDiscourse = (session: Sequelize) => {
@@ -24,7 +25,6 @@ const fetchSubscriptionsFromDiscourse = (session: Sequelize) => {
 };
 
 const createSubscription = async (
-  session: Sequelize,
   {
     userId,
     threadId,
@@ -32,7 +32,7 @@ const createSubscription = async (
   }: { userId: number; threadId: number; communityId: string },
   { transaction }: { transaction: Transaction },
 ) => {
-  const [subscription] = await session.query<{
+  const [subscription] = await models.sequelize.query<{
     id: number;
   }>(
     `
@@ -48,8 +48,8 @@ const createSubscription = async (
         NOW(),
         false,
         '${communityId}',
-        ${threadId}, 
-        null, 
+        ${threadId},
+        null,
         null) Returning id;
         `,
     { type: QueryTypes.SELECT, transaction },
@@ -59,7 +59,6 @@ const createSubscription = async (
 
 export const createAllSubscriptionsInCW = async (
   discourseConnection: Sequelize,
-  cwConnection: Sequelize,
   {
     communityId,
     threads,
@@ -79,7 +78,6 @@ export const createAllSubscriptionsInCW = async (
     );
     if (threadId && userId) {
       return createSubscription(
-        cwConnection,
         { threadId, userId, communityId: communityId },
         { transaction },
       );

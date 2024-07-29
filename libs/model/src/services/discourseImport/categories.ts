@@ -1,3 +1,4 @@
+import { models } from 'model/src/database';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
 export const fetchTopicsFromDiscourse = async (session: Sequelize) => {
@@ -10,7 +11,6 @@ export const fetchTopicsFromDiscourse = async (session: Sequelize) => {
 };
 
 const createCategory = async (
-  session: Sequelize,
   category: {
     name: string;
     communityId: string;
@@ -26,7 +26,7 @@ const createCategory = async (
 
   let result;
   if (name === 'General') {
-    result = await session.query(
+    result = await models.sequelize.query(
       `
       UPDATE "Topics"
       SET description = '${description}',
@@ -38,7 +38,7 @@ const createCategory = async (
       { type: QueryTypes.UPDATE, transaction },
     );
   } else {
-    result = await session.query(
+    result = await models.sequelize.query(
       `
       INSERT INTO "Topics"(
       id, name, created_at, updated_at, deleted_at, community_id, description,
@@ -55,7 +55,6 @@ const createCategory = async (
 
 export const createAllCategoriesInCW = async (
   discourseConnection: Sequelize,
-  cwConnection: Sequelize,
   { communityId }: { communityId: string },
   { transaction }: { transaction: Transaction },
 ) => {
@@ -63,7 +62,6 @@ export const createAllCategoriesInCW = async (
   const categoryPromises = categories.map(
     ({ id: discourseCategoryId, name, description }) =>
       createCategory(
-        cwConnection,
         {
           discourseCategoryId,
           // eslint-disable-next-line no-useless-escape

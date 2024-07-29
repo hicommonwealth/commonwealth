@@ -1,5 +1,5 @@
 import { models } from '@hicommonwealth/model';
-import { Address, User } from '@hicommonwealth/schemas';
+import { User } from '@hicommonwealth/schemas';
 import { Op, QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
 
@@ -17,6 +17,12 @@ type DiscourseUser = {
   email: string;
 };
 
+type DiscourseWebsiteBio = {
+  discourse_user_id: number;
+  website: string;
+  bio_raw: string;
+};
+
 class DiscourseQueries {
   static fetchUsers = async (session: Sequelize): Promise<DiscourseUser[]> => {
     return session.query<DiscourseUser>(
@@ -28,6 +34,21 @@ class DiscourseQueries {
         and email != 'no_email'
         and email != 'discobot_email'
         and ue.primary = true
+      `,
+      { type: QueryTypes.SELECT },
+    );
+  };
+
+  static fetchBiosFromDiscourse = async (
+    session: Sequelize,
+  ): Promise<DiscourseWebsiteBio[]> => {
+    return session.query<DiscourseWebsiteBio>(
+      `
+        SELECT
+          user_id as discourse_user_id,
+          website,
+          bio_raw
+        FROM "user_profiles";
       `,
       { type: QueryTypes.SELECT },
     );
@@ -53,24 +74,8 @@ class CWQueries {
     );
   };
 
-  static fetchAddressesByUsers = async ({
-    userIds,
-    communityId,
-  }: {
-    userIds: number[];
-    communityId: string;
-  }): Promise<Array<z.infer<typeof Address>>> => {
-    return models.Address.findAll({
-      where: {
-        community_id: communityId,
-        user_id: {
-          [Op.in]: userIds,
-        },
-      },
-    });
-  };
-
   static fetchUsersByEmail = async (
+    communityId: string,
     emails: string[],
   ): Promise<Array<z.infer<typeof User>>> => {
     return models.User.findAll({
@@ -79,143 +84,130 @@ class CWQueries {
           [Op.in]: emails,
         },
       },
+      include: [
+        {
+          model: models.Address,
+          where: {
+            community_id: communityId,
+          },
+        },
+      ],
     });
   };
 
-  static createUser = async (
-    {
-      email,
-      isAdmin,
-      isModerator,
-      username,
-      name,
-    }: {
-      email: string;
-      isAdmin: boolean;
-      isModerator: boolean;
-      username: string;
-      name: string;
-    },
+  static createCWUserFromDiscourseUser = async (
+    discourseUser: DiscourseUser,
+    discourseBio: DiscourseWebsiteBio | null,
     { transaction }: { transaction: Transaction },
   ) => {
     const [user] = await models.sequelize.query<UserIdEmail>(
       `
-       INSERT INTO "Users"(
-       id, email, created_at, updated_at, "selected_community_id", "isAdmin", "disableRichText",
-       "emailVerified", "emailNotificationInterval")
-       VALUES (default, '${email}', NOW(), NOW(), null, false, false, false, 'never')
-       RETURNING id, email;
-    `,
+      INSERT INTO "Users"(
+          id,
+          email,
+          created_at,
+          updated_at,
+          "selected_community_id",
+          "isAdmin",
+          "disableRichText",
+          "emailVerified",
+          "emailNotificationInterval",
+          profile
+      )
+      VALUES (
+          default,
+          :email,
+          NOW(),
+          NOW(),
+          null,
+          false,
+          false,
+          false,
+          'never',
+          jsonb_build_object(
+            'username', :username,
+            'bio', :bio,
+            'website', :website
+          )
+      )
+      RETURNING id, email;
+      `,
       {
         type: QueryTypes.SELECT,
+        replacements: {
+          email: discourseUser.email,
+          username: discourseUser.username || discourseUser.name,
+          bio: discourseBio?.bio_raw || null,
+          website: discourseBio?.website || null,
+        },
         transaction,
       },
     );
-    return { user, isAdmin, isModerator, username, name };
+    return user;
   };
 }
 
 export const createAllUsersInCW = async (
   discourseConnection: Sequelize,
-  { communityId }: { communityId: string },
+  communityId: string,
   { transaction }: { transaction: Transaction },
 ): Promise<{
-  newUsers: Array<z.infer<typeof User>>;
-  existingUsers: Array<z.infer<typeof User>>;
+  users: Array<z.infer<typeof User>>;
+  admins: Record<number, boolean>;
+  moderators: Record<number, boolean>;
 }> => {
   // fetch users in discourse
   const discourseUsers = await DiscourseQueries.fetchUsers(discourseConnection);
   const emails = discourseUsers.map(({ email }) => `'${email}'`);
 
-  // fetch users that already have an address
-  const userWithAddresses = await CWQueries.fetchAddressesByUsers({
-    userIds: discourseUsers.map(({ id }) => id),
-    communityId,
-  });
+  // fetch users in cw
+  const cwUsers = await CWQueries.fetchUsersByEmail(communityId, emails);
 
-  //  fetch users in cw
-  const cwUsers = await CWQueries.fetchUsersByEmail(emails);
-  const usersAlreadyExistingInCW = cwUsers
-    .map(({ id, email, emailVerified }) => {
-      const discourseUser = discourseUsers.find(
-        (discourseUser) => email === discourseUser.email,
-      );
-      if (!discourseUser) {
-        throw new Error(`Failed to find discourse user by email: ${email}`);
-      }
-      const {
-        id: discourseUserId,
-        admin,
-        username,
-        name,
-        moderator,
-      } = discourseUser;
-      return {
-        discourseUserId,
-        id,
-        email,
-        isAdmin: admin,
-        isModerator: moderator,
-        username,
-        name,
-        emailVerified,
-      };
-    })
-    .filter((user) => {
-      // this filters out any users that already have addresses in the community (already members)
-      for (const userWithAddress of userWithAddresses) {
-        if (userWithAddress.user_id === user.id) {
-          return false;
-        }
-      }
-      return true;
-    });
-
-  // insert users
+  // separate existing users from new
+  const existingUsers = cwUsers.filter(
+    (c) =>
+      c.email && discourseUsers.find((d) => d.email && d.email === c.email),
+  );
   const usersToCreate = discourseUsers.filter(
-    (user) =>
-      !usersAlreadyExistingInCW.some(({ email }) => user.email === email),
+    (d) => d.email && !cwUsers.find((c) => c.email && c.email === d.email),
+  );
+
+  const allBios = await DiscourseQueries.fetchBiosFromDiscourse(
+    discourseConnection,
   );
 
   // create all new users
-  const createdUsers = await Promise.all(
-    usersToCreate.map(({ email, admin, username, name, moderator }) =>
-      CWQueries.createUser(
-        { email, isAdmin: admin, isModerator: moderator, username, name },
+  const createdUsersIdAndEmail = await Promise.all(
+    usersToCreate.map((userToCreate) =>
+      CWQueries.createCWUserFromDiscourseUser(
+        userToCreate,
+        allBios.find((b) => b.discourse_user_id === userToCreate.id) || null,
         { transaction },
       ),
     ),
   );
-  const result = createdUsers.map(
-    ({ user, isAdmin, isModerator, username, name }): z.infer<typeof User> => {
-      const discourseUser = discourseUsers.find(
-        ({ email }) => email === user.email,
-      );
-      if (!discourseUser) {
-        throw new Error(
-          `Failed to find discourse user by email: ${user.email}`,
-        );
-      }
-      return {
-        discourseUserId: discourseUser.id,
-        id: user.id,
-        email: user.email,
-        isAdmin,
-        isModerator,
-        username,
-        name,
-        alreadyHasAccountInCW: false,
-        emailVerified: false,
-      };
-    },
-  );
 
-  // new users are users that we created as part of the import
-  // existing users are users that have already user their email to
-  // sign in to commonwealth so they already have profiles but they don't
-  // have addresses that puts them in the community
+  const createdUsers = createdUsersIdAndEmail.map(
+    (u) => cwUsers.find((c) => c.email === u.email)!,
+  )!;
+
+  const users = [...existingUsers, ...createdUsers];
+
   return {
-    newUsers: result,
-    existingUsers: usersAlreadyExistingInCW,
+    users,
+    admins: discourseUsers
+      .filter((d) => d.admin)
+      .map((d) => cwUsers.find((c) => c.email === d.email)!)
+      .reduce((acc, c) => ({
+        ...acc,
+        [c.id!]: true,
+      })),
+    moderators: discourseUsers
+      .filter((d) => d.moderator)
+      .map((d) => cwUsers.find((c) => c.email === d.email)!)
+      .reduce((acc, c) => ({
+        ...acc,
+        [c.id!]: true,
+      })),
   };
 };
