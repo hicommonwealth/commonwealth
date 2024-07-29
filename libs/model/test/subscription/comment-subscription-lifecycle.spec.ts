@@ -19,7 +19,6 @@ describe('Comment subscription lifecycle', () => {
   let commentTwo: z.infer<typeof schemas.Comment> | undefined;
   let community: z.infer<typeof schemas.Community> | undefined;
   let thread: z.infer<typeof schemas.Thread> | undefined;
-  let address: z.infer<typeof schemas.Address> | undefined;
 
   beforeAll(async () => {
     await bootstrap_testing(true);
@@ -27,8 +26,6 @@ describe('Comment subscription lifecycle', () => {
       isAdmin: false,
       selected_community_id: null,
     });
-
-    address = community?.Addresses?.[0]!;
 
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
