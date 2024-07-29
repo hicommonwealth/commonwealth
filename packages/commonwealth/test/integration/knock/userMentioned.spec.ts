@@ -25,7 +25,6 @@ chai.use(chaiAsPromised);
 describe('userMentioned Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user, author: z.infer<typeof schemas.User> | undefined;
-  let authorProfile: z.infer<typeof schemas.Profile> | undefined;
   let thread: z.infer<typeof schemas.Thread> | undefined;
   let sandbox: sinon.SinonSandbox;
 
@@ -43,11 +42,6 @@ describe('userMentioned Event Handler', () => {
     );
     [user] = await tester.seed('User', {});
     [author] = await tester.seed('User', {});
-    [authorProfile] = await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: author.id,
-      profile_name: author?.profile.name ?? '',
-    });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
       Addresses: [
@@ -136,7 +130,7 @@ describe('userMentioned Event Handler', () => {
         author_address: community!.Addresses![0].address,
         community_id: community!.id,
         community_name: community!.name,
-        author: authorProfile!.profile_name,
+        author: author?.profile.name,
         object_body: safeTruncateBody(thread!.body!, 255),
         object_url: getThreadUrl(community!.id!, thread!.id!),
       },

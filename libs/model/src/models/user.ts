@@ -5,7 +5,6 @@ import type { AddressAttributes, AddressInstance } from './address';
 import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { CommunityAlertAttributes } from './community_alerts';
-import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { SubscriptionPreferenceAttributes } from './subscription_preference';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
@@ -16,7 +15,6 @@ export type UserAttributes = z.infer<typeof User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
-  Profiles?: ProfileAttributes[];
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   threadSubscriptions?: ThreadSubscriptionAttributes[];
@@ -41,8 +39,6 @@ export type UserInstance = ModelInstance<UserAttributes> & {
     AddressInstance,
     AddressInstance['id']
   >;
-
-  getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
 };
 
 export type UserModelStatic = Sequelize.ModelStatic<UserInstance>;

@@ -109,12 +109,6 @@ async function deleteUser(user_id: number) {
       },
       transaction,
     });
-    await models.Profile.destroy({
-      where: {
-        user_id,
-      },
-      transaction,
-    });
     await models.User.destroy({
       where: {
         id: user_id,
