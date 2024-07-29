@@ -1,7 +1,10 @@
 import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
+import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import Permissions from 'utils/Permissions';
 import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
@@ -67,23 +70,68 @@ export const ThreadOptions = ({
 
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
 
-  const handleToggleSubscribe = async (e) => {
-    // prevent clicks from propagating to discussion row
-    e.preventDefault();
-    e.stopPropagation();
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
-    if (!thread) {
-      return;
-    }
+  const doToggleSubscribeOld = useCallback(
+    async (e: React.MouseEvent) => {
+      if (!thread) {
+        return;
+      }
 
-    await handleToggleSubscription(
-      thread,
-      getCommentSubscription(thread),
-      getReactionSubscription(thread),
+      await handleToggleSubscription(
+        thread,
+        getCommentSubscription(thread),
+        getReactionSubscription(thread),
+        isSubscribed,
+        setIsSubscribed,
+      );
+    },
+    [isSubscribed, thread],
+  );
+
+  const createThreadSubscriptionMutation =
+    useCreateThreadSubscriptionMutation();
+  const deleteThreadSubscriptionMutation =
+    useDeleteThreadSubscriptionMutation();
+
+  const doToggleSubscribe = useCallback(
+    async (e: React.MouseEvent) => {
+      if (isSubscribed) {
+        await deleteThreadSubscriptionMutation.mutateAsync({
+          thread_id: thread.id,
+        });
+      } else {
+        await createThreadSubscriptionMutation.mutateAsync({
+          thread_ids: [thread.id],
+        });
+      }
+    },
+    [
+      createThreadSubscriptionMutation,
+      deleteThreadSubscriptionMutation,
       isSubscribed,
-      setIsSubscribed,
-    );
-  };
+      thread.id,
+    ],
+  );
+
+  const handleToggleSubscribe = useCallback(
+    (e: React.MouseEvent) => {
+      async function doAsync() {
+        if (enableKnockInAppNotifications) {
+          await doToggleSubscribe(e);
+        } else {
+          await doToggleSubscribeOld(e);
+        }
+      }
+
+      // prevent clicks from propagating to discussion row
+      e.preventDefault();
+      e.stopPropagation();
+
+      doAsync().catch(console.error);
+    },
+    [doToggleSubscribe, doToggleSubscribeOld, enableKnockInAppNotifications],
+  );
 
   return (
     <>

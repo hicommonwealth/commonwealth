@@ -126,6 +126,10 @@ export const CommentCard = ({
     }
   }, [comment.canvasSignedData]);
 
+  const handleToggleSubscribe = useCallback(() => {
+    // toggle sub
+  }, []);
+
   useEffect(() => {
     if (!config?.enforceSessionKeys) return;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -250,6 +254,12 @@ export const CommentCard = ({
                   }}
                 />
               )}
+
+              <CWThreadAction
+                action="subscribe"
+                label="Subscribe"
+                onClick={handleToggleSubscribe}
+              />
 
               {!isThreadArchived && (canEdit || canDelete || canToggleSpam) && (
                 <PopoverMenu
