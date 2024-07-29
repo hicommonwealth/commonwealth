@@ -42,7 +42,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETH_RPC](#eth_rpc)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
-- [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
 - [JWT_SECRET](#jwt_secret)
@@ -232,10 +231,6 @@ After this time, the server will try the original DB endpoint again.
 ## FLAG_NEW_CREATE_COMMUNITY
 
 Boolean toggle allowing the creation of new communities during local development.
-
-## FLAG_PROPOSAL_TEMPLATES
-
-Boolean toggle to display side-wide sidebar proposal templates. Temporary flag for 2.0 work.
 
 ## HEROKU_APP_NAME
 

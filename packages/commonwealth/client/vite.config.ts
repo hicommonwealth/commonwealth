@@ -32,9 +32,6 @@ export default defineConfig(({ mode }) => {
 
   // WARN: only used locally never in remote (Heroku) apps
   const featureFlags = {
-    'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
-      env.FLAG_PROPOSAL_TEMPLATES,
-    ),
     'process.env.FLAG_CONTEST': JSON.stringify(env.FLAG_CONTEST),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
