@@ -127,43 +127,16 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         order_direction ?? 'DESC',
       );
 
-      // If search query is present count the number of members in the SQL query itself, Otherwise, pull the total
-      // members from the cached value in the Communities table in a subsequent query.
-      const sql = `
-      ${
-        search
-          ? `WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)`
-          : ''
-      }
-      SELECT
-        U.id AS user_id,
-        U.profile->>'name' AS profile_name,
-        U.profile->>'avatar_url' AS avatar_url,
-        U.created_at,
-        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
-        JSONB_AGG(JSON_BUILD_OBJECT(
-          'id', A.id,
-          'address', A.address,
-          'community_id', A.community_id,
-          'role', A.role,
-          'stake_balance', 0 -- TODO: project stake balance here
-        )) AS addresses,
-        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
-        ${search ? `, T.total` : ''}
-      FROM ${search ? `F JOIN "Addresses" A ON F.id = A.id` : '"Addresses" A'}
-        JOIN "Users" U ON A.user_id = U.id
-        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
-        ${search ? `JOIN T ON true` : ''}
-      GROUP BY U.id ${search ? ', T.total' : ''}
-      ORDER BY ${orderBy}
-      LIMIT ${limit} OFFSET ${offset};
-      `;
+      const sql = search
+        ? membersSqlWithSearch(cte, orderBy, limit, offset)
+        : membersSqlWithoutSearch(orderBy, limit, offset);
 
       const members = await models.sequelize.query<
         z.infer<typeof schemas.CommunityMember> & { total?: number }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
+        logging: true,
       });
 
       if (!search) {
@@ -184,4 +157,67 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       );
     },
   };
+}
+
+function membersSqlWithoutSearch(
+  orderBy: string,
+  limit: number,
+  offset: number,
+) {
+  return `
+      SELECT
+        U.id AS user_id,
+        U.profile->>'name' AS profile_name,
+        U.profile->>'avatar_url' AS avatar_url,
+        U.created_at,
+        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
+        JSONB_AGG(JSON_BUILD_OBJECT(
+          'id', A.id,
+          'address', A.address,
+          'community_id', A.community_id,
+          'role', A.role,
+          'stake_balance', 0 -- TODO: project stake balance here
+        )) AS addresses,
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
+      FROM "Addresses" A
+        JOIN "Users" U ON A.user_id = U.id
+        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
+      WHERE
+        A.community_id = :community_id
+      GROUP BY U.id
+      ORDER BY ${orderBy}
+      LIMIT ${limit} OFFSET ${offset};
+     `;
+}
+
+function membersSqlWithSearch(
+  cte: string,
+  orderBy: string,
+  limit: number,
+  offset: number,
+) {
+  return `
+      WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
+      SELECT
+        U.id AS user_id,
+        U.profile->>'name' AS profile_name,
+        U.profile->>'avatar_url' AS avatar_url,
+        U.created_at,
+        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
+        JSONB_AGG(JSON_BUILD_OBJECT(
+          'id', A.id,
+          'address', A.address,
+          'community_id', A.community_id,
+          'role', A.role,
+          'stake_balance', 0 -- TODO: project stake balance here
+        )) AS addresses,
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids, T.total
+      FROM F JOIN "Addresses" A ON F.id = A.id
+        JOIN "Users" U ON A.user_id = U.id
+        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
+        JOIN T ON TRUE
+      GROUP BY U.id, T.total
+      ORDER BY ${orderBy}
+      LIMIT ${limit} OFFSET ${offset};
+     `;
 }
