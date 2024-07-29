@@ -7,10 +7,6 @@ import { createDiscourseDBConnection, models } from '../database';
 import {
   createAllAddressesInCW,
   createAllCategoriesInCW,
-  createAllCommentsInCW,
-  createAllReactionsInCW,
-  createAllSubscriptionsInCW,
-  createAllThreadsInCW,
   createAllUsersInCW,
   importDump,
 } from '../services/discourseImport';
@@ -146,7 +142,6 @@ export function ImportDiscourseCommunity(): Command<
         // insert users
         const { users, admins, moderators } = await createAllUsersInCW(
           restrictedDiscourseConnection,
-          communityId!,
           { transaction },
         );
         log.debug(`Users: ${users.length}`);
@@ -172,45 +167,45 @@ export function ImportDiscourseCommunity(): Command<
         );
         log.debug(`Categories: ${categories.length}`);
 
-        // insert topics (threads)
-        const threads = await createAllThreadsInCW(
-          restrictedDiscourseConnection,
-          {
-            users,
-            categories,
-            communityId: communityId!,
-          },
-          { transaction },
-        );
-        log.debug(`Threads: ${threads.length}`);
+        // // insert topics (threads)
+        // const threads = await createAllThreadsInCW(
+        //   restrictedDiscourseConnection,
+        //   {
+        //     users,
+        //     categories,
+        //     communityId: communityId!,
+        //   },
+        //   { transaction },
+        // );
+        // log.debug(`Threads: ${threads.length}`);
 
-        // insert posts (comments)
-        const comments = await createAllCommentsInCW(
-          restrictedDiscourseConnection,
-          { communityId: communityId!, addresses, threads },
-          { transaction },
-        );
-        log.debug(`Comments: ${comments.length}`);
+        // // insert posts (comments)
+        // const comments = await createAllCommentsInCW(
+        //   restrictedDiscourseConnection,
+        //   { communityId: communityId!, addresses, threads },
+        //   { transaction },
+        // );
+        // log.debug(`Comments: ${comments.length}`);
 
-        // insert reactions
-        const reactions = await createAllReactionsInCW(
-          restrictedDiscourseConnection,
-          { addresses, communityId: communityId!, threads, comments },
-          { transaction },
-        );
-        log.debug(`Reactions: ${reactions.length}`);
+        // // insert reactions
+        // const reactions = await createAllReactionsInCW(
+        //   restrictedDiscourseConnection,
+        //   { addresses, communityId: communityId!, threads, comments },
+        //   { transaction },
+        // );
+        // log.debug(`Reactions: ${reactions.length}`);
 
-        // insert subscriptions
-        const subscriptions = await createAllSubscriptionsInCW(
-          restrictedDiscourseConnection,
-          {
-            communityId: communityId!,
-            users,
-            threads,
-          },
-          { transaction },
-        );
-        log.debug(`Subscriptions: ${subscriptions.length}`);
+        // // insert subscriptions
+        // const subscriptions = await createAllSubscriptionsInCW(
+        //   restrictedDiscourseConnection,
+        //   {
+        //     communityId: communityId!,
+        //     users,
+        //     threads,
+        //   },
+        //   { transaction },
+        // );
+        // log.debug(`Subscriptions: ${subscriptions.length}`);
 
         await transaction.commit();
       } catch (err) {

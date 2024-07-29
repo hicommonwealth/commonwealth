@@ -39,7 +39,7 @@ class DiscourseQueries {
     );
   };
 
-  static fetchBiosFromDiscourse = async (
+  static fetchBios = async (
     session: Sequelize,
   ): Promise<DiscourseWebsiteBio[]> => {
     return session.query<DiscourseWebsiteBio>(
@@ -90,18 +90,22 @@ class CWQueries {
           where: {
             community_id: communityId,
           },
+          required: false,
         },
       ],
     });
   };
 
-  static createCWUserFromDiscourseUser = async (
+  static createOrFindUser = async (
     discourseUser: DiscourseUser,
     discourseBio: DiscourseWebsiteBio | null,
     { transaction }: { transaction: Transaction },
-  ) => {
-    return models.User.create(
-      {
+  ): Promise<z.infer<typeof User>> => {
+    const [user] = await models.User.findOrCreate({
+      where: {
+        email: discourseUser.email,
+      },
+      defaults: {
         email: discourseUser.email,
         profile: {
           name: discourseUser.username || discourseUser.name,
@@ -114,14 +118,14 @@ class CWQueries {
         emailVerified: false,
         emailNotificationInterval: 'never',
       },
-      { transaction },
-    );
+      transaction,
+    });
+    return user;
   };
 }
 
 export const createAllUsersInCW = async (
   discourseConnection: Sequelize,
-  communityId: string,
   { transaction }: { transaction: Transaction },
 ): Promise<{
   users: Array<z.infer<typeof User>>;
@@ -129,29 +133,16 @@ export const createAllUsersInCW = async (
   moderators: Record<number, boolean>;
 }> => {
   // fetch users in discourse
-  const discourseUsers = await DiscourseQueries.fetchUsers(discourseConnection);
-  const emails = discourseUsers.map(({ email }) => `'${email}'`);
-
-  // fetch users in cw
-  const cwUsers = await CWQueries.fetchUsersByEmail(communityId, emails);
-
-  // separate existing users from new
-  const existingUsers = cwUsers.filter(
-    (c) =>
-      c.email && discourseUsers.find((d) => d.email && d.email === c.email),
-  );
-  const usersToCreate = discourseUsers.filter(
-    (d) => d.email && !cwUsers.find((c) => c.email && c.email === d.email),
-  );
-
-  const allBios = await DiscourseQueries.fetchBiosFromDiscourse(
+  const allDiscourseUsers = await DiscourseQueries.fetchUsers(
     discourseConnection,
   );
 
-  // create all new users
-  const createdUsersIdAndEmail = await Promise.all(
-    usersToCreate.map((userToCreate) =>
-      CWQueries.createCWUserFromDiscourseUser(
+  const allBios = await DiscourseQueries.fetchBios(discourseConnection);
+
+  // create or find new users
+  const users = await Promise.all(
+    allDiscourseUsers.map((userToCreate) =>
+      CWQueries.createOrFindUser(
         userToCreate,
         allBios.find((b) => b.discourse_user_id === userToCreate.id) || null,
         { transaction },
@@ -159,24 +150,18 @@ export const createAllUsersInCW = async (
     ),
   );
 
-  const createdUsers = createdUsersIdAndEmail.map(
-    (u) => cwUsers.find((c) => c.email === u.email)!,
-  )!;
-
-  const users = [...existingUsers, ...createdUsers];
-
   return {
     users,
-    admins: discourseUsers
+    admins: allDiscourseUsers
       .filter((d) => d.admin)
-      .map((d) => cwUsers.find((c) => c.email === d.email)!)
+      .map((d) => users.find((c) => c.email === d.email)!)
       .reduce((acc, c) => ({
         ...acc,
         [c.id!]: true,
       })),
-    moderators: discourseUsers
+    moderators: allDiscourseUsers
       .filter((d) => d.moderator)
-      .map((d) => cwUsers.find((c) => c.email === d.email)!)
+      .map((d) => users.find((c) => c.email === d.email)!)
       .reduce((acc, c) => ({
         ...acc,
         [c.id!]: true,

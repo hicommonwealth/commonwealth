@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { BASES } from './constants';
 import { createCosmosAddress } from './utils';
 
-const createAddress = async (
+const createOrFindAddress = async (
   {
     userId,
     address,
@@ -23,8 +23,13 @@ const createAddress = async (
   },
   { transaction }: { transaction: Transaction },
 ) => {
-  return models.Address.create(
-    {
+  return models.Address.findOrCreate({
+    where: {
+      address: address,
+      user_id: userId,
+      community_id: communityId,
+    },
+    defaults: {
       address,
       community_id: communityId,
       user_id: userId,
@@ -39,8 +44,8 @@ const createAddress = async (
       ghost_address: true,
       role: isAdmin ? 'admin' : isModerator ? 'moderator' : 'member',
     },
-    { transaction },
-  );
+    transaction,
+  });
 };
 
 export const createAllAddressesInCW = async (
@@ -77,7 +82,7 @@ export const createAllAddressesInCW = async (
       ghostAddress = web3.eth.accounts.create().address;
     }
 
-    return createAddress(
+    return createOrFindAddress(
       {
         userId: user.id!,
         address: ghostAddress,

@@ -2,20 +2,22 @@ import { models } from '@hicommonwealth/model';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
+export type DiscourseThread = {
+  id: number;
+  title: string;
+  cooked: string;
+  raw: any;
+  pinned_globally: any;
+  category_id: any;
+  user_id: any;
+  views: number;
+  like_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export const fetchThreadsFromDiscourse = async (session: Sequelize) => {
-  return session.query<{
-    id: number;
-    title: string;
-    cooked: string;
-    raw: any;
-    pinned_globally: any;
-    category_id: any;
-    user_id: any;
-    views: number;
-    like_count: number;
-    created_at: string;
-    updated_at: string;
-  }>(
+  return session.query<DiscourseThread>(
     `
         select *,
         (select cooked from posts where topic_id=topics.id and post_number=1),

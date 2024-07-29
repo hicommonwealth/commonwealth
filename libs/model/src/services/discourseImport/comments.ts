@@ -1,7 +1,9 @@
 import { models } from '@hicommonwealth/model';
+import { Address, Thread } from '@hicommonwealth/schemas';
 import lo from 'lodash';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { z } from 'zod';
 
 export const fetchPosts = async (session: Sequelize) => {
   return session.query<{
@@ -106,7 +108,11 @@ export const createAllCommentsInCW = async (
     addresses,
     communityId,
     threads,
-  }: { addresses: any[]; communityId: string; threads: any[] },
+  }: {
+    addresses: Array<z.infer<typeof Address>>;
+    communityId: string;
+    threads: Array<z.infer<typeof Thread>>;
+  },
   { transaction }: { transaction: Transaction },
 ) => {
   const parentComments: Record<any, any> = {};
