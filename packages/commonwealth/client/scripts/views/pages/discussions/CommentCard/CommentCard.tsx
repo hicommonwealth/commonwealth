@@ -119,12 +119,16 @@ export const CommentCard = ({
   // this is in an inner loop but trpc will batch this so it's only called once.
   const commentSubscriptions = useCommentSubscriptions();
 
-  const hasCommentSubscription = useMemo(() => {
+  const hasCommentSubscriptionDefault = useMemo(() => {
     const matching = (commentSubscriptions.data || []).filter(
       (current) => current.comment_id === comment.id,
     );
     return matching.length > 0;
   }, [comment.id, commentSubscriptions.data]);
+
+  const [hasCommentSubscription, setHasCommentSubscription] = useState(
+    hasCommentSubscriptionDefault,
+  );
 
   const { data: config } = useFetchConfigurationQuery();
 
@@ -159,6 +163,8 @@ export const CommentCard = ({
         comment_id: comment.id,
       });
     }
+
+    setHasCommentSubscription(!hasCommentSubscription);
   }, [
     hasCommentSubscription,
     deleteCommentSubscriptionMutation,
@@ -306,6 +312,7 @@ export const CommentCard = ({
                 <CWThreadAction
                   action="subscribe"
                   label="Subscribe"
+                  selected={!hasCommentSubscription}
                   onClick={handleToggleSubscribe}
                 />
               )}
