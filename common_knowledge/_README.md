@@ -7,7 +7,7 @@
 - [Updating The Docs: How & When](#updating-the-docs-how--when)
   * [Inline Documentation](#inline-documentation)
   * [Documentation Language](#documentation-language)
-    + [Indexicality & Timestamps](#indexicality--timestamps)
+    + [Indexicality & Datestamps](#indexicality--datestamps)
     + [Must, Should, & May](#must-should--may)
     + [Responsible, Accountable, Consulted, Informed](#responsible-accountable-consulted-informed)
   * [Linting](#linting)
@@ -61,13 +61,13 @@ We use a combination of TSDoc and comments for inline documentation. For more in
 
 ### Documentation Language
 
-#### Indexicality & Timestamps
+#### Indexicality & Datestamps
 
 Language is "indexical" insofar as it relies on inferred context to be understood. For instance, in Common Knowledge, words like "I," "you," "now," and "soon" are indexical insofar as they rely on a context, known to the contributor at time of writing, that will likely be lost to future readers.
 
 In place of pronouns, documentation should be written with proper names and nouns. Moreover, it is preferable to name _teams_ rather than individuals, since individuals may be replaced or change over time.
 
-References to places and times (e.g. "now," "soon," "recently," "historically") should be explicitly contextualized with dates whenever possible (e.g. "As of 230831..."). Dates across Common Knowledge and codebase should be structured YYMMDD, e.g. 230831 for August 31st, 2023.  
+References to places and times (e.g. "now," "soon," "recently," "historically") should be explicitly contextualized with dates whenever possible (e.g. "As of 230831..."). Dates across Common Knowledge and codebase should be structured YYMMDD, e.g. 230831 for August 31st, 2023.
 
 #### Must, Should, & May
 
