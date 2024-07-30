@@ -18,7 +18,7 @@ Contests logic is managed by `Contest.sol`, and financial processes by the `FeeM
 
 ## Contest Funding and Economics
 
-Contest prizes are primarily funded through the namespace’s Community Stake transaction commissions. This will be used by the `FeeManager.sol` contract, and CommunityStake fees generated from the community's staking activities will be directed to the contest contract. Additionally, direct transfers to the contest contract are also supported.
+Contest prizes are primarily funded through the namespace’s Community Stake transaction commissions. These transaction commissions will be collected by the `FeeManager.sol` contract, and CommunityStake fees generated from the community's staking activities will be directed to the contest contract based on the share of the community stake in the `FeeManager.sol` contract. Additionally, direct transfers to the contest contract are also supported.
 
 Contest project will be able to utilize both ETH and ERC20 tokens. As of 240506, there is no additional funding plan for the contest project.
 
