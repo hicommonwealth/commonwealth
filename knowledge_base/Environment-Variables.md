@@ -42,8 +42,8 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
 - [EVM_CE_POLL_INTERVAL](#evm_ce_poll_interval)
-- [FLAG_CONTEST](#flag_contest)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
+- [FLAG_CONTEST](#flag_contest)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
@@ -235,9 +235,7 @@ Required for testing contests. Number of milliseconds. `10000` is recommended; i
 
 ## FALLBACK_NODE_DURATION_S
 
-Optional. Defaults to 5 minutes (300 seconds).
-This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
-After this time, the server will try the original DB endpoint again.
+Optional. Defaults to 5 minutes (300 seconds). This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails. After this time, the server will try the original DB endpoint again.
 
 ## FLAG_CONTEST
 
