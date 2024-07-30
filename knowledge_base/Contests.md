@@ -10,7 +10,7 @@ Common Contests are an application of contest contracts using Common content. Wi
 
 Each community may have at most one contest running. Contests continue to run even if the prize pool is empty, but no payments will be made to winners in such cases.
 
-Admins cannot alter the content submission and voting processes. They may alter a contest's prize share, but changes will only affect the following cycle, and the current running cycle will continue unaltered. To be change constructor variables, admins must deploy a new contest contract with their new desired variables.
+Admins cannot alter the content submission and voting processes. They may alter a contest's prize share, but changes will only affect the following cycle, and the current running cycle will continue unaltered. To change constructor variables, admins must deploy a new contest contract with their new desired variables.
 
 On-chain data submission will be conducted and sponsored by Commonwealth Labs. As of 240509, Common takes a 10% fee from contest distributions.
 
