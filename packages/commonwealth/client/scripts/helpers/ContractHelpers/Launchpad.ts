@@ -27,6 +27,7 @@ class LaunchpadBondingCurve extends ContractBase {
       walletAddress,
       amountEth,
     );
+    return txReceipt;
   }
 
   async sellToken(amountSell: number, walletAddress: string) {
@@ -40,6 +41,7 @@ class LaunchpadBondingCurve extends ContractBase {
       amountSell,
       walletAddress,
     );
+    return txReceipt;
   }
 
   async transferLiquidity(walletAddress: string) {
@@ -52,6 +54,7 @@ class LaunchpadBondingCurve extends ContractBase {
       this.tokenAddress,
       walletAddress,
     );
+    return txReceipt;
   }
 
   async getAmountOut(amountIn: number, buy: boolean) {
@@ -64,3 +67,5 @@ class LaunchpadBondingCurve extends ContractBase {
     return Number(amountOut / 1e18);
   }
 }
+
+export default LaunchpadBondingCurve;
