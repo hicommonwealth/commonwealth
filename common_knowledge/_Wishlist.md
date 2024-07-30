@@ -1,10 +1,9 @@
 # Wishlist
 
-This page allows us to track and prioritize new knowledge base entries.
-
-Engineers are encouraged to reach out to Graham Johnson with suggestions for new entries.
+This page allows us to track and prioritize new Common Knowledge entries.
 
 ## Requested Items
 
-- Swagger UI (requested 230205 by Forest)
-- Subscription Constraints (empty doc added 230802 by Timothee Legros)
+_Include a datestamp, ticket number, and the name of the requesting party, e.g._
+
+- Example Entry requested by Graham Johnson (#000).

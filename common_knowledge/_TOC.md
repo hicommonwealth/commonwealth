@@ -1,4 +1,4 @@
-# Knowledge Base Directory
+# Common Knowledge Directory
 
 ## Onboarding & Praxis
 
@@ -12,7 +12,7 @@
 
 ## Documentation
 
-- [Knowledge Base ReadMe](./_README.md): How to contribute documentation.
+- [Common Knowledge ReadMe](./_README.md): How to contribute documentation.
 - [Wishlist](./_Wishlist.md): Entries in need of writing.
 
 ## Common App
