@@ -2,7 +2,7 @@
 
 Contests is a new feature, based on contest contracts, available for communities on Common. This document outlines the implementation of Contests on our platform.
 
-A contest contract is an on-chain, repeating game which receives content submissions and votes on submitted content. It then determines the winning content based on relative voting power applied.
+A contest contract is an on-chain, one-shot or iterated game which receives content submissions and votes on submitted content. It then determines the winning content based on relative voting power applied.
 
 Common Contests are an application of contest contracts using Common content. Winners receive a token-denominated prize from a community-designated pool.
 
