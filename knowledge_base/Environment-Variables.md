@@ -333,7 +333,7 @@ Localhost port location, default value `8080`.
 
 ## PRIVATE_KEY
 
-The private Ethereum key that will be used by the developer for testing contests. Must include the 0x prefix.
+The private Ethereum key that will be used for contests. Must be funded on the chains that will be used for testing (base Sepolia for dev, base Mainnet for prod). Must include the 0x prefix.
 
 ## PROCFILE
 
