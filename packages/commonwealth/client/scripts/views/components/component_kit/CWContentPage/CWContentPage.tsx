@@ -1,3 +1,4 @@
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import { IThreadCollaborator } from 'models/Thread';
@@ -6,11 +7,11 @@ import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
+import { useForumActionGated } from '../../../../hooks/useForumActionGated';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
@@ -80,6 +81,7 @@ type ContentPageProps = {
   sidebarComponentsSkeletonCount?: number;
   setThreadBody?: (body: string) => void;
   editingDisabled?: boolean;
+  topicId?: number;
 };
 
 export const CWContentPage = ({
@@ -118,32 +120,23 @@ export const CWContentPage = ({
   sidebarComponentsSkeletonCount = 2,
   setThreadBody,
   editingDisabled,
+  topicId,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
   const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const allowedActions = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    topicId,
   });
 
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
+  const canReactToThread =
+    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_THREAD_REACTION);
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -219,7 +212,7 @@ export const CWContentPage = ({
     isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
+    isThreadTopicGated: !canReactToThread,
   });
 
   const mainBody = (

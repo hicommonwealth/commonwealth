@@ -1,3 +1,4 @@
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
@@ -17,10 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
@@ -35,6 +33,7 @@ import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
+import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
@@ -142,25 +141,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const allowedActions = useForumActionGated({
     communityId: app.activeChainId(),
-    address: user?.activeAccount?.address || '',
-    apiEnabled: !!user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    topicId: thread?.topic?.id,
   });
-
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -328,7 +313,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!user.activeAccount && !isRestrictedMembership;
+  const canComment =
+    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_COMMENT);
+  const canReactToComment =
+    isAdmin ||
+    allowedActions.includes(ForumActionsEnum.CREATE_COMMENT_REACTION);
+
+  const isRestrictedMembership = !canComment || !canReactToComment;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -595,6 +586,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           }}
           hasPendingEdits={!!editsToSave}
           setThreadBody={setThreadBody}
+          topicId={thread?.topic?.id}
           body={(threadOptionsComp) => (
             <div className="thread-content">
               {isEditingBody ? (
@@ -669,7 +661,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       />
                       {foundGatedTopic &&
                         !hideGatingBanner &&
-                        isRestrictedMembership && (
+                        (!canComment || !canReactToComment) && (
                           <CWGatedTopicBanner
                             groupNames={gatedGroupsMatchingTopic.map(
                               (g) => g.name,
@@ -734,8 +726,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 parentCommentId={parentCommentId}
                 setParentCommentId={setParentCommentId}
                 canComment={canComment}
-                canReact={!isRestrictedMembership}
-                canReply={!isRestrictedMembership}
+                canReact={canReactToComment}
+                canReply={canComment}
                 fromDiscordBot={fromDiscordBot}
                 commentSortType={commentSortType}
                 disabledActionsTooltipText={disabledActionsTooltipText}

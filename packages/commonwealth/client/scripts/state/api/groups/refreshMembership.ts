@@ -1,3 +1,4 @@
+import { ForumActions } from '@hicommonwealth/schemas/src/index';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
@@ -10,6 +11,7 @@ interface RefreshMembershipProps {
   communityId: string;
   address: string;
   topicId?: string;
+  forumAction?: ForumActions;
   apiEnabled?: boolean;
 }
 
@@ -48,10 +50,17 @@ const useRefreshMembershipQuery = ({
   communityId,
   address,
   topicId,
+  forumAction,
   apiEnabled = true,
 }: RefreshMembershipProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.REFRESH_MEMBERSHIP, communityId, address, topicId],
+    queryKey: [
+      ApiEndpoints.REFRESH_MEMBERSHIP,
+      communityId,
+      address,
+      topicId,
+      forumAction,
+    ],
     queryFn: () => refreshMembership({ communityId, address, topicId }),
     enabled: apiEnabled,
     staleTime: REFRESH_MEMBERSHIP_STALE_TIME,

@@ -1,3 +1,4 @@
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -9,10 +10,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
@@ -24,6 +22,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
+import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -95,10 +94,11 @@ export const NewThreadForm = () => {
     communityId: app.activeChainId(),
     includeTopics: true,
   });
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+
+  const allowedActions = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    topicId: threadTopic?.id,
   });
 
   const {
@@ -120,23 +120,17 @@ export const NewThreadForm = () => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
 
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    membership.topicIds.includes(threadTopic?.id),
-  );
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      membership.topicIds.includes(threadTopic?.id) && membership.isAllowed,
-  );
+  const canCreateThread =
+    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_THREAD);
+
   const gatedGroupNames = groups
     .filter((group) =>
       group.topics.find((topic) => topic.id === threadTopic?.id),
     )
     .map((group) => group.name);
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
-    if (isRestrictedMembership) {
+    if (!canCreateThread) {
       notifyError('Topic is gated!');
       return;
     }
@@ -199,7 +193,7 @@ export const NewThreadForm = () => {
   const showBanner = !user.activeAccount && isBannerVisible;
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
-    isThreadTopicGated: isRestrictedMembership,
+    isThreadTopicGated: !canCreateThread,
   });
 
   const contestThreadBannerVisible =
@@ -262,7 +256,7 @@ export const NewThreadForm = () => {
               <ReactQuillEditor
                 contentDelta={threadContentDelta}
                 setContentDelta={setThreadContentDelta}
-                isDisabled={isRestrictedMembership || !user.activeAccount}
+                isDisabled={!canCreateThread || !user.activeAccount}
                 tooltipLabel={
                   typeof disabledActionsTooltipText === 'function'
                     ? disabledActionsTooltipText?.('submit')
@@ -308,7 +302,7 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {isRestrictedMembership && canShowGatingBanner && (
+              {!canCreateThread && canShowGatingBanner && (
                 <div>
                   <CWGatedTopicBanner
                     groupNames={gatedGroupNames}

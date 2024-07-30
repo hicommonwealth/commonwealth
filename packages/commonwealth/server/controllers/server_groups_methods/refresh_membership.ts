@@ -1,9 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
-import {
-  AddressInstance,
-  MembershipRejectReason,
-  UserInstance,
-} from '@hicommonwealth/model';
+import { AddressInstance, MembershipRejectReason } from '@hicommonwealth/model';
+import { ForumActions } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
@@ -13,13 +10,12 @@ const Errors = {
 };
 
 export type RefreshMembershipOptions = {
-  user: UserInstance;
   address: AddressInstance;
   topicId: number;
 };
 export type RefreshMembershipResult = {
   topicId?: number;
-  allowed: boolean;
+  allowed: ForumActions[];
   rejectReason?: MembershipRejectReason;
 }[];
 
@@ -27,11 +23,10 @@ export async function __refreshMembership(
   this: ServerGroupsController,
   { address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  // get all groups in the community with the topic_ids if the topicId is passed in
   const groups = await this.models.sequelize.query(
     `
-    SELECT G.* FROM "Groups" G
-    LEFT JOIN "GroupPermissions" GP ON :topicId IS NOT NULL AND G.id = GP.group_id 
+    SELECT G.*, GP.allowed_actions, GP.topic_id FROM "Groups" G
+    LEFT JOIN "GroupPermissions" GP ON G.id = GP.group_id 
     WHERE community_id = :communityId AND (:topicId IS NULL OR GP.topic_id = :topicId)
     `,
     {
@@ -56,16 +51,20 @@ export async function __refreshMembership(
   );
 
   // transform memberships to result shape
-  const results = memberships.map((membership) => ({
-    groupId: membership.group_id,
-    topicIds: groups
-      // @ts-expect-error StrictNullChecks
-      .filter((g) => g.group_id === membership.group_id)
-      .map((g) => g.topic_id)
-      .map((t) => t.id),
-    allowed: !membership.reject_reason,
-    rejectReason: membership.reject_reason,
-  }));
+  const results = memberships.map((membership) => {
+    const specifiedGroup = groups.find(
+      (g) => g.id === membership.group_id && g.topic_id === topicId,
+    );
+
+    return {
+      groupId: membership.group_id,
+      topicIds: groups
+        .filter((g) => g.id === membership.group_id)
+        .map((g) => g.topic_id),
+      allowed: !membership.reject_reason ? specifiedGroup.allowed_actions : [],
+      rejectReason: membership.reject_reason,
+    };
+  });
 
   return results;
 }

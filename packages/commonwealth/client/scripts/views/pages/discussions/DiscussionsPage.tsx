@@ -1,3 +1,4 @@
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -7,6 +8,7 @@ import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -23,7 +25,6 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
@@ -74,11 +75,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const user = useUserStore();
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: communityId,
+  const allowedActions = useForumActionGated({
+    communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    topicId,
   });
+
+  const canReactToThread =
+    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_THREAD_REACTION);
+
+  const canComment =
+    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_COMMENT);
 
   const { contestsData } = useCommunityContests();
 
@@ -180,24 +187,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
-          );
-
-          const isActionAllowedInGatedTopic = !!(memberships || []).find(
-            (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
-              membership.isAllowed,
-          );
-
-          const isRestrictedMembership =
-            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!user.activeAccount,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isRestrictedMembership,
+            isThreadTopicGated: !canReactToThread,
           });
 
           const isThreadTopicInContest = checkIsTopicInContest(
@@ -205,12 +199,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             thread?.topic?.id,
           );
 
+          console.log(canComment, 'can comment');
           return (
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
+              canReact={canReactToThread}
+              canComment={canComment}
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);

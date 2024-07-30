@@ -1,7 +1,9 @@
+import { ForumActionsEnum } from '@hicommonwealth/schemas/src/index';
 import React from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
+import { useForumActionGated } from '../../hooks/useForumActionGated';
 
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
@@ -16,7 +18,6 @@ import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
 } from 'state/api/feeds';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { DashboardViews } from 'views/pages/user_dashboard';
@@ -52,30 +53,22 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: thread.communityId,
-    // @ts-expect-error <StrictNullChecks/>
-    address: account?.address,
-    apiEnabled: !!account?.address,
+  const allowedActions = useForumActionGated({
+    communityId: app.activeChainId(),
+    address: user.activeAccount?.address || '',
+    topicId: thread?.topic?.id,
   });
 
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+  const canComment =
+    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_COMMENT);
+  const canReactToThread =
+    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_THREAD_REACTION);
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: Permissions.isCommunityMember(thread.communityId),
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
+    isThreadTopicGated: !(canComment || canReactToThread),
   });
 
   return (

@@ -156,7 +156,6 @@ describe('ServerGroupsController', () => {
     const results = await controller.refreshMembership({
       user,
       address,
-      topicId: 1,
     });
     expect(results[0]).to.have.property('groupId');
     expect(results[0]).to.have.property('topicIds');

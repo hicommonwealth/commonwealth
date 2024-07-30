@@ -1,6 +1,6 @@
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { CommunityMember, CommunityStake } from '../entities';
+import { CommunityMember, CommunityStake, ForumActionsEnum } from '../entities';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -75,6 +75,21 @@ export const GetStakeHistoricalPrice = {
     .object({
       community_id: z.string(),
       old_price: z.string().nullish(),
+    })
+    .array(),
+};
+
+export const CheckGroupPermissions = {
+  input: z.object({
+    address: z.string(),
+    community_id: z.string(),
+    action: z.nativeEnum(ForumActionsEnum),
+  }),
+  output: z
+    .object({
+      group_id: z.number(),
+      topic_id: z.number(),
+      allowed_actions: z.array(z.nativeEnum(ForumActionsEnum)),
     })
     .array(),
 };
