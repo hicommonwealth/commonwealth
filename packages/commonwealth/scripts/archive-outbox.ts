@@ -7,11 +7,8 @@ import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
-// REQUIRED for S3 env var
-
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
-const S3_BUCKET_NAME = 'outbox-event-stream-archive';
 const _blobStorage = blobStorage(S3BlobStorage());
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
@@ -56,16 +53,16 @@ async function uploadToS3(filePath: string): Promise<boolean> {
   try {
     const fileStream = createReadStream(filePath);
     const { url } = await _blobStorage.upload({
-      bucket: S3_BUCKET_NAME,
       key: filePath,
+      bucket: 'archives',
       content: fileStream,
     });
     log.info(`File uploaded successfully at ${url}`);
     return true;
   } catch (error) {
     log.error(`S3 upload failed`, error, {
-      S3_BUCKET_NAME,
       filePath,
+      bucket: 'archives',
     });
   }
 
@@ -103,10 +100,10 @@ async function getTablesToBackup(): Promise<string[]> {
   const archiveExists = await Promise.allSettled(
     tablesInPg.map(async (t) => {
       const objectKey = getCompressedDumpName(getDumpName(t));
-      log.info(`Searching for ${objectKey} in S3 bucket ${S3_BUCKET_NAME}...`);
+      log.info(`Searching for ${objectKey} in archives...`);
       return await _blobStorage.exists({
-        bucket: S3_BUCKET_NAME,
         key: objectKey,
+        bucket: 'archives',
       });
     }),
   );

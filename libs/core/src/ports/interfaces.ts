@@ -225,21 +225,23 @@ export interface Broker extends Disposable {
 }
 
 export type BlobType = string | Uint8Array | Buffer | Readable;
+export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
+export type BlobBucket = typeof BlobBuckets[number];
 
 /**
  * External Blob Storage Port
  */
 export interface BlobStorage extends Disposable {
   upload(options: {
-    bucket: string;
     key: string;
+    bucket: BlobBucket;
     content: BlobType;
     contentType?: string;
   }): Promise<{ url: string; location: string }>;
-  exists(options: { bucket: string; key: string }): Promise<boolean>;
+  exists(options: { key: string; bucket: BlobBucket }): Promise<boolean>;
   getSignedUrl(options: {
-    bucket: string;
     key: string;
+    bucket: BlobBucket;
     contentType: string;
     ttl: number;
   }): Promise<string>;

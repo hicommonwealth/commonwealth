@@ -1,17 +1,20 @@
 import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import type { BlobStorage } from '@hicommonwealth/core';
+import { BlobBucket, type BlobStorage } from '@hicommonwealth/core';
+
+const s3Buckets: Record<BlobBucket, string> = {
+  assets: 'assets.commonwealth.im',
+  archives: 'outbox-event-stream-archive',
+  sitemap: 'sitemap.commonwealth.im',
+};
 
 /**
  * Creates a valid S3 asset url from an upload.Location url
  * @param uploadLocation The url returned by the Upload method of @aws-sdk/lib-storage
  * @param bucketName The name of the bucket or the domain (alias) of the bucket. Defaults to assets.commonwealth.im
  */
-function formatS3Url(
-  uploadLocation: string,
-  bucketName: string = 'assets.commonwealth.im',
-): string {
+function formatS3Url(uploadLocation: string, bucketName: string): string {
   return (
     `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
   );
@@ -29,7 +32,7 @@ export const S3BlobStorage = (): BlobStorage => {
       const data = await new Upload({
         client,
         params: {
-          Bucket: bucket,
+          Bucket: s3Buckets[bucket],
           Key: key,
           Body: content,
           ContentType: contentType,
@@ -39,12 +42,12 @@ export const S3BlobStorage = (): BlobStorage => {
 
       return {
         location: data.Location,
-        url: formatS3Url(data.Location, bucket),
+        url: formatS3Url(data.Location, s3Buckets[bucket]),
       };
     },
     exists: async ({ bucket, key }) => {
       try {
-        await client.headObject({ Bucket: bucket, Key: key });
+        await client.headObject({ Bucket: s3Buckets[bucket], Key: key });
         return true;
       } catch (e) {
         if (e instanceof Error && 'statusCode' in e && e.statusCode === 404)
@@ -56,7 +59,7 @@ export const S3BlobStorage = (): BlobStorage => {
       await getSignedUrl(
         client,
         new PutObjectCommand({
-          Bucket: bucket,
+          Bucket: s3Buckets[bucket],
           Key: key,
           ContentType: contentType,
         }),

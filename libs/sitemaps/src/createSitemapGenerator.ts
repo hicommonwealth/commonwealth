@@ -7,8 +7,6 @@ import { createSitemapIndex } from './createSitemapIndex';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-const BUCKET_NAME = 'sitemap.commonwealth.im';
-
 export interface SitemapFile {
   readonly location: string;
 }
@@ -43,8 +41,8 @@ export function createSitemapGenerator(
         const sitemap = createSitemap(page.links);
         const sitemapPath = `sitemap-${idx++}.xml`;
         const res = await blobStorage().upload({
-          bucket: BUCKET_NAME,
           key: sitemapPath,
+          bucket: 'sitemap',
           content: sitemap,
           contentType: 'text/xml; charset=utf-8',
         });
@@ -61,8 +59,8 @@ export function createSitemapGenerator(
       );
       const idx_path = `sitemap-index.xml`;
       const res = await blobStorage().upload({
-        bucket: BUCKET_NAME,
         key: idx_path,
+        bucket: 'sitemap',
         content: index,
         contentType: 'text/xml; charset=utf-8',
       });

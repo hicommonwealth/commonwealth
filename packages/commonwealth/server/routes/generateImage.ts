@@ -58,8 +58,8 @@ const generateImage = async (
     const resp = await fetch(image);
     const buffer = await resp.buffer();
     const { url } = await blobStorage().upload({
-      bucket: 'assets.commonwealth.im',
       key: `${uuidv4()}.png`,
+      bucket: 'assets',
       content: buffer,
       contentType: 'image/png',
     });

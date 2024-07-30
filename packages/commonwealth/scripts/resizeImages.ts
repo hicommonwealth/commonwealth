@@ -188,8 +188,8 @@ async function uploadToS3AndReplace(
     }
 
     const { url } = await _blobStorage.upload({
-      bucket: 'assets.commonwealth.im',
       key: `${datum.id}_resized.${contentType.split('/')[1]}`,
+      bucket: 'assets',
       content: resizedImage,
       contentType,
     });

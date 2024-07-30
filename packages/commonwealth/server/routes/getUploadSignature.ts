@@ -34,8 +34,8 @@ const getUploadSignature = async (
 
   try {
     const url = await blobStorage().getSignedUrl({
-      bucket: 'assets.commonwealth.im',
       key: filename,
+      bucket: 'assets',
       contentType,
       ttl: 3600,
     });
