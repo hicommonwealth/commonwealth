@@ -16,9 +16,10 @@ export type DiscourseThread = {
   updated_at: string;
 };
 
-export const fetchThreadsFromDiscourse = async (session: Sequelize) => {
-  return session.query<DiscourseThread>(
-    `
+class DiscourseQueries {
+  static fetchThreadsFromDiscourse = async (session: Sequelize) => {
+    return session.query<DiscourseThread>(
+      `
         select *,
         (select cooked from posts where topic_id=topics.id and post_number=1),
         (select raw from posts where topic_id=topics.id and post_number=1)
@@ -26,9 +27,24 @@ export const fetchThreadsFromDiscourse = async (session: Sequelize) => {
         where deleted_at is null
         and user_id > 0
     `,
-    { raw: true, type: QueryTypes.SELECT },
-  );
-};
+      { raw: true, type: QueryTypes.SELECT },
+    );
+  };
+
+  static fetchDiscourseGeneralCategoryId = async (
+    session: Sequelize,
+  ): Promise<number> => {
+    const [result] = await session.query<{
+      id: number;
+    }>(
+      `
+    SELECT id FROM categories WHERE name = 'General';
+  `,
+      { type: QueryTypes.SELECT },
+    );
+    return result.id;
+  };
+}
 
 const createThread = async (
   session: Sequelize,
@@ -111,25 +127,17 @@ export const createAllThreadsInCW = async (
   }: { users: any[]; categories: any[]; communityId: string },
   { transaction }: { transaction: Transaction },
 ) => {
-  const topics = await fetchThreadsFromDiscourse(discourseConnection);
-  const generalCwTopicId = (
-    await models.sequelize.query<{ id: number }>(
-      `
-    SELECT id FROM "Topics" WHERE name = 'General' and community_id = '${communityId}';
-  `,
-      {
-        type: QueryTypes.SELECT,
-      },
-    )
-  )[0].id;
-  const generalDiscourseCategoryId = await discourseConnection.query<{
-    id: number;
-  }>(
-    `
-    SELECT id FROM categories WHERE name = 'General';
-  `,
-    { type: QueryTypes.SELECT },
+  const topics = await DiscourseQueries.fetchThreadsFromDiscourse(
+    discourseConnection,
   );
+  const generalCwTopic = await models.Topic.findOne({
+    where: {
+      name: 'General',
+      community_id: communityId,
+    },
+  });
+  const generalDiscourseCategoryId =
+    await DiscourseQueries.fetchDiscourseGeneralCategoryId(discourseConnection);
   const threadPromises = topics
     .map((topic) => {
       const {
@@ -146,15 +154,14 @@ export const createAllThreadsInCW = async (
         updated_at,
       } = topic;
 
-      let cwTopicId = generalCwTopicId;
+      let cwTopicId = generalCwTopic!.id;
       if (category_id) {
         const category = categories.find(
           ({ discourseCategoryId }) => discourseCategoryId === category_id,
         );
         if (
-          generalDiscourseCategoryId.length === 0 ||
-          (generalDiscourseCategoryId.length > 0 &&
-            category?.discourseCategoryId !== generalDiscourseCategoryId[0].id)
+          generalDiscourseCategoryId > 0 &&
+          category?.discourseCategoryId !== generalDiscourseCategoryId
         ) {
           cwTopicId = category.id;
         }

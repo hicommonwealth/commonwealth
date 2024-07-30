@@ -7,6 +7,7 @@ import { createDiscourseDBConnection, models } from '../database';
 import {
   createAllAddressesInCW,
   createAllCategoriesInCW,
+  createAllThreadsInCW,
   createAllUsersInCW,
   importDump,
 } from '../services/discourseImport';
@@ -168,16 +169,16 @@ export function ImportDiscourseCommunity(): Command<
         log.debug(`Categories: ${categories.length}`);
 
         // // insert topics (threads)
-        // const threads = await createAllThreadsInCW(
-        //   restrictedDiscourseConnection,
-        //   {
-        //     users,
-        //     categories,
-        //     communityId: communityId!,
-        //   },
-        //   { transaction },
-        // );
-        // log.debug(`Threads: ${threads.length}`);
+        const threads = await createAllThreadsInCW(
+          restrictedDiscourseConnection,
+          {
+            users,
+            categories,
+            communityId: communityId!,
+          },
+          { transaction },
+        );
+        log.debug(`Threads: ${threads.length}`);
 
         // // insert posts (comments)
         // const comments = await createAllCommentsInCW(

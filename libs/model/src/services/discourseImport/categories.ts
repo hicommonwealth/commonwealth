@@ -1,67 +1,76 @@
-import { models } from '@hicommonwealth/model';
+import { models, TopicAttributes } from '@hicommonwealth/model';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
-export const fetchTopicsFromDiscourse = async (session: Sequelize) => {
-  return session.query<{ id: any; name: string; description: string }>(
-    `
+class DiscourseQueries {
+  static fetchTopicsFromDiscourse = async (session: Sequelize) => {
+    return session.query<{ id: any; name: string; description: string }>(
+      `
         select * FROM public.categories
     `,
-    { raw: true, type: QueryTypes.SELECT },
-  );
-};
+      { raw: true, type: QueryTypes.SELECT },
+    );
+  };
+}
 
-const createCategory = async (
-  category: {
-    name: string;
-    communityId: string;
-    description: string;
+class CWQueries {
+  static createCategory = async (
+    category: {
+      name: string;
+      communityId: string;
+      description: string;
+      discourseCategoryId: number;
+    },
+    { transaction }: { transaction: Transaction },
+  ): Promise<{
+    createdCategory: { id: number; name: string };
     discourseCategoryId: number;
-  },
-  { transaction }: { transaction: Transaction },
-): Promise<{
-  createdCategory: { id: number; name: string };
-  discourseCategoryId: number;
-}> => {
-  const { name, communityId, description, discourseCategoryId } = category;
+  }> => {
+    const { name, communityId, description, discourseCategoryId } = category;
 
-  let result;
-  if (name === 'General') {
-    result = await models.sequelize.query(
-      `
-      UPDATE "Topics"
-      SET description = '${description}',
-          updated_at = NOW(),
-          featured_in_sidebar = true
-      WHERE name = 'General' AND community_id = '${communityId}'
-      RETURNING id, name;
-    `,
-      { type: QueryTypes.UPDATE, transaction },
-    );
-  } else {
-    result = await models.sequelize.query(
-      `
-      INSERT INTO "Topics"(
-      id, name, created_at, updated_at, deleted_at, community_id, description,
-      telegram, featured_in_sidebar, featured_in_new_post)
-      VALUES (default, '${name}', NOW(), NOW(), null, '${communityId}', '${description}', null, true, false)
-      RETURNING id, name;
-    `,
-      { type: QueryTypes.SELECT, transaction },
-    );
-  }
+    let result: TopicAttributes | null = null;
+    if (name === 'General') {
+      // update existing general topic
+      const originalTopic = await models.Topic.findOne({
+        where: {
+          name: 'General',
+          community_id: communityId,
+        },
+      });
+      if (originalTopic) {
+        originalTopic.description = description;
+        originalTopic.featured_in_sidebar = true;
+        await originalTopic.save({ transaction });
+        result = originalTopic;
+      }
+    } else {
+      // create new topic
+      result = await models.Topic.create(
+        {
+          name,
+          description,
+          community_id: communityId,
+          featured_in_sidebar: true,
+          featured_in_new_post: false,
+        },
+        { transaction },
+      );
+    }
 
-  return { createdCategory: result[0], discourseCategoryId } as any;
-};
+    return { createdCategory: result, discourseCategoryId } as any;
+  };
+}
 
 export const createAllCategoriesInCW = async (
   discourseConnection: Sequelize,
   { communityId }: { communityId: string },
   { transaction }: { transaction: Transaction },
 ) => {
-  const categories = await fetchTopicsFromDiscourse(discourseConnection);
+  const categories = await DiscourseQueries.fetchTopicsFromDiscourse(
+    discourseConnection,
+  );
   const categoryPromises = categories.map(
     ({ id: discourseCategoryId, name, description }) =>
-      createCategory(
+      CWQueries.createCategory(
         {
           discourseCategoryId,
           // eslint-disable-next-line no-useless-escape
