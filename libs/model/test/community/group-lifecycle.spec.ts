@@ -65,22 +65,17 @@ describe('Group lifecycle', () => {
 
   test('should fail creation when sending invalid topics', () => {
     const invalid = {
-      id,
-      actor,
-      payload: {
-        metadata: {
-          name: chance.name(),
-          description: chance.sentence(),
-          required_requirements: 1,
-        },
-        requirements: [],
-        topics: [1, 2, 3],
+      metadata: {
+        name: chance.name(),
+        description: chance.sentence(),
+        required_requirements: 1,
       },
+      requirements: [],
+      topics: [1, 2, 3],
     };
-    expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
-      InvalidState,
-      Errors.InvalidTopics,
-    );
+    expect(
+      command(CreateGroup(), { id, actor, payload: invalid }),
+    ).to.eventually.be.rejectedWith(InvalidState, Errors.InvalidTopics);
   });
 
   test('should fail creation when community reached max number of groups allowed', async () => {
@@ -97,20 +92,15 @@ describe('Group lifecycle', () => {
     }
 
     const invalid = {
-      id,
-      actor,
-      payload: {
-        metadata: {
-          name: chance.name(),
-          description: chance.sentence(),
-        },
-        requirements: [],
-        topics: [],
+      metadata: {
+        name: chance.name(),
+        description: chance.sentence(),
       },
+      requirements: [],
+      topics: [],
     };
-    expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
-      InvalidState,
-      Errors.MaxGroups,
-    );
+    expect(
+      command(CreateGroup(), { id, actor, payload: invalid }),
+    ).to.eventually.be.rejectedWith(InvalidState, Errors.MaxGroups);
   });
 });
