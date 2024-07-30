@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
@@ -99,7 +99,7 @@ export const User = ({
         shouldShowAsDeleted ? (
           'Deleted'
         ) : (
-          'Anonymous'
+          DEFAULT_NAME
         )
       ) : !profile?.userId ? (
         redactedAddress

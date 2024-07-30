@@ -3,8 +3,8 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export const Image = z.object({
-  url: z.string(),
-  imageBehavior: z.string(),
+  url: z.string().optional(),
+  imageBehavior: z.string().optional(),
 });
 
 export const UserProfile = z.object({
@@ -18,22 +18,30 @@ export const UserProfile = z.object({
   background_image: Image.nullish(),
 });
 
+export const ProfileTags = z.object({
+  user_id: z.number(),
+  tag_id: z.number(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
+
 export const User = z.object({
   id: PG_INT.optional(),
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).optional(),
   disableRichText: z.boolean().default(false).optional(),
-  emailVerified: z.boolean().default(false).optional(),
-  selected_community_id: z.string().max(255).optional().nullish(),
+  emailVerified: z.boolean().default(false).nullish(),
+  selected_community_id: z.string().max(255).nullish(),
   emailNotificationInterval: z
     .enum(['weekly', 'never'])
     .default('never')
     .optional(),
-  promotional_emails_enabled: z.boolean().optional(),
+  promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
   profile: UserProfile,
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
+  ProfileTags: z.array(ProfileTags).optional(),
 });
 
 export const Profile = z.object({

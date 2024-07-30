@@ -37,7 +37,6 @@ const buildCommunityString = (numCommunities: number) =>
     ? `${numeral(numCommunities).format('0.0a')} Communities`
     : `${numCommunities} Communities`;
 
-const communityToCategoriesMap = app.config.chainCategoryMap;
 // Handle mapping provided by ChainCategories table
 const communityCategories = Object.values(CommunityCategoryType);
 const communityNetworks = Object.keys(ChainNetwork).filter(
@@ -119,23 +118,10 @@ const CommunitiesPage = () => {
     });
   };
 
-  const communityCategoryFilter = (list) => {
-    return list.filter((data) => {
-      for (const cat of communityCategories) {
-        if (
-          filterMap[cat] &&
-          // @ts-expect-error <StrictNullChecks/>
-          (!communityToCategoriesMap[data.id] ||
-            // @ts-expect-error <StrictNullChecks/>
-            !communityToCategoriesMap[data.id].includes(
-              cat as CommunityCategoryType,
-            ))
-        ) {
-          return false;
-        }
-      }
-      return true;
-    });
+  const communityCategoryFilter = (communities: ChainInfo[]) => {
+    return communities.filter((community) =>
+      community.CommunityTags.some((tag) => filterMap[tag.name] === true),
+    );
   };
 
   const sortCommunities = (list: CommunityInfo[]) => {

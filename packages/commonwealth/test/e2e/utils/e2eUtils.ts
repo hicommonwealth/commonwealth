@@ -217,8 +217,8 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       if (addresses.length && addresses.some((u) => u['chain'] === chain))
         return;
 
-      const profile = e2eEntities.testProfiles[0];
-      await createAddress(chain, profile.user_id);
+      const user = e2eEntities.testUsers[0];
+      await createAddress(chain, user.id);
     },
   };
 };

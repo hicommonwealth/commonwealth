@@ -1,10 +1,6 @@
 import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
-const DEFAULTS = {
-  JWT_SECRET: 'my secret',
-};
-
 const {
   TEST_DB_NAME,
   DATABASE_URL,
@@ -25,14 +21,17 @@ const {
 const NAME =
   target.NODE_ENV === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
 
+const DEFAULTS = {
+  JWT_SECRET: 'my secret',
+  PRIVATE_KEY: '',
+  DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
+};
+
 export const config = configure(
   target,
   {
     DB: {
-      URI:
-        target.NODE_ENV === 'production'
-          ? DATABASE_URL!
-          : `postgresql://commonwealth:edgeware@localhost/${NAME}`,
+      URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
       NO_SSL: NO_SSL === 'true',
       CLEAN_HOUR: DATABASE_CLEAN_HOUR
@@ -71,7 +70,17 @@ export const config = configure(
   },
   z.object({
     DB: z.object({
-      URI: z.string(),
+      URI: z
+        .string()
+        .refine(
+          (data) =>
+            !(
+              target.APP_ENV !== 'local' &&
+              target.APP_ENV !== 'CI' &&
+              data === DEFAULTS.DATABASE_URL
+            ),
+          'DATABASE_URL must be set to a non-default value in Heroku apps.',
+        ),
       NAME: z.string(),
       NO_SSL: z.boolean(),
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
@@ -79,7 +88,13 @@ export const config = configure(
       TRACE: z.boolean(),
     }),
     WEB3: z.object({
-      PRIVATE_KEY: z.string(),
+      PRIVATE_KEY: z
+        .string()
+        .refine(
+          (data) =>
+            !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
+          'PRIVATE_KEY must be set to a non-default value in production.',
+        ),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -98,7 +113,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (target.NODE_ENV === 'production') {
+          if (!['local', 'CI'].includes(target.APP_ENV)) {
             return !!JWT_SECRET && data.JWT_SECRET !== DEFAULTS.JWT_SECRET;
           }
           return true;

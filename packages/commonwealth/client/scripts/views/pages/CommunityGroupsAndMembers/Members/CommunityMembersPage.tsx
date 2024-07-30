@@ -1,3 +1,4 @@
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import moment from 'moment';
@@ -35,7 +36,6 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useAppStatus from '../../../../hooks/useAppStatus';
-import { useFlag } from '../../../../hooks/useFlag';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -52,7 +52,6 @@ const GROUP_AND_MEMBER_FILTERS = [
 ];
 
 const CommunityMembersPage = () => {
-  const allowlistEnabled = useFlag('allowlist');
   const location = useLocation();
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -207,7 +206,7 @@ const CommunityMembersPage = () => {
       .map((p) => ({
         userId: p.user_id,
         avatarUrl: p.avatar_url,
-        name: p.profile_name || 'Anonymous',
+        name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map(
@@ -366,9 +365,7 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TABS[1].value &&
-        groups?.length === 0 &&
-        !allowlistEnabled ? (
+        {selectedTab === TABS[1].value && groups?.length === 0 ? (
           <></>
         ) : (
           <section

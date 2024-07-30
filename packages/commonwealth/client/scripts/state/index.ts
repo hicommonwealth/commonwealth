@@ -1,4 +1,3 @@
-import { CommunityCategoryType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
@@ -74,8 +73,6 @@ export interface IApp {
   // stored on server-side
   config: {
     chains: ChainStore;
-    // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
-    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
@@ -204,8 +201,6 @@ export async function initAppState(
           });
         }
       });
-
-    app.config.chainCategoryMap = statusRes.result.communityCategoryMap;
 
     // add recentActivity
     const { recentThreads } = statusRes.result;

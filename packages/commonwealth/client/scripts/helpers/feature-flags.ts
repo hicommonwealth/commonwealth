@@ -19,11 +19,9 @@ const buildFlag = (env: string | undefined) => {
 };
 
 // WARN: for frontend work you MUST define these feature flags in
-// vite.config.ts or they won't be passed to the frontend.
+// vite.config.ts (locally) or in Unleash (remote apps) or they won't be passed to the frontend.
 const featureFlags = {
-  allowlist: buildFlag(process.env.FLAG_ALLOWLIST),
   contest: buildFlag(process.env.FLAG_CONTEST),
-  communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   knockInAppNotifications: buildFlag(
     process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
   ),

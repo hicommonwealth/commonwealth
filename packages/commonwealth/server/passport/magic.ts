@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
 import { ServerError, logger } from '@hicommonwealth/core';
-import type {
-  DB,
-  ProfileAttributes,
-  ProfileInstance,
-} from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model';
 import {
   AddressAttributes,
   AddressInstance,
@@ -60,8 +56,6 @@ async function createMagicAddressInstances(
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
-  // @ts-expect-error StrictNullChecks
-  const profile_id = (user.Profiles[0] as ProfileAttributes).id;
 
   for (const { community_id, address } of generatedAddresses) {
     log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
@@ -124,8 +118,7 @@ async function createNewMagicUser({
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
-    // @ts-expect-error StrictNullChecks
-    const newUser = await models.User.createWithProfile(
+    const newUser = await models.User.create(
       {
         // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
         // so it is safe to set emails from magic as part of User data, even though they may be unverified.
@@ -142,16 +135,14 @@ async function createNewMagicUser({
     );
 
     // update profile with metadata if exists
-    // @ts-expect-error StrictNullChecks
-    const newProfile = newUser.Profiles[0] as ProfileInstance;
     if (profileMetadata?.username) {
-      newProfile.profile_name = profileMetadata.username;
+      newUser.profile.name = profileMetadata.username;
     }
     if (profileMetadata?.avatarUrl) {
-      newProfile.avatar_url = profileMetadata.avatarUrl;
+      newUser.profile.avatar_url = profileMetadata.avatarUrl;
     }
     if (profileMetadata?.username || profileMetadata?.avatarUrl) {
-      await newProfile.save({ transaction });
+      await newUser.save({ transaction });
     }
 
     const addressInstances: AddressAttributes[] =
@@ -351,10 +342,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
   // to be owned by currently logged in user
   await models.Address.update(
     {
-      // @ts-expect-error StrictNullChecks
-      user_id: loggedInUser.id,
-      // @ts-expect-error StrictNullChecks
-      profile_id: loggedInUser.Profiles[0].id,
+      user_id: loggedInUser?.id,
       verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
@@ -475,11 +463,6 @@ async function magicLoginRoute(
       // @ts-expect-error StrictNullChecks
       loggedInUser = await models.User.findOne({
         where: { id },
-        include: [
-          {
-            model: models.Profile,
-          },
-        ],
       });
       log.trace(
         `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
@@ -578,9 +561,6 @@ async function magicLoginRoute(
           },
           required: true,
         },
-        {
-          model: models.Profile,
-        },
       ],
     },
   );
@@ -598,9 +578,6 @@ async function magicLoginRoute(
     existingUserInstance = await models.User.scope('withPrivateData').findOne({
       where: { email: magicUserMetadata.email },
       include: [
-        {
-          model: models.Profile,
-        },
         {
           // guarantee that we only access ghost addresses as part of this query
           model: models.Address,

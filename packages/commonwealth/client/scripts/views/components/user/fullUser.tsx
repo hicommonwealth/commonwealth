@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import clsx from 'clsx';
 import 'components/user/user.scss';
@@ -91,7 +91,7 @@ export const FullUser = ({
         shouldShowAsDeleted ? (
           'Deleted'
         ) : (
-          'Anonymous'
+          DEFAULT_NAME
         )
       ) : !profile?.userId ? (
         redactedAddress

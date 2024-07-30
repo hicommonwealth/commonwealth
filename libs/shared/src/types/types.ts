@@ -11,7 +11,6 @@ export type AddressRole = {
 export enum DefaultPage {
   Discussions = 'default_all_discussions_view',
   Overview = 'default_summary_view',
-  Homepage = 'homepage',
 }
 
 export type HttpMethod =

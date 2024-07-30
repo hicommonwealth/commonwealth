@@ -1,5 +1,6 @@
 import { CommunityInstance, config } from '@hicommonwealth/model';
 import {
+  DEFAULT_NAME,
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
@@ -92,7 +93,7 @@ export async function getWebhookData(
       previewImageUrl: previewImage.previewImageUrl,
       previewImageAltText: previewImage.previewAltText,
 
-      profileName: profile?.profile_name ?? 'Anonymous',
+      profileName: profile?.profile_name ?? DEFAULT_NAME,
       // @ts-expect-error StrictNullChecks
       profileUrl: profile
         ? `${config.SERVER_URL}/profile/id/${profile.user_id}`

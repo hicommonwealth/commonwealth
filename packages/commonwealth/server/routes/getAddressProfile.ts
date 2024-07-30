@@ -3,6 +3,7 @@ import {
   GetAddressProfileReq,
   GetAddressProfileResp,
 } from '@hicommonwealth/schemas';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -53,7 +54,7 @@ const getAddressProfiles = async (
     (address) => {
       return {
         userId: address.User!.id!,
-        name: address.User?.profile.name ?? 'Anonymous',
+        name: address.User?.profile.name ?? DEFAULT_NAME,
         address: address.address,
         lastActive: address.last_active ?? address.User?.created_at,
         avatarUrl: address.User?.profile.avatar_url ?? undefined,
