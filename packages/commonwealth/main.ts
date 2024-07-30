@@ -18,6 +18,7 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
+import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -27,7 +28,7 @@ import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const parseJson = json({ limit: '1mb' });
 
