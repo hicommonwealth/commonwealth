@@ -41,21 +41,21 @@ export const CommentSubscriptionEntry = (
     true,
   );
 
-  const deleteThreadSubscription = useCallback(async () => {
-    await deleteCommentSubscriptionMutation.mutateAsync({
-      id: `${comment_id}`,
-      comment_ids: [comment_id],
-    });
-  }, [deleteCommentSubscriptionMutation, comment_id]);
-
   const handleDeleteSubscription = useCallback(() => {
-    deleteThreadSubscription()
+    async function doAsync() {
+      await deleteCommentSubscriptionMutation.mutateAsync({
+        id: `${comment_id}`,
+        comment_ids: [comment_id],
+      });
+    }
+
+    doAsync()
       .then(() => {
         notifySuccess('Unsubscribed!');
         onUnsubscribe(comment_id);
       })
       .catch(console.error);
-  }, [deleteThreadSubscription, onUnsubscribe, comment_id]);
+  }, [deleteCommentSubscriptionMutation, comment_id, onUnsubscribe]);
 
   const navigate = useCommonNavigate();
 

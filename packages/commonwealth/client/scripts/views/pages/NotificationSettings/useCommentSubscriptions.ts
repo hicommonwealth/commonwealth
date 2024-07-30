@@ -7,6 +7,9 @@ export function useCommentSubscriptions() {
 
   // TODO this a workaround to fix the problem with dates as strings and types
   // being wrong. We need to fix this once we fix types on the client.
+  //
+  // https://github.com/hicommonwealth/commonwealth/issues/7866
+
   return useMemo(() => {
     return {
       ...subscriptionsQuery,
