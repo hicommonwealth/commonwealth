@@ -8,7 +8,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useAppStatus from '../../../hooks/useAppStatus';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
@@ -57,7 +56,7 @@ export const CreateComment = ({
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const { data: profile } = useFetchProfilesByAddressesQuery({
+  const { data } = useFetchProfilesByAddressesQuery({
     profileChainIds: user.activeAccount?.community?.id
       ? [user.activeAccount?.community?.id]
       : [],
@@ -67,82 +66,67 @@ export const CreateComment = ({
     currentChainId: app.activeChainId(),
     apiCallEnabled: !!user.activeAccount?.profile,
   });
-
   if (user.activeAccount) {
-    user.activeAccount.profile = profile?.[0];
+    user.activeAccount.profile = data?.[0];
   }
   const author = user.activeAccount;
 
-  const {
-    mutateAsync: createComment,
-    error: createCommentError,
-    reset: resetCreateCommentMutation,
-  } = useCreateCommentMutation({
+  const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
     communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetCreateCommentMutation,
-    error: createCommentError,
-  });
-
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = () => {
     if (!user.activeAccount) return;
 
     setErrorMsg(null);
     setSendingComment(true);
 
     const communityId = app.activeChainId();
+    const asyncHandle = async () => {
+      try {
+        const newComment = await createComment({
+          communityId,
+          profile: user.activeAccount!.profile!.toUserProfile(),
+          threadId: rootThread.id,
+          unescapedText: serializeDelta(contentDelta),
+          parentCommentId: parentCommentId ?? null,
+          existingNumberOfComments: rootThread.numberOfComments || 0,
+          isPWA: isAddedToHomeScreen,
+        });
 
-    try {
-      const { address = '', profile: userProfile } = user.activeAccount;
-      const newComment: any = await createComment({
-        threadId: rootThread.id,
-        communityId,
-        profile: {
-          address,
-          id: userProfile?.id || 0,
-          avatarUrl: userProfile?.avatarUrl || '',
-          name: userProfile?.name || '',
-          lastActive: userProfile?.lastActive?.toString() || '',
-        },
-        // @ts-expect-error <StrictNullChecks/>
-        parentCommentId: parentCommentId,
-        unescapedText: serializeDelta(contentDelta),
-        existingNumberOfComments: rootThread.numberOfComments || 0,
-        isPWA: isAddedToHomeScreen,
-      });
+        setErrorMsg(null);
+        setContentDelta(createDeltaFromText(''));
+        clearDraft();
 
-      setErrorMsg(null);
-      setContentDelta(createDeltaFromText(''));
-      clearDraft();
+        setTimeout(() => {
+          // Wait for dom to be updated before scrolling to comment
+          jumpHighlightComment(newComment?.id as number);
+        }, 100);
 
-      setTimeout(() => {
-        // Wait for dom to be updated before scrolling to comment
-        jumpHighlightComment(newComment.id);
-      }, 100);
+        // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
+        // once we are receiving notifications from the websocket
+        await app.user.notifications.refresh();
+      } catch (err) {
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        const errMsg = err?.responseJSON?.error || err?.message;
+        console.error(errMsg);
 
-      // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
-      // once we are receiving notifications from the websocket
-      await app.user.notifications.refresh();
-    } catch (err) {
-      if (err instanceof SessionKeyError) {
-        return;
+        notifyError('Failed to create comment');
+        setErrorMsg(errMsg);
+      } finally {
+        setSendingComment(false);
+
+        if (handleIsReplying) {
+          handleIsReplying(false);
+        }
       }
-      const errMsg = err?.responseJSON?.error || err?.message;
-      console.error(errMsg);
+    };
 
-      notifyError('Failed to create comment');
-      setErrorMsg(errMsg);
-    } finally {
-      setSendingComment(false);
-
-      if (handleIsReplying) {
-        handleIsReplying(false);
-      }
-    }
+    asyncHandle().then().catch(console.error);
   };
 
   const disabled = editorValue.length === 0 || sendingComment;
@@ -161,29 +145,22 @@ export const CreateComment = ({
     saveDraft(contentDelta);
   }, [handleIsReplying, saveDraft, contentDelta]);
 
-  return (
-    <>
-      {rootThread.archivedAt === null ? (
-        <>
-          <CommentEditor
-            parentType={parentType}
-            canComment={canComment}
-            handleSubmitComment={handleSubmitComment}
-            // @ts-expect-error <StrictNullChecks/>
-            errorMsg={errorMsg}
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
-            disabled={disabled}
-            onCancel={handleCancel}
-            author={author as Account}
-            editorValue={editorValue}
-            tooltipText={tooltipText}
-          />
-          {RevalidationModal}
-        </>
-      ) : (
-        <ArchiveMsg archivedAt={rootThread.archivedAt} />
-      )}
-    </>
+  return rootThread.archivedAt === null ? (
+    <CommentEditor
+      parentType={parentType}
+      canComment={canComment}
+      handleSubmitComment={handleSubmitComment}
+      // @ts-expect-error <StrictNullChecks/>
+      errorMsg={errorMsg}
+      contentDelta={contentDelta}
+      setContentDelta={setContentDelta}
+      disabled={disabled}
+      onCancel={handleCancel}
+      author={author as Account}
+      editorValue={editorValue}
+      tooltipText={tooltipText}
+    />
+  ) : (
+    <ArchiveMsg archivedAt={rootThread.archivedAt} />
   );
 };

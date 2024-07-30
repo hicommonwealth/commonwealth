@@ -2,12 +2,12 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { signCommentReaction } from 'controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
 import Reaction from 'models/Reaction';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -49,7 +49,6 @@ const useCreateCommentReactionMutation = ({
   commentId,
   communityId,
 }: Partial<CreateReactionProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     // @ts-expect-error StrictNullChecks
@@ -61,6 +60,8 @@ const useCreateCommentReactionMutation = ({
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: createReaction,
@@ -74,23 +75,19 @@ const useCreateCommentReactionMutation = ({
         const tempComments = [...comments];
         const commentToUpdate = tempComments.find((x) => x.id === commentId);
         reaction.Address.User = {
-          Profiles: [commentToUpdate.profile],
+          profile: commentToUpdate.profile,
         };
         commentToUpdate.reactions.push(new Reaction(reaction));
         return tempComments;
       });
 
-      if (userOnboardingEnabled) {
-        const profileId = user.addresses?.[0]?.profile?.id;
-        profileId &&
-          markTrainingActionAsComplete(
-            UserTrainingCardTypes.GiveUpvote,
-            profileId,
-          );
-      }
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
 
       return reaction;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

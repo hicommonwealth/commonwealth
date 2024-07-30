@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -11,7 +10,6 @@ import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
@@ -27,21 +25,9 @@ import './DesktopHeader.scss';
 interface DesktopHeaderProps {
   onMobile: boolean;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
-  onRevalidationModalData: ({
-    walletSsoSource,
-    walletAddress,
-  }: {
-    walletSsoSource: WalletSsoSource;
-    walletAddress: string;
-  }) => void;
 }
 
-const DesktopHeader = ({
-  onMobile,
-  onAuthModalOpen,
-  onRevalidationModalData,
-}: DesktopHeaderProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
@@ -127,30 +113,14 @@ const DesktopHeader = ({
         </div>
 
         {isLoggedIn && (
-          <UserDropdown
-            onAuthModalOpen={() => onAuthModalOpen()}
-            onRevalidationModalData={onRevalidationModalData}
-          />
+          <UserDropdown onAuthModalOpen={() => onAuthModalOpen()} />
         )}
 
         {!isLoggedIn && (
-          <>
-            {userOnboardingEnabled ? (
-              <AuthButtons
-                smallHeightButtons
-                onButtonClick={(selectedType) => onAuthModalOpen(selectedType)}
-              />
-            ) : (
-              <CWButton
-                buttonType="primary"
-                buttonHeight="sm"
-                label="Sign in"
-                buttonWidth="wide"
-                disabled={location.pathname.includes('/finishsociallogin')}
-                onClick={() => onAuthModalOpen()}
-              />
-            )}
-          </>
+          <AuthButtons
+            smallHeightButtons
+            onButtonClick={(selectedType) => onAuthModalOpen(selectedType)}
+          />
         )}
       </div>
     </div>

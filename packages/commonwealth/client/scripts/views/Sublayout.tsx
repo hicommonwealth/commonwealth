@@ -9,7 +9,6 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
@@ -31,32 +30,22 @@ type SublayoutProps = {
 } & React.PropsWithChildren;
 
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const [authModalType, setAuthModalType] = useState<AuthModalType>();
-  const [profileId, setProfileId] = useState<null | number>(null);
+  const [userId, setUserId] = useState<null | number>(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
-    stickyBehaviourEnabled: userOnboardingEnabled,
+    stickyBehaviourEnabled: true,
     zIndex: 70,
   });
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
+  const { authModalType, setAuthModalType } = useAuthModalStore();
   const user = useUserStore();
-
-  useEffect(() => {
-    if (triggerOpenModalType) {
-      setAuthModalType(triggerOpenModalType);
-      // @ts-expect-error StrictNullChecks
-      setTriggerOpenModalType(undefined);
-    }
-  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
@@ -65,11 +54,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     let timeout: ReturnType<typeof setTimeout> | null = null;
     if (isLoggedIn) {
       timeout = setTimeout(() => {
-        user.addresses?.[0]?.profile?.id &&
-          setProfileId(user.addresses?.[0]?.profile?.id);
+        user.addresses?.[0]?.profile?.userId &&
+          setUserId(user.addresses?.[0]?.profile?.userId);
       }, 100);
     } else {
-      setProfileId(null);
+      setUserId(null);
     }
 
     return () => {
@@ -81,9 +70,8 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   useNecessaryEffect(() => {
     if (
       isLoggedIn &&
-      userOnboardingEnabled &&
       !isWelcomeOnboardModalOpen &&
-      profileId &&
+      userId &&
       !userStore.getState().isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
@@ -93,8 +81,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
-    profileId,
-    userOnboardingEnabled,
+    userId,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
     isLoggedIn,
@@ -202,8 +189,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           <div className="Body">
             <div
               className={clsx('mobile-auth-buttons', {
-                isVisible:
-                  !isLoggedIn && userOnboardingEnabled && isWindowExtraSmall,
+                isVisible: !isLoggedIn && isWindowExtraSmall,
               })}
               id="mobile-auth-buttons"
             >
@@ -213,21 +199,17 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {userOnboardingEnabled && !routesWithoutGenericSliders && (
-              <UserTrainingSlider />
-            )}
+            {!routesWithoutGenericSliders && <UserTrainingSlider />}
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
             {children}
           </div>
         </div>
-        {userOnboardingEnabled && (
-          <WelcomeOnboardModal
-            isOpen={isWelcomeOnboardModalOpen}
-            onClose={() => setIsWelcomeOnboardModalOpen(false)}
-          />
-        )}
+        <WelcomeOnboardModal
+          isOpen={isWelcomeOnboardModalOpen}
+          onClose={() => setIsWelcomeOnboardModalOpen(false)}
+        />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

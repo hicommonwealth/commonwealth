@@ -2,13 +2,13 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { signComment } from 'controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
@@ -18,7 +18,7 @@ interface CreateCommentProps {
   threadId: number;
   communityId: string;
   unescapedText: string;
-  parentCommentId: number;
+  parentCommentId: number | null;
   existingNumberOfComments: number;
   isPWA?: boolean;
 }
@@ -28,7 +28,6 @@ const createComment = async ({
   profile,
   threadId,
   unescapedText,
-  // @ts-expect-error StrictNullChecks
   parentCommentId = null,
   isPWA,
 }: CreateCommentProps) => {
@@ -56,10 +55,14 @@ const createComment = async ({
     },
   );
 
+  // map profile to server schema
   response.data.result.Address.User = {
-    Profiles: [profile],
+    profile: {
+      ...profile,
+      avatar_url: profile.avatarUrl,
+      last_active: profile.lastActive,
+    },
   };
-
   return new Comment(response.data.result);
 };
 
@@ -68,7 +71,6 @@ const useCreateCommentMutation = ({
   threadId,
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     // @ts-expect-error StrictNullChecks
@@ -81,6 +83,8 @@ const useCreateCommentMutation = ({
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: createComment,
@@ -103,17 +107,16 @@ const useCreateCommentMutation = ({
         'combineAndRemoveDups',
       );
 
-      if (userOnboardingEnabled) {
-        const profileId = user.addresses?.[0]?.profile?.id;
-        profileId &&
-          markTrainingActionAsComplete(
-            UserTrainingCardTypes.CreateContent,
-            profileId,
-          );
-      }
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          userId,
+        );
 
       return newComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

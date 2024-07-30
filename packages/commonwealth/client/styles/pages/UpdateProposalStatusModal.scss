@@ -1,0 +1,17 @@
+.UpdateProposalStatusModal {
+  .proposal-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .left-button {
+    display: flex;
+  }
+
+  .right-buttons {
+    display: flex;
+    gap: 8px;
+  }
+}

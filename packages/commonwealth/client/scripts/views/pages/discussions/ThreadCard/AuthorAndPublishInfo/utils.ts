@@ -1,3 +1,4 @@
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { Moment } from 'moment';
 import { UserProfile } from '../../../../../models/MinimumProfile';
 
@@ -15,9 +16,9 @@ export const formatVersionText = (
   if (!address) {
     return formattedTime;
   }
-  let formattedName = collabInfo[address] ?? 'Anonymous';
+  let formattedName = collabInfo[address] ?? DEFAULT_NAME;
   if (profile?.address === address) {
-    formattedName = profile.name ?? 'Anonymous';
+    formattedName = profile.name ?? DEFAULT_NAME;
   }
 
   return formattedTime + '\n' + formattedName + ' ' + address.substring(0, 5);

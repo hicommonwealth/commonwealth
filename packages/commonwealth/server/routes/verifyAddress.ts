@@ -3,11 +3,7 @@ import { fileURLToPath } from 'url';
 
 import { Session } from '@canvas-js/interfaces';
 import { AppError, logger } from '@hicommonwealth/core';
-import type {
-  CommunityInstance,
-  DB,
-  ProfileAttributes,
-} from '@hicommonwealth/model';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   DynamicTemplate,
@@ -84,17 +80,14 @@ const processAddress = async (
 
   if (!user?.id) {
     // user is not logged in
-    // @ts-expect-error StrictNullChecks
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
-      // @ts-expect-error StrictNullChecks
-      const newUser = await models.User.createWithProfile({
+      const newUser = await models.User.create({
         email: null,
+        profile: {},
       });
-      addressInstance.profile_id = // @ts-expect-error StrictNullChecks
-        (newUser.Profiles[0] as ProfileAttributes).id;
       await models.Subscription.create({
         // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
@@ -111,22 +104,15 @@ const processAddress = async (
     }
   } else {
     // user is already logged in => verify the newly created address
-    // @ts-expect-error StrictNullChecks
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     addressInstance.user_id = user.id;
-    const profile = await models.Profile.findOne({
-      where: { user_id: user.id },
-    });
-    // @ts-expect-error StrictNullChecks
-    addressInstance.profile_id = profile.id;
   }
   await addressInstance.save();
 
   // if address has already been previously verified, update all other addresses
   // to point to the new user = "transfer ownership".
   const addressToTransfer = await models.Address.findOne({
-    // @ts-expect-error StrictNullChecks
     where: {
       address,
       user_id: { [Op.ne]: addressInstance.user_id },
@@ -135,14 +121,12 @@ const processAddress = async (
   });
 
   if (addressToTransfer) {
-    // reassign the users and profiles of the transferred addresses
+    // reassign the users of the transferred addresses
     await models.Address.update(
       {
         user_id: addressInstance.user_id,
-        profile_id: addressInstance.profile_id,
       },
       {
-        // @ts-expect-error StrictNullChecks
         where: {
           address,
           user_id: { [Op.ne]: addressInstance.user_id },
@@ -154,7 +138,7 @@ const processAddress = async (
     try {
       // send email to the old user (should only ever be one)
       const oldUser = await models.User.scope('withPrivateData').findOne({
-        where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
+        where: { id: addressToTransfer.user_id!, email: { [Op.ne]: null } },
       });
       if (!oldUser?.email) {
         throw new AppError(Errors.NoEmail);
@@ -174,7 +158,7 @@ const processAddress = async (
         `Sent address move email: ${address} transferred to a new account`,
       );
     } catch (e) {
-      log.error(`Could not send address move email for: ${address}`);
+      log.error(`Could not send address move email for: ${address}`, e);
     }
   }
 };
@@ -238,7 +222,6 @@ const verifyAddress = async (
       // @ts-expect-error StrictNullChecks
       where: { id: newAddress.user_id },
     });
-    // @ts-expect-error StrictNullChecks
     req.login(user, (err) => {
       const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
@@ -253,7 +236,6 @@ const verifyAddress = async (
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          // @ts-expect-error StrictNullChecks
           userId: user.id,
         },
         req,

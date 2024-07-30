@@ -1,6 +1,8 @@
 # Platform Coding Guidelines
 
-Structuring code for the backend API.
+Recommendations, solutions, and best practices for working on Common's backend API.
+
+_See also [Database Migrations: Best Practices](./Database-Migrations.md) entry._
 
 ## Contents
 

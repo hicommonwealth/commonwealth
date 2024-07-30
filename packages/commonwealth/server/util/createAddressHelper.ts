@@ -15,14 +15,12 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { Errors } from '../routes/createAddress';
-import { createRole, findOneRole } from './roles';
 
 type CreateAddressReq = {
   address: string;
   community_id?: string;
   wallet_id: WalletId;
   wallet_sso_source: WalletSsoSource;
-  keytype?: string;
   block_info?: string;
 };
 
@@ -83,12 +81,11 @@ export async function createAddressHelper(
       const existingHexes = await models.Address.scope(
         'withPrivateData',
       ).findAll({
-        // @ts-expect-error StrictNullChecks
         where: { hex: addressHex, verified: { [Op.ne]: null } },
       });
       const existingHexesSorted = existingHexes.sort((a, b) => {
         // sort by latest last_active
-        return +b.dataValues.last_active - +a.dataValues.last_active;
+        return +b.dataValues.last_active! - +a.dataValues.last_active!;
       });
 
       // use the latest active address with this hex to assign profile
@@ -148,12 +145,7 @@ export async function createAddressHelper(
     );
     if (updatedId) {
       existingAddress.user_id = updatedId;
-      const profileId = await models.Profile.findOne({
-        where: { user_id: updatedId },
-      });
-      existingAddress.profile_id = profileId?.id;
     }
-    existingAddress.keytype = req.keytype;
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
@@ -168,26 +160,10 @@ export async function createAddressHelper(
 
     const updatedObj = await existingAddress.save();
 
-    // even if this is the existing address, there is a case to login to community through this address's chain
-    // if community is valid, then we should create a role between this community vs address
-
-    let isRole = true;
-    if (req.community_id) {
-      const role = await findOneRole(
-        models,
-        { where: { address_id: updatedObj.id } },
-        req.community_id,
-      );
-      if (!role) {
-        // @ts-expect-error StrictNullChecks
-        await createRole(models, updatedObj.id, req.community_id, 'member');
-        isRole = false;
-      }
-    }
     return {
       ...updatedObj.toJSON(),
       newly_created: false,
-      joined_community: !isRole,
+      joined_community: false,
     };
   } else {
     // address doesn't exist, add it to the database
@@ -197,7 +173,6 @@ export async function createAddressHelper(
       +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
     const last_active = new Date();
-    let profile_id: number | undefined;
     let user_id = user ? user.id : null;
 
     // @ts-expect-error StrictNullChecks
@@ -205,47 +180,24 @@ export async function createAddressHelper(
       user_id = existingAddressWithHex.user_id;
     }
 
-    if (user_id) {
-      const profile = await models.Profile.findOne({
-        attributes: ['id'],
-        where: { user_id },
-      });
-      profile_id = profile?.id;
-    }
-
-    // @ts-expect-error StrictNullChecks
-    if (existingAddressWithHex && !profile_id) {
-      profile_id = existingAddressWithHex.profile_id;
-    }
-
     const newObj = await models.sequelize.transaction(async (transaction) => {
       return models.Address.create(
         {
-          // @ts-expect-error StrictNullChecks
           user_id,
-          profile_id,
-          // @ts-expect-error StrictNullChecks
           community_id: req.community_id,
           address: encodedAddress,
           hex: addressHex,
           verification_token,
           verification_token_expires,
           block_info: req.block_info,
-          keytype: req.keytype,
           last_active,
           wallet_id: req.wallet_id,
           wallet_sso_source: req.wallet_sso_source,
+          role: 'member',
         },
         { transaction },
       );
     });
-
-    // if user.id is undefined, the address is being used to create a new user,
-    // and we should automatically give it a Role in its native chain (or community)
-    if (!user) {
-      // @ts-expect-error StrictNullChecks
-      await createRole(models, newObj.id, req.community_id, 'member');
-    }
 
     serverAnalyticsController.track(
       {

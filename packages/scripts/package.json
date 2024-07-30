@@ -19,6 +19,7 @@
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/model": "workspace:*",
     "@hicommonwealth/sitemaps": "workspace:*",
+    "@hicommonwealth/adapters": "workspace:*",
     "moment": "^2.23.0",
     "sequelize": "^6.32.1",
     "tsx": "^4.7.2"

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
 import app from 'state';
+import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { userStore } from '../../ui/user';
 import { removeThreadFromAllCaches } from './helpers/cache';
@@ -46,6 +47,8 @@ const useDeleteThreadMutation = ({
   threadId,
   currentStage,
 }: UseDeleteThreadMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteThread,
     onSuccess: async (response) => {
@@ -67,6 +70,7 @@ const useDeleteThreadMutation = ({
 
       return response.data;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 
