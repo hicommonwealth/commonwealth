@@ -13,7 +13,6 @@ $size: 48px;
 
   .BreadcrumbsPageLayout {
     padding-inline: 0;
-    padding-bottom: 52px;
 
     @include smallInclusive {
       padding-bottom: initial;
