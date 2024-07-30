@@ -5,8 +5,8 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 
 import app from 'state';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { SnapshotProposalSelectorItem } from 'views/components/snapshot_proposal_selector';
 
 type SnapshotProposalSelectorProps = {
@@ -40,7 +40,7 @@ export const SnapshotProposalSelector = ({
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data = []) => {
         const loadedProposals = data.reduce(
           (acc, curr) => [...acc, ...curr.proposals],
-          []
+          [],
         );
 
         setAllProposals(loadedProposals);
@@ -54,15 +54,15 @@ export const SnapshotProposalSelector = ({
       allProposals
         .sort((a, b) => b.created - a.created)
         .filter(({ title }) =>
-          title.toLowerCase().includes(searchTerm.toLowerCase())
+          title.toLowerCase().includes(searchTerm.toLowerCase()),
         ),
-    [allProposals, searchTerm]
+    [allProposals, searchTerm],
   );
 
   const renderItem = useCallback(
     (i: number, snapshot: SnapshotProposal) => {
       const isSelected = !!snapshotProposalsToSet.find(
-        ({ id }) => id === snapshot.id
+        ({ id }) => id === snapshot.id,
       );
 
       return (
@@ -73,7 +73,7 @@ export const SnapshotProposalSelector = ({
         />
       );
     },
-    [onSelect, snapshotProposalsToSet]
+    [onSelect, snapshotProposalsToSet],
   );
 
   if (!app.chain || !app.activeChainId()) {
@@ -88,6 +88,7 @@ export const SnapshotProposalSelector = ({
     setSearchTerm(e.target.value);
   };
 
+  // eslint-disable-next-line react/no-multi-comp
   const EmptyComponent = () => (
     <div className="empty-component">{getEmptyContentMessage()}</div>
   );
@@ -98,7 +99,7 @@ export const SnapshotProposalSelector = ({
         placeholder="Search for snapshot proposals"
         iconRightonClick={handleClearButtonClick}
         value={searchTerm}
-        iconRight="close"
+        iconRight={searchTerm ? 'close' : 'magnifyingGlass'}
         onInput={handleInputChange}
       />
 

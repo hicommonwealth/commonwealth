@@ -188,10 +188,10 @@ describe('DatabaseCleaner Tests', async () => {
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
       // create old user and address
-      // @ts-expect-error StrictNullChecks
-      const oldUser = await models.User.createWithProfile({
+      const oldUser = await models.User.create({
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
+        profile: {},
       });
       // @ts-expect-error StrictNullChecks
       await models.Address.create({
@@ -203,10 +203,10 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       // create new user and address
-      // @ts-expect-error StrictNullChecks
-      const newUser = await models.User.createWithProfile({
+      const newUser = await models.User.create({
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
+        profile: {},
       });
       // @ts-expect-error StrictNullChecks
       await models.Address.create({

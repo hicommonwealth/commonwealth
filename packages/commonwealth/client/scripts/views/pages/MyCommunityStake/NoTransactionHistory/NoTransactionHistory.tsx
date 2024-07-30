@@ -1,8 +1,8 @@
 import noTransactionHistory from 'assets/img/noTransactionHistory.svg';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './NoTransactionHistory.scss';
 
 const NoTransactionHistory = () => {

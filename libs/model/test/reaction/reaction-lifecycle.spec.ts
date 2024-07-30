@@ -31,7 +31,6 @@ describe('Reactions lifecycle', () => {
             id: addressId,
             user_id: user?.id,
             role: 'admin',
-            profile_id: undefined,
           },
         ],
         // CommunityStakes: [],

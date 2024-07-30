@@ -6,17 +6,17 @@ import type {
   RoleAssignmentAttributes,
 } from '@hicommonwealth/model';
 import type { Role } from '@hicommonwealth/shared';
-import type { FindOptions, Transaction, WhereOptions } from 'sequelize';
+import type { FindOptions, WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 
-export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
+type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   community_id: string;
   permission: Role;
   allow: number;
   deny: number;
 };
 
-export class RoleInstanceWithPermission {
+class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
   community_id: string;
   permission: Role;
@@ -45,18 +45,6 @@ export class RoleInstanceWithPermission {
       allow: this.allow,
       deny: this.deny,
     };
-  }
-}
-
-export async function getHighestRoleFromCommunityRoles(
-  roles: CommunityRoleAttributes[],
-): Promise<CommunityRoleAttributes> {
-  if (roles.findIndex((r) => r.name === 'admin') !== -1) {
-    return roles[roles.findIndex((r) => r.name === 'admin')];
-  } else if (roles.findIndex((r) => r.name === 'moderator') !== -1) {
-    return roles[roles.findIndex((r) => r.name === 'moderator')];
-  } else {
-    return roles[roles.findIndex((r) => r.name === 'member')];
   }
 }
 
@@ -140,7 +128,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
     const communityRole: CommunityRoleAttributes = {
       id: a.id,
       name: a.role,
-      community_id: a.community_id,
+      community_id: a.community_id!,
       allow: 0 as any,
       deny: 0 as any,
       created_at: a.created_at,
@@ -184,101 +172,4 @@ export async function findAllRoles(
     }
   }
   return roles;
-}
-
-// Returns highest permission role found
-export async function findOneRole(
-  models: DB,
-  findOptions: FindOptions<RoleAssignmentAttributes>,
-  community_id: string,
-  permissions?: Role[],
-): Promise<RoleInstanceWithPermission> {
-  const communityRoles: CommunityRoleAttributes[] =
-    await findAllCommunityRolesWithRoleAssignments(
-      models,
-      findOptions,
-      community_id,
-      permissions,
-    );
-  let communityRole: CommunityRoleAttributes;
-  if (communityRoles) {
-    // find the highest role
-    communityRole = await getHighestRoleFromCommunityRoles(communityRoles);
-  } else {
-    throw new Error("Couldn't find any community roles");
-  }
-
-  // @ts-expect-error StrictNullChecks
-  let role: RoleInstanceWithPermission = null;
-  if (
-    communityRole &&
-    communityRole.RoleAssignments &&
-    communityRole.RoleAssignments.length > 0
-  ) {
-    const roleAssignment = communityRole.RoleAssignments[0];
-    role = new RoleInstanceWithPermission(
-      roleAssignment,
-      community_id,
-      communityRole.name,
-      communityRole.allow,
-      communityRole.deny,
-    );
-  }
-  return role;
-}
-
-export async function createRole(
-  models: DB,
-  address_id: number,
-  community_id: string,
-  role_name?: Role,
-  is_user_default?: boolean,
-  transaction?: Transaction,
-): Promise<RoleInstanceWithPermission> {
-  is_user_default = !!is_user_default;
-
-  // Member is the lowest role, so return early.
-  if (!role_name) {
-    const attributes: RoleAssignmentAttributes = {
-      community_role_id: 1,
-      address_id: address_id,
-    };
-    return new RoleInstanceWithPermission(
-      attributes,
-      community_id,
-      'member',
-      0,
-      0,
-    );
-  }
-
-  // update the role to be either the highest role either assigned or called on the address.
-  await models.sequelize.query(
-    `
-    UPDATE "Addresses"
-    SET role = CASE
-        WHEN '${role_name}' = 'admin' THEN 'admin'
-        WHEN '${role_name}' = 'moderator' AND role = 'member' THEN 'moderator'
-        ELSE role
-        END,
-        is_user_default = ${is_user_default}
-    WHERE id = ${address_id};
-  `,
-    // @ts-expect-error StrictNullChecks
-    transaction ? { transaction } : null,
-  );
-
-  // for backwards compatibility, should be removed
-  const assignment: RoleAssignmentAttributes = {
-    community_role_id: -1,
-    address_id: address_id,
-  };
-
-  return new RoleInstanceWithPermission(
-    assignment,
-    community_id,
-    role_name,
-    0,
-    0,
-  );
 }

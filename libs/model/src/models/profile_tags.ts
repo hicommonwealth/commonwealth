@@ -1,14 +1,9 @@
+import { ProfileTags } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type ProfileTagsAttributes = {
-  user_id: number;
-  tag_id: number;
-  created_at: Date;
-  updated_at: Date;
-};
-
-export type ProfileTagsInstance = ModelInstance<ProfileTagsAttributes>;
+export type ProfileTagsInstance = ModelInstance<z.infer<typeof ProfileTags>>;
 
 export type ProfileTagsModelStatic = Sequelize.ModelStatic<ProfileTagsInstance>;
 

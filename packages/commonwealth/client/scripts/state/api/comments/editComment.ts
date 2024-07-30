@@ -1,11 +1,13 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signComment } from 'client/scripts/controllers/server/sessions';
+import { signComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { useAuthModalStore } from '../../ui/modals';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -40,13 +42,13 @@ const editComment = async ({
       id: commentId,
       community_id: communityId,
       body: encodeURIComponent(updatedBody),
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );
 
   response.data.result.Address.User = {
-    Profiles: [profile],
+    profile,
   };
 
   return new Comment(response.data.result);
@@ -66,6 +68,8 @@ const useEditCommentMutation = ({
     communityId,
     threadId,
   });
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: editComment,
@@ -89,6 +93,7 @@ const useEditCommentMutation = ({
 
       return updatedComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -3,7 +3,6 @@ import { config } from '../config';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';
 import { rollbar } from './rollbar';
 
-let logLevel: 'info' | 'debug';
 let transport: DestinationStream;
 
 const formatFilename = (name: string) => {
@@ -23,13 +22,12 @@ if (config.NODE_ENV !== 'production') {
       singleLine: true,
     },
   });
-  logLevel = 'debug';
-} else logLevel = 'info';
+}
 
 export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
   const logger = pino(
     {
-      level: logLevel,
+      level: config.LOGGING.LOG_LEVEL,
       formatters: {
         level: (label) => {
           return { level: label.toUpperCase() };

@@ -3,6 +3,7 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
+import { userStore } from '../state/ui/user';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;
@@ -16,46 +17,45 @@ export const deinitChainOrCommunity = async () => {
     app.chain = null;
   }
 
-  // @ts-expect-error StrictNullChecks
-  app.user.setSelectedCommunity(null);
-  app.user.setActiveAccounts([]);
-  // @ts-expect-error StrictNullChecks
-  app.user.ephemerallySetActiveAccount(null);
+  userStore.getState().setData({
+    activeCommunity: null,
+    accounts: [],
+    activeAccount: null,
+  });
   document.title = 'Common';
 };
 
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
+export const loadCommunityChainInfo = async (
+  chain?: ChainInfo,
+): Promise<boolean> => {
+  let tempChain = chain;
+
   // Select the default node, if one wasn't provided
-  if (!chain) {
-    if (app.user.selectedCommunity) {
-      // eslint-disable-next-line no-param-reassign
-      chain = app.user.selectedCommunity;
+  if (!tempChain) {
+    const activeCommunity = userStore.getState().activeCommunity;
+    if (activeCommunity) {
+      tempChain = activeCommunity;
     } else {
-      // eslint-disable-next-line no-param-reassign
-      chain = app.config.chains.getById(DEFAULT_CHAIN);
+      tempChain = app.config.chains.getById(DEFAULT_CHAIN);
     }
 
-    if (!chain) {
+    if (!tempChain) {
       throw new Error('no chain available');
     }
   }
 
   // Check for valid chain selection, and that we need to switch
-  if (app.chain && chain === app.chain.meta) {
+  if (app.chain && tempChain === app.chain.meta) {
     // @ts-expect-error StrictNullChecks
     return;
   }
 
-  // This is a bandaid fix used to stop chain deinit on navigation from createCommunities page. Should be removed.
-  if (!app.skipDeinitChain) {
-    await deinitChainOrCommunity();
-    app.skipDeinitChain = false;
-  }
+  await deinitChainOrCommunity();
   app.chainPreloading = true;
-  document.title = `Common – ${chain.name}`;
+  document.title = `Common – ${tempChain.name}`;
 
   // Import top-level chain adapter lazily, to facilitate code split.
   const newChain = await (async (base: ChainBase) => {
@@ -64,32 +64,32 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
         const Substrate = (
           await import('../controllers/chain/substrate/adapter')
         ).default;
-        return new Substrate(chain, app);
+        return new Substrate(tempChain, app);
       }
       case ChainBase.CosmosSDK: {
         const Cosmos = (await import('../controllers/chain/cosmos/adapter'))
           .default;
-        return new Cosmos(chain, app);
+        return new Cosmos(tempChain, app);
       }
       case ChainBase.NEAR: {
         const Near = (await import('../controllers/chain/near/adapter'))
           .default;
-        return new Near(chain, app);
+        return new Near(tempChain, app);
       }
       case ChainBase.Solana: {
         const Solana = (await import('../controllers/chain/solana/adapter'))
           .default;
-        return new Solana(chain, app);
+        return new Solana(tempChain, app);
       }
       case ChainBase.Ethereum: {
         const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
           .default;
-        return new Ethereum(chain, app);
+        return new Ethereum(tempChain, app);
       }
       default:
         throw new Error('Invalid Chain');
     }
-  })(chain.base);
+  })(tempChain.base);
 
   // Load server data without initializing modules/chain connection.
   const finalizeInitialization = await newChain.initServer();
@@ -113,13 +113,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses({ chain });
-
-  // Update default on server if logged in
-  if (app.isLoggedIn()) {
-    await app.user.selectCommunity({
-      community: chain.id,
-    });
-  }
 
   return true;
 };

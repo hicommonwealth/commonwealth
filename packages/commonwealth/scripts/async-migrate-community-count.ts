@@ -21,12 +21,7 @@ async function run() {
         UPDATE "Communities"
         SET count_updated = true,
             thread_count = (SELECT COUNT(*) FROM "Threads" WHERE community_id = :community_id),
-            profile_count = (
-                SELECT COUNT(DISTINCT p.id)
-                FROM "Profiles" p
-                JOIN "Addresses" a ON p.id = a.profile_id
-                WHERE a.community_id = :community_id
-            )
+            profile_count = (SELECT COUNT(*) FROM "Addresses" WHERE a.community_id = :community_id)
         WHERE id = :community_id;
         `,
         { replacements: { community_id } },

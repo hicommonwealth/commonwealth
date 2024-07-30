@@ -8,6 +8,7 @@ const CreateAccountModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
+  showAuthOptionFor,
   onSignInClick,
   onChangeModalType,
 }: ModalVariantProps) => {
@@ -20,9 +21,10 @@ const CreateAccountModal = ({
       layoutType={AuthModalType.CreateAccount}
       hideDescription={!!authMethod}
       {...(authMethod && {
-        showAuthenticationOptionsFor: [authMethod],
+        showAuthOptionTypesFor: [authMethod],
       })}
       showWalletsFor={showWalletsFor}
+      showAuthOptionFor={showAuthOptionFor}
       customBody={
         !authMethod && (
           <>

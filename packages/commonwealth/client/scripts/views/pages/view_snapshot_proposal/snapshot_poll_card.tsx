@@ -1,5 +1,5 @@
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import 'components/poll_card.scss';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useEffect } from 'react';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWCard } from '../../components/component_kit/cw_card';

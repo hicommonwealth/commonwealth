@@ -16,7 +16,6 @@ const Errors = {
 type SearchProfilesRequestParams = {
   search: string;
   community_id?: string;
-  include_roles?: string;
   include_group_ids?: string;
   include_count?: boolean;
 } & PaginationQueryParams;
@@ -38,7 +37,6 @@ export const searchProfilesHandler = async (
     // @ts-expect-error StrictNullChecks
     community: req.community,
     search: options.search,
-    includeRoles: options.include_roles === 'true',
     // @ts-expect-error StrictNullChecks
     limit: parseInt(options.limit, 10) || 0,
     // @ts-expect-error StrictNullChecks

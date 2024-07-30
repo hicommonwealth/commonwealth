@@ -1,15 +1,15 @@
-import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MembersSection.scss';
 
 export type Member = {
-  id: number;
+  userId: number;
   avatarUrl: string;
   name: string;
   role: 'admin' | 'moderator' | '';
@@ -57,11 +57,11 @@ const MembersSection = ({
                     onChange={() => handleCheckboxChange(member.address)}
                   />
                 )}
-                <Link to={`/profile/id/${member.id}`} className="user-info">
+                <Link to={`/profile/id/${member.userId}`} className="user-info">
                   <Avatar
                     url={member.avatarUrl}
                     size={24}
-                    address={member.id}
+                    address={member.userId}
                   />
                   <p>{member.name}</p>
                 </Link>

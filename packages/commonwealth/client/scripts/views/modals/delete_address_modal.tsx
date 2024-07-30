@@ -17,7 +17,9 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import axios from 'axios';
+import useUserStore from 'state/ui/user';
 import '../../../styles/modals/delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
@@ -28,16 +30,16 @@ type DeleteAddressModalAttrs = {
   closeModal: () => void;
 };
 
-export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
-  const onDeleteAddress = async (
-    e: React.MouseEvent,
-    passedProps: Partial<DeleteAddressModalAttrs>,
-  ) => {
-    const { addresses, address, chain } = passedProps;
+export const DeleteAddressModal = ({
+  address,
+  addresses,
+  chain,
+  closeModal,
+  profile,
+}: DeleteAddressModalAttrs) => {
+  const user = useUserStore();
 
-    e.preventDefault();
-
-    // @ts-expect-error <StrictNullChecks/>
+  const onDeleteAddress = async () => {
     if (addresses.length === 1) {
       notifyError(
         'You must have at least one address linked to a profile. Please add another address before removing this one.',
@@ -48,19 +50,16 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       const response = await axios.post(`${app.serverUrl()}/deleteAddress`, {
         address,
         chain,
-        jwt: app.user.jwt,
-      });
-      // remove deleted role from app.roles
-      // @ts-expect-error <StrictNullChecks/>
-      const foundAddressInfo = addresses.find((a) => a.address === address);
-      app.roles.deleteRole({
-        // @ts-expect-error <StrictNullChecks/>
-        address: foundAddressInfo,
-        // @ts-expect-error <StrictNullChecks/>
-        community: chain,
+        jwt: user.jwt,
       });
 
       if (response?.data.status === 'Success') {
+        user.setData({
+          accounts: user.accounts.filter(
+            (a) => a.address !== address && a.community.id !== chain,
+          ),
+        });
+
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {
@@ -70,9 +69,16 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
     closeModal();
   };
 
-  const { profile, address, closeModal } = props;
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    onDeleteAddress()
+      .then(() => undefined)
+      .catch(console.error);
+  };
+
   const { name } = profile;
-  const defaultAvatar = jdenticon.toSvg(props.profile.id, 90);
+  const defaultAvatar = jdenticon.toSvg(profile.userId, 90);
 
   return (
     <div className="DeleteAddressModal">
@@ -95,7 +101,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
               )}`}
             />
           )}
-          <CWText fontWeight="bold">{name || 'Anonymous user'}</CWText>
+          <CWText fontWeight="bold">{name || DEFAULT_NAME}</CWText>
         </div>
         <div className="confirmation">
           <CWText>Are you sure you want to remove this address?</CWText>
@@ -112,7 +118,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         <CWButton
           label="Delete"
           buttonType="destructive"
-          onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
+          onClick={handleDelete}
           buttonHeight="sm"
         />
       </CWModalFooter>

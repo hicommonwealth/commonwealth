@@ -7,6 +7,14 @@
   display: none;
 }
 
+.KnockNotifications .rnf-notification-feed__knock-branding {
+  display: none;
+}
+
+.KnockNotifications .rnf-notification-feed-popover__inner img {
+  max-width: 350px;
+}
+
 .KnockNotifications button:focus,
 .KnockNotifications select:focus {
   outline: none;

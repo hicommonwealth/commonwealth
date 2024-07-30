@@ -4,6 +4,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
@@ -34,13 +35,14 @@ const Analytics = () => {
   const [communityLookupCompleted, setCommunityLookupCompleted] =
     useState<boolean>(false);
   const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
+  const user = useUserStore();
 
   const getCommunityAnalytics = async (communityId: string) => {
     axios
       .get(`${app.serverUrl()}/admin/analytics?community_id=${communityId}`, {
         params: {
           auth: true,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         },
       })
       .then((response) => {
@@ -60,7 +62,7 @@ const Analytics = () => {
         .get(`${app.serverUrl()}/admin/analytics`, {
           params: {
             auth: true,
-            jwt: app.user.jwt,
+            jwt: user.jwt,
           },
         })
         .then((response) => {
