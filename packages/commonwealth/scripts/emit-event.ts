@@ -1,10 +1,8 @@
 import { dispose, EventNames, logger } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
 import { SnapshotEventType } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 async function main() {
   if (process.argv[2] === 'snapshot') {

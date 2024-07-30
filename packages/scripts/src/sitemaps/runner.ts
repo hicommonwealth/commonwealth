@@ -5,10 +5,8 @@ import {
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 async function doExec() {
   if (process.env.SITEMAP_ENV !== 'production') {

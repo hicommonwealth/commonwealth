@@ -15,7 +15,6 @@ import {
 } from '@hicommonwealth/core';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
-import { fileURLToPath } from 'url';
 
 /**
  * Build a retry strategy function based on custom retry strategies map.
@@ -85,8 +84,7 @@ export class RabbitMQAdapter implements Broker {
   private readonly _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
-    const __filename = fileURLToPath(import.meta.url);
-    this._log = logger(__filename);
+    this._log = logger(import.meta);
     this._rawVhost =
       _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
     this.subscribers = Object.keys(this._rawVhost.subscriptions);

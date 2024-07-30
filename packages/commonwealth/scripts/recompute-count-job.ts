@@ -1,9 +1,7 @@
 import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function recomputeCounts(
   logging: boolean | ((sql: string, timing?: number) => void) = false,

@@ -1,13 +1,11 @@
 import { Policy, events, logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';
 import { processSnapshotProposalCreated } from './eventHandlers/snapshotProposalCreated';
 import { processSubscriptionPreferencesUpdated } from './eventHandlers/subscriptionPreferencesUpdated';
 import { processUserMentioned } from './eventHandlers/userMentioned';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const notificationInputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,

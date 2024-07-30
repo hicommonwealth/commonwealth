@@ -24,13 +24,11 @@ import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 type MagicLoginContext = {
   models: DB;

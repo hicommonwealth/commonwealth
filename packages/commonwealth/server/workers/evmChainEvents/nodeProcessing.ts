@@ -16,14 +16,12 @@ import {
 } from '@hicommonwealth/core';
 import { DB, emitEvent } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since

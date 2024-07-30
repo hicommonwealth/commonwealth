@@ -18,7 +18,6 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -28,7 +27,6 @@ import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const parseJson = json({ limit: '1mb' });
@@ -51,7 +49,7 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
-  const log = logger(__filename);
+  const log = logger(import.meta);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
