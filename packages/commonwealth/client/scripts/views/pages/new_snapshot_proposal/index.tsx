@@ -10,6 +10,7 @@ import 'pages/new_snapshot_proposal.scss';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
@@ -53,6 +54,7 @@ export const NewSnapshotProposalForm = ({
   const [errorMessage, setErrorMessage] = useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   const clearLocalStorage = () => {
     localStorage.removeItem(
@@ -143,7 +145,7 @@ export const NewSnapshotProposalForm = ({
       const snapshotSpace = app.snapshot.space;
       const scoreResponse = await getScore(
         snapshotSpace,
-        app.user.activeAccount.address,
+        user.activeAccount?.address || '',
       );
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
@@ -162,7 +164,7 @@ export const NewSnapshotProposalForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const author = app.user.activeAccount;
+  const author = user.activeAccount;
 
   const isMember =
     author &&

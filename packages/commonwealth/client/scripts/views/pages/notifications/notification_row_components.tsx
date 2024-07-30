@@ -181,7 +181,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
           users={authorInfo.map(
             (auth) =>
               new AddressInfo({
-                id: null,
+                userId: 0, // TODO: is this OK?
+                id: 0, // TODO: is this OK?
                 address: auth[1],
                 communityId: auth[0],
               }),

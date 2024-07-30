@@ -1,12 +1,12 @@
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import FeatureHint from 'client/scripts/views/components/FeatureHint';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import FeatureHint from 'views/components/FeatureHint';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
   CWTabsRow,
-} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
-import React, { useState } from 'react';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+} from 'views/components/component_kit/new_designs/CWTabs';
 import CreateTopicSection from './CreateTopicsSection';
 import ManageTopicsSection from './ManageTopicsSection';
 import './Topics.scss';

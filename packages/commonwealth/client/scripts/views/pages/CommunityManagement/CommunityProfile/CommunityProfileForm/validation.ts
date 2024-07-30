@@ -9,9 +9,9 @@ export const communityProfileValidationSchema = z.object({
   communityDescription: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  communityProfileImageURL: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  communityProfileImageURL: z.string({
+    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+  }),
   defaultPage: z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
   hasStagesEnabled: z.boolean({
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,

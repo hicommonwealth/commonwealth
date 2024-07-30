@@ -25,7 +25,14 @@ import {
   LaunchContestStep,
 } from '../../types';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
+import useAppStatus from 'client/scripts/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
+import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
@@ -53,6 +60,13 @@ const SignTransactionsStep = ({
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
+  const user = useUserStore();
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
+    onAction: true,
+  });
 
   const isContestRecurring =
     contestFormData.contestRecurring === ContestRecurringType.Yes;
@@ -76,7 +90,7 @@ const SignTransactionsStep = ({
       ? ONE_HOUR_IN_SECONDS
       : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
-    const walletAddress = app.user.activeAccount?.address;
+    const walletAddress = user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
       : stakeData?.stake_token;
@@ -143,6 +157,10 @@ const SignTransactionsStep = ({
 
       onSetLaunchContestStep('ContestLive');
       onSetCreatedContestAddress(contestAddress);
+      trackAnalytics({
+        event: MixpanelContestEvents.CONTEST_CREATED,
+        isPWA: isAddedToHomeScreen,
+      });
     } catch (error) {
       console.log('error', error);
       setLaunchContestData((prevState) => ({

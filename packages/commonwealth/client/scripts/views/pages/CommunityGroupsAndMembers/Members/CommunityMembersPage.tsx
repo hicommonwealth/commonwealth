@@ -1,8 +1,6 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -19,6 +17,7 @@ import {
 } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
+import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { trpc } from 'utils/trpcClient';
@@ -29,13 +28,14 @@ import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useAppStatus from '../../../../hooks/useAppStatus';
-import { useFlag } from '../../../../hooks/useFlag';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -52,10 +52,9 @@ const GROUP_AND_MEMBER_FILTERS = [
 ];
 
 const CommunityMembersPage = () => {
-  const allowlistEnabled = useFlag('allowlist');
-  useUserActiveAccount();
   const location = useLocation();
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState({
@@ -77,8 +76,8 @@ const CommunityMembersPage = () => {
 
   const { data: memberships = null } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -156,15 +155,21 @@ const CommunityMembersPage = () => {
     },
     {
       initialCursor: 1,
-      getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) {
+          return nextPageNum;
+        }
+        return undefined;
+      },
+      enabled: user.activeAccount?.address ? !!memberships : true,
     },
   );
 
   const { data: groups, refetch } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled: user.activeAccount?.address ? !!memberships : true,
   });
 
   const filterOptions = useMemo(
@@ -199,11 +204,10 @@ const CommunityMembersPage = () => {
         return [...acc, ...page.results];
       }, [] as SearchProfilesResponse['results'])
       .map((p) => ({
-        id: p.id,
+        userId: p.user_id,
         avatarUrl: p.avatar_url,
-        name: p.profile_name || 'Anonymous',
-        // @ts-expect-error <StrictNullChecks/>
-        role: p.roles[0],
+        name: p.profile_name || DEFAULT_NAME,
+        role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map(
             (groupId) =>
@@ -361,9 +365,7 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TABS[1].value &&
-        groups?.length === 0 &&
-        !allowlistEnabled ? (
+        {selectedTab === TABS[1].value && groups?.length === 0 ? (
           <></>
         ) : (
           <section
@@ -394,7 +396,7 @@ const CommunityMembersPage = () => {
                 }))
               }
             />
-            {app.user.activeAccount && (
+            {user.activeAccount && (
               <div className="select-dropdown-container">
                 <CWText type="b2" fontWeight="bold" className="filter-text">
                   Filter

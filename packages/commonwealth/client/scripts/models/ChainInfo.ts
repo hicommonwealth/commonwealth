@@ -1,11 +1,15 @@
-import type { ChainNetwork, DefaultPage } from '@hicommonwealth/shared';
+import type {
+  AddressRole,
+  ChainNetwork,
+  DefaultPage,
+} from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
+import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
-import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
 import Tag from './Tag';
 
@@ -36,8 +40,7 @@ class ChainInfo {
   public defaultPage: DefaultPage;
   public hasHomepage: boolean;
   public readonly chainObjectId: string;
-  public adminsAndMods: RoleInfo[];
-  public members: RoleInfo[];
+  public adminsAndMods: AddressRole[];
   public type: string;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
@@ -155,7 +158,6 @@ class ChainInfo {
     default_summary_view,
     default_page,
     has_homepage,
-    adminsAndMods,
     base,
     ss58_prefix,
     bech32_prefix,
@@ -177,6 +179,7 @@ class ChainInfo {
     CommunityStakes,
     CommunityTags,
     snapshot_spaces,
+    Addresses,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -212,7 +215,6 @@ class ChainInfo {
       defaultOverview: default_summary_view,
       defaultPage: default_page,
       hasHomepage: has_homepage,
-      adminsAndMods,
       base,
       ss58_prefix,
       bech32_prefix,
@@ -234,33 +236,18 @@ class ChainInfo {
       thread_count,
       address_count,
       snapshot_spaces,
+      adminsAndMods: Addresses,
     });
   }
 
-  public setAdmins(roles) {
-    this.adminsAndMods = [];
-    roles.forEach((r) => {
-      this.adminsAndMods.push(
-        new RoleInfo({
-          id: r.id,
-          address_id: r.address_id,
-          address: r.Address.address,
-          address_chain: r.Address.community_id,
-          community_id: r.chain_id,
-          permission: r.permission,
-          allow: r.allow,
-          deny: r.deny,
-          is_user_default: r.is_user_default,
-        }),
-      );
-    });
+  public setAdminsAndMods(roles: AddressRole[]) {
+    this.adminsAndMods = roles;
   }
 
   public setBanner(banner_text: string) {
     this.communityBanner = banner_text;
   }
 
-  // TODO: change to accept an object
   public async updateChainData({
     name,
     description,
@@ -326,7 +313,7 @@ class ChainInfo {
         directory_page_enabled,
         directory_page_chain_node_id,
         type,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       },
       {
         headers: {
@@ -375,7 +362,10 @@ class ChainInfo {
           categorizedLinks.telegrams.push(link);
         } else if (link.includes('://matrix.to')) {
           categorizedLinks.elements.push(link);
-        } else if (link.includes('://twitter.com')) {
+        } else if (
+          link.includes('://twitter.com') ||
+          link.includes('://x.com')
+        ) {
           categorizedLinks.twitters.push(link);
         } else {
           categorizedLinks.remainingLinks.push(link);

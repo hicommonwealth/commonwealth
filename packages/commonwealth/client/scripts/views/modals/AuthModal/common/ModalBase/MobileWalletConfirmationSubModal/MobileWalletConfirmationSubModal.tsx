@@ -1,6 +1,6 @@
 import commonLogo from 'assets/img/branding/common-logo.svg';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import React from 'react';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../../components/component_kit/cw_text';
 import {

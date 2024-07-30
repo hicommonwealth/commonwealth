@@ -151,12 +151,13 @@ export async function __getBulkThreads(
                 'address', A.address,
                 'community_id', A.community_id
             ) as "Address",
-            A.profile_id as profile_id, A.last_active as address_last_active,
-            P.id as profile_id, P.avatar_url as avatar_url, P.profile_name as profile_name
-        FROM top_threads TH
-        JOIN "Topics" T ON TH.topic_id = T.id
+            U.id as user_id,
+            A.last_active as address_last_active,
+            U.profile->>'avatar_url' as avatar_url, 
+            U.profile->>'name' as profile_name
+        FROM top_threads TH JOIN "Topics" T ON TH.topic_id = T.id
         LEFT JOIN "Addresses" A ON TH.address_id = A.id
-        LEFT JOIN "Profiles" P ON A.profile_id = P.id
+        LEFT JOIN "Users" U ON A.user_id = U.id
     ), collaborator_data AS (
     -- get the thread collaborators and their profiles
         SELECT
@@ -166,21 +167,21 @@ export async function __getBulkThreads(
                     'address', A.address,
                     'community_id', A.community_id,
                     'User', json_build_object(
-                        'Profiles', json_build_array(json_build_object(
-                            'id', editor_profiles.id,
-                            'name', editor_profiles.profile_name,
-                            'address', A.address,
-                            'lastActive', A.last_active::text,
-                            'avatarUrl', editor_profiles.avatar_url::text
-                        ))
+                      'id', editor_profiles.id,
+                      'profile', json_build_object(
+                        'userId', editor_profiles.id,
+                        'name', editor_profiles.profile->>'name',
+                        'address', A.address,
+                        'lastActive', A.last_active::text,
+                        'avatarUrl', editor_profiles.profile->>'avatar_url'
+                      )
                     )
                 )))
             ELSE '[]'::json
             END AS collaborators
-        FROM top_threads TT
-        LEFT JOIN "Collaborations" AS C ON TT.id = C.thread_id
+        FROM top_threads TT LEFT JOIN "Collaborations" AS C ON TT.id = C.thread_id
         LEFT JOIN "Addresses" A ON C.address_id = A.id
-        LEFT JOIN "Profiles" AS editor_profiles ON A.user_id = editor_profiles.user_id
+        LEFT JOIN "Users" editor_profiles ON A.user_id = editor_profiles.id
         GROUP BY TT.id
     ), reaction_data AS (
     -- get the thread reactions and the address/profile of the user who reacted
@@ -192,14 +193,13 @@ export async function __getBulkThreads(
             'address', A.address,
             'updated_at', R.updated_at::text,
             'voting_weight', R.calculated_voting_weight,
-            'profile_name', P.profile_name,
-            'avatar_url', P.avatar_url,
+            'profile_name', U.profile->>'name',
+            'avatar_url', U.profile->>'avatar_url',
             'last_active', A.last_active::text
         ))) as "associatedReactions"
-        FROM "Reactions" R
-        JOIN top_threads TT ON TT.id = R.thread_id
+        FROM "Reactions" R JOIN top_threads TT ON TT.id = R.thread_id
         JOIN "Addresses" A ON A.id = R.address_id
-        JOIN "Profiles" P ON P.id = A.profile_id
+        JOIN "Users" U ON U.id = A.user_id
         -- where clause doesn't change query result but forces DB to use the correct indexes
         WHERE R.community_id = :communityId AND R.thread_id = TT.id
         GROUP BY TT.id
@@ -241,10 +241,9 @@ export async function __getBulkThreads(
               'deleted_at', COM.deleted_at::text,
               'marked_as_spam_at', COM.marked_as_spam_at::text,
               'discord_meta', COM.discord_meta,
-              'profile_id', P.id,
-              'profile_name', P.profile_name,
-              'profile_avatar_url', P.avatar_url,
-              'user_id', P.user_id
+              'profile_name', U.profile->>'name',
+              'profile_avatar_url', U.profile->>'avatar_url',
+              'user_id', U.id
           ))) as "recentComments"
           FROM (
             Select tempC.* FROM "Comments" tempC
@@ -255,7 +254,7 @@ export async function __getBulkThreads(
           ) COM
           JOIN top_threads TT ON TT.id = COM.thread_id
           JOIN "Addresses" A ON A.id = COM.address_id
-          JOIN "Profiles" P ON P.user_id = A.user_id
+          JOIN "Users" U ON U.id = A.user_id
           GROUP BY TT.id
       )`
         : ''

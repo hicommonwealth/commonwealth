@@ -1,10 +1,11 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import clsx from 'clsx';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPopover, {
@@ -30,13 +31,13 @@ export const FullUser = ({
   shouldShowAvatarOnly,
   shouldShowAddressWithDisplayName,
   avatarSize = 16,
-  role,
   showSkeleton,
   popoverPlacement,
   profile,
   className,
 }: FullUserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
+  const loggedInUser = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (showSkeleton) {
@@ -61,31 +62,26 @@ export const FullUser = ({
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =
     Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const friendlyCommunityName =
-    app.config.chains.getById(userCommunityId)?.name;
-  const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-  const isGhostAddress = app.user.addresses.some(
+  const userCommunity = app.config.chains.getById(userCommunityId);
+  const friendlyCommunityName = userCommunity?.name;
+  const roleInCommunity = userCommunity?.adminsAndMods?.find(
+    ({ address }) => address === userAddress,
+  )?.role;
+  const isGhostAddress = loggedInUser.addresses.some(
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
-  const roleInCommunity =
-    role ||
-    adminsAndMods.find(
-      (r) => r.address === userAddress && r.address_chain === userCommunityId,
-    );
 
   const roleTags = (
     <>
       {shouldShowRole && roleInCommunity && (
         <div className="role-tag-container">
-          <CWText className="role-tag-text">
-            {roleInCommunity.permission}
-          </CWText>
+          <CWText className="role-tag-text">{roleInCommunity}</CWText>
         </div>
       )}
     </>
   );
 
-  const isSelfSelected = app.user.addresses
+  const isSelfSelected = loggedInUser.addresses
     .map((a) => a.address)
     .includes(userAddress);
 
@@ -95,9 +91,9 @@ export const FullUser = ({
         shouldShowAsDeleted ? (
           'Deleted'
         ) : (
-          'Anonymous'
+          DEFAULT_NAME
         )
-      ) : !profile?.id ? (
+      ) : !profile?.userId ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
         profile?.name
@@ -116,12 +112,14 @@ export const FullUser = ({
       <Avatar
         url={profile?.avatarUrl}
         size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
-        address={profile?.id}
+        address={profile?.userId}
       />
     </div>
   ) : (
     <div
-      className={`User${shouldLinkProfile && profile?.id ? ' linkified' : ''}`}
+      className={`User${
+        shouldLinkProfile && profile?.userId ? ' linkified' : ''
+      }`}
       key={profile?.address || '-'}
     >
       {showAvatar && (
@@ -129,7 +127,7 @@ export const FullUser = ({
           // @ts-expect-error <StrictNullChecks/>
           to={
             profile && shouldLinkProfile
-              ? `/profile/id/${profile?.id}`
+              ? `/profile/id/${profile?.userId}`
               : undefined
           }
           className="user-avatar"
@@ -138,17 +136,17 @@ export const FullUser = ({
           <Avatar
             url={profile?.avatarUrl}
             size={avatarSize}
-            address={profile?.id}
+            address={profile?.userId}
           />
         </Link>
       )}
       {
         <>
           {/* non-substrate name */}
-          {shouldLinkProfile && profile?.id ? (
+          {shouldLinkProfile && profile?.userId ? (
             <Link
               className="user-display-name username"
-              to={`/profile/id/${profile?.id}`}
+              to={`/profile/id/${profile?.userId}`}
               onClick={(e) => e.stopPropagation()}
             >
               {userBasisInfo}
@@ -177,7 +175,7 @@ export const FullUser = ({
             <Avatar
               url={profile?.avatarUrl}
               size={profile?.avatarUrl ? 36 : 32}
-              address={profile?.id}
+              address={profile?.userId}
             />
           </div>
           <div className="user-name">
@@ -185,10 +183,10 @@ export const FullUser = ({
               <Link
                 className="user-display-name substrate@"
                 // @ts-expect-error <StrictNullChecks/>
-                to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
+                to={profile?.id ? `/profile/id/${profile?.userId}` : undefined}
               >
-                {!profile || !profile?.id ? (
-                  !profile?.id && userAddress ? (
+                {!profile || !profile?.userId ? (
+                  !profile?.userId && userAddress ? (
                     `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
                     redactedAddress

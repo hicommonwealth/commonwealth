@@ -1,4 +1,4 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { APIOrderDirection } from 'helpers/constants';
 import { useMemo, useState } from 'react';
 import { CWTableColumnInfo, CWTableSorting } from './CWTable';
 

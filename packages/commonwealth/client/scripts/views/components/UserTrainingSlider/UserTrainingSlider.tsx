@@ -1,9 +1,9 @@
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import app from 'client/scripts/state';
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
-import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
+import useAdminActionCardsStore from 'state/ui/adminOnboardingCards';
+import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -14,7 +14,8 @@ import { UserTrainingCardTypes } from './types';
 export const UserTrainingSlider = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+  const user = useUserStore();
+  const userId = user.id.toString();
 
   const [cardToDismiss, setCardToDismiss] = useState<
     UserTrainingCardTypes | 'all'
@@ -42,15 +43,13 @@ export const UserTrainingSlider = () => {
       UserTrainingCardTypes.CreateContent,
       UserTrainingCardTypes.FinishProfile,
       UserTrainingCardTypes.ExploreCommunities,
-      // @ts-expect-error <StrictNullChecks/>
-    ].map((card) => markTrainingActionAsPermanentlyHidden(card, profileId));
+    ].map((card) => markTrainingActionAsPermanentlyHidden(card, userId));
   };
 
   const isCardVisible = (cardName: UserTrainingCardTypes) => {
     return (
       completedActions.includes(cardName) ||
-      // @ts-expect-error <StrictNullChecks/>
-      !trainingActionPermanentlyHidden?.[profileId]?.includes(cardName)
+      !trainingActionPermanentlyHidden?.[userId]?.includes(cardName)
     );
   };
 
@@ -74,7 +73,7 @@ export const UserTrainingSlider = () => {
       hideAllCards();
     } else {
       // @ts-expect-error <StrictNullChecks/>
-      markTrainingActionAsPermanentlyHidden(cardToDismiss, profileId);
+      markTrainingActionAsPermanentlyHidden(cardToDismiss, userId);
     }
     setCardToDismiss(undefined);
   };
@@ -86,17 +85,17 @@ export const UserTrainingSlider = () => {
   }, [isLoggedIn, completedActions, clearCompletedActionsState]);
 
   useEffect(() => {
-    if (isLoggedIn && !isLoadingProfile && profile && profileId) {
+    if (isLoggedIn && !isLoadingProfile && profile && userId) {
       // if user has already given any upvotes, then hide `give-upvote` card
       if (
         profile?.totalUpvotes > 0 &&
-        !trainingActionPermanentlyHidden?.[profileId]?.includes(
+        !trainingActionPermanentlyHidden?.[userId]?.includes(
           UserTrainingCardTypes.GiveUpvote,
         )
       ) {
         markTrainingActionAsPermanentlyHidden(
           UserTrainingCardTypes.GiveUpvote,
-          profileId,
+          userId,
         );
       }
 
@@ -106,44 +105,45 @@ export const UserTrainingSlider = () => {
           (link) => link.trim().length > 0,
         )?.length > 0;
       if (
-        (hasSocialLinks || app?.user?.email) &&
-        !trainingActionPermanentlyHidden?.[profileId]?.includes(
+        (hasSocialLinks || user.email) &&
+        !trainingActionPermanentlyHidden?.[userId]?.includes(
           UserTrainingCardTypes.FinishProfile,
         )
       ) {
         markTrainingActionAsPermanentlyHidden(
           UserTrainingCardTypes.FinishProfile,
-          profileId,
+          userId,
         );
       }
 
       // if user has created any comment/thread, then hide `create-content` card
       if (
         (profile?.comments?.length > 0 || profile?.threads?.length > 0) &&
-        !trainingActionPermanentlyHidden?.[profileId]?.includes(
+        !trainingActionPermanentlyHidden?.[userId]?.includes(
           UserTrainingCardTypes.CreateContent,
         )
       ) {
         markTrainingActionAsPermanentlyHidden(
           UserTrainingCardTypes.CreateContent,
-          profileId,
+          userId,
         );
       }
     }
   }, [
+    user.email,
     isLoggedIn,
     isLoadingProfile,
     profile,
-    profileId,
+    userId,
     trainingActionPermanentlyHidden,
     markTrainingActionAsPermanentlyHidden,
   ]);
 
   if (
-    !profileId ||
+    !userId ||
     !isLoggedIn ||
     isLoadingProfile ||
-    (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&
+    (trainingActionPermanentlyHidden?.[userId]?.length === 4 &&
       completedActions.length === 0) ||
     isAdminSliderVisible // if admin slider is visible, we hide user training slider
   ) {
@@ -244,7 +244,7 @@ export const UserTrainingSlider = () => {
 
               markTrainingActionAsComplete(
                 UserTrainingCardTypes.ExploreCommunities,
-                profileId,
+                userId,
               );
             }}
           />

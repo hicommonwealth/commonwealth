@@ -1,4 +1,4 @@
-import Comment from 'client/scripts/models/Comment';
+import Comment from 'models/Comment';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
 import { ViewUpvotesDrawer } from './ViewUpvotesDrawer';

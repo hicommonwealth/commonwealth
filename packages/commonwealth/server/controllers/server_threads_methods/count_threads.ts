@@ -18,7 +18,6 @@ export async function __countThreads(
         community_id: communityId,
       },
       limit,
-      logging: console.log,
     });
     return result.length;
   }

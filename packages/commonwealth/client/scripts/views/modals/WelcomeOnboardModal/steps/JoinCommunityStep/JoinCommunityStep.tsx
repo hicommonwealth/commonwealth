@@ -1,9 +1,9 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import Permissions from 'client/scripts/utils/Permissions';
 import ChainInfo from 'models/ChainInfo';
 import React, { useEffect, useRef, useState } from 'react';
-import app from 'state';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -20,7 +20,8 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
   const [suggestedCommunities, setSuggestedCommunities] = useState<
     { community: ChainInfo; isJoined: boolean }[]
   >([]);
-  const userAddress = useRef(app?.user?.addresses?.[0]);
+  const user = useUserStore();
+  const userAddress = useRef(user.addresses?.[0]);
   const areCommunitiesSuggested = useRef(false);
 
   const { data: profile, isLoading: isLoadingProfile } =

@@ -1,8 +1,8 @@
-import { pluralizeWithoutNumberPrefix } from 'client/scripts/helpers';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CWCommunityAvatar } from 'client/scripts/views/components/component_kit/cw_community_avatar';
 import clsx from 'clsx';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
+import ChainInfo from 'models/ChainInfo';
 import React from 'react';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './JoinCommunityCard.scss';

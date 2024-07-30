@@ -1,7 +1,7 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/AdminPanel.scss';
 import React, { useEffect } from 'react';
-import app from 'state';
+import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import UpdateCommunityIdTask from 'views/pages/AdminPanel/UpdateCommunityIdTask';
 import UpdateCustomDomainTask from 'views/pages/AdminPanel/UpdateCustomDomainTask';
@@ -18,7 +18,7 @@ const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!app.user.isSiteAdmin) {
+    if (!Permissions.isSiteAdmin()) {
       // redirect to 404
       navigate('/404');
     }

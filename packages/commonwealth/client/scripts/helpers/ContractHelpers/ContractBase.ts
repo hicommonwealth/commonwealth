@@ -1,6 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import IWebWallet from 'client/scripts/models/IWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
+import IWebWallet from 'models/IWebWallet';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
@@ -66,6 +66,21 @@ abstract class ContractBase {
       this.abi as AbiItem[],
       this.contractAddress,
     );
+  }
+
+  async estimateGas(): Promise<bigint | null> {
+    try {
+      const latestBlock = await this.web3.eth.getBlock('latest');
+
+      // Calculate maxFeePerGas and maxPriorityFeePerGas
+      const baseFeePerGas = latestBlock.baseFeePerGas;
+      const maxPriorityFeePerGas = this.web3.utils.toWei('0.001', 'gwei');
+      const maxFeePerGas =
+        baseFeePerGas! * BigInt(2) + BigInt(parseInt(maxPriorityFeePerGas));
+      return maxFeePerGas;
+    } catch {
+      return null;
+    }
   }
 }
 

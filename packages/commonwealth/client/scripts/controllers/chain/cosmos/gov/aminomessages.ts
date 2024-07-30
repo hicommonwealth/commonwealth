@@ -1,6 +1,6 @@
 import { AminoMsg } from '@cosmjs/amino';
-import { AminoConverters } from '@cosmjs/stargate/build/aminotypes';
 import { AminoMsgSubmitProposal } from '@cosmjs/stargate';
+import { AminoConverters } from '@cosmjs/stargate/build/aminotypes';
 import {
   assert,
   assertDefinedAndNotNull,
@@ -12,7 +12,7 @@ import { MsgSubmitProposal } from 'cosmjs-types/cosmos/gov/v1beta1/tx';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 
 export function isAminoMsgSubmitProposal(
-  msg: AminoMsg
+  msg: AminoMsg,
 ): msg is AminoMsgSubmitProposal {
   return msg.type === 'cosmos-sdk/MsgSubmitProposal';
 }
@@ -43,7 +43,7 @@ export function createAltGovAminoConverters(): AminoConverters {
           }
           case '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal': {
             const spendProposal = CommunityPoolSpendProposal.decode(
-              content.value
+              content.value,
             );
             proposal = {
               type: 'cosmos-sdk/CommunityPoolSpendProposal',
@@ -84,7 +84,7 @@ export function createAltGovAminoConverters(): AminoConverters {
                 TextProposal.fromPartial({
                   title: title,
                   description: description,
-                })
+                }),
               ).finish(),
             });
             break;
@@ -105,7 +105,7 @@ export function createAltGovAminoConverters(): AminoConverters {
                   description: description,
                   recipient: recipient,
                   amount: Array.from(amount),
-                })
+                }),
               ).finish(),
             });
             break;

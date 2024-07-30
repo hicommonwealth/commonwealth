@@ -6,6 +6,7 @@ import type Thread from '../../models/Thread';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 
+import useUserStore from 'state/ui/user';
 import {
   notifyError,
   notifySuccess,
@@ -26,13 +27,14 @@ export const ArchiveThreadModal = ({
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
   });
+  const user = useUserStore();
 
   const handleArchiveThread = async () => {
     editThread({
       threadId: thread.id,
       communityId: app.activeChainId(),
       archived: !thread.archivedAt,
-      address: app.user?.activeAccount?.address,
+      address: user.activeAccount?.address || '',
       pinned: false,
     })
       .then(() => {

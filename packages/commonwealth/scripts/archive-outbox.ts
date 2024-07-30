@@ -207,10 +207,11 @@ async function main() {
 if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(async () => {
-      stats(HotShotsStats()).increment('cw.scheduler.archive-outbox');
+      stats(HotShotsStats()).on('cw.scheduler.archive-outbox');
       await dispose()('EXIT', true);
     })
     .catch(async (err) => {
+      stats(HotShotsStats()).off('cw.scheduler.archive-outbox');
       log.fatal('Failed to archive outbox child partitions to S3', err);
       await dispose()('ERROR', true);
     });
