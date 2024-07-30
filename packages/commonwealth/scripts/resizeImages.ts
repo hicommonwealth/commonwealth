@@ -3,19 +3,18 @@
 // this script will resize the images in the Chains.icon_url that are larger than 1000x1000.
 // It will then re-upload these compressed images to s3.
 // Lastly it will update the icon_url with the new compressed image link
-
-import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
-import { formatS3Url, models, sequelize } from '@hicommonwealth/model';
+import { S3BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage } from '@hicommonwealth/core';
+import { models, sequelize } from '@hicommonwealth/model';
 import * as https from 'https';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import sharp from 'sharp';
 
-const s3 = new S3();
-
 const startChainsFrom = process.argv[2];
 const startProfilesFrom = process.argv[3];
+
+const _blobStorage = blobStorage(S3BlobStorage());
 
 async function resizeImage(data: Buffer, contentType: string) {
   if (
@@ -188,27 +187,14 @@ async function uploadToS3AndReplace(
       contentType = 'image/jpeg';
     }
 
-    const params: PutObjectCommandInput = {
-      Bucket: 'assets.commonwealth.im',
-      Key: `${datum.id}_resized.${contentType.split('/')[1]}`,
-      Body: resizedImage,
-      ContentType: contentType,
-    };
-
-    const newImage = await new Upload({
-      client: s3,
-      params,
-    }).done();
-
-    // although it gets added to the assets.commonwealth.im bucket, the location of the newImage object points
-    // to the bucket directly. We want to swap this out with the cloudflare url.
-    // @ts-expect-error StrictNullChecks
-    const newLocation = formatS3Url(newImage.Location);
-
-    console.log(
-      `Successfully resized ${name} ${datum.id} with new url ${newLocation}`,
-    );
-    await updateFunction(datum.id, newLocation, transaction);
+    const { url } = await _blobStorage.upload({
+      bucket: 'assets.commonwealth.im',
+      key: `${datum.id}_resized.${contentType.split('/')[1]}`,
+      content: resizedImage,
+      contentType,
+    });
+    console.log(`Successfully resized ${name} ${datum.id} with new url ${url}`);
+    await updateFunction(datum.id, url, transaction);
 
     await transaction.commit();
   }

@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { z } from 'zod';
 import {
   EventContext,
@@ -221,6 +222,27 @@ export interface Broker extends Disposable {
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
+}
+
+export type BlobType = string | Uint8Array | Buffer | Readable;
+
+/**
+ * External Blob Storage Port
+ */
+export interface BlobStorage extends Disposable {
+  upload(options: {
+    bucket: string;
+    key: string;
+    content: BlobType;
+    contentType?: string;
+  }): Promise<{ url: string; location: string }>;
+  exists(options: { bucket: string; key: string }): Promise<boolean>;
+  getSignedUrl(options: {
+    bucket: string;
+    key: string;
+    contentType: string;
+    ttl: number;
+  }): Promise<string>;
 }
 
 export enum WorkflowKeys {

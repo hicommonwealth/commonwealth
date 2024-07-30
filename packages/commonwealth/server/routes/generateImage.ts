@@ -1,11 +1,8 @@
-import { S3 } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
+import { AppError, blobStorage } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
-
-import { AppError } from '@hicommonwealth/core';
-import { DB, formatS3Url } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -57,30 +54,20 @@ const generateImage = async (
     throw new AppError('Problem Generating Image!');
   }
 
-  const s3 = new S3();
-  const resp = await fetch(image);
-  const buffer = await resp.buffer();
-  const params = {
-    Bucket: 'assets.commonwealth.im',
-    Key: `${uuidv4()}.png`,
-    Body: buffer,
-    ContentType: 'image/png',
-  };
-
-  let imageUrl = '';
   try {
-    const upload = await new Upload({
-      client: s3,
-      params,
-    }).done();
-    // @ts-expect-error StrictNullChecks
-    imageUrl = formatS3Url(upload.Location);
+    const resp = await fetch(image);
+    const buffer = await resp.buffer();
+    const { url } = await blobStorage().upload({
+      bucket: 'assets.commonwealth.im',
+      key: `${uuidv4()}.png`,
+      content: buffer,
+      contentType: 'image/png',
+    });
+    return success(res, { imageUrl: url });
   } catch (e) {
     console.log(e);
     throw new AppError('Problem uploading image!');
   }
-
-  return success(res, { imageUrl });
 };
 
 export default generateImage;

@@ -111,20 +111,6 @@ export async function emitEvent(
   }
 }
 
-/**
- * Creates a valid S3 asset url from an upload.Location url
- * @param uploadLocation The url returned by the Upload method of @aws-sdk/lib-storage
- * @param bucketName The name of the bucket or the domain (alias) of the bucket. Defaults to assets.commonwealth.im
- */
-export function formatS3Url(
-  uploadLocation: string,
-  bucketName: string = 'assets.commonwealth.im',
-): string {
-  return (
-    `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
-  );
-}
-
 export function buildThreadContentUrl(communityId: string, threadId: number) {
   const fullContentUrl = getThreadUrl({
     chain: communityId,

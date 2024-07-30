@@ -317,6 +317,15 @@ importers:
 
   libs/adapters:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.577.0
+        version: 3.577.0
+      '@aws-sdk/lib-storage':
+        specifier: ^3.578.0
+        version: 3.578.0(@aws-sdk/client-s3@3.577.0)
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.577.0
+        version: 3.577.0
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../core
@@ -765,12 +774,9 @@ importers:
 
   libs/sitemaps:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.577.0
-        version: 3.577.0
-      '@aws-sdk/lib-storage':
-        specifier: ^3.578.0
-        version: 3.578.0(@aws-sdk/client-s3@3.577.0)
+      '@hicommonwealth/adapters':
+        specifier: workspace:*
+        version: link:../adapters
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../core
@@ -792,15 +798,6 @@ importers:
       '@apollo/client':
         specifier: ^3.3.18
         version: 3.10.2(@types/react@18.3.1)(graphql@15.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@aws-sdk/client-s3':
-        specifier: ^3.577.0
-        version: 3.577.0
-      '@aws-sdk/lib-storage':
-        specifier: ^3.578.0
-        version: 3.578.0(@aws-sdk/client-s3@3.577.0)
-      '@aws-sdk/s3-request-presigner':
-        specifier: ^3.577.0
-        version: 3.577.0
       '@brillout/import':
         specifier: ^0.2.2
         version: 0.2.3

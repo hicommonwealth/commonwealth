@@ -1,8 +1,4 @@
-import { AppError } from '@hicommonwealth/core';
-
-import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
+import { AppError, blobStorage } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
@@ -36,16 +32,12 @@ const getUploadSignature = async (
     return next(new AppError(Errors.ImageType));
   }
 
-  const s3 = new S3();
-  const params = {
-    Bucket: 'assets.commonwealth.im',
-    Key: `${filename}`,
-    ContentType: contentType,
-  };
-
   try {
-    const url = await getSignedUrl(s3, new PutObjectCommand(params), {
-      expiresIn: 3600,
+    const url = await blobStorage().getSignedUrl({
+      bucket: 'assets.commonwealth.im',
+      key: filename,
+      contentType,
+      ttl: 3600,
     });
     res.json({ status: 'Success', result: url });
   } catch (err) {

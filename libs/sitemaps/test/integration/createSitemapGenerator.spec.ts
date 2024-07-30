@@ -3,7 +3,6 @@ import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
-  createAsyncWriterMock,
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '../../src';
@@ -79,10 +78,8 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
   });
 
   test.skip('basic', async () => {
-    const writer = createAsyncWriterMock();
     const paginator = createDatabasePaginatorDefault(50);
-
-    const sitemapGenerator = createSitemapGenerator(writer, [
+    const sitemapGenerator = createSitemapGenerator([
       paginator.threads,
       paginator.profiles,
     ]);
