@@ -22,20 +22,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .toLowerCase();
 };
 
-export const getThreadUrlWithoutObject = (
-  proposalCommunity,
-  proposalId,
-  comment?,
-) => {
-  const aId = proposalCommunity;
-  const tId = proposalId;
-  const cId = comment ? `?comment=${comment.id}` : '';
-
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
-};
-
 // WARN: Using process.env to avoid webpack failures
 export const getCommunityUrl = (community: string): string => {
   return process.env.NODE_ENV === 'production'

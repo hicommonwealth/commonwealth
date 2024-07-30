@@ -51,7 +51,7 @@ const app = express();
  */
 const start = async () => {
   const { models } = await import('@hicommonwealth/model');
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
 
   const { main } = await import('./main');
 
@@ -59,10 +59,7 @@ const start = async () => {
     port: config.PORT,
     noGlobalActivityCache: config.NO_GLOBAL_ACTIVITY_CACHE,
     withLoggingMiddleware: true,
-    withPrerender:
-      config.NODE_ENV === 'production' &&
-      !config.NO_PRERENDER &&
-      config.SERVER_URL.includes('commonwealth.im'),
+    withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
   })
     .then(() => {
       isServiceHealthy = true;

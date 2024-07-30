@@ -40,10 +40,8 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ENFORCE_SESSION_KEYS](#enforce_session_keys)
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
-- [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
-- [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
 - [JWT_SECRET](#jwt_secret)
@@ -223,10 +221,6 @@ If set to `e2e-test`, the app will bypass usage of real ETH RPCs and use the moc
 
 Owner: Ian Rowan
 
-## ETHERSCAN_JS_API_KEY
-
-API key for Ethereum data.
-
 ## FALLBACK_NODE_DURATION_S
 
 Optional. Defaults to 5 minutes (300 seconds).
@@ -237,10 +231,6 @@ After this time, the server will try the original DB endpoint again.
 ## FLAG_NEW_CREATE_COMMUNITY
 
 Boolean toggle allowing the creation of new communities during local development.
-
-## FLAG_PROPOSAL_TEMPLATES
-
-Boolean toggle to display side-wide sidebar proposal templates. Temporary flag for 2.0 work.
 
 ## HEROKU_APP_NAME
 
@@ -286,14 +276,6 @@ Mixpanel analytics tracking token for development work. Reach out to a lead to r
 ## MIXPANEL_PROD_TOKEN
 
 Mixpanel analytics tracking token for our live production site.
-
-## NEXT_PUBLIC_RSA_PRIVATE_KEY
-
-<!-- Likely deprecated; flagged for removal with closing of #6185. -->
-
-## NEXT_PUBLIC_RSA_PUBLIC_KEY
-
-<!-- Likely deprecated; flagged for removal with closing of #6185. -->
 
 ## NO_GLOBAL_ACTIVITY_CACHE
 

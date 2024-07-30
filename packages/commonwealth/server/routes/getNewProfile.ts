@@ -1,10 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
-import type {
-  DB,
-  ProfileTagsAttributes,
-  TagsAttributes,
-} from '@hicommonwealth/model';
-import { GetNewProfileReq, GetNewProfileResp } from '@hicommonwealth/schemas';
+import type { DB, TagsAttributes } from '@hicommonwealth/model';
+import {
+  GetNewProfileReq,
+  GetNewProfileResp,
+  ProfileTags,
+} from '@hicommonwealth/schemas';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import z from 'zod';
@@ -16,7 +16,7 @@ export const Errors = {
   NoProfileFound: 'No profile found',
 };
 
-type ProfileWithTags = ProfileTagsAttributes & { Tag: TagsAttributes };
+type ProfileWithTags = z.infer<typeof ProfileTags> & { Tag: TagsAttributes };
 
 const getNewProfile = async (
   models: DB,

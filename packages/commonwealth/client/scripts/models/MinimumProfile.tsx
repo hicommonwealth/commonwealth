@@ -1,4 +1,5 @@
 import { Address } from '@hicommonwealth/schemas';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import jdenticon from 'jdenticon';
 import { z } from 'zod';
 
@@ -16,7 +17,7 @@ export function addressToUserProfile(
   return {
     userId: address.user_id!,
     avatarUrl: address.User?.profile.avatar_url ?? '',
-    name: address.User?.profile.name ?? 'Anonymous',
+    name: address.User?.profile.name ?? DEFAULT_NAME,
     address: address?.address,
     lastActive: address?.last_active ?? address.User?.created_at,
   };
@@ -37,7 +38,7 @@ class MinimumProfile {
 
   get name() {
     if (!this._initialized) return 'Loading...';
-    return this._name || 'Anonymous';
+    return this._name || DEFAULT_NAME;
   }
 
   get address() {

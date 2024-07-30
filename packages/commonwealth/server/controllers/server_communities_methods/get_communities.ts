@@ -11,7 +11,9 @@ export type GetCommunitiesOptions = {
   includeStakes?: boolean; // include community stakes
 };
 
-type CommunityWithTags = CommunityTagsAttributes & { Tag: TagsAttributes };
+export type CommunityWithTags = CommunityTagsAttributes & {
+  Tag: TagsAttributes;
+};
 
 type CommunityInstanceWithTags = CommunityInstance & {
   CommunityTags: TagsAttributes;

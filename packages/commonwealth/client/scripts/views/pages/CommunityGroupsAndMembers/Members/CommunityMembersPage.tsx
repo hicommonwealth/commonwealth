@@ -1,3 +1,4 @@
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import moment from 'moment';
@@ -205,7 +206,7 @@ const CommunityMembersPage = () => {
       .map((p) => ({
         userId: p.user_id,
         avatarUrl: p.avatar_url,
-        name: p.profile_name || 'Anonymous',
+        name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map(

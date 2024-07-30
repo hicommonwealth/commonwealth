@@ -40,7 +40,7 @@ log.info(
 );
 
 async function startDiscordListener() {
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
 
   // async imports to delay calling logger
   const { handleMessage, handleThreadChannel } = await import(
