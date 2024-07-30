@@ -8,6 +8,7 @@ import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
+import { userStore } from '../state/ui/user';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
@@ -47,7 +48,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         params: {
           chain: this.id,
           community: null,
-          jwt: this.app.user.jwt,
+          jwt: userStore.getState().jwt,
         },
       }),
     ]);
@@ -59,15 +60,19 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    const { admins, numVotingThreads, numTotalThreads, communityBanner } =
-      response.data.result;
+    const {
+      adminsAndMods,
+      numVotingThreads,
+      numTotalThreads,
+      communityBanner,
+    } = response.data.result;
     // Update community level thread counters variables (Store in state instead of react query here is an
     // exception case, view the threadCountersStore code for more details)
     EXCEPTION_CASE_threadCountersStore.setState({
       totalThreadsInCommunity: numTotalThreads,
       totalThreadsInCommunityForVoting: numVotingThreads,
     });
-    this.meta.setAdmins(admins);
+    this.meta.setAdminsAndMods(adminsAndMods);
     this.meta.setBanner(communityBanner);
 
     this._serverLoaded = true;

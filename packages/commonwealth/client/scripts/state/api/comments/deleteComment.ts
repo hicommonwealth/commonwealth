@@ -1,11 +1,13 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signDeleteComment } from 'client/scripts/controllers/server/sessions';
+import { signDeleteComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -24,7 +26,7 @@ const deleteComment = async ({
   canvasHash,
 }: DeleteCommentProps) => {
   const canvasSignedData = await signDeleteComment(
-    app.user.activeAccount.address,
+    userStore.getState().activeAccount?.address || '',
     {
       comment_id: canvasHash,
     },
@@ -32,7 +34,7 @@ const deleteComment = async ({
 
   await axios.delete(`${app.serverUrl()}/comments/${commentId}`, {
     data: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       address: address,
       community_id: communityId,
       author_community_id: communityId,
@@ -70,6 +72,8 @@ const useDeleteCommentMutation = ({
     communityId,
     threadId,
   });
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: deleteComment,
@@ -109,6 +113,7 @@ const useDeleteCommentMutation = ({
       );
       return response;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

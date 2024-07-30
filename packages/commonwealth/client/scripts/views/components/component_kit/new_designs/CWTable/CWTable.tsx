@@ -83,8 +83,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { getRelativeTimestamp } from 'client/scripts/helpers/dates';
 import clsx from 'clsx';
+import { getRelativeTimestamp } from 'helpers/dates';
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';

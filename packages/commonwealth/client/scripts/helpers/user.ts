@@ -1,4 +1,4 @@
-import app from '../state';
+import { userStore } from '../state/ui/user';
 
 type GetUniqueUserAddressesArgs = {
   forChain?: string;
@@ -7,7 +7,7 @@ type GetUniqueUserAddressesArgs = {
 export const getUniqueUserAddresses = ({
   forChain,
 }: GetUniqueUserAddressesArgs) => {
-  const addresses = app?.user?.addresses || [];
+  const addresses = userStore.getState().addresses;
 
   const filteredAddresses = forChain
     ? addresses.filter((x) => x?.community?.base === forChain)

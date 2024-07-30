@@ -4,16 +4,15 @@
 // but we are using it for ethermint chains only for now.
 // We use this client because cosmjs does not have plans to support Ethermint.
 // See: https://github.com/cosmos/cosmjs/issues/1351
-import axios from 'axios';
-import Long from 'long';
+import { fromBase64, toBase64 } from '@cosmjs/encoding';
+import { Registry, makeSignDoc } from '@cosmjs/proto-signing';
 import {
-  defaultRegistryTypes as defaultStargateTypes,
-  assertIsDeliverTxSuccess,
   DeliverTxResponse,
+  assertIsDeliverTxSuccess,
+  defaultRegistryTypes as defaultStargateTypes,
 } from '@cosmjs/stargate';
 import { sleep } from '@cosmjs/utils';
-import { makeSignDoc, Registry } from '@cosmjs/proto-signing';
-import { toBase64, fromBase64 } from '@cosmjs/encoding';
+import axios from 'axios';
 import { PubKey } from 'cosmjs-types/cosmos/crypto/secp256k1/keys.js';
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing.js';
 import {
@@ -22,6 +21,7 @@ import {
   TxBody,
   TxRaw,
 } from 'cosmjs-types/cosmos/tx/v1beta1/tx.js';
+import Long from 'long';
 
 function EthSigningClient(network, signer) {
   const coinType = 60; // Common to ethermint chains
@@ -95,13 +95,13 @@ function EthSigningClient(network, signer) {
           `Transaction with ID ${txId} was submitted but was not yet found on the chain. 
           You might want to check later. There was a wait of ${
             timeoutMs / 1000
-          } seconds.`
+          } seconds.`,
         );
       }
       await sleep(pollIntervalMs);
       try {
         const response = await axios.get(
-          restUrl + '/cosmos/tx/v1beta1/txs/' + txId
+          restUrl + '/cosmos/tx/v1beta1/txs/' + txId,
         );
         const result = parseTxResult(response.data.tx_response);
         return result;
@@ -125,7 +125,7 @@ function EthSigningClient(network, signer) {
       (error) => {
         clearTimeout(txPollTimeout);
         return error;
-      }
+      },
     );
   }
 
@@ -140,13 +140,13 @@ function EthSigningClient(network, signer) {
         amount: fee.amount,
         gasLimit: fee.gas,
       },
-      SignMode.SIGN_MODE_DIRECT
+      SignMode.SIGN_MODE_DIRECT,
     );
     const signDoc = makeSignDoc(
       txBodyBytes,
       authInfoBytes,
       chainId,
-      accountNumber
+      accountNumber,
     );
     const { signature, signed } = await signer.signDirect(address, signDoc);
     return {
@@ -176,7 +176,7 @@ function EthSigningClient(network, signer) {
       TxBody.fromPartial({
         messages: anyMsgs,
         memo: memo,
-      })
+      }),
     ).finish();
   }
 

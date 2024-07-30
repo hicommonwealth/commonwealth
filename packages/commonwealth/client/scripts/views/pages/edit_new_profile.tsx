@@ -1,4 +1,4 @@
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React from 'react';
 import EditProfileComponent from '../components/EditProfile';
 import { PageNotFound } from '../pages/404';

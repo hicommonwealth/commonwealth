@@ -15,22 +15,23 @@ import type {
   DB,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-import { type Link, type LinkSource, type Role } from '@hicommonwealth/shared';
+import {
+  CANVAS_TOPIC,
+  CanvasSignResult,
+  CanvasSignedData,
+  SubstrateSignerCW,
+  serializeCanvas,
+  toCanvasSignedDataApiArgs,
+  type Link,
+  type LinkSource,
+  type Role,
+} from '@hicommonwealth/shared';
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
-import { SubstrateSignerCW } from 'shared/canvas/sessionSigners';
-import {
-  CanvasSignResult,
-  CanvasSignedData,
-  serializeCanvas,
-  toCanvasSignedDataApiArgs,
-} from 'shared/canvas/types';
-import { createRole, findOneRole } from '../../server/util/roles';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { CANVAS_TOPIC } from '../../shared/canvas';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {
@@ -584,48 +585,14 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   updateRole: async (args: AssignRoleArgs) => {
-    const currentRole = await findOneRole(
-      models,
-      { where: { address_id: args.address_id } },
-      args.chainOrCommObj.chain_id,
+    await models.sequelize.query(
+      `
+      UPDATE "Addresses"
+      SET role = '${args.role}'
+      WHERE id = ${args.address_id};
+    `,
     );
-    let role;
-    // Can only be a promotion
-    if (currentRole.toJSON().permission === 'member') {
-      role = await createRole(
-        models,
-        args.address_id,
-        args.chainOrCommObj.chain_id,
-        args.role,
-      );
-    }
-    // Can be demoted or promoted
-    else if (currentRole.toJSON().permission === 'moderator') {
-      // Demotion
-      if (args.role === 'member') {
-        role = await models['RoleAssignment'].destroy({
-          where: {
-            community_role_id: currentRole.toJSON().community_role_id,
-            address_id: args.address_id,
-          },
-        });
-      }
-      // Promotion
-      else if (args.role === 'admin') {
-        role = await createRole(
-          models,
-          args.address_id,
-          args.chainOrCommObj.chain_id,
-          args.role,
-        );
-      }
-    }
-    // If current role is admin, you cannot change it is the assumption
-    else {
-      return null;
-    }
-    if (!role) return null;
-    return role;
+    return true;
   },
 
   createSubscription: async (args: SubscriptionArgs) => {
@@ -649,7 +616,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {
-    const { jwt, address, chain, originChain, address_id } = args;
+    const { jwt, address, chain, originChain } = args;
     try {
       await chai.request
         .agent(app)
@@ -663,14 +630,6 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         });
     } catch (e) {
       console.error('Failed to link an existing address to a chain');
-      console.error(e);
-      return false;
-    }
-
-    try {
-      await createRole(models, address_id, chain, 'member', false);
-    } catch (e) {
-      console.error('Failed to create a role for a new member');
       console.error(e);
       return false;
     }

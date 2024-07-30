@@ -1,11 +1,12 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signThreadReaction } from 'client/scripts/controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { signThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
+import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
@@ -32,12 +33,12 @@ const createReaction = async ({
   return await axios.post(
     `${app.serverUrl()}/threads/${threadId}/reactions`,
     {
-      author_community_id: app.user.activeAccount.community.id,
+      author_community_id: userStore.getState().activeAccount?.community?.id,
       thread_id: threadId,
       community_id: app.chain.id,
       address,
       reaction: reactionType,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
     {
@@ -52,10 +53,12 @@ const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
 }: IuseCreateThreadReactionMutation) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
-
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
+  const user = useUserStore();
 
   return useMutation({
     mutationFn: createReaction,
@@ -74,15 +77,11 @@ const useCreateThreadReactionMutation = ({
         'combineAndRemoveDups',
       );
 
-      if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          // @ts-expect-error StrictNullChecks
-          profileId,
-        );
-      }
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

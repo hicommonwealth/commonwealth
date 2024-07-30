@@ -62,8 +62,10 @@ const useSearchResults = (
 
   const { data: profilesData } = useSearchProfilesQuery({
     ...sharedQueryOptions,
-    includeRoles: false,
-    enabled: queryEnabled && filters.includes('members'),
+    enabled:
+      queryEnabled &&
+      filters.includes('members') &&
+      debouncedSearchTerm?.length >= 3,
   });
 
   const searchResults = useMemo(() => {

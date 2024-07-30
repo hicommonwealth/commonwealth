@@ -4,7 +4,7 @@ import axios from 'axios';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { baseToNetwork } from 'helpers';
 import app, { initAppState } from 'state';
-import { updateAdminOnCreateCommunity } from 'views/pages/create_community/community_input_rows';
+import { userStore } from '../../ui/user';
 
 interface CreateCommunityProps {
   id: string;
@@ -61,7 +61,7 @@ const createCommunity = async ({
       network: communityNetwork,
       default_symbol: nameToSymbol,
       bech32_prefix: bech32Prefix,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
     {
       headers: {
@@ -74,17 +74,16 @@ const createCommunity = async ({
 const useCreateCommunityMutation = () => {
   return useMutation({
     mutationFn: createCommunity,
-    onSuccess: async ({ data }, variables) => {
+    onSuccess: async ({ data }) => {
       if (data?.result?.admin_address) {
         await linkExistingAddressToChainOrCommunity(
           data.result.admin_address,
-          data.result.role.community_id,
-          data.result.role.community_id,
+          data.result.community.id,
+          data.result.community.id,
         );
       }
 
       await initAppState(false);
-      await updateAdminOnCreateCommunity(variables.id);
     },
   });
 };

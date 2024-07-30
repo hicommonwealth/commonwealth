@@ -527,8 +527,8 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
-    key="/profile/id/:profileId"
-    path="/profile/id/:profileId"
+    key="/profile/id/:userId"
+    path="/profile/id/:userId"
     element={withLayout(NewProfilePage, {
       scoped: true,
       type: 'common',

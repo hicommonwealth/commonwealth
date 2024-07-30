@@ -3,6 +3,7 @@ import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 const PROFILES_STALE_TIME = 30 * 1_000; // 3 minutes
 
@@ -24,7 +25,7 @@ export const fetchProfilesByAddress = async ({
     {
       addresses: profileAddresses,
       communities: profileChainIds,
-      ...(app?.user?.jwt && { jwt: app.user.jwt }),
+      ...(userStore.getState().jwt && { jwt: userStore.getState().jwt }),
     },
   );
 
@@ -33,10 +34,10 @@ export const fetchProfilesByAddress = async ({
   return response.data.result.map((t) => {
     const profile = new MinimumProfile(t.address, currentChainId);
     profile.initialize(
+      t.userId,
       t.name,
       t.address,
       t.avatarUrl,
-      t.profileId,
       currentChainId,
       t.lastActive,
     );

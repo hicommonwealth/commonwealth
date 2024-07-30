@@ -1,7 +1,7 @@
-import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import type { IAccountsModule } from '../../../models/interfaces';
+import { DISCORD_BOT_ADDRESS } from '@hicommonwealth/shared';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import type { IAccountsModule } from '../../../models/interfaces';
 import EthereumAccount from './account';
 import type EthereumChain from './chain';
 
@@ -21,7 +21,7 @@ class EthereumAccounts implements IAccountsModule<EthereumAccount> {
 
   private _Chain: EthereumChain;
 
-  public get(address: string, keytype?: string, ignoreProfiles = true) {
+  public get(address: string, ignoreProfiles = true) {
     return this.fromAddress(address, ignoreProfiles);
   }
 
@@ -35,15 +35,18 @@ class EthereumAccounts implements IAccountsModule<EthereumAccount> {
   }
 
   public fromAddress(address: string, ignoreProfiles = true): EthereumAccount {
-    if (address.indexOf('0x') !== -1) {
-      if (address.length !== 42) {
-        console.error(`Invalid address length! ${address}`);
+    if (address !== DISCORD_BOT_ADDRESS) {
+      if (address.indexOf('0x') !== -1) {
+        if (address.length !== 42) {
+          console.error(`Invalid address length! ${address}`);
+        }
+      } else {
+        if (address.length !== 40) {
+          console.error(`Invalid address length! ${address}`);
+        }
+        // eslint-disable-next-line no-param-reassign
+        address = `0x${address}`;
       }
-    } else {
-      if (address.length !== 40) {
-        console.error(`Invalid address length! ${address}`);
-      }
-      address = `0x${address}`;
     }
     try {
       return this._store.getByAddress(address);
@@ -53,7 +56,7 @@ class EthereumAccounts implements IAccountsModule<EthereumAccount> {
         this._Chain,
         this,
         address,
-        ignoreProfiles
+        ignoreProfiles,
       );
     }
   }

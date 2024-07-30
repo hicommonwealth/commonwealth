@@ -1,22 +1,23 @@
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
-import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
-import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
+import { getBrowserInfo } from 'helpers/browser';
 import {
   GetThreadActionTooltipTextResponse,
   filterLinks,
 } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
+import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
@@ -96,10 +97,8 @@ export const ThreadCard = ({
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
-    // @ts-expect-error <StrictNullChecks/>
-    Permissions.isCommunityAdmin(null, thread.communityId) ||
-    // @ts-expect-error <StrictNullChecks/>
-    Permissions.isCommunityModerator(null, thread.communityId);
+    Permissions.isCommunityAdmin(thread.communityId) ||
+    Permissions.isCommunityModerator(thread.communityId);
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 
@@ -110,6 +109,16 @@ export const ThreadCard = ({
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
+
+  // Future Ref: this fixes https://github.com/hicommonwealth/commonwealth/issues/8611 for iOS mobile
+  // where quill renders broken/cut-off/overlapping thread.plaintext in cases when there are multiple
+  // <p/> tags in the quill delta for thread.plaintext or if thread.plaintext has \n characters which
+  // iOS devices don't seem to render correctly.
+  // Not updating it for desktop per a previous issue where markdown wasn't rendered correctly in
+  // preview because of .slice()'d  content.
+  const bodyText = getBrowserInfo().isMobile
+    ? thread.plaintext.replaceAll(/\n/g, '').slice(0, 150)
+    : thread.plaintext;
 
   return (
     <>
@@ -191,7 +200,7 @@ export const ThreadCard = ({
             </div>
             <CWText type="b1" className="content-body">
               <QuillRenderer
-                doc={thread.plaintext}
+                doc={bodyText}
                 cutoffLines={4}
                 customShowMoreButton={
                   <CWText type="b1" className="show-more-btn">

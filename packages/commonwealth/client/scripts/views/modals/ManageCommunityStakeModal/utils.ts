@@ -5,6 +5,7 @@ import AddressInfo from 'models/AddressInfo';
 import NodeInfo from 'models/NodeInfo';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from 'state/ui/user';
 
 export const convertEthToUsd = (
   ethAmount: string | number,
@@ -86,12 +87,14 @@ export const setActiveAccountOnTransactionSuccess = async (
   userAddressUsedInTransaction: string,
 ) => {
   if (
-    app?.user?.activeAccount &&
-    app.user.activeAccount.address !== userAddressUsedInTransaction
+    userStore.getState().activeAccount &&
+    userStore.getState().activeAccount?.address !== userAddressUsedInTransaction
   ) {
-    const accountToSet = app.user.activeAccounts.find(
-      (account) => account.address === userAddressUsedInTransaction,
-    );
+    const accountToSet = userStore
+      .getState()
+      .accounts.find(
+        (account) => account.address === userAddressUsedInTransaction,
+      );
     // @ts-expect-error StrictNullChecks
     return await setActiveAccount(accountToSet);
   }

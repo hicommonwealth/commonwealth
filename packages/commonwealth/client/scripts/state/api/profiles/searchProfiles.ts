@@ -1,17 +1,18 @@
+import { CommunityMember } from '@hicommonwealth/schemas';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
-import { MemberResult } from 'client/scripts/views/pages/search/helpers';
 import app from 'state';
+import { z } from 'zod';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
 
 export type SearchProfilesResponse = {
-  results: MemberResult[];
+  results: z.infer<typeof CommunityMember>[];
   limit: number;
   page: number;
   totalPages: number;
@@ -24,7 +25,6 @@ interface SearchProfilesProps {
   limit: number;
   orderBy?: APIOrderBy;
   orderDirection?: APIOrderDirection;
-  includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
   includeGroupIds?: boolean;
   includeCount?: boolean;
@@ -38,7 +38,6 @@ const searchProfiles = async ({
   limit,
   orderBy,
   orderDirection,
-  includeRoles,
   includeCount,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -56,7 +55,6 @@ const searchProfiles = async ({
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
-        include_roles: includeRoles,
         include_count: includeCount,
       },
     },
@@ -70,7 +68,6 @@ const useSearchProfilesQuery = ({
   limit,
   orderBy,
   orderDirection,
-  includeRoles,
   includeCount,
   enabled = true,
 }: SearchProfilesProps) => {
@@ -80,7 +77,6 @@ const useSearchProfilesQuery = ({
       communityId,
       orderBy,
       orderDirection,
-      includeRoles,
     },
   ];
   return useInfiniteQuery(
@@ -93,7 +89,6 @@ const useSearchProfilesQuery = ({
         limit,
         orderBy,
         orderDirection,
-        includeRoles,
         includeCount,
       }),
     {
@@ -105,7 +100,7 @@ const useSearchProfilesQuery = ({
         return undefined;
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
-      enabled: enabled && searchTerm.length >= 3,
+      enabled: enabled,
     },
   );
 };

@@ -1,5 +1,6 @@
 import { AppError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import { validateCommunity } from '../../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../../types';
@@ -120,20 +121,13 @@ const setDiscordBotConfig = async (
   }
 
   await models.sequelize.transaction(async (transaction) => {
-    const profile = await models.Profile.findOne({
-      where: {
-        profile_name: 'Discord Bot',
-      },
-      transaction,
+    const user = await models.User.findOne({
+      where: { email: DISCORD_BOT_EMAIL },
     });
-
     const [address, created] = await models.Address.findOrCreate({
       where: {
-        // @ts-expect-error StrictNullChecks
-        user_id: profile.user_id,
-        // @ts-expect-error StrictNullChecks
-        profile_id: profile.id,
-        address: '0xdiscordbot',
+        user_id: user?.id,
+        address: DISCORD_BOT_ADDRESS,
         community_id,
       },
       // @ts-expect-error StrictNullChecks

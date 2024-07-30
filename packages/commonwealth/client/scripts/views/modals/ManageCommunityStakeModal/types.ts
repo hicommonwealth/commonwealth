@@ -1,4 +1,4 @@
-import ChainInfo from 'client/scripts/models/ChainInfo';
+import ChainInfo from 'models/ChainInfo';
 
 export type ManageCommunityStakeModalMode = 'buy' | 'sell';
 

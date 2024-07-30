@@ -182,7 +182,7 @@ const ContestActionZ = ContestAction.pick({
 type ContestActionT = z.infer<typeof ContestActionZ>;
 
 export interface VersionHistory {
-  author?: MinimumProfile & { profile_id: number };
+  author?: MinimumProfile;
   timestamp: Moment;
   body: string;
 }
@@ -190,7 +190,7 @@ export interface VersionHistory {
 export interface IThreadCollaborator {
   address: string;
   community_id: string;
-  User: { Profiles: UserProfile[] };
+  User: { profile: UserProfile };
 }
 
 export type AssociatedReaction = {
@@ -232,7 +232,6 @@ type RecentComment = {
   marked_as_spam_at?: string;
   deleted_at?: string;
   discord_meta?: string;
-  profile_id: number;
   profile_name?: string;
   profile_avatar_url?: string;
   user_id: string;
@@ -346,7 +345,8 @@ export class Thread implements IUniqueId {
     canvasHash,
     links,
     discord_meta,
-    profile_id,
+    userId,
+    user_id,
     profile_name,
     avatar_url,
     address_last_active,
@@ -392,7 +392,8 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
-    profile_id: number;
+    userId: number;
+    user_id: number;
     profile_name: string;
     avatar_url: string;
     address_last_active: string;
@@ -477,15 +478,13 @@ export class Thread implements IUniqueId {
           plaintext: rc?.plainText,
           text: rc?.text,
           Address: {
+            user_id: rc?.user_id,
             address: rc?.address,
             User: {
-              Profiles: [
-                {
-                  id: rc?.profile_id,
-                  profile_name: rc?.profile_name,
-                  avatar_url: rc?.profile_avatar_url,
-                },
-              ],
+              profile: {
+                name: rc?.profile_name,
+                avatar_url: rc?.profile_avatar_url,
+              },
             },
           },
           discord_meta: rc?.discord_meta,
@@ -509,7 +508,7 @@ export class Thread implements IUniqueId {
       this.profile = addressToUserProfile(Address);
     } else {
       this.profile = {
-        id: profile_id,
+        userId: userId ?? user_id,
         name: profile_name,
         address: Address?.address,
         lastActive: address_last_active,

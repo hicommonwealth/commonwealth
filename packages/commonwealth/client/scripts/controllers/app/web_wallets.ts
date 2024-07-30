@@ -1,6 +1,7 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import CoinbaseWebWalletController from './webWallets/coinbase_web_wallet';
@@ -53,7 +54,7 @@ export default class WebWalletController {
 
   // sets a WalletId on the backend for an account whose walletId has not already been set
   public async _setWalletId(account: Account, wallet: WalletId): Promise<void> {
-    if (app.user.activeAccount.address !== account.address) {
+    if (userStore.getState().activeAccount?.address !== account.address) {
       console.error('account must be active to set wallet id');
       return;
     }
@@ -64,7 +65,7 @@ export default class WebWalletController {
         author_community_id: account.community.id,
         wallet_id: wallet,
         wallet_sso_source: null,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       });
     } catch (e) {
       console.error(`Failed to set wallet for address: ${e.message}`);
@@ -87,7 +88,7 @@ export default class WebWalletController {
       throw new Error('No wallet available');
     }
 
-    if (app.user.addresses[0].walletId === 'magic') {
+    if (userStore.getState().addresses?.[0]?.walletId === 'magic') {
       throw new Error(
         'On-chain Transactions not currently available for magic',
       );

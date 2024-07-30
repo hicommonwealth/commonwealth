@@ -1,5 +1,4 @@
 import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
-import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -8,7 +7,6 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
@@ -18,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
@@ -26,6 +25,7 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
@@ -83,8 +83,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
-  // @ts-expect-error <StrictNullChecks/>
-  const [viewCount, setViewCount] = useState<number>(null);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -94,13 +92,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
-  const [isViewMarked, setIsViewMarked] = useState(false);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const user = useUserStore();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -143,8 +141,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
+  });
+
+  const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
+    communityId: app.activeChainId(),
+    objectId: thread?.id || '',
+    apiCallEnabled: !!thread?.id,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -247,28 +251,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       });
   }, [thread, arePollsFetched]);
 
-  useNecessaryEffect(() => {
-    if (!thread || (thread && isViewMarked)) {
-      return;
-    }
-
-    // load view count
-    axios
-      .post(`${app.serverUrl()}/viewCount`, {
-        community_id: app.activeChainId(),
-        object_id: thread.id,
-      })
-      .then((response) => {
-        setViewCount(response?.data?.result?.view_count || 0);
-      })
-      .catch(() => {
-        setViewCount(0);
-      })
-      .finally(() => {
-        setIsViewMarked(true);
-      });
-  }, [thread, isViewMarked]);
-
   useManageDocumentTitle('View thread', thread?.title);
 
   if (typeof identifier !== 'string') {
@@ -327,7 +309,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
+  const canComment = !!user.activeAccount && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -372,7 +354,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     .filter((c) => !c.parentComment)
     .sort((a, b) => commentsByDate(a, b, commentSortType));
 
-  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const showBanner = !user.activeAccount && isBannerVisible;
   const fromDiscordBot =
     // @ts-expect-error <StrictNullChecks/>
     thread.discord_meta !== null && thread.discord_meta !== undefined;
@@ -397,7 +379,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,

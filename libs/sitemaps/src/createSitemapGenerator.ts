@@ -1,7 +1,12 @@
+import { logger } from '@hicommonwealth/core';
+import { fileURLToPath } from 'url';
 import { AsyncWriter } from './createAsyncWriter';
 import { Paginator } from './createDatabasePaginator';
 import { createSitemap } from './createSitemap';
 import { createSitemapIndex } from './createSitemapIndex';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export interface SitemapFile {
   readonly location: string;
@@ -25,7 +30,7 @@ export function createSitemapGenerator(
 
     const children: SitemapFile[] = [];
     for (const paginator of paginators) {
-      console.log('Working with paginator...');
+      log.info('Working with paginator...');
 
       while (await paginator.hasNext()) {
         const page = await paginator.next();
@@ -34,12 +39,14 @@ export function createSitemapGenerator(
           continue;
         }
 
-        console.log('Processing N links: ' + page.links.length);
+        log.info('Processing N links: ' + page.links.length);
         const sitemap = createSitemap(page.links);
         const sitemapPath = `sitemap-${idx++}.xml`;
         const res = await writer.write(sitemapPath, sitemap);
-        console.log('Wrote sitemap: ' + sitemapPath);
-        children.push({ location: res.location });
+        const url = new URL(res.location);
+        const location = 'https://' + url.hostname + '/' + sitemapPath;
+        log.info(`Wrote sitemap: ${sitemapPath} to location ${location}`);
+        children.push({ location });
       }
     }
 
@@ -49,7 +56,7 @@ export function createSitemapGenerator(
       );
       const idx_path = `sitemap-index.xml`;
       const res = await writer.write(idx_path, index);
-      console.log('Wrote sitemap index ' + idx_path);
+      log.info(`Wrote sitemap index ${idx_path} at location: ${res.location}`);
       return { location: res.location };
     }
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import useUserStore from 'state/ui/user';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from '../../state';
@@ -26,6 +27,7 @@ export const ChangeThreadTopicModal = ({
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+  const user = useUserStore();
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
@@ -47,7 +49,7 @@ export const ChangeThreadTopicModal = ({
     try {
       await editThread({
         communityId: app.activeChainId(),
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address || '',
         threadId: thread.id,
         topicId: activeTopic.id,
       });
