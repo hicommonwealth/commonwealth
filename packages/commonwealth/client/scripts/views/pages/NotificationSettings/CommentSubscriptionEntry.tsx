@@ -59,9 +59,9 @@ export const CommentSubscriptionEntry = (
 
   const navigate = useCommonNavigate();
 
-  const handleNavigateToThread = useCallback(() => {
+  const handleNavigateToThread = () => {
     navigate(threadUrl);
-  }, [navigate, threadUrl]);
+  };
 
   return (
     <div className="SubscriptionEntry">
