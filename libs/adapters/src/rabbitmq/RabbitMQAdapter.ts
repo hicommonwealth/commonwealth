@@ -300,7 +300,7 @@ export class RabbitMQAdapter implements Broker {
       'contestManagers' in event.payload &&
       event.payload.contestManagers?.length
     ) {
-      return `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}`;
+      return `${event.name}.${RoutingKeyTags.Contest}`;
     } else {
       return `${event.name}`;
     }
