@@ -10,6 +10,7 @@ If you add a new environment variable, you must add documentation here. Please d
 
 ## Contents
 
+- [ALLOWED_EVENTS](#allowed_events)
 - [AWS_ACCESS_KEY_ID](#aws_access_key_id)
 - [AWS_REGION](#aws_region)
 - [AWS_SECRET_ACCESS_KEY](#aws_secret_access_key)
@@ -40,9 +41,11 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
 - [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
+- [EVM_CE_POLL_INTERVAL](#evm_ce_poll_interval)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
 - [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
 - [FLAG_COMMUNITY_STAKE](#flag_community_stake)
+- [FLAG_CONTEST](#flag_contest)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
@@ -62,6 +65,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [NODE_ENV](#node_env)
 - [PGPASSWORD](#pgpassword)
 - [PORT](#port)
+- [PRIVATE_KEY](#private_key)
 - [PROCFILE](#procfile)
 - [RABBITMQ_API_URI](#rabbitmq_api_uri)
 - [RABBITMQ_URI](#rabbitmq_uri)
@@ -84,6 +88,10 @@ If you add a new environment variable, you must add documentation here. Please d
 - [TEST_WITH_LOGS](#test_with_logs)
 - [WITH_PRERENDER](#with_prerender)
 - [ZAPIER_WEBHOOK_URL_DEV](#zapier_webhook_url_dev)
+
+## ALLOWED_EVENTS
+
+To enable contests, must be set to `ChainEventCreated,ThreadCreated,ThreadUpvoted,ContestContentAdded,ContestContentUpvoted,ContestStarted,OneOffContestManagerDeployed,RecurringContestManagerDeployed`.
 
 ## AWS_ACCESS_KEY_ID
 
@@ -207,7 +215,7 @@ Owner: Raymond Zhong.
 
 ## ETH_ALCHEMY_API_KEY
 
-Used in our CI/CD and stored in GitHub repo secrets. If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work that involves querying Ethereum.
+Must be enabled for testing contests. Also used in our CI/CD and stored in GitHub repo secrets. If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work that involves querying Ethereum.
 
 Owner: Kurtis Assad.
 
@@ -220,6 +228,10 @@ Owner: Ian Rowan
 ## ETHERSCAN_JS_API_KEY
 
 API key for Ethereum data.
+
+## EVM_CE_POLL_INTERVAL
+
+Required for testing contests. Number of milliseconds. `10000` is recommended; if the number is too low, millions of requests will be made.
 
 ## FALLBACK_NODE_DURATION_S
 
@@ -234,6 +246,10 @@ Boolean toggle to display side-wide homepage feature for communities. Temporary 
 ## FLAG_COMMUNITY_STAKE
 
 Boolean toggle to enable [community stake](./Stake.md) for local development.
+
+## FLAG_CONTEST
+
+Boolean toggle to enable contests. Required for testing contests.
 
 ## FLAG_NEW_CREATE_COMMUNITY
 
@@ -314,6 +330,10 @@ Postgres DB password (by default, `edgeware`). Bypasses usual password prompt fo
 ## PORT
 
 Localhost port location, default value `8080`.
+
+## PRIVATE_KEY
+
+The private Ethereum key that will be used by the developer for testing contests. Must include the 0x prefix.
 
 ## PROCFILE
 
