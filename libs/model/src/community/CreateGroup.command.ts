@@ -57,14 +57,14 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
           );
           if (topicsToAssociate.length > 0) {
             const createPermissionsPromises = topicsToAssociate.map((topic) => {
-              return this.models.GroupPermission.create(
+              return models.GroupPermission.create(
                 {
                   group_id: group.id,
                   topic_id: topic.id,
                   allowed_actions: Object.values(ForumActionsEnum),
                 },
                 {
-                  transaction: t,
+                  transaction,
                 },
               );
             });
