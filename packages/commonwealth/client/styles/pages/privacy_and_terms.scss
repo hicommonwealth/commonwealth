@@ -58,9 +58,12 @@
     padding: 5px;
     font-family: $font-family-silka;
   }
+  a {
+    color: $primary-500;
+  }
 
   .table-header {
-    background-color: #d3d3d3;
+    background-color: $neutral-300;
   }
 
   .column-header {
