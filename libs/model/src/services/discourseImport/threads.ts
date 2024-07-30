@@ -1,6 +1,8 @@
 import { models } from '@hicommonwealth/model';
+import { Topic, User } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { z } from 'zod';
 
 export type DiscourseThread = {
   id: number;
@@ -122,12 +124,16 @@ export const createAllThreadsInCW = async (
   discourseConnection: Sequelize,
   {
     users,
-    categories,
+    topics,
     communityId,
-  }: { users: any[]; categories: any[]; communityId: string },
+  }: {
+    users: Array<z.infer<typeof User>>;
+    topics: Array<z.infer<typeof Topic>>;
+    communityId: string;
+  },
   { transaction }: { transaction: Transaction },
 ) => {
-  const topics = await DiscourseQueries.fetchThreadsFromDiscourse(
+  const discourseThreads = await DiscourseQueries.fetchThreadsFromDiscourse(
     discourseConnection,
   );
   const generalCwTopic = await models.Topic.findOne({
@@ -138,7 +144,7 @@ export const createAllThreadsInCW = async (
   });
   const generalDiscourseCategoryId =
     await DiscourseQueries.fetchDiscourseGeneralCategoryId(discourseConnection);
-  const threadPromises = topics
+  const threadPromises = discourseThreads
     .map((topic) => {
       const {
         id: discourseThreadId,
@@ -154,9 +160,11 @@ export const createAllThreadsInCW = async (
         updated_at,
       } = topic;
 
-      let cwTopicId = generalCwTopic!.id;
+      // set topic of thread
+      let cwTopicId = generalCwTopic!.id; // general by default
       if (category_id) {
-        const category = categories.find(
+        // discourse topic
+        const category = topics.find(
           ({ discourseCategoryId }) => discourseCategoryId === category_id,
         );
         if (

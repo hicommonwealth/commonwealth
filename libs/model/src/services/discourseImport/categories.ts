@@ -1,5 +1,11 @@
 import { models, TopicAttributes } from '@hicommonwealth/model';
+import { Topic } from '@hicommonwealth/schemas';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { z } from 'zod';
+
+type CWTopicWithDiscourseId = z.infer<typeof Topic> & {
+  discourseCategoryId: number;
+};
 
 class DiscourseQueries {
   static fetchTopicsFromDiscourse = async (session: Sequelize) => {
