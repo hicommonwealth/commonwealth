@@ -14,7 +14,7 @@ import useFetchCommentsQuery from './fetchComments';
 interface DeleteCommentProps {
   address: string;
   communityId: string;
-  canvasHash: string;
+  canvasMsgId: string;
   commentId: number;
   existingNumberOfComments: number;
 }
@@ -23,12 +23,12 @@ const deleteComment = async ({
   address,
   communityId,
   commentId,
-  canvasHash,
+  canvasMsgId,
 }: DeleteCommentProps) => {
   const canvasSignedData = await signDeleteComment(
     userStore.getState().activeAccount?.address || '',
     {
-      comment_id: canvasHash,
+      comment_id: canvasMsgId,
     },
   );
 

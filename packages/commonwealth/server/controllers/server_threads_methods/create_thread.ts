@@ -55,7 +55,7 @@ export type CreateThreadOptions = {
   stage?: string;
   url?: string;
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
   discordMeta?: any;
 };
 
@@ -79,7 +79,7 @@ export async function __createThread(
     stage,
     url,
     canvasSignedData,
-    canvasHash,
+    canvasMsgId,
     discordMeta,
   }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
@@ -190,7 +190,7 @@ export async function __createThread(
     url,
     read_only: readOnly,
     canvas_signed_data: canvasSignedData,
-    canvas_hash: canvasHash,
+    canvas_msg_id: canvasMsgId,
     discord_meta: discordMeta,
     // @ts-expect-error StrictNullChecks
     topic_id: +topicId,

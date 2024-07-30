@@ -5,7 +5,7 @@ export const fromCanvasSignedDataApiArgs = (
   data: CanvasSignedDataApiArgs,
 ): CanvasSignResult => ({
   canvasSignedData: deserializeCanvas(data.canvas_signed_data),
-  canvasHash: data.canvas_hash,
+  canvasMsgId: data.canvas_msg_id,
 });
 
 export const toCanvasSignedDataApiArgs = (
@@ -17,11 +17,11 @@ export const toCanvasSignedDataApiArgs = (
     return;
   }
 
-  const { canvasSignedData, canvasHash } = data;
+  const { canvasSignedData, canvasMsgId } = data;
 
   return {
     canvas_signed_data: serializeCanvas(canvasSignedData),
-    canvas_hash: canvasHash,
+    canvas_msg_id: canvasMsgId,
   };
 };
 
@@ -34,17 +34,23 @@ export const hasCanvasSignedDataApiArgs = (
    * The input is valid if either all three are present or all three are absent
    */
 
-  if (args.canvas_signed_data === undefined && args.canvas_hash === undefined) {
+  if (
+    args.canvas_signed_data === undefined &&
+    args.canvas_msg_id === undefined
+  ) {
     return false;
   }
 
-  if (args.canvas_signed_data === undefined || args.canvas_hash === undefined) {
+  if (
+    args.canvas_signed_data === undefined ||
+    args.canvas_msg_id === undefined
+  ) {
     throw new Error('Missing canvas signed data');
   }
 
   if (
     typeof args.canvas_signed_data !== 'string' ||
-    typeof args.canvas_hash !== 'string'
+    typeof args.canvas_msg_id !== 'string'
   ) {
     throw new Error('Canvas signed data fields should be strings (if present)');
   }

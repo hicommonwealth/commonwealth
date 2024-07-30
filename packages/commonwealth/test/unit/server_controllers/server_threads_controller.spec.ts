@@ -570,7 +570,7 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         });
 
@@ -651,7 +651,7 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Ban error: big bad error');
@@ -719,7 +719,7 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Thread not found');
@@ -804,7 +804,7 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Thread is archived');
@@ -875,7 +875,7 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Cannot comment when thread is read_only');
@@ -949,7 +949,7 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Invalid parent');
@@ -1020,7 +1020,7 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Comments can only be nested 8 levels deep');
@@ -1342,7 +1342,7 @@ describe('ServerThreadsController', () => {
           topicId,
           stage,
           url,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         });
 
@@ -1361,7 +1361,7 @@ describe('ServerThreadsController', () => {
           topicId,
           stage,
           url,
-          canvasHash: undefined,
+          canvasMsgId: undefined,
           canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Ban error: banned');

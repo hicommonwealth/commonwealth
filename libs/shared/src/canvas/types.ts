@@ -9,10 +9,10 @@ export type CanvasSignedData = {
 
 export type CanvasSignResult = {
   canvasSignedData: CanvasSignedData;
-  canvasHash: string;
+  canvasMsgId: string;
 };
 
 export type CanvasSignedDataApiArgs = {
   canvas_signed_data: string;
-  canvas_hash: string;
+  canvas_msg_id: string;
 };

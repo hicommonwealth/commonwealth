@@ -69,7 +69,7 @@ export const contract = {
       db.set("comments", {
         id: id,
         author: did,
-        thread_id, // TODO: this should be the thread's canvas_hash/cid
+        thread_id, // TODO: this should be the thread's canvas_msg_id/cid
         body,
         parent_comment_id,
         updated_at: timestamp

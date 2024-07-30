@@ -71,7 +71,7 @@ export const CommentReactionButton = ({
         communityId: app.activeChainId(),
         address: user.activeAccount?.address,
         // @ts-expect-error <StrictNullChecks/>
-        canvasHash: foundReaction.canvasHash,
+        canvasMsgId: foundReaction.canvasMsgId,
         // @ts-expect-error <StrictNullChecks/>
         reactionId: foundReaction.id,
       }).catch((err) => {

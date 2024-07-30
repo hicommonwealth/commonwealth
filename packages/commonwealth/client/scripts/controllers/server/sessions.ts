@@ -11,8 +11,6 @@ import {
   chainBaseToCanvasChainId,
   getSessionSigners,
 } from '@hicommonwealth/shared';
-import { encode } from '@ipld/dag-json';
-import { sha256 } from '@noble/hashes/sha256';
 import app from 'state';
 import { fetchCachedConfiguration } from 'state/api/configuration';
 import Account from '../../models/Account';
@@ -206,7 +204,7 @@ async function sign(
           actionMessage,
           actionMessageSignature,
         },
-        canvasHash: Buffer.from(sha256(encode(actionMessage))).toString('hex'), // TODO
+        canvasMsgId: actionMessageId,
       };
     }
   }

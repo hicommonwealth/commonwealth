@@ -26,15 +26,15 @@ export const getCanvasData = async (
 
   const [rows] = await models.sequelize.query(
     `
-(SELECT canvas_signed_data, canvas_hash as hash, updated_at
+(SELECT canvas_signed_data, canvas_msg_id as hash, updated_at
     FROM "Threads" WHERE canvas_signed_data IS NOT NULL AND updated_at < COALESCE(?, NOW())
     ORDER BY updated_at DESC LIMIT 50)
 UNION
-(SELECT canvas_signed_data, canvas_hash as hash, updated_at
+(SELECT canvas_signed_data, canvas_msg_id as hash, updated_at
     FROM "Comments" WHERE canvas_signed_data IS NOT NULL AND updated_at < COALESCE(?, NOW())
     ORDER BY updated_at DESC LIMIT 50)
 UNION
-(SELECT canvas_signed_data, canvas_hash as hash, updated_at
+(SELECT canvas_signed_data, canvas_msg_id as hash, updated_at
     FROM "Reactions" WHERE canvas_signed_data IS NOT NULL AND updated_at < COALESCE(?, NOW())
     ORDER BY updated_at DESC LIMIT 50)
 ORDER BY updated_at DESC LIMIT 50;

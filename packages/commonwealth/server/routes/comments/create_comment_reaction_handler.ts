@@ -56,7 +56,7 @@ export const createCommentReactionHandler = async (
 
   if (hasCanvasSignedDataApiArgs(req.body)) {
     commentReactionFields.canvasSignedData = req.body.canvas_signed_data;
-    commentReactionFields.canvasHash = req.body.canvas_hash;
+    commentReactionFields.canvasMsgId = req.body.canvas_msg_id;
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);

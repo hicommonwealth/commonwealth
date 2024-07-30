@@ -59,7 +59,7 @@ export const createThreadReactionHandler = async (
   if (hasCanvasSignedDataApiArgs(req.body)) {
     // Only save the canvas fields if they are given and they are strings
     reactionFields.canvasSignedData = req.body.canvas_signed_data;
-    reactionFields.canvasHash = req.body.canvas_hash;
+    reactionFields.canvasMsgId = req.body.canvas_msg_id;
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);

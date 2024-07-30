@@ -62,7 +62,7 @@ export const createThreadHandler = async (
 
   if (hasCanvasSignedDataApiArgs(req.body)) {
     threadFields.canvasSignedData = req.body.canvas_signed_data;
-    threadFields.canvasHash = req.body.canvas_hash;
+    threadFields.canvasMsgId = req.body.canvas_msg_id;
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);

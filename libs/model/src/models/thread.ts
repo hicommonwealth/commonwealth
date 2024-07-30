@@ -73,7 +73,7 @@ export default (
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -137,7 +137,7 @@ export default (
         { fields: ['community_id', 'updated_at'] },
         { fields: ['community_id', 'pinned'] },
         { fields: ['community_id', 'has_poll'] },
-        { fields: ['canvas_hash'] },
+        { fields: ['canvas_msg_id'] },
       ],
       hooks: {
         afterCreate: async (

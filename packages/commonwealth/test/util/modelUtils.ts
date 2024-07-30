@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { SignedMessage } from '@canvas-js/gossiplog';
 import type {
   Action,
   Awaitable,
@@ -26,8 +27,6 @@ import {
   type LinkSource,
   type Role,
 } from '@hicommonwealth/shared';
-import { encode } from '@ipld/dag-json';
-import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
@@ -56,10 +55,14 @@ function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
     sessionMessage,
     sessionMessageSignature,
   };
-  const canvasHash = Buffer.from(sha256(encode(actionMessage))).toString('hex');
+  const actionMessageId = SignedMessage.encode(
+    actionMessageSignature,
+    actionMessage,
+  ).id;
+
   return {
     canvasSignedData,
-    canvasHash,
+    canvasMsgId: actionMessageId,
   };
 }
 

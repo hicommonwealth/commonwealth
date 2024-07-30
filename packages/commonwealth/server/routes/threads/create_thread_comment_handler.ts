@@ -69,7 +69,7 @@ export const createThreadCommentHandler = async (
 
   if (hasCanvasSignedDataApiArgs(req.body)) {
     threadCommentFields.canvasSignedData = req.body.canvas_signed_data;
-    threadCommentFields.canvasHash = req.body.canvas_hash;
+    threadCommentFields.canvasMsgId = req.body.canvas_msg_id;
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
