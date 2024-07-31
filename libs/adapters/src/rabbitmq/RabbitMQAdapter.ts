@@ -4,12 +4,15 @@ import {
   BrokerSubscriptions,
   CustomRetryStrategyError,
   EventContext,
+  EventNames,
   EventSchemas,
   Events,
   EventsHandlerMetadata,
   ILogger,
   InvalidInput,
   RetryStrategyFn,
+  RoutingKey,
+  RoutingKeyTags,
   handleEvent,
   logger,
 } from '@hicommonwealth/core';
@@ -152,7 +155,7 @@ export class RabbitMQAdapter implements Broker {
 
     try {
       const publication = await this.broker!.publish(topic, event, {
-        routingKey: event.name,
+        routingKey: this.getRoutingKey(event),
       });
 
       return new Promise<boolean>((resolve, reject) => {
@@ -284,6 +287,21 @@ export class RabbitMQAdapter implements Broker {
     }
 
     return false;
+  }
+
+  public getRoutingKey<Name extends Events>(
+    event: EventContext<Name>,
+  ): RoutingKey {
+    if (
+      (event.name === EventNames.ThreadCreated ||
+        event.name === EventNames.ThreadUpvoted) &&
+      'contestManagers' in event.payload &&
+      event.payload.contestManagers?.length
+    ) {
+      return `${event.name}.${RoutingKeyTags.Contest}`;
+    } else {
+      return `${event.name}`;
+    }
   }
 
   public get name(): string {

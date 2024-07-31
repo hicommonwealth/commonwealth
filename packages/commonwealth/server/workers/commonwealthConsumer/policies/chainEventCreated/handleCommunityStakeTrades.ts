@@ -1,4 +1,4 @@
-import { events, logger } from '@hicommonwealth/core';
+import { CommunityStakeTrade, events, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
@@ -18,7 +18,7 @@ export async function handleCommunityStakeTrades(
     4: ethAmount,
     // 5: protocolEthAmount,
     // 6: nameSpaceEthAmount,
-  } = event.parsedArgs as z.infer<typeof events.CommunityStakeTrade>;
+  } = event.parsedArgs as z.infer<typeof CommunityStakeTrade>;
 
   const existingTxn = await models.StakeTransaction.findOne({
     where: {
