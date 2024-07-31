@@ -210,8 +210,8 @@ importers:
         specifier: ^17.7.0
         version: 17.7.0(eslint@8.57.0)
       eslint-plugin-prettier:
-        specifier: ^4.2.1
-        version: 4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3)
+        specifier: ^5.2.1
+        version: 5.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3)
       eslint-plugin-promise:
         specifier: ^6.1.1
         version: 6.1.1(eslint@8.57.0)
@@ -4333,6 +4333,13 @@ packages:
         integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==,
       }
     engines: { node: '>=14' }
+
+  '@pkgr/core@0.1.1':
+    resolution:
+      {
+        integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==,
+      }
+    engines: { node: ^12.20.0 || ^14.18.0 || >=16.0.0 }
 
   '@playwright/test@1.44.0':
     resolution:
@@ -10395,17 +10402,20 @@ packages:
     peerDependencies:
       eslint: '>=8.23.0'
 
-  eslint-plugin-prettier@4.2.1:
+  eslint-plugin-prettier@5.2.1:
     resolution:
       {
-        integrity: sha512-f/0rXLXUt0oFYs8ra4w49wYZBG5GKZpAYsJSm6rnYL5uVDjd+zowwMwVZHnAjf4edNrKpCDYfXDgmRE/Ak7QyQ==,
+        integrity: sha512-gH3iR3g4JfF+yYPaJYkN7jEl9QbweL/YfkoRlNnuIEHEz1vHVlCmWOS+eGGiRuzHQXdJFCOTxRgvju9b8VUmrw==,
       }
-    engines: { node: '>=12.0.0' }
+    engines: { node: ^14.18.0 || >=16.0.0 }
     peerDependencies:
-      eslint: '>=7.28.0'
+      '@types/eslint': '>=8.0.0'
+      eslint: '>=8.0.0'
       eslint-config-prettier: '*'
-      prettier: '>=2.0.0'
+      prettier: '>=3.0.0'
     peerDependenciesMeta:
+      '@types/eslint':
+        optional: true
       eslint-config-prettier:
         optional: true
 
@@ -17450,6 +17460,13 @@ packages:
         integrity: sha512-J8jTXuZzRlvU7HemDgHi3pGnh/rkoqR/OZSjhTyyZrEkkYQbk7Z33AXp37mkPfPpfdOuj7Ex3H/TJM1z48uPQw==,
       }
 
+  synckit@0.9.1:
+    resolution:
+      {
+        integrity: sha512-7gr8p9TQP6RAHusBOSLs46F4564ZrjV8xFmw5zCmgmhGUcw2hxsShhJ6CEiHQMgPDwAQ1fWHPM0ypc4RMAig4A==,
+      }
+    engines: { node: ^14.18.0 || >=16.0.0 }
+
   system-architecture@0.1.0:
     resolution:
       {
@@ -21977,6 +21994,8 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@pkgr/core@0.1.1': {}
 
   '@playwright/test@1.44.0':
     dependencies:
@@ -26573,11 +26592,12 @@ snapshots:
       minimatch: 9.0.4
       semver: 7.6.0
 
-  eslint-plugin-prettier@4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3):
+  eslint-plugin-prettier@5.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3):
     dependencies:
       eslint: 8.57.0
       prettier: 3.3.3
       prettier-linter-helpers: 1.0.0
+      synckit: 0.9.1
     optionalDependencies:
       eslint-config-prettier: 8.10.0(eslint@8.57.0)
 
@@ -31301,6 +31321,11 @@ snapshots:
   sync-rpc@1.3.6:
     dependencies:
       get-port: 3.2.0
+
+  synckit@0.9.1:
+    dependencies:
+      '@pkgr/core': 0.1.1
+      tslib: 2.6.2
 
   system-architecture@0.1.0: {}
 
