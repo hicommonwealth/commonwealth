@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import {
+  CompleteMultipartUploadCommandOutput,
+  PutObjectCommand,
+  S3,
+} from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { BlobBucket, type BlobStorage } from '@hicommonwealth/core';
@@ -17,14 +21,11 @@ const s3Buckets: Record<BlobBucket, string> =
         sitemap: 'sitemap.commonwealth.im',
       };
 
-/**
- * Creates a valid S3 asset url from an upload.Location url
- * @param uploadLocation The url returned by the Upload method of @aws-sdk/lib-storage
- * @param bucketName The name of the bucket or the domain (alias) of the bucket. Defaults to assets.commonwealth.im
- */
-function formatS3Url(uploadLocation: string, bucketName: string): string {
+function formatS3Url(data: CompleteMultipartUploadCommandOutput): string {
+  if (config.APP_ENV === 'local')
+    return `https://s3.amazonaws.com/${data.Bucket}/${data.Key}`;
   return (
-    `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
+    `https://${data.Bucket}/` + data.Location!.split('amazonaws.com/').pop()
   );
 }
 
@@ -52,7 +53,7 @@ export const S3BlobStorage = (): BlobStorage => {
 
       return {
         location: data.Location,
-        url: formatS3Url(data.Location, s3Buckets[bucket]),
+        url: formatS3Url(data),
       };
     },
 
