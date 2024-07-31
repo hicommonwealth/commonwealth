@@ -500,7 +500,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
             })
           : selectedAddress,
       ],
-      profileChainIds: [app.activeChainId() ?? wallet.chain],
+      profileChainIds: [],
       initiateProfilesAfterFetch: false,
     });
     const addressExists = profileAddresses?.length > 0;
