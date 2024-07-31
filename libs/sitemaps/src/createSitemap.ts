@@ -18,6 +18,11 @@ export function createSitemap(links: ReadonlyArray<Link>): string {
     // loc, changefreq, priority, lastmod
     buff.append(`<loc>${link.url}</loc>\n`);
     buff.append(`<lastmod>${link.updated_at}</lastmod>\n`);
+
+    if (link.priority !== undefined) {
+      buff.append(`<priority>${link.priority}</priority>\n`);
+    }
+
     buff.append('</url>\n');
   }
 

@@ -2,10 +2,18 @@ import { models, ThreadInstance, UserAttributes } from '@hicommonwealth/model';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 
+const THREAD_PRIORITY: number = parseFloat(
+  process.env.SITEMAP_THREAD_PRIORITY || '0.8',
+);
+const PROFILE_PRIORITY: number = parseFloat(
+  process.env.SITEMAP_PROFILE_PRIORITY || '0.4',
+);
+
 export interface Link {
   readonly id: number;
   readonly url: string;
   readonly updated_at: string;
+  readonly priority?: number;
 }
 
 /**
@@ -69,6 +77,7 @@ function createThreadsTableAdapter(): TableAdapter {
       id: thread.id,
       url,
       updated_at: thread.updated_at.toISOString(),
+      priority: THREAD_PRIORITY,
     };
   }
 
@@ -104,6 +113,7 @@ function createProfilesTableAdapter(): TableAdapter {
       id: user.id,
       url,
       updated_at: user.updated_at.toISOString(),
+      priority: PROFILE_PRIORITY,
     };
   }
 
