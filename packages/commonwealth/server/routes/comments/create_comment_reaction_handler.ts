@@ -2,12 +2,13 @@ import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
+  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyReaction,
 } from '@hicommonwealth/shared';
 import { CreateCommentReactionOptions } from 'server/controllers/server_comments_methods/create_comment_reaction';
-import { config } from '../../config';
+import { canvas } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -17,7 +18,10 @@ const Errors = {
 };
 
 type CreateCommentReactionRequestParams = { id: string };
-type CreateCommentReactionRequestBody = { reaction: string };
+type CreateCommentReactionRequestBody = {
+  reaction: string;
+  comment_msg_id: string | null;
+};
 type CreateCommentReactionResponse = ReactionAttributes;
 
 export const createCommentReactionHandler = async (
@@ -31,7 +35,7 @@ export const createCommentReactionHandler = async (
 ) => {
   const { user, address } = req;
   // @ts-expect-error <StrictNullChecks>
-  const { reaction } = req.body;
+  const { reaction, comment_msg_id: commentMsgId } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -54,31 +58,34 @@ export const createCommentReactionHandler = async (
 
   if (hasCanvasSignedDataApiArgs(req.body)) {
     commentReactionFields.canvasSignedData = req.body.canvas_signed_data;
-    commentReactionFields.canvasHash = req.body.canvas_hash;
+    commentReactionFields.canvasMsgId = req.body.canvas_msg_id;
 
-    if (config.ENFORCE_SESSION_KEYS) {
-      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-
-      await verifyReaction(canvasSignedData, {
-        comment_id: commentId,
-        address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                // @ts-expect-error <StrictNullChecks>
-                address: address.address,
-              })
-            : // @ts-expect-error <StrictNullChecks>
-              address.address,
-        value: reaction,
-      });
-    }
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    const canvasReaction = {
+      comment_id: commentMsgId ?? null,
+      address:
+        canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
+          ? addressSwapper({
+              currentPrefix: 42,
+              // @ts-expect-error <StrictNullChecks>
+              address: address.address,
+            })
+          : // @ts-expect-error <StrictNullChecks>
+            address.address,
+      value: reaction,
+    };
+    await verifyReaction(canvasSignedData, canvasReaction);
   }
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.comments.createCommentReaction(commentReactionFields);
+
+  // publish signed data
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    await applyCanvasSignedData(canvas, canvasSignedData);
+  }
 
   // emit notifications
   for (const n of notificationOptions) {

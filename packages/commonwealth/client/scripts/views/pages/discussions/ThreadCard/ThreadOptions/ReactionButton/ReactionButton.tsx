@@ -60,12 +60,14 @@ export const ReactionButton = ({
     useCreateThreadReactionMutation({
       communityId: app.activeChainId(),
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId: app.activeChainId(),
       address: user.activeAccount?.address || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -90,6 +92,7 @@ export const ReactionButton = ({
         communityId: app.activeChainId(),
         address: user.activeAccount?.address,
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId,
         reactionId: reactedId as number,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
@@ -102,6 +105,7 @@ export const ReactionButton = ({
         communityId: app.activeChainId(),
         address: activeAddress || '',
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId,
         reactionType: 'like',
         isPWA: isAddedToHomeScreen,
       }).catch((e) => {

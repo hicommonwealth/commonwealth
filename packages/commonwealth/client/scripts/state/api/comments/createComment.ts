@@ -15,9 +15,11 @@ import useFetchCommentsQuery from './fetchComments';
 interface CreateCommentProps {
   profile: UserProfile;
   threadId: number;
+  threadMsgId: string;
   communityId: string;
   unescapedText: string;
   parentCommentId: number | null;
+  parentCommentMsgId: string | null;
   existingNumberOfComments: number;
   isPWA?: boolean;
 }
@@ -26,14 +28,16 @@ const createComment = async ({
   communityId,
   profile,
   threadId,
+  threadMsgId,
   unescapedText,
   parentCommentId = null,
+  parentCommentMsgId = null,
   isPWA,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(profile.address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
     body: unescapedText,
-    parent_comment_id: parentCommentId,
+    parent_comment_id: parentCommentMsgId,
   });
 
   const response = await axios.post(
@@ -43,6 +47,8 @@ const createComment = async ({
       community_id: communityId,
       address: profile.address,
       parent_id: parentCommentId,
+      thread_msg_id: threadMsgId,
+      parent_comment_msg_id: parentCommentMsgId,
       text: encodeURIComponent(unescapedText),
       jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),

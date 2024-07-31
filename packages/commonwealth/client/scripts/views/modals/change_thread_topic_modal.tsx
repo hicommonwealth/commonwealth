@@ -41,6 +41,7 @@ export const ChangeThreadTopicModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId(),
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
   });
@@ -50,6 +51,7 @@ export const ChangeThreadTopicModal = ({
       await editThread({
         communityId: app.activeChainId(),
         address: user.activeAccount?.address || '',
+        threadMsgId: thread.canvasMsgId,
         threadId: thread.id,
         topicId: activeTopic.id,
       });

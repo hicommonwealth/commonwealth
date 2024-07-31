@@ -148,7 +148,6 @@ export async function initAppState(
     app.user.notifications.clearSubscriptions();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-      enforceSessionKeys: statusRes.result.enforceSessionKeys,
       evmTestEnv: statusRes.result.evmTestEnv,
     });
 

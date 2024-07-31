@@ -18,7 +18,7 @@ export function sanitizeDeletedComment(
       ghost_address: false,
     },
     address_id: 0,
-    canvas_hash: null,
+    canvas_msg_id: null,
     canvas_signed_data: null,
     plaintext: '[deleted]',
     text: '[deleted]',

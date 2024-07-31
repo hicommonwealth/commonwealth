@@ -67,12 +67,15 @@ export const CommentReactionButton = ({
       const foundReaction = comment.reactions.find((r) => {
         return r.author === activeAddress;
       });
+      if (!foundReaction) {
+        console.error('missing reaction');
+        notifyError('Failed to update reaction count');
+        return;
+      }
       deleteCommentReaction({
         communityId: app.activeChainId(),
         address: user.activeAccount?.address,
-        // @ts-expect-error <StrictNullChecks/>
-        canvasHash: foundReaction.canvasHash,
-        // @ts-expect-error <StrictNullChecks/>
+        commentMsgId: comment.canvasMsgId,
         reactionId: foundReaction.id,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {
@@ -87,6 +90,7 @@ export const CommentReactionButton = ({
         commentId: comment.id,
         communityId: app.activeChainId(),
         threadId: comment.threadId,
+        commentMsgId: comment.canvasMsgId,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {
           return;

@@ -39,14 +39,17 @@ describe.skip('Thread Tests', () => {
 
   let adminJWT;
   let adminAddress;
+  let adminDid;
   let adminSession;
 
   let userJWT;
   let userAddress;
+  let userDid;
   let userSession;
 
   let userJWT2;
   let userAddress2;
+  let userDid2;
   let userSession2;
 
   let thread;
@@ -59,6 +62,7 @@ describe.skip('Thread Tests', () => {
     topicId = await server.seeder.getTopicId({ chain });
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     adminAddress = res.address;
+    adminDid = res.did;
     adminJWT = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
@@ -70,17 +74,20 @@ describe.skip('Thread Tests', () => {
     });
     adminSession = { session: res.session, sign: res.sign };
     expect(adminAddress).to.not.be.null;
+    expect(adminDid).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
 
     res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
+    userDid = res.did;
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
     );
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
+    expect(userDid).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
     res = await server.seeder.createAndVerifyAddress(
@@ -88,12 +95,14 @@ describe.skip('Thread Tests', () => {
       'Alice',
     );
     userAddress2 = res.address;
+    userDid2 = res.did;
     userJWT2 = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
     );
     userSession2 = { session: res.session, sign: res.sign };
     expect(userAddress2).to.not.be.null;
+    expect(userDid2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
   });
 
@@ -126,6 +135,7 @@ describe.skip('Thread Tests', () => {
     test('should fail to create a forum thread with an empty title', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -144,6 +154,7 @@ describe.skip('Thread Tests', () => {
     test('should fail to create a link thread with an empty title', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind: 'link',
         stage,
         chainId: chain,
@@ -163,6 +174,7 @@ describe.skip('Thread Tests', () => {
     test('should fail to create a link thread with an empty URL', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind: 'link',
         stage,
         chainId: chain,
@@ -183,6 +195,7 @@ describe.skip('Thread Tests', () => {
     test('should fail to create a comment on a readOnly thread', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -202,10 +215,11 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: markdownComment.text,
         // @ts-expect-error StrictNullChecks
-        thread_id: tRes.result.id,
+        threadId: tRes.result.id,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -216,6 +230,7 @@ describe.skip('Thread Tests', () => {
     test('should create a discussion thread', async () => {
       const res = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -241,6 +256,7 @@ describe.skip('Thread Tests', () => {
     test('should fail to create a thread without a topic name (if the community has topics)', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -257,6 +273,7 @@ describe.skip('Thread Tests', () => {
     test('should create a thread with mentions to non-existent addresses', async () => {
       const res = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -282,6 +299,7 @@ describe.skip('Thread Tests', () => {
     test('Thread Create should fail because address does not have permission', async () => {
       const res2 = await server.seeder.createThread({
         address: userAddress2,
+        did: userDid2,
         kind,
         stage,
         chainId: chain2,
@@ -332,6 +350,7 @@ describe.skip('Thread Tests', () => {
     beforeEach(async () => {
       const res2 = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -351,9 +370,10 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: markdownComment.text,
-        thread_id: thread.id,
+        threadId: thread.id,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -370,9 +390,10 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: bodyWithMentions,
-        thread_id: thread.id,
+        threadId: thread.id,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -389,9 +410,10 @@ describe.skip('Thread Tests', () => {
       let cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: markdownComment.text,
-        thread_id: thread.id,
+        threadId: thread.id,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -399,9 +421,10 @@ describe.skip('Thread Tests', () => {
       cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: markdownComment.text,
-        thread_id: thread.id,
+        threadId: thread.id,
         parentCommentId: `${parentId}`,
         session: userSession.session,
         sign: userSession.sign,
@@ -420,9 +443,10 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: markdownComment.text,
-        thread_id: null,
+        threadId: null,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -435,9 +459,10 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: null,
-        thread_id: thread.id,
+        threadId: thread.id,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -450,9 +475,10 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: 'test',
-        thread_id: -1,
+        threadId: -1,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -466,6 +492,7 @@ describe.skip('Thread Tests', () => {
     beforeEach(async () => {
       const res2 = await server.seeder.createThread({
         address: adminAddress,
+        did: adminDid,
         kind,
         stage,
         chainId: chain,
@@ -616,6 +643,7 @@ describe.skip('Thread Tests', () => {
     test('should turn on readonly', async () => {
       const res1 = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -655,9 +683,10 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: res.address,
+        did: res.did,
         jwt: newUserJWT,
         text: 'hello world',
-        thread_id: tempThread.id,
+        threadId: tempThread.id,
         session: res.session,
         sign: res.sign,
       });
@@ -686,6 +715,7 @@ describe.skip('Thread Tests', () => {
       const tRes = await server.seeder.createThread({
         chainId: chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         title,
         body,
@@ -698,10 +728,10 @@ describe.skip('Thread Tests', () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
+        did: userDid,
         jwt: userJWT,
         text: markdownComment.text,
-        // @ts-expect-error StrictNullChecks
-        thread_id: tRes.result.id,
+        threadId: tRes.result?.id,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -716,8 +746,7 @@ describe.skip('Thread Tests', () => {
       expect(eRes.status).to.be.equal('Success');
       expect(eRes.result).not.to.be.null;
       expect(eRes.result.chain).to.be.equal(chain);
-      // @ts-expect-error StrictNullChecks
-      expect(eRes.result.thread_id).to.be.equal(tRes.result.id);
+      expect(eRes.result.thread_id).to.be.equal(tRes.result?.id);
     });
   });
 
@@ -725,6 +754,7 @@ describe.skip('Thread Tests', () => {
     test('should track views on chain', async () => {
       const threadRes = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -779,6 +809,7 @@ describe.skip('Thread Tests', () => {
     test('should track views on community', async () => {
       const threadRes = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -855,6 +886,7 @@ describe.skip('Thread Tests', () => {
     beforeAll(async () => {
       const res = await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,

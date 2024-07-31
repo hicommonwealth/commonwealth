@@ -77,8 +77,8 @@ function processVersionHistory(versionHistory: any[]) {
           typeof history.author === 'string'
             ? JSON.parse(history.author)
             : typeof history.author === 'object'
-            ? history.author
-            : null;
+              ? history.author
+              : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
         console.log(e);
@@ -172,6 +172,7 @@ const ContestZ = Contest.pick({
   end_time: z.string(),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContestActionZ = ContestAction.pick({
   content_id: true,
   thread_id: true,
@@ -271,7 +272,7 @@ export class Thread implements IUniqueId {
   public readOnly: boolean;
 
   public readonly canvasSignedData: string;
-  public readonly canvasHash: string;
+  public readonly canvasMsgId: string;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
   //  we should remove the number to allow the store to work.
@@ -341,8 +342,8 @@ export class Thread implements IUniqueId {
     reactedProfileName,
     reactedProfileAvatarUrl,
     reactedAddressLastActive,
-    canvasSignedData,
-    canvasHash,
+    canvas_signed_data,
+    canvas_msg_id,
     links,
     discord_meta,
     userId,
@@ -365,8 +366,8 @@ export class Thread implements IUniqueId {
     url?: string;
     pinned?: boolean;
     links?: Link[];
-    canvasSignedData?: string;
-    canvasHash?: string;
+    canvas_signed_data?: string;
+    canvas_msg_id?: string;
     plaintext?: string;
     collaborators?: any[];
     last_edited: string;
@@ -431,8 +432,8 @@ export class Thread implements IUniqueId {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-      ? this.versionHistory[0].timestamp
-      : null;
+        ? this.versionHistory[0].timestamp
+        : null;
     // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
@@ -440,9 +441,9 @@ export class Thread implements IUniqueId {
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.numberOfComments = numberOfComments || 0;
     // @ts-expect-error StrictNullChecks
-    this.canvasSignedData = canvasSignedData;
+    this.canvasSignedData = canvas_signed_data;
     // @ts-expect-error <StrictNullChecks>
-    this.canvasHash = canvasHash;
+    this.canvasMsgId = canvas_msg_id;
     this.links = links || [];
     this.discord_meta = discord_meta;
     this.versionHistory = processVersionHistory(version_history);
@@ -498,7 +499,7 @@ export class Thread implements IUniqueId {
           version_history: [],
           reaction_weights_sum: 0,
           canvas_signed_data: null,
-          canvas_hash: null,
+          canvas_msg_id: null,
         }),
     );
     this.latestActivity = last_commented_on

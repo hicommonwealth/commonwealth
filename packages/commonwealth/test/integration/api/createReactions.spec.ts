@@ -13,15 +13,17 @@ chai.use(chaiHttp);
 describe('createReaction Integration Tests', () => {
   const communityId = 'ethereum';
   let userAddress;
+  let userDid;
   let userJWT;
   let userSession;
   let threadId: number;
+  let threadMsgId: string;
   let server: TestServer;
 
   const deleteReaction = async (reactionId, jwtToken, address) => {
     const validRequest = {
       jwt: jwtToken,
-      address: address.split(':')[2],
+      address,
       author_chain: 'ethereum',
       chain: 'ethereum',
     };
@@ -54,6 +56,7 @@ describe('createReaction Integration Tests', () => {
       'Alice',
     );
     userAddress = res.address;
+    userDid = res.did;
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
       () => ({ [userAddress.split(':')[2]]: 300 }),
     );
@@ -73,6 +76,7 @@ describe('createReaction Integration Tests', () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: communityId,
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
       title: 'test1',
       body: 'body1',
@@ -83,8 +87,9 @@ describe('createReaction Integration Tests', () => {
       session: userSession.session,
       sign: userSession.sign,
     });
-    // @ts-expect-error StrictNullChecks
-    threadId = thread.id;
+    if (!thread) throw new Error('Thread not created');
+    threadMsgId = thread.canvas_msg_id!;
+    threadId = thread.id!;
   });
 
   afterAll(async () => {
@@ -97,9 +102,11 @@ describe('createReaction Integration Tests', () => {
     const createCommentResponse = await server.seeder.createComment({
       chain: 'ethereum',
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
       text,
-      thread_id: threadId,
+      threadId: threadId,
+      threadMsgId,
       session: userSession.session,
       sign: userSession.sign,
     });
@@ -117,9 +124,11 @@ describe('createReaction Integration Tests', () => {
     const createReactionResponse = await server.seeder.createReaction({
       chain: communityId,
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
       reaction: 'like',
       comment_id: createCommentResponse.result.id,
+      comment_msg_id: createCommentResponse.result.canvas_msg_id,
       author_chain: communityId,
       session: userSession.session,
       sign: userSession.sign,
@@ -152,9 +161,11 @@ describe('createReaction Integration Tests', () => {
     const createReactionResponse = await server.seeder.createThreadReaction({
       chain: 'ethereum',
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
       reaction: 'like',
       thread_id: thread.id,
+      thread_msg_id: thread.canvas_msg_id!,
       author_chain: 'ethereum',
       session: userSession.session,
       sign: userSession.sign,

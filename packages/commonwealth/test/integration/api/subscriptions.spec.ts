@@ -16,7 +16,10 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken, loggedInAddr, loggedInSession, thread, comment, userId: number;
+  let jwtToken: string;
+  let loggedInAddr: string;
+  let loggedInDid: `did:${string}`;
+  let loggedInSession, thread, comment, userId: number;
   const community_id = 'ethereum';
   let server: TestServer;
 
@@ -28,6 +31,7 @@ describe('Subscriptions Tests', () => {
       'Alice',
     );
     loggedInAddr = result.address;
+    loggedInDid = result.did;
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
@@ -45,6 +49,7 @@ describe('Subscriptions Tests', () => {
     let res = await server.seeder.createThread({
       chainId: community_id,
       address: loggedInAddr,
+      did: loggedInDid,
       jwt: jwtToken,
       title: 't',
       body: 't',
@@ -62,9 +67,11 @@ describe('Subscriptions Tests', () => {
     res = await server.seeder.createComment({
       chain: community_id,
       address: loggedInAddr,
+      did: loggedInDid,
       jwt: jwtToken,
       text: 'cw4eva',
-      thread_id: thread.id,
+      threadId: thread.id,
+      threadMsgId: thread.canvas_msg_id,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
     });

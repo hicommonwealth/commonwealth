@@ -2,14 +2,14 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { SignedMessage } from '@canvas-js/gossiplog';
 import type {
-  Action,
   Awaitable,
   Message,
-  Session,
   SessionSigner,
   Signature,
 } from '@canvas-js/interfaces';
+import { Action, Session } from '@canvas-js/interfaces';
 import type {
   CommunityAttributes,
   DB,
@@ -26,8 +26,6 @@ import {
   type LinkSource,
   type Role,
 } from '@hicommonwealth/shared';
-import { encode } from '@ipld/dag-json';
-import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
@@ -35,16 +33,21 @@ import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/key
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {
-    clock: 0,
+    clock: 1,
     parents: [],
     payload: session,
     topic: CANVAS_TOPIC,
   };
   const sessionMessageSignature = sign(sessionMessage);
 
+  const sessionMessageId = SignedMessage.encode(
+    sessionMessageSignature,
+    sessionMessage,
+  ).id;
+
   const actionMessage = {
-    clock: 0,
-    parents: [],
+    clock: 2,
+    parents: [sessionMessageId],
     payload: action,
     topic: CANVAS_TOPIC,
   };
@@ -56,16 +59,21 @@ function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
     sessionMessage,
     sessionMessageSignature,
   };
-  const canvasHash = Buffer.from(sha256(encode(actionMessage))).toString('hex');
+  const actionMessageId = SignedMessage.encode(
+    actionMessageSignature,
+    actionMessage,
+  ).id;
+
   return {
     canvasSignedData,
-    canvasHash,
+    canvasMsgId: actionMessageId,
   };
 }
 
 export interface ThreadArgs {
   jwt: any;
   address: string;
+  did: `did:${string}`;
   kind: string;
   stage?: string;
   chainId: string;
@@ -94,10 +102,12 @@ type getLinksArgs = {
 export interface CommentArgs {
   chain: string;
   address: string;
+  did: `did:${string}`;
   jwt: any;
   text: any;
   parentCommentId?: any;
-  thread_id?: any;
+  threadId?: any;
+  threadMsgId?: any;
   session: Session;
   sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
@@ -123,10 +133,12 @@ export interface CreateReactionArgs {
   author_chain: string;
   chain: string;
   address: string;
+  did: `did:${string}`;
   reaction: string;
   jwt: string;
   comment_id?: number;
   thread_id?: number;
+  comment_msg_id: string;
   session: Session;
   sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
@@ -135,9 +147,11 @@ export interface CreateThreadReactionArgs {
   author_chain: string;
   chain: string;
   address: string;
+  did: `did:${string}`;
   reaction: string;
   jwt: string;
   thread_id?: number;
+  thread_msg_id: string;
   session: Session;
   sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
@@ -145,6 +159,7 @@ export interface CreateThreadReactionArgs {
 export interface EditTopicArgs {
   jwt: any;
   address: string;
+  did: `did:${string}`;
   id: number;
   name?: string;
   description?: string;
@@ -192,6 +207,7 @@ export type ModelSeeder = {
   ) => Promise<{
     address_id: string;
     address: string;
+    did: `did:${string}`;
     user_id: string;
     email: string;
     session: Session;
@@ -258,10 +274,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       throw new Error(`invalid chain ${chain}`);
     }
 
-    const { payload: session, signer } = await sessionSigner.newSession(
-      CANVAS_TOPIC,
-    );
-    const walletAddress = session.address.split(':')[2];
+    const { payload: session, signer } =
+      await sessionSigner.newSession(CANVAS_TOPIC);
+    const walletAddress = session.did.split(':')[4];
 
     let res = await chai.request
       .agent(app)
@@ -292,7 +307,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const email = res.body.result.user.email;
     return {
       address_id,
-      address: session.address,
+      address: session.did.split(':')[4],
+      did: session.did,
       user_id,
       email,
       session,
@@ -315,6 +331,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const {
       chainId,
       address,
+      did,
       jwt,
       title,
       body,
@@ -326,10 +343,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sign,
     } = args;
 
-    const action = {
+    const action: Action = {
       type: 'action' as const,
-      address,
-      blockhash: null,
+      did,
       name: 'thread',
       args: {
         community: chainId || '',
@@ -339,7 +355,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         link: url || '',
         topic: topicId || '',
       },
-      timestamp: Date.now(),
+      context: {
+        timestamp: Date.now(),
+      },
     };
 
     const canvasSignResult = createCanvasSignResult({
@@ -355,7 +373,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         author_chain: chainId,
         chain: chainId,
-        address: address.split(':')[2],
+        address,
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
@@ -400,25 +418,28 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const {
       chain,
       address,
+      did,
       jwt,
       text,
       parentCommentId,
-      thread_id,
+      threadId,
+      threadMsgId,
       session,
       sign,
     } = args;
 
-    const action = {
+    const action: Action = {
       type: 'action' as const,
-      address,
-      blockhash: null,
+      did,
       name: 'comment',
       args: {
         body: text,
-        thread_id,
+        thread_id: threadMsgId,
         parent_comment_id: parentCommentId || null,
       },
-      timestamp: Date.now(),
+      context: {
+        timestamp: Date.now(),
+      },
     };
     const canvasSignResult = createCanvasSignResult({
       session,
@@ -428,14 +449,14 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${thread_id}/comments`)
+      .post(`/api/threads/${threadId}/comments`)
       .set('Accept', 'application/json')
       .send({
         author_chain: chain,
         chain,
-        address: address.split(':')[2],
+        address,
         parent_id: parentCommentId || null,
-        thread_id,
+        thread_msg_id: threadMsgId,
         text,
         jwt,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
@@ -464,22 +485,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const {
       chain,
       address,
+      did,
       jwt,
       author_chain,
       reaction,
       comment_id,
-      thread_id,
+      comment_msg_id: commentMsgId,
       session,
       sign,
     } = args;
 
-    const action = {
+    const action: Action = {
       type: 'action' as const,
-      address,
-      blockhash: null,
+      did,
       name: 'reactComment',
-      args: { comment_id, value: reaction },
-      timestamp: Date.now(),
+      args: { comment_id: commentMsgId, value: reaction },
+      context: {
+        timestamp: Date.now(),
+      },
     };
     const canvasSignResult = createCanvasSignResult({
       session,
@@ -487,19 +510,18 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       action,
     });
 
-    const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
       .post(`/api/comments/${comment_id}/reactions`)
       .set('Accept', 'application/json')
       .send({
         chain,
-        address: walletAddress,
+        address,
         reaction,
         comment_id,
         author_chain,
         jwt,
-        thread_id,
+        comment_msg_id: commentMsgId,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
@@ -509,39 +531,43 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const {
       chain,
       address,
+      did,
       jwt,
       author_chain,
       reaction,
       thread_id,
+      thread_msg_id: threadMsgId,
       session,
       sign,
     } = args;
 
-    const action = {
+    const action: Action = {
       type: 'action' as const,
-      address,
-      blockhash: null,
+      did,
       name: 'reactThread',
-      args: { thread_id, value: reaction },
-      timestamp: Date.now(),
+      args: { thread_id: threadMsgId, value: reaction },
+      context: {
+        timestamp: Date.now(),
+      },
     };
     const canvasSignResult = createCanvasSignResult({
       session,
       sign,
       action,
     });
-    const walletAddress = address.split(':')[2];
+
     const res = await chai.request
       .agent(app)
       .post(`/api/threads/${thread_id}/reactions`)
       .set('Accept', 'application/json')
       .send({
         chain,
-        address: walletAddress,
+        address,
         reaction,
         author_chain,
         jwt,
         thread_id,
+        thread_msg_id: threadMsgId,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
@@ -623,7 +649,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         .post('/api/linkExistingAddressToCommunity')
         .set('Accept', 'application/json')
         .send({
-          address: address.split(':')[2],
+          address,
           community_id: chain,
           originChain,
           jwt,

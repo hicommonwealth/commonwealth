@@ -44,6 +44,7 @@ export const EditBody = (props: EditBodyProps) => {
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId(),
+    threadMsgId: thread.canvasMsgId,
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -96,6 +97,7 @@ export const EditBody = (props: EditBodyProps) => {
           newBody: JSON.stringify(contentDelta) || thread.body,
           newTitle: title || thread.title,
           threadId: thread.id,
+          threadMsgId: thread.canvasMsgId,
           authorProfile: user.activeAccount?.profile,
           address: user.activeAccount?.address || '',
           communityId: app.activeChainId(),
