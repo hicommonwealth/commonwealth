@@ -13,7 +13,8 @@
     z-index: 3;
     overflow: auto;
     width: 100%;
-    max-width: 500px;
+    max-width: 1000px;
+    overflow: hidden;
     max-height: 52px !important;
     min-height: 52px !important;
 
@@ -30,7 +31,7 @@
 
   .BreadcrumbsBlockContentArea {
     width: 100%;
-    max-width: 500px;
+    max-width: 1000px;
     max-height: 52px !important;
     min-height: 52px !important;
     @include extraSmall {
