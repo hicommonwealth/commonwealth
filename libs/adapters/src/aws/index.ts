@@ -36,6 +36,7 @@ export const S3BlobStorage = (): BlobStorage => {
       client.destroy();
       return Promise.resolve();
     },
+
     upload: async ({ bucket, key, content, contentType }) => {
       const data = await new Upload({
         client,
@@ -46,6 +47,7 @@ export const S3BlobStorage = (): BlobStorage => {
           ContentType: contentType,
         },
       }).done();
+
       if (!data.Location) throw Error('Upload failed');
 
       return {
@@ -53,6 +55,7 @@ export const S3BlobStorage = (): BlobStorage => {
         url: formatS3Url(data.Location, s3Buckets[bucket]),
       };
     },
+
     exists: async ({ bucket, key }) => {
       try {
         await client.headObject({ Bucket: s3Buckets[bucket], Key: key });
@@ -63,6 +66,7 @@ export const S3BlobStorage = (): BlobStorage => {
         else throw e;
       }
     },
+
     getSignedUrl: async ({ bucket, key, contentType, ttl }) =>
       await getSignedUrl(
         client,
