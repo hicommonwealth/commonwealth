@@ -1,4 +1,5 @@
 import {
+  CommunityStakeTrade,
   events,
   logger,
   notificationsProvider,
@@ -18,7 +19,7 @@ export async function handleCommunityStakeTrades(
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const { 1: namespaceAddress, 2: isBuy } = event.parsedArgs as z.infer<
-    typeof events.CommunityStakeTrade
+    typeof CommunityStakeTrade
   >;
 
   const community = await models.Community.findOne({
