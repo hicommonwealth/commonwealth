@@ -1,10 +1,19 @@
-import { models } from '@hicommonwealth/model';
-import { Topic, User } from '@hicommonwealth/schemas';
+import {
+  CWTopicWithDiscourseId,
+  CWUserWithDiscourseId,
+  models,
+} from '@hicommonwealth/model';
+import { Thread } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
 
-export type DiscourseThread = {
+export type CWThreadWithDiscourseId = z.infer<typeof Thread> & {
+  discourseTopicId: number; // discourse "topic" ID
+};
+
+// Discourse Topic == CW Thread
+type DiscourseTopic = {
   id: number;
   title: string;
   cooked: string;
@@ -19,8 +28,8 @@ export type DiscourseThread = {
 };
 
 class DiscourseQueries {
-  static fetchThreadsFromDiscourse = async (session: Sequelize) => {
-    return session.query<DiscourseThread>(
+  static fetchTopics = async (session: Sequelize) => {
+    return session.query<DiscourseTopic>(
       `
         select *,
         (select cooked from posts where topic_id=topics.id and post_number=1),
@@ -33,7 +42,7 @@ class DiscourseQueries {
     );
   };
 
-  static fetchDiscourseGeneralCategoryId = async (
+  static fetchGeneralCategoryId = async (
     session: Sequelize,
   ): Promise<number> => {
     const [result] = await session.query<{
@@ -48,77 +57,43 @@ class DiscourseQueries {
   };
 }
 
-const createThread = async (
-  session: Sequelize,
-  {
-    title,
-    communityId,
-    text,
-    plaintext,
-    pinned,
-    cwTopicId,
-    email,
-    discourseThreadId,
-    views,
-    like_count,
-    created_at,
-    updated_at,
-  }: {
-    title: string;
-    communityId: string;
-    text: string;
-    plaintext: string;
-    pinned: boolean;
-    cwTopicId: number;
-    email: string;
-    discourseThreadId: any;
-    views: number;
-    like_count: number;
-    created_at: string;
-    updated_at: string;
-  },
-  { transaction }: { transaction: Transaction },
-) => {
-  const [createdThread] = await session.query<{
-    id: number;
-    address_id: number;
-    topic_id: number;
-  }>(
-    `
-        INSERT INTO "Threads"(
-        id, address_id, title, body, created_at, updated_at, deleted_at, community_id, pinned, kind, url,
-        version_history, read_only, topic_id, plaintext, _search, stage, has_poll, last_commented_on, view_count)
-        VALUES (default,
-        (
-        SELECT addresses.id
-        FROM "Addresses" addresses
-        INNER JOIN "Users" users ON users.id = addresses.user_id
-        WHERE email = '${email}' LIMIT 1
-        ),
-        '${encodeURIComponent(title.replace(/'/g, "''"))}',
-        '${encodeURIComponent(text.replace(/'/g, "''"))}',
-        '${moment(created_at).format('YYYY-MM-DD HH:mm:ss')}',
-        '${moment(updated_at).format('YYYY-MM-DD HH:mm:ss')}',
-        null,
-        '${communityId}',
-        ${pinned},
-        'discussion',
-        null,
-        '{}',
-        false,
-        ${cwTopicId},
-       '${plaintext.replace(/'/g, "''")}',
-        null,
-        'discussion',
-        false,
-        null,
-        ${views}
-        ) RETURNING id, address_id, topic_id;
-    `,
-    { type: QueryTypes.SELECT, transaction },
-  );
-  return { createdThread, discourseThreadId, views, like_count };
-};
+class CWQueries {
+  static createOrFindThread = async (
+    discourseTopic: DiscourseTopic,
+    communityId: string,
+    cwTopicId: number,
+    addressId: number,
+    { transaction }: { transaction: Transaction },
+  ): Promise<CWThreadWithDiscourseId> => {
+    const options: z.infer<typeof Thread> = {
+      address_id: addressId,
+      title: encodeURIComponent(discourseTopic.title.replace(/'/g, "''")),
+      body: encodeURIComponent(discourseTopic.cooked.replace(/'/g, "''")),
+      created_at: moment(discourseTopic.created_at).toDate(),
+      updated_at: moment(discourseTopic.updated_at).toDate(),
+      community_id: communityId,
+      pinned: discourseTopic.pinned_globally,
+      kind: 'discussion',
+      topic_id: cwTopicId,
+      plaintext: discourseTopic.raw.replace(/'/g, "''"),
+      stage: 'discussion',
+      view_count: discourseTopic.views,
+      reaction_count: discourseTopic.like_count,
+      reaction_weights_sum: 0,
+      comment_count: 0,
+      max_notif_id: 0,
+    };
+    const [thread] = await models.Thread.findOrCreate({
+      where: options,
+      defaults: options,
+      transaction,
+    });
+    return {
+      ...thread,
+      discourseTopicId: discourseTopic.id,
+    };
+  };
+}
 
 export const createAllThreadsInCW = async (
   discourseConnection: Sequelize,
@@ -127,13 +102,13 @@ export const createAllThreadsInCW = async (
     topics,
     communityId,
   }: {
-    users: Array<z.infer<typeof User>>;
-    topics: Array<z.infer<typeof Topic>>;
+    users: Array<CWUserWithDiscourseId>;
+    topics: Array<CWTopicWithDiscourseId>;
     communityId: string;
   },
   { transaction }: { transaction: Transaction },
-) => {
-  const discourseThreads = await DiscourseQueries.fetchThreadsFromDiscourse(
+): Promise<Array<CWThreadWithDiscourseId>> => {
+  const discourseThreads = await DiscourseQueries.fetchTopics(
     discourseConnection,
   );
   const generalCwTopic = await models.Topic.findOne({
@@ -142,84 +117,69 @@ export const createAllThreadsInCW = async (
       community_id: communityId,
     },
   });
-  const generalDiscourseCategoryId =
-    await DiscourseQueries.fetchDiscourseGeneralCategoryId(discourseConnection);
-  const threadPromises = discourseThreads
-    .map((topic) => {
-      const {
-        id: discourseThreadId,
-        title,
-        cooked: text,
-        raw,
-        pinned_globally,
-        category_id,
-        user_id,
-        views,
-        like_count,
-        created_at,
-        updated_at,
-      } = topic;
 
-      // set topic of thread
-      let cwTopicId = generalCwTopic!.id; // general by default
-      if (category_id) {
-        // discourse topic
-        const category = topics.find(
-          ({ discourseCategoryId }) => discourseCategoryId === category_id,
+  const generalDiscourseCategoryId =
+    await DiscourseQueries.fetchGeneralCategoryId(discourseConnection);
+
+  const threadPromises = discourseThreads
+    .map((discourseThread) => {
+      const user = users.find(
+        ({ discourseUserId }) => discourseUserId === discourseThread.user_id,
+      );
+      return {
+        ...discourseThread,
+        user,
+      };
+    })
+    .filter((discourseThread) => {
+      // filter out threads where the cw user doesn't exist
+      return !!discourseThread.user;
+    })
+    .map(async (discourseThread): Promise<CWThreadWithDiscourseId> => {
+      const { category_id: discourseThreadCategoryId } = discourseThread;
+
+      // get thread's associated cw topic
+      let cwTopicId = generalCwTopic!.id!; // general by default
+      if (discourseThreadCategoryId) {
+        // find cw topic that matches the discourse thread's topic
+        const cwTopic = topics.find(
+          ({ discourseCategoryId: discourseCategoryId }) =>
+            discourseCategoryId === discourseThreadCategoryId,
         );
         if (
-          generalDiscourseCategoryId > 0 &&
-          category?.discourseCategoryId !== generalDiscourseCategoryId
+          cwTopic &&
+          (!generalDiscourseCategoryId ||
+            cwTopic.discourseCategoryId !== generalDiscourseCategoryId)
         ) {
-          cwTopicId = category.id;
+          cwTopicId = cwTopic.id!;
         }
       }
 
-      const userId = users.find(
-        ({ discourseUserId }) => discourseUserId === user_id,
-      );
+      // find address for user
+      const address = await models.Address.findOne({
+        where: {
+          community_id: communityId,
+          user_id: discourseThread.user!.id,
+        },
+        transaction,
+      });
+      if (!address) {
+        throw new Error(
+          `could not find address for user ${discourseThread.user!.id}`,
+        );
+      }
 
-      const email = userId?.email;
-      if (!email) {
-        return null;
-      }
-      return {
+      // create thread
+      return CWQueries.createOrFindThread(
+        discourseThread,
         communityId,
-        discourseThreadId,
-        text,
-        plaintext: raw,
-        title,
-        pinned: pinned_globally,
         cwTopicId,
-        email,
-        views,
-        like_count,
-        created_at,
-        updated_at,
-      };
-    })
-    .map((options) => {
-      if (!options) {
-        return null;
-      }
-      return createThread(models.sequelize, options, { transaction });
+        address.id!,
+        {
+          transaction,
+        },
+      );
     });
 
-  const createdThreads = await Promise.all(threadPromises);
-  return createdThreads
-    .map((options) => {
-      if (!options) {
-        return null;
-      }
-      const { createdThread, discourseThreadId, views, like_count } = options;
-      return {
-        id: createdThread.id,
-        address_id: createdThread.address_id,
-        topic_id: createdThread.topic_id,
-        discourseThreadId,
-        views,
-        like_count,
-      };
-    })
-    .filter(Boolean);
+  return Promise.all(threadPromises);
 };

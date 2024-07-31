@@ -1,4 +1,4 @@
-import { logger, type Command } from '@hicommonwealth/core';
+import { AppError, logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Sequelize } from 'sequelize';
 import { URL, fileURLToPath } from 'url';
@@ -6,14 +6,19 @@ import { config } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
 import {
   createAllAddressesInCW,
-  createAllCategoriesInCW,
+  createAllCommentsInCW,
   createAllThreadsInCW,
+  createAllTopicsInCW,
   createAllUsersInCW,
   importDump,
 } from '../services/discourseImport';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
+
+const Errors = {
+  CommunityNotFound: 'community not found',
+};
 
 type CleanupFn = {
   description: string;
@@ -29,8 +34,12 @@ export function ImportDiscourseCommunity(): Command<
     auth: [], // TODO: add super admin middleware
     body: async ({ id: communityId, payload }) => {
       // TODO: use global lock to limit concurrency on this command?
-
       // TODO: implement accountsClaimable
+
+      const community = await models.Community.findByPk(communityId);
+      if (!community) {
+        throw new AppError(Errors.CommunityNotFound);
+      }
       const { base, dumpUrl } = payload;
 
       // cleanup functions are pushed to this array, then popped off
@@ -160,33 +169,33 @@ export function ImportDiscourseCommunity(): Command<
         );
         log.debug(`Addresses: ${addresses.length}`);
 
-        // insert categories (topics)
-        const categories = await createAllCategoriesInCW(
+        // insert topics (discourse categories)
+        const topics = await createAllTopicsInCW(
           restrictedDiscourseConnection,
           { communityId: communityId! },
           { transaction },
         );
-        log.debug(`Categories: ${categories.length}`);
+        log.debug(`Topics: ${topics.length}`);
 
-        // // insert topics (threads)
+        // insert threads (discourse topics)
         const threads = await createAllThreadsInCW(
           restrictedDiscourseConnection,
           {
             users,
-            categories,
+            topics,
             communityId: communityId!,
           },
           { transaction },
         );
         log.debug(`Threads: ${threads.length}`);
 
-        // // insert posts (comments)
-        // const comments = await createAllCommentsInCW(
-        //   restrictedDiscourseConnection,
-        //   { communityId: communityId!, addresses, threads },
-        //   { transaction },
-        // );
-        // log.debug(`Comments: ${comments.length}`);
+        // insert comments (discourse posts)
+        const comments = await createAllCommentsInCW(
+          restrictedDiscourseConnection,
+          { communityId: communityId!, addresses, threads },
+          { transaction },
+        );
+        log.debug(`Comments: ${comments.length}`);
 
         // // insert reactions
         // const reactions = await createAllReactionsInCW(
@@ -209,6 +218,8 @@ export function ImportDiscourseCommunity(): Command<
         // log.debug(`Subscriptions: ${subscriptions.length}`);
 
         await transaction.commit();
+
+        log.debug(`DISCOURSE IMPORT SUCCESSFUL ON ${communityId}`);
       } catch (err) {
         await transaction.rollback();
         throw err;

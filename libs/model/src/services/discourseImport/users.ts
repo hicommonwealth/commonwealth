@@ -3,6 +3,10 @@ import { User } from '@hicommonwealth/schemas';
 import { Op, QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
 
+export type CWUserWithDiscourseId = z.infer<typeof User> & {
+  discourseUserId: number;
+};
+
 type DiscourseUser = {
   id: number;
   username: string;
@@ -55,30 +59,31 @@ class DiscourseQueries {
   };
 }
 
-type UserIdEmail = Required<Pick<z.infer<typeof User>, 'id' | 'email'>>;
-
 class CWQueries {
-  static fetchImportedUserIdsByCommunity = async ({
+  static fetchImportedUsersByCommunity = async ({
     communityId,
   }: {
     communityId: string;
-  }): Promise<Array<UserIdEmail>> => {
-    return models.sequelize.query<UserIdEmail>(
-      `
-      SELECT users.id, email
-      FROM "Addresses"
-      INNER JOIN "Users" users on users.id = user_id
-      where ghost_address = true and community_id = '${communityId}';
-    `,
-      { type: QueryTypes.SELECT },
-    );
+  }): Promise<Array<z.infer<typeof User>>> => {
+    return models.User.findAll({
+      include: [
+        {
+          model: models.Address,
+          where: {
+            community_id: communityId,
+            ghost_address: true,
+          },
+          required: true,
+        },
+      ],
+    });
   };
 
   static fetchUsersByEmail = async (
     communityId: string,
     emails: string[],
   ): Promise<Array<z.infer<typeof User>>> => {
-    return models.User.findAll({
+    const users = await models.User.findAll({
       where: {
         email: {
           [Op.in]: emails,
@@ -94,13 +99,14 @@ class CWQueries {
         },
       ],
     });
+    return users.map((user) => user.get({ plain: true }));
   };
 
   static createOrFindUser = async (
     discourseUser: DiscourseUser,
     discourseBio: DiscourseWebsiteBio | null,
     { transaction }: { transaction: Transaction },
-  ): Promise<z.infer<typeof User>> => {
+  ): Promise<CWUserWithDiscourseId> => {
     const [user] = await models.User.findOrCreate({
       where: {
         email: discourseUser.email,
@@ -120,7 +126,10 @@ class CWQueries {
       },
       transaction,
     });
-    return user;
+    return {
+      ...user.get({ plain: true }),
+      discourseUserId: discourseUser.id,
+    };
   };
 }
 
@@ -128,7 +137,7 @@ export const createAllUsersInCW = async (
   discourseConnection: Sequelize,
   { transaction }: { transaction: Transaction },
 ): Promise<{
-  users: Array<z.infer<typeof User>>;
+  users: Array<CWUserWithDiscourseId>;
   admins: Record<number, boolean>;
   moderators: Record<number, boolean>;
 }> => {
@@ -140,7 +149,7 @@ export const createAllUsersInCW = async (
   const allBios = await DiscourseQueries.fetchBios(discourseConnection);
 
   // create or find new users
-  const users = await Promise.all(
+  const cwUsers = await Promise.all(
     allDiscourseUsers.map((userToCreate) =>
       CWQueries.createOrFindUser(
         userToCreate,
@@ -150,21 +159,26 @@ export const createAllUsersInCW = async (
     ),
   );
 
+  console.log(
+    'cwUsers: ',
+    cwUsers.map((v) => v),
+  );
+
   return {
-    users,
+    users: cwUsers,
     admins: allDiscourseUsers
       .filter((d) => d.admin)
-      .map((d) => users.find((c) => c.email === d.email)!)
-      .reduce((acc, c) => ({
+      .map((d) => cwUsers.find((c) => c.email === d.email)!)
+      .reduce((acc, u) => ({
         ...acc,
-        [c.id!]: true,
+        [u.id!]: true,
       })),
     moderators: allDiscourseUsers
       .filter((d) => d.moderator)
-      .map((d) => users.find((c) => c.email === d.email)!)
-      .reduce((acc, c) => ({
+      .map((d) => cwUsers.find((c) => c.email === d.email)!)
+      .reduce((acc, u) => ({
         ...acc,
-        [c.id!]: true,
+        [u.id!]: true,
       })),
   };
 };

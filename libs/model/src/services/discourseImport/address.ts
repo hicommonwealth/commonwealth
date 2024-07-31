@@ -1,11 +1,15 @@
-import { models } from '@hicommonwealth/model';
-import { Address, User } from '@hicommonwealth/schemas';
+import { CWUserWithDiscourseId, models } from '@hicommonwealth/model';
+import { Address } from '@hicommonwealth/schemas';
 import crypto from 'crypto';
 import { Transaction } from 'sequelize';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { BASES } from './constants';
 import { createCosmosAddress } from './utils';
+
+export type CWAddressWithDiscourseId = z.infer<typeof Address> & {
+  discourseUserId: number;
+};
 
 class CWQueries {
   static createOrFindAddress = async (
@@ -15,16 +19,18 @@ class CWQueries {
       communityId,
       isAdmin,
       isModerator,
+      discourseUserId,
     }: {
       userId: number;
       address: string;
       communityId: string;
       isAdmin: boolean;
       isModerator: boolean;
+      discourseUserId: number;
     },
     { transaction }: { transaction: Transaction },
-  ) => {
-    return models.Address.findOrCreate({
+  ): Promise<CWAddressWithDiscourseId> => {
+    const [createdAddress] = await models.Address.findOrCreate({
       where: {
         address: address,
         user_id: userId,
@@ -47,6 +53,10 @@ class CWQueries {
       },
       transaction,
     });
+    return {
+      ...createdAddress.get({ plain: true }),
+      discourseUserId,
+    };
   };
 }
 
@@ -58,7 +68,7 @@ export const createAllAddressesInCW = async (
     communityId,
     base,
   }: {
-    users: Array<z.infer<typeof User>>;
+    users: Array<CWUserWithDiscourseId>;
     admins: Record<number, boolean>;
     moderators: Record<number, boolean>;
     communityId: string;
@@ -91,6 +101,7 @@ export const createAllAddressesInCW = async (
         communityId,
         isAdmin: admins[user.id!],
         isModerator: moderators[user.id!],
+        discourseUserId: user.discourseUserId,
       },
       { transaction },
     );
