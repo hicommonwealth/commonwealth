@@ -141,7 +141,6 @@ const Profile = ({ userId }: ProfileProps) => {
             : {}
         }
       >
-        <div className="fixed-slug-header"></div>
         <CWPageLayout>
           <Helmet>
             <link
