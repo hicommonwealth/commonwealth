@@ -67,7 +67,7 @@ const useDirectoryPageData = ({
         nameLower: c.community.toLowerCase(),
         namespace: c.namespace,
         description: c.description,
-        members: c.address_count,
+        members: c.profile_count,
         threads: c.thread_count,
         iconUrl: c.icon_url,
         id: c.id,
