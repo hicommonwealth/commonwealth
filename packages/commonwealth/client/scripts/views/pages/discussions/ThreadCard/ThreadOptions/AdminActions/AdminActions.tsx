@@ -76,6 +76,7 @@ export const AdminActions = ({
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     communityId: app.activeChainId(),
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
   });
 
@@ -99,6 +100,7 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 threadId: thread.id,
+                threadMsgId: thread.canvasMsgId,
                 communityId: app.activeChainId(),
                 address: user.activeAccount?.address || '',
               });
