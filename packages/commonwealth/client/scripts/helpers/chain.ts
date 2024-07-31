@@ -84,7 +84,6 @@ export const loadCommunityChainInfo = async (
       case ChainBase.Ethereum: {
         const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
           .default;
-        console.log('>>>>>>>>>>>>>>>>>>>>>>', tempChain.namespace);
         return new Ethereum(tempChain, app);
       }
       default:
