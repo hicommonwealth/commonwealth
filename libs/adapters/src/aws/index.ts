@@ -2,12 +2,20 @@ import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { BlobBucket, type BlobStorage } from '@hicommonwealth/core';
+import { config } from '../config';
 
-const s3Buckets: Record<BlobBucket, string> = {
-  assets: 'assets.commonwealth.im',
-  archives: 'outbox-event-stream-archive',
-  sitemap: 'sitemap.commonwealth.im',
-};
+const s3Buckets: Record<BlobBucket, string> =
+  config.APP_ENV === 'local'
+    ? {
+        assets: 'local.assets',
+        archives: 'local.outbox-event-stream-archive',
+        sitemap: 'local.sitemap',
+      }
+    : {
+        assets: 'assets.commonwealth.im',
+        archives: 'outbox-event-stream-archive',
+        sitemap: 'sitemap.commonwealth.im',
+      };
 
 /**
  * Creates a valid S3 asset url from an upload.Location url
