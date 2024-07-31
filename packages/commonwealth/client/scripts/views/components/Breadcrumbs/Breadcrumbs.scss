@@ -10,9 +10,11 @@
     background-color: $white;
     padding-block: 16px;
     position: fixed;
-    width: 100%;
     z-index: 3;
     overflow: auto;
+    width: 100%;
+    max-height: 52px !important;
+    min-height: 52px !important;
 
     @include extraSmall {
       position: static;
@@ -22,6 +24,15 @@
       &:hover {
         cursor: default;
       }
+    }
+  }
+
+  .BreadcrumbsBlockContentArea {
+    width: 100%;
+    max-height: 52px !important;
+    min-height: 52px !important;
+    @include extraSmall {
+      display: none;
     }
   }
 }
