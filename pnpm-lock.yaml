@@ -211,7 +211,7 @@ importers:
         version: 17.7.0(eslint@8.57.0)
       eslint-plugin-prettier:
         specifier: ^4.2.1
-        version: 4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@2.7.1)
+        version: 4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3)
       eslint-plugin-promise:
         specifier: ^6.1.1
         version: 6.1.1(eslint@8.57.0)
@@ -246,11 +246,11 @@ importers:
         specifier: ^8.2.0
         version: 8.4.0
       prettier:
-        specifier: 2.7.1
-        version: 2.7.1
+        specifier: ^3.3.3
+        version: 3.3.3
       prettier-plugin-organize-imports:
-        specifier: ^3.2.3
-        version: 3.2.4(prettier@2.7.1)(typescript@5.4.5)
+        specifier: ^3.2.4
+        version: 3.2.4(prettier@3.3.3)(typescript@5.4.5)
       process:
         specifier: ^0.11.10
         version: 0.11.10
@@ -15341,6 +15341,14 @@ packages:
     engines: { node: '>=10.13.0' }
     hasBin: true
 
+  prettier@3.3.3:
+    resolution:
+      {
+        integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==,
+      }
+    engines: { node: '>=14' }
+    hasBin: true
+
   pretty-format@29.7.0:
     resolution:
       {
@@ -26565,10 +26573,10 @@ snapshots:
       minimatch: 9.0.4
       semver: 7.6.0
 
-  eslint-plugin-prettier@4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@2.7.1):
+  eslint-plugin-prettier@4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3):
     dependencies:
       eslint: 8.57.0
-      prettier: 2.7.1
+      prettier: 3.3.3
       prettier-linter-helpers: 1.0.0
     optionalDependencies:
       eslint-config-prettier: 8.10.0(eslint@8.57.0)
@@ -29804,12 +29812,14 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier-plugin-organize-imports@3.2.4(prettier@2.7.1)(typescript@5.4.5):
+  prettier-plugin-organize-imports@3.2.4(prettier@3.3.3)(typescript@5.4.5):
     dependencies:
-      prettier: 2.7.1
+      prettier: 3.3.3
       typescript: 5.4.5
 
   prettier@2.7.1: {}
+
+  prettier@3.3.3: {}
 
   pretty-format@29.7.0:
     dependencies:
