@@ -21,12 +21,10 @@ const s3Buckets: Record<BlobBucket, string> =
         sitemap: 'sitemap.commonwealth.im',
       };
 
-function formatS3Url(data: CompleteMultipartUploadCommandOutput): string {
-  if (config.APP_ENV === 'local')
-    return `https://s3.amazonaws.com/${data.Bucket}/${data.Key}`;
-  return (
-    `https://${data.Bucket}/` + data.Location!.split('amazonaws.com/').pop()
-  );
+function formatS3Url(data: CompleteMultipartUploadCommandOutput) {
+  return config.APP_ENV === 'local'
+    ? `https://s3.amazonaws.com/${data.Bucket}/${data.Key}`
+    : `https://${data.Bucket}/${data.Key}`;
 }
 
 export const S3BlobStorage = (): BlobStorage => {
