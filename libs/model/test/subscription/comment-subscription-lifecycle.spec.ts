@@ -73,6 +73,7 @@ describe('Comment subscription lifecycle', () => {
 
   test('should create a new comment subscription', async () => {
     const payload = {
+      id: actor.user.id!,
       comment_id: commentOne!.id!,
     };
     const res = await command(CreateCommentSubscription(), {
@@ -117,6 +118,7 @@ describe('Comment subscription lifecycle', () => {
     ]);
 
     const payload = {
+      id: 0,
       comment_ids: [commentOne!.id!, commentTwo!.id!],
     };
 

@@ -16,12 +16,12 @@ export function UpdateContestManagerMetadata(): Command<
   return {
     ...schemas.UpdateContestManagerMetadata,
     auth: [isCommunityAdmin],
-    body: async ({ id, payload }) => {
+    body: async ({ payload }) => {
       const { topic_ids, ...rest } = payload;
 
       const contestManager = await models.ContestManager.findOne({
         where: {
-          community_id: id,
+          community_id: payload.id,
           contest_address: payload.contest_address,
         },
       });
