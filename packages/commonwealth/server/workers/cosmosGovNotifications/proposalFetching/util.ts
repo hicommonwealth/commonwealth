@@ -3,11 +3,9 @@ import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { fileURLToPath } from 'url';
 import { AllCosmosProposals } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export function uint8ArrayToNumberBE(bytes) {
   if (!bytes) return 0;

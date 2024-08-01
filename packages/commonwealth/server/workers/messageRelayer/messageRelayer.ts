@@ -6,13 +6,11 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 let isServiceHealthy = false;
 

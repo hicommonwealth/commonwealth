@@ -16,12 +16,10 @@ import {
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { NotificationsPolicy } from './notificationsPolicy';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 stats(HotShotsStats());
 

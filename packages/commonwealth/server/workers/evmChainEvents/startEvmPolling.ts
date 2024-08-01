@@ -1,11 +1,9 @@
 import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from

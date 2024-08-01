@@ -14,12 +14,10 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import z from 'zod';
 import { config, models } from '..';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 type AdditionalMetaData<Key extends keyof typeof EnrichedNotificationNames> = {
   event_name: typeof EnrichedNotificationNames[Key];
