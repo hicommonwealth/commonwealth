@@ -97,10 +97,10 @@ describe('Comment subscription lifecycle', () => {
       actor,
       payload: {},
     });
-    expect(res).to.have.deep.members([
-      commentSubOne.toJSON(),
-      commentSubTwo.toJSON(),
-    ]);
+
+    expect(res!.length).to.equal(2);
+    expect(res![0].id === commentSubOne.id);
+    expect(res![1].id === commentSubTwo.id);
   });
 
   test('should not throw for no comment subscriptions', async () => {

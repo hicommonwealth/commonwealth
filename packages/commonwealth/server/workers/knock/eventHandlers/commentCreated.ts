@@ -4,7 +4,8 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, safeTruncateBody } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
+import { safeTruncateBody } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
 import { getCommentUrl } from '../util';
