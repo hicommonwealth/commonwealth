@@ -19,6 +19,7 @@ import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import { useCreateCommentSubscriptionMutation } from 'state/api/trpc/subscription/useCreateCommentSubscriptionMutation';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
+import useUserStore from 'state/ui/user';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -101,6 +102,9 @@ export const CommentCard = ({
   className,
   shareURL,
 }: CommentCardProps) => {
+  const user = useUserStore();
+  const userOwnsComment = comment.profile.userId === user.id;
+
   const [commentText, setCommentText] = useState(comment.text);
   const commentBody = deserializeDelta(
     (editDraft || commentText) ?? comment.text,
@@ -126,9 +130,13 @@ export const CommentCard = ({
     return matching.length > 0;
   }, [comment.id, commentSubscriptions.data]);
 
-  const [hasCommentSubscription, setHasCommentSubscription] = useState(
-    hasCommentSubscriptionDefault,
-  );
+  const [hasCommentSubscriptionState, setHasCommentSubscriptionState] =
+    useState<boolean | undefined>(undefined);
+
+  const hasCommentSubscription =
+    hasCommentSubscriptionState !== undefined
+      ? hasCommentSubscriptionState
+      : hasCommentSubscriptionDefault;
 
   const { data: config } = useFetchConfigurationQuery();
 
@@ -164,7 +172,7 @@ export const CommentCard = ({
       });
     }
 
-    setHasCommentSubscription(!hasCommentSubscription);
+    setHasCommentSubscriptionState(!hasCommentSubscription);
   }, [
     hasCommentSubscription,
     deleteCommentSubscriptionMutation,
@@ -308,10 +316,10 @@ export const CommentCard = ({
                 />
               )}
 
-              {enableKnockInAppNotifications && (
+              {enableKnockInAppNotifications && userOwnsComment && (
                 <CWThreadAction
                   action="subscribe"
-                  label={hasCommentSubscription ? 'Unsubscribe' : 'Subscribe'}
+                  label="Subscribe"
                   selected={!hasCommentSubscription}
                   onClick={handleToggleSubscribe}
                 />

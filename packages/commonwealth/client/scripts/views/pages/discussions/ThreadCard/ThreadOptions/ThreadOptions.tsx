@@ -104,12 +104,18 @@ export const ThreadOptions = ({
     const matching = (threadSubscriptions.data || []).filter(
       (current) => current.thread_id === thread.id,
     );
+
     return matching.length > 0;
   }, [thread.id, threadSubscriptions.data]);
 
-  const [hasThreadSubscription, setHasThreadSubscription] = useState(
-    hasThreadSubscriptionDefault,
-  );
+  const [hasThreadSubscriptionState, setHasThreadSubscriptionState] = useState<
+    boolean | undefined
+  >(undefined);
+
+  const hasThreadSubscription =
+    hasThreadSubscriptionState !== undefined
+      ? hasThreadSubscriptionState
+      : hasThreadSubscriptionDefault;
 
   const doToggleSubscribe = useCallback(async () => {
     if (hasThreadSubscription) {
@@ -123,7 +129,7 @@ export const ThreadOptions = ({
         thread_id: thread.id,
       });
     }
-    setHasThreadSubscription(!hasThreadSubscription);
+    setHasThreadSubscriptionState(!hasThreadSubscription);
   }, [
     createThreadSubscriptionMutation,
     deleteThreadSubscriptionMutation,
@@ -213,7 +219,7 @@ export const ThreadOptions = ({
           {enableKnockInAppNotifications && (
             <CWThreadAction
               action="subscribe"
-              label={hasThreadSubscription ? 'Unsubscribe' : 'Subscribe'}
+              label="Subscribe"
               onClick={handleToggleSubscribe}
               selected={!hasThreadSubscription}
               disabled={!isCommunityMember}
