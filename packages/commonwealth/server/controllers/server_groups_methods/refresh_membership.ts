@@ -52,12 +52,7 @@ export async function __refreshMembership(
 
   // transform memberships to result shape
   const results = memberships.map((membership) => {
-    const specifiedGroup = groups.find(
-      (g) => g.id === membership.group_id && g.topic_id === topicId,
-    );
-    if (!specifiedGroup) {
-      return;
-    }
+    const specifiedGroup = groups.find((g) => g.id === membership.group_id);
 
     return {
       groupId: membership.group_id,
