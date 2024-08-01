@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
+import commonUrl from 'assets/img/branding/common.svg';
+import farcasterUrl from 'assets/img/farcaster.svg';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
@@ -12,16 +14,31 @@ import { PageNotFound } from 'views/pages/404';
 
 import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import useAppStatus from 'hooks/useAppStatus';
+import { useFlag } from 'hooks/useFlag';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
 } from 'shared/analytics/types';
+import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
 import ContestsList from '../ContestsList';
 import useCommunityContests from '../useCommunityContests';
 import './AdminContestsPage.scss';
 import FeeManagerBanner from './FeeManagerBanner';
 
+enum ContestView {
+  List = 'List',
+  TypeSelection = 'TypeSelection',
+}
+
+export enum ContestType {
+  Common = 'Common',
+  Farcaster = 'Farcaster',
+}
+
 const AdminContestsPage = () => {
+  const farcasterContestEnabled = useFlag('farcasterContest');
+  const [contestView, setContestView] = useState<ContestView>(ContestView.List);
+
   const navigate = useCommonNavigate();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -55,7 +72,10 @@ const AdminContestsPage = () => {
       event: MixpanelContestEvents.CREATE_CONTEST_BUTTON_PRESSED,
       isPWA: isAddedToHomeScreen,
     });
-    navigate('/manage/contests/launch');
+
+    return farcasterContestEnabled
+      ? setContestView(ContestView.TypeSelection)
+      : navigate('/manage/contests/launch');
   };
 
   if (!app.isLoggedIn() || !isAdmin) {
@@ -71,7 +91,7 @@ const AdminContestsPage = () => {
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {stakeEnabled && (
+          {stakeEnabled && contestView !== ContestView.TypeSelection && (
             <CWButton
               iconLeft="plusPhosphor"
               label="Create contest"
@@ -80,21 +100,55 @@ const AdminContestsPage = () => {
           )}
         </div>
 
-        {showBanner && (
-          <FeeManagerBanner
-            feeManagerBalance={feeManagerBalance}
-            isLoading={isFeeManagerBalanceLoading}
-          />
-        )}
+        {contestView === ContestView.List ? (
+          <>
+            {showBanner && (
+              <FeeManagerBanner
+                feeManagerBalance={feeManagerBalance}
+                isLoading={isFeeManagerBalanceLoading}
+              />
+            )}
 
-        <ContestsList
-          contests={contestsData}
-          isLoading={isContestDataLoading}
-          isAdmin={isAdmin}
-          isContestAvailable={isContestAvailable}
-          stakeEnabled={stakeEnabled}
-          feeManagerBalance={feeManagerBalance}
-        />
+            <ContestsList
+              contests={contestsData}
+              isLoading={isContestDataLoading}
+              isAdmin={isAdmin}
+              isContestAvailable={isContestAvailable}
+              stakeEnabled={stakeEnabled}
+              feeManagerBalance={feeManagerBalance}
+              onSetContestSelectionView={() =>
+                setContestView(ContestView.TypeSelection)
+              }
+            />
+          </>
+        ) : (
+          <div className="type-selection-list">
+            <EmptyCard
+              img={commonUrl}
+              title="Launch on Common"
+              subtitle="lorem ipsum dolor sit amet"
+              button={{
+                label: 'Launch Common contest',
+                handler: () =>
+                  navigate(
+                    `/manage/contests/launch?type=${ContestType.Common}`,
+                  ),
+              }}
+            />
+            <EmptyCard
+              img={farcasterUrl}
+              title="Launch on Farcaster"
+              subtitle="lorem ipsum dolor sit amet"
+              button={{
+                label: 'Launch Farcaster contest',
+                handler: () =>
+                  navigate(
+                    `/manage/contests/launch?type=${ContestType.Farcaster}`,
+                  ),
+              }}
+            />
+          </div>
+        )}
       </div>
     </CWPageLayout>
   );

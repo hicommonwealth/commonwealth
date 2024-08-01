@@ -45,6 +45,7 @@ interface ContestsListProps {
   stakeEnabled: boolean;
   isContestAvailable: boolean;
   feeManagerBalance?: string;
+  onSetContestSelectionView: () => void;
 }
 const ContestsList = ({
   contests,
@@ -53,6 +54,7 @@ const ContestsList = ({
   stakeEnabled,
   isContestAvailable,
   feeManagerBalance,
+  onSetContestSelectionView,
 }: ContestsListProps) => {
   const [fundDrawerAddress, setFundDrawerAddress] = useState('');
 
@@ -73,6 +75,7 @@ const ContestsList = ({
           <EmptyContestsList
             isStakeEnabled={stakeEnabled}
             isContestAvailable={isContestAvailable}
+            onSetContestSelectionView={onSetContestSelectionView}
           />
         ) : (
           contests.map((contest) => {

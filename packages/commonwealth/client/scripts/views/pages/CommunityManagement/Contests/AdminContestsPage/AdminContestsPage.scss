@@ -12,6 +12,16 @@
     }
   }
 
+  .type-selection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .empty-img {
+      min-width: 50px;
+    }
+  }
+
   .list-container {
     display: flex;
     flex-direction: column;
