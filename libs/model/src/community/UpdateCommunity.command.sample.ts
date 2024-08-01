@@ -9,8 +9,10 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
   return {
     ...schemas.UpdateCommunity,
     auth: [isCommunityAdmin],
-    body: async ({ id, payload }) => {
-      const community = await models.Community.findOne({ where: { id } });
+    body: async ({ payload }) => {
+      const community = await models.Community.findOne({
+        where: { id: payload.id },
+      });
 
       if (!mustExist('Community', community)) return;
 

@@ -121,7 +121,7 @@ const PersonalInformationStep = ({
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
     await updateUser({
-      id: user.id.toString(),
+      id: user.id,
       promotional_emails_enabled: values.enableProductUpdates,
       profile: {
         name: values.username.trim(),
