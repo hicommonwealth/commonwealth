@@ -120,12 +120,12 @@ export const ThreadOptions = ({
   const doToggleSubscribe = useCallback(async () => {
     if (hasThreadSubscription) {
       await deleteThreadSubscriptionMutation.mutateAsync({
-        id: `${thread.id}`,
+        id: thread.id,
         thread_ids: [thread.id],
       });
     } else {
       await createThreadSubscriptionMutation.mutateAsync({
-        id: `${thread.id}`,
+        id: thread.id,
         thread_id: thread.id,
       });
     }

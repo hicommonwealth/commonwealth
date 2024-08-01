@@ -162,12 +162,12 @@ export const CommentCard = ({
   const doToggleSubscribe = useCallback(async () => {
     if (hasCommentSubscription) {
       await deleteCommentSubscriptionMutation.mutateAsync({
-        id: `${comment.id}`,
+        id: comment.id,
         comment_ids: [comment.id],
       });
     } else {
       await createCommentSubscriptionMutation.mutateAsync({
-        id: `${comment.id}`,
+        id: comment.id,
         comment_id: comment.id,
       });
     }
