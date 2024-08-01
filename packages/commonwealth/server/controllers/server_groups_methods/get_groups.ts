@@ -23,20 +23,20 @@ export async function __getGroups(
   this: ServerGroupsController,
   { communityId, includeMembers, includeTopics }: GetGroupsOptions,
 ): Promise<GetGroupsResult> {
-  const include: Includeable | undefined = includeTopics
-    ? ({
+  const include = includeTopics
+    ? {
         model: this.models.GroupPermission,
         include: {
           model: this.models.Topic,
         },
-      } as Includeable)
+      }
     : undefined;
 
   const groups = await this.models.Group.findAll({
     where: {
       community_id: communityId,
     },
-    include,
+    include: include as unknown as Includeable,
   });
 
   let groupsResult = groups.map((group) => group.toJSON() as GroupWithExtras);

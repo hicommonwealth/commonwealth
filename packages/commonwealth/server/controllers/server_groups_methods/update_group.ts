@@ -3,18 +3,19 @@ import {
   AddressInstance,
   DB,
   GroupAttributes,
-  sequelize,
+  GroupPermissionAttributes,
+  GroupPermissionInstance,
   TopicInstance,
   UserInstance,
+  sequelize,
 } from '@hicommonwealth/model';
-import { GroupPermissionInstance } from '@hicommonwealth/model/src/models/groupPermission';
 import {
   ForumActions,
   ForumActionsEnum,
   GroupMetadata,
 } from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
-import { Op, Transaction } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
@@ -174,7 +175,7 @@ async function updateGroupPermissions(
     (id) => !topics.includes(id),
   );
   const permissionsToUpsert = topics.filter(
-    (id) => !permissionsToRemove.includes(id),
+    (id) => !permissionsToRemove.includes(id!),
   );
 
   if (permissionsToRemove.length > 0) {
@@ -182,7 +183,7 @@ async function updateGroupPermissions(
       where: {
         group_id,
         topic_id: { [Op.in]: permissionsToRemove },
-      },
+      } as WhereOptions<GroupPermissionAttributes>,
       transaction,
     });
   }
