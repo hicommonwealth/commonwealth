@@ -85,7 +85,7 @@ export const createThreadCommentHandler = async (
               })
             : // @ts-expect-error <StrictNullChecks>
               address.address,
-        parent_comment_id: parentId,
+        parent_comment_id: parentId ? parentId.toString() : null,
       };
       await verifyComment(canvasSignedData, canvasComment);
     }
