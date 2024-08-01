@@ -44,7 +44,7 @@ export const CommentSubscriptionEntry = (
   const handleDeleteSubscription = useCallback(() => {
     async function doAsync() {
       await deleteCommentSubscriptionMutation.mutateAsync({
-        id: `${comment_id}`,
+        id: comment_id,
         comment_ids: [comment_id],
       });
     }
