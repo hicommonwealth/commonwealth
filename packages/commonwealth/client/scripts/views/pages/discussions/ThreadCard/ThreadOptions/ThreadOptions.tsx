@@ -213,7 +213,7 @@ export const ThreadOptions = ({
           {enableKnockInAppNotifications && (
             <CWThreadAction
               action="subscribe"
-              label="Subscribe"
+              label={hasThreadSubscription ? 'Unsubscribe' : 'Subscribe'}
               onClick={handleToggleSubscribe}
               selected={!hasThreadSubscription}
               disabled={!isCommunityMember}

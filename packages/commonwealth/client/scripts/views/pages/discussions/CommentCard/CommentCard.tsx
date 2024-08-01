@@ -311,7 +311,7 @@ export const CommentCard = ({
               {enableKnockInAppNotifications && (
                 <CWThreadAction
                   action="subscribe"
-                  label="Subscribe"
+                  label={hasCommentSubscription ? 'Unsubscribe' : 'Subscribe'}
                   selected={!hasCommentSubscription}
                   onClick={handleToggleSubscribe}
                 />
