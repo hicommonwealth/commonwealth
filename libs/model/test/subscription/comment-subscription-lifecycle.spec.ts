@@ -118,7 +118,7 @@ describe('Comment subscription lifecycle', () => {
     ]);
 
     const payload = {
-      id: actor.user.id!,
+      id: 0,
       comment_ids: [commentOne!.id!, commentTwo!.id!],
     };
 

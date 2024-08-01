@@ -54,7 +54,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should update a single property in subscription preferences', async () => {
     const payload = {
-      id: actor.user.id!,
+      id: subPreferences!.id!,
       email_notifications_enabled: true,
     };
 
@@ -77,7 +77,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should update multiple properties in subscription preferences', async () => {
     const payload = {
-      id: actor.user.id!,
+      id: subPreferences!.id!,
       email_notifications_enabled: true,
       digest_email_enabled: true,
     };
@@ -130,7 +130,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should emit a SubscriptionPreferencesUpdated event if emails are enabled', async () => {
     const payload = {
-      id: actor.user.id!,
+      id: subPreferences!.id!,
       email_notifications_enabled: true,
     };
 
@@ -161,7 +161,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should emit a SubscriptionPreferencesUpdated event if recap emails are enabled', async () => {
     const payload = {
-      id: actor.user.id!,
+      id: subPreferences!.id!,
       email_notifications_enabled: true,
       recap_email_enabled: true,
     };
@@ -202,7 +202,7 @@ describe('Subscription preferences lifecycle', () => {
     );
 
     const payload = {
-      id: actor.user.id!,
+      id: subPreferences!.id!,
       email_notifications_enabled: false,
     };
 
@@ -242,7 +242,7 @@ describe('Subscription preferences lifecycle', () => {
     );
 
     const payload = {
-      id: actor.user.id!,
+      id: subPreferences!.id!,
       recap_email_enabled: false,
     };
 
@@ -284,7 +284,7 @@ describe('Subscription preferences lifecycle', () => {
     );
 
     const payload = {
-      id: actor.user.id!,
+      id: subPreferences!.id!,
       email_notifications_enabled: true,
       recap_email_enabled: false,
       digest_email_enabled: false,
@@ -294,7 +294,6 @@ describe('Subscription preferences lifecycle', () => {
       payload,
       actor,
     });
-
     expect(res).to.deep.contains({
       ...payload,
       id: subPreferences!.id,
