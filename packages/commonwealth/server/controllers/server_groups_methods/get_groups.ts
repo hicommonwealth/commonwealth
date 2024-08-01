@@ -4,6 +4,7 @@ import {
   TopicAttributes,
 } from '@hicommonwealth/model';
 import { Op, WhereOptions } from 'sequelize';
+import { Includeable } from 'sequelize/types/model';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
@@ -22,13 +23,13 @@ export async function __getGroups(
   this: ServerGroupsController,
   { communityId, includeMembers, includeTopics }: GetGroupsOptions,
 ): Promise<GetGroupsResult> {
-  const include = includeTopics
-    ? {
+  const include: Includeable | undefined = includeTopics
+    ? ({
         model: this.models.GroupPermission,
         include: {
           model: this.models.Topic,
         },
-      }
+      } as Includeable)
     : undefined;
 
   const groups = await this.models.Group.findAll({
