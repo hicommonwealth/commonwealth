@@ -24,6 +24,7 @@ interface APIResponseFormat {
       token_id?: string;
     };
   }[];
+  GroupPermissions: { Topic: unknown }[];
   topics: any[];
   memberships: any[];
   updated_at: string;

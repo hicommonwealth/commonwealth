@@ -1,4 +1,4 @@
-import { ForumActions } from '@hicommonwealth/schemas/src/index';
+import { ForumActions } from '@hicommonwealth/schemas';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
@@ -18,7 +18,7 @@ interface RefreshMembershipProps {
 export interface Memberships {
   groupId: number;
   topicIds: number[];
-  isAllowed: ForumActions;
+  allowedActions: ForumActions;
   rejectReason?: string;
 }
 

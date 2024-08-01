@@ -66,7 +66,6 @@ describe('createReaction Integration Tests', () => {
     const topic = await server.models.Topic.findOne({
       where: {
         community_id: communityId,
-        group_ids: [],
       },
     });
 
@@ -78,8 +77,7 @@ describe('createReaction Integration Tests', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
-      // @ts-expect-error StrictNullChecks
-      topicId: topic.id,
+      topicId: topic?.id,
       session: userSession.session,
       sign: userSession.sign,
     });

@@ -40,11 +40,9 @@ describe('Polls', () => {
     const topic = await server.models.Topic.findOne({
       where: {
         community_id: chain,
-        group_ids: [],
       },
     });
-    // @ts-expect-error StrictNullChecks
-    topicId = topic.id;
+    topicId = topic?.id;
 
     const userRes = await server.seeder.createAndVerifyAddress(
       { chain },

@@ -13,11 +13,11 @@ export const useForumActionGated = ({
   communityId,
   address,
   topicId,
-}: UseAllowedGroupsParams[]): UseForumActionGatedResponse => {
+}: UseAllowedGroupsParams): UseForumActionGatedResponse => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId,
     address,
-    topicId,
+    topicId: topicId?.toString(),
     apiEnabled: !!address,
   });
 
@@ -30,10 +30,16 @@ export const useForumActionGated = ({
       topic_id: t,
       allowedActions: m.allowedActions,
     })),
-  );
+  ) as unknown as {
+    topic_id: number;
+    allowedActions: ForumActions[];
+  }[];
 
   const topicIdToIsAllowedMap: Map<number, ForumActions[]> = new Map(
-    flatMemberships.map((g) => [g.topic_id, g.allowedActions]),
+    flatMemberships.map((g) => [
+      g.topic_id,
+      g.allowedActions as ForumActions[],
+    ]),
   );
 
   // Each map entry represents a topic and associated forumActions they are allowed to perform. We want to find for
