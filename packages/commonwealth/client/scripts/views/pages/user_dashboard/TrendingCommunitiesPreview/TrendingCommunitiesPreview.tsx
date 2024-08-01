@@ -1,15 +1,23 @@
+import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
-import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import { trpc } from '../../../../utils/trpcClient';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
 
 export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
+  const { isLoggedIn } = useUserLoggedIn();
+
+  const { data } = trpc.user.getCommunitiesWithNewContent.useQuery(
+    {},
+    {
+      enabled: isLoggedIn,
+    },
+  );
 
   const sortedCommunities = app.config.chains
     .getAll()
@@ -22,11 +30,6 @@ export const TrendingCommunitiesPreview = () => {
         !['"', '>', '<', "'", '/', '`'].includes(name[1])
       );
     })
-    .sort((a, b) => {
-      const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
-      const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
-      return threadCountB - threadCountA;
-    })
     .map((community) => {
       const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
         community.id,
@@ -38,11 +41,19 @@ export const TrendingCommunitiesPreview = () => {
         monthlyThreadCount,
         isMember,
         // TODO: should we remove the new label once user visits the community? -- ask from product
-        hasNewContent: user.joinedCommunityIdsWithNewContent.includes(
+        hasNewContent: (data?.joinedCommunityIdsWithNewContent || []).includes(
           community.id,
         ),
+        threadCount: app.recentActivity.getCommunityThreadCount(community.id),
         onClick: () => navigate(`/${community.id}`),
       };
+    })
+    .sort((a, b) => {
+      // display user-joined communities with new content first
+      if (a.hasNewContent) return -1;
+      if (b.hasNewContent) return 1;
+
+      return b.threadCount - a.threadCount;
     });
 
   return (

@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { pluralize } from 'helpers';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import CommunityInfo from '../../../../../models/ChainInfo';
 import { CWCard } from '../../../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
@@ -47,19 +48,17 @@ const CommunityPreviewCard = ({
               {community.name}
             </CWText>
           )}
-          {/* @ts-expect-error StrictNullChecks*/}
-          {monthlyThreadCount > 0 && (
+          {monthlyThreadCount && monthlyThreadCount > 0 && (
             <div className="thread-counts">
               <CWIcon iconName="notepad" weight="light" />
               <CWText className="card-subtext" type="b2" fontWeight="medium">
                 {`${pluralize(
-                  // @ts-expect-error <StrictNullChecks/>
                   monthlyThreadCount,
                   'new thread',
                 )} created this month`}
               </CWText>
               {isCommunityMember && hasNewContent && (
-                <CWText className="new-activity-tag">New</CWText>
+                <CWTag type="new" label="New" />
               )}
             </div>
           )}

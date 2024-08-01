@@ -3,4 +3,5 @@ import { User } from '@hicommonwealth/model';
 
 export const trpcRouter = trpc.router({
   updateUser: trpc.command(User.UpdateUser, trpc.Tag.User),
+  getCommunitiesWithNewContent: trpc.query(User.GetNewContent),
 });

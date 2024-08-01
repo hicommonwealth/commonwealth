@@ -10,3 +10,10 @@ export const UpdateUser = {
   }),
   output: User,
 };
+
+export const GetNewContent = {
+  input: z.object({}),
+  output: z.object({
+    joinedCommunityIdsWithNewContent: z.array(z.string()),
+  }),
+};

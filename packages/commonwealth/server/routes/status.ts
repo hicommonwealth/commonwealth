@@ -7,7 +7,6 @@ import type {
   StarredCommunityAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { sequelize } from '@hicommonwealth/model';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
 import { QueryTypes } from 'sequelize';
@@ -35,7 +34,6 @@ type StatusResp = {
     isAdmin: boolean;
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
-    joinedCommunityIdsWithNewContent: string[]; // ids of communities
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
@@ -88,49 +86,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     where: { user_id: user.id },
   });
 
-  // get ids of user-joined coommunities which have new content after user's last_active date per addresses
-  const joinedCommunityIdsWithNewContent: string[] = [];
-  for (let i = 0; i < addresses.length; i++) {
-    const { community_id, last_active } = addresses[i];
-
-    // continue to next address
-    if (
-      !community_id ||
-      !last_active ||
-      joinedCommunityIdsWithNewContent.includes(community_id)
-    ) {
-      continue;
-    }
-
-    const query = `
-        SELECT (
-          (
-            SELECT COUNT(*) 
-              FROM "Threads" 
-              WHERE "community_id" = :community_id 
-              AND "created_at" > :last_active 
-              AND "deleted_at" IS NULL
-          )
-          +
-          (
-            SELECT COUNT(*) 
-            FROM "Comments" 
-            WHERE "community_id" = :community_id 
-            AND "created_at" > :last_active 
-            AND "deleted_at" IS NULL
-          )
-        ) AS count;
-      `;
-    const response = await sequelize.query<{ count: string }>(query, {
-      raw: true,
-      type: QueryTypes.SELECT,
-      replacements: { community_id, last_active: last_active?.toISOString() },
-    });
-    const count = parseInt(response[0].count); // query returns `count` as a string, convert it to int
-
-    if (count > 0) joinedCommunityIdsWithNewContent.push(community_id);
-  }
-
   return {
     user: {
       id: user.id,
@@ -146,7 +101,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       isAdmin,
       disableRichText,
       starredCommunities,
-      joinedCommunityIdsWithNewContent,
     },
     id: user.id,
     email: user.email,

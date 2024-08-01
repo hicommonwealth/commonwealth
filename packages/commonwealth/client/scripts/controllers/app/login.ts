@@ -202,7 +202,6 @@ export function updateActiveUser(data) {
       knockJWT: '',
       addresses: [],
       starredCommunities: [],
-      joinedCommunityIdsWithNewContent: [],
       accounts: [],
       activeAccount: null,
       jwt: null,
@@ -232,8 +231,6 @@ export function updateActiveUser(data) {
       emailNotificationInterval: data.emailInterval || '',
       knockJWT: data.knockJwtToken || '',
       addresses,
-      joinedCommunityIdsWithNewContent:
-        data.joinedCommunityIdsWithNewContent || [],
       jwt: data.jwt || null,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
