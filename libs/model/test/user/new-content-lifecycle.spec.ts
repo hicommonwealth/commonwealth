@@ -6,7 +6,6 @@ import { afterAll, beforeAll, describe, test } from 'vitest';
 import { seed } from '../../src/tester';
 
 describe('New Content lifecycle', () => {
-  let id: string;
   let actor1: Actor;
   let actor2: Actor;
 
@@ -28,7 +27,6 @@ describe('New Content lifecycle', () => {
       ],
     });
 
-    id = community!.id!;
     actor1 = {
       user: { id: user1!.id!, email: user1!.email!, isAdmin: user1?.isAdmin },
       address_id: community!.Addresses!.at(0)!.address!,
