@@ -189,7 +189,7 @@ async function updateGroupPermissions(
   }
 
   if (permissionsToUpsert.length === 0) {
-    return;
+    return Promise.resolve([]);
   }
 
   const upsertGroupPermissions = permissionsToUpsert.map((topic_id) => ({
@@ -221,5 +221,7 @@ async function updateGroupPermissions(
     ),
   );
 
-  return await Promise.all(upsertPromises);
+  return (await Promise.all(upsertPromises)) as unknown as Promise<
+    GroupPermissionInstance[]
+  >;
 }

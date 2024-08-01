@@ -4,7 +4,7 @@ import {
   GroupAttributes,
   MembershipRejectReason,
 } from '@hicommonwealth/model';
-import { ForumActions } from '@hicommonwealth/schemas';
+import { ForumActions, ForumActionsEnum } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
@@ -68,7 +68,8 @@ export async function __refreshMembership(
       topicIds: groups
         .filter((g) => g.id === membership.group_id)
         .map((g) => g.topic_id),
-      allowed: specifiedGroup.allowed_actions,
+      allowed:
+        specifiedGroup?.allowed_actions ?? Object.values(ForumActionsEnum),
       rejectReason: membership.reject_reason,
     };
   });
