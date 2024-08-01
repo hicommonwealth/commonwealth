@@ -30,7 +30,7 @@ export const PushNotificationsToggle = () => {
     useUnregisterClientRegistrationTokenMutation();
 
   const browserType = getBrowserType();
-  const channelType = computeChannelTypeFromBrowserType(browserType);
+  const channelType = computeChannelTypeFromBrowserType(browserType) ?? 'APNS'; //cannot be undefined
 
   const [checked, setChecked] = useState(
     () => localStorage.getItem(LOCAL_STORAGE_KEY) === 'on',
@@ -48,7 +48,7 @@ export const PushNotificationsToggle = () => {
         console.log('Notification permission granted.');
         const token = await getFirebaseMessagingToken();
         await registerClientRegistrationToken.mutateAsync({
-          id: 'none',
+          id: 0, // this should be the aggregate id (user?)
           token,
           channelType,
         });
@@ -65,7 +65,7 @@ export const PushNotificationsToggle = () => {
         console.log('Notification permission granted.');
         const token = await getFirebaseMessagingToken();
         await unregisterClientRegistrationToken.mutateAsync({
-          id: 'none',
+          id: 0, // this should be the aggregate id (user?)
           token,
           channelType,
         });

@@ -26,13 +26,13 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
     async function doAsync() {
       if (subscribed) {
         await deleteCommunityAlert.mutateAsync({
-          id: communityInfo.id,
+          id: 0, // this should be the aggregate id (user?)
           community_ids: [communityInfo.id],
         });
         notifySuccess('Unsubscribed!');
       } else {
         await createCommunityAlert.mutateAsync({
-          id: communityInfo.id,
+          id: 0, // this should be the aggregate id (user?)
           community_id: communityInfo.id,
         });
         notifySuccess('Subscribed!');

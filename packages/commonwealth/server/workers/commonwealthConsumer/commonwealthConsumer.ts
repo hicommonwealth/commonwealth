@@ -129,7 +129,7 @@ function startRolloverLoop() {
       Contest.PerformContestRollovers(),
       {
         actor: {} as Actor,
-        payload: {},
+        payload: { id: '' },
       },
       false,
     ).catch(console.error);
