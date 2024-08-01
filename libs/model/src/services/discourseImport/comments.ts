@@ -49,7 +49,7 @@ class DiscourseQueries {
 }
 
 class CWQueries {
-  static createComment = async (
+  static createOrFindComment = async (
     discoursePost: DiscoursePost,
     parentCommentId: number | null,
     communityId: string,
@@ -139,7 +139,7 @@ export const createAllCommentsInCW = async (
   const discoursePosts = await DiscourseQueries.fetchPosts(discourseConnection);
   const postsGroupedByTopic: Record<number, Array<DiscoursePost>> = lo.groupBy(
     discoursePosts,
-    ({ topic_id }) => topic_id,
+    ({ topic_id: discourseTopicId }) => discourseTopicId,
   );
   const createdComments: Array<CWCommentWithDiscourseId> = [];
 
@@ -155,41 +155,44 @@ export const createAllCommentsInCW = async (
     for (const post of sortedPosts) {
       const {
         id: discoursePostId,
-        post_number,
-        user_id,
-        reply_to_post_number,
+        post_number: discoursePostNumber,
+        user_id: discoursePostUserId,
+        reply_to_post_number: discoursePostReplyToPostNumber,
       } = post;
 
-      if (post_number <= 0) {
+      if (discoursePostNumber <= 0) {
         continue;
       }
 
       const { id: addressId } =
-        addresses.find(({ discourseUserId }) => discourseUserId === user_id) ||
-        {};
+        addresses.find(
+          ({ discourseUserId }) => discourseUserId === discoursePostUserId,
+        ) || {};
 
       const { id: parentCommentId } =
         createdComments.find(
           (oldComment) =>
             discoursePostId === oldComment.discoursePostId && // is this thread
-            reply_to_post_number === oldComment.discoursePostNumber, // is reply to old comment
+            discoursePostReplyToPostNumber === oldComment.discoursePostNumber, // is reply to old comment
         ) || {};
 
       const parentId =
         parentCommentId &&
-        reply_to_post_number > 1 &&
-        post_number - 1 > reply_to_post_number
+        discoursePostReplyToPostNumber > 1 &&
+        discoursePostNumber - 1 > discoursePostReplyToPostNumber
           ? parentCommentId
           : null;
       if (!addressId) {
-        throw new Error(`Error: Address not found for user ${user_id}`);
+        throw new Error(
+          `Error: Address not found for user ${discoursePostUserId}`,
+        );
       }
       if (!cwThreadId) {
         throw new Error(
           `Error: Thread ID not found for discourse post ${discoursePostId}`,
         );
       }
-      const createdComment = await CWQueries.createComment(
+      const createdComment = await CWQueries.createOrFindComment(
         post,
         parentId,
         communityId,
