@@ -55,13 +55,16 @@ export async function __refreshMembership(
     const specifiedGroup = groups.find(
       (g) => g.id === membership.group_id && g.topic_id === topicId,
     );
+    if (!specifiedGroup) {
+      return;
+    }
 
     return {
       groupId: membership.group_id,
       topicIds: groups
         .filter((g) => g.id === membership.group_id)
         .map((g) => g.topic_id),
-      allowed: !membership.reject_reason ? specifiedGroup.allowed_actions : [],
+      allowed: specifiedGroup.allowed_actions,
       rejectReason: membership.reject_reason,
     };
   });

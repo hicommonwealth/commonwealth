@@ -1,4 +1,3 @@
-import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -24,7 +23,7 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import { ThreadKind, ThreadStage } from '../../../models/types';
-import Permissions from '../../../utils/Permissions';
+import Permissions, { canPerformAction } from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -120,8 +119,11 @@ export const NewThreadForm = () => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
 
-  const canCreateThread =
-    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_THREAD);
+  const { canCreateThread } = canPerformAction(
+    allowedActions,
+    isAdmin,
+    threadTopic?.id,
+  );
 
   const gatedGroupNames = groups
     .filter((group) =>

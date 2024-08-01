@@ -1,31 +1,53 @@
-import { ForumActionsEnum } from '@hicommonwealth/schemas';
+import { ForumActions } from '@hicommonwealth/schemas';
 import { useRefreshMembershipQuery } from '../state/api/groups';
 
 type UseAllowedGroupsParams = {
   communityId: string;
   address: string;
-  topicId: number;
+  topicId?: number;
 };
+
+export type UseForumActionGatedResponse = Map<number, ForumActions[]>;
 
 export const useForumActionGated = ({
   communityId,
   address,
   topicId,
-}: UseAllowedGroupsParams[]) => {
+}: UseAllowedGroupsParams[]): UseForumActionGatedResponse => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId,
     address,
     topicId,
-    apiEnabled: !!topicId && !!address,
+    apiEnabled: !!address,
   });
 
   if (memberships.length === 0) {
-    return Object.values(ForumActionsEnum);
+    return new Map();
   }
 
-  const validGroups = (memberships || []).filter(
-    (membership) => membership.rejectReason.length === 0,
+  const flatMemberships = memberships.flatMap((m) =>
+    m.topicIds.map((t) => ({
+      topic_id: t,
+      allowedActions: m.allowedActions,
+    })),
   );
 
-  return Array.from(new Set(validGroups.map((g) => g.isAllowed).flat()));
+  const topicIdToIsAllowedMap: Map<number, ForumActions[]> = new Map(
+    flatMemberships.map((g) => [g.topic_id, g.allowedActions]),
+  );
+
+  // Each map entry represents a topic and associated forumActions they are allowed to perform. We want to find for
+  // each topic, the set union of all associated forumActions to get the actions that the address can perform.
+  topicIdToIsAllowedMap.forEach((value, key) => {
+    const oldAllowList = topicIdToIsAllowedMap.get(key);
+    if (!oldAllowList) {
+      topicIdToIsAllowedMap.set(key, Array.from(new Set(value)));
+    }
+    topicIdToIsAllowedMap.set(
+      key,
+      Array.from(new Set([...oldAllowList, ...value])),
+    );
+  });
+
+  return topicIdToIsAllowedMap;
 };

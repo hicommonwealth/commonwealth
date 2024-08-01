@@ -95,7 +95,7 @@ export const TopicSummaryRow = ({
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               membership.topicIds.includes(thread?.topic?.id) &&
-              membership.isAllowed,
+              membership.forumAction,
           );
 
           const isRestrictedMembership =

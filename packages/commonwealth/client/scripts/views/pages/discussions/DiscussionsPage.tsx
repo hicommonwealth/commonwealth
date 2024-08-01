@@ -1,6 +1,10 @@
-import { ForumActionsEnum } from '@hicommonwealth/schemas';
+import { slugify } from '@hicommonwealth/shared';
+import { getThreadActionTooltipText } from 'helpers/threads';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
+import 'pages/discussions/index.scss';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
@@ -8,6 +12,12 @@ import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import useUserStore from 'state/ui/user';
+import Permissions, { canPerformAction } from 'utils/Permissions';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import {
   ThreadFeaturedFilterTypes,
@@ -15,26 +25,14 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
-import { Breadcrumbs } from '../../components/Breadcrumbs';
-import { HeaderWithFilters } from './HeaderWithFilters';
-import { ThreadCard } from './ThreadCard';
-import { sortByFeaturedFilter, sortPinned } from './helpers';
-
-import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
-import 'pages/discussions/index.scss';
-import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
-import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
+import { HeaderWithFilters } from './HeaderWithFilters';
+import { ThreadCard } from './ThreadCard';
+import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -78,14 +76,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const allowedActions = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
-    topicId,
   });
-
-  const canReactToThread =
-    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_THREAD_REACTION);
-
-  const canComment =
-    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_COMMENT);
 
   const { contestsData } = useCommunityContests();
 
@@ -187,11 +178,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
+          const { canCreateComment, canReactToThread } = canPerformAction(
+            allowedActions,
+            isAdmin,
+            thread?.topic?.id,
+          );
+
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!user.activeAccount,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: !canReactToThread,
+            isThreadTopicGated: !canReactToThread || !canCreateComment,
           });
 
           const isThreadTopicInContest = checkIsTopicInContest(
@@ -199,13 +196,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             thread?.topic?.id,
           );
 
-          console.log(canComment, 'can comment');
           return (
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
               canReact={canReactToThread}
-              canComment={canComment}
+              canComment={canCreateComment}
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);

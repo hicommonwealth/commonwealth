@@ -1,4 +1,3 @@
-import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
@@ -38,7 +37,7 @@ import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
-import Permissions from '../../../utils/Permissions';
+import Permissions, { canPerformAction } from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import MetaTags from '../../components/MetaTags';
 import { Select } from '../../components/Select';
@@ -313,13 +312,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment =
-    isAdmin || allowedActions.includes(ForumActionsEnum.CREATE_COMMENT);
-  const canReactToComment =
-    isAdmin ||
-    allowedActions.includes(ForumActionsEnum.CREATE_COMMENT_REACTION);
+  const { canCreateComment, canReactToComment } = canPerformAction(
+    allowedActions,
+    isAdmin,
+    thread?.topic?.id,
+  );
 
-  const isRestrictedMembership = !canComment || !canReactToComment;
+  const isRestrictedMembership = !canCreateComment || !canReactToComment;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -652,7 +651,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <CreateComment
                         // @ts-expect-error <StrictNullChecks/>
                         rootThread={thread}
-                        canComment={canComment}
+                        canComment={canCreateComment}
                         tooltipText={
                           typeof disabledActionsTooltipText === 'function'
                             ? disabledActionsTooltipText?.('comment')
@@ -661,7 +660,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       />
                       {foundGatedTopic &&
                         !hideGatingBanner &&
-                        (!canComment || !canReactToComment) && (
+                        (!canCreateComment || !canReactToComment) && (
                           <CWGatedTopicBanner
                             groupNames={gatedGroupsMatchingTopic.map(
                               (g) => g.name,
@@ -725,9 +724,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 setIsReplying={setIsReplying}
                 parentCommentId={parentCommentId}
                 setParentCommentId={setParentCommentId}
-                canComment={canComment}
+                canComment={canCreateComment}
                 canReact={canReactToComment}
-                canReply={canComment}
+                canReply={canCreateComment}
                 fromDiscordBot={fromDiscordBot}
                 commentSortType={commentSortType}
                 disabledActionsTooltipText={disabledActionsTooltipText}

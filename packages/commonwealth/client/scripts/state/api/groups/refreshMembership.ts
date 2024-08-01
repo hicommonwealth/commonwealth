@@ -11,14 +11,14 @@ interface RefreshMembershipProps {
   communityId: string;
   address: string;
   topicId?: string;
-  forumAction?: ForumActions;
+  allowedActions?: ForumActions;
   apiEnabled?: boolean;
 }
 
 export interface Memberships {
   groupId: number;
   topicIds: number[];
-  isAllowed: boolean;
+  isAllowed: ForumActions;
   rejectReason?: string;
 }
 
@@ -41,7 +41,7 @@ const refreshMembership = async ({
   return response?.data?.result?.map((r) => ({
     groupId: r.groupId,
     topicIds: r.topicIds,
-    isAllowed: r.allowed,
+    allowedActions: r.allowed,
     rejectReason: r.rejectReason,
   }));
 };
@@ -50,7 +50,7 @@ const useRefreshMembershipQuery = ({
   communityId,
   address,
   topicId,
-  forumAction,
+  allowedActions,
   apiEnabled = true,
 }: RefreshMembershipProps) => {
   return useQuery({
@@ -59,7 +59,7 @@ const useRefreshMembershipQuery = ({
       communityId,
       address,
       topicId,
-      forumAction,
+      allowedActions,
     ],
     queryFn: () => refreshMembership({ communityId, address, topicId }),
     enabled: apiEnabled,
