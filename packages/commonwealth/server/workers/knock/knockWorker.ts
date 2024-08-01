@@ -16,6 +16,7 @@ import {
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
+import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { NotificationsPolicy } from './notificationsPolicy';
 
@@ -26,7 +27,7 @@ stats(HotShotsStats());
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: __filename.endsWith(process.argv[1]),
+  enabled: fileURLToPath(import.meta.url).endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {
