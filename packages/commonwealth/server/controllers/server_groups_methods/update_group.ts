@@ -172,7 +172,7 @@ async function updateGroupPermissions(
   );
 
   const permissionsToRemove = existingTopicIds.filter(
-    (id) => !topics.includes(id),
+    (id) => !topics.includes(id!),
   );
   const permissionsToUpsert = topics.filter(
     (id) => !permissionsToRemove.includes(id!),
