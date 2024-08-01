@@ -9,7 +9,7 @@ import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
 
 export type CWThreadWithDiscourseId = z.infer<typeof Thread> & {
-  discourseTopicId: number; // discourse "topic" ID
+  discourseTopicId: number;
 };
 
 // Discourse Topic == CW Thread

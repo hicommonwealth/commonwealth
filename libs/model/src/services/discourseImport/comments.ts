@@ -11,6 +11,7 @@ import { z } from 'zod';
 
 export type CWCommentWithDiscourseId = z.infer<typeof Comment> & {
   discoursePostId: number;
+  discoursePostNumber: number;
 };
 
 // Discourse Post == CW Comment
@@ -21,7 +22,7 @@ type DiscoursePost = {
   reply_to_post_number: number;
   cooked: any;
   reply_count: number;
-  topic_id: any;
+  topic_id: number;
   like_count: number;
   created_at: string;
   updated_at: string;
@@ -50,7 +51,7 @@ class DiscourseQueries {
 class CWQueries {
   static createComment = async (
     discoursePost: DiscoursePost,
-    parentCommentId: number,
+    parentCommentId: number | null,
     communityId: string,
     threadId: number,
     addressId: number,
@@ -77,6 +78,7 @@ class CWQueries {
     return {
       ...comment.get({ plain: true }),
       discoursePostId: discoursePost.id,
+      discoursePostNumber: discoursePost.post_number,
     };
     // const [createdComment] = await models.sequelize.query<{
     //   id: number;
@@ -133,93 +135,69 @@ export const createAllCommentsInCW = async (
     threads: Array<CWThreadWithDiscourseId>;
   },
   { transaction }: { transaction: Transaction },
-) => {
-  const parentComments: Record<any, any> = {};
+): Promise<Array<CWCommentWithDiscourseId>> => {
   const discoursePosts = await DiscourseQueries.fetchPosts(discourseConnection);
-  const postsByTopic = lo.groupBy(discoursePosts, ({ topic_id }) => topic_id);
-  const postIds = Object.keys(postsByTopic);
-  const createdComments: any[] = [];
-  for (let i = 0; i < postIds.length; i++) {
-    const discoursePostId = parseInt(postIds[i]);
-    const posts = lo.sortBy(
-      postsByTopic[discoursePostId],
-      ({ post_number }) => post_number,
-    );
+  const postsGroupedByTopic: Record<number, Array<DiscoursePost>> = lo.groupBy(
+    discoursePosts,
+    ({ topic_id }) => topic_id,
+  );
+  const createdComments: Array<CWCommentWithDiscourseId> = [];
+
+  // iterate over each topic (CW thread)
+  for (const [discourseTopicId, posts] of Object.entries(postsGroupedByTopic)) {
+    const sortedPosts = lo.sortBy(posts, ({ post_number }) => post_number);
     const { id: cwThreadId } =
-      threads.find((thread) => thread.discourseTopicId === discoursePostId) ||
-      {};
-    for (let j = 0; j < posts.length; j++) {
+      threads.find(
+        (thread) => `${thread.discourseTopicId}` === `${discourseTopicId}`,
+      ) || {};
+
+    // iterate over each post (CW comment)
+    for (const post of sortedPosts) {
       const {
         id: discoursePostId,
         post_number,
         user_id,
-        cooked,
         reply_to_post_number,
-        like_count,
-        created_at,
-        updated_at,
-      } = posts[j];
-      if (post_number > 1) {
-        const { id: addressId } =
-          addresses.find(
-            ({ discourseUserId }) => discourseUserId === user_id,
-          ) || {};
-        const { id: parentCommentId } =
-          createdComments.find(
-            (createdComment) =>
-              discoursePostId === createdComment.discoursePostId &&
-              reply_to_post_number === createdComment.post_number,
-          ) || {};
-        const parentId =
-          parentCommentId &&
-          reply_to_post_number > 1 &&
-          post_number - 1 > reply_to_post_number
-            ? parentCommentId
-            : null;
-        if (addressId) {
-          if (!cwThreadId) {
-            throw new Error(
-              `Error: Thread ID not found for discourse post ${discoursePostId}`,
-            );
-          }
-          const createdComment = await CWQueries.createComment(
-            {
-              post_number,
-              cwThreadId,
-              addressId,
-              text: cooked,
-              like_count,
-              created_at,
-              updated_at,
-            },
-            parentId,
-            communityId,
-            cwThreadId,
-            addressId,
-            { transaction },
-          );
-          createdComments.push({
-            id: createdComment.id,
-            discourseCommentId: discoursePostId,
-            discoursePostId,
-            post_number,
-            cwThreadId,
-            like_count,
-          });
-          // record child comments
-          if (parentId) {
-            if (parentComments[parentId]) {
-              parentComments[
-                parentId
-              ] = `${parentComments[parentId]},${createdComment.id}`;
-            } else {
-              parentComments[parentId] = createdComment.id;
-            }
-          }
-        } else {
-          throw new Error(`Error: Address not found for user ${user_id}`);
-        }
+      } = post;
+
+      if (post_number <= 0) {
+        continue;
       }
+
+      const { id: addressId } =
+        addresses.find(({ discourseUserId }) => discourseUserId === user_id) ||
+        {};
+
+      const { id: parentCommentId } =
+        createdComments.find(
+          (oldComment) =>
+            discoursePostId === oldComment.discoursePostId && // is this thread
+            reply_to_post_number === oldComment.discoursePostNumber, // is reply to old comment
+        ) || {};
+
+      const parentId =
+        parentCommentId &&
+        reply_to_post_number > 1 &&
+        post_number - 1 > reply_to_post_number
+          ? parentCommentId
+          : null;
+      if (!addressId) {
+        throw new Error(`Error: Address not found for user ${user_id}`);
+      }
+      if (!cwThreadId) {
+        throw new Error(
+          `Error: Thread ID not found for discourse post ${discoursePostId}`,
+        );
+      }
+      const createdComment = await CWQueries.createComment(
+        post,
+        parentId,
+        communityId,
+        cwThreadId,
+        addressId,
+        { transaction },
+      );
+      createdComments.push(createdComment);
     }
   }
   return createdComments;
