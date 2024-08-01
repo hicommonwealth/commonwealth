@@ -5,7 +5,7 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
@@ -83,30 +83,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
-
-  const splitURLPath = useMemo(() => location.pathname.split('/'), []);
-  const decodedString = useMemo(
-    () => decodeURIComponent(splitURLPath[3]),
-    [splitURLPath],
-  );
-  const memoizedTopics = useMemo(() => topics, [topics]);
-
-  //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
-  useEffect(() => {
-    if (
-      decodedString &&
-      splitURLPath[2] === 'discussions' &&
-      splitURLPath.length === 4
-    ) {
-      const validTopics = memoizedTopics?.some(
-        (topic) => topic?.name === decodedString,
-      );
-      if (!validTopics) {
-        navigate('/discussions');
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [memoizedTopics, decodedString, splitURLPath]);
 
   const isOnArchivePage =
     location.pathname ===

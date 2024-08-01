@@ -5,6 +5,7 @@ import {
   EnrichedChainProposalsNotification,
   EnrichedCommentCreatedNotification,
   EnrichedCommunityStakeNotification,
+  EnrichedNotificationNames,
   EnrichedSnapshotProposalCreatedNotification,
   EnrichedUserMentionedNotification,
   KnockChannelIds,
@@ -17,7 +18,6 @@ import {
   Address,
   Comment,
   Community,
-  Profile,
   Thread,
   User,
 } from '@hicommonwealth/schemas';
@@ -28,7 +28,6 @@ type ArrayItemType<T> = T extends Array<infer U> ? U : never;
 
 export function generateDiscussionData(
   authorUser: z.infer<typeof User>,
-  authorProfile: z.infer<typeof Profile>,
   authorAddress: z.infer<typeof Address>,
   recipientUser: z.infer<typeof User>,
   community: z.infer<typeof Community>,
@@ -48,8 +47,10 @@ export function generateDiscussionData(
     ArrayItemType<NotificationsProviderGetMessagesReturn>,
   ];
 } {
+  const date = new Date();
+
   const userMentionedNotification: z.infer<typeof UserMentionedNotification> = {
-    author: authorProfile.profile_name!,
+    author: authorUser.profile.name!,
     author_address: authorAddress.address,
     author_address_id: authorAddress.id!,
     author_user_id: authorUser.id!,
@@ -61,7 +62,7 @@ export function generateDiscussionData(
 
   const commentCreatedNotification: z.infer<typeof CommentCreatedNotification> =
     {
-      author: authorProfile.profile_name!,
+      author: authorUser.profile.name!,
       comment_parent_name: comment.parent_id ? 'comment' : 'thread',
       community_name: community.name,
       comment_body: 'Testing',
@@ -73,17 +74,19 @@ export function generateDiscussionData(
     typeof EnrichedUserMentionedNotification
   > = {
     ...userMentionedNotification,
+    event_name: EnrichedNotificationNames.UserMentioned,
     author_avatar_url: authorUser.profile.avatar_url!,
+    inserted_at: date.toISOString(),
   };
 
   const enrichedCommentCreatedNotification: z.infer<
     typeof EnrichedCommentCreatedNotification
   > = {
     ...commentCreatedNotification,
+    event_name: EnrichedNotificationNames.CommentCreated,
     author_avatar_url: authorUser.profile.avatar_url!,
+    inserted_at: date.toISOString(),
   };
-
-  const date = new Date();
 
   const userMentionedMessage: ArrayItemType<NotificationsProviderGetMessagesReturn> =
     {
@@ -156,6 +159,8 @@ export function generateGovernanceData(
     ArrayItemType<NotificationsProviderGetMessagesReturn>,
   ];
 } {
+  const date = new Date();
+
   const snapshotProposalCreatedNotification: z.infer<
     typeof SnapshotProposalCreatedNotification
   > = {
@@ -177,17 +182,19 @@ export function generateGovernanceData(
     typeof EnrichedSnapshotProposalCreatedNotification
   > = {
     ...snapshotProposalCreatedNotification,
+    event_name: EnrichedNotificationNames.SnapshotProposalCreated,
     community_icon_url: community.icon_url,
+    inserted_at: date.toISOString(),
   };
 
   const enrichedChainProposalsNotification: z.infer<
     typeof EnrichedChainProposalsNotification
   > = {
     ...chainProposalsNotification,
+    event_name: EnrichedNotificationNames.ChainProposal,
     community_icon_url: community.icon_url,
+    inserted_at: date.toISOString(),
   };
-
-  const date = new Date();
 
   const snapshotProposalCreatedMessage: ArrayItemType<NotificationsProviderGetMessagesReturn> =
     {
@@ -273,7 +280,9 @@ export function generateProtocolData(
 
     enrichedNotifications.push({
       ...notification,
+      event_name: EnrichedNotificationNames.CommunityStakeTrade,
       community_icon_url: community.icon_url,
+      inserted_at: notificationDate.toISOString(),
     });
     notifications.push(notification);
 

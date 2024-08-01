@@ -9,7 +9,6 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import { createRole, findOneRole } from '../util/roles';
 
 const { Op } = Sequelize;
 
@@ -48,7 +47,6 @@ const linkExistingAddressToCommunity = async (
   // check if the original address is verified and is owned by the user
   const originalAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      // @ts-expect-error StrictNullChecks
       where: {
         address: req.body.address,
         user_id: userId,
@@ -117,41 +115,50 @@ const linkExistingAddressToCommunity = async (
     hex = await bech32ToHex(req.body.address);
   }
 
-  let addressId: number;
+  let addressId = -1;
   if (existingAddress) {
     // refer edge case 2)
     // either if the existing address is owned by someone else or this user,
     //   we can just update with userId. this covers both edge case (1) & (2)
     // Address.updateWithTokenProvided
-    existingAddress.user_id = userId;
-    const profileId = await models.Profile.findOne({
-      where: { user_id: userId },
+    await models.sequelize.transaction(async (transaction) => {
+      if (!existingAddress.verified) {
+        await incrementProfileCount(
+          models,
+          community!.id!,
+          originalAddress.user_id!,
+          transaction,
+        );
+      }
+
+      const updatedObj = await models.Address.update(
+        {
+          user_id: userId,
+          verification_token: verificationToken,
+          verification_token_expires: verificationTokenExpires,
+          last_active: new Date(),
+          verified: originalAddress.verified,
+          hex,
+        },
+        { where: { id: existingAddress.id }, transaction },
+      );
+      // @ts-expect-error StrictNullChecks
+      addressId = updatedObj.id;
     });
-    existingAddress.profile_id = profileId?.id;
-    existingAddress.verification_token = verificationToken;
-    existingAddress.verification_token_expires = verificationTokenExpires;
-    existingAddress.last_active = new Date();
-    existingAddress.verified = originalAddress.verified;
-    existingAddress.hex = hex;
-    const updatedObj = await existingAddress.save();
-    // @ts-expect-error StrictNullChecks
-    addressId = updatedObj.id;
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
       await incrementProfileCount(
         models,
         community!.id!,
-        originalAddress.user_id,
+        originalAddress.user_id!,
         transaction,
       );
 
       return await models.Address.create(
         {
-          user_id: originalAddress.user_id,
-          profile_id: originalAddress.profile_id,
+          user_id: originalAddress.user_id!,
           address: encodedAddress,
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
+          community_id: community!.id,
           hex,
           verification_token: verificationToken,
           verification_token_expires: verificationTokenExpires,
@@ -159,6 +166,7 @@ const linkExistingAddressToCommunity = async (
           wallet_id: originalAddress.wallet_id,
           wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),
+          role: 'member',
         },
         { transaction },
       );
@@ -174,18 +182,6 @@ const linkExistingAddressToCommunity = async (
   const ownedAddresses = await models.Address.findAll({
     where: { user_id: originalAddress.user_id },
   });
-
-  const role = await findOneRole(
-    models,
-    { where: { address_id: addressId } },
-    // @ts-expect-error StrictNullChecks
-    community.id,
-  );
-
-  if (!role) {
-    // @ts-expect-error StrictNullChecks
-    await createRole(models, addressId, community.id, 'member');
-  }
 
   const serverAnalyticsController = new ServerAnalyticsController();
   serverAnalyticsController.track(

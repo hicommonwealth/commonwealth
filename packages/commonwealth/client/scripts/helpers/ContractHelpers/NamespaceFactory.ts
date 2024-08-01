@@ -97,7 +97,7 @@ class NamespaceFactory extends ContractBase {
     if (!namespaceStatus) {
       throw new Error('Namespace already reserved');
     }
-
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       const uri = `${window.location.origin}/api/namespaceMetadata/${name}/{id}`;
@@ -105,8 +105,9 @@ class NamespaceFactory extends ContractBase {
         .deployNamespace(name, uri, feeManager, [])
         .send({
           from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch (error) {
       throw new Error('Transaction failed: ' + error);
@@ -132,7 +133,7 @@ class NamespaceFactory extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
@@ -146,8 +147,9 @@ class NamespaceFactory extends ContractBase {
         )
         .send({
           from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch {
       throw new Error('Transaction failed');
@@ -170,6 +172,7 @@ class NamespaceFactory extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       if (!exchangeToken) {
@@ -186,8 +189,9 @@ class NamespaceFactory extends ContractBase {
           )
           .send({
             from: walletAddress,
-            maxPriorityFeePerGas: null,
-            maxFeePerGas: null,
+            type: '0x2',
+            maxFeePerGas: maxFeePerGasEst?.toString(),
+            maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
           });
       } else {
         txReceipt = await this.contract.methods
@@ -202,8 +206,9 @@ class NamespaceFactory extends ContractBase {
           )
           .send({
             from: walletAddress,
-            maxPriorityFeePerGas: null,
-            maxFeePerGas: null,
+            type: '0x2',
+            maxFeePerGas: maxFeePerGasEst?.toString(),
+            maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
           });
       }
     } catch {

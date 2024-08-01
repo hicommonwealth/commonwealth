@@ -1,12 +1,10 @@
 import { User } from '@hicommonwealth/schemas';
-import type { CreateOptions } from 'sequelize';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { CommunityAlertAttributes } from './community_alerts';
-import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { SubscriptionPreferenceAttributes } from './subscription_preference';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
@@ -17,7 +15,6 @@ export type UserAttributes = z.infer<typeof User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
-  Profiles?: ProfileAttributes[];
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   threadSubscriptions?: ThreadSubscriptionAttributes[];
@@ -42,19 +39,12 @@ export type UserInstance = ModelInstance<UserAttributes> & {
     AddressInstance,
     AddressInstance['id']
   >;
-
-  getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
 };
 
-export type UserModelStatic = Sequelize.ModelStatic<UserInstance> & {
-  createWithProfile?: (
-    attrs: UserAttributes,
-    options?: CreateOptions,
-  ) => Promise<UserInstance>;
-};
+export type UserModelStatic = Sequelize.ModelStatic<UserInstance>;
 
-export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
-  const User = <UserModelStatic>sequelize.define<UserInstance>(
+export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
+  <UserModelStatic>sequelize.define<UserInstance>(
     'User',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -106,21 +96,3 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
       },
     },
   );
-
-  User.createWithProfile = async (attrs, options) => {
-    const user = await User.create({ ...attrs, profile: {} }, options);
-    if (user) {
-      user.Profiles = user.Profiles || [];
-      const profile = await sequelize.models.Profile.create(
-        {
-          user_id: user.id,
-        },
-        options,
-      );
-      if (profile) user.Profiles.push(profile.toJSON());
-    }
-    return user;
-  };
-
-  return User;
-};

@@ -1,5 +1,6 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Router } from 'express';
+import { ChainEvents } from '@hicommonwealth/model';
+import { Router, raw } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { config } from '../config';
 import * as community from './community';
@@ -10,11 +11,13 @@ import * as integrations from './integrations';
 import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as thread from './threads';
+import * as user from './user';
 
 /**
  * API v1 - tRPC Router
  */
 const artifacts = {
+  user: user.trpcRouter,
   community: community.trpcRouter,
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
@@ -49,6 +52,22 @@ router.get('/v1/openapi.json', (req, res) => {
     }),
   );
 });
+
+router.post(
+  '/v1/rest/chainevent/ChainEventCreated/:id',
+  raw({ type: '*/*', limit: '10mb', inflate: true }),
+  (req, res, next) => {
+    ChainEvents.verifyAlchemySignature(req);
+    return next();
+  },
+  // parse body as JSON (native express.json middleware doesn't work here)
+  (req, res, next) => {
+    req.body = JSON.parse(req.body);
+    next();
+  },
+  express.command(ChainEvents.ChainEventCreated()),
+);
+
 router.use('/v1/docs', swaggerUi.serve);
 router.get(
   '/v1/docs',

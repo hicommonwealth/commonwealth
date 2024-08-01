@@ -39,11 +39,12 @@ const useContestTopics = ({
       const mappedTopics = topicsData.map(({ name, id }) => ({
         name,
         id,
-        // for brand-new contest, set all topics to true by default
+        // for brand-new contest, set all
+        // topics to true by default (with exception to "General")
         // otherwise, take value from saved contest
         checked: initialToggledTopicList
           ? !!initialToggledTopicList?.find((t) => t.id === id)?.checked
-          : true,
+          : name.toLowerCase() !== 'general',
       }));
       setToggledTopicList(mappedTopics);
       setAllTopicsToggled(mappedTopics.every(({ checked }) => checked));

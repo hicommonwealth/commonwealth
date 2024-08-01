@@ -9,6 +9,7 @@ import { ThreadStage } from 'models/types';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import useUserStore, { userStore } from '../../ui/user';
 import { addThreadInAllCaches } from './helpers/cache';
@@ -84,6 +85,8 @@ const useCreateThreadMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   const user = useUserStore();
 
   return useMutation({
@@ -106,15 +109,16 @@ const useCreateThreadMutation = ({
       // increment communities thread count
       if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          profileId,
+          userId,
         );
 
       return newThread;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

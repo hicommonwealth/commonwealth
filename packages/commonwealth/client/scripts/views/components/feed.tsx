@@ -46,7 +46,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin(undefined, thread.communityId);
+    Permissions.isCommunityAdmin(thread.communityId);
 
   const allowedActions = useForumActionGated({
     communityId: app.activeChainId(),
@@ -67,6 +67,8 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     isThreadTopicGated: !(canCreateComment || canReactToThread),
   });
 
+  // edge case for deleted communities with orphaned posts
+  if (!chain) return;
   return (
     <ThreadCard
       thread={thread}
@@ -141,9 +143,9 @@ export const Feed = ({
         customScrollParent={customScrollParent}
         totalCount={queryData?.data?.length || DEFAULT_COUNT}
         style={{ height: '100%' }}
-        itemContent={(i) => {
-          return <FeedThread key={1} thread={queryData.data[i] as Thread} />;
-        }}
+        itemContent={(i) => (
+          <FeedThread key={i} thread={queryData.data[i] as Thread} />
+        )}
       />
     </div>
   );

@@ -25,7 +25,13 @@ import {
   LaunchContestStep,
 } from '../../types';
 
+import useAppStatus from 'client/scripts/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
 import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
@@ -55,6 +61,12 @@ const SignTransactionsStep = ({
     useDeployRecurringContestOnchainMutation();
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const user = useUserStore();
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
+    onAction: true,
+  });
 
   const isContestRecurring =
     contestFormData.contestRecurring === ContestRecurringType.Yes;
@@ -145,6 +157,10 @@ const SignTransactionsStep = ({
 
       onSetLaunchContestStep('ContestLive');
       onSetCreatedContestAddress(contestAddress);
+      trackAnalytics({
+        event: MixpanelContestEvents.CONTEST_CREATED,
+        isPWA: isAddedToHomeScreen,
+      });
     } catch (error) {
       console.log('error', error);
       setLaunchContestData((prevState) => ({

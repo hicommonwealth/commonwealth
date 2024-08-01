@@ -64,7 +64,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
         <div>
           <CWCommunityAvatar
             community={{
-              iconUrl: thread.Community.icon_url,
+              iconUrl: thread.Community.icon_url!,
               name: thread.Community.name,
             }}
             size="small"

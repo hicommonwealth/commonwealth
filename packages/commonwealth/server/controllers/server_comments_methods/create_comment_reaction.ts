@@ -145,7 +145,7 @@ export async function __createCommentReaction(
     reaction,
     address_id: address.id,
     community_id: thread.community_id,
-    comment_id: comment.id,
+    comment_id: comment.id!,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
@@ -178,7 +178,7 @@ export async function __createCommentReaction(
         root_type: null, // What is this for?
         community_id: thread.community_id,
         author_address: address.address,
-        author_community_id: address.community_id,
+        author_community_id: address.community_id!,
       },
     },
     excludeAddresses: [address.address],

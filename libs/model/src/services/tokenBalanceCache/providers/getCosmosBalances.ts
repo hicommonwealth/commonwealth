@@ -1,6 +1,6 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { logger } from '@hicommonwealth/core';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, DISCORD_BOT_ADDRESS } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
@@ -39,7 +39,7 @@ export async function getCosmosBalances(
       const encodedAddress = toBech32(chainNode.bech32!, data);
       addressMap[encodedAddress] = address;
     } catch (e) {
-      if (address != '0xdiscordbot') {
+      if (address != DISCORD_BOT_ADDRESS) {
         log.error(
           `Failed to decode Cosmos address`,
           e instanceof Error ? e : undefined,

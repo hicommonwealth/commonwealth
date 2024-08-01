@@ -12,7 +12,12 @@ import {
   type Balances,
   type DB,
 } from '@hicommonwealth/model';
-import { BalanceSourceType, BalanceType, delay } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  BalanceType,
+  DISCORD_BOT_ADDRESS,
+  delay,
+} from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
 import BN from 'bn.js';
 import { expect } from 'chai';
@@ -48,7 +53,6 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
 
   const addressOne = '0xCEB3C3D4B78d5d10bd18930DC0757ddB588A862a';
   const addressTwo = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
-  const discobotAddress = '0xdiscordbot';
 
   const bulkAddresses = generateEVMAddresses(20);
   bulkAddresses.splice(4, 0, addressOne);
@@ -140,7 +144,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
@@ -187,7 +191,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
@@ -254,7 +258,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: newEthChainId,
             contractAddress: chainLinkAddress,
@@ -330,7 +334,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
           },
@@ -374,7 +378,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: ethChainId,
           },
@@ -438,7 +442,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: newEthChainId,
           },
@@ -501,7 +505,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: nft.address,
@@ -548,7 +552,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
-          addresses: [addressOne721, discobotAddress, addressTwo721],
+          addresses: [addressOne721, DISCORD_BOT_ADDRESS, addressTwo721],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: nft.address,
@@ -615,7 +619,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: erc1155.address,
@@ -679,7 +683,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
       test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: erc1155.address,

@@ -25,7 +25,6 @@ import Web3 from 'web3';
 import { z } from 'zod';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { config } from '../../config';
-import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -370,7 +369,6 @@ export async function __createCommunity(
     id,
     name,
     default_symbol,
-    // @ts-expect-error StrictNullChecks
     icon_url,
     description,
     network: network as ChainNetwork,
@@ -385,7 +383,7 @@ export async function __createCommunity(
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
-    default_page: DefaultPage.Homepage,
+    default_page: DefaultPage.Discussions,
     has_homepage: 'true',
   });
 
@@ -401,8 +399,6 @@ export async function __createCommunity(
   });
 
   // try to make admin one of the user's addresses
-  // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (user_address) {
@@ -493,11 +489,9 @@ export async function __createCommunity(
       hex = await bech32ToHex(addressToBeAdmin.address);
     }
 
-    const newAddress = await this.models.Address.create({
+    await this.models.Address.create({
       user_id: user.id,
-      profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      // @ts-expect-error StrictNullChecks
       community_id: createdCommunity.id,
       hex,
       verification_token: addressToBeAdmin.verification_token,
@@ -508,15 +502,6 @@ export async function __createCommunity(
       role: 'admin',
       last_active: new Date(),
     });
-
-    role = new RoleInstanceWithPermission(
-      // @ts-expect-error StrictNullChecks
-      { community_role_id: 0, address_id: newAddress.id },
-      createdCommunity.id,
-      'admin',
-      0,
-      0,
-    );
 
     await this.models.Subscription.findOrCreate({
       where: {
@@ -531,8 +516,6 @@ export async function __createCommunity(
   return {
     community: createdCommunity.toJSON(),
     node: nodeJSON,
-    // @ts-expect-error StrictNullChecks
-    role: role?.toJSON(),
     // @ts-expect-error StrictNullChecks
     admin_address: addressToBeAdmin?.address,
   };

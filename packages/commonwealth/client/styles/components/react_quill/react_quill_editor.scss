@@ -109,6 +109,7 @@
     .QuillEditorWrapper {
       min-height: 255px;
       position: relative;
+      border: 1px solid transparent;
 
       &.isFocused {
         border: 1px solid $primary-500;

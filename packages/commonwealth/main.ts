@@ -31,6 +31,8 @@ import ViewCountCache from './server/util/viewCountCache';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const parseJson = json({ limit: '1mb' });
+
 /**
  * Bootstraps express app
  */
@@ -130,7 +132,11 @@ export async function main(
         }),
       );
 
-    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use((req, res, next) => {
+      if (req.path.startsWith('/api/v1/rest/chainevent/')) next();
+      else parseJson(req, res, next);
+    });
+
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);

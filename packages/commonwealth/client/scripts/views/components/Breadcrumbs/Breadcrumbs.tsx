@@ -26,9 +26,6 @@ export const Breadcrumbs = () => {
       location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
 
-  const user = userData.addresses?.[0];
-  const profileId = user?.profileId || user?.profile?.id || 0;
-
   const currentDiscussion = {
     currentThreadName: linkedThreads?.[0]?.title || '',
     currentTopic: linkedThreads?.[0]?.topic?.name || '',
@@ -57,12 +54,13 @@ export const Breadcrumbs = () => {
     standalone = true;
   }
 
+  const user = userData.addresses?.[0];
   const pathnames = generateBreadcrumbs(
     location.pathname,
-    profileId,
     navigate,
     app.isCustomDomain() ? app.activeChainId() : '',
     currentDiscussion,
+    user?.userId,
   );
 
   //Gets the tooltip copy based on the current page.
@@ -101,6 +99,9 @@ export const Breadcrumbs = () => {
           />
         )}
       </nav>
+      {/* an empty div that takes the block content area on the active page, similar
+      to the area that the fixed position BreadcrumbsComponent would take */}
+      <div className="BreadcrumbsBlockContentArea" />
     </CWPageLayout>
   );
 };

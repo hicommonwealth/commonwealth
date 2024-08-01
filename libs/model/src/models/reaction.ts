@@ -1,7 +1,7 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
-import { emitEvent } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
@@ -73,6 +73,17 @@ export default (
                   });
                 }
                 if (reaction.reaction === 'like') {
+                  const { topic_id, community_id } = thread.get({
+                    plain: true,
+                  });
+                  const contestManagers = !topic_id
+                    ? []
+                    : await getThreadContestManagers(
+                        sequelize,
+                        topic_id,
+                        community_id,
+                      );
+
                   await emitEvent(
                     Outbox,
                     [
@@ -81,6 +92,7 @@ export default (
                         event_payload: {
                           ...reaction.get({ plain: true }),
                           reaction: 'like',
+                          contestManagers,
                         },
                       },
                     ],

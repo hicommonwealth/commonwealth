@@ -5,6 +5,7 @@ import { signThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -55,6 +56,8 @@ const useCreateThreadReactionMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   const user = useUserStore();
 
   return useMutation({
@@ -74,13 +77,11 @@ const useCreateThreadReactionMutation = ({
         'combineAndRemoveDups',
       );
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          profileId,
-        );
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

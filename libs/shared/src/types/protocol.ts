@@ -121,6 +121,7 @@ export enum ChainType {
   Offchain = 'offchain',
 }
 
+// TODO: this type should be deprecated as community tags/categories are dynamic
 export enum CommunityCategoryType {
   DeFi = 'DeFi',
   DAO = 'DAO',

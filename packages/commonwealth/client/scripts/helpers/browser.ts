@@ -22,3 +22,28 @@ export const getBrowserInfo = (): BrowserInfo => {
 
   return browserInfo;
 };
+
+export type BrowserType = 'safari' | 'chrome';
+
+/**
+ * Get the type of the browser.
+ *
+ * For now, we just care about Safari and Chrome.
+ */
+export const getBrowserType = (): BrowserType | undefined => {
+  if (
+    navigator.vendor === 'Google Inc.' &&
+    navigator.userAgent.includes('Chrome/')
+  ) {
+    return 'chrome';
+  }
+
+  if (
+    navigator.vendor === 'Apple Computer, Inc.' &&
+    navigator.userAgent.includes('Safari/')
+  ) {
+    return 'safari';
+  }
+
+  return undefined;
+};

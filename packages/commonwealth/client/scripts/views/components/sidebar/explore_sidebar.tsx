@@ -3,6 +3,7 @@ import React from 'react';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import ChainInfo from '../../../models/ChainInfo';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import { getClasses } from '../component_kit/helpers';
@@ -27,9 +28,7 @@ export const ExploreCommunitiesSidebar = ({
 
   const isInCommunity = (item) => {
     if (item instanceof ChainInfo) {
-      return (
-        app.roles.getAllRolesInCommunity({ community: item.id }).length > 0
-      );
+      return Permissions.isCommunityMember(item.id);
     } else {
       return false;
     }

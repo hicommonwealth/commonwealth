@@ -1,6 +1,7 @@
 name: CI
 
 env:
+  APP_ENV: CI
   IS_CI: true
   CI: true # ensures Vitest allowOnly option is false so no tests are accidentally skipped
   NODE_ENV: 'test'

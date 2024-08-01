@@ -51,6 +51,7 @@ export const ThreadSelector = ({
           title: t.title,
           community_id: t.community_id,
           Address: new AddressInfo({
+            userId: t.address_user_id,
             id: t.address_id,
             address: t.address,
             communityId: t.address_community_id,

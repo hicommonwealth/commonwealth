@@ -107,7 +107,7 @@ export const AvatarUpload = ({
   const avatarUrl = forUser
     ? account?.profile?.avatarUrl
     : app.chain?.meta?.iconUrl;
-  const address = forUser ? account?.profile?.id : undefined;
+  const address = forUser ? account?.profile?.userId : undefined;
   const showAvatar = avatarUrl || address;
 
   return (
