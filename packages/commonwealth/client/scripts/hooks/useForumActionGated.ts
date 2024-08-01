@@ -51,7 +51,7 @@ export const useForumActionGated = ({
     }
     topicIdToIsAllowedMap.set(
       key,
-      Array.from(new Set([...oldAllowList, ...value])),
+      Array.from(new Set([...(oldAllowList as []), ...(value as [])])),
     );
   });
 
