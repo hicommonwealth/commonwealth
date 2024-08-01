@@ -2,15 +2,9 @@ import React from 'react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 
-export type AutomationTestProps = {
-  'data-testid'?: string;
-};
+type ErrorPageProps = { title?: any; message?: string | JSX.Element };
 
-type ErrorPageProps = {
-  message?: string | JSX.Element;
-} & AutomationTestProps;
-
-const ErrorPage = ({ message, ...rest }: ErrorPageProps) => {
+const ErrorPage = ({ message }: ErrorPageProps) => {
   const chunkLoadingErrRe = /Loading chunk/;
 
   const isChunkLoadingError = () => {
@@ -43,7 +37,6 @@ const ErrorPage = ({ message, ...rest }: ErrorPageProps) => {
       <CWEmptyState
         iconName="cautionTriangle"
         content={message || 'An error occurred while loading this page.'}
-        data-testid={rest['data-testid']}
       />
     </>
   );

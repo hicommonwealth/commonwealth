@@ -149,9 +149,7 @@ const LayoutComponent = ({
 
   return (
     <ErrorBoundary
-      FallbackComponent={({ error }) => (
-        <ErrorPage message={error?.message} data-testid="app-error" />
-      )}
+      FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
     >
       {renderDefaultMetatags && <MetaTags />}
       <div className="Layout">
