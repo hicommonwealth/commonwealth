@@ -4,6 +4,7 @@ import {
   EvmRecurringContestEventSignatures,
   EvmSingleContestEventSignatures,
   logger as loggerFactory,
+  parseEvmEventToContestEvent,
   type Command,
 } from '@hicommonwealth/core';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
@@ -16,6 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const logger = loggerFactory(__filename);
 
 // TODO: how do we handle chain re-orgs
+// Alchemy re-emits logs with `removed: true` -> modify event handlers to rollback changes if `removed: true`
 
 function anyAddressEqual(
   addresses: string[],
@@ -51,13 +53,28 @@ export function verifyAlchemySignature(req: any) {
   if (signature !== digest) throw new Error('Invalid signature');
 }
 
+type AtLeastOne<ObjectT> = {
+  [Key in keyof ObjectT]: Pick<ObjectT, Key>;
+}[keyof ObjectT] &
+  Partial<ObjectT>;
+
 // TODO: this function will be moved to a util for the Contest project handler (replaces EvmEventSource.create)
+export type AddEventSource = ({
+  contractEvents,
+  eventSignatures,
+  contractAddresses,
+}: AtLeastOne<{
+  contractEvents?: { [contractAddress: string]: Array<string> };
+  eventSignatures?: Array<string>;
+  contractAddresses?: Array<String>;
+}>) => Promise<void>;
+
 /**
  * This function makes an API request to Alchemy to add the specified contract address to the GraphQL query of the
  * relevant webhook. If the contract address already exists in the query filter this function does nothing.
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function addContractAddressToWebhook() {}
+const addAlchemyWebhookFilter: AddEventSource = async () => {};
 
 export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
   return {
@@ -87,9 +104,12 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
           switch (eventSignature) {
             case EvmNamespaceFactoryEventSignatures.NewContest:
               logger.info('New Contest Deployed');
+              parseEvmEventToContestEvent(eventSignature, contractAddress);
               break;
             case EvmNamespaceFactoryEventSignatures.NewNamespace:
               logger.info('New Namespace Deployed');
+              // TODO: event handler to link a namespace to a community if it isn't already linked e.g. original API
+              //  request failed
               break;
           }
         }
