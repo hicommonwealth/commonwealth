@@ -4,11 +4,9 @@ import { config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 const _blobStorage = blobStorage(S3BlobStorage());
 
 function dumpTablesSync(table: string, outputFile: string): boolean {

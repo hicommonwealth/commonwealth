@@ -8,13 +8,11 @@ import {
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { config } from '../config';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const { Op } = Sequelize;
 
