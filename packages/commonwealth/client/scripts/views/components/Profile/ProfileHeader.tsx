@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import 'components/Profile/ProfileHeader.scss';
 
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { renderQuillDeltaToText } from '../../../../../shared/utils';
@@ -60,7 +61,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
       </div>
       <div className="profile-name-and-bio">
         <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-          {name || 'Anonymous user'}
+          {name || DEFAULT_NAME}
         </CWText>
         <SocialAccounts profile={profile} />
         {hasBio() && (

@@ -2,7 +2,6 @@ import {
   ALL_COMMUNITIES,
   ChainBase,
   ChainType,
-  CommunityCategoryType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -27,7 +26,7 @@ export const CreateCommunity = {
       .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
       .optional(),
     social_links: z.array(z.string().url()).default([]),
-    tags: z.array(z.nativeEnum(CommunityCategoryType)).default([]),
+    tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),

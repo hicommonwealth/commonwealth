@@ -2,10 +2,12 @@ import type { Session } from '@canvas-js/interfaces';
 import {
   addressSwapper,
   ChainBase,
+  DEFAULT_NAME,
   verifySession,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -26,7 +28,6 @@ import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
-import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import {
   BaseMixpanelPayload,
@@ -65,7 +66,7 @@ type UseAuthenticationProps = {
 type Wallet = IWebWallet<any>;
 
 const useAuthentication = (props: UseAuthenticationProps) => {
-  const [username, setUsername] = useState<string>('Anonymous');
+  const [username, setUsername] = useState<string>(DEFAULT_NAME);
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<Wallet>>();
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
@@ -95,7 +96,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onAction: true,
   });
 
-  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
+  const { mutateAsync: updateUser } = useUpdateUserMutation();
 
   const { sessionKeyValidationError } = useAuthModalStore();
 
@@ -415,15 +416,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (!currentUserUpdatedProfile) {
         console.log('No profile yet.');
       } else {
-        // @ts-expect-error <StrictNullChecks>
-        account.profile.initialize(
-          currentUserUpdatedProfile?.name,
+        account?.profile?.initialize(
+          currentUserUpdatedProfile.userId,
+          currentUserUpdatedProfile.name,
           currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile?.avatarUrl,
-          currentUserUpdatedProfile.id,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          currentUserUpdatedProfile?.lastActive,
+          currentUserUpdatedProfile.avatarUrl,
+          account?.profile?.chain,
+          currentUserUpdatedProfile.lastActive,
         );
       }
     } catch (e) {
@@ -438,14 +437,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     newelyCreated?: boolean,
   ) => {
     try {
-      if (username) {
-        await updateProfile({
-          userId: user.id,
-          // @ts-expect-error <StrictNullChecks>
-          address: account.profile.address,
-          // @ts-expect-error <StrictNullChecks>
-          chain: account.profile.chain,
-          name: username,
+      if (username && account?.profile) {
+        await updateUser({
+          id: account.profile.userId.toString(),
+          profile: {
+            name: username.trim(),
+          },
         });
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
@@ -503,7 +500,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
             })
           : selectedAddress,
       ],
-      profileChainIds: [app.activeChainId() ?? wallet.chain],
+      profileChainIds: [],
       initiateProfilesAfterFetch: false,
     });
     const addressExists = profileAddresses?.length > 0;

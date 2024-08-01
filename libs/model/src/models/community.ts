@@ -110,7 +110,6 @@ export default (
       terms: { type: Sequelize.STRING, allowNull: true },
       bech32_prefix: { type: Sequelize.STRING, allowNull: true },
       admin_only_polling: { type: Sequelize.BOOLEAN, allowNull: true },
-      category: { type: Sequelize.JSONB, allowNull: true },
       discord_bot_webhooks_enabled: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
