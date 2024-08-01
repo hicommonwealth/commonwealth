@@ -3,17 +3,15 @@ import {
   EvmNamespaceFactoryEventSignatures,
   EvmRecurringContestEventSignatures,
   EvmSingleContestEventSignatures,
-  logger as loggerFactory,
+  logger,
   type Command,
 } from '@hicommonwealth/core';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol as cp } from '@hicommonwealth/shared';
 import { Hmac, createHmac } from 'crypto';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const logger = loggerFactory(__filename);
+const log = logger(import.meta);
 
 // TODO: how do we handle chain re-orgs
 
@@ -69,9 +67,9 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
       // let chain = id!;
 
       // TODO: modify event parsing functions + emit events to Outbox
-      for (const log of payload.event.data.block.logs) {
-        const eventSignature = log.topics[0];
-        const contractAddress = log.account.address;
+      for (const l of payload.event.data.block.logs) {
+        const eventSignature = l.topics[0];
+        const contractAddress = l.account.address;
 
         // Namespace/Contest factory contract events
         if (
@@ -86,10 +84,10 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
         ) {
           switch (eventSignature) {
             case EvmNamespaceFactoryEventSignatures.NewContest:
-              logger.info('New Contest Deployed');
+              log.info('New Contest Deployed');
               break;
             case EvmNamespaceFactoryEventSignatures.NewNamespace:
-              logger.info('New Namespace Deployed');
+              log.info('New Namespace Deployed');
               break;
           }
         }
@@ -106,7 +104,7 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
             contractAddress,
           )
         ) {
-          logger.info('Community Stake Trade');
+          log.info('Community Stake Trade');
         }
 
         // Contest contract events

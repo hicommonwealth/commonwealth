@@ -22,12 +22,10 @@ import {
   type OpenApiMeta,
   type OpenApiRouter,
 } from 'trpc-openapi';
-import { fileURLToPath } from 'url';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export interface Context {
   req: Request;

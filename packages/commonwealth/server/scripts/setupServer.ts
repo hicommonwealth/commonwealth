@@ -1,10 +1,8 @@
 import { dispose, logger } from '@hicommonwealth/core';
 import type { Express } from 'express';
 import http from 'http';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const setupServer = (app: Express, port: number) => {
   app.set('port', port);

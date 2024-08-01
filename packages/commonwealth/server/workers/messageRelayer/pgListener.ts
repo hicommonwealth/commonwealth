@@ -1,11 +1,9 @@
 import { dispose, logger, stats } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
 import pg from 'pg';
-import { fileURLToPath } from 'url';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 const OUTBOX_CHANNEL = 'outbox_channel';
 let retryCount = 0;
 const maxRetries = 5;
