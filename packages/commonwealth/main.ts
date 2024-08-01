@@ -28,8 +28,7 @@ import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const parseJson = json({ limit: '1mb' });
 
@@ -51,7 +50,7 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
-  const log = logger(__filename);
+  const log = logger(import.meta);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,

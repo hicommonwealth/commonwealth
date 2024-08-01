@@ -8,14 +8,12 @@ import {
   Sequelize,
   Transaction,
 } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { isAddress } from 'web3-validator';
 import { z } from 'zod';
 import { config } from '../config';
 import { OutboxAttributes } from '../models';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export function hashAbi(abi: AbiType): string {
   const hashInstance = hasher({

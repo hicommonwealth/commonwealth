@@ -1,7 +1,6 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { emitEvent } from '../utils';
 import { CommentSubscriptionAttributes } from './comment_subscriptions';
@@ -10,8 +9,7 @@ import type { ReactionAttributes } from './reaction';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations

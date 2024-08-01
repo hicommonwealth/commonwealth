@@ -1,10 +1,7 @@
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
-
-const __filename = fileURLToPath(import.meta.url);
 
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
@@ -12,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
  * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
 export class DatabaseCleaner {
-  private readonly log = logger(__filename);
+  private readonly log = logger(import.meta);
   private _models: DB;
   private _timeToRun: Date;
   private _completed = false;

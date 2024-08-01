@@ -17,12 +17,10 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { Contest, ContestWorker } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 stats(HotShotsStats());
 

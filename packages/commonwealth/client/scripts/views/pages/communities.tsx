@@ -185,7 +185,7 @@ const CommunitiesPage = () => {
           <CWRelatedCommunityCard
             key={i}
             community={community}
-            memberCount={community.addressCount}
+            memberCount={community.profileCount}
             threadCount={community.threadCount}
             canBuyStake={canBuyStake}
             onStakeBtnClick={() => setSelectedCommunity(community)}

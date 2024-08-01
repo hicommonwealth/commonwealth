@@ -4,14 +4,11 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
-import { safeTruncateBody } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'url';
+import { models, safeTruncateBody } from '@hicommonwealth/model';
 import z from 'zod';
 import { getCommentUrl, getThreadUrl } from '../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const output = z.boolean();
 
