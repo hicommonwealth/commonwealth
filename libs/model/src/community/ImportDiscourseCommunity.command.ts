@@ -7,6 +7,7 @@ import { createDiscourseDBConnection, models } from '../database';
 import {
   createAllAddressesInCW,
   createAllCommentsInCW,
+  createAllReactionsInCW,
   createAllThreadsInCW,
   createAllTopicsInCW,
   createAllUsersInCW,
@@ -201,13 +202,18 @@ export function ImportDiscourseCommunity(): Command<
         );
         log.debug(`Comments: ${comments.length}`);
 
-        // // insert reactions
-        // const reactions = await createAllReactionsInCW(
-        //   restrictedDiscourseConnection,
-        //   { addresses, communityId: communityId!, threads, comments },
-        //   { transaction },
-        // );
-        // log.debug(`Reactions: ${reactions.length}`);
+        // insert reactions
+        const reactions = await createAllReactionsInCW(
+          restrictedDiscourseConnection,
+          {
+            addresses,
+            communityId: communityId!,
+            threads,
+            comments,
+          },
+          { transaction },
+        );
+        log.debug(`Reactions: ${reactions.length}`);
 
         // // insert subscriptions
         // const subscriptions = await createAllSubscriptionsInCW(

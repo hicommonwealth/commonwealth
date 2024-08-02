@@ -162,6 +162,11 @@ export const createAllCommentsInCW = async (
         addresses.find(
           ({ discourseUserId }) => discourseUserId === discoursePostUserId,
         ) || {};
+      if (!addressId) {
+        throw new Error(
+          `Error: Address not found for user ${discoursePostUserId}`,
+        );
+      }
 
       const { id: parentCommentId } =
         createdComments.find(
@@ -177,11 +182,6 @@ export const createAllCommentsInCW = async (
           ? parentCommentId
           : null;
 
-      if (!addressId) {
-        throw new Error(
-          `Error: Address not found for user ${discoursePostUserId}`,
-        );
-      }
       const createdComment = await CWQueries.createOrFindComment(
         post,
         parentId,

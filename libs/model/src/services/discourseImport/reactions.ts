@@ -1,14 +1,21 @@
-import { models } from '@hicommonwealth/model';
+import {
+  CWAddressWithDiscourseId,
+  CWCommentWithDiscourseId,
+  CWThreadWithDiscourseId,
+  models,
+  ReactionAttributes,
+} from '@hicommonwealth/model';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
-const fetchThreadsReactionsFromDiscourse = async (session: Sequelize) => {
-  return session.query<{
-    user_id: any;
-    topic_id: any;
-    liked: any;
-    email: string;
-  }>(
-    `
+class DiscourseQueries {
+  static fetchThreadsReactions = async (session: Sequelize) => {
+    return session.query<{
+      user_id: any;
+      topic_id: any;
+      liked: any;
+      email: string;
+    }>(
+      `
     SELECT topic_users.user_id, topic_id, liked, email
     FROM public.topic_users
     inner join topics on topics.id = topic_users.topic_id
@@ -20,20 +27,20 @@ const fetchThreadsReactionsFromDiscourse = async (session: Sequelize) => {
     and email != 'no_email'
     and email != 'discobot_email';
     `,
-    { type: QueryTypes.SELECT },
-  );
-};
+      { type: QueryTypes.SELECT },
+    );
+  };
 
-const fetchCommentsReactionsFromDiscourse = async (session: Sequelize) => {
-  return session.query<{
-    id: any;
-    post_id: any;
-    user_id: any;
-    post_action_type_id: any;
-    deleted_at: any;
-    name_key: any;
-  }>(
-    `
+  static fetchCommentsReactions = async (session: Sequelize) => {
+    return session.query<{
+      id: any;
+      post_id: any;
+      user_id: any;
+      post_action_type_id: any;
+      deleted_at: any;
+      name_key: any;
+    }>(
+      `
         SELECT post_actions.id, post_id, user_id, post_action_type_id, deleted_at, name_key
         FROM public.post_actions inner join post_action_types
         on post_actions.post_action_type_id = post_action_types.id
@@ -42,76 +49,97 @@ const fetchCommentsReactionsFromDiscourse = async (session: Sequelize) => {
         and user_id > 0
         order by user_id
         `,
-    { type: QueryTypes.SELECT },
-  );
-};
+      { type: QueryTypes.SELECT },
+    );
+  };
+}
 
-const createReaction = async (
-  {
-    communityId,
-    addressId,
-    threadId,
-    commentId,
-  }: {
-    communityId: string;
-    addressId: number;
-    threadId: number;
-    commentId: number;
-  },
-  { transaction }: { transaction: Transaction },
-) => {
-  const [reaction] = await models.sequelize.query<{
-    id: number;
-  }>(
-    `
-    INSERT INTO "Reactions"(
-    id, community_id, address_id, reaction, created_at, updated_at, thread_id, comment_id, proposal_id)
-    VALUES (
-    default,
-    '${communityId}',
-    ${addressId},
-    'like',
-    NOW(),
-    NOW(),
-    ${threadId || null},
-    ${commentId || null},
-    null) Returning id;`,
-    { type: QueryTypes.SELECT, transaction },
-  );
-  return reaction;
-};
+class CWQueries {
+  static createOrFindReaction = async (
+    {
+      communityId,
+      addressId,
+      threadId,
+      commentId,
+    }: {
+      communityId: string;
+      addressId: number;
+      threadId: number | null | undefined;
+      commentId: number | null | undefined;
+    },
+    { transaction }: { transaction: Transaction },
+  ) => {
+    const options: ReactionAttributes = {
+      community_id: communityId,
+      address_id: addressId,
+      reaction: 'like',
+      canvas_signed_data: '',
+      canvas_hash: '',
+      calculated_voting_weight: 0,
+    };
+    if (threadId) {
+      options.thread_id = threadId;
+    }
+    if (commentId) {
+      options.comment_id = commentId;
+    }
+    const [createdReaction] = await models.Reaction.findOrCreate({
+      where: options,
+      defaults: options,
+      transaction,
+    });
+    return createdReaction.get({ plain: true });
+  };
+}
 
 export const createAllReactionsInCW = async (
   discourseConnection: Sequelize,
   {
-    addresses,
     communityId,
+    addresses,
     threads,
     comments,
-  }: { addresses: any[]; communityId: string; threads: any[]; comments: any[] },
+  }: {
+    communityId: string;
+    addresses: Array<CWAddressWithDiscourseId>;
+    threads: Array<CWThreadWithDiscourseId>;
+    comments: Array<CWCommentWithDiscourseId>;
+  },
   { transaction }: { transaction: Transaction },
 ) => {
   const [threadReactions, commentReactions] = await Promise.all([
-    fetchThreadsReactionsFromDiscourse(discourseConnection),
-    fetchCommentsReactionsFromDiscourse(discourseConnection),
+    DiscourseQueries.fetchThreadsReactions(discourseConnection),
+    DiscourseQueries.fetchCommentsReactions(discourseConnection),
   ]);
-  const reactions = [...threadReactions, ...commentReactions];
-  const reactionPromises = reactions.map(
-    ({ user_id, topic_id, post_id }: any) => {
+
+  const allReactions = [...threadReactions, ...commentReactions];
+  const reactionPromises = allReactions.map(
+    ({
+      user_id: discourseReactionUserId,
+      topic_id: discourseReactionTopicId,
+      post_id: discourseReactionPostId,
+    }: any) => {
       const { id: addressId } =
-        addresses.find(({ discourseUserId }) => discourseUserId === user_id) ||
-        {};
+        addresses.find(
+          ({ discourseUserId }) => discourseUserId === discourseReactionUserId,
+        ) || {};
       const { id: threadId } =
         threads.find(
-          ({ discourseThreadId }) => discourseThreadId === topic_id,
+          ({ discourseTopicId }) =>
+            discourseTopicId === discourseReactionTopicId,
         ) || {};
       const { id: commentId } =
         comments.find(
-          ({ discourseCommentId }) => discourseCommentId === post_id,
+          ({ discoursePostId }) => discoursePostId === discourseReactionPostId,
         ) || {};
-      if (threadId || commentId) {
-        return createReaction(
-          { communityId: communityId, addressId, threadId, commentId },
+      if (addressId && (threadId || commentId)) {
+        return CWQueries.createOrFindReaction(
+          {
+            communityId,
+            addressId,
+            threadId,
+            commentId,
+          },
           { transaction },
         );
       }
