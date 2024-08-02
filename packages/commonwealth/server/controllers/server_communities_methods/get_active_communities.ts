@@ -61,9 +61,7 @@ export async function __getActiveCommunities(
     type: QueryTypes.SELECT,
   });
 
-  const thirtyDaysAgo = new Date(
-    (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
-  );
+  const thirtyDaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
   const communityIds = activeCommunities.map((community) => community.id);
   const [communities, totalCommunitiesCount]: [CommunityInstance[], number] =
     await Promise.all([
