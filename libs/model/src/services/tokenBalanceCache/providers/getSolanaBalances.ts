@@ -1,12 +1,10 @@
 import { logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { models } from '../../../database';
 import { Balances, GetSPLBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
 import { __get_spl_balances } from './get_spl_balances';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function getSolanaBalances(
   options: GetSPLBalancesOptions,

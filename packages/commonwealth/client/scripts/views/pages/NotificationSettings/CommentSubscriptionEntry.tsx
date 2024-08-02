@@ -1,62 +1,67 @@
-import { ThreadSubscription } from '@hicommonwealth/schemas';
-import { getThreadUrl } from '@hicommonwealth/shared';
+import { CommentSubscription } from '@hicommonwealth/schemas';
+import { getThreadUrl, safeTruncateBody } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
+import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
 import { getCommunityUrl } from 'utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { User } from 'views/components/user/user';
 import { z } from 'zod';
 
-interface SubscriptionEntryProps {
-  readonly subscription: z.infer<typeof ThreadSubscription>;
+interface CommentSubscriptionEntryProps {
+  readonly subscription: z.infer<typeof CommentSubscription>;
   readonly onUnsubscribe: (id: number) => void;
 }
 
-export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
+export const CommentSubscriptionEntry = (
+  props: CommentSubscriptionEntryProps,
+) => {
   const { subscription, onUnsubscribe } = props;
-  const thread = subscription.Thread!;
-  const thread_id = thread.id!;
+  const comment = subscription.Comment!;
+  const thread = comment.Thread;
+  const comment_id = comment.id!;
+
+  const deleteCommentSubscriptionMutation =
+    useDeleteCommentSubscriptionMutation();
 
   const threadUrl = getThreadUrl(
     {
       chain: thread.community_id,
-      id: thread.id!,
+      id: comment.id!,
       title: thread.title,
     },
-    undefined,
+    comment_id,
     true,
   );
 
-  const navigate = useCommonNavigate();
-
-  const handleComment = useCallback(() => {
-    navigate(threadUrl);
-  }, [navigate, threadUrl]);
-  const deleteThreadSubscriptionMutation =
-    useDeleteThreadSubscriptionMutation();
-
-  const deleteThreadSubscription = useCallback(async () => {
-    await deleteThreadSubscriptionMutation.mutateAsync({
-      id: `${thread_id}`,
-      thread_ids: [thread_id],
-    });
-  }, [deleteThreadSubscriptionMutation, thread_id]);
-
   const handleDeleteSubscription = useCallback(() => {
-    deleteThreadSubscription()
+    async function doAsync() {
+      await deleteCommentSubscriptionMutation.mutateAsync({
+        id: comment_id,
+        comment_ids: [comment_id],
+      });
+    }
+
+    doAsync()
       .then(() => {
         notifySuccess('Unsubscribed!');
-        onUnsubscribe(thread_id);
+        onUnsubscribe(comment_id);
       })
       .catch(console.error);
-  }, [deleteThreadSubscription, onUnsubscribe, thread_id]);
+  }, [deleteCommentSubscriptionMutation, comment_id, onUnsubscribe]);
+
+  const navigate = useCommonNavigate();
+
+  const handleNavigateToThread = () => {
+    navigate(threadUrl);
+  };
 
   return (
     <div className="SubscriptionEntry">
@@ -87,12 +92,20 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
 
         <div>•</div>
 
-        <div>{getRelativeTimestamp(thread.created_at!.getTime())}</div>
+        <div>{getRelativeTimestamp(comment.created_at!.getTime())}</div>
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
           <Link to={threadUrl}>
-            <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
+            <QuillRenderer
+              doc={safeTruncateBody(decodeURI(comment.text))}
+              cutoffLines={4}
+              customShowMoreButton={
+                <CWText type="b1" className="show-more-btn">
+                  Show more
+                </CWText>
+              }
+            />
           </Link>
         </CWText>
       </div>
@@ -103,12 +116,12 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
           action="comment"
           onClick={(e) => {
             e.preventDefault();
-            handleComment();
+            handleNavigateToThread();
           }}
         />
 
         <CWThreadAction
-          label="Subscribe"
+          label="Unsubscribe"
           action="subscribe"
           onClick={(e) => {
             e.preventDefault();

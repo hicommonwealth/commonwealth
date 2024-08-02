@@ -62,6 +62,7 @@ export const CreateCommunity = {
 
 export const SetCommunityStake = {
   input: z.object({
+    id: z.string(),
     stake_id: z.coerce.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
     stake_token: z.string().default(''),
     vote_weight: z.coerce
@@ -77,6 +78,7 @@ export const SetCommunityStake = {
 
 export const CreateStakeTransaction = {
   input: z.object({
+    id: z.string(), // should be id instead of community_id
     transaction_hash: z.string().length(66),
     community_id: z.string(),
   }),
@@ -85,6 +87,7 @@ export const CreateStakeTransaction = {
 
 export const UpdateCommunity = {
   input: z.object({
+    id: z.string(),
     namespace: z.string(),
     txHash: z.string(),
     address: z.string(),
@@ -93,7 +96,9 @@ export const UpdateCommunity = {
 };
 
 export const GenerateStakeholderGroups = {
-  input: z.object({}),
+  input: z.object({
+    id: z.string(),
+  }),
   output: z.object({
     groups: z.array(Group),
     created: z.boolean(),

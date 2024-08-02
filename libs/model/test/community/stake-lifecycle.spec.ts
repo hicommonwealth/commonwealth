@@ -93,15 +93,18 @@ describe('Stake lifecycle', () => {
   });
 
   test('should fail set when community namespace not configured', () => {
-    expect(command(SetCommunityStake(), { id: id_with_stake, actor, payload }))
-      .to.eventually.be.rejected;
+    expect(
+      command(SetCommunityStake(), {
+        actor,
+        payload: { ...payload, id: id_with_stake },
+      }),
+    ).to.eventually.be.rejected;
   });
 
   test('should set and get community stake', async () => {
     const cr = await command(SetCommunityStake(), {
-      id: id_without_stake_to_set,
       actor,
-      payload,
+      payload: { ...payload, id: id_without_stake_to_set },
     });
     expect(cr).to.deep.contains({
       CommunityStakes: [
@@ -123,16 +126,18 @@ describe('Stake lifecycle', () => {
 
   test('should fail set when community not found', async () => {
     expect(
-      command(SetCommunityStake(), { actor, payload, id: 'does-not-exist' }),
+      command(SetCommunityStake(), {
+        actor,
+        payload: { ...payload, id: 'does-not-exist' },
+      }),
     ).to.eventually.be.rejectedWith(InvalidActor);
   });
 
   test('should fail set when community stake has been configured', () => {
     expect(
       command(SetCommunityStake(), {
-        id: id_with_stake,
         actor,
-        payload,
+        payload: { ...payload, id: id_with_stake },
       }),
     ).to.eventually.be.rejectedWith(
       InvalidState,

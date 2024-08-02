@@ -1,8 +1,8 @@
-import { CommunityAlert, ThreadSubscription } from '@hicommonwealth/schemas';
+import { CommunityAlert } from '@hicommonwealth/schemas';
 import { getUniqueCommunities } from 'helpers/addresses';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
@@ -10,14 +10,15 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from 'views/pages/404';
+import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
+import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
 import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
-import { SubscriptionEntry } from './SubscriptionEntry';
 import './index.scss';
 
 type NotificationSection = 'community-alerts' | 'subscriptions';
@@ -35,16 +36,8 @@ const NotificationSettings = () => {
     >) || [],
   );
 
-  const [threadsFilter, setThreadsFilter] = useState<readonly number[]>([]);
   const [section, setSection] =
     useState<NotificationSection>('community-alerts');
-
-  const handleUnsubscribe = useCallback(
-    (id: number) => {
-      setThreadsFilter([...threadsFilter, id]);
-    },
-    [threadsFilter],
-  );
 
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
@@ -126,20 +119,9 @@ const NotificationSettings = () => {
             <CWText className="page-subheader-text">
               Manage your subscriptions to these discussions
             </CWText>
+            <ThreadSubscriptions />
 
-            {(threadSubscriptions.data || [])
-              .filter((current) => current.Thread)
-              .filter((current) => !threadsFilter.includes(current.Thread!.id!))
-              .map((current) => (
-                <>
-                  <SubscriptionEntry
-                    key={current.Thread!.id!}
-                    subscription={current as z.infer<typeof ThreadSubscription>}
-                    onUnsubscribe={handleUnsubscribe}
-                  />
-                  {/*<ThreadCard thread={current.Thread!}/>*/}
-                </>
-              ))}
+            <CommentSubscriptions />
           </>
         )}
       </div>

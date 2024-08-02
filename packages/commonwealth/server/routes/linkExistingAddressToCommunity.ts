@@ -115,21 +115,36 @@ const linkExistingAddressToCommunity = async (
     hex = await bech32ToHex(req.body.address);
   }
 
-  let addressId: number;
+  let addressId = -1;
   if (existingAddress) {
     // refer edge case 2)
     // either if the existing address is owned by someone else or this user,
     //   we can just update with userId. this covers both edge case (1) & (2)
     // Address.updateWithTokenProvided
-    existingAddress.user_id = userId;
-    existingAddress.verification_token = verificationToken;
-    existingAddress.verification_token_expires = verificationTokenExpires;
-    existingAddress.last_active = new Date();
-    existingAddress.verified = originalAddress.verified;
-    existingAddress.hex = hex;
-    const updatedObj = await existingAddress.save();
-    // @ts-expect-error StrictNullChecks
-    addressId = updatedObj.id;
+    await models.sequelize.transaction(async (transaction) => {
+      if (!existingAddress.verified) {
+        await incrementProfileCount(
+          models,
+          community!.id!,
+          originalAddress.user_id!,
+          transaction,
+        );
+      }
+
+      const updatedObj = await models.Address.update(
+        {
+          user_id: userId,
+          verification_token: verificationToken,
+          verification_token_expires: verificationTokenExpires,
+          last_active: new Date(),
+          verified: originalAddress.verified,
+          hex,
+        },
+        { where: { id: existingAddress.id }, transaction },
+      );
+      // @ts-expect-error StrictNullChecks
+      addressId = updatedObj.id;
+    });
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
       await incrementProfileCount(

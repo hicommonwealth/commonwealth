@@ -8,14 +8,12 @@ import {
   Sequelize,
   Transaction,
 } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { isAddress } from 'web3-validator';
 import { z } from 'zod';
 import { config } from '../config';
 import { OutboxAttributes } from '../models';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export function hashAbi(abi: AbiType): string {
   const hashInstance = hasher({
@@ -149,64 +147,6 @@ export function decodeThreadContentUrl(contentUrl: string): {
     communityId,
     threadId: parseInt(threadId, 10),
   };
-}
-
-function getWordAtIndex(
-  inputString: string,
-  index: number,
-): {
-  word: string;
-  startIndex: number;
-  endIndex: number;
-} | null {
-  if (index < 0 || index >= inputString.length || inputString[index] === ' ') {
-    return null;
-  }
-
-  // Find the start of the word
-  let start = index;
-  while (start > 0 && inputString[start - 1] !== ' ') {
-    start--;
-  }
-
-  // Find the end of the word
-  let end = index;
-  while (end < inputString.length && inputString[end] !== ' ') {
-    end++;
-  }
-
-  // Extract and return the word
-  return {
-    word: inputString.substring(start, end),
-    startIndex: start,
-    endIndex: end,
-  };
-}
-
-/**
- * This function attempts to safely truncates thread or comment content by not splicing urls
- * or user mentions e.g. `[@Tim](/profile/id/118532)`. If the body contains only a URL or a user mention,
- * and it does not fit in the provided length, the function will return '...'
- * @param body A thread or comment body.
- * @param length The maximum length of the returned string. Note, the returned string may be shorter than this length.
- */
-export function safeTruncateBody(body: string, length: number = 500): string {
-  if (body.length <= length) return body;
-
-  // Regular expressions to identify URLs and user mentions
-  const urlRegex = /((https?:\/\/|www\.)[^\s]+)$/gi;
-  const mentionRegex = /\[@[^\]]+\]\(\/profile\/id\/\d+\)$/g;
-
-  const result = getWordAtIndex(body, length);
-  if (!result) return body.substring(0, length);
-
-  const match = urlRegex.exec(result.word) || mentionRegex.exec(result.word);
-  if (!match) return body.substring(0, length);
-  else if (match && result.startIndex === 0 && result.endIndex > length) {
-    return '...';
-  } else {
-    return body.substring(0, result.startIndex);
-  }
 }
 
 /**

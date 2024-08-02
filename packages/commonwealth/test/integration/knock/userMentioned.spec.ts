@@ -9,9 +9,9 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { safeTruncateBody, tester } from '@hicommonwealth/model';
+import { tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';

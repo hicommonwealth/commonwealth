@@ -3,10 +3,8 @@ import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import _ from 'lodash';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 type UniqueAddresses = {
   thread_id: number;
