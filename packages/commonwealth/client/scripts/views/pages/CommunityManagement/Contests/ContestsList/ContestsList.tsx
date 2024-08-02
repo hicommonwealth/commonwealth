@@ -45,7 +45,7 @@ interface ContestsListProps {
   stakeEnabled: boolean;
   isContestAvailable: boolean;
   feeManagerBalance?: string;
-  onSetContestSelectionView: () => void;
+  onSetContestSelectionView?: () => void;
 }
 const ContestsList = ({
   contests,

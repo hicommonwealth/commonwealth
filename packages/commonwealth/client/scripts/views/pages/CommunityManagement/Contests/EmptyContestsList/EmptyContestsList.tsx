@@ -12,7 +12,7 @@ import './EmptyContestsList.scss';
 interface EmptyContestsListProps {
   isStakeEnabled: boolean;
   isContestAvailable: boolean;
-  onSetContestSelectionView: () => void;
+  onSetContestSelectionView?: () => void;
 }
 
 const EmptyContestsList = ({
@@ -44,7 +44,7 @@ const EmptyContestsList = ({
             label: 'Launch a contest',
             handler: () =>
               farcasterContestEnabled
-                ? onSetContestSelectionView()
+                ? onSetContestSelectionView?.()
                 : navigate('/manage/contests/launch'),
           }}
         />
