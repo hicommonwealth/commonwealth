@@ -79,14 +79,14 @@ export const verifyComment = async (
     thread_id,
     actionMessage.payload.args.thread_id,
     'comment',
-    'identifier',
+    'thread_id',
   );
   assertMatches(text, actionMessage.payload.args.body, 'comment', 'text');
   assertMatches(
     parent_comment_id ?? null,
     actionMessage.payload.args.parent_comment_id ?? null,
     'comment',
-    'parent',
+    'parent_comment_id',
   );
 
   assertMatches(

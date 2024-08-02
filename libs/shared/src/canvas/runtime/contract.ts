@@ -11,22 +11,22 @@ export const contract = {
       title: 'string',
       body: 'string',
       link: 'string',
-      topic: 'string',
+      topic: 'number',
       updated_at: 'integer',
       $indexes: [['author']],
     },
     comments: {
       id: 'primary',
       author: 'string',
-      thread_id: 'number', // TODO: this should be @threads or the cid of the thread
+      thread_id: '@threads.id?',
       body: 'string',
-      parent_comment_id: 'string?', // TODO: this should be @comments or the cid of the comment
+      parent_comment_id: '@comments.id?',
       updated_at: 'integer',
       $indexes: [['thread_id', 'author']],
     },
     thread_reactions: {
       id: 'primary',
-      thread_id: 'number', // TODO: this should be @threads or the cid of the thread
+      thread_id: '@threads.id?',
       author: 'string',
       value: 'string',
       updated_at: 'integer',
@@ -34,7 +34,7 @@ export const contract = {
     },
     comment_reactions: {
       id: 'primary',
-      comment_id: 'number', // TODO: this should be @comments or the cid of the comment
+      comment_id: '@comments.id?',
       author: 'string',
       value: 'string',
       updated_at: 'integer',
@@ -42,7 +42,7 @@ export const contract = {
     },
   },
   actions: {
-    thread(db, { community, title, body, link, topic }, { did, id, timestamp }) {
+    async thread(db, { community, title, body, link, topic }, { did, id, timestamp }) {
       db.set("threads", {
         id: id,
         author: did,
@@ -58,19 +58,18 @@ export const contract = {
     async updateThread(db, { thread_id, title, body, link, topic }, { did, id, timestamp }) {
       const t = await db.get("threads", thread_id);
       if (!t || !t.id) throw new Error("invalid thread");
-      db.set('threads', { id: t.id, title, body, link, topic, updated_at: timestamp });
+      db.set('threads', { id: t.id, author: t.author, community: t.community, title, body, link, topic, updated_at: timestamp });
     },
-    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/threads/delete_thread_handler.ts)
     async deleteThread(db, { thread_id }, { did, id }) {
       const t = await db.get("threads", thread_id);
       if (!t || !t.id) throw new Error("invalid thread");
-      db.delete("threads", t.id.toString());
+      db.delete("threads", t.id);
     },
-    comment(db, { thread_id, body, parent_comment_id }, { did, id, timestamp }) {
+    async comment(db, { thread_id, body, parent_comment_id }, { did, id, timestamp }) {
       db.set("comments", {
         id: id,
         author: did,
-        thread_id, // TODO: this should be the thread's canvas_msg_id/cid
+        thread_id,
         body,
         parent_comment_id,
         updated_at: timestamp
@@ -80,15 +79,14 @@ export const contract = {
     async updateComment(db, { comment_id, body }, { did, id, timestamp }) {
       const c = await db.get("comments", comment_id);
       if (!c || !c.id) throw new Error("invalid comment");
-      db.set("comments", { id: c.id.toString(), body, updated_at: timestamp });
+      db.set("comments", { id: c.id, author: c.author, thread_id: c.thread_id, body, parent_comment_id: c.parent_comment_id, updated_at: timestamp });
     },
-    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/comments/delete_comment_handler.ts)
     async deleteComment(db, { comment_id }, { did, id }) {
       const c = await db.get("comments", comment_id);
       if (!c || !c.id) throw new Error("invalid comment");
-      db.delete("comments", c.id.toString());
+      db.delete("comments", c.id);
     },
-    reactThread(db, { thread_id, value }, { did, id, timestamp }) {
+    async reactThread(db, { thread_id, value }, { did, id, timestamp }) {
       if (value !== 'like' && value !== 'dislike') {
         throw new Error('Invalid reaction');
       }
@@ -100,8 +98,8 @@ export const contract = {
         updated_at: timestamp,
       });
     },
-    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/threads/delete_thread_reaction_handler.ts)
-    unreactThread(db, { thread_id, value }, { did, id, timestamp }) {
+    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/reactions/delete_reaction_handler.ts)
+    async unreactThread(db, { thread_id, value }, { did, id, timestamp }) {
       db.set("thread_reactions", {
         id: `${thread_id}/${did}`,
         author: did,
@@ -110,7 +108,7 @@ export const contract = {
         updated_at: timestamp
       });
     },
-    reactComment(db, { comment_id, value }, { did, id, timestamp }) {
+    async reactComment(db, { comment_id, value }, { did, id, timestamp }) {
       if (value !== 'like' && value !== 'dislike') {
         throw new Error('Invalid reaction');
       }
@@ -122,8 +120,8 @@ export const contract = {
         updated_at: timestamp,
       });
     },
-    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/comments/delete_comment_reaction_handler.ts)
-    unreactComment(db, { comment_id, value }, { did, id, timestamp }) {
+    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/reactions/delete_reaction_handler.ts)
+    async unreactComment(db, { comment_id, value }, { did, id, timestamp }) {
       db.set("comment_reactions", {
         id: `${comment_id}/${did}`,
         author: did,
