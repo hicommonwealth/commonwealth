@@ -65,7 +65,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const contestStatus = searchParams.get('status');
 
   const containerRef = useRef();
-  console.log('isLoadingTopics: ', isLoadingTopics);
+
   useBrowserWindow({});
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
