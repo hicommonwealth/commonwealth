@@ -4,15 +4,10 @@ import {
   models,
 } from '@hicommonwealth/model';
 import { Comment, Thread } from '@hicommonwealth/schemas';
-import { logger } from '@polkadot/util';
 import lo from 'lodash';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
 
 export type CWCommentWithDiscourseId = z.infer<typeof Comment> & {
   discoursePostId: number;
