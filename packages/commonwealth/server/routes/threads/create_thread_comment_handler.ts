@@ -61,8 +61,7 @@ export const createThreadCommentHandler = async (
     // @ts-expect-error <StrictNullChecks>
     address,
     parentId,
-    // @ts-expect-error <StrictNullChecks>
-    threadId: parseInt(threadId, 10) || undefined,
+    threadId: parseInt(threadId, 10),
     text,
     discordMeta: discord_meta,
   };
@@ -74,7 +73,7 @@ export const createThreadCommentHandler = async (
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
       const canvasComment = {
-        thread_id: parseInt(threadId, 10) || undefined,
+        thread_id: parseInt(threadId, 10),
         text,
         address:
           canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'

@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/core';
 import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
@@ -11,6 +12,10 @@ import { CreateThreadOptions } from 'server/controllers/server_threads_methods/c
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
+
+export const Errors = {
+  MissingCommunity: 'Must provide valid community',
+};
 
 type CreateThreadRequestBody = {
   topic_id: string;
@@ -32,6 +37,10 @@ export const createThreadHandler = async (
 ) => {
   const { user, address, community } = req;
 
+  if (!community || !community.id) {
+    throw new AppError(Errors.MissingCommunity);
+  }
+
   const {
     topic_id: topicId,
     title,
@@ -48,7 +57,6 @@ export const createThreadHandler = async (
     user,
     // @ts-expect-error <StrictNullChecks>
     address,
-    // @ts-expect-error <StrictNullChecks>
     community,
     title,
     body,
@@ -67,7 +75,7 @@ export const createThreadHandler = async (
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
 
-      const canvasComment = {
+      const canvasThread = {
         title,
         body,
         address:
@@ -79,11 +87,10 @@ export const createThreadHandler = async (
               })
             : // @ts-expect-error <StrictNullChecks>
               address.address,
-        // @ts-expect-error <StrictNullChecks>
         community: community.id,
         topic: topicId ? parseInt(topicId, 10) : null,
       };
-      await verifyThread(canvasSignedData, canvasComment);
+      await verifyThread(canvasSignedData, canvasThread);
     }
   }
   // create thread
