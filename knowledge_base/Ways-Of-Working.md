@@ -227,17 +227,19 @@ Procedure for deploying a GitHub release:
 
 Tag names observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 240111, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hotfixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`.
 
-Release branches also follow this syntax, but prepend `release/` and append `-x`, e.g. `release/v0.6.9-x`. The `-x` suffix denotes that the branch contains any hot fix releases for that version.
+Release branches also follow this syntax, but prepend `release/` and append `-x`, e.g. `release/v0.6.9-x`. The `-x` suffix denotes that the branch contains any hotfix releases for that version.
 
 #### Hotfix procedure
 
-Hotfixes should rolled out to production as follows:
+Hotfixes should be rolled out to production as follows:
 
 1. The hotfix is pushed directly to the release branch.
 2. The release branch is manually pushed to the Beta (QA) server.
 3. QA approval is obtained.
 4. The hotfix branch is deployed to production.
-5. The hotfix branch is merged back into master before the next release is cut.
+5. The hotfix branch is merged back into master.
+6. A hotfix tag is cut from master, following the naming syntax described above.
+7. A release is cut from the hotfix tag.
 
 Alternatively, engineers are welcome to create a new hotfix branch, and cherrypick it into the release branch, replacing steps 1 & 2 above.
 
