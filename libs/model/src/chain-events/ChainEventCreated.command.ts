@@ -1,10 +1,16 @@
 import {
+  EvmEventSignature,
   EvmEventSignatures,
   logger as loggerFactory,
   parseEvmEvent,
   type Command,
 } from '@hicommonwealth/core';
-import { config, equalEvmAddresses } from '@hicommonwealth/model';
+import {
+  config,
+  emitEvent,
+  equalEvmAddresses,
+  models,
+} from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol as cp } from '@hicommonwealth/shared';
 import { Hmac, createHmac } from 'crypto';
@@ -14,7 +20,9 @@ const __filename = fileURLToPath(import.meta.url);
 const logger = loggerFactory(__filename);
 
 // TODO: how do we handle chain re-orgs
-// Alchemy re-emits logs with `removed: true` -> modify event handlers to rollback changes if `removed: true`
+//  Alchemy re-emits logs with `removed: true` -> modify event handlers to rollback changes if `removed: true`.
+//  Encapsulate re-org logic in consumer in interface since QuickNode streams (Alchemy alternative) may not follow the
+//  same 'removed' pattern
 
 function anyAddressEqual(
   addresses: string[],
@@ -73,6 +81,13 @@ export type AddEventSource = ({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const addAlchemyWebhookFilter: AddEventSource = async () => {};
 
+/**
+ * This command works under the assumption that only Common is adding contest data on-chain. This is because in order
+ * to order events, the command expects a contest manager to exist in the database before a ContentAdded event is
+ * emitted. This is currently the case because users cannot add content or upvote in a contest until the contest manager
+ * exists in the DB and we don't support external content on-chain.
+ * @constructor
+ */
 export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
   return {
     ...schemas.ChainEventCreated,
@@ -85,44 +100,21 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
       // TODO: remove switch statements and just check for valid contract address and signature
 
       // TODO: modify event parsing functions + emit events to Outbox
+      const events = [];
       for (const log of payload.event.data.block.logs) {
         const eventSignature = log.topics[0];
         const contractAddress = log.account.address;
 
-        // Namespace/Contest factory contract events
+        // NamespaceFactory and CommunityStake
         if (
           anyAddressEqual(
             [
+              // Namespace/Contest factory contract events
               cp.factoryContracts[cp.ValidChains.Base].factory,
               cp.factoryContracts[cp.ValidChains.SepoliaBase].factory,
               cp.factoryContracts[cp.ValidChains.Sepolia].factory,
-            ],
-            contractAddress,
-          )
-        ) {
-          switch (eventSignature) {
-            case EvmEventSignatures.NamespaceFactory.ContestManagerDeployed:
-              logger.info('New Contest Deployed');
-              parseEvmEvent(
-                contractAddress,
-                eventSignature,
-                log.data,
-                log.topics,
-              );
-              break;
-            case EvmEventSignatures.NamespaceFactory.NamespaceDeployed:
-              logger.info('New Namespace Deployed');
-              // TODO: event handler to link a namespace to a community if it isn't already linked e.g. original API
-              //  request failed
-              break;
-          }
-        }
 
-        // CommunityStake contract events
-        if (
-          eventSignature === EvmEventSignatures.CommunityStake.Trade &&
-          anyAddressEqual(
-            [
+              // CommunityStake contract events
               cp.factoryContracts[cp.ValidChains.Base].communityStake,
               cp.factoryContracts[cp.ValidChains.SepoliaBase].communityStake,
               cp.factoryContracts[cp.ValidChains.Sepolia].communityStake,
@@ -130,29 +122,43 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
             contractAddress,
           )
         ) {
-          logger.info('Community Stake Trade');
-        }
+          events.push(
+            parseEvmEvent(
+              contractAddress,
+              eventSignature as EvmEventSignature,
+              log.data,
+              log.topics,
+            ),
+          );
+        } else if (
+          // Contests
+          Object.values(EvmEventSignatures.Contests).includes(
+            eventSignature as any,
+          )
+        ) {
+          const matchingContestContract = await models.ContestManager.findByPk(
+            contractAddress,
+            {
+              attributes: ['contest_address'],
+            },
+          );
 
-        // Contest contract events
-        // TODO: Fetch contest contracts from DB (managers table or EvmEventSources?)
-        const contestContracts: string[] = [];
-        if (anyAddressEqual(contestContracts, contractAddress)) {
-          switch (eventSignature) {
-            case EvmEventSignatures.Contests.RecurringContestStarted:
-              break;
-            case EvmEventSignatures.Contests.SingleContestStarted:
-              break;
-            case EvmEventSignatures.Contests.ContentAdded:
-              break;
-            case EvmEventSignatures.Contests.RecurringContestVoterVoted:
-              break;
-            case EvmEventSignatures.Contests.SingleContestVoterVoted:
-              break;
+          if (matchingContestContract) {
+            events.push(
+              parseEvmEvent(
+                contractAddress,
+                eventSignature as EvmEventSignature,
+                log.data,
+                log.topics,
+              ),
+            );
           }
         }
       }
 
-      return {};
+      if (events.length > 0) {
+        await emitEvent(models.Outbox, events);
+      }
     },
   };
 }

@@ -4,6 +4,7 @@ import {
   ContestContentUpvoted,
   ContestStarted,
   EventNames,
+  EventPairs,
   NamespaceDeployed,
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
@@ -298,28 +299,19 @@ type DecodedEvmEvent<Signature extends EvmEventSignature> = Transform<
 >;
 
 // EvmMapper maps chain event args as input to a zod event schema type as output
-type EvmMapper<
-  Signature extends EvmEventSignature,
-  Schema extends ChainEventSchemas,
-> = {
+type EvmMapper<Signature extends EvmEventSignature> = {
   signature: Signature;
-  output: Schema;
   condition?: (obj: DecodedEvmEvent<Signature>) => boolean;
   mapEvmToSchema: (
     contestAddress: string,
     decodedEvmEvent: DecodedEvmEvent<Signature>,
-  ) => {
-    event_name: EventNames;
-    event_payload: z.infer<Schema>;
-  };
+  ) => EventPairs;
 };
 
 const RecurringContestManagerDeployedMapper: EvmMapper<
-  typeof EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
-  typeof RecurringContestManagerDeployed
+  typeof EvmEventSignatures.NamespaceFactory.ContestManagerDeployed
 > = {
   signature: EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
-  output: RecurringContestManagerDeployed,
   condition: (evmInput) => !evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
@@ -335,11 +327,9 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
 };
 
 const OneOffContestManagerDeployedMapper: EvmMapper<
-  typeof EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
-  typeof OneOffContestManagerDeployed
+  typeof EvmEventSignatures.NamespaceFactory.ContestManagerDeployed
 > = {
   signature: EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
-  output: OneOffContestManagerDeployed,
   condition: (evmInput) => evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
@@ -355,11 +345,9 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
 };
 
 const SingleContestStartedMapper: EvmMapper<
-  typeof EvmEventSignatures.Contests.SingleContestStarted,
-  typeof ContestStarted
+  typeof EvmEventSignatures.Contests.SingleContestStarted
 > = {
   signature: EvmEventSignatures.Contests.SingleContestStarted,
-  output: ContestStarted,
   mapEvmToSchema: (contestAddress, { startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
@@ -372,11 +360,9 @@ const SingleContestStartedMapper: EvmMapper<
 };
 
 const RecurringContestStartedMapper: EvmMapper<
-  typeof EvmEventSignatures.Contests.RecurringContestStarted,
-  typeof ContestStarted
+  typeof EvmEventSignatures.Contests.RecurringContestStarted
 > = {
   signature: EvmEventSignatures.Contests.RecurringContestStarted,
-  output: ContestStarted,
   mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
@@ -389,11 +375,9 @@ const RecurringContestStartedMapper: EvmMapper<
 };
 
 const ContestContentAddedMapper: EvmMapper<
-  typeof EvmEventSignatures.Contests.ContentAdded,
-  typeof ContestContentAdded
+  typeof EvmEventSignatures.Contests.ContentAdded
 > = {
   signature: EvmEventSignatures.Contests.ContentAdded,
-  output: ContestContentAdded,
   mapEvmToSchema: (contestAddress, { contentId, creator, url }) => ({
     event_name: EventNames.ContestContentAdded,
     event_payload: {
@@ -406,11 +390,9 @@ const ContestContentAddedMapper: EvmMapper<
 };
 
 const RecurringContestContentUpvotedMapper: EvmMapper<
-  typeof EvmEventSignatures.Contests.RecurringContestVoterVoted,
-  typeof ContestContentUpvoted
+  typeof EvmEventSignatures.Contests.RecurringContestVoterVoted
 > = {
   signature: EvmEventSignatures.Contests.RecurringContestVoterVoted,
-  output: ContestContentUpvoted,
   mapEvmToSchema: (
     contestAddress,
     { contestId, contentId, voter, votingPower },
@@ -427,11 +409,9 @@ const RecurringContestContentUpvotedMapper: EvmMapper<
 };
 
 const SingleContestContentUpvotedMapper: EvmMapper<
-  typeof EvmEventSignatures.Contests.SingleContestVoterVoted,
-  typeof ContestContentUpvoted
+  typeof EvmEventSignatures.Contests.SingleContestVoterVoted
 > = {
   signature: EvmEventSignatures.Contests.SingleContestVoterVoted,
-  output: ContestContentUpvoted,
   mapEvmToSchema: (contestAddress, { contentId, voter, votingPower }) => ({
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
@@ -472,16 +452,20 @@ export const parseEvmEvent = (
       `Failed find EvmMapper for event with contract address ${contractAddress} and even signature ${eventSignature}`,
     );
   }
-  const mappers: EvmMapper<any, any>[] = Array.isArray(m) ? m : [m];
+  const mappers: EvmMapper<EvmEventSignature>[] = Array.isArray(m) ? m : [m];
   for (const mapper of mappers) {
     // spread operator removes the Readonly type which decodeLog function does not accept
     const decodedParams = decodeLog(
       [...EvmEventAbis[eventSignature]],
       data,
       topics,
-    ) as DecodedEvmEvent<any>;
+    ) as unknown as DecodedEvmEvent<EvmEventSignature>;
     if (!mapper.condition || mapper.condition(decodedParams)) {
       return mapper.mapEvmToSchema(contractAddress, decodedParams);
     }
   }
+
+  throw new Error(
+    `Failed find EvmMapper for event with contract address ${contractAddress} and even signature ${eventSignature}`,
+  );
 };

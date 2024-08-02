@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import * as events from './events.schemas';
 
 // TODO: All usages of this should be replaced by the EventNames enum - exporting all by default causes issues
@@ -26,3 +27,53 @@ export enum EventNames {
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
 }
+
+export type EventPairs =
+  | {
+      event_name: EventNames.CommentCreated;
+      event_payload: z.infer<typeof events.CommentCreated>;
+    }
+  | {
+      event_name: EventNames.ThreadCreated;
+      event_payload: z.infer<typeof events.ThreadCreated>;
+    }
+  | {
+      event_name: EventNames.ThreadUpvoted;
+      event_payload: z.infer<typeof events.ThreadUpvoted>;
+    }
+  | {
+      event_name: EventNames.ChainEventCreated;
+      event_payload: z.infer<typeof events.ChainEventCreated>;
+    }
+  | {
+      event_name: EventNames.SnapshotProposalCreated;
+      event_payload: z.infer<typeof events.SnapshotProposalCreated>;
+    }
+  | {
+      event_name: EventNames.UserMentioned;
+      event_payload: z.infer<typeof events.UserMentioned>;
+    }
+  | {
+      event_name: EventNames.RecurringContestManagerDeployed;
+      event_payload: z.infer<typeof events.RecurringContestManagerDeployed>;
+    }
+  | {
+      event_name: EventNames.OneOffContestManagerDeployed;
+      event_payload: z.infer<typeof events.OneOffContestManagerDeployed>;
+    }
+  | {
+      event_name: EventNames.ContestStarted;
+      event_payload: z.infer<typeof events.ContestStarted>;
+    }
+  | {
+      event_name: EventNames.ContestContentAdded;
+      event_payload: z.infer<typeof events.ContestContentAdded>;
+    }
+  | {
+      event_name: EventNames.ContestContentUpvoted;
+      event_payload: z.infer<typeof events.ContestContentUpvoted>;
+    }
+  | {
+      event_name: EventNames.SubscriptionPreferencesUpdated;
+      event_payload: z.infer<typeof events.SubscriptionPreferencesUpdated>;
+    };
