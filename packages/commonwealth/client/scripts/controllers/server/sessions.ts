@@ -226,6 +226,17 @@ export async function signThread(
   });
 }
 
+export async function signUpdateThread(
+  address: string,
+  { thread_id, title, body },
+) {
+  return await sign(address, 'updateThread', {
+    thread_id,
+    title: encodeURIComponent(title),
+    body: encodeURIComponent(body),
+  });
+}
+
 export async function signDeleteThread(address: string, { thread_id }) {
   return await sign(address, 'deleteThread', {
     thread_id,
@@ -240,6 +251,13 @@ export async function signComment(
     thread_id,
     body: encodeURIComponent(body),
     parent_comment_id,
+  });
+}
+
+export async function signUpdateComment(address: string, { comment_id, body }) {
+  return await sign(address, 'updateComment', {
+    comment_id,
+    body: encodeURIComponent(body),
   });
 }
 
