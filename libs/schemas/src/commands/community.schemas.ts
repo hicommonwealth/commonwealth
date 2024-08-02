@@ -105,7 +105,7 @@ export const ImportDiscourseCommunity = {
   input: z.object({
     base: z.enum(['ETHEREUM', 'COSMOS', 'NEAR']),
     accountsClaimable: z.boolean(),
-    dumpUrl: z.string(),
+    dumpUrl: z.string().url(),
   }),
   output: z.void(),
 };

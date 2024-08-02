@@ -25,9 +25,26 @@ const Errors = {
 
 const mutex = new Mutex();
 
+// Since the import will create a new temp DB and
+// add a new DB role, we need a way to reverse
+// those operations, which is the purpose of
+// the cleanup logic
+
 type CleanupFn = {
   description: string;
   fn: () => Promise<void>;
+};
+
+const runCleanup = async (cleanupStack: CleanupFn[]) => {
+  while (cleanupStack.length > 0) {
+    const { description, fn } = cleanupStack.pop()!;
+    try {
+      log.debug(`RUNNING CLEANUP: ${description}`);
+      await fn();
+    } catch (err) {
+      log.error('cleanup failed: ', err as Error);
+    }
+  }
 };
 
 export function ImportDiscourseCommunity(): Command<
@@ -142,7 +159,6 @@ const performImport = async (
     restrictedDiscourseConnection = await createDiscourseDBConnection(
       restrictedDiscourseDbUri,
     );
-
     cleanupStack.push({
       description:
         'Disconnect restricted user from temporary discourse DB so it can be dropped',
@@ -255,17 +271,5 @@ const performImport = async (
   } finally {
     // always cleanup
     await runCleanup(cleanupStack);
-  }
-};
-
-const runCleanup = async (cleanupStack: CleanupFn[]) => {
-  while (cleanupStack.length > 0) {
-    const { description, fn } = cleanupStack.pop()!;
-    try {
-      log.debug(`RUNNING CLEANUP: ${description}`);
-      await fn();
-    } catch (err) {
-      log.error('cleanup failed: ', err as Error);
-    }
   }
 };
