@@ -352,6 +352,7 @@ export const CommentTree = ({
         threadId: thread.id,
         parentCommentId: comment.parentComment,
         communityId: app.activeChainId(),
+        commentMsgId: comment.canvasMsgId,
         profile: {
           userId: user.activeAccount?.profile?.userId || 0,
           address: user.activeAccount?.address || '',
