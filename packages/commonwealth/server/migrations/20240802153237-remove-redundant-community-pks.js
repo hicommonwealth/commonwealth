@@ -18,7 +18,7 @@ module.exports = {
 
   async down() {
     await queryInterface.sequelize.transaction(async () => {
-      // irreversible
+      // TODO
     });
   },
 };
