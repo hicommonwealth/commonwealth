@@ -68,13 +68,16 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps): Promise<Thread> => {
-  const canvasSignedData = await signUpdateThread(address, {
-    thread_id: threadMsgId,
-    title: newTitle,
-    body: newBody,
-    link: url,
-    topic: topicId,
-  });
+  let canvasSignedData;
+  if (newBody || newTitle) {
+    canvasSignedData = await signUpdateThread(address, {
+      thread_id: threadMsgId,
+      title: newTitle,
+      body: newBody,
+      link: url,
+      topic: topicId,
+    });
+  }
 
   const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
     // common payload
