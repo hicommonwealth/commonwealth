@@ -62,7 +62,12 @@ export const verify = async ({
 
 export const verifyComment = async (
   canvasSignedData: CanvasSignedData,
-  fields: any,
+  fields: {
+    thread_id: number;
+    text: string;
+    address: string;
+    parent_comment_id: string | null;
+  },
 ) => {
   const { thread_id, text, address, parent_comment_id } = fields;
 
@@ -95,21 +100,38 @@ export const verifyComment = async (
 
 export const verifyDeleteComment = async (
   canvasSignedData: CanvasSignedData,
-  fields: any,
+  fields: {
+    comment_msg_id: string;
+  },
 ) => {
+  const { comment_msg_id } = fields;
+
   await verify(canvasSignedData);
 
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'deleteComment', 'comment', 'call');
+  assertMatches(
+    actionMessage.payload.args.commentId,
+    comment_msg_id,
+    'comment',
+    'msgid',
+  );
 
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
 export const verifyThread = async (
   canvasSignedData: CanvasSignedData,
-  fields: any,
+  fields: {
+    title: string;
+    body: string;
+    address: string;
+    community: string;
+    topic: number | null;
+  },
 ) => {
-  const { title, body, address, community, link, topic } = fields;
+  const { title, body, address, community } = fields;
+  const topic = fields.topic ?? '';
 
   await verify(canvasSignedData);
 
@@ -123,14 +145,7 @@ export const verifyThread = async (
   );
   assertMatches(title, actionMessage.payload.args.title, 'thread', 'title');
   assertMatches(body, actionMessage.payload.args.body, 'thread', 'body');
-  assertMatches(link ?? '', actionMessage.payload.args.link, 'thread', 'link');
-  assertMatches(
-    topic ?? '',
-    actionMessage.payload.args.topic,
-    'thread',
-    'topic',
-  );
-
+  assertMatches(topic, actionMessage.payload.args.topic, 'thread', 'topic');
   assertMatches(
     address,
     actionMessage.payload.did.split(':')[4],
@@ -142,12 +157,20 @@ export const verifyThread = async (
 
 export const verifyDeleteThread = async (
   canvasSignedData: CanvasSignedData,
-  fields: any,
+  fields: {
+    threadMsgId: string;
+  },
 ) => {
   await verify(canvasSignedData);
 
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'deleteThread', 'thread', 'call');
+  assertMatches(
+    actionMessage.payload.args.thread_id,
+    fields.threadMsgId,
+    'thread',
+    'id',
+  );
 
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
