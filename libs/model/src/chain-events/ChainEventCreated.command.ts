@@ -97,9 +97,6 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
       // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/ChainEventCreated/BaseSepolia)
       // let chain = id!;
 
-      // TODO: remove switch statements and just check for valid contract address and signature
-
-      // TODO: modify event parsing functions + emit events to Outbox
       const events = [];
       for (const log of payload.event.data.block.logs) {
         const eventSignature = log.topics[0];
