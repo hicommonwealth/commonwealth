@@ -4,9 +4,7 @@ import {
   ContestContentUpvoted,
   ContestStarted,
   EventNames,
-  EvmNamespaceFactoryEventSignatures,
-  EvmRecurringContestEventSignatures,
-  EvmSingleContestEventSignatures,
+  EvmEventSignatures,
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
   events as coreEvents,
@@ -103,7 +101,7 @@ export async function processChainNode(
           parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
 
         switch (event.eventSource.eventSignature) {
-          case EvmNamespaceFactoryEventSignatures.NewContest:
+          case EvmEventSignatures.NamespaceFactory.ContestManagerDeployed:
             return parseContestEvent('NewContest') as
               | {
                   event_name: EventNames.RecurringContestManagerDeployed;
@@ -115,28 +113,27 @@ export async function processChainNode(
                   event_name: EventNames.OneOffContestManagerDeployed;
                   event_payload: z.infer<typeof OneOffContestManagerDeployed>;
                 };
-          case EvmRecurringContestEventSignatures.ContestStarted:
+          case EvmEventSignatures.Contests.RecurringContestStarted:
             return parseContestEvent('NewRecurringContestStarted') as {
               event_name: EventNames.ContestStarted;
               event_payload: z.infer<typeof ContestStarted>;
             };
-          case EvmSingleContestEventSignatures.ContestStarted:
+          case EvmEventSignatures.Contests.SingleContestStarted:
             return parseContestEvent('NewSingleContestStarted') as {
               event_name: EventNames.ContestStarted;
               event_payload: z.infer<typeof ContestStarted>;
             };
-          case EvmRecurringContestEventSignatures.ContentAdded:
-          case EvmSingleContestEventSignatures.ContentAdded:
+          case EvmEventSignatures.Contests.ContentAdded:
             return parseContestEvent('ContentAdded') as {
               event_name: EventNames.ContestContentAdded;
               event_payload: z.infer<typeof ContestContentAdded>;
             };
-          case EvmRecurringContestEventSignatures.VoterVoted:
+          case EvmEventSignatures.Contests.RecurringContestVoterVoted:
             return parseContestEvent('VoterVotedRecurring') as {
               event_name: EventNames.ContestContentUpvoted;
               event_payload: z.infer<typeof ContestContentUpvoted>;
             };
-          case EvmSingleContestEventSignatures.VoterVoted:
+          case EvmEventSignatures.Contests.SingleContestVoterVoted:
             return parseContestEvent('VoterVotedOneOff') as {
               event_name: EventNames.ContestContentUpvoted;
               event_payload: z.infer<typeof ContestContentUpvoted>;

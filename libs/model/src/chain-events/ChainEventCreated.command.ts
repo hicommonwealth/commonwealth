@@ -1,10 +1,7 @@
 import {
-  EvmCommunityStakingEventSignatures,
-  EvmNamespaceFactoryEventSignatures,
-  EvmRecurringContestEventSignatures,
-  EvmSingleContestEventSignatures,
+  EvmEventSignatures,
   logger as loggerFactory,
-  parseEvmEventToContestEvent,
+  parseEvmEvent,
   type Command,
 } from '@hicommonwealth/core';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
@@ -85,6 +82,8 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
       // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/ChainEventCreated/BaseSepolia)
       // let chain = id!;
 
+      // TODO: remove switch statements and just check for valid contract address and signature
+
       // TODO: modify event parsing functions + emit events to Outbox
       for (const log of payload.event.data.block.logs) {
         const eventSignature = log.topics[0];
@@ -102,11 +101,16 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
           )
         ) {
           switch (eventSignature) {
-            case EvmNamespaceFactoryEventSignatures.NewContest:
+            case EvmEventSignatures.NamespaceFactory.ContestManagerDeployed:
               logger.info('New Contest Deployed');
-              parseEvmEventToContestEvent(eventSignature, contractAddress);
+              parseEvmEvent(
+                contractAddress,
+                eventSignature,
+                log.data,
+                log.topics,
+              );
               break;
-            case EvmNamespaceFactoryEventSignatures.NewNamespace:
+            case EvmEventSignatures.NamespaceFactory.NamespaceDeployed:
               logger.info('New Namespace Deployed');
               // TODO: event handler to link a namespace to a community if it isn't already linked e.g. original API
               //  request failed
@@ -116,7 +120,7 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
 
         // CommunityStake contract events
         if (
-          eventSignature === EvmCommunityStakingEventSignatures.trade &&
+          eventSignature === EvmEventSignatures.CommunityStake.Trade &&
           anyAddressEqual(
             [
               cp.factoryContracts[cp.ValidChains.Base].communityStake,
@@ -134,16 +138,15 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
         const contestContracts: string[] = [];
         if (anyAddressEqual(contestContracts, contractAddress)) {
           switch (eventSignature) {
-            case EvmRecurringContestEventSignatures.ContestStarted:
+            case EvmEventSignatures.Contests.RecurringContestStarted:
               break;
-            case EvmSingleContestEventSignatures.ContestStarted:
+            case EvmEventSignatures.Contests.SingleContestStarted:
               break;
-            case EvmRecurringContestEventSignatures.ContentAdded:
-            case EvmSingleContestEventSignatures.ContentAdded:
+            case EvmEventSignatures.Contests.ContentAdded:
               break;
-            case EvmRecurringContestEventSignatures.VoterVoted:
+            case EvmEventSignatures.Contests.RecurringContestVoterVoted:
               break;
-            case EvmSingleContestEventSignatures.VoterVoted:
+            case EvmEventSignatures.Contests.SingleContestVoterVoted:
               break;
           }
         }
