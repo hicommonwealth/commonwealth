@@ -1,7 +1,7 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signThread } from 'controllers/server/sessions';
+import { signUpdateThread } from 'controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
@@ -18,6 +18,7 @@ interface EditThreadProps {
   address: string;
   communityId: string;
   threadId: number;
+  threadMsgId: string;
   // for edit profile
   newBody?: string;
   newTitle?: string;
@@ -46,6 +47,7 @@ const editThread = async ({
   address,
   communityId,
   threadId,
+  threadMsgId,
   // for edit profile
   newBody,
   newTitle,
@@ -66,8 +68,8 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps): Promise<Thread> => {
-  const canvasSignedData = await signThread(address, {
-    community: app.activeChainId(),
+  const canvasSignedData = await signUpdateThread(address, {
+    thread_id: threadMsgId,
     title: newTitle,
     body: newBody,
     link: url,

@@ -17,6 +17,7 @@ interface CreateReactionProps {
   communityId: string;
   threadId: number;
   commentId: number;
+  commentMsgId: string;
 }
 
 const createReaction = async ({
@@ -24,9 +25,10 @@ const createReaction = async ({
   reactionType = 'like',
   communityId,
   commentId,
+  commentMsgId,
 }: CreateReactionProps) => {
   const canvasSignedData = await signCommentReaction(address, {
-    comment_id: commentId,
+    comment_id: commentMsgId,
     like: reactionType === 'like',
   });
 
