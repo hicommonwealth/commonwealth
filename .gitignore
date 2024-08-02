@@ -14,7 +14,7 @@ node_modules/
 redis-data
 **/.nyc_output
 **/dependency-graph.svg
-.ghostal
 *dump.sql
+.ghostal
 **/yarn.lock
 *coverage

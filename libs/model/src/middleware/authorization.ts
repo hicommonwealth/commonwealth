@@ -57,6 +57,17 @@ type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
 type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
 
 /**
+ * Global middleware
+ */
+
+export const isSuperAdmin: CommunityMiddleware = async (ctx) => {
+  // only super admin is allowed
+  console.log(ctx.actor);
+  if (ctx.actor.user?.isAdmin) return;
+  throw new InvalidActor(ctx.actor, `User is not a super admin`);
+};
+
+/**
  * Community middleware
  */
 export const isCommunityAdmin: CommunityMiddleware = async (ctx) => {
