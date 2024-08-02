@@ -228,12 +228,14 @@ export async function signThread(
 
 export async function signUpdateThread(
   address: string,
-  { thread_id, title, body },
+  { thread_id, title, body, link, topic },
 ) {
   return await sign(address, 'updateThread', {
     thread_id,
     title: encodeURIComponent(title),
     body: encodeURIComponent(body),
+    link: link || '',
+    topic: topic || '',
   });
 }
 

@@ -11,6 +11,7 @@ export const contract = {
       title: 'string',
       body: 'string',
       link: 'string',
+      topic: 'string',
       updated_at: 'integer',
       $indexes: [['author']],
     },
@@ -49,15 +50,15 @@ export const contract = {
         title,
         body,
         link,
-        // topic,
+        topic,
         updated_at: timestamp,
       });
     },
     // TODO: not implemented (packages/commonwealth/server/routes/threads/update_thread_handler.ts)
-    async updateThread(db, { thread_id, title, body }, { did, id }) {
+    async updateThread(db, { thread_id, title, body, link, topic }, { did, id, timestamp }) {
       const t = await db.get("threads", thread_id);
       if (!t || !t.id) throw new Error("invalid thread");
-      db.set('threads', { id: t.id, title, body });
+      db.set('threads', { id: t.id, title, body, link, topic, updated_at: timestamp });
     },
     // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/threads/delete_thread_handler.ts)
     async deleteThread(db, { thread_id }, { did, id }) {

@@ -158,7 +158,7 @@ export const verifyThread = async (
 export const verifyDeleteThread = async (
   canvasSignedData: CanvasSignedData,
   fields: {
-    threadMsgId: string;
+    thread_msg_id: string;
   },
 ) => {
   await verify(canvasSignedData);
@@ -167,7 +167,7 @@ export const verifyDeleteThread = async (
   assertMatches(actionMessage.payload.name, 'deleteThread', 'thread', 'call');
   assertMatches(
     actionMessage.payload.args.thread_id,
-    fields.threadMsgId,
+    fields.thread_msg_id,
     'thread',
     'id',
   );
