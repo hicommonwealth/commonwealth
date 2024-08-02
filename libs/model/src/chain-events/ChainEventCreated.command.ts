@@ -85,7 +85,7 @@ const addAlchemyWebhookFilter: AddEventSource = async () => {};
  * This command works under the assumption that only Common is adding contest data on-chain. This is because in order
  * to order events, the command expects a contest manager to exist in the database before a ContentAdded event is
  * emitted. This is currently the case because users cannot add content or upvote in a contest until the contest manager
- * exists in the DB and we don't support external content on-chain.
+ * exists in the DB, and we don't support external content on-chain.
  * @constructor
  */
 export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
