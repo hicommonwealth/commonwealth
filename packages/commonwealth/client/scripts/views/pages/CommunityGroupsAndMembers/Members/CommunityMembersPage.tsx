@@ -40,6 +40,7 @@ import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
+import { MemberReultsOrderBy } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
@@ -114,7 +115,6 @@ const CommunityMembersPage = () => {
     {
       key: 'lastActive',
       header: 'Last Active',
-      hasCustomSortValue: true,
       numeric: false,
       sortable: true,
     },
@@ -133,7 +133,9 @@ const CommunityMembersPage = () => {
   } = trpc.community.getMembers.useInfiniteQuery(
     {
       limit: 30,
-      order_by: tableState.orderBy,
+      order_by: (tableState.orderBy === 'lastActive'
+        ? 'last_active'
+        : tableState.orderBy) as MemberReultsOrderBy,
       // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
       search: debouncedSearchTerm,
