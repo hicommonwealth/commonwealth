@@ -1,13 +1,15 @@
-import { Actor, command, dispose, query } from '@hicommonwealth/core';
+import { Actor, dispose, query } from '@hicommonwealth/core';
+import { Address } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
-import { CreateThread } from 'model/src/thread';
 import { GetNewContent } from 'model/src/user';
 import { afterAll, beforeAll, describe, test } from 'vitest';
+import { z } from 'zod';
 import { seed } from '../../src/tester';
 
 describe('New Content lifecycle', () => {
   let actor1: Actor;
   let actor2: Actor;
+  let address1: z.infer<typeof Address>;
 
   beforeAll(async () => {
     const [node] = await seed('ChainNode', {});
@@ -19,10 +21,14 @@ describe('New Content lifecycle', () => {
         {
           role: 'member',
           user_id: user1!.id,
+          verified: true,
+          last_active: new Date().toISOString(),
         },
         {
           role: 'member',
           user_id: user2!.id,
+          verified: true,
+          last_active: new Date().toISOString(),
         },
       ],
     });
@@ -31,6 +37,7 @@ describe('New Content lifecycle', () => {
       user: { id: user1!.id!, email: user1!.email!, isAdmin: user1?.isAdmin },
       address_id: community!.Addresses!.at(0)!.address!,
     };
+    address1 = community!.Addresses!.at(0)!;
     actor2 = {
       user: { id: user2!.id!, email: user2!.email!, isAdmin: user2?.isAdmin },
       address_id: community!.Addresses!.at(1)!.address!,
@@ -50,14 +57,29 @@ describe('New Content lifecycle', () => {
   });
 
   test('should return ids of user-joined communities which have new content', async () => {
-    // TODO: ask @Roger - CreateThread() command doesnt actually create a thread, should we still
-    // test this or whats the preferred alternative way to create a test thread here?
-    await command(CreateThread(), { actor: actor2, payload: {}, id: `1` }); // TODO: update payload/id
+    // create 2 threads in the same community via address 1
+    await seed('Thread', {
+      address_id: address1.id!,
+      community_id: address1.community_id,
+      pinned: false,
+      read_only: false,
+      version_history: [],
+      body: 'Sample 1',
+    });
+    await seed('Thread', {
+      address_id: address1.id!,
+      community_id: address1.community_id,
+      pinned: false,
+      read_only: false,
+      version_history: [],
+      body: 'Sample 2',
+    });
 
+    // now actor 2 should only get 1 entry for that community in new content array
     const results = await query(GetNewContent(), {
-      actor: actor1,
+      actor: actor2,
       payload: {},
     });
-    expect(results?.joinedCommunityIdsWithNewContent.length).to.be.equal(0); // TODO: the actual expected length is 1 here
+    expect(results?.joinedCommunityIdsWithNewContent.length).to.be.equal(1);
   });
 });
