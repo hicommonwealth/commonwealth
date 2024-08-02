@@ -37,7 +37,7 @@ To set up dyno-scoped metrics on Datadog:
 
 2. Set up Datadog to parse these logs and extract the data we need from them. Datadog ingests logs from Heroku in raw format and passes them through a pipeline which parses and remaps the log metrics. (Heroku buildpack takes care of this pipeline for us.) To display these metrics on the main dashboard, we need to create a Datadog Measure. A Datadog Measure is a key-value pair consisting of a number and reference string (name). To create a new Measure from the dashboard, select a log from the log feed, open the event attributes tab, select the parsed value from the available event attributes, navigate to “Create Measure,” name it, and click "Add."
 
-For general Heroku documentation, see our dedicated [knowledge base entry](./Heroku.md).
+For general Heroku documentation, see our dedicated [Common Knowledge entry](./Heroku.md).
 
 ### Postgres Metrics
 
@@ -60,7 +60,7 @@ To set up the RabbitMQ metrics, navigate to "Resources" from the Heroku dashboar
 
 For a list of the metrics available on `rabbitmq`, see <https://docs.datadoghq.com/integrations/rabbitmq/?tab=host#metrics>. Since we use Heroku, not all these metrics will be reported and accessible; the only way to know is to create a metric and find out.
 
-For more complete RabbitMQ documentation, see our dedicated [knowledge base entry](./RabbitMQ.md).
+For more complete RabbitMQ documentation, see our dedicated [Common Knowledge entry](./RabbitMQ.md).
 
 ## Configuration Prerequisites
 
