@@ -22,9 +22,6 @@ const generateSchemas = async () => {
       Comments: [
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
       ],
-      Reactions: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
-      ],
 
       // These will be deprecated soon
       Notifications: [

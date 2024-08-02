@@ -105,7 +105,6 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        community_id: thread.community_id,
       },
       include: [this.models.Address],
     });

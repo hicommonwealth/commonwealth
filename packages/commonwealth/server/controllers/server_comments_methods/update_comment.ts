@@ -71,7 +71,7 @@ export async function __updateComment(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: comment.community_id,
+    communityId: thread.community_id,
     address: address.address,
   });
   if (!canInteract) {
@@ -81,7 +81,7 @@ export async function __updateComment(
   const isAuthor = await validateOwner({
     models: this.models,
     user,
-    communityId: comment.community_id,
+    communityId: thread.community_id,
     entity: comment,
     allowSuperAdmin: true,
   });

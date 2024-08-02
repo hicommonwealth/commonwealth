@@ -98,9 +98,12 @@ export function ContestWorker(): Policy<typeof inputs> {
         }
       },
       ThreadUpvoted: async ({ payload }) => {
-        const { topic_id } = (await models.Thread.findByPk(payload.thread_id!, {
-          attributes: ['topic_id'],
-        }))!;
+        const { community_id, topic_id } = (await models.Thread.findByPk(
+          payload.thread_id!,
+          {
+            attributes: ['community_id', 'topic_id'],
+          },
+        ))!;
         if (!topic_id) {
           log.warn('ThreadUpvoted: thread does not contain topic_id');
           return;
@@ -162,7 +165,7 @@ export function ContestWorker(): Policy<typeof inputs> {
               thread_id: payload.thread_id!,
               actor_address: userAddress,
               topic_id: topic_id,
-              community_id: payload.community_id,
+              community_id,
             },
           },
         );

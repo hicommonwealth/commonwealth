@@ -28,7 +28,7 @@ export const Errors = {
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  reaction: string;
+  reaction: 'like';
   threadId: number;
   canvasSignedData?: string;
   canvasHash?: string;
@@ -136,13 +136,10 @@ export async function __createThreadReaction(
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: thread.community_id,
-    // @ts-expect-error StrictNullChecks
     thread_id: thread.id,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
     canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,

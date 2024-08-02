@@ -18,7 +18,7 @@ export const getCommentDepth = async (
       WITH RECURSIVE CommentDepth AS (
           SELECT id, parent_id, 0 AS depth, false AS max_depth_reached
           FROM "Comments"
-          WHERE parent_id = :parentCommentId AND community_id = :communityId
+          WHERE parent_id = :parentCommentId 
       
           UNION ALL
       
@@ -28,8 +28,9 @@ export const getCommentDepth = async (
                      ELSE false
                      END AS max_depth_reached
           FROM "Comments" c
-                   INNER JOIN CommentDepth cd ON c.id = cd.parent_id::INTEGER
-          WHERE cd.depth <= :maxDepth and community_id = :communityId
+            JOIN CommentDepth cd ON c.id = cd.parent_id::INTEGER
+          WHERE 
+            cd.depth <= :maxDepth 
       )
       SELECT 
           CASE 
@@ -45,7 +46,6 @@ export const getCommentDepth = async (
         replacements: {
           parentCommentId: comment.parent_id,
           maxDepth: maxIterations,
-          communityId: comment.community_id,
         },
       },
     );

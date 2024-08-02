@@ -8,7 +8,6 @@ export const Comment = z.object({
   text: z.string(),
   plaintext: z.string(),
   id: PG_INT.nullish(),
-  community_id: z.string(),
   parent_id: z.string().nullish(),
   version_history: z.array(z.string()).optional(),
   version_history_updated: z.boolean().optional(),
