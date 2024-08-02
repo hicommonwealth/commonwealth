@@ -89,7 +89,7 @@ class CWQueries {
       transaction,
     });
     return {
-      ...thread,
+      ...thread.get({ plain: true }),
       discourseTopicId: discourseTopic.id,
     };
   };
@@ -116,6 +116,7 @@ export const createAllThreadsInCW = async (
       name: 'General',
       community_id: communityId,
     },
+    transaction,
   });
 
   const generalDiscourseCategoryId =

@@ -75,7 +75,7 @@ export const createAllAddressesInCW = async (
     base: string;
   },
   { transaction }: { transaction: Transaction },
-): Promise<Array<z.infer<typeof Address>>> => {
+): Promise<Array<CWAddressWithDiscourseId>> => {
   const addressPromises = users.map((user) => {
     let ghostAddress;
     if (base.toUpperCase() === BASES.COSMOS) {

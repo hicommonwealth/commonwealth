@@ -159,11 +159,6 @@ export const createAllUsersInCW = async (
     ),
   );
 
-  console.log(
-    'cwUsers: ',
-    cwUsers.map((v) => v),
-  );
-
   return {
     users: cwUsers,
     admins: allDiscourseUsers

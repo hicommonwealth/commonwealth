@@ -192,7 +192,11 @@ export function ImportDiscourseCommunity(): Command<
         // insert comments (discourse posts)
         const comments = await createAllCommentsInCW(
           restrictedDiscourseConnection,
-          { communityId: communityId!, addresses, threads },
+          {
+            communityId: communityId!,
+            addresses,
+            threads,
+          },
           { transaction },
         );
         log.debug(`Comments: ${comments.length}`);

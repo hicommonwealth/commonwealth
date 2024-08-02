@@ -3,11 +3,16 @@ import {
   CWThreadWithDiscourseId,
   models,
 } from '@hicommonwealth/model';
-import { Comment } from '@hicommonwealth/schemas';
+import { Comment, Thread } from '@hicommonwealth/schemas';
+import { logger } from '@polkadot/util';
 import lo from 'lodash';
 import moment from 'moment';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { z } from 'zod';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export type CWCommentWithDiscourseId = z.infer<typeof Comment> & {
   discoursePostId: number;
@@ -80,46 +85,29 @@ class CWQueries {
       discoursePostId: discoursePost.id,
       discoursePostNumber: discoursePost.post_number,
     };
-    // const [createdComment] = await models.sequelize.query<{
-    //   id: number;
-    //   communityId: string;
-    //   parent_id: number;
-    //   address_id: string;
-    //   text: string;
-    //   created_at: string;
-    //   updated_at: string;
-    //   deleted_at: string;
-    //   version_history: any[];
-    //   root_id: any;
-    //   plaintext: string;
-    //   _search: string;
-    // }>(
-    //   `
-    //     INSERT INTO "Comments"(
-    //     id, community_id, parent_id, address_id, text, created_at, updated_at, deleted_at,
-    //     version_history, plaintext, _search, thread_id)
-    //     VALUES (
-    //     default,
-    //     '${communityId}',
-    //     ${parentId || null},
-    //     ${addressId},
-    //     '${encodeURIComponent(text.replace(/'/g, "''"))}',
-    //    '${moment(created_at).format('YYYY-MM-DD HH:mm:ss')}',
-    //    '${moment(updated_at).format('YYYY-MM-DD HH:mm:ss')}',
-    //     null,
-    //     '{}',
-    //     '${text.replace(/'/g, "''")}',
-    //     null, '${cwThreadId}') RETURNING id;
-    // `,
-    //   { type: QueryTypes.SELECT, transaction },
-    // );
-    // return {
-    //   createdComment,
-    //   discoursePostId,
-    //   post_number,
-    //   cwThreadId,
-    //   like_count,
-    // };
+  };
+
+  static setThreadCommentCounts = async (
+    threads: Array<z.infer<typeof Thread>>,
+    comments: Array<z.infer<typeof Comment>>,
+    transaction: Transaction,
+  ): Promise<void> => {
+    for (const thread of threads) {
+      const numThreadComments = comments.filter(
+        (c) => c.thread_id === thread.id,
+      ).length;
+      await models.Thread.update(
+        {
+          comment_count: numThreadComments,
+        },
+        {
+          where: {
+            id: thread.id,
+          },
+          transaction,
+        },
+      );
+    }
   };
 }
 
@@ -150,6 +138,12 @@ export const createAllCommentsInCW = async (
       threads.find(
         (thread) => `${thread.discourseTopicId}` === `${discourseTopicId}`,
       ) || {};
+
+    if (!cwThreadId) {
+      throw new Error(
+        `Error: Thread ID not found for discourse topic ID ${discourseTopicId}`,
+      );
+    }
 
     // iterate over each post (CW comment)
     for (const post of sortedPosts) {
@@ -182,26 +176,25 @@ export const createAllCommentsInCW = async (
         discoursePostNumber - 1 > discoursePostReplyToPostNumber
           ? parentCommentId
           : null;
+
       if (!addressId) {
         throw new Error(
           `Error: Address not found for user ${discoursePostUserId}`,
-        );
-      }
-      if (!cwThreadId) {
-        throw new Error(
-          `Error: Thread ID not found for discourse post ${discoursePostId}`,
         );
       }
       const createdComment = await CWQueries.createOrFindComment(
         post,
         parentId,
         communityId,
-        cwThreadId,
+        cwThreadId!,
         addressId,
         { transaction },
       );
       createdComments.push(createdComment);
     }
   }
+
+  await CWQueries.setThreadCommentCounts(threads, createdComments, transaction);
+
   return createdComments;
 };
