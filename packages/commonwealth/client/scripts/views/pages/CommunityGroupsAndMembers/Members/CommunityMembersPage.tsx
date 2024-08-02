@@ -130,6 +130,17 @@ const CommunityMembersPage = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
+  const membershipsFilter = (() => {
+    const { groupFilter } = searchFilters;
+    if (groupFilter === 'not-in-group') {
+      return searchFilters.groupFilter;
+    }
+    if (typeof groupFilter === 'number') {
+      return `in-group:${searchFilters.groupFilter}`;
+    }
+    return null;
+  })();
+
   const {
     data: members,
     fetchNextPage,
@@ -147,9 +158,8 @@ const CommunityMembersPage = () => {
       }),
       community_id: app.activeChainId(),
       include_roles: true,
-      ...((searchFilters.groupFilter === 'not-in-group' ||
-        typeof searchFilters.groupFilter === 'number') && {
-        memberships: `in-group:${searchFilters.groupFilter}`,
+      ...(membershipsFilter && {
+        memberships: membershipsFilter,
       }),
       include_group_ids: true,
       // only include stake balances if community has staking enabled
