@@ -14,7 +14,7 @@ export function GetNewContent(): Query<typeof schemas.GetNewContent> {
       // since user's last active session per address (the address that user used to join that community)
       const response = await sequelize.query<{ community_id: string }>(
         `
-          WITH CommunityContentContent AS (
+          WITH CommunityContent AS (
             SELECT 
               a.community_id,
               (
@@ -50,7 +50,7 @@ export function GetNewContent(): Query<typeof schemas.GetNewContent> {
           SELECT
             community_id
           FROM 
-            CommunityContentContent
+            CommunityContent
           WHERE
             content_content > 0;
         `,
