@@ -84,7 +84,12 @@ class CWQueries {
       max_notif_id: 0,
     };
     const [thread] = await models.Thread.findOrCreate({
-      where: options,
+      where: {
+        address_id: options.address_id,
+        community_id: options.community_id,
+        created_at: options.created_at,
+        updated_at: options.updated_at,
+      },
       defaults: options,
       transaction,
     });
