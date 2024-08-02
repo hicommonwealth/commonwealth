@@ -7,16 +7,19 @@ module.exports = {
         'Threads',
         'canvas_hash',
         'canvas_msg_id',
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Comments',
         'canvas_hash',
         'canvas_msg_id',
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Reactions',
         'canvas_hash',
         'canvas_msg_id',
+        { transaction: t },
       );
     });
   },
@@ -27,16 +30,19 @@ module.exports = {
         'Threads',
         'canvas_msg_id',
         'canvas_hash',
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Comments',
         'canvas_msg_id',
         'canvas_hash',
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Reactions',
         'canvas_msg_id',
         'canvas_hash',
+        { transaction: t },
       );
     });
   },
