@@ -33,6 +33,8 @@ type CreateThreadCommentRequestBody = {
   thread_id;
   text;
   discord_meta;
+  thread_msg_id;
+  parent_comment_msg_id;
 };
 type CreateThreadCommentResponse = CommentInstance;
 
@@ -48,8 +50,8 @@ export const createThreadCommentHandler = async (
   // @ts-expect-error <StrictNullChecks>
   const {
     parent_id: parentId,
-    parent_msg_id: parentMsgId,
     thread_msg_id: threadMsgId,
+    parent_comment_msg_id: parentCommentMsgId,
     text,
     discord_meta,
   } = req.body;
@@ -90,7 +92,7 @@ export const createThreadCommentHandler = async (
               })
             : // @ts-expect-error <StrictNullChecks>
               address.address,
-        parent_comment_id: parentMsgId ?? null,
+        parent_comment_id: parentCommentMsgId ?? null,
       };
       await verifyComment(canvasSignedData, canvasComment);
     }

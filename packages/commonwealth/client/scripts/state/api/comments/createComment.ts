@@ -48,6 +48,8 @@ const createComment = async ({
       community_id: communityId,
       address: profile.address,
       parent_id: parentCommentId,
+      thread_msg_id: threadMsgId,
+      parent_comment_msg_id: parentCommentMsgId,
       text: encodeURIComponent(unescapedText),
       jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
