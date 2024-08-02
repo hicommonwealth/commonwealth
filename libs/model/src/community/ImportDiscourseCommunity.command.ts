@@ -8,6 +8,7 @@ import {
   createAllAddressesInCW,
   createAllCommentsInCW,
   createAllReactionsInCW,
+  createAllSubscriptionsInCW,
   createAllThreadsInCW,
   createAllTopicsInCW,
   createAllUsersInCW,
@@ -216,16 +217,16 @@ export function ImportDiscourseCommunity(): Command<
         log.debug(`Reactions: ${reactions.length}`);
 
         // // insert subscriptions
-        // const subscriptions = await createAllSubscriptionsInCW(
-        //   restrictedDiscourseConnection,
-        //   {
-        //     communityId: communityId!,
-        //     users,
-        //     threads,
-        //   },
-        //   { transaction },
-        // );
-        // log.debug(`Subscriptions: ${subscriptions.length}`);
+        const subscriptions = await createAllSubscriptionsInCW(
+          restrictedDiscourseConnection,
+          {
+            communityId: communityId!,
+            users,
+            threads,
+          },
+          { transaction },
+        );
+        log.debug(`Subscriptions: ${subscriptions.length}`);
 
         await transaction.commit();
 
