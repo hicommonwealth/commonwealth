@@ -40,14 +40,18 @@ import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
-import { MemberReultsOrderBy } from './index.types';
+import {
+  BaseGroupFilter,
+  MemberReultsOrderBy,
+  SearchFilters,
+} from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
   { value: 'groups', label: 'Groups' },
 ];
 
-const GROUP_AND_MEMBER_FILTERS = [
+const GROUP_AND_MEMBER_FILTERS: { label: string; value: BaseGroupFilter }[] = [
   { label: 'All groups', value: 'all-community' },
   { label: 'Ungrouped', value: 'not-in-group' },
 ];
@@ -58,7 +62,7 @@ const CommunityMembersPage = () => {
   const user = useUserStore();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
-  const [searchFilters, setSearchFilters] = useState({
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
@@ -81,7 +85,7 @@ const CommunityMembersPage = () => {
     apiEnabled: !!user?.activeAccount?.address,
   });
 
-  const debouncedSearchTerm = useDebounce<string>(
+  const debouncedSearchTerm = useDebounce<string | undefined>(
     searchFilters.searchText,
     500,
   );
@@ -138,17 +142,14 @@ const CommunityMembersPage = () => {
         : tableState.orderBy) as MemberReultsOrderBy,
       // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
-      search: debouncedSearchTerm,
+      ...(debouncedSearchTerm && {
+        search: debouncedSearchTerm,
+      }),
       community_id: app.activeChainId(),
       include_roles: true,
-      ...(!['all-community', 'not-in-group'].includes(
-        `${searchFilters.groupFilter}`,
-      ) &&
-        searchFilters.groupFilter && {
-          memberships: `in-group:${searchFilters.groupFilter}`,
-        }),
-      ...(searchFilters.groupFilter === 'Ungrouped' && {
-        memberships: 'not-in-group',
+      ...((searchFilters.groupFilter === 'not-in-group' ||
+        typeof searchFilters.groupFilter === 'number') && {
+        memberships: `in-group:${searchFilters.groupFilter}`,
       }),
       include_group_ids: true,
       // only include stake balances if community has staking enabled
@@ -407,8 +408,7 @@ const CommunityMembersPage = () => {
                   onChange={(option) => {
                     setSearchFilters((g) => ({
                       ...g,
-                      // @ts-expect-error <StrictNullChecks/>
-                      groupFilter: option.value as string,
+                      groupFilter: option?.value as BaseGroupFilter,
                     }));
                   }}
                 />

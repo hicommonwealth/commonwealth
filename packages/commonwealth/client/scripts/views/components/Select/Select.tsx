@@ -13,34 +13,23 @@ import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow'
 import { Option } from './Option';
 import './Select.scss';
 
+export type OptionConfig = {
+  id?: string | number;
+  value?: string;
+  label: string;
+  iconLeft?: IconName;
+  type?: 'header' | 'header-divider' | 'contest';
+};
+
 export type SelectProps = {
   size?: 'default' | 'compact';
   label?: string;
   placeholder?: string;
   selected: string;
-  onSelect?: (
-    v:
-      | string
-      | {
-          id?: string | number;
-          value?: string;
-          label: string;
-          iconLeft?: IconName;
-          type?: 'header' | 'header-divider' | 'contest';
-        },
-  ) => any;
+  onSelect?: (v: string | OptionConfig) => any;
   onOpen?: () => {};
   onClose?: () => {};
-  options:
-    | string[]
-    | {
-        id?: string | number;
-        value?: string;
-        label: string;
-        iconLeft?: IconName;
-        type?: 'header' | 'header-divider' | 'contest';
-      }[]
-    | {}[];
+  options: string[] | OptionConfig[] | {}[];
   canEditOption?: boolean;
   onOptionEdit?: (
     v: string | { id: string | number; value: any; label: string },
