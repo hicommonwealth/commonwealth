@@ -66,7 +66,7 @@ export type AddEventSource = ({
 }: AtLeastOne<{
   contractEvents?: { [contractAddress: string]: Array<string> };
   eventSignatures?: Array<string>;
-  contractAddresses?: Array<String>;
+  contractAddresses?: Array<string>;
 }>) => Promise<void>;
 
 /**

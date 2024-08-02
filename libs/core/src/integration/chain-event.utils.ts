@@ -1,14 +1,4 @@
-import {
-  CommunityStakeTrade,
-  ContestContentAdded,
-  ContestContentUpvoted,
-  ContestStarted,
-  EventNames,
-  EventPairs,
-  NamespaceDeployed,
-  OneOffContestManagerDeployed,
-  RecurringContestManagerDeployed,
-} from '@hicommonwealth/core';
+import { EventNames, EventPairs } from '@hicommonwealth/core';
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
 import ethers from 'ethers';
 import { decodeLog } from 'web3-eth-abi';
@@ -51,26 +41,11 @@ type Values<T> = T[keyof T];
 type NestedValues<T> = Values<{ [K in keyof T]: Values<T[K]> }>;
 export type EvmEventSignature = NestedValues<typeof EvmEventSignatures>;
 
-type ChainEventSchemas =
-  | typeof ContestContentUpvoted
-  | typeof ContestContentAdded
-  | typeof ContestStarted
-  | typeof OneOffContestManagerDeployed
-  | typeof RecurringContestManagerDeployed
-  | typeof CommunityStakeTrade
-  | typeof NamespaceDeployed;
-
-type AbiEventParameter = {
-  name: string;
-  type: string;
-  indexed: boolean;
-  internalType: string;
-};
-
 // Event Inputs can be found in the contract ABI by filtering the objects by type = 'event' e.g.:
 //   for (const obj of abi) {
 //     if (obj.type === 'event') console.log(obj)
 //   }
+// WARN: adding explicit types to this variable breaks DecodedEvmEvent log type for some reason
 export const EvmEventAbis = {
   [EvmEventSignatures.CommunityStake.Trade]: [
     {
