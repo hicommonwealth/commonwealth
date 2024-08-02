@@ -12,7 +12,7 @@ export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
 
-  const { data } = trpc.user.getCommunitiesWithNewContent.useQuery(
+  const { data } = trpc.user.getNewContent.useQuery(
     {},
     {
       enabled: isLoggedIn,
