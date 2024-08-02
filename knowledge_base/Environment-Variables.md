@@ -10,6 +10,7 @@ If you add a new environment variable, you must add documentation here. Please d
 
 ## Contents
 
+- [ALLOWED_EVENTS](#allowed_events)
 - [AWS_ACCESS_KEY_ID](#aws_access_key_id)
 - [AWS_REGION](#aws_region)
 - [AWS_SECRET_ACCESS_KEY](#aws_secret_access_key)
@@ -40,7 +41,9 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ENFORCE_SESSION_KEYS](#enforce_session_keys)
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
+- [EVM_CE_POLL_INTERVAL](#evm_ce_poll_interval)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
+- [FLAG_CONTEST](#flag_contest)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
@@ -60,6 +63,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [NODE_ENV](#node_env)
 - [PGPASSWORD](#pgpassword)
 - [PORT](#port)
+- [PRIVATE_KEY](#private_key)
 - [PROCFILE](#procfile)
 - [RABBITMQ_API_URI](#rabbitmq_api_uri)
 - [RABBITMQ_URI](#rabbitmq_uri)
@@ -82,6 +86,10 @@ If you add a new environment variable, you must add documentation here. Please d
 - [TEST_WITH_LOGS](#test_with_logs)
 - [WITH_PRERENDER](#with_prerender)
 - [ZAPIER_WEBHOOK_URL_DEV](#zapier_webhook_url_dev)
+
+## ALLOWED_EVENTS
+
+To enable contests, must be set to `ChainEventCreated,ThreadCreated,ThreadUpvoted,ContestContentAdded,ContestContentUpvoted,ContestStarted,OneOffContestManagerDeployed,RecurringContestManagerDeployed`.
 
 ## AWS_ACCESS_KEY_ID
 
@@ -211,7 +219,7 @@ Owner: Raymond Zhong.
 
 ## ETH_ALCHEMY_API_KEY
 
-Used in our CI/CD and stored in GitHub repo secrets. If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work that involves querying Ethereum.
+Must be enabled for testing contests. Also used in our CI/CD and stored in GitHub repo secrets. If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work that involves querying Ethereum.
 
 Owner: Kurtis Assad.
 
@@ -221,12 +229,17 @@ If set to `e2e-test`, the app will bypass usage of real ETH RPCs and use the moc
 
 Owner: Ian Rowan
 
+## EVM_CE_POLL_INTERVAL
+
+Required for testing contests. Number of milliseconds. `10000` is recommended; if the number is too low, millions of requests will be made.
+
 ## FALLBACK_NODE_DURATION_S
 
-Optional. Defaults to 5 minutes (300 seconds).
-This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
-After this time, the server will try the original DB endpoint again.
+Optional. Defaults to 5 minutes (300 seconds). This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails. After this time, the server will try the original DB endpoint again.
 
+## FLAG_CONTEST
+
+Boolean toggle to enable contests. Required for testing contests.
 
 ## FLAG_NEW_CREATE_COMMUNITY
 
@@ -302,6 +315,10 @@ Postgres DB password (by default, `edgeware`). Bypasses usual password prompt fo
 ## PORT
 
 Localhost port location, default value `8080`.
+
+## PRIVATE_KEY
+
+The private Ethereum key that will be used for contests. Must be funded on the chains that will be used for testing (base Sepolia for dev, base Mainnet for prod). Must include the 0x prefix.
 
 ## PROCFILE
 
