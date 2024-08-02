@@ -208,25 +208,23 @@ export const verifyReaction = async (
 
 export const verifyDeleteReaction = async (
   canvasSignedData: CanvasSignedData,
-  fields: any,
+  fields: { comment_id: string } | { thread_id: string },
 ) => {
-  const { id } = fields;
-
   await verify(canvasSignedData);
 
   const { actionMessage } = canvasSignedData;
-  if (actionMessage.payload.name == 'unreactThread') {
+  if (actionMessage.payload.name === 'unreactThread') {
     assertMatches(
       actionMessage.payload.args.thread_id,
-      parseInt(id),
-      'thread',
+      fields.thread_id,
+      'reactThread',
       'thread_id',
     );
-  } else if (actionMessage.payload.name == 'unreactComment') {
+  } else if (actionMessage.payload.name === 'unreactComment') {
     assertMatches(
       actionMessage.payload.args.comment_id,
-      parseInt(id),
-      'comment',
+      fields.comment_id,
+      'reactComment',
       'comment_id',
     );
   } else {

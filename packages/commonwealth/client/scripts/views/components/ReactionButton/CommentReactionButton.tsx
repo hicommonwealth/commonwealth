@@ -70,9 +70,7 @@ export const CommentReactionButton = ({
       deleteCommentReaction({
         communityId: app.activeChainId(),
         address: user.activeAccount?.address,
-        // @ts-expect-error <StrictNullChecks/>
-        canvasMsgId: foundReaction.canvasMsgId,
-        // @ts-expect-error <StrictNullChecks/>
+        reactionMsgId: foundReaction.canvasMsgId,
         reactionId: foundReaction.id,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {

@@ -28,7 +28,7 @@ export const contract = {
       id: 'primary',
       thread_id: '@threads.id?',
       author: 'string',
-      value: 'string',
+      value: 'string?',
       updated_at: 'integer',
       $indexes: [['thread_id', 'author']],
     },
@@ -36,7 +36,7 @@ export const contract = {
       id: 'primary',
       comment_id: '@comments.id?',
       author: 'string',
-      value: 'string',
+      value: 'string?',
       updated_at: 'integer',
       $indexes: [['comment_id', 'author']],
     },
@@ -58,12 +58,12 @@ export const contract = {
     async updateThread(db, { thread_id, title, body, link, topic }, { did, id, timestamp }) {
       const t = await db.get("threads", thread_id);
       if (!t || !t.id) throw new Error("invalid thread");
-      db.set('threads', { id: t.id, author: t.author, community: t.community, title, body, link, topic, updated_at: timestamp });
+      db.set('threads', { id: t.id as string, author: t.author, community: t.community, title, body, link, topic, updated_at: timestamp });
     },
     async deleteThread(db, { thread_id }, { did, id }) {
       const t = await db.get("threads", thread_id);
       if (!t || !t.id) throw new Error("invalid thread");
-      db.delete("threads", t.id);
+      db.delete("threads", t.id as string);
     },
     async comment(db, { thread_id, body, parent_comment_id }, { did, id, timestamp }) {
       db.set("comments", {
@@ -98,7 +98,6 @@ export const contract = {
         updated_at: timestamp,
       });
     },
-    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/reactions/delete_reaction_handler.ts)
     async unreactThread(db, { thread_id, value }, { did, id, timestamp }) {
       db.set("thread_reactions", {
         id: `${thread_id}/${did}`,
@@ -120,7 +119,6 @@ export const contract = {
         updated_at: timestamp,
       });
     },
-    // TODO: signed on client, not verified on server (packages/commonwealth/server/routes/reactions/delete_reaction_handler.ts)
     async unreactComment(db, { comment_id, value }, { did, id, timestamp }) {
       db.set("comment_reactions", {
         id: `${comment_id}/${did}`,

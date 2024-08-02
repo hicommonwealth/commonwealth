@@ -60,7 +60,9 @@ export const deleteThreadHandler = async (
   // publish signed data
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-    await applyCanvasSignedData(canvas, canvasSignedData);
+    if (canvasSignedData.actionMessage.payload.args.thread_id !== null) {
+      await applyCanvasSignedData(canvas, canvasSignedData);
+    }
   }
 
   return success(res, undefined);
