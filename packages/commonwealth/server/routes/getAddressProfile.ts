@@ -33,13 +33,18 @@ const getAddressProfiles = async (
     ? { user_id: req.user.id }
     : {};
 
+  const where = {
+    ...userWhere,
+  };
+
+  if (req.body.communities.length > 0) {
+    where['community_id'] = { [Op.in]: req.body.communities };
+  }
+
   // TODO: Can we  use some caching in the client to avoid calling this
   // api so many times?
   const addressEntities = await models.Address.findAll({
-    where: {
-      community_id: { [Op.in]: req.body.communities },
-      ...userWhere,
-    },
+    where,
     attributes: ['address', 'last_active'],
     include: [
       {

@@ -2,12 +2,10 @@ import { logger } from '@hicommonwealth/core';
 import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { ChainNodeInstance } from 'model/src/models/chain_node';
-import { fileURLToPath } from 'url';
 import { Balances, GetSPLBalancesOptions } from '../types';
 import { failingChainNodeError } from '../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function __get_spl_balances(
   chainNode: ChainNodeInstance,

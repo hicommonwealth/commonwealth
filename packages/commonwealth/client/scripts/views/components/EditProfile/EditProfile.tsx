@@ -212,7 +212,7 @@ const EditProfile = () => {
         : null;
 
       const updates = {
-        id: user.id.toString(),
+        id: user.id,
         profile: {
           name: values.username.trim(),
           email: values.email.trim(),

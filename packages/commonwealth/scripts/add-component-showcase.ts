@@ -3,10 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import readlineSync from 'readline-sync';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const ComponentType = {
   Foundations: 'Foundations',

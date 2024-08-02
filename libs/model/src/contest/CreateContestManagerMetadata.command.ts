@@ -18,8 +18,8 @@ export function CreateContestManagerMetadata(): Command<
   return {
     ...schemas.CreateContestManagerMetadata,
     auth: [isCommunityAdmin],
-    body: async ({ id, payload }) => {
-      const { topic_ids, ...rest } = payload;
+    body: async ({ payload }) => {
+      const { id, topic_ids, ...rest } = payload;
 
       let contestTopics: TopicAttributes[] = [];
       let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
@@ -49,7 +49,7 @@ export function CreateContestManagerMetadata(): Command<
           const manager = await models.ContestManager.create(
             {
               ...rest,
-              community_id: id!,
+              community_id: id.toString(),
               created_at: new Date(),
               cancelled: false,
             },

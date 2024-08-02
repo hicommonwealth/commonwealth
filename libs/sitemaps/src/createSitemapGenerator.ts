@@ -1,12 +1,10 @@
 import { logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { AsyncWriter } from './createAsyncWriter';
 import { Paginator } from './createDatabasePaginator';
 import { createSitemap } from './createSitemap';
 import { createSitemapIndex } from './createSitemapIndex';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export interface SitemapFile {
   readonly location: string;

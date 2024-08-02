@@ -7,9 +7,11 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
     auth: [],
-    body: async ({ id, payload }) => {
+    body: async ({ payload }) => {
       console.log(payload); // TODO: remove
-      const community = await models.Community.findOne({ where: { id } });
+      const community = await models.Community.findOne({
+        where: { id: payload.id },
+      });
 
       mustNotExist('Community', community);
 

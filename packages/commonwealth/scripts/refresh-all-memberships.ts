@@ -1,14 +1,12 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 import { config } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 async function main() {
   config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
