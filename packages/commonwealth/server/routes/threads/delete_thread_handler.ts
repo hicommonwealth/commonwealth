@@ -49,9 +49,9 @@ export const deleteThreadHandler = async (
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      await verifyDeleteThread(canvasSignedData, {});
-      threadFields.threadMsgId =
-        canvasSignedData.actionMessage.payload.args.thread_id;
+      const thread_msg_id =
+        canvasSignedData.actionMessage.payload.args.thread_id; // TODO
+      await verifyDeleteThread(canvasSignedData, { thread_msg_id });
     }
   }
 

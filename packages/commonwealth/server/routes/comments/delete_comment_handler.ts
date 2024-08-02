@@ -36,10 +36,9 @@ export const deleteCommentHandler = async (
   if (hasCanvasSignedDataApiArgs(req.body)) {
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      commentFields.commentMsgId =
-        canvasSignedData.actionMessage.payload.args.comment_id;
-
-      await verifyDeleteComment(canvasSignedData, {});
+      const comment_msg_id =
+        canvasSignedData.actionMessage.payload.args.comment_id; // TODO
+      await verifyDeleteComment(canvasSignedData, { comment_msg_id });
     }
   }
 
