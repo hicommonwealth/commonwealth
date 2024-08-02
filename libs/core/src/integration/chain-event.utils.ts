@@ -8,6 +8,7 @@ import {
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
 } from '@hicommonwealth/core';
+import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
 import ethers from 'ethers';
 import { decodeLog } from 'web3-eth-abi';
 import { z } from 'zod';
@@ -65,11 +66,11 @@ type AbiEventParameter = {
   internalType: string;
 };
 
-// Event Inputs can be found in the contract ABI by filtering the objects by type = 'event'.
-export const EvmEventAbis: Record<
-  EvmEventSignature,
-  Array<AbiEventParameter>
-> = {
+// Event Inputs can be found in the contract ABI by filtering the objects by type = 'event' e.g.:
+//   for (const obj of abi) {
+//     if (obj.type === 'event') console.log(obj)
+//   }
+export const EvmEventAbis = {
   [EvmEventSignatures.CommunityStake.Trade]: [
     {
       name: 'trader',
@@ -125,7 +126,7 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'address',
     },
-  ],
+  ] as const,
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]: [
     {
       name: 'name',
@@ -151,7 +152,7 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'address',
     },
-  ],
+  ] as const,
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]: [
     {
       name: 'contest',
@@ -177,7 +178,7 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'bool',
     },
-  ],
+  ] as const,
   [EvmEventSignatures.Contests.RecurringContestStarted]: [
     {
       name: 'contestId',
@@ -197,7 +198,7 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'uint256',
     },
-  ],
+  ] as const,
   [EvmEventSignatures.Contests.SingleContestStarted]: [
     {
       name: 'startTime',
@@ -211,8 +212,7 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'uint256',
     },
-  ],
-  // single contest ContentAdded signature is the same as recurring contest ContentAdded signature
+  ] as const,
   [EvmEventSignatures.Contests.ContentAdded]: [
     {
       name: 'contentId',
@@ -232,7 +232,7 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'string',
     },
-  ],
+  ] as const,
   [EvmEventSignatures.Contests.RecurringContestVoterVoted]: [
     {
       name: 'voter',
@@ -258,7 +258,7 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'uint256',
     },
-  ],
+  ] as const,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]: [
     {
       name: 'voter',
@@ -278,11 +278,24 @@ export const EvmEventAbis: Record<
       indexed: false,
       internalType: 'uint256',
     },
-  ],
-} as const;
+  ] as const,
+};
 
-// TODO: add type
-type DecodedEvmEvent<S> = any;
+type AbiTypeToTS<T> = T extends 'address'
+  ? z.infer<typeof EVM_ADDRESS>
+  : T extends 'uint256'
+  ? z.infer<typeof ETHERS_BIG_NUMBER>
+  : T extends 'bool'
+  ? boolean
+  : never;
+
+type Transform<T extends ReadonlyArray<{ name: string; type: string }>> = {
+  [K in T[number] as K['name']]: AbiTypeToTS<K['type']>;
+};
+
+type DecodedEvmEvent<Signature extends EvmEventSignature> = Transform<
+  typeof EvmEventAbis[Signature]
+>;
 
 // EvmMapper maps chain event args as input to a zod event schema type as output
 type EvmMapper<
@@ -291,7 +304,7 @@ type EvmMapper<
 > = {
   signature: Signature;
   output: Schema;
-  condition?: (obj: any) => any; // TODO: add type
+  condition?: (obj: DecodedEvmEvent<Signature>) => boolean;
   mapEvmToSchema: (
     contestAddress: string,
     decodedEvmEvent: DecodedEvmEvent<Signature>,
@@ -347,11 +360,11 @@ const SingleContestStartedMapper: EvmMapper<
 > = {
   signature: EvmEventSignatures.Contests.SingleContestStarted,
   output: ContestStarted,
-  mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
+  mapEvmToSchema: (contestAddress, { startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: ethers.BigNumber.from(contestId).toNumber(),
+      contest_id: 0,
       start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
       end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
     },
@@ -364,11 +377,11 @@ const RecurringContestStartedMapper: EvmMapper<
 > = {
   signature: EvmEventSignatures.Contests.RecurringContestStarted,
   output: ContestStarted,
-  mapEvmToSchema: (contestAddress: string, { startTime, endTime }) => ({
+  mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
-      contest_address: contestAddress,
-      contest_id: 0,
+      contest_address: contestAddress!,
+      contest_id: ethers.BigNumber.from(contestId).toNumber(),
       start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
       end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
     },
@@ -432,8 +445,8 @@ const SingleContestContentUpvotedMapper: EvmMapper<
 };
 
 const EvmMappers = {
-  [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]: {},
-  [EvmEventSignatures.CommunityStake.Trade]: {},
+  [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]: null,
+  [EvmEventSignatures.CommunityStake.Trade]: null,
   [RecurringContestManagerDeployedMapper.signature]: [
     RecurringContestManagerDeployedMapper,
     OneOffContestManagerDeployedMapper,
@@ -461,7 +474,12 @@ export const parseEvmEvent = (
   }
   const mappers: EvmMapper<any, any>[] = Array.isArray(m) ? m : [m];
   for (const mapper of mappers) {
-    const decodedParams = decodeLog(EvmEventAbis[eventSignature], data, topics);
+    // spread operator removes the Readonly type which decodeLog function does not accept
+    const decodedParams = decodeLog(
+      [...EvmEventAbis[eventSignature]],
+      data,
+      topics,
+    ) as DecodedEvmEvent<any>;
     if (!mapper.condition || mapper.condition(decodedParams)) {
       return mapper.mapEvmToSchema(contractAddress, decodedParams);
     }
