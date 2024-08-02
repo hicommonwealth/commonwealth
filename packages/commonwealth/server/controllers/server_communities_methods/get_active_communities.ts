@@ -4,7 +4,7 @@ import {
   CommunityInstance,
   sequelize,
 } from '@hicommonwealth/model';
-import { Op, QueryTypes } from 'sequelize';
+import { Op, QueryTypes, literal } from 'sequelize';
 import { config } from '../../config';
 import { ServerCommunitiesController } from '../server_communities_controller';
 import { CommunityWithTags } from './get_communities';
@@ -61,6 +61,7 @@ export async function __getActiveCommunities(
     type: QueryTypes.SELECT,
   });
 
+  const thirtyDaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
   const communityIds = activeCommunities.map((community) => community.id);
   const [communities, totalCommunitiesCount]: [CommunityInstance[], number] =
     await Promise.all([
@@ -88,6 +89,20 @@ export async function __getActiveCommunities(
             attributes: ['id'],
           },
         ],
+        attributes: {
+          include: [
+            [
+              literal(`(
+            SELECT COUNT("Threads".id)
+            FROM "Threads"
+            WHERE "Threads".community_id = "Community".id
+            AND "Threads".created_at > '${thirtyDaysAgo.toISOString()}'
+            AND "Threads".deleted_at IS NULL
+            )`),
+              'recentThreadsCount',
+            ],
+          ],
+        },
       }),
       this.models.Community.count({
         where: {
@@ -97,12 +112,16 @@ export async function __getActiveCommunities(
     ]);
 
   const result = {
-    communities: communities.map((c) => ({
-      ...c.toJSON(),
-      CommunityTags: (c.toJSON().CommunityTags || []).map(
-        (ct) => (ct as unknown as CommunityWithTags).Tag,
+    communities: communities
+      .map((c) => ({
+        ...c.toJSON(),
+        CommunityTags: (c.toJSON().CommunityTags || []).map(
+          (ct) => (ct as unknown as CommunityWithTags).Tag,
+        ),
+      }))
+      .sort(
+        (a, b) => Number(b.recentThreadsCount) - Number(a.recentThreadsCount),
       ),
-    })),
     totalCommunitiesCount,
   };
 
