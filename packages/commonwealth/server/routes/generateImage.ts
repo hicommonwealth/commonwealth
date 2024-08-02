@@ -1,4 +1,9 @@
-import { AppError, blobStorage } from '@hicommonwealth/core';
+import {
+  AppError,
+  ServerError,
+  blobStorage,
+  logger,
+} from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
@@ -6,8 +11,9 @@ import { v4 as uuidv4 } from 'uuid';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-// @ts-expect-error StrictNullChecks
-let openai: OpenAI = undefined;
+let openai: OpenAI | undefined = undefined;
+
+const log = logger(import.meta);
 
 try {
   openai = new OpenAI({
@@ -15,7 +21,7 @@ try {
     apiKey: process.env.OPENAI_API_KEY,
   });
 } catch (e) {
-  console.warn('OpenAI initialization failed.');
+  log.error('OpenAI initialization failed.', e);
 }
 
 type generateImageReq = {
@@ -25,6 +31,7 @@ type generateImageReq = {
 type generateImageResp = {
   imageUrl: string;
 };
+
 const generateImage = async (
   models: DB,
   req: TypedRequestBody<generateImageReq>,
@@ -33,7 +40,7 @@ const generateImage = async (
   const { description } = req.body;
 
   if (!openai) {
-    throw new AppError('OpenAI not initialized');
+    throw new ServerError('OpenAI not initialized');
   }
 
   if (!description) {
@@ -50,8 +57,7 @@ const generateImage = async (
 
     image = response.data[0].url;
   } catch (e) {
-    console.log(e);
-    throw new AppError('Problem Generating Image!');
+    throw new ServerError('Problem Generating Image!', e);
   }
 
   try {
@@ -65,8 +71,7 @@ const generateImage = async (
     });
     return success(res, { imageUrl: url });
   } catch (e) {
-    console.log(e);
-    throw new AppError('Problem uploading image!');
+    throw new ServerError('Problem uploading image!', e);
   }
 };
 
