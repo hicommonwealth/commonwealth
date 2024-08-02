@@ -46,7 +46,13 @@ export const createThreadCommentHandler = async (
   // @ts-expect-error StrictNullChecks
   const { id: threadId } = req.params;
   // @ts-expect-error <StrictNullChecks>
-  const { parent_id: parentId, text, discord_meta } = req.body;
+  const {
+    parent_id: parentId,
+    parent_msg_id: parentMsgId,
+    thread_msg_id: threadMsgId,
+    text,
+    discord_meta,
+  } = req.body;
 
   if (!threadId) {
     throw new AppError(Errors.MissingThreadId);
@@ -73,7 +79,7 @@ export const createThreadCommentHandler = async (
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
       const canvasComment = {
-        thread_id: parseInt(threadId, 10),
+        thread_id: threadMsgId ?? null,
         text,
         address:
           canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
@@ -84,7 +90,7 @@ export const createThreadCommentHandler = async (
               })
             : // @ts-expect-error <StrictNullChecks>
               address.address,
-        parent_comment_id: parentId ? parentId.toString() : null,
+        parent_comment_id: parentMsgId ?? null,
       };
       await verifyComment(canvasSignedData, canvasComment);
     }
