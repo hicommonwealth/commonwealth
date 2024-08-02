@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Mutex } from 'async-mutex';
 import { Sequelize } from 'sequelize';
 import { URL, fileURLToPath } from 'url';
+import { z } from 'zod';
 import { config } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
 import {
