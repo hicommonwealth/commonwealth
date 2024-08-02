@@ -5,6 +5,7 @@ export const TodoUserCommands = z.object({});
 
 export const UpdateUser = {
   input: User.omit({ is_welcome_onboard_flow_complete: true }).extend({
+    id: z.number(),
     promotional_emails_enabled: z.boolean().nullish(),
     tag_ids: z.number().array().nullish(),
   }),

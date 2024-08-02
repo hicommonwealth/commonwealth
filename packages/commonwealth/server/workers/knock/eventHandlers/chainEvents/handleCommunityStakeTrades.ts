@@ -7,12 +7,10 @@ import {
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { getCommunityUrl } from '../../../../../shared/utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function handleCommunityStakeTrades(
   models: DB,

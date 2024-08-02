@@ -1,7 +1,6 @@
 import {
   EvmEventSignature,
   EvmEventSignatures,
-  logger as loggerFactory,
   parseEvmEvent,
   type Command,
 } from '@hicommonwealth/core';
@@ -14,10 +13,6 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol as cp } from '@hicommonwealth/shared';
 import { Hmac, createHmac } from 'crypto';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const logger = loggerFactory(__filename);
 
 // TODO: how do we handle chain re-orgs
 //  Alchemy re-emits logs with `removed: true` -> modify event handlers to rollback changes if `removed: true`.

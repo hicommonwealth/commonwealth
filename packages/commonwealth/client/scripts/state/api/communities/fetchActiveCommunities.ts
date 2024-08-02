@@ -15,13 +15,14 @@ export interface FetchActiveCommunitiesResponse {
     ethChainId?: string;
     cosmosChainId?: string;
     description: string;
-    iconUrl: string;
+    icon_url: string;
     socialLinks: string[];
     nodeUrl: string;
     altWalletUrl: string;
     userAddress: string;
     bech32Prefix?: string;
     CommunityTags: Tag[];
+    recentThreadsCount: string;
   }[];
   totalCommunitiesCount: number;
 }

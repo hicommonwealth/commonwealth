@@ -14,7 +14,6 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import express from 'express';
-import { fileURLToPath } from 'url';
 import { config } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
@@ -22,8 +21,8 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 import 'express-async-errors';
 
 // bootstrap production adapters
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+
+const log = logger(import.meta);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));

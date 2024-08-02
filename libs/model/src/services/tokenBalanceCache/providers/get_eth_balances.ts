@@ -1,7 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
-import { fileURLToPath } from 'url';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
@@ -10,8 +9,7 @@ import {
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export type GetEthBalancesOptions = {
   chainNode: ChainNodeInstance;

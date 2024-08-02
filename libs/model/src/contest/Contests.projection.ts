@@ -7,7 +7,6 @@ import {
 } from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -15,8 +14,7 @@ import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
 import { decodeThreadContentUrl } from '../utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export class MissingContestManager extends Error {
   constructor(
