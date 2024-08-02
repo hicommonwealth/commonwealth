@@ -21,6 +21,7 @@ const Errors = {
 type CreateThreadReactionRequestParams = { id: string };
 type CreateThreadReactionRequestBody = {
   reaction: string;
+  thread_msg_id: string | null;
 };
 type CreateThreadReactionResponse = ReactionAttributes;
 
@@ -35,7 +36,7 @@ export const createThreadReactionHandler = async (
 ) => {
   const { user, address } = req;
   // @ts-expect-error <StrictNullChecks>
-  const { reaction } = req.body;
+  const { reaction, thread_msg_id: threadMsgId } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -64,7 +65,7 @@ export const createThreadReactionHandler = async (
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
       const canvasThreadReaction = {
-        thread_id: threadId,
+        thread_id: threadMsgId ?? null,
         address:
           canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
             ? addressSwapper({

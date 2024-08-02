@@ -37,6 +37,7 @@ const createReaction = async ({
     {
       author_community_id: userStore.getState().activeAccount?.community?.id,
       thread_id: threadId,
+      thread_msg_id: threadMsgId,
       community_id: app.chain.id,
       address,
       reaction: reactionType,

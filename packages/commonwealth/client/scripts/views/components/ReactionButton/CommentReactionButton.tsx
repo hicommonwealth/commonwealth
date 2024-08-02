@@ -87,6 +87,7 @@ export const CommentReactionButton = ({
         commentId: comment.id,
         communityId: app.activeChainId(),
         threadId: comment.threadId,
+        commentMsgId: comment.canvasMsgId,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {
           return;

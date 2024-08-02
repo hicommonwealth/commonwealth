@@ -19,7 +19,10 @@ const Errors = {
 };
 
 type CreateCommentReactionRequestParams = { id: string };
-type CreateCommentReactionRequestBody = { reaction: string };
+type CreateCommentReactionRequestBody = {
+  reaction: string;
+  comment_msg_id: string | null;
+};
 type CreateCommentReactionResponse = ReactionAttributes;
 
 export const createCommentReactionHandler = async (
@@ -33,7 +36,7 @@ export const createCommentReactionHandler = async (
 ) => {
   const { user, address } = req;
   // @ts-expect-error <StrictNullChecks>
-  const { reaction } = req.body;
+  const { reaction, comment_msg_id: commentMsgId } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -61,7 +64,7 @@ export const createCommentReactionHandler = async (
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
       const canvasReaction = {
-        comment_id: commentId,
+        comment_id: commentMsgId ?? null,
         address:
           canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
             ? addressSwapper({

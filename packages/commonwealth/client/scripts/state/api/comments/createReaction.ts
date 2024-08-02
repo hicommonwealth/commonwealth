@@ -42,6 +42,7 @@ const createReaction = async ({
       jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
       comment_id: commentId,
+      comment_msg_id: commentMsgId,
     },
   );
 };
