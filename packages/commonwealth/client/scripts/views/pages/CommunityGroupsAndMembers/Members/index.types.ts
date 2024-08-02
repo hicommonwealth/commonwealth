@@ -5,4 +5,4 @@ export type SearchFilters = {
   groupFilter?: BaseGroupFilter; // or the group id represented by number
 };
 
-export type MemberReultsOrderBy = 'name' | 'last_active' | undefined;
+export type MemberResultsOrderBy = 'name' | 'last_active' | undefined;

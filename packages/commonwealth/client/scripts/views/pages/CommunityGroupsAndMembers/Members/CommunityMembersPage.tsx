@@ -42,7 +42,7 @@ import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
 import {
   BaseGroupFilter,
-  MemberReultsOrderBy,
+  MemberResultsOrderBy,
   SearchFilters,
 } from './index.types';
 
@@ -139,7 +139,7 @@ const CommunityMembersPage = () => {
       limit: 30,
       order_by: (tableState.orderBy === 'lastActive'
         ? 'last_active'
-        : tableState.orderBy) as MemberReultsOrderBy,
+        : tableState.orderBy) as MemberResultsOrderBy,
       // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
       ...(debouncedSearchTerm && {
