@@ -57,14 +57,3 @@ export const EvmSingleContestEventSignatures = {
 export const EvmCommunityStakingEventSignatures = {
   trade: '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
 } as const;
-
-export const EvmEventSignatures = {
-  NamespaceFactory: EvmNamespaceFactoryEventSignatures,
-  RecurringContest: EvmRecurringContestEventSignatures,
-  SingleContest: EvmSingleContestEventSignatures,
-  CommunityStake: EvmCommunityStakingEventSignatures,
-} as const;
-
-type Values<T> = T[keyof T];
-type NestedValues<T> = Values<{ [K in keyof T]: Values<T[K]> }>;
-export type EvmEventSignature = NestedValues<typeof EvmEventSignatures>;
