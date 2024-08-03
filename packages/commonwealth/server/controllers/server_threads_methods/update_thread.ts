@@ -65,7 +65,7 @@ export type UpdateThreadOptions = {
     toRemove?: number[];
   };
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
   discordMeta?: any;
 };
 
@@ -91,7 +91,7 @@ export async function __updateThread(
     spam,
     topicId,
     collaborators,
-    canvasHash,
+    canvasMsgId,
     canvasSignedData,
     discordMeta,
   }: UpdateThreadOptions,
@@ -217,7 +217,7 @@ export async function __updateThread(
         title,
         body,
         url,
-        canvasHash,
+        canvasMsgId,
         canvasSignedData,
       },
       isContestThread,
@@ -498,7 +498,7 @@ export type UpdatableThreadAttributes = {
   body?: string;
   url?: string;
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
 };
 
 /**
@@ -507,7 +507,13 @@ export type UpdatableThreadAttributes = {
 async function setThreadAttributes(
   permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
-  { title, body, url, canvasSignedData, canvasHash }: UpdatableThreadAttributes,
+  {
+    title,
+    body,
+    url,
+    canvasSignedData,
+    canvasMsgId,
+  }: UpdatableThreadAttributes,
   isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
@@ -559,7 +565,7 @@ async function setThreadAttributes(
     }
 
     toUpdate.canvas_signed_data = canvasSignedData;
-    toUpdate.canvas_hash = canvasHash;
+    toUpdate.canvas_msg_id = canvasMsgId;
   }
 }
 

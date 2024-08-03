@@ -50,6 +50,7 @@ export const ChangeThreadTopicModal = ({
       await editThread({
         communityId: app.activeChainId(),
         address: user.activeAccount?.address || '',
+        threadMsgId: thread.canvasMsgId,
         threadId: thread.id,
         topicId: activeTopic.id,
       });

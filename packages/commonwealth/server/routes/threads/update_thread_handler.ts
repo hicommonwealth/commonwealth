@@ -22,7 +22,7 @@ type UpdateThreadRequestBody = {
     toRemove?: number[];
   };
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
   discord_meta?: IDiscordMeta; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
@@ -60,7 +60,7 @@ export const updateThreadHandler = async (
     // @ts-expect-error StrictNullChecks
     canvasSignedData,
     // @ts-expect-error StrictNullChecks
-    canvasHash,
+    canvasMsgId,
     // @ts-expect-error StrictNullChecks
     discord_meta: discordMeta,
   } = req.body;
@@ -88,7 +88,7 @@ export const updateThreadHandler = async (
       topicId,
       collaborators,
       canvasSignedData,
-      canvasHash,
+      canvasMsgId,
       discordMeta,
     });
 

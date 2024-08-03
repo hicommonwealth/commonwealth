@@ -13,16 +13,18 @@ import { updateCommunityThreadCount } from './helpers/counts';
 interface DeleteThreadProps {
   communityId: string;
   threadId: number;
+  threadMsgId: string;
   address: string;
 }
 
 const deleteThread = async ({
   communityId,
   threadId,
+  threadMsgId,
   address,
 }: DeleteThreadProps) => {
   const canvasSignedData = await signDeleteThread(address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
   });
 
   return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
@@ -39,6 +41,7 @@ const deleteThread = async ({
 interface UseDeleteThreadMutationProps {
   communityId: string;
   threadId: number;
+  threadMsgId: string;
   currentStage: ThreadStage;
 }
 

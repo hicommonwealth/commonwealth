@@ -1,7 +1,7 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signComment } from 'controllers/server/sessions';
+import { signUpdateComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
@@ -17,6 +17,7 @@ interface EditCommentProps {
   parentCommentId: number | null;
   threadId: number;
   commentId: number;
+  commentMsgId: string;
   updatedBody: string;
 }
 
@@ -26,12 +27,12 @@ const editComment = async ({
   parentCommentId,
   threadId,
   commentId,
+  commentMsgId,
   updatedBody,
 }: EditCommentProps) => {
-  const canvasSignedData = await signComment(profile.address, {
-    thread_id: threadId,
+  const canvasSignedData = await signUpdateComment(profile.address, {
+    comment_id: commentMsgId,
     body: updatedBody,
-    parent_comment_id: parentCommentId,
   });
 
   const response = await axios.patch(

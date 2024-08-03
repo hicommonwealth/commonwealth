@@ -4,7 +4,7 @@ import assert from 'assert';
 import {
   CANVAS_TOPIC,
   NotificationCategories,
-  getSessionSignerForAddress,
+  getSessionSignerForDid,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 
@@ -27,13 +27,13 @@ const verifySessionSignature = async (
 ): Promise<void> => {
   const expectedAddress = addressModel.address;
 
-  const walletAddress = session.address.split(':')[2];
+  const walletAddress = session.did.split(':')[4];
   assert(
     walletAddress === expectedAddress,
-    `session.address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
+    `session.did address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
   );
 
-  const signer = getSessionSignerForAddress(session.address);
+  const signer = getSessionSignerForDid(session.did);
   if (!signer) {
     throw new Error('missing signer');
   }

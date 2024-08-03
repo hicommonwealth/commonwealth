@@ -96,6 +96,7 @@ export const EditBody = (props: EditBodyProps) => {
           newBody: JSON.stringify(contentDelta) || thread.body,
           newTitle: title || thread.title,
           threadId: thread.id,
+          threadMsgId: thread.canvasMsgId,
           authorProfile: user.activeAccount?.profile,
           address: user.activeAccount?.address || '',
           communityId: app.activeChainId(),

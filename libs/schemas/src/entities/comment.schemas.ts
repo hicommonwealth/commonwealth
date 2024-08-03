@@ -14,7 +14,7 @@ export const Comment = z.object({
   version_history_updated: z.boolean().optional(),
 
   canvas_signed_data: z.string(),
-  canvas_hash: z.string(),
+  canvas_msg_id: z.string(),
 
   created_by: z.string().nullish(),
   created_at: zDate.nullish(),

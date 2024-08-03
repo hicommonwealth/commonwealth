@@ -76,12 +76,14 @@ export const AdminActions = ({
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     communityId: app.activeChainId(),
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId(),
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
     currentTopicId: thread.topic?.id,
   });
@@ -99,6 +101,7 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 threadId: thread.id,
+                threadMsgId: thread.canvasMsgId,
                 communityId: app.activeChainId(),
                 address: user.activeAccount?.address || '',
               });

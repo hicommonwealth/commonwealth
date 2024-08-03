@@ -2,10 +2,12 @@ import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
+  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyReaction,
 } from '@hicommonwealth/shared';
+import { canvas } from 'server';
 import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
@@ -19,6 +21,7 @@ const Errors = {
 type CreateThreadReactionRequestParams = { id: string };
 type CreateThreadReactionRequestBody = {
   reaction: string;
+  thread_msg_id: string | null;
 };
 type CreateThreadReactionResponse = ReactionAttributes;
 
@@ -33,7 +36,7 @@ export const createThreadReactionHandler = async (
 ) => {
   const { user, address } = req;
   // @ts-expect-error <StrictNullChecks>
-  const { reaction } = req.body;
+  const { reaction, thread_msg_id: threadMsgId } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -57,15 +60,14 @@ export const createThreadReactionHandler = async (
   if (hasCanvasSignedDataApiArgs(req.body)) {
     // Only save the canvas fields if they are given and they are strings
     reactionFields.canvasSignedData = req.body.canvas_signed_data;
-    reactionFields.canvasHash = req.body.canvas_hash;
+    reactionFields.canvasMsgId = req.body.canvas_msg_id;
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      await verifyReaction(canvasSignedData, {
-        thread_id: threadId,
+      const canvasThreadReaction = {
+        thread_id: threadMsgId ?? null,
         address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
+          canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
                 // @ts-expect-error <StrictNullChecks>
@@ -74,13 +76,20 @@ export const createThreadReactionHandler = async (
             : // @ts-expect-error <StrictNullChecks>
               address.address,
         value: reaction,
-      });
+      };
+      await verifyReaction(canvasSignedData, canvasThreadReaction);
     }
   }
 
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadReaction(reactionFields);
+
+  // publish signed data
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    await applyCanvasSignedData(canvas, canvasSignedData);
+  }
 
   // update address last active
   // @ts-expect-error StrictNullChecks

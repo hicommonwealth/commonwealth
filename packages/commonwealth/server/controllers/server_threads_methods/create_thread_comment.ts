@@ -45,7 +45,7 @@ export type CreateThreadCommentOptions = {
   threadId: number;
   text: string;
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
   discordMeta?: any;
 };
 
@@ -64,7 +64,7 @@ export async function __createThreadComment(
     threadId,
     text,
     canvasSignedData,
-    canvasHash,
+    canvasMsgId,
     discordMeta,
   }: CreateThreadCommentOptions,
 ): Promise<CreateThreadCommentResult> {
@@ -174,7 +174,7 @@ export async function __createThreadComment(
     // @ts-expect-error <StrictNullChecks>
     canvas_signed_data: canvasSignedData,
     // @ts-expect-error <StrictNullChecks>
-    canvas_hash: canvasHash,
+    canvas_msg_id: canvasMsgId,
     discord_meta: discordMeta,
     reaction_count: 0,
     reaction_weights_sum: 0,

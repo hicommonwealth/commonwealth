@@ -11,6 +11,7 @@ import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
   threadId: number;
+  threadMsgId: string;
   communityId: string;
 }
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
@@ -23,10 +24,11 @@ const createReaction = async ({
   address,
   reactionType = 'like',
   threadId,
+  threadMsgId,
   isPWA,
 }: CreateReactionProps) => {
   const canvasSignedData = await signThreadReaction(address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
     like: reactionType === 'like',
   });
 
@@ -35,6 +37,7 @@ const createReaction = async ({
     {
       author_community_id: userStore.getState().activeAccount?.community?.id,
       thread_id: threadId,
+      thread_msg_id: threadMsgId,
       community_id: app.chain.id,
       address,
       reaction: reactionType,

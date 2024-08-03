@@ -305,7 +305,8 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
-  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+  // TODO: handle that process.env.MAGIC_PUBLISHABLE_KEY may be undefined
+  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY as any, {
     extensions: !isCosmos
       ? [new OAuthExtension()]
       : [
@@ -429,7 +430,8 @@ export async function handleSocialLoginCallback({
       magicAddress = metadata.publicAddress;
     } else {
       const { utils } = await import('ethers');
-      magicAddress = utils.getAddress(metadata.publicAddress);
+      // TODO: handle that metadata.publicAddress may be undefined
+      magicAddress = utils.getAddress(metadata.publicAddress as any);
     }
   } else {
     const result = await magic.oauth.getRedirectResult();

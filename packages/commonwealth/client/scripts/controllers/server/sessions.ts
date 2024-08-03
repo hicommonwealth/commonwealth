@@ -1,3 +1,4 @@
+import { SignedMessage } from '@canvas-js/gossiplog'; // TODO: tree shake?
 import type { Action, Message, Session } from '@canvas-js/interfaces';
 import {
   CANVAS_TOPIC,
@@ -10,8 +11,6 @@ import {
   chainBaseToCanvasChainId,
   getSessionSigners,
 } from '@hicommonwealth/shared';
-import { encode } from '@ipld/dag-json';
-import { sha256 } from '@noble/hashes/sha256';
 import app from 'state';
 import { fetchCachedConfiguration } from 'state/api/configuration';
 import Account from '../../models/Account';
@@ -34,7 +33,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   account: Account,
 ) {
   const session = await getSessionFromWallet(wallet);
-  const walletAddress = session.address.split(':')[2];
+  const walletAddress = session.did.split(':')[4];
   if (walletAddress !== account.address) {
     throw new Error(
       `Session signed with wrong address ('${walletAddress}', expected '${account.address}')`,
@@ -79,7 +78,7 @@ export async function getSessionFromWallet(
   }
 }
 
-function getCaip2Address(address: string) {
+function getDidForCurrentAddress(address: string) {
   const caip2Prefix = chainBaseToCaip2(app.chain.base);
 
   const idOrPrefix =
@@ -88,7 +87,7 @@ function getCaip2Address(address: string) {
       : app.chain?.meta.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(app.chain.base, idOrPrefix);
 
-  return `${caip2Prefix}:${canvasChainId}:${address}`;
+  return `did:pkh:${caip2Prefix}:${canvasChainId}:${address}`;
 }
 
 // Sign an arbitrary action, using context from the last authSession() call.
@@ -102,14 +101,21 @@ async function sign(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
 ): Promise<CanvasSignResult | null> {
-  const address = getCaip2Address(address_);
+  const did = getDidForCurrentAddress(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
-    if (signer.match(address)) {
-      let lookupAddress = address;
+    if (signer.match(did)) {
+      let lookupDid = did;
 
-      const [chainBaseFromAddress, chainIdFromAddress, walletAddress] =
-        address.split(':');
+      const [
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _did,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _pkh,
+        chainBaseFromAddress,
+        chainIdFromAddress,
+        walletAddress,
+      ] = did.split(':');
 
       // if using polkadot, we need to convert the address so that it has the prefix 42
       if (chainBaseFromAddress === 'polkadot') {
@@ -117,11 +123,12 @@ async function sign(
           address: walletAddress,
           currentPrefix: 42,
         });
-        lookupAddress = `polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        lookupDid = `did:pkh:polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
       }
 
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
-        address: lookupAddress,
+        did, // TODO: lookupDid?
       });
 
       const config = fetchCachedConfiguration();
@@ -132,7 +139,7 @@ async function sign(
         }
         throw new SessionKeyError({
           name: 'Authentication Error',
-          message: `No session found for address ${address}`,
+          message: `No session found for ${did}`,
           address: walletAddress,
           ssoSource: WalletSsoSource.Unknown,
         });
@@ -140,15 +147,16 @@ async function sign(
       const { payload: session, signer: messageSigner } = savedSessionMessage;
 
       // check if session is expired
-      if (session.duration !== null) {
-        const sessionExpirationTime = session.timestamp + session.duration;
+      if (session.context.duration) {
+        const sessionExpirationTime =
+          session.context.timestamp + session.context.duration;
         if (Date.now() > sessionExpirationTime) {
           if (!config?.enforceSessionKeys) {
             return null;
           }
           throw new SessionKeyError({
             name: 'Authentication Error',
-            message: `Session expired for address ${address}`,
+            message: `Session expired for ${did}`,
             address: walletAddress,
             ssoSource: WalletSsoSource.Unknown,
           });
@@ -156,29 +164,38 @@ async function sign(
       }
 
       const sessionMessage: Message<Session> = {
-        clock: 0,
+        clock: 1,
         parents: [],
         topic: CANVAS_TOPIC,
         payload: session,
       };
 
       const sessionMessageSignature = await messageSigner.sign(sessionMessage);
+      const sessionMessageId = SignedMessage.encode(
+        sessionMessageSignature,
+        sessionMessage,
+      ).id;
 
       const actionMessage: Message<Action> = {
-        clock: 0,
-        parents: [],
+        clock: 2,
+        parents: [sessionMessageId],
         topic: CANVAS_TOPIC,
         payload: {
           type: 'action' as const,
-          address: session.address,
-          blockhash: null,
+          did: session.did,
+          context: {
+            timestamp: Date.now(),
+          },
           name: call,
           args,
-          timestamp: Date.now(),
         },
       };
 
       const actionMessageSignature = await messageSigner.sign(actionMessage);
+      const actionMessageId = SignedMessage.encode(
+        actionMessageSignature,
+        actionMessage,
+      ).id;
 
       return {
         canvasSignedData: {
@@ -187,20 +204,34 @@ async function sign(
           actionMessage,
           actionMessageSignature,
         },
-        canvasHash: Buffer.from(sha256(encode(actionMessage))).toString('hex'),
+        canvasMsgId: actionMessageId,
       };
     }
   }
-  throw new Error(`No signer found for address ${address}`);
+  throw new Error(`No signer found for ${did}`);
 }
 
 // Public signer methods
+// TODO: rename all these to `createSignThreadAction()` or similar
 export async function signThread(
   address: string,
   { community, title, body, link, topic },
 ) {
   return await sign(address, 'thread', {
     community: community || '',
+    title: encodeURIComponent(title),
+    body: encodeURIComponent(body),
+    link: link || '',
+    topic: topic || '',
+  });
+}
+
+export async function signUpdateThread(
+  address: string,
+  { thread_id, title, body, link, topic },
+) {
+  return await sign(address, 'updateThread', {
+    thread_id,
     title: encodeURIComponent(title),
     body: encodeURIComponent(body),
     link: link || '',
@@ -222,6 +253,13 @@ export async function signComment(
     thread_id,
     body: encodeURIComponent(body),
     parent_comment_id,
+  });
+}
+
+export async function signUpdateComment(address: string, { comment_id, body }) {
+  return await sign(address, 'updateComment', {
+    comment_id,
+    body: encodeURIComponent(body),
   });
 }
 

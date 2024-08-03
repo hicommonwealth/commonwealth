@@ -62,8 +62,6 @@ import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
 
-import { getCanvasData, postCanvasData } from '../routes/canvas';
-
 import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
@@ -908,10 +906,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateCommunityCategory.bind(this, models),
   );
-
-  // signed data
-  router.get('/oplog', getCanvasData.bind(this, models));
-  router.post('/oplog', postCanvasData.bind(this, models));
 
   // settings
   registerRoute(

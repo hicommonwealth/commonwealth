@@ -17,7 +17,7 @@ import {
   WalletId,
   WalletSsoSource,
   deserializeCanvas,
-  getSessionSignerForAddress,
+  getSessionSignerForDid,
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
@@ -514,7 +514,7 @@ async function magicLoginRoute(
         });
       } else if (
         communityToJoin.base === ChainBase.Ethereum &&
-        session.address.startsWith('eip155:')
+        session.did.startsWith('did:pkh:eip155:')
       ) {
         generatedAddresses.push({
           // @ts-expect-error StrictNullChecks
@@ -532,7 +532,7 @@ async function magicLoginRoute(
 
     if (config.ENFORCE_SESSION_KEYS) {
       // verify the session signature using session signer
-      const sessionSigner = getSessionSignerForAddress(session.address);
+      const sessionSigner = getSessionSignerForDid(session.did);
       if (!sessionSigner) {
         throw new Error('No session signer found for address');
       }
