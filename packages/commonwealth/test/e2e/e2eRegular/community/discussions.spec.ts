@@ -20,25 +20,23 @@ test.describe('Test community discussions page', () => {
   // shouldn't crash even when url params are invalid or data relevant to those params is non-existant
   test(
     ...generatePageCrashTestConfig(
-      'http://localhost:8080/dydx/proposal/discussion/non-existant-thread-path',
+      `${config.SERVER_URL}/dydx/proposal/discussion/non-existant-thread-path`,
     ),
   );
-  test(
-    ...generatePageCrashTestConfig('http://localhost:8080/dydx/discussions'),
-  );
+  test(...generatePageCrashTestConfig(`${config.SERVER_URL}/dydx/discussions`));
   test(
     ...generatePageCrashTestConfig(
-      'http://localhost:8080/dydx/discussions/non-existant-topis',
-    ),
-  );
-  test(
-    ...generatePageCrashTestConfig(
-      'http://localhost:8080/dydx/discussion/non-existant-thread-path',
+      `${config.SERVER_URL}/dydx/discussions/non-existant-topis`,
     ),
   );
   test(
     ...generatePageCrashTestConfig(
-      'http://localhost:8080/discussion/non-existant-thread-path',
+      `${config.SERVER_URL}/dydx/discussion/non-existant-thread-path`,
+    ),
+  );
+  test(
+    ...generatePageCrashTestConfig(
+      `${config.SERVER_URL}/discussion/non-existant-thread-path`,
     ),
   );
 

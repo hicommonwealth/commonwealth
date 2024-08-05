@@ -1,8 +1,9 @@
+import { config } from '@hicommonwealth/core';
 import { test } from '@playwright/test';
 import { generatePageCrashTestConfig } from './common/testConfigs';
 
 test.describe('Test home page', () => {
-  test(...generatePageCrashTestConfig(`http://localhost:8080/`));
+  test(...generatePageCrashTestConfig(`${config.SERVER_URL}/`));
 
-  test(...generatePageCrashTestConfig(`http://localhost:8080/home`));
+  test(...generatePageCrashTestConfig(`${config.SERVER_URL}/home`));
 });

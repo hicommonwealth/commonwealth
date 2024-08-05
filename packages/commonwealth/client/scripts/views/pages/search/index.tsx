@@ -305,8 +305,9 @@ const SearchPage = () => {
             )}
             {sharedQueryOptions?.searchTerm?.length > 0 && (
               <>
-                {isLoading && <PageLoading />}
-                {!isLoading && (
+                {isLoading ? (
+                  <PageLoading />
+                ) : (
                   <>
                     <CWText className="search-results-caption">
                       {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}

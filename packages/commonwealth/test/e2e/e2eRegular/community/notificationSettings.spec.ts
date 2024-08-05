@@ -1,10 +1,11 @@
+import { config } from '@hicommonwealth/core';
 import { test } from '@playwright/test';
 import { generatePageCrashTestConfig } from '../common/testConfigs';
 
 test.describe('Test community notification settings page', () => {
   test(
     ...generatePageCrashTestConfig(
-      'http://localhost:8080/dydx/notification-settings',
+      `${config.SERVER_URL}/dydx/notification-settings`,
     ),
   );
 });

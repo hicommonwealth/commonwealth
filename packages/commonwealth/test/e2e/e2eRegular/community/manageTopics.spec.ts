@@ -1,8 +1,9 @@
+import { config } from '@hicommonwealth/core';
 import { test } from '@playwright/test';
 import { generatePageCrashTestConfig } from '../common/testConfigs';
 
 test.describe('Test community manage topics page', () => {
   test(
-    ...generatePageCrashTestConfig('http://localhost:8080/dydx/manage/topics'),
+    ...generatePageCrashTestConfig(`${config.SERVER_URL}/dydx/manage/topics`),
   );
 });
