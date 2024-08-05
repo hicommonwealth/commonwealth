@@ -782,6 +782,7 @@ describe('ServerCommentsController', () => {
         Comment: {
           findOne: async () => ({
             address_id: 1,
+            Thread: { community_id: 1 },
             destroy: async () => {
               didDestroy = true;
             },
