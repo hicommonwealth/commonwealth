@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { z } from 'zod';
 import {
   EventContext,
@@ -237,6 +238,29 @@ export interface Broker extends Disposable {
   ): Promise<boolean>;
 
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
+}
+
+export type BlobType = string | Uint8Array | Buffer | Readable;
+export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
+export type BlobBucket = typeof BlobBuckets[number];
+
+/**
+ * External Blob Storage Port
+ */
+export interface BlobStorage extends Disposable {
+  upload(options: {
+    key: string;
+    bucket: BlobBucket;
+    content: BlobType;
+    contentType?: string;
+  }): Promise<{ url: string; location: string }>;
+  exists(options: { key: string; bucket: BlobBucket }): Promise<boolean>;
+  getSignedUrl(options: {
+    key: string;
+    bucket: BlobBucket;
+    contentType: string;
+    ttl: number;
+  }): Promise<string>;
 }
 
 /**
