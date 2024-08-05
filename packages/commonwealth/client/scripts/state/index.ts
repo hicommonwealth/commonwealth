@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
-import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
@@ -60,7 +59,6 @@ export interface IApp {
 
   // User
   user: UserController;
-  recentActivity: RecentActivityController;
 
   // Web3
   snapshot: SnapshotController;
@@ -123,7 +121,6 @@ const app: IApp = {
 
   // User
   user,
-  recentActivity: new RecentActivityController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
 
@@ -201,12 +198,6 @@ export async function initAppState(
           });
         }
       });
-
-    // add recentActivity
-    const { recentThreads } = statusRes.result;
-    recentThreads.forEach(({ communityId, count }) => {
-      app.recentActivity.setCommunityThreadCounts(communityId, count);
-    });
 
     // update the login status
     updateActiveUser(statusRes.result.user);

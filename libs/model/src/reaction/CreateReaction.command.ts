@@ -7,8 +7,10 @@ export function CreateReaction(): Command<typeof schemas.CreateTodo> {
   return {
     ...schemas.CreateTodo,
     auth: [],
-    body: async ({ id, payload }) => {
-      const reaction = await models.Reaction.findOne({ where: { id } });
+    body: async ({ payload }) => {
+      const reaction = await models.Reaction.findOne({
+        where: { id: payload.id },
+      });
 
       mustNotExist('Reaction', reaction);
 

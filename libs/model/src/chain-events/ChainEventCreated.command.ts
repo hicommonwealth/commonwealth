@@ -62,7 +62,7 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
     ...schemas.ChainEventCreated,
     auth: [],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    body: async ({ id, payload }) => {
+    body: async ({ payload }) => {
       // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/ChainEventCreated/BaseSepolia)
       // let chain = id!;
 

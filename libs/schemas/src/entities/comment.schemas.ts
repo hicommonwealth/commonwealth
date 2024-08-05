@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PG_INT } from '../utils';
+import { PG_INT, zDate } from '../utils';
 import { Address } from './user.schemas';
 
 export const Comment = z.object({
@@ -17,10 +17,10 @@ export const Comment = z.object({
   canvas_hash: z.string(),
 
   created_by: z.string().nullish(),
-  created_at: z.any(),
-  updated_at: z.any(),
-  deleted_at: z.any(),
-  marked_as_spam_at: z.any(),
+  created_at: zDate.nullish(),
+  updated_at: zDate.nullish(),
+  deleted_at: zDate.nullish(),
+  marked_as_spam_at: zDate.nullish(),
 
   discord_meta: z
     .object({

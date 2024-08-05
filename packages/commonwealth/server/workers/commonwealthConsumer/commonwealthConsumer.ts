@@ -17,6 +17,7 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { Contest, ContestWorker } from '@hicommonwealth/model';
+import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
@@ -27,7 +28,7 @@ stats(HotShotsStats());
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: __filename.endsWith(process.argv[1]),
+  enabled: fileURLToPath(import.meta.url).endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {
@@ -129,7 +130,7 @@ function startRolloverLoop() {
       Contest.PerformContestRollovers(),
       {
         actor: {} as Actor,
-        payload: {},
+        payload: { id: '' },
       },
       false,
     ).catch(console.error);

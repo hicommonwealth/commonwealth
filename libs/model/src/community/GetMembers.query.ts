@@ -136,7 +136,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
-        logging: true,
       });
 
       if (!search) {

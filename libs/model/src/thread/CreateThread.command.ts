@@ -7,8 +7,8 @@ export function CreateThread(): Command<typeof schemas.CreateTodo> {
   return {
     ...schemas.CreateTodo,
     auth: [],
-    body: async ({ id, payload }) => {
-      const thread = await models.Thread.findOne({ where: { id } });
+    body: async ({ payload }) => {
+      const thread = await models.Thread.findOne({ where: { id: payload.id } });
 
       mustNotExist('Thread', thread);
 

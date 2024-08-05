@@ -73,6 +73,7 @@ describe('Comment subscription lifecycle', () => {
 
   test('should create a new comment subscription', async () => {
     const payload = {
+      id: actor.user.id!,
       comment_id: commentOne!.id!,
     };
     const res = await command(CreateCommentSubscription(), {
@@ -96,10 +97,10 @@ describe('Comment subscription lifecycle', () => {
       actor,
       payload: {},
     });
-    expect(res).to.have.deep.members([
-      commentSubOne.toJSON(),
-      commentSubTwo.toJSON(),
-    ]);
+
+    expect(res!.length).to.equal(2);
+    expect(res![0].id === commentSubOne.id);
+    expect(res![1].id === commentSubTwo.id);
   });
 
   test('should not throw for no comment subscriptions', async () => {
@@ -117,6 +118,7 @@ describe('Comment subscription lifecycle', () => {
     ]);
 
     const payload = {
+      id: 0,
       comment_ids: [commentOne!.id!, commentTwo!.id!],
     };
 

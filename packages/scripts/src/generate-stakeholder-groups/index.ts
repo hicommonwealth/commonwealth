@@ -25,11 +25,10 @@ async function main() {
   for (const c of stakedCommunities) {
     if ((c.CommunityStakes || []).length > 0) {
       const result = await command(Community.GenerateStakeholderGroups(), {
-        id: c.id,
         actor: {
           user: { email: 'generate-stakeholder-groups' },
         },
-        payload: {},
+        payload: { id: c.id! },
       });
 
       if (result?.created) {

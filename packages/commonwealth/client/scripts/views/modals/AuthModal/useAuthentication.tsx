@@ -439,7 +439,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       if (username && account?.profile) {
         await updateUser({
-          id: account.profile.userId.toString(),
+          id: account.profile.userId,
           profile: {
             name: username.trim(),
           },
