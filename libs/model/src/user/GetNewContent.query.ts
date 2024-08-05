@@ -14,45 +14,26 @@ export function GetNewContent(): Query<typeof schemas.GetNewContent> {
       // since user's last active session per address (the address that user used to join that community)
       const response = await sequelize.query<{ community_id: string }>(
         `
-          WITH CommunityContent AS (
-            SELECT 
-              a.community_id,
-              (
-                (
-                  SELECT 
-                    COUNT(*) 
-                  FROM 
-                    "Threads" 
-                  WHERE 
-                    "community_id" = a.community_id 
-                    AND "created_at" > a.last_active 
-                    AND "deleted_at" IS NULL
-                )
-                +
-                (
-                  SELECT 
-                    COUNT(*) 
-                  FROM 
-                    "Comments" 
-                  WHERE 
-                    "community_id" = a.community_id 
-                    AND "created_at" > a.last_active 
-                    AND "deleted_at" IS NULL
-                )
-              ) AS content_content
-            FROM 
-              "Addresses" a
-            WHERE 
-              a.verified IS NOT NULL 
-              AND a.last_active IS NOT NULL 
-              AND a.user_id = :user_id
-          )
-          SELECT
-            community_id
+          SELECT 
+            a.community_id
           FROM 
-            CommunityContent
-          WHERE
-            content_content > 0;
+            "Addresses" a
+          LEFT JOIN "Threads" t
+            ON t.community_id = a.community_id 
+            AND t.created_at > a.last_active 
+            AND t.deleted_at IS NULL
+          LEFT JOIN "Comments" c 
+            ON c.community_id = a.community_id 
+            AND c.created_at > a.last_active 
+            AND c.deleted_at IS NULL
+          WHERE 
+            a.verified IS NOT NULL 
+            AND a.last_active IS NOT NULL 
+            AND a.user_id = :user_id
+          GROUP BY 
+            a.community_id
+          HAVING  
+            COUNT(t.id) + COUNT(c.id) > 0;
         `,
         {
           raw: true,

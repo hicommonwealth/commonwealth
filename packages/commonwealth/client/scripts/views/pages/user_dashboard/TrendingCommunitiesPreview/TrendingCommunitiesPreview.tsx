@@ -1,9 +1,9 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
+import { useGetNewContent } from 'client/scripts/state/api/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
 import Permissions from 'utils/Permissions';
-import { trpc } from '../../../../utils/trpcClient';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
@@ -12,12 +12,7 @@ export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
 
-  const { data } = trpc.user.getNewContent.useQuery(
-    {},
-    {
-      enabled: isLoggedIn,
-    },
-  );
+  const { data } = useGetNewContent({ enabled: isLoggedIn });
 
   const sortedCommunities = app.config.chains
     .getAll()
