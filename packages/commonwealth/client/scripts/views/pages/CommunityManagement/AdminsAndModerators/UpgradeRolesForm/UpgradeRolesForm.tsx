@@ -1,4 +1,4 @@
-import { AddressRole, Role } from '@hicommonwealth/shared';
+import { AddressRole, DEFAULT_NAME, Role } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
@@ -65,7 +65,7 @@ export const UpgradeRolesForm = ({
   const options = useMemo(() => {
     return rows.map((r) => {
       const roleText = r.role !== 'member' ? `(${r.role})` : '';
-      const text = `${r?.profile_name || 'anonymous'} - ${formatAddressShort(
+      const text = `${r?.profile_name || DEFAULT_NAME} - ${formatAddressShort(
         r.address,
       )} ${roleText}`;
 
