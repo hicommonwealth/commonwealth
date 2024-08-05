@@ -49,21 +49,9 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
     subscribed,
   ]);
 
-  // <div className="setting-container">
-  //   <div className="setting-container-left">
-  //     <CWText className="text-muted">
-  //       Turn on notifications to receive alerts on your device.
-  //     </CWText>
-  //   </div>
-  //
-  //   <div className="setting-container-right">
-  //     <PushNotificationsToggle />
-  //   </div>
-  // </div>
-
   return (
     <div key={communityInfo?.id} className="notification-row CommunityEntry">
-      <div className="" style={{ display: 'flex', flexGrow: 1 }}>
+      <div className="section">
         <div className="avatar-and-name">
           <CommunityInfo
             name={communityInfo.name}
@@ -72,7 +60,7 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
           />
         </div>
 
-        <div className="toggle" style={{ marginLeft: 'auto' }}>
+        <div className="toggle">
           <CWToggle checked={subscribed} onChange={toggleSubscription} />
         </div>
       </div>

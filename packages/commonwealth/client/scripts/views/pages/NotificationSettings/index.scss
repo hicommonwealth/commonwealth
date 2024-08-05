@@ -61,8 +61,17 @@
     font-size: 14px;
   }
 
-  .CommunityEntry .toggle {
-    margin-left: auto;
+  .CommunityEntry {
+    .section {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-grow: 1;
+    }
+
+    .toggle {
+      margin-left: auto;
+    }
   }
 
   .left-content-container {

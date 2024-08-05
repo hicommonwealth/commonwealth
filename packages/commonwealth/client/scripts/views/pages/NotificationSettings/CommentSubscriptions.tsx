@@ -22,7 +22,7 @@ export const CommentSubscriptions = () => {
 
   if (!data.length) {
     return (
-      <CWText type="h4" fontWeight="semiBold" className="error-content">
+      <CWText type="h4" className="error-content">
         No comment subscriptions.
       </CWText>
     );
