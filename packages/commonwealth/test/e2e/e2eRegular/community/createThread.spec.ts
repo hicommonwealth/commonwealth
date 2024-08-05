@@ -1,6 +1,8 @@
 import { test } from '@playwright/test';
-import { testPageCrash } from '../common/testPageCrash';
+import { generatePageCrashTestConfig } from '../common/testConfigs';
 
 test.describe('Test community create thread page', () => {
-  testPageCrash('http://localhost:8080/dydx/new/discussion');
+  test(
+    ...generatePageCrashTestConfig('http://localhost:8080/dydx/new/discussion'),
+  );
 });

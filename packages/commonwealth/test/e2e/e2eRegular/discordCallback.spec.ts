@@ -1,6 +1,8 @@
 import { test } from '@playwright/test';
-import { testPageCrash } from './common/testPageCrash';
+import { generatePageCrashTestConfig } from './common/testConfigs';
 
 test.describe('Test discord callback page', () => {
-  testPageCrash('http://localhost:8080/discord-callback');
+  test(
+    ...generatePageCrashTestConfig('http://localhost:8080/discord-callback'),
+  );
 });

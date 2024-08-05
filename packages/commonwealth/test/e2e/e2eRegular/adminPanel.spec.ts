@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import { testPageCrash } from './common/testPageCrash';
+import { generatePageCrashTestConfig } from './common/testConfigs';
 
 test.describe('Test admin panel page', () => {
-  testPageCrash('http://localhost:8080/admin-panel');
+  test(...generatePageCrashTestConfig('http://localhost:8080/admin-panel'));
 });

@@ -1,7 +1,7 @@
 import { config } from '@hicommonwealth/core';
 import { test } from '@playwright/test';
 import { e2eSeeder, type E2E_Seeder } from '../../utils/e2eUtils';
-import { testPageCrash } from '../common/testPageCrash';
+import { generatePageCrashTestConfig } from '../common/testConfigs';
 import { discussionTests } from './discussionsTest';
 
 let seeder: E2E_Seeder;
@@ -18,15 +18,29 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Test community discussions page', () => {
   // shouldn't crash even when url params are invalid or data relevant to those params is non-existant
-  testPageCrash(
-    'http://localhost:8080/dydx/proposal/discussion/non-existant-thread-path',
+  test(
+    ...generatePageCrashTestConfig(
+      'http://localhost:8080/dydx/proposal/discussion/non-existant-thread-path',
+    ),
   );
-  testPageCrash('http://localhost:8080/dydx/discussions');
-  testPageCrash('http://localhost:8080/dydx/discussions/non-existant-topis');
-  testPageCrash(
-    'http://localhost:8080/dydx/discussion/non-existant-thread-path',
+  test(
+    ...generatePageCrashTestConfig('http://localhost:8080/dydx/discussions'),
   );
-  testPageCrash('http://localhost:8080/discussion/non-existant-thread-path');
+  test(
+    ...generatePageCrashTestConfig(
+      'http://localhost:8080/dydx/discussions/non-existant-topis',
+    ),
+  );
+  test(
+    ...generatePageCrashTestConfig(
+      'http://localhost:8080/dydx/discussion/non-existant-thread-path',
+    ),
+  );
+  test(
+    ...generatePageCrashTestConfig(
+      'http://localhost:8080/discussion/non-existant-thread-path',
+    ),
+  );
 
   discussionTests(test);
 });

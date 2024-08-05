@@ -1,6 +1,10 @@
 import { test } from '@playwright/test';
-import { testPageCrash } from './common/testPageCrash';
+import { generatePageCrashTestConfig } from './common/testConfigs';
 
 test.describe('Test notification settings page', () => {
-  testPageCrash('http://localhost:8080/notification-settings');
+  test(
+    ...generatePageCrashTestConfig(
+      'http://localhost:8080/notification-settings',
+    ),
+  );
 });

@@ -1,6 +1,8 @@
 import { test } from '@playwright/test';
-import { testPageCrash } from './common/testPageCrash';
+import { generatePageCrashTestConfig } from './common/testConfigs';
 
 test.describe('Test my community stake page', () => {
-  testPageCrash('http://localhost:8080/myCommunityStake');
+  test(
+    ...generatePageCrashTestConfig('http://localhost:8080/myCommunityStake'),
+  );
 });

@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import { testPageCrash } from '../common/testPageCrash';
+import { generatePageCrashTestConfig } from '../common/testConfigs';
 
 test.describe('Test community home page', () => {
-  testPageCrash('http://localhost:8080/dydx');
+  test(...generatePageCrashTestConfig('http://localhost:8080/dydx'));
 
-  testPageCrash('http://localhost:8080/dydx/home');
+  test(...generatePageCrashTestConfig('http://localhost:8080/dydx/home'));
 });
