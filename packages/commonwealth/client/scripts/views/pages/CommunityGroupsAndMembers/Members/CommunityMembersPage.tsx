@@ -40,13 +40,18 @@ import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
+import {
+  BaseGroupFilter,
+  MemberResultsOrderBy,
+  SearchFilters,
+} from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
   { value: 'groups', label: 'Groups' },
 ];
 
-const GROUP_AND_MEMBER_FILTERS = [
+const GROUP_AND_MEMBER_FILTERS: { label: string; value: BaseGroupFilter }[] = [
   { label: 'All groups', value: 'all-community' },
   { label: 'Ungrouped', value: 'not-in-group' },
 ];
@@ -57,7 +62,7 @@ const CommunityMembersPage = () => {
   const user = useUserStore();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
-  const [searchFilters, setSearchFilters] = useState({
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
@@ -80,7 +85,7 @@ const CommunityMembersPage = () => {
     apiEnabled: !!user?.activeAccount?.address,
   });
 
-  const debouncedSearchTerm = useDebounce<string>(
+  const debouncedSearchTerm = useDebounce<string | undefined>(
     searchFilters.searchText,
     500,
   );
@@ -114,7 +119,6 @@ const CommunityMembersPage = () => {
     {
       key: 'lastActive',
       header: 'Last Active',
-      hasCustomSortValue: true,
       numeric: false,
       sortable: true,
     },
@@ -126,6 +130,17 @@ const CommunityMembersPage = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
+  const membershipsFilter = (() => {
+    const { groupFilter } = searchFilters;
+    if (groupFilter === 'not-in-group') {
+      return searchFilters.groupFilter;
+    }
+    if (typeof groupFilter === 'number') {
+      return `in-group:${searchFilters.groupFilter}`;
+    }
+    return null;
+  })();
+
   const {
     data: members,
     fetchNextPage,
@@ -133,20 +148,18 @@ const CommunityMembersPage = () => {
   } = trpc.community.getMembers.useInfiniteQuery(
     {
       limit: 30,
-      order_by: tableState.orderBy,
+      order_by: (tableState.orderBy === 'lastActive'
+        ? 'last_active'
+        : tableState.orderBy) as MemberResultsOrderBy,
       // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
-      search: debouncedSearchTerm,
+      ...(debouncedSearchTerm && {
+        search: debouncedSearchTerm,
+      }),
       community_id: app.activeChainId(),
       include_roles: true,
-      ...(!['all-community', 'not-in-group'].includes(
-        `${searchFilters.groupFilter}`,
-      ) &&
-        searchFilters.groupFilter && {
-          memberships: `in-group:${searchFilters.groupFilter}`,
-        }),
-      ...(searchFilters.groupFilter === 'Ungrouped' && {
-        memberships: 'not-in-group',
+      ...(membershipsFilter && {
+        memberships: membershipsFilter,
       }),
       include_group_ids: true,
       // only include stake balances if community has staking enabled
@@ -218,19 +231,10 @@ const CommunityMembersPage = () => {
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
-      }))
-      .filter((p) =>
-        debouncedSearchTerm
-          ? p.groups.find((g) =>
-              // @ts-expect-error <StrictNullChecks/>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-            ) ||
-            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-          : true,
-      );
+      }));
 
     return results;
-  }, [members, groups, debouncedSearchTerm]);
+  }, [members, groups]);
 
   const filteredGroups = useMemo(() => {
     const modifiedGroupsArr = (groups || []).map((group) => ({
@@ -414,8 +418,7 @@ const CommunityMembersPage = () => {
                   onChange={(option) => {
                     setSearchFilters((g) => ({
                       ...g,
-                      // @ts-expect-error <StrictNullChecks/>
-                      groupFilter: option.value as string,
+                      groupFilter: option?.value as BaseGroupFilter,
                     }));
                   }}
                 />
