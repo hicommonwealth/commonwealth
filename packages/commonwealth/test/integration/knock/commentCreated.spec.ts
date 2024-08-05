@@ -153,7 +153,7 @@ describe('CommentCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
-    const a = await tester.seed('ThreadSubscription', {
+    await tester.seed('ThreadSubscription', {
       // @ts-expect-error StrictNullChecks
       user_id: subscriber.id,
       // @ts-expect-error StrictNullChecks
