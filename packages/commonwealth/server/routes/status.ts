@@ -144,10 +144,10 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // add the community and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT thread_id, community_id
-              FROM "Comments"
-              WHERE community_id = ?
-                AND created_at > ?`;
+    query += `SELECT C.thread_id, T.community_id
+              FROM "Comments" C JOIN "Threads" T ON C.thread_id = T.id
+              WHERE T.community_id = ?
+                AND C.created_at > ?`;
     if (i === communityActivity.length - 1) query += ';';
   }
 
