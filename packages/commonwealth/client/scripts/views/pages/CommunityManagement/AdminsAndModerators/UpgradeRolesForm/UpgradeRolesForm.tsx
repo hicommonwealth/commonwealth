@@ -20,12 +20,11 @@ type UpgradeRolesFormProps = {
 };
 
 type UserDisplayRow = {
+  profile_name: string | null | undefined;
   user_id: number;
+  avatar_url: string | null | undefined;
+  role: string;
   address_id: number;
-  community_id: string;
-  profile_name: string;
-  role: Role;
-  avatar_url: string;
   address: string;
 };
 
@@ -107,12 +106,12 @@ export const UpgradeRolesForm = ({
         notifySuccess('Member upgraded');
         onRoleUpdate(
           {
-            address: selectedAddress,
-            role: selectedRole,
+            address: selectedAddress as string,
+            role: selectedRole as Role,
           },
           {
-            address: response.data.result.address,
-            role: response.data.result.role,
+            address: response.data.result.address as string,
+            role: response.data.result.role as Role,
           },
         );
         zeroOutRadioButtons();
