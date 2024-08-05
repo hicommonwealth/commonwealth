@@ -2,10 +2,12 @@ import { delay } from '@hicommonwealth/shared';
 import { config } from '../config';
 import { logger, rollbar } from '../logging';
 import { ExitCode } from './enums';
+import { inMemoryBlobStorage } from './in-memory-blob-storage';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
   AdapterFactory,
   Analytics,
+  BlobStorage,
   Broker,
   Cache,
   Disposable,
@@ -182,6 +184,18 @@ export const broker = port(function broker(broker?: Broker) {
   return broker || successfulInMemoryBroker;
 });
 
+/**
+ * External blob storage port factory
+ */
+export const blobStorage = port(function blobStorage(
+  blobStorage?: BlobStorage,
+) {
+  return blobStorage || inMemoryBlobStorage;
+});
+
+/**
+ * Notifications provider port factory
+ */
 export const notificationsProvider = port(function notificationsProvider(
   notificationsProvider?: NotificationsProvider,
 ) {

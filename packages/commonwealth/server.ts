@@ -3,11 +3,13 @@ import {
   KnockProvider,
   MixpanelAnalytics,
   RedisCache,
+  S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   analytics,
+  blobStorage,
   cache,
   logger,
   notificationsProvider,
@@ -25,6 +27,7 @@ import 'express-async-errors';
 const log = logger(import.meta);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
+blobStorage(S3BlobStorage());
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)

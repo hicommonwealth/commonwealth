@@ -20,6 +20,9 @@
     "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.577.0",
+    "@aws-sdk/lib-storage": "^3.578.0",
+    "@aws-sdk/s3-request-presigner": "^3.577.0",
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "@knocklabs/node": "^0.6.10",

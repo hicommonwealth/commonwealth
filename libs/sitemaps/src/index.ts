@@ -1,4 +1,3 @@
-export * from './createAsyncWriter';
 export * from './createBuffer';
 export * from './createDatabasePaginator';
 export * from './createSitemap';
