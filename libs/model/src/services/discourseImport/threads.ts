@@ -53,7 +53,7 @@ class DiscourseQueries {
   `,
       { type: QueryTypes.SELECT },
     );
-    return result.id;
+    return result?.id || 0;
   };
 }
 

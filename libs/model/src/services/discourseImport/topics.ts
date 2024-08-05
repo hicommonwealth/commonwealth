@@ -40,7 +40,7 @@ class CWQueries {
       },
       defaults: {
         name,
-        description,
+        description: description || '',
         community_id: communityId,
         featured_in_sidebar: true,
         featured_in_new_post: false,
