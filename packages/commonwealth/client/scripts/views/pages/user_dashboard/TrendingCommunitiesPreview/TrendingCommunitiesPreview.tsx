@@ -1,7 +1,8 @@
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
-import useUserStore from 'state/ui/user';
+import { useGetNewContent } from 'state/api/user';
 import Permissions from 'utils/Permissions';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
@@ -9,7 +10,9 @@ import './TrendingCommunitiesPreview.scss';
 
 export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
+  const { isLoggedIn } = useUserLoggedIn();
+
+  const { data } = useGetNewContent({ enabled: isLoggedIn });
 
   const { data: activeCommunities } = useFetchActiveCommunitiesQuery();
 
@@ -31,11 +34,18 @@ export const TrendingCommunitiesPreview = () => {
         monthlyThreadCount: +community.recentThreadsCount,
         isMember,
         // TODO: should we remove the new label once user visits the community? -- ask from product
-        hasUnseenPosts: user.joinedCommunitiesWithNewContent.includes(
+        hasNewContent: (data?.joinedCommunityIdsWithNewContent || []).includes(
           community.id,
         ),
         onClick: () => navigate(`/${community.id}`),
       };
+    })
+    .sort((a, b) => {
+      // display user-joined communities with new content first
+      if (a.hasNewContent) return -1;
+      if (b.hasNewContent) return 1;
+
+      return b.monthlyThreadCount - a.monthlyThreadCount;
     });
 
   return (
@@ -53,7 +63,7 @@ export const TrendingCommunitiesPreview = () => {
             community={sortedCommunity.community}
             monthlyThreadCount={sortedCommunity.monthlyThreadCount}
             isCommunityMember={sortedCommunity.isMember}
-            hasUnseenPosts={sortedCommunity.hasUnseenPosts}
+            hasNewContent={sortedCommunity.hasNewContent}
             onClick={sortedCommunity.onClick}
           />
         ))}

@@ -1,7 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_empty_state.scss';
-
+import React from 'react';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
@@ -11,14 +9,11 @@ type EmptyStateProps = {
   iconName?: IconName;
 };
 
-export const CWEmptyState = (props: EmptyStateProps) => {
-  const { content, iconName } = props;
-
+export const CWEmptyState = ({ content, iconName }: EmptyStateProps) => {
   return (
     <div className="EmptyState">
       <div className="inner-content">
-        {/*@ts-expect-error <StrictNullChecks/>*/}
-        <CWIcon iconName={iconName} iconSize="xl" />
+        {iconName && <CWIcon iconName={iconName} iconSize="xl" />}
         {typeof content === 'string' ? <CWText>{content}</CWText> : content}
       </div>
     </div>
