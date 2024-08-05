@@ -1,5 +1,6 @@
 import { z, ZodError, ZodSchema } from 'zod';
 import {
+  CommandInput,
   InvalidInput,
   type CommandContext,
   type CommandMetadata,
@@ -17,18 +18,17 @@ import {
  * @throws {@link InvalidInput} when user invokes command with invalid payload or attributes, or rethrows internal domain errors
  */
 export const command = async <
-  Input extends ZodSchema,
+  Input extends CommandInput,
   Output extends ZodSchema,
 >(
   { input, auth, body }: CommandMetadata<Input, Output>,
-  { id, actor, payload }: CommandContext<Input>,
+  { actor, payload }: CommandContext<Input>,
   validate = true,
 ): Promise<Partial<z.infer<Output>> | undefined> => {
   try {
     const context: CommandContext<Input> = {
       actor,
       payload: validate ? input.parse(payload) : payload,
-      id,
     };
     let state: Partial<z.infer<Output>> | undefined = undefined;
     for (const fn of auth) {

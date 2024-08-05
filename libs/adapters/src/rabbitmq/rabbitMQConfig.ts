@@ -78,18 +78,9 @@ export function getRabbitMQConfig(
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
-      RascalBindings.NotificationsProviderCommentCreated,
-      RascalBindings.NotificationsProviderChainEventCreated,
-      RascalBindings.NotificationsProviderSnapshotProposalCreated,
-      RascalBindings.NotificationsProviderUserMentioned,
-      RascalBindings.NotificationsProviderPreferencesUpdated,
-      RascalBindings.ContestWorkerPolicyThreadCreated,
-      RascalBindings.ContestWorkerPolicyThreadUpvoted,
-      RascalBindings.ContestProjectionRecurringContestManagerDeployed,
-      RascalBindings.ContestProjectionOneOffContestManagerDeployed,
-      RascalBindings.ContestProjectionContestStarted,
-      RascalBindings.ContestProjectionContestContentAdded,
-      RascalBindings.ContestProjectionContestContentUpvoted,
+      RascalBindings.NotificationsProvider,
+      RascalBindings.ContestWorkerPolicy,
+      RascalBindings.ContestProjection,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,

@@ -1,8 +1,6 @@
 import { InvalidState, logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export const mustExist = <T>(subject: string, state?: T | null): state is T => {
   if (!state) throw new InvalidState(`${subject} must exist`, state);

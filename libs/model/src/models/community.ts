@@ -22,7 +22,6 @@ export type CommunityAttributes = z.infer<typeof Community> & {
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
   thread_count?: number;
-  address_count?: number;
   profile_count?: number;
   count_updated?: boolean;
   communityAlerts?: CommunityAlertAttributes[];
@@ -129,11 +128,6 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
-      address_count: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
       profile_count: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -155,11 +149,6 @@ export default (
       include_in_digest_email: {
         type: Sequelize.BOOLEAN,
         allowNull: true,
-      },
-      count_updated: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
       },
     },
     {

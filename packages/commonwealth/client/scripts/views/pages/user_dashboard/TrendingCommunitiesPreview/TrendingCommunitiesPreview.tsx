@@ -1,8 +1,8 @@
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import { useGetNewContent } from 'client/scripts/state/api/user';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import app from 'state';
+import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import { useGetNewContent } from 'state/api/user';
 import Permissions from 'utils/Permissions';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
@@ -14,8 +14,9 @@ export const TrendingCommunitiesPreview = () => {
 
   const { data } = useGetNewContent({ enabled: isLoggedIn });
 
-  const sortedCommunities = app.config.chains
-    .getAll()
+  const { data: activeCommunities } = useFetchActiveCommunitiesQuery();
+
+  const sortedCommunities = (activeCommunities?.communities || [])
     .filter((community) => {
       const name = community.name.toLowerCase();
       //this filter is meant to not include any de facto communities that are actually xss attempts.
@@ -26,20 +27,16 @@ export const TrendingCommunitiesPreview = () => {
       );
     })
     .map((community) => {
-      const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
-        community.id,
-      );
       const isMember = Permissions.isCommunityMember(community.id);
 
       return {
         community,
-        monthlyThreadCount,
+        monthlyThreadCount: +community.recentThreadsCount,
         isMember,
         // TODO: should we remove the new label once user visits the community? -- ask from product
         hasNewContent: (data?.joinedCommunityIdsWithNewContent || []).includes(
           community.id,
         ),
-        threadCount: app.recentActivity.getCommunityThreadCount(community.id),
         onClick: () => navigate(`/${community.id}`),
       };
     })
@@ -48,7 +45,7 @@ export const TrendingCommunitiesPreview = () => {
       if (a.hasNewContent) return -1;
       if (b.hasNewContent) return 1;
 
-      return b.threadCount - a.threadCount;
+      return b.monthlyThreadCount - a.monthlyThreadCount;
     });
 
   return (

@@ -1,12 +1,9 @@
-import { logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
-import { AsyncWriter } from './createAsyncWriter';
+import { blobStorage, logger } from '@hicommonwealth/core';
 import { Paginator } from './createDatabasePaginator';
 import { createSitemap } from './createSitemap';
 import { createSitemapIndex } from './createSitemapIndex';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export interface SitemapFile {
   readonly location: string;
@@ -22,7 +19,6 @@ export interface SitemapGenerator {
 }
 
 export function createSitemapGenerator(
-  writer: AsyncWriter,
   paginators: ReadonlyArray<Paginator>,
 ): SitemapGenerator {
   async function exec(): Promise<SitemapManifest> {
@@ -42,7 +38,12 @@ export function createSitemapGenerator(
         log.info('Processing N links: ' + page.links.length);
         const sitemap = createSitemap(page.links);
         const sitemapPath = `sitemap-${idx++}.xml`;
-        const res = await writer.write(sitemapPath, sitemap);
+        const res = await blobStorage().upload({
+          key: sitemapPath,
+          bucket: 'sitemap',
+          content: sitemap,
+          contentType: 'text/xml; charset=utf-8',
+        });
         const url = new URL(res.location);
         const location = 'https://' + url.hostname + '/' + sitemapPath;
         log.info(`Wrote sitemap: ${sitemapPath} to location ${location}`);
@@ -55,7 +56,12 @@ export function createSitemapGenerator(
         children.map((current) => current.location),
       );
       const idx_path = `sitemap-index.xml`;
-      const res = await writer.write(idx_path, index);
+      const res = await blobStorage().upload({
+        key: idx_path,
+        bucket: 'sitemap',
+        content: index,
+        contentType: 'text/xml; charset=utf-8',
+      });
       log.info(`Wrote sitemap index ${idx_path} at location: ${res.location}`);
       return { location: res.location };
     }

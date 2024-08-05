@@ -11,10 +11,10 @@ import { seed } from '../../src/tester';
 const chance = Chance();
 
 describe('Group lifecycle', () => {
-  let id: string;
   let actor: Actor;
 
   const payload = {
+    id: '',
     metadata: {
       name: chance.name(),
       description: chance.sentence(),
@@ -38,7 +38,7 @@ describe('Group lifecycle', () => {
       ],
     });
 
-    id = community!.id!;
+    payload.id = community!.id!;
     actor = {
       user: { id: user!.id!, email: user!.email!, isAdmin: user?.isAdmin },
       address_id: community!.Addresses!.at(0)!.address!,
@@ -50,22 +50,22 @@ describe('Group lifecycle', () => {
   });
 
   test('should create group when none exists', async () => {
-    const results = await command(CreateGroup(), { id, actor, payload });
+    const results = await command(CreateGroup(), { actor, payload });
     expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
   });
 
   test('should fail creation when group with same id found', async () => {
     await expect(() =>
-      command(CreateGroup(), { id, actor, payload }),
+      command(CreateGroup(), { actor, payload }),
     ).rejects.toThrow(InvalidState);
   });
 
   test('should fail creation when sending invalid topics', async () => {
     await expect(
       command(CreateGroup(), {
-        id,
         actor,
         payload: {
+          id: payload.id,
           metadata: {
             name: chance.name(),
             description: chance.sentence(),
@@ -82,9 +82,9 @@ describe('Group lifecycle', () => {
     // create max groups
     for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
       await command(CreateGroup(), {
-        id,
         actor,
         payload: {
+          id: payload.id,
           metadata: { name: chance.name(), description: chance.sentence() },
           requirements: [],
           topics: [],
@@ -94,9 +94,9 @@ describe('Group lifecycle', () => {
 
     await expect(() =>
       command(CreateGroup(), {
-        id,
         actor,
         payload: {
+          id: payload.id,
           metadata: { name: chance.name(), description: chance.sentence() },
           requirements: [],
           topics: [],

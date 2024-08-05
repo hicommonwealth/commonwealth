@@ -1,9 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import dgram from 'dgram';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 const server = dgram.createSocket('udp4');
 
 server.on('message', (msg, rinfo) => {
