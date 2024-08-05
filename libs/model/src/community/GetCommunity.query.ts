@@ -15,7 +15,6 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         include.push({
           model: models.ChainNode,
           required: true,
-          // TODO: attributes
         });
       }
 
