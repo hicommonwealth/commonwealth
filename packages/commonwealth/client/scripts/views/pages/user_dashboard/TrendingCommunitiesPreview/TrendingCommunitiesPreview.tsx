@@ -1,7 +1,8 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import app from 'state';
+import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
@@ -10,8 +11,9 @@ export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const sortedCommunities = app.config.chains
-    .getAll()
+  const { data: activeCommunities } = useFetchActiveCommunitiesQuery();
+
+  const sortedCommunities = (activeCommunities?.communities || [])
     .filter((community) => {
       const name = community.name.toLowerCase();
       //this filter is meant to not include any de facto communities that are actually xss attempts.
@@ -21,23 +23,12 @@ export const TrendingCommunitiesPreview = () => {
         !['"', '>', '<', "'", '/', '`'].includes(name[1])
       );
     })
-    .sort((a, b) => {
-      const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
-      const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
-      return threadCountB - threadCountA;
-    })
     .map((community) => {
-      const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
-        community.id,
-      );
-      const isMember = app.roles.isMember({
-        account: user.activeAccount || undefined,
-        community: community.id,
-      });
+      const isMember = Permissions.isCommunityMember(community.id);
 
       return {
         community,
-        monthlyThreadCount,
+        monthlyThreadCount: +community.recentThreadsCount,
         isMember,
         // TODO: should we remove the new label once user visits the community? -- ask from product
         hasUnseenPosts: user.joinedCommunitiesWithNewContent.includes(

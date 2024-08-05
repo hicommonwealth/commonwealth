@@ -18,7 +18,6 @@ export type Aggregates = Extract<
   | 'CommunityAlert'
   | 'Address'
   | 'Topic'
-  | 'Profile'
   | 'CommentSubscription'
   | 'ThreadSubscription'
   | 'Contract'

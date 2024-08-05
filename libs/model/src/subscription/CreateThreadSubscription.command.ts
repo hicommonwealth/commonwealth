@@ -13,7 +13,7 @@ export function CreateThreadSubscription(): Command<
       const { 0: subscription } = await models.ThreadSubscription.findOrCreate({
         where: {
           user_id: actor.user.id!,
-          ...payload,
+          thread_id: payload.thread_id,
         },
       });
       return subscription.get({ plain: true });

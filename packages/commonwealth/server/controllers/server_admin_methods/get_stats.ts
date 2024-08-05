@@ -110,9 +110,9 @@ export async function __getStats(
     ),
     this.models.sequelize.query<{ result: number }>(
       `
-      SELECT AVG(address_count) as result
+      SELECT AVG(profile_count) as result
       FROM (
-          SELECT "Communities".id, COUNT("Addresses".id) as address_count
+          SELECT "Communities".id, COUNT("Addresses".id) as profile_count
           FROM "Communities"
           JOIN "Addresses" ON "Addresses".community_id = "Communities".id
           GROUP BY "Communities".id

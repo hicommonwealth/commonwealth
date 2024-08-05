@@ -57,7 +57,7 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
       } else {
         const user = await models.sequelize.transaction(async (transaction) => {
-          const userEntity = await models.User.createWithProfile?.(
+          const userEntity = await models.User.create(
             {
               email: null,
               profile: {},
@@ -93,6 +93,12 @@ const verifySessionSignature = async (
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     addressModel.user_id = user_id;
+    await incrementProfileCount(
+      models,
+      addressModel.community_id!,
+      user_id,
+      undefined,
+    );
   }
   await addressModel.save();
 };

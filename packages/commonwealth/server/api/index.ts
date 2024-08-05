@@ -11,12 +11,14 @@ import * as integrations from './integrations';
 import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as thread from './threads';
+import * as user from './user';
 import * as wallet from './wallet';
 
 /**
  * API v1 - tRPC Router
  */
 const artifacts = {
+  user: user.trpcRouter,
   community: community.trpcRouter,
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,

@@ -4,6 +4,7 @@ import { PG_INT } from '../utils';
 
 export const CreateGroup = {
   input: z.object({
+    id: z.string(),
     metadata: z.object({
       name: z.string(),
       description: z.string(),

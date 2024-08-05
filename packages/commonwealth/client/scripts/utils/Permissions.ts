@@ -1,5 +1,5 @@
+import { Role } from '@hicommonwealth/shared';
 import app from 'state';
-import Account from '../models/Account';
 import Thread from '../models/Thread';
 import { userStore } from '../state/ui/user';
 
@@ -16,36 +16,36 @@ const isSiteAdmin = () => {
   );
 };
 
-const isCommunityMember = (communityId?: string) => {
-  return (
-    app.roles.getAllRolesInCommunity({
-      community: communityId || app.activeChainId(),
-    }).length > 0
-  );
+const isCommunityMember = (communityId = app.activeChainId()) => {
+  if (!communityId) {
+    return false;
+  }
+  return userStore
+    .getState()
+    .addresses.some(({ community }) => community.id === communityId);
 };
 
-const isCommunityAdmin = (account?: Account, communityId?: string) => {
-  return (
-    (userStore.getState().activeAccount ||
-      userStore.getState().addresses?.length > 0) &&
-    app.roles.isRoleOfCommunity({
-      role: ROLES.ADMIN,
-      community: communityId || app.activeChainId(),
-      ...(account && { account }),
-    })
-  );
+const isCommunityRole = (adminOrMod: Role, communityId?: string) => {
+  const chainInfo = communityId
+    ? app.config.chains.getById(communityId)
+    : app.chain?.meta;
+  if (!chainInfo) return false;
+  return userStore.getState().addresses.some(({ community, address }) => {
+    return (
+      community.id === chainInfo.id &&
+      chainInfo.adminsAndMods.some(
+        (role) => role.address === address && role.role === adminOrMod,
+      )
+    );
+  });
 };
 
-const isCommunityModerator = (account?: Account, communityId?: string) => {
-  return (
-    (userStore.getState().activeAccount ||
-      userStore.getState().addresses?.length > 0) &&
-    app.roles.isRoleOfCommunity({
-      role: ROLES.MODERATOR,
-      community: communityId || app.activeChainId(),
-      ...(account && { account }),
-    })
-  );
+const isCommunityAdmin = (communityId?: string) => {
+  return isCommunityRole('admin', communityId);
+};
+
+const isCommunityModerator = (communityId?: string) => {
+  return isCommunityRole('moderator', communityId);
 };
 
 const isThreadCollaborator = (thread: Thread) => {

@@ -3,10 +3,8 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 /**
  * This function maps fields from the different notification data objects to Subscription model fields. It returns an

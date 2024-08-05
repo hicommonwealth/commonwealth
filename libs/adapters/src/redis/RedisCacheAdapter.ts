@@ -6,7 +6,6 @@ import {
 } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
-import { fileURLToPath } from 'url';
 
 const CONNECT_TIMEOUT = 5000;
 
@@ -49,8 +48,7 @@ export class RedisCache implements Cache {
       };
     }
 
-    const __filename = fileURLToPath(import.meta.url);
-    this._log = logger(__filename);
+    this._log = logger(import.meta);
     this._log.info(`Connecting to Redis at: ${redis_url}`);
     this._client = createClient(redisOptions) as RedisClientType;
 

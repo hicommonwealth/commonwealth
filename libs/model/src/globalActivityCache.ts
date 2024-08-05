@@ -1,6 +1,5 @@
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { DB } from './models/index';
 
@@ -10,7 +9,7 @@ export async function getActivityFeed(models: DB, id = 0) {
    */
   const query = `
       WITH 
-      user_communities AS (SELECT community_id FROM "Addresses" WHERE user_id = :id),
+      user_communities AS (SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = :id),
       top_threads AS (
           SELECT T.*
           FROM "Threads" T
@@ -105,8 +104,7 @@ export async function getActivityFeed(models: DB, id = 0) {
   return threads;
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export class GlobalActivityCache {
   private _cacheKey = 'global_activity';

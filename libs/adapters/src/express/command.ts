@@ -1,7 +1,7 @@
 import type { CommandMetadata, User } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { ZodSchema, z } from 'zod';
+import { ZodSchema } from 'zod';
 
 /**
  * Adapts commands to express handlers
@@ -12,24 +12,15 @@ import { ZodSchema, z } from 'zod';
  * @returns express command handler
  */
 export const command =
-  <Input extends ZodSchema, Output extends ZodSchema>(
+  <Input extends core.CommandInput, Output extends ZodSchema>(
     md: CommandMetadata<Input, Output>,
   ): RequestHandler =>
-  async (
-    req: Request<
-      z.infer<Input> & {
-        id?: string;
-        address_id?: string;
-      }
-    >,
-    res: Response<Partial<z.infer<Output>> | undefined>,
-    next: NextFunction,
-  ) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { address_id, ...body } = req.body;
       const results = await core.command(md, {
-        id: req.params.id,
-        actor: { user: req.user as User, address_id: req.body.address_id },
-        payload: req.body,
+        actor: { user: req.user as User, address_id },
+        payload: { ...body, id: req.params.id ?? body.id },
       });
       return res.json(results);
     } catch (error) {

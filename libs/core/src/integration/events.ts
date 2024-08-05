@@ -1,4 +1,7 @@
 import * as events from './events.schemas';
+
+// TODO: All usages of this should be replaced by the EventNames enum - exporting all by default causes issues
+//  when non-event schemas are added to the schema i.e. this is an implicit export and EventNames makes it explicit
 export type Events = keyof typeof events;
 export { events };
 

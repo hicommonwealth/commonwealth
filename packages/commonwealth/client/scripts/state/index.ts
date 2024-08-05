@@ -1,7 +1,5 @@
-import { CommunityCategoryType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
-import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
@@ -10,7 +8,6 @@ import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
-import { RolesController } from 'controllers/server/roles';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
@@ -62,8 +59,6 @@ export interface IApp {
 
   // User
   user: UserController;
-  roles: RolesController;
-  recentActivity: RecentActivityController;
 
   // Web3
   snapshot: SnapshotController;
@@ -76,8 +71,6 @@ export interface IApp {
   // stored on server-side
   config: {
     chains: ChainStore;
-    // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
-    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
@@ -95,14 +88,10 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
-
-  // bandaid fix to skip next deinit chain on layout.tsx transition
-  skipDeinitChain: boolean;
 }
 
 // INJECT DEPENDENCIES
 const user = new UserController();
-const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
@@ -132,8 +121,6 @@ const app: IApp = {
 
   // User
   user,
-  roles,
-  recentActivity: new RecentActivityController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
 
@@ -162,7 +149,6 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
-  skipDeinitChain: false,
 };
 //allows for FS.identify to be used
 declare const window: any;
@@ -212,15 +198,6 @@ export async function initAppState(
           });
         }
       });
-
-    app.roles.setRoles(statusRes.result.roles);
-    app.config.chainCategoryMap = statusRes.result.communityCategoryMap;
-
-    // add recentActivity
-    const { recentThreads } = statusRes.result;
-    recentThreads.forEach(({ communityId, count }) => {
-      app.recentActivity.setCommunityThreadCounts(communityId, count);
-    });
 
     // update the login status
     updateActiveUser(statusRes.result.user);

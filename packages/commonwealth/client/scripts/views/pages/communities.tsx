@@ -8,7 +8,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
-import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
@@ -37,7 +36,6 @@ const buildCommunityString = (numCommunities: number) =>
     ? `${numeral(numCommunities).format('0.0a')} Communities`
     : `${numCommunities} Communities`;
 
-const communityToCategoriesMap = app.config.chainCategoryMap;
 // Handle mapping provided by ChainCategories table
 const communityCategories = Object.values(CommunityCategoryType);
 const communityNetworks = Object.keys(ChainNetwork).filter(
@@ -119,23 +117,10 @@ const CommunitiesPage = () => {
     });
   };
 
-  const communityCategoryFilter = (list) => {
-    return list.filter((data) => {
-      for (const cat of communityCategories) {
-        if (
-          filterMap[cat] &&
-          // @ts-expect-error <StrictNullChecks/>
-          (!communityToCategoriesMap[data.id] ||
-            // @ts-expect-error <StrictNullChecks/>
-            !communityToCategoriesMap[data.id].includes(
-              cat as CommunityCategoryType,
-            ))
-        ) {
-          return false;
-        }
-      }
-      return true;
-    });
+  const communityCategoryFilter = (communities: ChainInfo[]) => {
+    return communities.filter((community) =>
+      community.CommunityTags.some((tag) => filterMap[tag.name] === true),
+    );
   };
 
   const sortCommunities = (list: CommunityInfo[]) => {
@@ -183,32 +168,26 @@ const CommunitiesPage = () => {
           );
 
     // Filter by recent thread activity
-    const res = filteredList
-      .sort((a, b) => {
-        const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
-        const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
-        return threadCountB - threadCountA;
-      })
-      .map((community: CommunityInfo, i) => {
-        // allow user to buy stake if they have a connected address that matches this community's base chain
-        const canBuyStake = !!user.addresses.find?.(
-          (address) => address?.community?.base === community?.base,
-        );
+    const res = filteredList.map((community: CommunityInfo, i) => {
+      // allow user to buy stake if they have a connected address that matches this community's base chain
+      const canBuyStake = !!user.addresses.find?.(
+        (address) => address?.community?.base === community?.base,
+      );
 
-        return (
-          <CWRelatedCommunityCard
-            key={i}
-            community={community}
-            memberCount={community.addressCount}
-            threadCount={community.threadCount}
-            canBuyStake={canBuyStake}
-            onStakeBtnClick={() => setSelectedCommunity(community)}
-            ethUsdRate={ethUsdRate}
-            historicalPrice={historicalPriceMap?.get(community.id)}
-            onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
-          />
-        );
-      });
+      return (
+        <CWRelatedCommunityCard
+          key={i}
+          community={community}
+          memberCount={community.profileCount}
+          threadCount={community.threadCount}
+          canBuyStake={canBuyStake}
+          onStakeBtnClick={() => setSelectedCommunity(community)}
+          ethUsdRate={ethUsdRate}
+          historicalPrice={historicalPriceMap?.get(community.id)}
+          onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
+        />
+      );
+    });
 
     return res;
   };

@@ -22,12 +22,10 @@ import {
   type OpenApiMeta,
   type OpenApiRouter,
 } from 'trpc-openapi';
-import { fileURLToPath } from 'url';
-import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
+import { ZodSchema, ZodUndefined, z } from 'zod';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export interface Context {
   req: Request;
@@ -127,7 +125,10 @@ export enum Tag {
   LoadTest = 'LoadTest',
 }
 
-export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
+export const command = <
+  Input extends core.CommandInput,
+  Output extends ZodSchema,
+>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
 ) => {
@@ -142,7 +143,7 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
         protect: md.secure,
       },
     })
-    .input(md.input.extend({ id: z.string() })) // this might cause client typing issues
+    .input(md.input)
     .output(md.output)
     .mutation(async ({ ctx, input }) => {
       // md.secure must explicitly be false if the route requires no authentication
@@ -153,7 +154,6 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
         return await core.command(
           md,
           {
-            id: input?.id,
             actor: {
               user: ctx.req.user as core.User,
               // TODO: get from JWT?

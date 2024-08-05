@@ -48,7 +48,6 @@ const generateSchemas = async () => {
     ignore_columns: {
       // Missing in model - migrations with backups
       Comments: ['body_backup', 'text_backup', 'root_id', '_search'],
-      Profiles: ['bio_backup', 'profile_name_backup'],
       Threads: ['body_backup', '_search'],
       Topics: ['default_offchain_template_backup'],
       GroupPermissions: ['allowed_actions'],

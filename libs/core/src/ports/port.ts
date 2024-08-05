@@ -1,11 +1,13 @@
-import { fileURLToPath } from 'url';
+import { delay } from '@hicommonwealth/shared';
 import { config } from '../config';
 import { logger, rollbar } from '../logging';
 import { ExitCode } from './enums';
+import { inMemoryBlobStorage } from './in-memory-blob-storage';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
   AdapterFactory,
   Analytics,
+  BlobStorage,
   Broker,
   Cache,
   Disposable,
@@ -15,8 +17,7 @@ import {
   Stats,
 } from './interfaces';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 /**
  * Map of disposable adapter instances
@@ -55,8 +56,10 @@ const disposeAndExit = async (
   forceExit: boolean = false,
 ): Promise<void> => {
   // don't kill process when errors are caught in production
-  if (code === 'ERROR' && config.NODE_ENV === 'production' && !forceExit)
-    return;
+  if (code === 'ERROR' && config.NODE_ENV === 'production') {
+    if (forceExit) await delay(1_000);
+    else return;
+  }
 
   // call disposers
   await Promise.all(disposers.map((disposer) => disposer()));
@@ -181,6 +184,18 @@ export const broker = port(function broker(broker?: Broker) {
   return broker || successfulInMemoryBroker;
 });
 
+/**
+ * External blob storage port factory
+ */
+export const blobStorage = port(function blobStorage(
+  blobStorage?: BlobStorage,
+) {
+  return blobStorage || inMemoryBlobStorage;
+});
+
+/**
+ * Notifications provider port factory
+ */
 export const notificationsProvider = port(function notificationsProvider(
   notificationsProvider?: NotificationsProvider,
 ) {

@@ -1,7 +1,6 @@
 import { HotShotsStats } from '@hicommonwealth/adapters';
 import { dispose, logger, stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -13,8 +12,7 @@ import {
   filterProposals,
 } from './util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 /**
  * Entry-point to generate Cosmos proposal notifications. Uses a polling scheme to fetch created proposals.

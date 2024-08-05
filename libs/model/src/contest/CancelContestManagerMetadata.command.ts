@@ -10,10 +10,10 @@ export function CancelContestManagerMetadata(): Command<
   return {
     ...schemas.CancelContestManagerMetadata,
     auth: [isCommunityAdmin],
-    body: async ({ id, payload }) => {
+    body: async ({ payload }) => {
       const contestManager = await models.ContestManager.findOne({
         where: {
-          community_id: id,
+          community_id: payload.id,
           contest_address: payload.contest_address,
         },
       });

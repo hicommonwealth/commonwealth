@@ -7,8 +7,10 @@ export function CreateComment(): Command<typeof schemas.CreateTodo> {
   return {
     ...schemas.CreateTodo,
     auth: [],
-    body: async ({ id, payload }) => {
-      const comment = await models.Comment.findOne({ where: { id } });
+    body: async ({ payload }) => {
+      const comment = await models.Comment.findOne({
+        where: { id: payload.id },
+      });
 
       mustNotExist('Comment', comment);
 

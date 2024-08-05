@@ -10,12 +10,10 @@ import {
   slugify,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { WebhookDestinations } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export const REGEX_IMAGE =
   /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
