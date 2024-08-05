@@ -1,12 +1,12 @@
-import { HotShotsStats } from '@hicommonwealth/adapters';
-import { dispose, logger, stats } from '@hicommonwealth/core';
+import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
 import {
-  createAsyncWriterS3,
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
 
 const log = logger(import.meta);
+blobStorage(S3BlobStorage());
 
 async function doExec() {
   if (process.env.SITEMAP_ENV !== 'production') {
@@ -24,11 +24,10 @@ async function doExec() {
   stats(HotShotsStats()).increment('cw.scheduler.email-digest');
 
   log.info('Creating writer... ');
-  const writer = createAsyncWriterS3();
   log.info('Creating paginator... ');
   const paginator = createDatabasePaginatorDefault();
 
-  const { index } = await createSitemapGenerator(writer, [
+  const { index } = await createSitemapGenerator([
     paginator.threads,
     paginator.profiles,
   ]).exec();
