@@ -68,10 +68,8 @@ describe('CommentCreated Event Handler', () => {
     });
 
     [thread] = await tester.seed('Thread', {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[1].id,
+      community_id: community!.id!,
+      address_id: community!.Addresses![1].id,
       topic_id: null,
       deleted_at: null,
       read_only: false,
@@ -80,23 +78,14 @@ describe('CommentCreated Event Handler', () => {
     });
     [rootComment] = await tester.seed('Comment', {
       parent_id: null,
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      thread_id: thread.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[0].id,
+      thread_id: thread!.id!,
+      address_id: community!.Addresses![0].id,
       deleted_at: null,
     });
     [replyComment] = await tester.seed('Comment', {
-      // @ts-expect-error StrictNullChecks
-      parent_id: String(rootComment.id),
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      thread_id: thread.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[0].id,
+      parent_id: String(rootComment!.id),
+      thread_id: thread!.id!,
+      address_id: community!.Addresses![0].id,
       deleted_at: null,
     });
   });
@@ -164,7 +153,7 @@ describe('CommentCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
-    await tester.seed('ThreadSubscription', {
+    const a = await tester.seed('ThreadSubscription', {
       // @ts-expect-error StrictNullChecks
       user_id: subscriber.id,
       // @ts-expect-error StrictNullChecks
@@ -173,7 +162,7 @@ describe('CommentCreated Event Handler', () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       // @ts-expect-error StrictNullChecks
-      payload: { ...rootComment },
+      payload: { ...rootComment, community_id: community.id },
     });
     expect(
       res,
@@ -195,11 +184,11 @@ describe('CommentCreated Event Handler', () => {
         community_name: community?.name,
         comment_body: rootComment?.text.substring(0, 255),
         comment_url: getCommentUrl(
-          community?.id ?? '',
-          thread?.id ?? 0,
-          rootComment?.id ?? 0,
+          community!.id!,
+          thread!.id!,
+          rootComment!.id!,
         ),
-        comment_created_event: rootComment,
+        comment_created_event: { ...rootComment, community_id: community!.id },
       },
       // @ts-expect-error StrictNullChecks
       actor: { id: String(author.id) },
@@ -219,7 +208,7 @@ describe('CommentCreated Event Handler', () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       // @ts-expect-error StrictNullChecks
-      payload: { ...replyComment },
+      payload: { ...replyComment, community_id: community.id },
     });
     expect(
       res,
@@ -241,11 +230,11 @@ describe('CommentCreated Event Handler', () => {
         community_name: community?.name,
         comment_body: replyComment?.text.substring(0, 255),
         comment_url: getCommentUrl(
-          community?.id ?? '',
-          thread?.id ?? 0,
-          replyComment?.id ?? 0,
+          community!.id!,
+          thread!.id!,
+          replyComment!.id!,
         ),
-        comment_created_event: replyComment,
+        comment_created_event: { ...replyComment, community_id: community!.id },
       },
       // @ts-expect-error StrictNullChecks
       actor: { id: String(author.id) },
@@ -267,7 +256,7 @@ describe('CommentCreated Event Handler', () => {
       processCommentCreated({
         name: EventNames.CommentCreated,
         // @ts-expect-error StrictNullChecks
-        payload: { ...rootComment },
+        payload: { ...rootComment, community_id: community.id },
       }),
     ).to.eventually.be.rejectedWith(ProviderError);
   });

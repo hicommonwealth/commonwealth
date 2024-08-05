@@ -211,4 +211,15 @@ export const buildAssociations = (db: DB) => {
       hooks: true,
     },
   );
+
+  // subscriptions
+  db.Subscription.belongsTo(db.Community, {
+    foreignKey: 'community_id',
+  });
+  db.Subscription.belongsTo(db.Thread, {
+    foreignKey: 'thread_id',
+  });
+  db.Subscription.belongsTo(db.Comment, {
+    foreignKey: 'comment_id',
+  });
 };
