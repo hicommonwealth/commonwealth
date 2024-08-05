@@ -21,7 +21,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { ContestType } from 'views/pages/CommunityManagement/Contests/AdminContestsPage';
+import { ContestType } from 'views/pages/CommunityManagement/Contests/types';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
 import { CONTEST_FAQ_URL } from '../../../utils';

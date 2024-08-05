@@ -1,4 +1,3 @@
-import AdminContestsPage, { ContestType } from './AdminContestsPage';
+import AdminContestsPage from './AdminContestsPage';
 
-export { ContestType };
 export default AdminContestsPage;

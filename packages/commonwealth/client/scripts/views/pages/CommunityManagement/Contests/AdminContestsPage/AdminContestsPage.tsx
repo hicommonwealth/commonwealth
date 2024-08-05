@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 
 import commonUrl from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
+import useAppStatus from 'hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
 import app from 'state';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import Permissions from 'utils/Permissions';
@@ -11,29 +18,14 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
-
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
-import useAppStatus from 'hooks/useAppStatus';
-import { useFlag } from 'hooks/useFlag';
-import {
-  BaseMixpanelPayload,
-  MixpanelContestEvents,
-} from 'shared/analytics/types';
 import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
+
 import ContestsList from '../ContestsList';
+import { ContestType, ContestView } from '../types';
 import useCommunityContests from '../useCommunityContests';
-import './AdminContestsPage.scss';
 import FeeManagerBanner from './FeeManagerBanner';
 
-enum ContestView {
-  List = 'List',
-  TypeSelection = 'TypeSelection',
-}
-
-export enum ContestType {
-  Common = 'Common',
-  Farcaster = 'Farcaster',
-}
+import './AdminContestsPage.scss';
 
 const AdminContestsPage = () => {
   const farcasterContestEnabled = useFlag('farcasterContest');
