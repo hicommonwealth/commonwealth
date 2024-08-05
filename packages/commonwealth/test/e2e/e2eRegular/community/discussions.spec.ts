@@ -17,15 +17,16 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Test community discussions page', () => {
-  testPageCrash('http://localhost:8080/dydx/proposal/discussion/:identifier');
-
+  // shouldn't crash even when url params are invalid or data relevant to those params is non-existant
+  testPageCrash(
+    'http://localhost:8080/dydx/proposal/discussion/non-existant-thread-path',
+  );
   testPageCrash('http://localhost:8080/dydx/discussions');
-
-  testPageCrash('http://localhost:8080/dydx/discussions/:topicName');
-
-  testPageCrash('http://localhost:8080/dydx/discussion/:identifier');
-
-  testPageCrash('http://localhost:8080/discussion/:identifier');
+  testPageCrash('http://localhost:8080/dydx/discussions/non-existant-topis');
+  testPageCrash(
+    'http://localhost:8080/dydx/discussion/non-existant-thread-path',
+  );
+  testPageCrash('http://localhost:8080/discussion/non-existant-thread-path');
 
   discussionTests(test);
 });
