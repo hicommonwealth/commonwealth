@@ -4,7 +4,11 @@
     "rootDir": ".",
     "outDir": "build"
   },
-  "include": ["src", "scripts/releasePhaseEnvCheck.ts"],
+  "include": [
+    "src",
+    "scripts/releasePhaseEnvCheck.ts",
+    "scripts/purgeCloudflareCache.ts"
+  ],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
     { "path": "../../libs/core/tsconfig.build.json" },
