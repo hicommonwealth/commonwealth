@@ -1,8 +1,16 @@
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { CommunityMember, CommunityStake } from '../entities';
+import { Community, CommunityMember, CommunityStake } from '../entities';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+
+export const GetCommunity = {
+  input: z.object({
+    id: z.string(),
+    include_node_info: z.boolean().optional(),
+  }),
+  output: Community.optional(),
+};
 
 export const GetCommunityStake = {
   input: z.object({
