@@ -21,8 +21,12 @@ const s3Buckets: Record<BlobBucket, string> =
         sitemap: 'sitemap.commonwealth.im',
       };
 
-function formatS3Url(data: CompleteMultipartUploadCommandOutput) {
-  return config.APP_ENV === 'local'
+function formatS3Url(
+  bucket: BlobBucket,
+  data: CompleteMultipartUploadCommandOutput,
+) {
+  // TODO: Consider moving blob mappings and cdn rules to config (.env)
+  return config.APP_ENV === 'local' || bucket === 'archives'
     ? `https://s3.amazonaws.com/${data.Bucket}/${data.Key}`
     : `https://${data.Bucket}/${data.Key}`;
 }
@@ -51,7 +55,7 @@ export const S3BlobStorage = (): BlobStorage => {
 
       return {
         location: data.Location,
-        url: formatS3Url(data),
+        url: formatS3Url(bucket, data),
       };
     },
 
