@@ -8,6 +8,7 @@ import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -56,11 +57,16 @@ export const AdminOnboardingSlider = () => {
 
   const navigate = useCommonNavigate();
 
-  const community = app.config.chains.getById(app.activeChainId());
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
+
   const integrations = {
-    snapshot: community?.snapshot?.length > 0,
-    discordBot: community?.discordConfigId !== null,
-    discordBotWebhooksEnabled: community?.discordBotWebhooksEnabled,
+    snapshot: (community?.snapshot_spaces || [])?.length > 0,
+    discordBot: community?.discord_config_id !== null,
+    discordBotWebhooksEnabled: community?.discord_bot_webhooks_enabled,
   };
   const hasAnyIntegration =
     integrations.snapshot ||
@@ -117,6 +123,7 @@ export const AdminOnboardingSlider = () => {
 
   const isSliderHidden =
     !app.activeChainId() ||
+    isLoadingCommunity ||
     isContestDataLoading ||
     isLoadingTopics ||
     isLoadingGroups ||
