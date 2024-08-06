@@ -22,11 +22,11 @@ import { UserGallery } from '../../components/user/user_gallery';
 import { getBatchNotificationFields } from './helpers';
 import type { NotificationRowProps } from './notification_row';
 
-export const ChainEventNotificationRow = (
-  props: Omit<NotificationRowProps, 'allRead'>,
-) => {
-  const { notification, onListPage } = props;
-
+export const ChainEventNotificationRow = ({
+  notification,
+  communityName,
+  onListPage,
+}: Omit<NotificationRowProps, 'allRead'>) => {
   const navigate = useCommonNavigate();
 
   if (!notification.chainEvent) {
@@ -45,8 +45,6 @@ export const ChainEventNotificationRow = (
     network: notification.chainEvent.network,
     data: notification.chainEvent.data,
   };
-
-  const communityName = app.config.chains.getById(communityId)?.name;
 
   let label: IEventLabel | undefined;
   try {
