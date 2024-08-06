@@ -1,5 +1,12 @@
-import { Actor, InvalidState, command, dispose } from '@hicommonwealth/core';
+import {
+  Actor,
+  InvalidState,
+  command,
+  dispose,
+  query,
+} from '@hicommonwealth/core';
 import { Chance } from 'chance';
+import { GetCommunities } from 'model/src/community';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateGroup,
@@ -49,9 +56,23 @@ describe('Group lifecycle', () => {
     await dispose()();
   });
 
+  test('should fail to query community via has_groups when none exists', async () => {
+    const communityResults = await query(GetCommunities(), {
+      actor,
+      payload: { has_groups: true, cursor: 1, limit: 10 },
+    });
+    // TODO: confirm output
+  });
+
   test('should create group when none exists', async () => {
     const results = await command(CreateGroup(), { actor, payload });
     expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
+
+    const communityResults = await query(GetCommunities(), {
+      actor,
+      payload: { has_groups: true, cursor: 1, limit: 10 },
+    });
+    // TODO: confirm output
   });
 
   test('should fail creation when group with same id found', async () => {

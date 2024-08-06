@@ -1,6 +1,6 @@
-import { type Query } from '@hicommonwealth/core';
+import { InvalidState, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Includeable, Op, WhereOptions } from 'sequelize';
+import { Includeable, Op, OrderItem, WhereOptions } from 'sequelize';
 import { models } from '../database';
 import { CommunityAttributes } from '../models';
 
@@ -22,13 +22,22 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         order_by,
         order_direction,
       } = payload;
+      if (
+        order_by &&
+        order_by !== 'profile_count' &&
+        order_by !== 'thread_count'
+      ) {
+        throw new InvalidState(
+          'Invalid ordering: must be profile_count or thread_count.',
+        );
+      }
 
-      const includeOptions: Includeable[] = [];
-      const whereOptions: WhereOptions<CommunityAttributes> = { active: true };
+      const include: Includeable[] = [];
+      const where: WhereOptions<CommunityAttributes> = { active: true };
 
       // group configuration
       if (has_groups) {
-        includeOptions.push({
+        include.push({
           model: models.Group,
           as: 'groups',
           required: true,
@@ -37,7 +46,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
 
       // tag configuration
       if (tag_ids && tag_ids.length > 0) {
-        includeOptions.push({
+        include.push({
           model: models.CommunityTags,
           include: [
             {
@@ -52,7 +61,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           required: true,
         });
       } else {
-        includeOptions.push({
+        include.push({
           model: models.CommunityTags,
           include: [
             {
@@ -64,44 +73,52 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
 
       // stake configuration
       if (stake_enabled) {
-        includeOptions.push({
+        include.push({
           model: models.CommunityStake,
           where: { stakeEnabled: true },
           required: true,
         });
       } else {
-        includeOptions.push({
+        include.push({
           model: models.CommunityStake,
         });
       }
 
       // node configuration
       if (include_node_info) {
-        includeOptions.push({
+        include.push({
           model: models.ChainNode,
         });
       }
 
       // base configuration
       if (base) {
-        whereOptions['base'] = base;
+        where['base'] = base;
       }
 
-      // query
+      // pagination configuration
+      const direction = order_direction || 'DESC';
+      const order: OrderItem[] = [[order_by || 'profile_count', direction]];
       const offset = limit * (cursor - 1);
+
+      // execute query
       const { rows: communities, count } =
         await models.Community.findAndCountAll({
-          where: whereOptions,
-          include: includeOptions,
+          where,
+          include,
           limit,
           offset,
-          order: [[order_by, order_direction || 'ASC']],
+          order,
         });
 
-      return schemas.buildPaginatedResponse(communities, count, {
-        limit,
-        offset,
-      });
+      return schemas.buildPaginatedResponse(
+        communities.map((c) => c.toJSON()),
+        count,
+        {
+          limit,
+          offset,
+        },
+      );
     },
   };
 }
