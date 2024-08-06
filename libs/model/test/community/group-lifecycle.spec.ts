@@ -59,9 +59,9 @@ describe('Group lifecycle', () => {
   test('should fail to query community via has_groups when none exists', async () => {
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { has_groups: true, cursor: 1, limit: 10 },
+      payload: { has_groups: true },
     });
-    // TODO: confirm output
+    expect(communityResults?.results).to.have.length(0);
   });
 
   test('should create group when none exists', async () => {
@@ -70,9 +70,9 @@ describe('Group lifecycle', () => {
 
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { has_groups: true, cursor: 1, limit: 10 },
+      payload: { has_groups: true },
     });
-    // TODO: confirm output
+    expect(communityResults?.results?.at(0)?.id).to.equal(payload.id);
   });
 
   test('should fail creation when group with same id found', async () => {
