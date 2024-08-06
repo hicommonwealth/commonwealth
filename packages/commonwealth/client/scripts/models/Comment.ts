@@ -37,6 +37,7 @@ export class Comment<T extends IUniqueId> {
     id,
     text,
     author,
+    community_id,
     Address,
     Thread,
     thread_id,
@@ -74,7 +75,7 @@ export class Comment<T extends IUniqueId> {
         })
       : [];
 
-    this.communityId = Thread.community_id;
+    this.communityId = community_id ?? Thread.community_id;
     this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
