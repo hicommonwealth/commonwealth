@@ -141,7 +141,7 @@ export async function __createCommentReaction(
         throw new AppError(Errors.MustHaveStake);
       }
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalances[address.address],
+        stakeBalance,
         voteWeight,
       );
     }

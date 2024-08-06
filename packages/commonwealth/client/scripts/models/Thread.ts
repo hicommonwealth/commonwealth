@@ -137,7 +137,7 @@ function processAssociatedReactions(
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
         updated_at: tempReactionTimestamps[i],
-        voting_weight: tempReactionWeights[i] || 1,
+        voting_weight: tempReactionWeights[i] || 0,
         reactedProfileName: emptyStringToNull(reactedProfileName?.[i]),
         reactedProfileAvatarUrl: emptyStringToNull(
           reactedProfileAvatarUrl?.[i],

@@ -1,6 +1,7 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { signCommentReaction } from 'controllers/server/sessions';
 import Reaction from 'models/Reaction';
 import app from 'state';
@@ -87,7 +88,14 @@ const useCreateCommentReactionMutation = ({
 
       return reaction;
     },
-    onError: (error) => checkForSessionKeyRevalidationErrors(error),
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.data?.error?.toLowerCase().includes('stake')) {
+          notifyError('Buy stake in community to upvote comments');
+        }
+      }
+      return checkForSessionKeyRevalidationErrors(error);
+    },
   });
 };
 
