@@ -2,7 +2,7 @@ import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Includeable, Op, WhereOptions } from 'sequelize';
 import { models } from '../database';
-import { CommunityAttributes, CommunityTagsAttributes } from '../models';
+import { CommunityAttributes } from '../models';
 
 export function GetCommunities(): Query<typeof schemas.GetCommunities> {
   return {
@@ -10,6 +10,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
+      // TODO: constrain order_by
       const {
         base,
         tag_ids,
@@ -86,31 +87,21 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         whereOptions['base'] = base;
       }
 
-      // pagination configuration
-      // TODO
-
       // query
-      const communities = await models.Community.findAll({
-        where: whereOptions,
-        include: includeOptions,
+      const offset = limit * (cursor - 1);
+      const { rows: communities, count } =
+        await models.Community.findAndCountAll({
+          where: whereOptions,
+          include: includeOptions,
+          limit,
+          offset,
+          order: [[order_by, order_direction || 'ASC']],
+        });
+
+      return schemas.buildPaginatedResponse(communities, count, {
+        limit,
+        offset,
       });
-
-      const communitiesResult: Array<typeof schemas.Community> =
-        communities.map((c: CommunityAttributes) => ({
-          ...c,
-          CommunityTags: (
-            (c.CommunityTags || []) as CommunityTagsAttributes[]
-          ).map((ct) => ({ id: ct!.Tag!.id, name: ct!.Tag!.name })),
-        }));
-
-      return schemas.buildPaginatedResponse(
-        communitiesResult,
-        0, // total results TODO
-        {
-          limit: 0, // TODO
-          offset: 0, // TODO
-        },
-      );
     },
   };
 }
