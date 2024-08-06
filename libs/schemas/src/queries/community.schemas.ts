@@ -1,8 +1,25 @@
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Community, CommunityMember, CommunityStake } from '../entities';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+
+export const GetCommunities = {
+  input: PaginationParamsSchema.extend({
+    base: z.nativeEnum(ChainBase).optional(),
+    tag_ids: z.array(PG_INT).optional(),
+    include_node_info: z.boolean().optional(),
+    stake_enabled: z.boolean().optional(),
+    has_groups: z.boolean().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: Community.array(),
+  }),
+};
 
 export const GetCommunity = {
   input: z.object({

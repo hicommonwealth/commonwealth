@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import { TagsAttributes } from './tags';
 import type { ModelInstance } from './types';
 
 export type CommunityTagsAttributes = {
@@ -7,6 +8,7 @@ export type CommunityTagsAttributes = {
   tag_id: number;
   created_at?: Date;
   updated_at?: Date;
+  Tag?: TagsAttributes;
 };
 
 export type CommunityTagsInstance = ModelInstance<CommunityTagsAttributes>;
