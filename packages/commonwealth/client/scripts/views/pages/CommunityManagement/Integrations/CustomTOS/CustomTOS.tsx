@@ -1,7 +1,12 @@
 import { notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
+import {
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
+} from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -9,9 +14,29 @@ import { ZodError } from 'zod';
 import './CustomTOS.scss';
 
 const CustomTOS = () => {
-  const [community] = useState(app.config.chains.getById(app.activeChainId()));
+  const {
+    data: community,
+    isLoading: isLoadingCommunity,
+    refetch: refetchCommunity,
+  } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+  });
+
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
+
+  useRunOnceOnCondition({
+    callback: () => {
+      setTerms({
+        value: community?.terms || '',
+        error: '',
+      });
+    },
+    shouldRun: !isLoadingCommunity && !!community,
+  });
+
   const [terms, setTerms] = useState({
-    value: community.terms || '',
+    value: '',
     error: '',
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -33,13 +58,15 @@ const CustomTOS = () => {
   }, []);
 
   const onSaveChanges = useCallback(async () => {
-    if (isSaving || terms.error) return;
+    if (isSaving || terms.error || !community?.id) return;
     setIsSaving(true);
 
     try {
-      await community.updateChainData({
-        terms: terms.value,
+      await updateCommunity({
+        communityId: community?.id,
+        terms: terms.value || '',
       });
+      refetchCommunity();
 
       notifySuccess('TOS link updated!');
     } catch {
@@ -47,7 +74,7 @@ const CustomTOS = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [isSaving, terms, community]);
+  }, [isSaving, terms, community, refetchCommunity, updateCommunity]);
 
   return (
     <section className="CustomTOS">
