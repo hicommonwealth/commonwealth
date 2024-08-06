@@ -11,7 +11,8 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
     base: z.nativeEnum(ChainBase).optional(),
-    tag_ids: z.array(PG_INT).optional(),
+    // TODO: why is this a type error?
+    tag_ids: PG_INT.array().optional(),
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),

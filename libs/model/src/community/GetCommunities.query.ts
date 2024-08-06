@@ -45,6 +45,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       }
 
       // tag configuration
+      // TODO: should this be intersection or union? currently latter
       if (tag_ids && tag_ids.length > 0) {
         include.push({
           model: models.CommunityTags,
