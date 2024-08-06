@@ -245,13 +245,12 @@ export async function __createThread(
       await address.save({ transaction });
 
       await emitMentions(this.models, transaction, {
-        // @ts-expect-error StrictNullChecks
-        authorAddressId: address.id,
-        // @ts-expect-error StrictNullChecks
-        authorUserId: user.id,
+        authorAddressId: address.id!,
+        authorUserId: user.id!,
         authorAddress: address.address,
         mentions: mentions,
         thread,
+        community_id: thread.community_id,
       });
 
       return thread.id;
