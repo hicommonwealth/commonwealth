@@ -36,6 +36,7 @@ export type AdminActionsProps = {
   onEditStart?: () => any;
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
+  onDownloadMarkdown?: () => void;
   hasPendingEdits?: boolean;
   editingDisabled?: boolean;
 };
@@ -54,6 +55,7 @@ export const AdminActions = ({
   onEditConfirm,
   hasPendingEdits,
   editingDisabled,
+  onDownloadMarkdown,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
@@ -359,9 +361,9 @@ export const AdminActions = ({
               : []),
             ...[
               {
-                onClick: handleDeleteThread,
+                onClick: () => onDownloadMarkdown?.(),
                 label: 'Download as Markdown',
-                iconLeft: 'trash' as const,
+                iconLeft: 'download' as const,
                 iconLeftWeight: 'bold' as const,
               },
             ],
