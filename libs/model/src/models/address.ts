@@ -2,10 +2,8 @@ import { Address } from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { decrementProfileCount } from '../utils/denormalizedCountUtils';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
-import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { SsoTokenInstance } from './sso_token';
 import type { ModelInstance } from './types';
 import type { UserInstance } from './user';
@@ -13,14 +11,12 @@ import type { UserInstance } from './user';
 export type AddressAttributes = z.infer<typeof Address> & {
   // associations
   Community?: CommunityAttributes;
-  Profile?: ProfileAttributes;
   Memberships?: MembershipAttributes[];
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
   getCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
-  getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
@@ -113,35 +109,6 @@ export default (
       },
       scopes: {
         withPrivateData: {},
-      },
-      hooks: {
-        afterCreate: async (
-          address: AddressInstance,
-          options: Sequelize.CreateOptions<AddressAttributes>,
-        ) => {
-          await sequelize.models.Community.increment('address_count', {
-            by: 1,
-            where: { id: address.community_id },
-            transaction: options.transaction,
-          });
-        },
-        afterDestroy: async (
-          address: AddressInstance,
-          options: Sequelize.InstanceDestroyOptions,
-        ) => {
-          await sequelize.models.Community.decrement('address_count', {
-            by: 1,
-            where: { id: address.community_id },
-            transaction: options.transaction,
-          });
-
-          await decrementProfileCount(
-            sequelize.models,
-            address.community_id!,
-            address.user_id!,
-            options.transaction!,
-          );
-        },
       },
     },
   );

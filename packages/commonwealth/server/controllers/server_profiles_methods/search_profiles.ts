@@ -107,9 +107,9 @@ export async function __searchProfiles(
     WHERE
       ${communityWhere}
       (
-        "Users".profile->>'name' ILIKE '%' || $searchTerm || '%'
-        OR
-        "Addresses".address ILIKE '%' || $searchTerm || '%'
+        "Users".profile->>'name' ILIKE $searchTerm
+        --OR
+        --"Addresses".address ILIKE $searchTerm
       )
     GROUP BY
       "Users".id

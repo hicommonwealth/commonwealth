@@ -9,11 +9,9 @@ import {
 } from '@hicommonwealth/core';
 import { Knock, Schedule } from '@knocklabs/node';
 import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
-import { fileURLToPath } from 'url';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 function formatScheduleResponse(
   schedules: Schedule[],

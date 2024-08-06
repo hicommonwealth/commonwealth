@@ -22,14 +22,14 @@ export function GenerateStakeholderGroups(): Command<
   return {
     ...schemas.GenerateStakeholderGroups,
     auth: [],
-    body: async ({ id }) => {
-      const community = await models.Community.findByPk(id, {
+    body: async ({ payload }) => {
+      const community = await models.Community.findByPk(payload.id, {
         include: [
           {
             model: models.Group,
             as: 'groups',
             where: {
-              community_id: id!,
+              community_id: payload.id,
               is_system_managed: true,
             },
             required: false,
@@ -38,7 +38,7 @@ export function GenerateStakeholderGroups(): Command<
             model: models.CommunityStake,
             as: 'CommunityStakes',
             where: {
-              community_id: id!,
+              community_id: payload.id,
             },
             required: false,
           },
@@ -91,7 +91,7 @@ export function GenerateStakeholderGroups(): Command<
             // create group
             const group = await models.Group.create(
               {
-                community_id: id!,
+                community_id: payload.id,
                 metadata: {
                   name: `Stakeholder`,
                   description:

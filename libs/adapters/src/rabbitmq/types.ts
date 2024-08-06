@@ -2,6 +2,7 @@ import {
   BrokerPublications,
   BrokerSubscriptions,
   EventNames,
+  RoutingKeyTags,
 } from '@hicommonwealth/core';
 
 export enum RascalPublications {
@@ -34,22 +35,12 @@ export enum RascalQueues {
 }
 
 export enum RascalBindings {
-  NotificationsProviderCommentCreated = 'NotificationsProviderCommentCreatedBinding',
-  NotificationsProviderChainEventCreated = 'NotificationsProviderChainEventCreatedBinding',
-  NotificationsProviderSnapshotProposalCreated = 'NotificationsProviderSnapshotProposalCreatedBinding',
-  NotificationsProviderUserMentioned = 'NotificationsProviderUserMentionedBinding',
-  NotificationsProviderPreferencesUpdated = 'NotificationsProviderPreferencesUpdatedBinding',
+  NotificationsProvider = 'NotificationsProvider',
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
-
-  ContestWorkerPolicyThreadCreated = 'ContestWorkerPolicyThreadCreatedBinding',
-  ContestWorkerPolicyThreadUpvoted = 'ContestWorkerPolicyThreadUpvotedBinding',
-  ContestProjectionRecurringContestManagerDeployed = 'ContestProjectionRecurringContestManagerDeployed',
-  ContestProjectionOneOffContestManagerDeployed = 'ContestProjectionOneOffContestManagerDeployed',
-  ContestProjectionContestStarted = 'ContestProjectionContestStarted',
-  ContestProjectionContestContentAdded = 'ContestProjectionContestContentAdded',
-  ContestProjectionContestContentUpvoted = 'ContestProjectionContestContentUpvoted',
+  ContestWorkerPolicy = 'ContestWorkerPolicy',
+  ContestProjection = 'ContestProjection',
 }
 
 export enum RascalRoutingKeys {
@@ -58,13 +49,13 @@ export enum RascalRoutingKeys {
   NotificationsProviderSnapshotProposalCreated = EventNames.SnapshotProposalCreated,
   NotificationsProviderUserMentioned = EventNames.UserMentioned,
   NotificationsProviderPreferencesUpdated = EventNames.SubscriptionPreferencesUpdated,
-  SnapshotListener = EventNames.SnapshotProposalCreated,
   DeadLetter = 'DeadLetter',
   DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
 
-  ContestWorkerPolicyThreadCreated = EventNames.ThreadCreated,
-  ContestWorkerPolicyThreadUpvoted = EventNames.ThreadUpvoted,
+  ContestWorkerPolicyThreadCreated = `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}.#`,
+  ContestWorkerPolicyThreadUpvoted = `${EventNames.ThreadUpvoted}.${RoutingKeyTags.Contest}.#`,
+
   ContestProjectionRecurringContestManagerDeployed = EventNames.RecurringContestManagerDeployed,
   ContestProjectionOneOffContestManagerDeployed = EventNames.OneOffContestManagerDeployed,
   ContestProjectionContestStarted = EventNames.ContestStarted,

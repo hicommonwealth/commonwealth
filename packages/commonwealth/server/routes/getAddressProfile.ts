@@ -3,6 +3,7 @@ import {
   GetAddressProfileReq,
   GetAddressProfileResp,
 } from '@hicommonwealth/schemas';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -32,13 +33,18 @@ const getAddressProfiles = async (
     ? { user_id: req.user.id }
     : {};
 
+  const where = {
+    ...userWhere,
+  };
+
+  if (req.body.communities.length > 0) {
+    where['community_id'] = { [Op.in]: req.body.communities };
+  }
+
   // TODO: Can we  use some caching in the client to avoid calling this
   // api so many times?
   const addressEntities = await models.Address.findAll({
-    where: {
-      community_id: { [Op.in]: req.body.communities },
-      ...userWhere,
-    },
+    where,
     attributes: ['address', 'last_active'],
     include: [
       {
@@ -53,7 +59,7 @@ const getAddressProfiles = async (
     (address) => {
       return {
         userId: address.User!.id!,
-        name: address.User?.profile.name ?? 'Anonymous',
+        name: address.User?.profile.name ?? DEFAULT_NAME,
         address: address.address,
         lastActive: address.last_active ?? address.User?.created_at,
         avatarUrl: address.User?.profile.avatar_url ?? undefined,

@@ -1,13 +1,11 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
-import { fileURLToPath } from 'url';
 import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export type ReactionAttributes = {
   address_id: number;

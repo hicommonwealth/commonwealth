@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { z } from 'zod';
 import {
   EventContext,
@@ -5,7 +6,7 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
 } from '../framework';
-import { Events } from '../integration/events';
+import { EventNames, Events } from '../integration/events';
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,
@@ -206,6 +207,20 @@ export enum BrokerSubscriptions {
 /**
  * Broker Port
  */
+export enum RoutingKeyTags {
+  Contest = 'contest',
+}
+
+type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
+
+type EventNamesType = `${EventNames}`;
+
+type RoutingKeyTagsType = `${RoutingKeyTags}`;
+
+export type RoutingKey =
+  | EventNamesType
+  | Concat<EventNamesType, RoutingKeyTagsType>;
+
 export interface Broker extends Disposable {
   publish<Name extends Events>(
     topic: BrokerPublications,
@@ -221,8 +236,36 @@ export interface Broker extends Disposable {
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
+
+  getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
 
+export type BlobType = string | Uint8Array | Buffer | Readable;
+export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
+export type BlobBucket = typeof BlobBuckets[number];
+
+/**
+ * External Blob Storage Port
+ */
+export interface BlobStorage extends Disposable {
+  upload(options: {
+    key: string;
+    bucket: BlobBucket;
+    content: BlobType;
+    contentType?: string;
+  }): Promise<{ url: string; location: string }>;
+  exists(options: { key: string; bucket: BlobBucket }): Promise<boolean>;
+  getSignedUrl(options: {
+    key: string;
+    bucket: BlobBucket;
+    contentType: string;
+    ttl: number;
+  }): Promise<string>;
+}
+
+/**
+ * Notifications
+ */
 export enum WorkflowKeys {
   CommentCreation = 'comment-creation',
   SnapshotProposals = 'snapshot-proposals',

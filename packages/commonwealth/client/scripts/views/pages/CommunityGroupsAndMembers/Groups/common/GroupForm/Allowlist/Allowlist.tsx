@@ -1,3 +1,4 @@
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
@@ -6,7 +7,7 @@ import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
-import { Select } from 'views/components/Select';
+import { OptionConfig, Select } from 'views/components/Select';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPagination from 'views/components/component_kit/new_designs/CWPagination';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
@@ -15,10 +16,14 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import MembersSection, {
   Member,
 } from '../../../../Members/MembersSection/MembersSection';
-import { BaseGroupFilter } from '../../../../Members/index.types';
 import { useMemberData } from '../../../../common/useMemberData';
 import { getTotalPages } from '../../helpers/index';
 import './Allowlist.scss';
+import {
+  AllowListGroupFilters,
+  AllowListProps,
+  AllowListSearchFilters,
+} from './index.types';
 
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   isStakedCommunity,
@@ -54,13 +59,6 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   },
 ];
 
-type AllowlistProps = {
-  allowedAddresses: string[];
-  setAllowedAddresses: (
-    value: ((prevState: string[]) => string[]) | string[],
-  ) => void;
-};
-
 const baseFilterOptions = [
   { type: 'header', label: 'Filters' },
   { label: 'All community', value: 'all-community' },
@@ -76,9 +74,9 @@ const MEMBERS_PER_PAGE = 10;
 const Allowlist = ({
   allowedAddresses,
   setAllowedAddresses,
-}: AllowlistProps) => {
+}: AllowListProps) => {
   const user = useUserStore();
-  const [searchFilters, setSearchFilters] = useState({
+  const [searchFilters, setSearchFilters] = useState<AllowListSearchFilters>({
     searchText: '',
     groupFilter: 'all-community',
   });
@@ -99,7 +97,7 @@ const Allowlist = ({
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const debouncedSearchTerm = useDebounce<string>(
+  const debouncedSearchTerm = useDebounce<string | undefined>(
     searchFilters.searchText,
     500,
   );
@@ -129,7 +127,7 @@ const Allowlist = ({
       (members?.results?.map((p) => ({
         userId: p.user_id,
         avatarUrl: p.avatar_url,
-        name: p.profile_name || 'Anonymous',
+        name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map(
@@ -195,18 +193,14 @@ const Allowlist = ({
             }),
           ]}
           placeholder={baseFilterOptions[1].label}
-          onSelect={(option) => {
+          onSelect={(option: OptionConfig) => {
             handlePageChange(null, 1);
             setSearchFilters((g) => ({
               ...g,
-              groupFilter: (
-                option as {
-                  value: number | BaseGroupFilter;
-                }
-              ).value as string,
+              groupFilter: option.value as AllowListGroupFilters,
             }));
           }}
-          selected={searchFilters.groupFilter.toString()}
+          selected={(searchFilters.groupFilter || '').toString()}
         />
         <CWTextInput
           fullWidth={true}

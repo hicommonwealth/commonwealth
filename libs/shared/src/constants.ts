@@ -12,3 +12,5 @@ export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const DISCORD_BOT_NAME = 'Discord Bot';
 export const DISCORD_BOT_EMAIL = 'discord@common.xyz';
 export const DISCORD_BOT_ADDRESS = '0xdiscordbot';
+
+export const DEFAULT_NAME = 'Anonymous';

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const ChainEventCreated = {
   input: z.object({
+    id: z.string(),
     webhookId: z.string(),
     createdAt: z.string(),
     type: z.literal('GRAPHQL'),

@@ -1,14 +1,12 @@
 import { logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
-import { fileURLToPath } from 'url';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ModelInstance } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export type NotificationAttributes = {
   id: number;

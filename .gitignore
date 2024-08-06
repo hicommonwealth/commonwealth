@@ -18,3 +18,5 @@ redis-data
 .ghostal
 **/yarn.lock
 *coverage
+**/*.dump.sql
+**/*.dump.sql.gz

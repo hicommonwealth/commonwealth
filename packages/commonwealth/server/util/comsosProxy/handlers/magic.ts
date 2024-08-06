@@ -2,10 +2,8 @@ import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import axios from 'axios';
 import type { Request, Response } from 'express';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export function cosmosMagicOptionsHandler(_req: Request, res: Response): void {
   res.header('Access-Control-Allow-Origin', 'https://auth.magic.link');

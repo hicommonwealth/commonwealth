@@ -8,7 +8,6 @@ import type {
   UserInstance,
 } from '@hicommonwealth/model';
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
-import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
 import { QueryTypes } from 'sequelize';
@@ -16,13 +15,7 @@ import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
-type ThreadCountQueryData = {
-  communityId: string;
-  count: number;
-};
-
 type StatusResp = {
-  recentThreads: ThreadCountQueryData[];
   loggedIn?: boolean;
   user?: {
     id: number;
@@ -40,45 +33,6 @@ type StatusResp = {
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
-  communityCategoryMap: { [communityId: string]: CommunityCategoryType[] };
-};
-
-const getCommunityStatus = async (models: DB) => {
-  const communities = await models.Community.findAll({
-    where: { active: true },
-  });
-
-  const communityCategories: {
-    [communityId: string]: CommunityCategoryType[];
-  } = {};
-  for (const community of communities) {
-    if (community.category !== null) {
-      // @ts-expect-error StrictNullChecks
-      communityCategories[community.id] =
-        community.category as CommunityCategoryType[];
-    }
-  }
-
-  const thirtyDaysAgo = new Date(
-    (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
-  );
-
-  const threadCountQueryData: ThreadCountQueryData[] =
-    await models.sequelize.query<{ communityId: string; count: number }>(
-      `
-          SELECT "Threads".community_id as "communityId", COUNT("Threads".id)
-          FROM "Threads"
-          WHERE "Threads".created_at > :thirtyDaysAgo
-            AND "Threads".deleted_at IS NULL
-          GROUP BY "Threads".community_id;
-      `,
-      { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT },
-    );
-
-  return {
-    communityCategories,
-    threadCountQueryData,
-  };
 };
 
 export const getUserStatus = async (models: DB, user: UserInstance) => {
@@ -281,26 +235,15 @@ export const status = async (
   res: TypedResponse<StatusResp>,
 ) => {
   try {
-    const communityStatusPromise = getCommunityStatus(models);
     const { user: reqUser } = req;
     if (!reqUser) {
-      const { communityCategories, threadCountQueryData } =
-        await communityStatusPromise;
-
       return success(res, {
-        recentThreads: threadCountQueryData,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
-        communityCategoryMap: communityCategories,
       });
     } else {
       // user is logged in
-      const userStatusPromise = getUserStatus(models, reqUser);
-      const [communityStatus, userStatus] = await Promise.all([
-        communityStatusPromise,
-        userStatusPromise,
-      ]);
-      const { communityCategories, threadCountQueryData } = communityStatus;
+      const userStatus = await getUserStatus(models, reqUser);
       const { user, id } = userStatus;
 
       const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
@@ -314,13 +257,11 @@ export const status = async (
       user.knockJwtToken = knockJwtToken!;
 
       return success(res, {
-        recentThreads: threadCountQueryData,
         loggedIn: true,
         // @ts-expect-error StrictNullChecks
         user,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
-        communityCategoryMap: communityCategories,
       });
     }
   } catch (error) {

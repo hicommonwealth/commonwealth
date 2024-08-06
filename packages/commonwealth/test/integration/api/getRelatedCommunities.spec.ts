@@ -34,7 +34,7 @@ describe('GetRelatedCommunities Tests', async () => {
 
     const ethereumCommunity = response.find((r) => r.community === 'Ethereum');
     // @ts-expect-error StrictNullChecks
-    assert.equal(ethereumCommunity.address_count, 2);
+    assert.equal(ethereumCommunity.profile_count, 2);
     // @ts-expect-error StrictNullChecks
     assert.equal(ethereumCommunity.thread_count, 0);
     // @ts-expect-error StrictNullChecks
@@ -44,7 +44,7 @@ describe('GetRelatedCommunities Tests', async () => {
 
     const sushiCommunity = response.find((r) => r.community === 'Sushi');
     // @ts-expect-error StrictNullChecks
-    assert.equal(sushiCommunity.address_count, 0);
+    assert.equal(sushiCommunity.profile_count, 0);
     // @ts-expect-error StrictNullChecks
     assert.equal(sushiCommunity.thread_count, 0);
     // @ts-expect-error StrictNullChecks
@@ -56,7 +56,7 @@ describe('GetRelatedCommunities Tests', async () => {
       (r) => r.community === 'yearn.finance',
     );
     // @ts-expect-error StrictNullChecks
-    assert.equal(yearnFinanceCommunity.address_count, 0);
+    assert.equal(yearnFinanceCommunity.profile_count, 0);
     // @ts-expect-error StrictNullChecks
     assert.equal(yearnFinanceCommunity.thread_count, 0);
     assert.equal(

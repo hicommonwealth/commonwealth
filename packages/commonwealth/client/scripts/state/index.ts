@@ -1,7 +1,5 @@
-import { CommunityCategoryType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
-import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
@@ -61,7 +59,6 @@ export interface IApp {
 
   // User
   user: UserController;
-  recentActivity: RecentActivityController;
 
   // Web3
   snapshot: SnapshotController;
@@ -74,8 +71,6 @@ export interface IApp {
   // stored on server-side
   config: {
     chains: ChainStore;
-    // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
-    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
@@ -126,7 +121,6 @@ const app: IApp = {
 
   // User
   user,
-  recentActivity: new RecentActivityController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
 
@@ -204,14 +198,6 @@ export async function initAppState(
           });
         }
       });
-
-    app.config.chainCategoryMap = statusRes.result.communityCategoryMap;
-
-    // add recentActivity
-    const { recentThreads } = statusRes.result;
-    recentThreads.forEach(({ communityId, count }) => {
-      app.recentActivity.setCommunityThreadCounts(communityId, count);
-    });
 
     // update the login status
     updateActiveUser(statusRes.result.user);

@@ -1,12 +1,10 @@
-import { events, logger } from '@hicommonwealth/core';
+import { CommunityStakeTrade, events, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
-import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { z } from 'zod';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function handleCommunityStakeTrades(
   models: DB,
@@ -20,7 +18,7 @@ export async function handleCommunityStakeTrades(
     4: ethAmount,
     // 5: protocolEthAmount,
     // 6: nameSpaceEthAmount,
-  } = event.parsedArgs as z.infer<typeof events.CommunityStakeTrade>;
+  } = event.parsedArgs as z.infer<typeof CommunityStakeTrade>;
 
   const existingTxn = await models.StakeTransaction.findOne({
     where: {

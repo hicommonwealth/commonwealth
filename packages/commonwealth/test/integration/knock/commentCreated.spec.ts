@@ -33,7 +33,6 @@ describe('CommentCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined,
     author: z.infer<typeof schemas.User> | undefined,
     subscriber: z.infer<typeof schemas.User> | undefined,
-    authorProfile: z.infer<typeof schemas.Profile> | undefined,
     thread: z.infer<typeof schemas.Thread> | undefined,
     rootComment: z.infer<typeof schemas.Comment> | undefined,
     replyComment: z.infer<typeof schemas.Comment> | undefined,
@@ -53,15 +52,7 @@ describe('CommentCreated Event Handler', () => {
     );
     [author] = await tester.seed('User', {});
     [subscriber] = await tester.seed('User', {});
-    [authorProfile] = await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: author.id,
-      profile_name: author?.profile.name ?? '',
-    });
-    await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: subscriber.id,
-    });
+
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
       Addresses: [
@@ -199,15 +190,15 @@ describe('CommentCreated Event Handler', () => {
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: authorProfile.profile_name,
+        author: author?.profile.name,
         comment_parent_name: 'thread',
-        // @ts-expect-error StrictNullChecks
-        community_name: community.name,
-        // @ts-expect-error StrictNullChecks
-        comment_body: rootComment.text.substring(0, 255),
-        // @ts-expect-error StrictNullChecks
-        comment_url: getCommentUrl(community.id, thread.id, rootComment.id),
+        community_name: community?.name,
+        comment_body: rootComment?.text.substring(0, 255),
+        comment_url: getCommentUrl(
+          community?.id ?? '',
+          thread?.id ?? 0,
+          rootComment?.id ?? 0,
+        ),
         comment_created_event: rootComment,
       },
       // @ts-expect-error StrictNullChecks
@@ -245,15 +236,15 @@ describe('CommentCreated Event Handler', () => {
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: authorProfile.profile_name,
+        author: author?.profile.name,
         comment_parent_name: 'comment',
-        // @ts-expect-error StrictNullChecks
-        community_name: community.name,
-        // @ts-expect-error StrictNullChecks
-        comment_body: replyComment.text.substring(0, 255),
-        // @ts-expect-error StrictNullChecks
-        comment_url: getCommentUrl(community.id, thread.id, replyComment.id),
+        community_name: community?.name,
+        comment_body: replyComment?.text.substring(0, 255),
+        comment_url: getCommentUrl(
+          community?.id ?? '',
+          thread?.id ?? 0,
+          replyComment?.id ?? 0,
+        ),
         comment_created_event: replyComment,
       },
       // @ts-expect-error StrictNullChecks

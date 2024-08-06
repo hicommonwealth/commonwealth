@@ -5,7 +5,6 @@ import {
 } from '@hicommonwealth/shared';
 import z from 'zod';
 import { PG_INT } from '../utils';
-import { Community } from './community.schemas';
 import { Contract } from './contract.schemas';
 
 export const ChainNode = z.object({
@@ -32,6 +31,3 @@ export const ChainNode = z.object({
   block_explorer: z.string().optional(),
   max_ce_block_range: z.number().gte(-1).nullish(),
 });
-
-// aliases
-export const Chain = Community;

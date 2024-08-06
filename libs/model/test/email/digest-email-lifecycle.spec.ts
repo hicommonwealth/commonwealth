@@ -19,9 +19,6 @@ describe('Digest email lifecycle', () => {
       isAdmin: false,
       selected_community_id: null,
     });
-    await seed('Profile', {
-      user_id: authorUser!.id,
-    });
 
     [communityOne] = await seed('Community', {
       chain_node_id: undefined,

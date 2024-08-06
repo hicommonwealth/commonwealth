@@ -99,6 +99,9 @@ export const Breadcrumbs = () => {
           />
         )}
       </nav>
+      {/* an empty div that takes the block content area on the active page, similar
+      to the area that the fixed position BreadcrumbsComponent would take */}
+      <div className="BreadcrumbsBlockContentArea" />
     </CWPageLayout>
   );
 };
