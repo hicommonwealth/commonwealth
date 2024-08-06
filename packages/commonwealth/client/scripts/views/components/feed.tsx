@@ -12,6 +12,7 @@ import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
@@ -42,7 +43,10 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     thread.communityId,
   );
 
-  const chain = app.config.chains.getById(thread.communityId);
+  const { data: community } = useGetCommunityByIdQuery({
+    id: thread.communityId,
+    enabled: !!thread.communityId,
+  });
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
@@ -79,7 +83,8 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   });
 
   // edge case for deleted communities with orphaned posts
-  if (!chain) return;
+  if (!community) return;
+
   return (
     <ThreadCard
       thread={thread}
@@ -96,7 +101,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
       disabledActionsTooltipText={disabledActionsTooltipText}
-      customStages={chain?.customStages}
+      customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
       layoutType="community-first"
