@@ -1,7 +1,7 @@
 import { DefaultPage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import getLinkType from 'helpers/linkType';
+import { getLinkType } from 'helpers/link';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';

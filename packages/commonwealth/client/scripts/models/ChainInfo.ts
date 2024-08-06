@@ -8,6 +8,7 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
+import { CategorizedSocialLinks, categorizeSocialLinks } from '../helpers/link';
 import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
 import StakeInfo from './StakeInfo';
@@ -342,51 +343,11 @@ class ChainInfo {
   }
 
   public categorizeSocialLinks(): CategorizedSocialLinks {
-    const categorizedLinks: CategorizedSocialLinks = {
-      discords: [],
-      githubs: [],
-      telegrams: [],
-      twitters: [],
-      elements: [],
-      remainingLinks: [],
-    };
-
-    this.socialLinks
-      .filter((link) => !!link)
-      .forEach((link) => {
-        if (link.includes('://discord.com') || link.includes('://discord.gg')) {
-          categorizedLinks.discords.push(link);
-        } else if (link.includes('://github.com')) {
-          categorizedLinks.githubs.push(link);
-        } else if (link.includes('://t.me')) {
-          categorizedLinks.telegrams.push(link);
-        } else if (link.includes('://matrix.to')) {
-          categorizedLinks.elements.push(link);
-        } else if (
-          link.includes('://twitter.com') ||
-          link.includes('://x.com')
-        ) {
-          categorizedLinks.twitters.push(link);
-        } else {
-          categorizedLinks.remainingLinks.push(link);
-        }
-      });
-
-    return categorizedLinks;
+    return categorizeSocialLinks(this.socialLinks);
   }
 
   public updateTags(tags: Tag[]) {
     this.CommunityTags = tags;
   }
 }
-
-export type CategorizedSocialLinks = {
-  discords: string[];
-  githubs: string[];
-  telegrams: string[];
-  twitters: string[];
-  elements: string[];
-  remainingLinks: string[];
-};
-
 export default ChainInfo;
