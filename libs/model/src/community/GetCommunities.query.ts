@@ -1,8 +1,8 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Includeable, Op } from 'sequelize';
+import { Includeable, Op, WhereOptions } from 'sequelize';
 import { models } from '../database';
-import { CommunityTagsAttributes } from '../models';
+import { CommunityAttributes, CommunityTagsAttributes } from '../models';
 
 export function GetCommunities(): Query<typeof schemas.GetCommunities> {
   return {
@@ -23,6 +23,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       } = payload;
 
       const includeOptions: Includeable[] = [];
+      const whereOptions: WhereOptions<CommunityAttributes> = { active: true };
 
       // group configuration
       if (has_groups) {
@@ -80,18 +81,23 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         });
       }
 
+      // base configuration
+      if (base) {
+        whereOptions['base'] = base;
+      }
+
       // pagination configuration
       // TODO
 
       // query
       const communities = await models.Community.findAll({
-        where: { active: true },
+        where: whereOptions,
         include: includeOptions,
       });
 
       const communitiesResult: Array<typeof schemas.Community> =
-        communities.map((c) => ({
-          ...c.toJSON(),
+        communities.map((c: CommunityAttributes) => ({
+          ...c,
           CommunityTags: (
             (c.CommunityTags || []) as CommunityTagsAttributes[]
           ).map((ct) => ({ id: ct!.Tag!.id, name: ct!.Tag!.name })),
