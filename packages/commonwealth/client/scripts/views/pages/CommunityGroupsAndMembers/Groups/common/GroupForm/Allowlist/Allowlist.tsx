@@ -4,6 +4,7 @@ import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
@@ -89,8 +90,11 @@ const Allowlist = ({
     apiEnabled: !!user.activeAccount?.address,
   });
 
-  const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
-    .namespace;
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+  });
+  const isStakedCommunity = !!community?.namespace;
 
   const tableState = useCWTableState({
     columns: tableColumns(isStakedCommunity),
