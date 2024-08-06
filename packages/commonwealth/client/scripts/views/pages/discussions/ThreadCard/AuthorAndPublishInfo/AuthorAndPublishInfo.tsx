@@ -16,7 +16,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import { UserProfile } from '../../../../../models/MinimumProfile';
 import {
   IThreadCollaborator,
-  VersionHistory,
+  ThreadVersionHistory,
 } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { CWSelectList } from '../../../../components/component_kit/new_designs/CWSelectList/index';
@@ -52,7 +52,7 @@ export type AuthorAndPublishInfoProps = {
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
-  versionHistory?: VersionHistory[];
+  versionHistory?: ThreadVersionHistory[];
   changeContentText?: (text: string) => void;
 };
 
@@ -100,11 +100,10 @@ export const AuthorAndPublishInfo = ({
   const versionHistoryOptions = versionHistory?.map((v) => ({
     value: v.body,
     label: formatVersionText(
-      v.timestamp,
-      // @ts-expect-error <StrictNullChecks>
-      v.author?.address,
-      profile,
+      moment(v.timestamp),
+      v.address,
       collaboratorLookupInfo,
+      profile?.name,
     ),
   }));
 

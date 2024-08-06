@@ -5,7 +5,6 @@ import {
   ContestScore,
 } from '@hicommonwealth/schemas';
 import { ProposalType } from '@hicommonwealth/shared';
-import type MinimumProfile from 'models/MinimumProfile';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import { z } from 'zod';
@@ -181,10 +180,12 @@ const ContestActionZ = ContestAction.pick({
 
 type ContestActionT = z.infer<typeof ContestActionZ>;
 
-export interface VersionHistory {
-  author?: MinimumProfile;
-  timestamp: Moment;
+export interface ThreadVersionHistory {
+  id: number;
+  thread_id: number;
+  address: string;
   body: string;
+  timestamp: string;
 }
 
 export interface IThreadCollaborator {
@@ -284,7 +285,7 @@ export class Thread implements IUniqueId {
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
-  public readonly versionHistory: VersionHistory[];
+  public readonly versionHistory: ThreadVersionHistory[];
   public readonly communityId: string;
   public readonly lastEdited: Moment;
 
@@ -316,7 +317,7 @@ export class Thread implements IUniqueId {
     topic,
     kind,
     stage,
-    version_history,
+    ThreadVersionHistories,
     community_id,
     read_only,
     body,
@@ -389,7 +390,7 @@ export class Thread implements IUniqueId {
     reactionTimestamps?: string[];
     reactionWeights?: number[];
     reaction_weights_sum: number;
-    version_history: any[]; // TODO: fix type
+    ThreadVersionHistories: ThreadVersionHistory[];
     Address: any; // TODO: fix type
     discord_meta?: any;
     userId: number;
@@ -445,7 +446,7 @@ export class Thread implements IUniqueId {
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
-    this.versionHistory = processVersionHistory(version_history);
+    this.versionHistory = ThreadVersionHistories;
     this.reactionWeightsSum = reaction_weights_sum;
     this.associatedReactions =
       associatedReactions ??
@@ -494,7 +495,7 @@ export class Thread implements IUniqueId {
           // and these should not be added here unless needed.
           parent_id: null,
           reactions: [],
-          version_history: [],
+          ThreadVersionHistories: [],
           reaction_weights_sum: 0,
           canvas_signed_data: null,
           canvas_hash: null,

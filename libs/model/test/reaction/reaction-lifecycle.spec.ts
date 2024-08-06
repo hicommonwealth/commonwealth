@@ -51,7 +51,6 @@ describe('Reactions lifecycle', () => {
         deleted_at: undefined, // so we can find it!
         pinned: false,
         read_only: false,
-        version_history: [],
       },
       //{ mock: true, log: true },
     );

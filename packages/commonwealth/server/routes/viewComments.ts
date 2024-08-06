@@ -62,6 +62,9 @@ const viewComments = async (
           },
         ],
       },
+      {
+        model: models.CommentVersionHistory,
+      },
     ],
     order: [['created_at', 'DESC']],
     paranoid: false,

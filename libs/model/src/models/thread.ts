@@ -13,7 +13,6 @@ import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
-  version_history_updated?: boolean;
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
@@ -62,11 +61,6 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
-        allowNull: false,
-      },
       links: { type: Sequelize.JSONB, allowNull: true },
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
       has_poll: { type: Sequelize.BOOLEAN, allowNull: true },
@@ -114,12 +108,6 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
-      },
-
-      version_history_updated: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
       },
     },
     {

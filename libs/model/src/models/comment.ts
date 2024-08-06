@@ -42,11 +42,6 @@ export default (
       created_by: { type: Sequelize.STRING, allowNull: true },
       text: { type: Sequelize.TEXT, allowNull: false },
       plaintext: { type: Sequelize.TEXT, allowNull: true },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
-        allowNull: false,
-      },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
@@ -69,11 +64,6 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
-      },
-      version_history_updated: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
       },
     },
     {
