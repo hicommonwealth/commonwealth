@@ -36,7 +36,7 @@ export type TagProps = {
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   trimAt?: number;
   classNames?: string;
-  community?: ChainInfo;
+  community?: Pick<ChainInfo, 'iconUrl' | 'name'>;
   onMouseEnter?: (e?: React.MouseEvent<HTMLElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
 };
