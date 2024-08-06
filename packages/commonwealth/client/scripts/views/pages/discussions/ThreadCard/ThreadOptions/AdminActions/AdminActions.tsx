@@ -357,6 +357,14 @@ export const AdminActions = ({
                   },
                 ]
               : []),
+            ...[
+              {
+                onClick: handleDeleteThread,
+                label: 'Download as Markdown',
+                iconLeft: 'trash' as const,
+                iconLeftWeight: 'bold' as const,
+              },
+            ],
             ...(isThreadAuthor || hasAdminPermissions
               ? [
                   ...(app.chain?.meta.snapshot.length

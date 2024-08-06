@@ -3,7 +3,6 @@ import 'components/proposals/json_display.scss';
 import { CoinObject } from 'controllers/chain/cosmos/types';
 import React from 'react';
 import app from 'state';
-import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -26,10 +25,21 @@ export const JSONDisplay = ({ data, title }: JSONDisplayProps) => {
   const isKYVE = app.chain.network === ChainNetwork.Kyve;
   const handleExport = () => {
     const dataTitle = data.title || 'Proposal';
-    const filename = `${dataTitle}.md`;
     const proposalDetails = data.details || '';
 
-    downloadDataAsFile(proposalDetails, filename);
+    const blob = new Blob([proposalDetails], { type: 'text/markdown' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${dataTitle}.md`;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(link.href);
   };
 
   return (
