@@ -5,9 +5,10 @@ import { userStore } from '../../ui/user';
 
 interface UpdateCommunityProps {
   communityId: string;
-  namespace: string;
-  symbol: string;
-  transactionHash: string;
+  namespace?: string;
+  symbol?: string;
+  transactionHash?: string;
+  discordBotWebhooksEnabled?: boolean;
 }
 
 const updateCommunity = async ({
@@ -15,21 +16,39 @@ const updateCommunity = async ({
   namespace,
   symbol,
   transactionHash,
+  discordBotWebhooksEnabled,
 }: UpdateCommunityProps) => {
   return await axios.patch(`${app.serverUrl()}/communities/${communityId}`, {
     jwt: userStore.getState().jwt,
     id: communityId,
-    namespace,
-    default_symbol: symbol,
-    transactionHash,
+    ...(namespace && {
+      namespace,
+    }),
+    ...(typeof symbol !== 'undefined' && {
+      default_symbol: symbol,
+    }),
+    ...(typeof transactionHash !== 'undefined' && {
+      transactionHash,
+    }),
+    ...(typeof discordBotWebhooksEnabled === 'boolean' && {
+      discord_bot_webhooks_enabled: discordBotWebhooksEnabled,
+    }),
   });
 };
 
-const useUpdateCommunityMutation = () => {
+type UseUpdateCommunityMutationProps = {
+  reInitAppOnSuccess?: boolean;
+};
+
+const useUpdateCommunityMutation = ({
+  reInitAppOnSuccess,
+}: UseUpdateCommunityMutationProps) => {
   return useMutation({
     mutationFn: updateCommunity,
     onSuccess: async () => {
-      await initAppState(false);
+      if (reInitAppOnSuccess) {
+        await initAppState(false);
+      }
     },
   });
 };

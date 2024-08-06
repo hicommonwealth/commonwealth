@@ -3,6 +3,10 @@ import { uuidv4 } from 'lib/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import {
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
+} from 'state/api/communities';
+import {
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
 } from 'state/api/discord';
@@ -21,9 +25,15 @@ const CTA_TEXT = {
 };
 
 const Discord = () => {
-  const [community] = useState(app.config.chains.getById(app.activeChainId()));
+  // TODO: refetch can be cleaner
+  const { data: community, refetch: refetchCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
-    community.discordConfigId ? 'connected' : 'none',
+    community?.discord_config_id ? 'connected' : 'none',
   );
 
   const queryParams = useMemo(() => {
@@ -35,7 +45,7 @@ const Discord = () => {
     app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
   }
   const [isDiscordWebhooksEnabled, setIsDiscordWebhooksEnabled] = useState(
-    community.discordBotWebhooksEnabled,
+    community?.discord_bot_webhooks_enabled,
   );
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
     chainId: app.activeChainId(),
@@ -50,7 +60,7 @@ const Discord = () => {
   } = useRemoveDiscordBotConfigMutation();
 
   useEffect(() => {
-    if (community.discordConfigId) {
+    if (community?.discord_config_id) {
       setConnectionStatus('connected');
     }
   }, [community]);
@@ -110,19 +120,27 @@ const Discord = () => {
   }, [connectionStatus, queryParams, removeDiscordBotConfig]);
 
   const onToggleWebhooks = useCallback(async () => {
+    if (!community?.id) return;
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
 
     try {
-      await community.updateChainData({
-        discord_bot_webhooks_enabled: !isDiscordWebhooksEnabled,
+      await updateCommunity({
+        communityId: community?.id,
+        discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
       });
+      refetchCommunity();
       setIsDiscordWebhooksEnabled(!isDiscordWebhooksEnabled);
 
       notifySuccess(`Discord webhooks ${toggleMsgType}d!`);
     } catch (e) {
       notifyError(e || `Failed to ${toggleMsgType} discord webhooks!`);
     }
-  }, [isDiscordWebhooksEnabled, community]);
+  }, [
+    community?.id,
+    isDiscordWebhooksEnabled,
+    updateCommunity,
+    refetchCommunity,
+  ]);
 
   const onConnectDiscordChannel = async (
     channelId: string,

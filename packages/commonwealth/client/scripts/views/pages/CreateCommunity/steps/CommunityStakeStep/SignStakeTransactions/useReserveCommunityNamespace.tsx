@@ -29,7 +29,9 @@ const useReserveCommunityNamespace = ({
     useState<ActionState>(defaultActionState);
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    reInitAppOnSuccess: true,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
