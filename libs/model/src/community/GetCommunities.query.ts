@@ -1,6 +1,13 @@
 import { InvalidState, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Includeable, Op, OrderItem, WhereOptions } from 'sequelize';
+import {
+  FindAttributeOptions,
+  Includeable,
+  Op,
+  OrderItem,
+  WhereOptions,
+  literal,
+} from 'sequelize';
 import { models } from '../database';
 import { CommunityAttributes } from '../models';
 
@@ -32,8 +39,11 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         );
       }
 
+      // TODO: this must be rewritten in SQL to support the intersection of tags
       const include: Includeable[] = [];
-      const where: WhereOptions<CommunityAttributes> = { active: true };
+      const where: WhereOptions<CommunityAttributes & { tagCount: number }> = {
+        active: true,
+      };
 
       // group configuration
       if (has_groups) {
@@ -45,7 +55,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       }
 
       // tag configuration
-      // TODO: should this be intersection or union? currently latter
+      // TODO: this needs to be an intersection, not a union
       if (tag_ids && tag_ids.length > 0) {
         include.push({
           model: models.CommunityTags,
@@ -55,9 +65,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             },
           ],
           where: {
-            tag_id: {
-              [Op.in]: tag_ids,
-            },
+            tag_id: tag_ids,
           },
           required: true,
         });
@@ -100,21 +108,40 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       // pagination configuration
       const direction = order_direction || 'DESC';
       const order: OrderItem[] = [[order_by || 'profile_count', direction]];
-      const offset = limit * (cursor - 1);
+      const offset = limit! * (cursor! - 1);
 
+      const attributes: FindAttributeOptions = {
+        include: [
+          [
+            literal(`(
+              SELECT COUNT(*)
+              FROM "CommunityTags" AS tag
+              WHERE tag.community_id = "Community".id
+            )`),
+            'tagCount',
+          ],
+        ],
+      };
+
+      where['tagCount'] = {
+        [Op.gte]: tag_ids!.length,
+      };
       // execute query
       const { rows: communities, count } =
         await models.Community.findAndCountAll({
+          distinct: true, // ensure correct count
           where,
           include,
           limit,
           offset,
           order,
+          attributes,
         });
+      console.log(communities, count);
 
       return schemas.buildPaginatedResponse(
         communities.map((c) => c.toJSON()),
-        count,
+        0,
         {
           limit,
           offset,
