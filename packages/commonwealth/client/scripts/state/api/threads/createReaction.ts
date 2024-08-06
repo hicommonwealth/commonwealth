@@ -1,6 +1,7 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { signThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -68,7 +69,7 @@ const useCreateThreadReactionMutation = ({
         address: response.data.result.Address.address,
         type: 'like',
         updated_at: response.data.result.updated_at,
-        voting_weight: response.data.result.calculated_voting_weight || 1,
+        voting_weight: response.data.result.calculated_voting_weight || 0,
       };
       updateThreadInAllCaches(
         communityId,
@@ -81,7 +82,14 @@ const useCreateThreadReactionMutation = ({
       userId &&
         markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
     },
-    onError: (error) => checkForSessionKeyRevalidationErrors(error),
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.data?.error?.toLowerCase().includes('stake')) {
+          notifyError('Buy stake in community to upvote threads');
+        }
+      }
+      return checkForSessionKeyRevalidationErrors(error);
+    },
   });
 };
 
