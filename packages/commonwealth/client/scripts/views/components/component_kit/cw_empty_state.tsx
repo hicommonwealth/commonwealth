@@ -15,13 +15,13 @@ type EmptyStateProps = {
 export const CWEmptyState = ({
   content,
   iconName,
-  ...rest
+  testid,
 }: EmptyStateProps) => {
   return (
     <div
       className="EmptyState"
-      {...(rest['data-testid'] && {
-        'data-testid': rest['data-testid'],
+      {...(testid && {
+        'data-testid': testid,
       })}
     >
       <div className="inner-content">
