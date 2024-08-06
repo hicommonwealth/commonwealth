@@ -2,7 +2,7 @@ import { WebhookCategory } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import getLinkType from 'helpers/linkType';
+import { getLinkType } from 'helpers/link';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import Webhook from 'models/Webhook';
 import React, { useState } from 'react';
@@ -23,7 +23,7 @@ import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import './Webhooks.scss';
 
 const Webhooks = () => {
-  const community = app.config.chains.getById(app.activeChainId());
+  const communityId = app.activeChainId();
   const [hasExistingWebhooks, setHasExistingWebhooks] = useState(false);
   const [webhookToConfigure, setWebhookToConfigure] = useState<Webhook | null>(
     null,
@@ -45,7 +45,7 @@ const Webhooks = () => {
 
   const { data: existingWebhooks, isLoading: isLoadingWebhooks } =
     useFetchWebhooksQuery({
-      communityId: community.id,
+      communityId: communityId,
     });
 
   const { mutateAsync: deleteWebhook, isLoading: isDeletingWebhook } =
@@ -80,7 +80,7 @@ const Webhooks = () => {
       await Promise.all(
         webhooksToCreate.map(async (webhook) => {
           await createWebhook({
-            communityId: community.id,
+            communityId: communityId,
             webhookUrl: webhook.value.trim(),
           });
         }),
@@ -116,7 +116,7 @@ const Webhooks = () => {
         webhooks[index].canConfigure
       ) {
         await deleteWebhook({
-          communityId: community.id,
+          communityId: communityId,
           webhookUrl: webhooks[index].value,
         });
         notifySuccess('Webhook deleted!');
@@ -136,7 +136,7 @@ const Webhooks = () => {
 
     try {
       await editWebhook({
-        communityId: community.id,
+        communityId: communityId,
         webhookId: webhook.id,
         webhookCategories: categories,
       });
