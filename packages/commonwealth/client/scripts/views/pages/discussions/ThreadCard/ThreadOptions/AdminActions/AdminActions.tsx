@@ -26,7 +26,7 @@ import './AdminActions.scss';
 
 export type AdminActionsProps = {
   thread: Thread;
-  canUpdateThread: boolean;
+  canUpdateThread?: boolean;
   onDelete?: () => any;
   onSpamToggle?: (thread: Thread) => any;
   onLockToggle?: (isLocked: boolean) => any;
