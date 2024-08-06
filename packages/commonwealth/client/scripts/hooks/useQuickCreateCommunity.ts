@@ -53,7 +53,11 @@ const useQuickCreateCommunity = () => {
     try {
       const { name, description, icon_url, address } = communityData;
       const communityId = slugifyPreserveDashes(name.toLowerCase());
-      const symbol = name.slice(0, 4).toUpperCase();
+      const symbol =
+        name.slice(0, 4).toUpperCase() +
+        Math.floor(Math.random() * 10000)
+          .toString()
+          .padStart(4, '0');
 
       const selectedChainNode = chainTypes.find(
         (chain) => String(chain.value) === DEFAULT_CHAIN_ID,

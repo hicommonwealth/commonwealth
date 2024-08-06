@@ -516,6 +516,8 @@ export async function handleSocialLoginCallback({
     const metadata = await magic.user.getMetadata();
     profileMetadata = { username: null };
 
+    console.log(metadata, 'metadata');
+
     if (isCosmos) {
       magicAddress = metadata.publicAddress;
     } else {

@@ -59,7 +59,8 @@ export const CommunityLaunchCard: React.FC<CommunityLaunchCardProps> = ({
       });
 
       generatedName =
-        nameCompletion.choices[0].message.content?.trim() || 'New Community';
+        nameCompletion.choices[0].message.content?.trim().slice(0, 6) ||
+        'New Community';
       setName(generatedName);
     }
 

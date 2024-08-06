@@ -54,6 +54,9 @@ const MobileHeader = ({
   const user = isLoggedIn ? userData.addresses?.[0] : null;
   const profileId = isLoggedIn ? userData.addresses?.[0]?.profileId : null;
 
+  console.log(user, 'user');
+  console.log(profileId);
+
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
     ? !menuVisible
@@ -106,6 +109,8 @@ const MobileHeader = ({
                 userAddress={user?.address}
                 userCommunityId={user?.community?.id}
               />
+              {/* Display profileId for debugging */}
+              <CWText>{profileId}</CWText>
             </div>
           ) : userOnboardingEnabled ? (
             <></>
