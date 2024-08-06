@@ -8,7 +8,6 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
-import { CategorizedSocialLinks, categorizeSocialLinks } from '../helpers/link';
 import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
 import StakeInfo from './StakeInfo';
@@ -340,10 +339,6 @@ class ChainInfo {
     this.directoryPageEnabled = updatedChain.directory_page_enabled;
     this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
     this.type = updatedChain.type;
-  }
-
-  public categorizeSocialLinks(): CategorizedSocialLinks {
-    return categorizeSocialLinks(this.socialLinks);
   }
 
   public updateTags(tags: Tag[]) {
