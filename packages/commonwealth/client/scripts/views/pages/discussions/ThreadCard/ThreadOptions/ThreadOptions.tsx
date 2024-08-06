@@ -233,6 +233,7 @@ export const ThreadOptions = ({
 
           {thread && (
             <AdminActions
+              canUpdateThread={canUpdateThread}
               thread={thread}
               onLockToggle={onLockToggle}
               onCollaboratorsEdit={onCollaboratorsEdit}
