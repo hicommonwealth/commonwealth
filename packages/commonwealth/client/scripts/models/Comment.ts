@@ -36,9 +36,9 @@ export class Comment<T extends IUniqueId> {
   constructor({
     id,
     text,
-    community_id,
     author,
     Address,
+    Thread,
     thread_id,
     parent_id,
     plaintext,
@@ -74,7 +74,7 @@ export class Comment<T extends IUniqueId> {
         })
       : [];
 
-    this.communityId = community_id;
+    this.communityId = Thread.community_id;
     this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;

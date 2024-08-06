@@ -5,14 +5,12 @@ import { z } from 'zod';
 import { emitEvent } from '../utils';
 import { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { ReactionAttributes } from './reaction';
-import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 
 const log = logger(import.meta);
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
-  Thread?: ThreadAttributes;
   reactions?: ReactionAttributes[];
   subscriptions?: CommentSubscriptionAttributes[];
 };

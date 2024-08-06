@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PG_INT, zDate } from '../utils';
+import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
 
 export const Comment = z.object({
@@ -36,6 +37,7 @@ export const Comment = z.object({
   reaction_weights_sum: PG_INT.optional(),
 
   Address: Address.nullish(),
+  Thread: Thread.nullish(),
 });
 
 export const CommentVersionHistory = z.object({
