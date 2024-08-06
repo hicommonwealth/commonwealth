@@ -1,7 +1,8 @@
-import { config } from 'dotenv';
+import { logger } from '@hicommonwealth/core';
 import fetch from 'node-fetch';
+import { config } from '../config';
 
-config();
+const log = logger(import.meta);
 
 async function purgeCache(zoneId?: string, apiKey?: string) {
   if (!zoneId || !apiKey) throw Error('Missing Env Vars');
@@ -30,8 +31,8 @@ async function purgeCache(zoneId?: string, apiKey?: string) {
   }
 }
 
-purgeCache(process.env.CF_ZONE_ID, process.env.CF_API_KEY)
-  .then(() => console.log('finished cloudflare purge script'))
+purgeCache(config.CLOUDFLARE.ZONE_ID, config.CLOUDFLARE.API_KEY)
+  .then(() => log.info('finished cloudflare purge script'))
   .catch((e) => {
-    console.log('cloudflare purge script failed:', e);
+    log.error('cloudflare purge script failed:', e);
   });
