@@ -11,7 +11,11 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { GetCommunityStake, SetCommunityStake } from '../../src/community';
+import {
+  GetCommunities,
+  GetCommunityStake,
+  SetCommunityStake,
+} from '../../src/community';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
 
@@ -34,6 +38,7 @@ describe('Stake lifecycle', () => {
     const [node] = await seed('ChainNode', {});
     const [user] = await seed('User', { isAdmin: true });
     const [community_with_stake] = await seed('Community', {
+      active: true,
       chain_node_id: node?.id,
       Addresses: [
         {
@@ -51,6 +56,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake_to_set] = await seed('Community', {
+      active: true,
       chain_node_id: node?.id,
       Addresses: [
         {
@@ -60,6 +66,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake] = await seed('Community', {
+      active: true,
       chain_node_id: node?.id,
       Addresses: [
         {
@@ -92,6 +99,15 @@ describe('Stake lifecycle', () => {
     Sinon.restore();
   });
 
+  test('should query community that has stake enabled', async () => {
+    const results = await query(GetCommunities(), {
+      actor,
+      payload: { stake_enabled: true },
+    });
+    expect(results?.totalResults).to.eq('1');
+    expect(results?.results?.at(0)?.id).to.eq(id_with_stake);
+  });
+
   test('should fail set when community namespace not configured', () => {
     expect(
       command(SetCommunityStake(), {
@@ -122,6 +138,12 @@ describe('Stake lifecycle', () => {
       payload: { community_id: id_without_stake_to_set },
     });
     expect(qr).to.deep.include({ ...payload });
+
+    const commr = await query(GetCommunities(), {
+      actor,
+      payload: { stake_enabled: true },
+    });
+    expect(commr?.totalResults).to.eq('2');
   });
 
   test('should fail set when community not found', async () => {
