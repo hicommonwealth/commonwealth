@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 export type CWTopicWithDiscourseId = z.infer<typeof Topic> & {
   discourseCategoryId: number;
+  created: boolean;
 };
 
 // Discourse Category == CW Topic
@@ -31,9 +32,9 @@ class CWQueries {
     description: string,
     communityId: string,
     discourseCategoryId: number,
-    { transaction }: { transaction: Transaction },
+    { transaction }: { transaction: Transaction | null },
   ): Promise<CWTopicWithDiscourseId> => {
-    const [topic] = await models.Topic.findOrCreate({
+    const [topic, created] = await models.Topic.findOrCreate({
       where: {
         name,
         community_id: communityId,
@@ -50,6 +51,7 @@ class CWQueries {
     return {
       ...(topic.get({ plain: true }) as z.infer<typeof Topic>),
       discourseCategoryId,
+      created,
     };
   };
 }
@@ -57,7 +59,7 @@ class CWQueries {
 export const createAllTopicsInCW = async (
   discourseConnection: Sequelize,
   { communityId }: { communityId: string },
-  { transaction }: { transaction: Transaction },
+  { transaction }: { transaction: Transaction | null },
 ): Promise<Array<CWTopicWithDiscourseId>> => {
   const discourseTopics = await DiscourseQueries.fetchCategories(
     discourseConnection,

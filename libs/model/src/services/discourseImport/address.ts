@@ -9,6 +9,7 @@ import { createCosmosAddress } from './utils';
 
 export type CWAddressWithDiscourseId = z.infer<typeof Address> & {
   discourseUserId: number;
+  created: boolean;
 };
 
 class CWQueries {
@@ -28,9 +29,9 @@ class CWQueries {
       isModerator: boolean;
       discourseUserId: number;
     },
-    { transaction }: { transaction: Transaction },
+    { transaction }: { transaction: Transaction | null },
   ): Promise<CWAddressWithDiscourseId> => {
-    const [createdAddress] = await models.Address.findOrCreate({
+    const [addr, created] = await models.Address.findOrCreate({
       where: {
         address: address,
         user_id: userId,
@@ -54,8 +55,9 @@ class CWQueries {
       transaction,
     });
     return {
-      ...createdAddress.get({ plain: true }),
+      ...addr.get({ plain: true }),
       discourseUserId,
+      created,
     };
   };
 }
@@ -74,7 +76,7 @@ export const createAllAddressesInCW = async (
     communityId: string;
     base: string;
   },
-  { transaction }: { transaction: Transaction },
+  { transaction }: { transaction: Transaction | null },
 ): Promise<Array<CWAddressWithDiscourseId>> => {
   const addressPromises = users.map((user) => {
     let ghostAddress;

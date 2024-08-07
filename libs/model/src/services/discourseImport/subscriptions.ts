@@ -6,6 +6,10 @@ import {
 } from '@hicommonwealth/model';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
+type CWSubscriptionWithDiscourseId = SubscriptionAttributes & {
+  created: boolean;
+};
+
 class DiscourseQueries {
   static fetchSubscriptions = (session: Sequelize) => {
     return session.query<{
@@ -38,8 +42,8 @@ class CWQueries {
       threadId,
       communityId,
     }: { userId: number; threadId: number; communityId: string },
-    { transaction }: { transaction: Transaction },
-  ) => {
+    { transaction }: { transaction: Transaction | null },
+  ): Promise<CWSubscriptionWithDiscourseId> => {
     const options: SubscriptionAttributes = {
       subscriber_id: userId,
       category_id: 'new-mention',
@@ -48,12 +52,15 @@ class CWQueries {
       community_id: communityId,
       thread_id: threadId,
     };
-    const [subscription] = await models.Subscription.findOrCreate({
+    const [subscription, created] = await models.Subscription.findOrCreate({
       where: options,
       defaults: options,
       transaction,
     });
-    return subscription.get({ plain: true });
+    return {
+      ...subscription.get({ plain: true }),
+      created,
+    };
   };
 }
 
@@ -68,7 +75,7 @@ export const createAllSubscriptionsInCW = async (
     threads: Array<CWThreadWithDiscourseId>;
     users: Array<CWUserWithDiscourseId>;
   },
-  { transaction }: { transaction: Transaction },
+  { transaction }: { transaction: Transaction | null },
 ) => {
   const subscriptions = await DiscourseQueries.fetchSubscriptions(
     discourseConnection,
@@ -88,7 +95,7 @@ export const createAllSubscriptionsInCW = async (
     return null;
   });
   const createdSubscriptions = await Promise.all(subscriptionPromises);
-  return createdSubscriptions
-    .filter(Boolean)
-    .map((subscription) => subscription!.id);
+  return createdSubscriptions.filter(
+    Boolean,
+  ) as Array<CWSubscriptionWithDiscourseId>;
 };

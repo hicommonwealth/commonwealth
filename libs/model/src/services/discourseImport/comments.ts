@@ -12,6 +12,7 @@ import { z } from 'zod';
 export type CWCommentWithDiscourseId = z.infer<typeof Comment> & {
   discoursePostId: number;
   discoursePostNumber: number;
+  created: boolean;
 };
 
 // Discourse Post == CW Comment
@@ -70,7 +71,7 @@ class CWQueries {
       created_at: moment(discoursePost.created_at).toDate(),
       updated_at: moment(discoursePost.updated_at).toDate(),
     };
-    const [comment] = await models.Comment.findOrCreate({
+    const [comment, created] = await models.Comment.findOrCreate({
       where: options,
       defaults: options,
       transaction,
@@ -79,6 +80,7 @@ class CWQueries {
       ...comment.get({ plain: true }),
       discoursePostId: discoursePost.id,
       discoursePostNumber: discoursePost.post_number,
+      created,
     };
   };
 
@@ -117,7 +119,7 @@ export const createAllCommentsInCW = async (
     addresses: Array<CWAddressWithDiscourseId>;
     threads: Array<CWThreadWithDiscourseId>;
   },
-  { transaction }: { transaction: Transaction },
+  { transaction }: { transaction: Transaction | null },
 ): Promise<Array<CWCommentWithDiscourseId>> => {
   const discoursePosts = await DiscourseQueries.fetchPosts(discourseConnection);
   const postsGroupedByTopic: Record<number, Array<DiscoursePost>> = lo.groupBy(

@@ -3,11 +3,11 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { emitEvent } from '../utils';
 
-export function ImportDiscourseCommunity(): Command<
-  typeof schemas.ImportDiscourseCommunity
+export function SubmitDiscourseImport(): Command<
+  typeof schemas.SubmitDiscourseImport
 > {
   return {
-    ...schemas.ImportDiscourseCommunity,
+    ...schemas.SubmitDiscourseImport,
     secure: false, // TODO: remove this
     auth: [], // TODO: add super admin middleware
     body: async ({ payload }) => {

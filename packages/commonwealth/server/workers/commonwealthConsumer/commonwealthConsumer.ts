@@ -16,7 +16,11 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { Contest, ContestWorker } from '@hicommonwealth/model';
+import {
+  Contest,
+  ContestWorker,
+  DiscourseImportWorker,
+} from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
@@ -90,6 +94,12 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     Contest.Contests(),
   );
 
+  const discourseImportWorkerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.DiscourseImportWorkerPolicy,
+    DiscourseImportWorker(),
+    buildRetryStrategy(() => true), // disable retry
+  );
+
   if (!chainEventSubRes) {
     log.fatal(
       'Failed to subscribe to chain-events. Requires restart!',
@@ -113,6 +123,16 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   if (!contestProjectionsSubRes) {
     log.fatal(
       'Failed to subscribe to contest projection events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestProjection,
+      },
+    );
+  }
+
+  if (!discourseImportWorkerSubRes) {
+    log.fatal(
+      'Failed to subscribe to discourse import worker events. Requires restart!',
       undefined,
       {
         topic: BrokerSubscriptions.ContestProjection,

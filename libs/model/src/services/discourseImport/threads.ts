@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 export type CWThreadWithDiscourseId = z.infer<typeof Thread> & {
   discourseTopicId: number;
+  created: boolean;
 };
 
 // Discourse Topic == CW Thread
@@ -83,7 +84,7 @@ class CWQueries {
       comment_count: 0,
       max_notif_id: 0,
     };
-    const [thread] = await models.Thread.findOrCreate({
+    const [thread, created] = await models.Thread.findOrCreate({
       where: {
         address_id: options.address_id,
         community_id: options.community_id,
@@ -96,6 +97,7 @@ class CWQueries {
     return {
       ...thread.get({ plain: true }),
       discourseTopicId: discourseTopic.id,
+      created,
     };
   };
 }
@@ -111,7 +113,7 @@ export const createAllThreadsInCW = async (
     topics: Array<CWTopicWithDiscourseId>;
     communityId: string;
   },
-  { transaction }: { transaction: Transaction },
+  { transaction }: { transaction: Transaction | null },
 ): Promise<Array<CWThreadWithDiscourseId>> => {
   const discourseThreads = await DiscourseQueries.fetchTopics(
     discourseConnection,

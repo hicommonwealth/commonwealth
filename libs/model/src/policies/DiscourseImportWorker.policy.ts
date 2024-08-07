@@ -1,5 +1,5 @@
 import { AppError, events, logger, Policy } from '@hicommonwealth/core';
-import { Sequelize } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { config } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
 import {
@@ -159,16 +159,29 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           throw new Error('failed to connect to discourse DB');
         }
 
-        const transaction = await models.sequelize.transaction();
         try {
           // TODO: use accountsClaimable flag
 
           // insert users
           const { users, admins, moderators } = await createAllUsersInCW(
             restrictedDiscourseConnection,
-            { transaction },
+            { transaction: null },
           );
           log.debug(`Users: ${users.length}`);
+          cleanupStack.push({
+            description: 'Cleanup created users',
+            fn: async () => {
+              await models.User.destroy({
+                where: {
+                  id: {
+                    [Op.in]: users
+                      .filter((u) => u.id && u.created)
+                      .map((u) => u.id!),
+                  },
+                },
+              });
+            },
+          });
 
           // insert addresses
           const addresses = await createAllAddressesInCW(
@@ -179,17 +192,45 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
               communityId: communityId!,
               base,
             },
-            { transaction },
+            { transaction: null },
           );
           log.debug(`Addresses: ${addresses.length}`);
+          cleanupStack.push({
+            description: 'Cleanup created addresses',
+            fn: async () => {
+              await models.Address.destroy({
+                where: {
+                  id: {
+                    [Op.in]: addresses
+                      .filter((a) => a.id && a.created)
+                      .map((a) => a.id!),
+                  },
+                },
+              });
+            },
+          });
 
           // insert topics (discourse categories)
           const topics = await createAllTopicsInCW(
             restrictedDiscourseConnection,
             { communityId: communityId! },
-            { transaction },
+            { transaction: null },
           );
           log.debug(`Topics: ${topics.length}`);
+          cleanupStack.push({
+            description: 'Cleanup created topics',
+            fn: async () => {
+              await models.Topic.destroy({
+                where: {
+                  id: {
+                    [Op.in]: topics
+                      .filter((t) => t.id && t.created)
+                      .map((t) => t.id!),
+                  },
+                },
+              });
+            },
+          });
 
           // insert threads (discourse topics)
           const threads = await createAllThreadsInCW(
@@ -199,9 +240,23 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
               topics,
               communityId: communityId!,
             },
-            { transaction },
+            { transaction: null },
           );
           log.debug(`Threads: ${threads.length}`);
+          cleanupStack.push({
+            description: 'Cleanup created threads',
+            fn: async () => {
+              await models.Thread.destroy({
+                where: {
+                  id: {
+                    [Op.in]: threads
+                      .filter((t) => t.id && t.created)
+                      .map((t) => t.id!),
+                  },
+                },
+              });
+            },
+          });
 
           // insert comments (discourse posts)
           const comments = await createAllCommentsInCW(
@@ -211,9 +266,23 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
               addresses,
               threads,
             },
-            { transaction },
+            { transaction: null },
           );
           log.debug(`Comments: ${comments.length}`);
+          cleanupStack.push({
+            description: 'Cleanup created comments',
+            fn: async () => {
+              await models.Comment.destroy({
+                where: {
+                  id: {
+                    [Op.in]: comments
+                      .filter((c) => c.id && c.created)
+                      .map((c) => c.id!),
+                  },
+                },
+              });
+            },
+          });
 
           // insert reactions
           const reactions = await createAllReactionsInCW(
@@ -224,9 +293,23 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
               threads,
               comments,
             },
-            { transaction },
+            { transaction: null },
           );
           log.debug(`Reactions: ${reactions.length}`);
+          cleanupStack.push({
+            description: 'Cleanup created reactions',
+            fn: async () => {
+              await models.Reaction.destroy({
+                where: {
+                  id: {
+                    [Op.in]: reactions
+                      .filter((r) => r.id && r.created)
+                      .map((r) => r.id!),
+                  },
+                },
+              });
+            },
+          });
 
           // insert subscriptions
           const subscriptions = await createAllSubscriptionsInCW(
@@ -236,16 +319,27 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
               users,
               threads,
             },
-            { transaction },
+            { transaction: null },
           );
           log.debug(`Subscriptions: ${subscriptions.length}`);
+          cleanupStack.push({
+            description: 'Cleanup created subscriptions',
+            fn: async () => {
+              await models.Subscription.destroy({
+                where: {
+                  id: {
+                    [Op.in]: subscriptions
+                      .filter((s) => s.id && s.created)
+                      .map((s) => s.id!),
+                  },
+                },
+              });
+            },
+          });
 
-          await transaction.commit();
+          throw new Error('BOOM');
 
           log.debug(`DISCOURSE IMPORT SUCCESSFUL ON ${communityId}`);
-        } catch (err) {
-          await transaction.rollback();
-          throw err;
         } finally {
           // always cleanup
           await runCleanup(cleanupStack);

@@ -5,14 +5,21 @@ import {
   models,
   ReactionAttributes,
 } from '@hicommonwealth/model';
+import { Reaction } from '@hicommonwealth/schemas';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+
+type CWReactionWithDiscourseId = z.infer<typeof Reaction> & {
+  discoursePostActionId: number | null;
+  discourseTopicId: number | null;
+  created: boolean;
+};
 
 class DiscourseQueries {
   static fetchThreadsReactions = async (session: Sequelize) => {
     return session.query<{
-      user_id: any;
-      topic_id: any;
-      liked: any;
+      user_id: number;
+      topic_id: number;
+      liked: boolean;
       email: string;
     }>(
       `
@@ -33,12 +40,12 @@ class DiscourseQueries {
 
   static fetchCommentsReactions = async (session: Sequelize) => {
     return session.query<{
-      id: any;
-      post_id: any;
-      user_id: any;
-      post_action_type_id: any;
-      deleted_at: any;
-      name_key: any;
+      id: number;
+      post_id: number;
+      user_id: number;
+      post_action_type_id: number;
+      deleted_at: Date | null;
+      name_key: string;
     }>(
       `
         SELECT post_actions.id, post_id, user_id, post_action_type_id, deleted_at, name_key
@@ -57,18 +64,22 @@ class DiscourseQueries {
 class CWQueries {
   static createOrFindReaction = async (
     {
+      discoursePostActionId,
+      discourseTopicId,
       communityId,
       addressId,
       threadId,
       commentId,
     }: {
+      discoursePostActionId: number | null | undefined;
+      discourseTopicId: number | null | undefined;
       communityId: string;
       addressId: number;
       threadId: number | null | undefined;
       commentId: number | null | undefined;
     },
-    { transaction }: { transaction: Transaction },
-  ) => {
+    { transaction }: { transaction: Transaction | null },
+  ): Promise<CWReactionWithDiscourseId> => {
     const options: ReactionAttributes = {
       community_id: communityId,
       address_id: addressId,
@@ -83,12 +94,17 @@ class CWQueries {
     if (commentId) {
       options.comment_id = commentId;
     }
-    const [createdReaction] = await models.Reaction.findOrCreate({
+    const [reaction, created] = await models.Reaction.findOrCreate({
       where: options,
       defaults: options,
       transaction,
     });
-    return createdReaction.get({ plain: true });
+    return {
+      ...reaction.get({ plain: true }),
+      discoursePostActionId: discoursePostActionId || null,
+      discourseTopicId: discourseTopicId || null,
+      created,
+    };
   };
 }
 
@@ -105,47 +121,72 @@ export const createAllReactionsInCW = async (
     threads: Array<CWThreadWithDiscourseId>;
     comments: Array<CWCommentWithDiscourseId>;
   },
-  { transaction }: { transaction: Transaction },
-) => {
+  { transaction }: { transaction: Transaction | null },
+): Promise<Array<CWReactionWithDiscourseId>> => {
   const [threadReactions, commentReactions] = await Promise.all([
     DiscourseQueries.fetchThreadsReactions(discourseConnection),
     DiscourseQueries.fetchCommentsReactions(discourseConnection),
   ]);
 
-  const allReactions = [...threadReactions, ...commentReactions];
-  const reactionPromises = allReactions.map(
-    ({
-      user_id: discourseReactionUserId,
-      topic_id: discourseReactionTopicId,
-      post_id: discourseReactionPostId,
-    }: any) => {
-      const { id: addressId } =
-        addresses.find(
+  const reactionPromises: Array<Promise<CWReactionWithDiscourseId | null>> = [
+    ...threadReactions.map(
+      ({
+        user_id: discourseReactionUserId,
+        topic_id: discourseReactionTopicId,
+      }) => {
+        const addressId = addresses.find(
           ({ discourseUserId }) => discourseUserId === discourseReactionUserId,
-        ) || {};
-      const { id: threadId } =
-        threads.find(
+        )?.id;
+        const threadId = threads.find(
           ({ discourseTopicId }) =>
             discourseTopicId === discourseReactionTopicId,
-        ) || {};
-      const { id: commentId } =
-        comments.find(
+        )?.id;
+        if (addressId && threadId) {
+          return CWQueries.createOrFindReaction(
+            {
+              discourseTopicId: discourseReactionTopicId,
+              discoursePostActionId: null,
+              communityId,
+              addressId,
+              threadId,
+              commentId: null,
+            },
+            { transaction },
+          );
+        }
+        return Promise.resolve(null);
+      },
+    ),
+    ...commentReactions.map(
+      ({
+        id: discoursePostActionId,
+        user_id: discourseReactionUserId,
+        post_id: discourseReactionPostId,
+      }) => {
+        const addressId = addresses.find(
+          ({ discourseUserId }) => discourseUserId === discourseReactionUserId,
+        )?.id;
+        const commentId = comments.find(
           ({ discoursePostId }) => discoursePostId === discourseReactionPostId,
-        ) || {};
-      if (addressId && (threadId || commentId)) {
-        return CWQueries.createOrFindReaction(
-          {
-            communityId,
-            addressId,
-            threadId,
-            commentId,
-          },
-          { transaction },
-        );
-      }
-      return null;
-    },
-  );
+        )?.id;
+        if (addressId && commentId) {
+          return CWQueries.createOrFindReaction(
+            {
+              discourseTopicId: null,
+              discoursePostActionId,
+              communityId,
+              addressId,
+              threadId: null,
+              commentId,
+            },
+            { transaction },
+          );
+        }
+        return Promise.resolve(null);
+      },
+    ),
+  ];
+
   const createdReactions = await Promise.all(reactionPromises);
-  return createdReactions.filter(Boolean).map((reaction) => reaction!.id);
+  return createdReactions.filter(Boolean) as Array<CWReactionWithDiscourseId>;
 };

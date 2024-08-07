@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 export type CWUserWithDiscourseId = z.infer<typeof User> & {
   discourseUserId: number;
+  created: boolean;
 };
 
 type DiscourseUser = {
@@ -105,9 +106,9 @@ class CWQueries {
   static createOrFindUser = async (
     discourseUser: DiscourseUser,
     discourseBio: DiscourseWebsiteBio | null,
-    { transaction }: { transaction: Transaction },
+    { transaction }: { transaction: Transaction | null },
   ): Promise<CWUserWithDiscourseId> => {
-    const [user] = await models.User.findOrCreate({
+    const [user, created] = await models.User.findOrCreate({
       where: {
         email: discourseUser.email,
       },
@@ -129,13 +130,14 @@ class CWQueries {
     return {
       ...user.get({ plain: true }),
       discourseUserId: discourseUser.id,
+      created,
     };
   };
 }
 
 export const createAllUsersInCW = async (
   discourseConnection: Sequelize,
-  { transaction }: { transaction: Transaction },
+  { transaction }: { transaction: Transaction | null },
 ): Promise<{
   users: Array<CWUserWithDiscourseId>;
   admins: Record<number, boolean>;

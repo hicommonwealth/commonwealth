@@ -105,7 +105,7 @@ export const GenerateStakeholderGroups = {
   }),
 };
 
-export const ImportDiscourseCommunity = {
+export const SubmitDiscourseImport = {
   input: z.object({
     id: z.string(),
     base: z.enum(['ETHEREUM', 'COSMOS', 'NEAR']),
