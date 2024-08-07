@@ -6,10 +6,8 @@ import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CommunityFinder from './CommunityFinder';
 
 type Stats = {
   numCommentsLastMonth: number;
@@ -29,9 +27,6 @@ const Analytics = () => {
     { id: string; created_at: string }[]
   >([]);
   const [globalStats, setGlobalStats] = useState<Stats>();
-  const [communityLookupValue, setCommunityLookupValue] = useState<string>('');
-  const [communityLookupValidated, setCommunityLookupValidated] =
-    useState<boolean>(false);
   const [communityLookupCompleted, setCommunityLookupCompleted] =
     useState<boolean>(false);
   const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
@@ -82,24 +77,6 @@ const Analytics = () => {
       });
     }
   }, [initialized]);
-
-  const validationFn = (value: string): [ValidationStatus, string] | [] => {
-    if (!value || !app.config.chains.getById(value)) {
-      setCommunityLookupCompleted(false);
-      setCommunityLookupValidated(false);
-      return ['failure', 'Community not found'];
-    }
-    setCommunityLookupValidated(true);
-    return [];
-  };
-
-  const onInput = (e) => {
-    setCommunityLookupValue(e.target.value);
-    if (e.target.value.length === 0) {
-      setCommunityLookupValidated(false);
-      setCommunityLookupCompleted(false);
-    }
-  };
 
   return (
     <div className="Analytics">
@@ -181,23 +158,13 @@ const Analytics = () => {
             <CWText type="caption">
               Search for 30 day analytics from a specific community.
             </CWText>
-            <div className="Row">
-              <CWTextInput
-                value={communityLookupValue}
-                onInput={onInput}
-                inputValidationFn={validationFn}
-                placeholder="Enter a community id"
-              />
-              <CWButton
-                label="Search"
-                className="TaskButton"
-                disabled={!communityLookupValidated}
-                onClick={async () => {
-                  await getCommunityAnalytics(communityLookupValue);
-                }}
-              />
-            </div>
-            {communityLookupValidated && communityLookupCompleted && (
+            <CommunityFinder
+              ctaLabel="Search"
+              onAction={async (communityId) => {
+                await getCommunityAnalytics(communityId);
+              }}
+            />
+            {communityAnalytics && communityLookupCompleted && (
               <div className="Stats">
                 <div className="Stat">
                   <CWText fontWeight="medium">Total Threads</CWText>
