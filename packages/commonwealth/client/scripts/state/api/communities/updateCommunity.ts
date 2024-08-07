@@ -1,3 +1,4 @@
+import { ChainType } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app, { initAppState } from 'state';
@@ -21,6 +22,8 @@ interface UpdateCommunityProps {
   customDomain?: string;
   iconUrl?: string;
   defaultOverview?: boolean;
+  chainNodeId?: string;
+  type?: ChainType;
   isPWA?: boolean;
 }
 
@@ -42,6 +45,8 @@ const updateCommunity = async ({
   customDomain,
   iconUrl,
   defaultOverview,
+  chainNodeId,
+  type,
   isPWA,
 }: UpdateCommunityProps) => {
   return await axios.patch(
@@ -102,6 +107,12 @@ const updateCommunity = async ({
       }),
       ...(typeof defaultOverview !== 'undefined' && {
         default_summary_view: defaultOverview,
+      }),
+      ...(typeof chainNodeId !== 'undefined' && {
+        chain_node_id: chainNodeId,
+      }),
+      ...(typeof type !== 'undefined' && {
+        type: type,
       }),
     },
     {

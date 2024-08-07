@@ -25,6 +25,7 @@ export const findSuggestedCommunities = ({
   // 2. then sort them by the count of members (from higher to lower)
   // 3. then sort them by the count of threads (from higher to lower)
   // 4. then seperate them into 2 groups, communities that match user preferences and those that don't
+  // TODO: 8762 this algo needs to move to backend -> `GET /communities?suggested=true`
   [...app.config.chains.getAll()]
     .filter((community) => community.base === userChainBase)
     .sort((a, b) => b.profileCount - a.profileCount)
