@@ -169,11 +169,11 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
             ' threads.thread_created < $to_date '
           : ''
       }
-      ${includePinnedThreads || orderByQueries[orderBy!] ? 'ORDER BY ' : ''}
+      ${includePinnedThreads || orderByQueries[orderBy] ? 'ORDER BY ' : ''}
       ${includePinnedThreads ? ' threads.pinned DESC' : ''}
       ${
-        orderByQueries[orderBy!]
-          ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy!]
+        orderByQueries[orderBy]
+          ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy]
           : ''
       }
       LIMIT $limit OFFSET $offset
