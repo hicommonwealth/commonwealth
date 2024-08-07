@@ -46,6 +46,8 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
       );
 
       // !side effects
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
       const [updated] = await models.CommunityStake.upsert({
         ...rest,
         community_id: id.toString(),

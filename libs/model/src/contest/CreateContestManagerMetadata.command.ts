@@ -47,6 +47,8 @@ export function CreateContestManagerMetadata(): Command<
       const contestManager = await models.sequelize.transaction(
         async (transaction) => {
           const manager = await models.ContestManager.create(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //@ts-ignore
             {
               ...rest,
               community_id: id.toString(),
