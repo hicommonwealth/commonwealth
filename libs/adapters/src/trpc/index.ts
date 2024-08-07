@@ -209,7 +209,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
   return trpc.procedure
     .meta({
       openapi: {
-        method: 'GET',
+        method: 'POST',
         path: `/${Tag.Query.toLowerCase()}/${factory.name}`,
         tags: [Tag.Query],
         headers: [{ name: 'address_id' }],
