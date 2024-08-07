@@ -127,7 +127,13 @@ type ExtendedNotificationRowProps = NotificationRowProps & {
 
 // eslint-disable-next-line react/no-multi-comp
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
-  const { handleSetMarkingRead, markingRead, notification, allRead } = props;
+  const {
+    handleSetMarkingRead,
+    markingRead,
+    notification,
+    allRead,
+    communityName,
+  } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
 
   const category = notification.categoryId;
@@ -138,10 +144,14 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
     typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data,
   );
 
+  const response = getBatchNotificationFields(
+    category,
+    notificationData,
+    communityName,
+  );
   const { authorInfo, createdAt, notificationHeader, notificationBody } =
-    getBatchNotificationFields(category, notificationData);
-
-  let { path } = getBatchNotificationFields(category, notificationData);
+    response;
+  let { path } = response;
 
   if (app.isCustomDomain()) {
     if (

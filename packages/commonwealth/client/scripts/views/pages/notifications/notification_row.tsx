@@ -58,6 +58,7 @@ export const NotificationRow = (props: NotificationRowProps) => {
         handleSetMarkingRead={handleSetMarkingRead}
         markingRead={markingRead}
         allRead={allRead}
+        communityName={community?.name}
       />
     );
   }
