@@ -61,7 +61,6 @@ describe('Group lifecycle', () => {
       actor,
       payload: { has_groups: true },
     });
-    console.log(communityResults);
     expect(communityResults?.results).to.have.length(0);
   });
 
@@ -73,6 +72,7 @@ describe('Group lifecycle', () => {
       actor,
       payload: { has_groups: true },
     });
+    console.log(communityResults);
     expect(communityResults?.results?.at(0)?.id).to.equal(payload.id);
   });
 

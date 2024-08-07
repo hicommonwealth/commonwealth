@@ -7,7 +7,6 @@ export const Tags = z.object({
 });
 
 export const CommunityTags = z.object({
-  id: PG_INT.optional(),
   community_id: z.string(),
   tag_id: PG_INT,
   Tag: Tags.optional(),

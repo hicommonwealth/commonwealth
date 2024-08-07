@@ -3,7 +3,6 @@ import { TagsAttributes } from './tags';
 import type { ModelInstance } from './types';
 
 export type CommunityTagsAttributes = {
-  id?: number;
   community_id: string;
   tag_id: number;
   created_at?: Date;

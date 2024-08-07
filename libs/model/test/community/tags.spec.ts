@@ -50,7 +50,6 @@ describe('Tags', () => {
       actor,
       payload: {},
     });
-    console.log(communityResults);
     expect(communityResults?.results).to.have.length(3);
   });
 
@@ -59,7 +58,6 @@ describe('Tags', () => {
       actor,
       payload: { tag_ids: [tag1Id] },
     });
-    console.log(communityResults);
     expect(communityResults?.results).to.have.length(2);
   });
 
@@ -68,7 +66,6 @@ describe('Tags', () => {
       actor,
       payload: { tag_ids: [tag1Id, tag2Id] },
     });
-    console.log(communityResults);
     expect(communityResults?.results).to.have.length(1);
   });
 });
