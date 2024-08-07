@@ -27,12 +27,12 @@ export async function __refreshMembership(
   this: ServerGroupsController,
   { address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  type QueryResult = (GroupAttributes & {
+  type QueryResult = GroupAttributes & {
     allowed_actions: ForumActions[];
     topic_id: number;
-  })[];
+  };
 
-  const groups: QueryResult = (await this.models.sequelize.query(
+  const groups = await this.models.sequelize.query<QueryResult>(
     `
     SELECT G.*, GP.allowed_actions, GP.topic_id FROM "Groups" G
     LEFT JOIN "GroupPermissions" GP ON G.id = GP.group_id 
@@ -46,7 +46,7 @@ export async function __refreshMembership(
         topicId: topicId ?? null,
       },
     },
-  )) as QueryResult;
+  );
 
   if (groups.length === 0 && topicId) {
     throw new AppError(Errors.TopicNotFound);
@@ -55,7 +55,7 @@ export async function __refreshMembership(
   const memberships = await refreshMembershipsForAddress(
     this.models,
     address,
-    groups as unknown as GroupAttributes[],
+    groups as GroupAttributes[],
     true, // use fresh balances
   );
 

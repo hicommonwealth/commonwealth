@@ -37,7 +37,7 @@ export type UpdateGroupOptions = {
   user: UserInstance;
   address: AddressInstance;
   groupId: number;
-  allowedActions?: ForumActions;
+  allowedActions?: ForumActions[];
   metadata?: z.infer<typeof GroupMetadata>;
   requirements?: Requirement[];
   topics?: number[];
@@ -138,8 +138,7 @@ export async function __updateGroup(
     if (topics) {
       group.groupPermissions = await updateGroupPermissions(
         topics,
-        allowedActions ??
-          (Object.values(ForumActionsEnum) as unknown as ForumActions),
+        allowedActions ?? Object.values(ForumActionsEnum),
         group.id,
         this.models,
         transaction,
@@ -158,7 +157,7 @@ export async function __updateGroup(
 
 async function updateGroupPermissions(
   topics: number[],
-  allowed_actions: ForumActions,
+  allowed_actions: ForumActions[],
   group_id: number,
   models: DB,
   transaction: Transaction,
