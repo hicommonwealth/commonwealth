@@ -75,12 +75,14 @@ export function getRabbitMQConfig(
       RascalQueues.NotificationsProvider,
       RascalQueues.ContestWorkerPolicy,
       RascalQueues.ContestProjection,
+      RascalQueues.DiscourseImportWorkerPolicy,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
       RascalBindings.NotificationsProvider,
       RascalBindings.ContestWorkerPolicy,
       RascalBindings.ContestProjection,
+      RascalBindings.DiscourseImportWorkerPolicy,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
@@ -90,6 +92,7 @@ export function getRabbitMQConfig(
       RascalSubscriptions.NotificationsProvider,
       RascalSubscriptions.ContestWorkerPolicy,
       RascalSubscriptions.ContestProjection,
+      RascalSubscriptions.DiscourseImportWorkerPolicy,
     ]);
   } else if (service === RascalConfigServices.DiscobotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
