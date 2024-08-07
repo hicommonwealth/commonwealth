@@ -13,6 +13,14 @@ interface UpdateCommunityProps {
   discordBotWebhooksEnabled?: boolean;
   snapshot?: string[];
   terms?: string;
+  name?: string;
+  description?: string;
+  socialLinks?: string[];
+  stagesEnabled?: boolean;
+  customStages?: string[];
+  customDomain?: string;
+  iconUrl?: string;
+  defaultOverview?: boolean;
   isPWA?: boolean;
 }
 
@@ -26,6 +34,14 @@ const updateCommunity = async ({
   discordBotWebhooksEnabled,
   snapshot,
   terms,
+  name,
+  description,
+  socialLinks,
+  stagesEnabled,
+  customStages,
+  customDomain,
+  iconUrl,
+  defaultOverview,
   isPWA,
 }: UpdateCommunityProps) => {
   return await axios.patch(
@@ -59,6 +75,33 @@ const updateCommunity = async ({
       }),
       ...(typeof discordBotWebhooksEnabled === 'boolean' && {
         discord_bot_webhooks_enabled: discordBotWebhooksEnabled,
+      }),
+      ...(typeof name !== 'undefined' && {
+        name,
+      }),
+      ...(typeof name !== 'undefined' && {
+        name,
+      }),
+      ...(typeof description !== 'undefined' && {
+        description,
+      }),
+      ...(typeof socialLinks !== 'undefined' && {
+        social_links: socialLinks,
+      }),
+      ...(typeof stagesEnabled !== 'undefined' && {
+        stages_enabled: stagesEnabled,
+      }),
+      ...(typeof customStages !== 'undefined' && {
+        custom_stages: customStages,
+      }),
+      ...(typeof customDomain !== 'undefined' && {
+        custom_domain: customDomain,
+      }),
+      ...(typeof iconUrl !== 'undefined' && {
+        icon_url: iconUrl,
+      }),
+      ...(typeof defaultOverview !== 'undefined' && {
+        default_summary_view: defaultOverview,
       }),
     },
     {

@@ -248,6 +248,7 @@ class ChainInfo {
     this.communityBanner = banner_text;
   }
 
+  // TODO: 8762 remove
   public async updateChainData({
     name,
     description,

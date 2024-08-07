@@ -10,7 +10,21 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
     secure: false,
     body: async ({ payload }) => {
       const where = { id: payload.id };
-      const include: Includeable[] = [];
+
+      const include: Includeable[] = [
+        {
+          model: models.CommunityStake,
+        },
+        {
+          model: models.CommunityTags,
+          include: [
+            {
+              model: models.Tags,
+            },
+          ],
+        },
+      ];
+
       if (payload.include_node_info) {
         include.push({
           model: models.ChainNode,
@@ -18,12 +32,17 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         });
       }
 
-      return (
-        await models.Community.findOne({
-          where,
-          include,
-        })
-      )?.toJSON();
+      const community = await models.Community.findOne({
+        where: where,
+        include: include,
+      });
+
+      return {
+        ...community?.toJSON(),
+        CommunityTags: (community?.toJSON()?.CommunityTags || []).map(
+          (ct: any) => ct.Tag,
+        ),
+      };
     },
   };
 }
