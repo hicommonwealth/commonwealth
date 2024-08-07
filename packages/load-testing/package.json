@@ -12,7 +12,7 @@
     "stop": "docker compose -p load-testing down"
   },
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "keywords": [],
   "author": "",
