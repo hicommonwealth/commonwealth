@@ -11,6 +11,7 @@ import {
   chainBaseToCanvasChainId,
   getSessionSigners,
 } from '@hicommonwealth/shared';
+import axios from 'axios';
 import app from 'state';
 import { fetchCachedConfiguration } from 'state/api/configuration';
 import Account from '../../models/Account';
@@ -163,9 +164,13 @@ async function sign(
         }
       }
 
+      // get the clock and parents from the backend
+      const response = await axios.get(`${app.serverUrl()}/getCanvasClock`);
+      const { clock, heads: parents } = response.data.result;
+
       const sessionMessage: Message<Session> = {
-        clock: 1,
-        parents: [],
+        clock,
+        parents,
         topic: CANVAS_TOPIC,
         payload: session,
       };
@@ -177,7 +182,7 @@ async function sign(
       ).id;
 
       const actionMessage: Message<Action> = {
-        clock: 2,
+        clock: clock + 1,
         parents: [sessionMessageId],
         topic: CANVAS_TOPIC,
         payload: {
