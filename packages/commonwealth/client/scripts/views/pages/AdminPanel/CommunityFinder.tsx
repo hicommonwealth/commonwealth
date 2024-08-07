@@ -7,10 +7,15 @@ import { CWTextInput } from '../../components/component_kit/new_designs/CWTextIn
 
 type CommunityFinderProps = {
   ctaLabel: string;
+  actionDisabled?: boolean;
   onAction?: (communityId: string) => any;
 };
 
-const CommunityFinder = ({ ctaLabel, onAction }: CommunityFinderProps) => {
+const CommunityFinder = ({
+  ctaLabel,
+  actionDisabled,
+  onAction,
+}: CommunityFinderProps) => {
   const [communityLookupId, setCommunityLookupId] = useState<string>('');
   const debouncedCommunityLookupId = useDebounce<string | undefined>(
     communityLookupId,
@@ -41,7 +46,7 @@ const CommunityFinder = ({ ctaLabel, onAction }: CommunityFinderProps) => {
       <CWButton
         label={ctaLabel}
         className="TaskButton"
-        disabled={isLoadingCommunityLookupData}
+        disabled={isLoadingCommunityLookupData || actionDisabled}
         onClick={async () => await onAction?.(communityLookupId)}
       />
     </div>
