@@ -36,6 +36,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       const direction = order_direction || 'DESC';
       const order_col = order_by || 'profile_count';
       const offset = limit! * (cursor! - 1);
+
+      // note that tags are queried based on the INTERSECTION of provided tags
       const filtering_tags = tag_ids && tag_ids.length > 0;
       const replacements = filtering_tags ? { tag_ids } : {};
 

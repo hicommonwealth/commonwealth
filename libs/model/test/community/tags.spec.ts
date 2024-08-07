@@ -12,7 +12,7 @@ describe('Tags', () => {
     const [node] = await seed('ChainNode', {});
     const [tag1] = await seed('Tags', { name: 'tag1' });
     const [tag2] = await seed('Tags', { name: 'tag2' });
-    const [communityNoTags] = await seed('Community', {
+    await seed('Community', {
       chain_node_id: node?.id,
       active: true,
     });
@@ -20,7 +20,7 @@ describe('Tags', () => {
       chain_node_id: node?.id,
       active: true,
     });
-    const [community1tag1Tag] = await seed('CommunityTags', {
+    await seed('CommunityTags', {
       community_id: community1Tag1Only?.id,
       tag_id: tag1?.id,
     });
@@ -28,11 +28,11 @@ describe('Tags', () => {
       chain_node_id: node?.id,
       active: true,
     });
-    const [community2tag1Tag] = await seed('CommunityTags', {
+    await seed('CommunityTags', {
       community_id: community2Tag1And2?.id,
       tag_id: tag1?.id,
     });
-    const [community2tag2Tag] = await seed('CommunityTags', {
+    await seed('CommunityTags', {
       community_id: community2Tag1And2?.id,
       tag_id: tag2?.id,
     });

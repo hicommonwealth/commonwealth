@@ -12,7 +12,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
         payload;
       // sort by rank by default
       let sortOptions: schemas.PaginationSqlOptions = {
-        limit: Math.min(limit, 100) || 10,
+        limit: Math.min(limit!, 100) || 10,
         page: page || 1,
         orderDirection,
       };
