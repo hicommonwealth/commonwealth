@@ -95,7 +95,7 @@ export const ThreadOptions = ({
   }, [isSubscribed, thread]);
 
   const handleDownloadMarkdown = () => {
-    downloadDataAsFile(thread.plaintext, thread.title + '.md');
+    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
   };
 
   const createThreadSubscriptionMutation =

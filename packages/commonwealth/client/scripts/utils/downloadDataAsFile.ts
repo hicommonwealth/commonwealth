@@ -2,8 +2,12 @@
  * Save the content locally and use the `filename` as the suggested name for the
  * file.
  */
-export function downloadDataAsFile(content: string, filename: string) {
-  const blob = new Blob([content], { type: 'text/markdown' });
+export function downloadDataAsFile(
+  content: string,
+  type: string,
+  filename: string,
+) {
+  const blob = new Blob([content], { type });
 
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
