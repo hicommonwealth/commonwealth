@@ -12,7 +12,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
     body: async ({ payload }) => {
       const {
         base,
-        tag_ids,
         include_node_info,
         stake_enabled,
         has_groups,
@@ -21,6 +20,11 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         order_by,
         order_direction,
       } = payload;
+      // NOTE 8/7/24: as a result of having to provide a preprocessed string instead of
+      //  being able to provide an array, we must explicitly set tag_ids as type number[]
+      //  here. The input parser will handle incorrectly formatted strings (see the
+      //  tags.spec.ts file where it is exercised) so this is safe to do.
+      const tag_ids = payload.tag_ids as number[];
 
       // pagination configuration
       const direction = order_direction || 'DESC';

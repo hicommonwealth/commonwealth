@@ -56,7 +56,7 @@ describe('Tags', () => {
   test('should query both tagged communities with tag 1 provided', async () => {
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { tag_ids: [tag1Id] },
+      payload: { tag_ids: [tag1Id].join(',') },
     });
     expect(communityResults?.results).to.have.length(2);
   });
@@ -64,8 +64,20 @@ describe('Tags', () => {
   test('should query single community with tag 1 and 2 provided', async () => {
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { tag_ids: [tag1Id, tag2Id] },
+      payload: { tag_ids: [tag1Id, tag2Id].join(',') },
     });
     expect(communityResults?.results).to.have.length(1);
+  });
+
+  test('should fail on invalid tag string', async () => {
+    try {
+      await query(GetCommunities(), {
+        actor,
+        payload: { tag_ids: 'abkjdgkjsagj,daskgjdsakgjsdg' },
+      });
+    } catch (e) {
+      expect((e as Error).message).to.include('Invalid query payload');
+      return;
+    }
   });
 });
