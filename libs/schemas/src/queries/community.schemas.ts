@@ -11,7 +11,10 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
     base: z.nativeEnum(ChainBase).optional(),
-    // TODO: why is this a type error?
+    // NOTE 8/7/24: passing arrays as GET requests is not supported
+    //  to support this field, we converted queries to use POST instead
+    //  but we may need a workaround such as a regex-parsed string
+    //  in the future, depending on the impact of the GET-POST change.
     tag_ids: PG_INT.array().optional(),
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),

@@ -10,7 +10,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      // TODO: constrain order_by
       const {
         base,
         tag_ids,
