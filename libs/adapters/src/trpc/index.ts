@@ -121,6 +121,7 @@ export enum Tag {
   Query = 'Query',
   Integration = 'Integration',
   Subscription = 'Subscription',
+  Wallet = 'Wallet',
   LoadTest = 'LoadTest',
 }
 
