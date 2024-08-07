@@ -37,6 +37,7 @@ describe('Group lifecycle', () => {
     const [user] = await seed('User', { isAdmin: true });
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
+      active: true,
       Addresses: [
         {
           role: 'admin',
@@ -72,7 +73,6 @@ describe('Group lifecycle', () => {
       actor,
       payload: { has_groups: true },
     });
-    console.log(communityResults);
     expect(communityResults?.results?.at(0)?.id).to.equal(payload.id);
   });
 
