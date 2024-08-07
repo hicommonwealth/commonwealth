@@ -39,9 +39,11 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
 
       return {
         ...community?.toJSON(),
-        CommunityTags: (community?.toJSON()?.CommunityTags || []).map(
-          (ct: any) => ct.Tag,
-        ),
+        ...(community?.toJSON() && {
+          CommunityTags: (community?.toJSON()?.CommunityTags || []).map(
+            (ct: any) => ct.Tag,
+          ),
+        }),
       };
     },
   };
