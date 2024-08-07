@@ -36,7 +36,18 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       const replacements = filtering_tags ? { tag_ids } : {};
 
       const sql = `
-        SELECT DISTINCT ON ("Community"."id", "Community"."${order_col}") "Community".*, count(*) OVER() AS total
+        SELECT DISTINCT ON ("Community"."id", "Community"."${order_col}") "Community".*, count(*) OVER() AS total,
+              "CommunityTags"."community_id"    AS "CommunityTags.community_id",
+              "CommunityTags"."tag_id"          AS "CommunityTags.tag_id",
+              "CommunityTags->Tag"."id"         AS "CommunityTags.Tag.id",
+              "CommunityTags->Tag"."name"       AS "CommunityTags.Tag.name",
+              "CommunityStakes"."community_id"  AS "CommunityStakes.community_id",
+              "CommunityStakes"."stake_id"      AS "CommunityStakes.stake_id",
+              "CommunityStakes"."stake_token"   AS "CommunityStakes.stake_token",
+              "CommunityStakes"."vote_weight"   AS "CommunityStakes.vote_weight",
+              "CommunityStakes"."stake_enabled" AS "CommunityStakes.stake_enabled",
+              "CommunityStakes"."created_at"    AS "CommunityStakes.created_at",
+              "CommunityStakes"."updated_at"    AS "CommunityStakes.updated_at"
               ${
                 has_groups
                   ? `
@@ -48,27 +59,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
               "Groups"."created_at"             AS "Groups.created_at",
               "Groups"."updated_at"             AS "Groups.updated_at"
               `
-                  : ''
-              }
-              ${
-                filtering_tags
-                  ? `
-            , "CommunityTags"."community_id"    AS "CommunityTags.community_id",
-              "CommunityTags"."tag_id"          AS "CommunityTags.tag_id",
-              "CommunityTags->Tag"."id"         AS "CommunityTags.Tag.id",
-              "CommunityTags->Tag"."name"       AS "CommunityTags.Tag.name"`
-                  : ''
-              }
-              ${
-                stake_enabled
-                  ? `
-            , "CommunityStakes"."community_id"  AS "CommunityStakes.community_id",
-              "CommunityStakes"."stake_id"      AS "CommunityStakes.stake_id",
-              "CommunityStakes"."stake_token"   AS "CommunityStakes.stake_token",
-              "CommunityStakes"."vote_weight"   AS "CommunityStakes.vote_weight",
-              "CommunityStakes"."stake_enabled" AS "CommunityStakes.stake_enabled",
-              "CommunityStakes"."created_at"    AS "CommunityStakes.created_at",
-              "CommunityStakes"."updated_at"    AS "CommunityStakes.updated_at"`
                   : ''
               }
               ${
@@ -184,30 +174,17 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                           : ''
                       }
                 ) AS "Community"
+              LEFT OUTER JOIN "CommunityTags" AS "CommunityTags"
+                ON "Community"."id" = "CommunityTags"."community_id"
+              LEFT OUTER JOIN "Tags" AS "CommunityTags->Tag"
+                ON "CommunityTags"."tag_id" = "CommunityTags->Tag"."id"
+              LEFT OUTER JOIN "CommunityStakes" AS "CommunityStakes"
+                ON "Community"."id" = "CommunityStakes"."community_id"
               ${
                 has_groups
                   ? `
                 INNER JOIN "Groups" AS "Groups"
                   ON "Community"."id" = "Groups"."community_id"
-              `
-                  : ''
-              }
-              ${
-                filtering_tags
-                  ? `
-                LEFT OUTER JOIN "CommunityTags" AS "CommunityTags"
-                  ON "Community"."id" = "CommunityTags"."community_id"
-                LEFT OUTER JOIN "Tags" AS "CommunityTags->Tag"
-                  ON "CommunityTags"."tag_id" = "CommunityTags->Tag"."id"
-              `
-                  : ''
-              }
-              ${
-                stake_enabled
-                  ? `
-                INNER JOIN "CommunityStakes" AS "CommunityStakes"
-                  ON "Community"."id" = "CommunityStakes"."community_id"
-                    AND "CommunityStakes"."stake_enabled" = true
               `
                   : ''
               }
