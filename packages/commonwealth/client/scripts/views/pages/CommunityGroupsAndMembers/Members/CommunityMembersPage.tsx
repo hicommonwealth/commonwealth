@@ -167,8 +167,7 @@ const CommunityMembersPage = () => {
       }),
       include_group_ids: true,
       // only include stake balances if community has staking enabled
-      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-        .namespace,
+      include_stake_balances: !!community?.namespace,
     },
     {
       initialCursor: 1,
