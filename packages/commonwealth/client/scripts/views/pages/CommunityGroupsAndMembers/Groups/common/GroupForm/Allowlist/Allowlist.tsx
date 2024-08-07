@@ -121,6 +121,7 @@ const Allowlist = ({
     membersPerPage: MEMBERS_PER_PAGE,
     page: currentPage,
     allowedAddresses: memoizedAddresses,
+    isStakedEnabled: isStakedCommunity,
   });
 
   const handlePageChange = (_e, page: number) => {
