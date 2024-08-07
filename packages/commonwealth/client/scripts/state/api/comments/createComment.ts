@@ -63,7 +63,7 @@ const createComment = async ({
       last_active: profile.lastActive,
     },
   };
-  return new Comment(response.data.result);
+  return new Comment({ community_id: undefined, ...response.data.result });
 };
 
 const useCreateCommentMutation = ({
