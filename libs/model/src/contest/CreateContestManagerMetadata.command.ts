@@ -49,8 +49,6 @@ export function CreateContestManagerMetadata(): Command<
           const manager = await models.ContestManager.create(
             {
               ...rest,
-              ticker: rest.ticker!,
-              decimals: rest.decimals!,
               community_id: id.toString(),
               created_at: new Date(),
               cancelled: false,

@@ -118,7 +118,7 @@ export type CommandInput = ZodObject<{
  */
 export type CommandContext<Input extends CommandInput> = {
   readonly actor: Actor;
-  readonly payload: z.input<Input>;
+  readonly payload: z.infer<Input>;
 };
 
 /**
@@ -130,7 +130,7 @@ export type CommandContext<Input extends CommandInput> = {
  */
 export type QueryContext<Input extends ZodSchema> = {
   readonly actor: Actor;
-  readonly payload: z.input<Input>;
+  readonly payload: z.infer<Input>;
 };
 
 /**

@@ -102,7 +102,7 @@ describe('Stake lifecycle', () => {
   test('should query community that has stake enabled', async () => {
     const results = await query(GetCommunities(), {
       actor,
-      payload: { stake_enabled: true },
+      payload: { stake_enabled: true } as any,
     });
     expect(results?.totalResults).to.eq('1');
     expect(results?.results?.at(0)?.id).to.eq(id_with_stake);
@@ -141,7 +141,7 @@ describe('Stake lifecycle', () => {
 
     const commr = await query(GetCommunities(), {
       actor,
-      payload: { stake_enabled: true },
+      payload: { stake_enabled: true } as any,
     });
     expect(commr?.totalResults).to.eq('2');
   });

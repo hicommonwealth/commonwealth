@@ -60,7 +60,7 @@ describe('Group lifecycle', () => {
   test('should fail to query community via has_groups when none exists', async () => {
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { has_groups: true },
+      payload: { has_groups: true } as any,
     });
     expect(communityResults?.results).to.have.length(0);
   });
@@ -71,7 +71,7 @@ describe('Group lifecycle', () => {
 
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { has_groups: true },
+      payload: { has_groups: true } as any,
     });
     expect(communityResults?.results?.at(0)?.id).to.equal(payload.id);
   });

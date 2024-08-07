@@ -108,7 +108,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         order_direction,
       } = payload;
 
-      const offset = limit! * (cursor! - 1);
+      const offset = limit * (cursor - 1);
       const addresses = allowedAddresses?.split(',').map((a) => a.trim()) ?? [];
 
       const replacements = {
@@ -129,8 +129,8 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
 
       const sql =
         search || memberships || addresses.length > 0
-          ? membersSqlWithSearch(cte, orderBy, limit!, offset)
-          : membersSqlWithoutSearch(orderBy, limit!, offset);
+          ? membersSqlWithSearch(cte, orderBy, limit, offset)
+          : membersSqlWithoutSearch(orderBy, limit, offset);
 
       const members = await models.sequelize.query<
         z.infer<typeof schemas.CommunityMember> & { total?: number }

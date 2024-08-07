@@ -48,7 +48,7 @@ describe('Tags', () => {
   test('should query all communities when no tag passed', async () => {
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: {},
+      payload: {} as any,
     });
     expect(communityResults?.results).to.have.length(3);
   });
@@ -56,7 +56,7 @@ describe('Tags', () => {
   test('should query both tagged communities with tag 1 provided', async () => {
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { tag_ids: [tag1Id].join(',') },
+      payload: { tag_ids: [tag1Id].join(',') } as any,
     });
     expect(communityResults?.results).to.have.length(2);
   });
@@ -64,7 +64,7 @@ describe('Tags', () => {
   test('should query single community with tag 1 and 2 provided', async () => {
     const communityResults = await query(GetCommunities(), {
       actor,
-      payload: { tag_ids: [tag1Id, tag2Id].join(',') },
+      payload: { tag_ids: [tag1Id, tag2Id].join(',') } as any,
     });
     expect(communityResults?.results).to.have.length(1);
   });
@@ -73,7 +73,7 @@ describe('Tags', () => {
     try {
       await query(GetCommunities(), {
         actor,
-        payload: { tag_ids: 'abkjdgkjsagj,daskgjdsakgjsdg' },
+        payload: { tag_ids: 'abkjdgkjsagj,daskgjdsakgjsdg' } as any,
       });
     } catch (e) {
       expect((e as Error).message).to.include('Invalid query payload');
