@@ -46,10 +46,11 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
       );
 
       // !side effects
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
       const [updated] = await models.CommunityStake.upsert({
-        ...rest,
+        stake_id: rest.stake_id,
+        stake_token: rest.stake_token!,
+        vote_weight: rest.vote_weight!,
+        stake_enabled: rest.stake_enabled!,
         community_id: id.toString(),
       });
 
