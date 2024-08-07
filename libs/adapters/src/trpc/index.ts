@@ -138,7 +138,14 @@ export const command = <
         method: 'POST',
         path: `/${tag.toLowerCase()}/{id}/${factory.name}`,
         tags: [tag],
-        headers: [{ name: 'address_id' }],
+        headers: [
+          {
+            in: 'header',
+            name: 'address_id',
+            required: true,
+            schema: { type: 'string' },
+          },
+        ],
         protect: md.secure,
       },
     })
@@ -212,7 +219,14 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
         method: 'GET',
         path: `/${Tag.Query.toLowerCase()}/${factory.name}`,
         tags: [Tag.Query],
-        headers: [{ name: 'address_id' }],
+        headers: [
+          {
+            in: 'header',
+            name: 'address_id',
+            required: false,
+            schema: { type: 'string' },
+          },
+        ],
       },
       protect: md.secure,
     })
