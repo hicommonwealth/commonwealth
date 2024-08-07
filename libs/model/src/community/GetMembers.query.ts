@@ -126,7 +126,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         order_by ?? 'name',
         order_direction ?? 'DESC',
       );
-
       const sql =
         search || memberships || addresses.length > 0
           ? membersSqlWithSearch(cte, orderBy, limit, offset)

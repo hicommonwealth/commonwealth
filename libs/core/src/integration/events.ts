@@ -25,6 +25,8 @@ export enum EventNames {
 
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
+
+  DiscourseImportSubmitted = 'DiscourseImportSubmitted',
 }
 
 export const EvmNamespaceFactoryEventSignatures = {

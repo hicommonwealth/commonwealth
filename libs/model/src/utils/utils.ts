@@ -74,6 +74,10 @@ type EmitEventValues =
   | {
       event_name: EventNames.SubscriptionPreferencesUpdated;
       event_payload: z.infer<typeof events.SubscriptionPreferencesUpdated>;
+    }
+  | {
+      event_name: EventNames.DiscourseImportSubmitted;
+      event_payload: z.infer<typeof events.DiscourseImportSubmitted>;
     };
 
 /**

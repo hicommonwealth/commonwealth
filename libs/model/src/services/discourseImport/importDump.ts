@@ -1,9 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { exec } from 'child_process';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export function importDump(dumpUrl: string, dbUri: string): Promise<void> {
   const command = `curl -s ${dumpUrl} | psql ${dbUri}`;
