@@ -1,11 +1,18 @@
+import { ChainBase } from '@hicommonwealth/shared';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import React from 'react';
-import app from 'state';
 import { CWContentPageCard } from 'views/components/component_kit/CWContentPageCard';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 
 const CardsShowcase = () => {
+  const sampleCommunityId = 'dydx';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: sampleCommunityId,
+    enabled: !!sampleCommunityId,
+  });
+
   return (
     <>
       <CWText type="h5">Card</CWText>
@@ -37,7 +44,18 @@ const CardsShowcase = () => {
 
       <CWText type="h5">Related Community Card</CWText>
       <CWRelatedCommunityCard
-        community={app.config.chains.getAll()[30]}
+        community={{
+          id: community?.id || '',
+          name: community?.name || '',
+          base: (community?.base || '') as ChainBase,
+          description: community?.description || '',
+          iconUrl: community?.icon_url || '',
+          ChainNode: {
+            url: community?.ChainNode?.url || '',
+            ethChainId: community?.ChainNode?.eth_chain_id || 0,
+          },
+          namespace: community?.namespace || '',
+        }}
         memberCount="123"
         threadCount="456"
       />

@@ -13,13 +13,14 @@ import {
   ManageCommunityStakeModalState,
 } from './types';
 
+import { ChainBase } from '@hicommonwealth/shared';
+import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import './ManageCommunityStakeModal.scss';
 
 const ManageCommunityStakeModal = ({
   onModalClose,
   mode,
   denomination,
-  community,
 }: ManageCommunityStakeModalProps) => {
   const [modalState, setModalState] = useState(
     ManageCommunityStakeModalState.Exchange,
@@ -27,8 +28,12 @@ const ManageCommunityStakeModal = ({
   const [successTransactionHash, setSuccessTransactionHash] = useState('');
   const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);
 
+  const { selectedCommunity: community } = useManageCommunityStakeModalStore();
+
   const { selectedAddress, setSelectedAddress, addressOptions } =
-    useStakeAddresses({ community });
+    useStakeAddresses({
+      stakedCommunityChainBase: community?.base as ChainBase,
+    });
 
   const getModalBody = () => {
     switch (modalState) {
@@ -44,7 +49,6 @@ const ManageCommunityStakeModal = ({
             numberOfStakeToExchange={numberOfStakeToExchange}
             onSetNumberOfStakeToExchange={setNumberOfStakeToExchange}
             denomination={denomination}
-            community={community}
           />
         );
       case ManageCommunityStakeModalState.Loading:
