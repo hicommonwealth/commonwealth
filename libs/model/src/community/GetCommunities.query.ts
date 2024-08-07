@@ -1,4 +1,4 @@
-import { InvalidState, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -22,15 +22,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         order_by,
         order_direction,
       } = payload;
-      if (
-        order_by &&
-        order_by !== 'profile_count' &&
-        order_by !== 'thread_count'
-      ) {
-        throw new InvalidState(
-          'Invalid ordering: must be profile_count or thread_count.',
-        );
-      }
 
       // pagination configuration
       const direction = order_direction || 'DESC';

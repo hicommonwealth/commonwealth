@@ -16,6 +16,7 @@ export const GetCommunities = {
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
+    order_by: z.enum(['profile_count', 'thread_count']).optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: Community.array(),
