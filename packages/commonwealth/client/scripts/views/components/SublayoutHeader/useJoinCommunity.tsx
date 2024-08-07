@@ -35,8 +35,7 @@ const useJoinCommunity = () => {
     }
 
     // add all items on same base as active chain
-    const addressChainInfo = app.config.chains.getById(a.community.id);
-    if (addressChainInfo?.base !== activeBase) {
+    if (a?.community?.base !== activeBase) {
       return false;
     }
 
@@ -44,8 +43,7 @@ const useJoinCommunity = () => {
     const addressExists = !!user.addresses.slice(idx + 1).find(
       (prev) =>
         activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.community.id)?.base ===
-        ChainBase.Substrate
+        (prev.community?.base === ChainBase.Substrate
           ? addressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -62,6 +60,11 @@ const useJoinCommunity = () => {
     }
 
     return true;
+  });
+
+  console.log('samebaseAddresses => ', {
+    samebaseAddresses,
+    ua: user.addresses,
   });
 
   const uniqueAddresses = [];
