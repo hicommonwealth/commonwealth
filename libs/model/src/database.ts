@@ -8,7 +8,7 @@ const log = logger(import.meta);
 export const sequelize = new Sequelize(config.DB.URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
-  logging: config.DB.TRACE ? (msg) => log.info(msg) : false,
+  logging: config.DB.TRACE ? (msg) => log.trace(msg) : false,
   dialectOptions:
     config.NODE_ENV !== 'production' || config.DB.NO_SSL
       ? { requestTimeout: 40000 }
