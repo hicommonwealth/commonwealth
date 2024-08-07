@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app, { initAppState } from 'state';
 import { userStore } from '../../ui/user';
+import { invalidateAllQueriesForCommunity } from './getCommuityById';
 
 interface UpdateCommunityProps {
   communityId: string;
@@ -124,15 +125,21 @@ const updateCommunity = async ({
 };
 
 type UseUpdateCommunityMutationProps = {
+  communityId: string;
   reInitAppOnSuccess?: boolean;
 };
 
 const useUpdateCommunityMutation = ({
+  communityId,
   reInitAppOnSuccess,
 }: UseUpdateCommunityMutationProps) => {
   return useMutation({
     mutationFn: updateCommunity,
     onSuccess: async () => {
+      // since this is the main chain/community object affecting
+      // some other features, better to re-fetch on update.
+      await invalidateAllQueriesForCommunity(communityId);
+
       if (reInitAppOnSuccess) {
         await initAppState(false);
       }

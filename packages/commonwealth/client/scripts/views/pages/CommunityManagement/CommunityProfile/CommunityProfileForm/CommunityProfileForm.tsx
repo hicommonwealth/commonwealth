@@ -57,18 +57,17 @@ const CommunityProfileForm = () => {
     }[]
   >([]);
 
-  const {
-    data: community,
-    isLoading: isCommunityLoading,
-    refetch: refetchCommunity,
-  } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
-  });
+  const { data: community, isLoading: isCommunityLoading } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
   const { mutateAsync: editTags } = useEditCommunityTagsMutation();
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
 
   const {
     isLoadingTags,
@@ -161,8 +160,6 @@ const CommunityProfileForm = () => {
         iconUrl: values.communityProfileImageURL,
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
-
-      await refetchCommunity();
 
       setNameFieldDisabledState({
         isDisabled: true,

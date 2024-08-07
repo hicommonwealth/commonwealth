@@ -25,13 +25,13 @@ const CTA_TEXT = {
 };
 
 const Discord = () => {
-  // TODO: refetch can be cleaner
-  const { data: community, refetch: refetchCommunity } =
-    useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
-    });
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+  });
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community?.discord_config_id ? 'connected' : 'none',
   );
@@ -128,19 +128,13 @@ const Discord = () => {
         communityId: community?.id,
         discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
       });
-      refetchCommunity();
       setIsDiscordWebhooksEnabled(!isDiscordWebhooksEnabled);
 
       notifySuccess(`Discord webhooks ${toggleMsgType}d!`);
     } catch (e) {
       notifyError(e || `Failed to ${toggleMsgType} discord webhooks!`);
     }
-  }, [
-    community?.id,
-    isDiscordWebhooksEnabled,
-    updateCommunity,
-    refetchCommunity,
-  ]);
+  }, [community?.id, isDiscordWebhooksEnabled, updateCommunity]);
 
   const onConnectDiscordChannel = async (
     channelId: string,

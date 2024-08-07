@@ -27,17 +27,16 @@ const Directory = () => {
   const chainNodeOptionsSorted = (chainNodeOptions || []).sort((a, b) =>
     a.label.localeCompare(b.label),
   );
-  const {
-    data: community,
-    isLoading: isLoadingCommunity,
-    refetch: refetchCommunity,
-  } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
-    includeNodeInfo: true,
-  });
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+      includeNodeInfo: true,
+    });
 
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
   const communityDefaultChainNodeId = community?.ChainNode?.id;
 
   const navigate = useCommonNavigate();
@@ -79,8 +78,6 @@ const Directory = () => {
         isPWA: isAddedToHomeScreen,
       });
 
-      refetchCommunity();
-
       notifySuccess('Updated community directory');
       app.sidebarRedraw.emit('redraw');
     } catch {
@@ -97,7 +94,6 @@ const Directory = () => {
     isEnabled,
     isAddedToHomeScreen,
     updateCommunity,
-    refetchCommunity,
   ]);
 
   return (

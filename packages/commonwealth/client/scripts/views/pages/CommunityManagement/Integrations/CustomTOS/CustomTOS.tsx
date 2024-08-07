@@ -14,16 +14,15 @@ import { ZodError } from 'zod';
 import './CustomTOS.scss';
 
 const CustomTOS = () => {
-  const {
-    data: community,
-    isLoading: isLoadingCommunity,
-    refetch: refetchCommunity,
-  } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
-  });
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
 
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
 
   useRunOnceOnCondition({
     callback: () => {
@@ -66,7 +65,6 @@ const CustomTOS = () => {
         communityId: community?.id,
         terms: terms.value || '',
       });
-      refetchCommunity();
 
       notifySuccess('TOS link updated!');
     } catch {
@@ -74,7 +72,7 @@ const CustomTOS = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [isSaving, terms, community, refetchCommunity, updateCommunity]);
+  }, [isSaving, terms, community, updateCommunity]);
 
   return (
     <section className="CustomTOS">

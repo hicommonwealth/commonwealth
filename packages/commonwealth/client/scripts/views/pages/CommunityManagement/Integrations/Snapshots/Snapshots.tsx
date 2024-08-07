@@ -14,14 +14,11 @@ import './Snapshots.scss';
 import { snapshotValidationSchema } from './validation';
 
 const Snapshots = () => {
-  const {
-    data: community,
-    isLoading: isLoadingCommunity,
-    refetch: refetchCommunity,
-  } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
-  });
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
 
   useRunOnceOnCondition({
     callback: () => {
@@ -37,7 +34,9 @@ const Snapshots = () => {
     shouldRun: !isLoadingCommunity && !!community,
   });
 
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
 
   const hasExistingSnapshots = (community?.snapshot_spaces || [])?.length > 0;
   const {
@@ -68,12 +67,11 @@ const Snapshots = () => {
             }),
         ),
       ];
+
       await updateCommunity({
         communityId: community?.id,
         snapshot: newSnapshots,
       });
-
-      refetchCommunity();
 
       setLinks(
         newSnapshots.map((snapshot) => ({
