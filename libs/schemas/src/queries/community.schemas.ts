@@ -36,7 +36,17 @@ export const GetCommunity = {
     id: z.string(),
     include_node_info: z.boolean().optional(),
   }),
-  output: Community.optional(),
+  output: Community.extend({
+    numVotingThreads: PG_INT,
+    numTotalThreads: PG_INT,
+    adminsAndMods: z.array(
+      z.object({
+        address: z.string(),
+        role: z.enum(['admin', 'moderator']),
+      }),
+    ),
+    communityBanner: z.string().optional(),
+  }).optional(),
 };
 
 export const GetCommunityStake = {
