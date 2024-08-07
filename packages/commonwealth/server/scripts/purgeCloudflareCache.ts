@@ -5,7 +5,10 @@ import { config } from '../config';
 const log = logger(import.meta);
 
 async function purgeCache(zoneId?: string, apiKey?: string) {
-  if (!zoneId || !apiKey) throw Error('Missing Env Vars');
+  if (!zoneId || !apiKey) {
+    log.warn('Missing Cloudflare env variables. Skipping cache purge');
+    return;
+  }
 
   const url = `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`;
   const body = {
