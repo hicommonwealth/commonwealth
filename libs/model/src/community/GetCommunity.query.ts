@@ -1,6 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Includeable, literal, Op } from 'sequelize';
+import { Includeable, Op } from 'sequelize';
 import { models } from '../database';
 import { CommunityAttributes } from '../models';
 
@@ -12,16 +12,6 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
     body: async ({ payload }) => {
       const where = { id: payload.id };
       const include: Includeable[] = [
-        {
-          model: models.Address,
-          attributes: ['address', 'role'],
-          where: {
-            // @ts-expect-error StrictNullChecks
-            community_id: id,
-            [Op.or]: [{ role: 'admin' }, { role: 'moderator' }],
-          },
-          as: 'adminsAndMods',
-        },
         {
           model: models.CommunityBanner,
         },
@@ -47,45 +37,68 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
       const result = await models.Community.findOne({
         where,
         include,
-        attributes: {
-          include: [
-            [
-              literal(`
-                  SELECT COUNT(*) FROM "Threads"
-                  WHERE "Threads"."community_id" = "Communities"."id"
-                    AND "Threads"."stage" = 'voting')
-                `),
-              'numVotingThreads',
-            ],
-            [
-              literal(`
-                  SELECT COUNT(*) FROM "Threads"
-                  WHERE "Threads"."community_id" = "Communities"."id"
-                    AND "Threads"."marked_as_spam_at" IS NULL)
-                `),
-              'numTotalThreads',
-            ],
-            [
-              literal(`
-                  SELECT banner_text FROM "CommunityBanners"
-                  WHERE "CommunityBanners"."community_id" = "Communities"."id")
-                `),
-              'communityBanner',
-            ],
-          ],
-        },
       });
-      return result?.toJSON() as
-        | (CommunityAttributes & {
-            numVotingThreads: number;
-            numTotalThreads: number;
-            adminsAndMods: Array<{
-              address: string;
-              role: 'admin' | 'moderator';
-            }>;
-            communityBanner: string | undefined;
-          })
-        | undefined;
+
+      if (!result) {
+        return;
+      }
+
+      const [
+        adminsAndMods,
+        numVotingThreads,
+        numTotalThreads,
+        communityBanner,
+      ] = await (<
+        Promise<
+          [
+            Array<{ address: string; role: 'admin' | 'moderator' }>,
+            number,
+            number,
+            { banner_text: string } | undefined,
+          ]
+        >
+      >Promise.all([
+        models.Address.findAll({
+          where: {
+            community_id: payload.id,
+            [Op.or]: [{ role: 'admin' }, { role: 'moderator' }],
+          },
+          attributes: ['address', 'role'],
+        }),
+        models.Thread.count({
+          where: {
+            community_id: payload.id,
+            stage: 'voting',
+          },
+        }),
+        models.Thread.count({
+          where: {
+            community_id: payload.id,
+            marked_as_spam_at: null,
+          },
+        }),
+        models.CommunityBanner.findOne({
+          where: {
+            community_id: payload.id,
+          },
+        }),
+      ]));
+
+      return {
+        ...result.toJSON(),
+        adminsAndMods,
+        numVotingThreads,
+        numTotalThreads,
+        communityBanner: communityBanner?.banner_text,
+      } as CommunityAttributes & {
+        numVotingThreads: number;
+        numTotalThreads: number;
+        adminsAndMods: Array<{
+          address: string;
+          role: 'admin' | 'moderator';
+        }>;
+        communityBanner: string | undefined;
+      };
     },
   };
 }

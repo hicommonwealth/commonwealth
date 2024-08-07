@@ -1,5 +1,5 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
-import { GetCommunities } from 'model/src/community';
+import { GetCommunities, GetCommunity } from 'model/src/community';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { seed } from '../../src/tester';
 
@@ -7,6 +7,7 @@ describe('Tags', () => {
   let actor: Actor;
   let tag1Id: number;
   let tag2Id: number;
+  let community2id: string;
 
   beforeAll(async () => {
     const [node] = await seed('ChainNode', {});
@@ -39,6 +40,7 @@ describe('Tags', () => {
 
     tag1Id = tag1!.id!;
     tag2Id = tag2!.id!;
+    community2id = community2Tag1And2!.id!;
   });
 
   afterAll(async () => {
@@ -67,6 +69,14 @@ describe('Tags', () => {
       payload: { tag_ids: [tag1Id, tag2Id].join(',') } as any,
     });
     expect(communityResults?.results).to.have.length(1);
+
+    const singleCommunityResults = await query(GetCommunity(), {
+      actor,
+      payload: { id: community2id },
+    });
+    expect(
+      singleCommunityResults?.CommunityTags?.map(({ tag_id }) => tag_id),
+    ).to.be.deep.equal([tag1Id, tag2Id]);
   });
 
   test('should fail on invalid tag string', async () => {
