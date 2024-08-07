@@ -26,17 +26,20 @@ const Errors = {
 
 type CleanupFn = {
   description: string;
+  runOnErrorOnly?: boolean;
   fn: () => Promise<void>;
 };
 
-const runCleanup = async (cleanupStack: CleanupFn[]) => {
+const runCleanup = async (error: any | null, cleanupStack: CleanupFn[]) => {
   while (cleanupStack.length > 0) {
-    const { description, fn } = cleanupStack.pop()!;
-    try {
-      log.debug(`RUNNING CLEANUP: ${description}`);
-      await fn();
-    } catch (err) {
-      log.error('cleanup failed: ', err as Error);
+    const { description, runOnErrorOnly, fn } = cleanupStack.pop()!;
+    if (!runOnErrorOnly || error) {
+      try {
+        log.debug(`RUNNING CLEANUP: ${description}`);
+        await fn();
+      } catch (err) {
+        log.error('cleanup failed: ', err as Error);
+      }
     }
   }
 };
@@ -150,7 +153,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
         } catch (err) {
           // on error, cleanup and throw
           log.error('import stage failed: ', err as Error);
-          await runCleanup(cleanupStack);
+          await runCleanup(err, cleanupStack);
           throw err;
         }
 
@@ -170,6 +173,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           log.debug(`Users: ${users.length}`);
           cleanupStack.push({
             description: 'Cleanup created users',
+            runOnErrorOnly: true,
             fn: async () => {
               await models.User.destroy({
                 where: {
@@ -197,6 +201,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           log.debug(`Addresses: ${addresses.length}`);
           cleanupStack.push({
             description: 'Cleanup created addresses',
+            runOnErrorOnly: true,
             fn: async () => {
               await models.Address.destroy({
                 where: {
@@ -219,6 +224,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           log.debug(`Topics: ${topics.length}`);
           cleanupStack.push({
             description: 'Cleanup created topics',
+            runOnErrorOnly: true,
             fn: async () => {
               await models.Topic.destroy({
                 where: {
@@ -245,6 +251,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           log.debug(`Threads: ${threads.length}`);
           cleanupStack.push({
             description: 'Cleanup created threads',
+            runOnErrorOnly: true,
             fn: async () => {
               await models.Thread.destroy({
                 where: {
@@ -271,6 +278,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           log.debug(`Comments: ${comments.length}`);
           cleanupStack.push({
             description: 'Cleanup created comments',
+            runOnErrorOnly: true,
             fn: async () => {
               await models.Comment.destroy({
                 where: {
@@ -298,6 +306,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           log.debug(`Reactions: ${reactions.length}`);
           cleanupStack.push({
             description: 'Cleanup created reactions',
+            runOnErrorOnly: true,
             fn: async () => {
               await models.Reaction.destroy({
                 where: {
@@ -324,6 +333,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           log.debug(`Subscriptions: ${subscriptions.length}`);
           cleanupStack.push({
             description: 'Cleanup created subscriptions',
+            runOnErrorOnly: true,
             fn: async () => {
               await models.Subscription.destroy({
                 where: {
@@ -340,10 +350,13 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           throw new Error('BOOM');
 
           log.debug(`DISCOURSE IMPORT SUCCESSFUL ON ${communityId}`);
-        } finally {
-          // always cleanup
-          await runCleanup(cleanupStack);
+        } catch (err) {
+          // run cleanup with error
+          await runCleanup(err, cleanupStack);
+          throw err;
         }
+        // run cleanup without error
+        await runCleanup(null, cleanupStack);
       },
     },
   };

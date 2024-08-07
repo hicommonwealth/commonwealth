@@ -2,10 +2,16 @@ import {
   CWTopicWithDiscourseId,
   CWUserWithDiscourseId,
   models,
+  ThreadAttributes,
 } from '@hicommonwealth/model';
 import { Thread } from '@hicommonwealth/schemas';
 import moment from 'moment';
-import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import {
+  FindOrCreateOptions,
+  QueryTypes,
+  Sequelize,
+  Transaction,
+} from 'sequelize';
 import { z } from 'zod';
 
 export type CWThreadWithDiscourseId = z.infer<typeof Thread> & {
@@ -64,7 +70,7 @@ class CWQueries {
     communityId: string,
     cwTopicId: number,
     addressId: number,
-    { transaction }: { transaction: Transaction },
+    { transaction }: { transaction: Transaction | null },
   ): Promise<CWThreadWithDiscourseId> => {
     const options: z.infer<typeof Thread> = {
       address_id: addressId,
@@ -93,6 +99,9 @@ class CWQueries {
       },
       defaults: options,
       transaction,
+      skipOutbox: true,
+    } as FindOrCreateOptions<ThreadAttributes> & {
+      skipOutbox: boolean;
     });
     return {
       ...thread.get({ plain: true }),

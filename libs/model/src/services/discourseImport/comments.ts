@@ -1,4 +1,5 @@
 import {
+  CommentAttributes,
   CWAddressWithDiscourseId,
   CWThreadWithDiscourseId,
   models,
@@ -6,7 +7,12 @@ import {
 import { Comment, Thread } from '@hicommonwealth/schemas';
 import lo from 'lodash';
 import moment from 'moment';
-import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import {
+  FindOrCreateOptions,
+  QueryTypes,
+  Sequelize,
+  Transaction,
+} from 'sequelize';
 import { z } from 'zod';
 
 export type CWCommentWithDiscourseId = z.infer<typeof Comment> & {
@@ -75,6 +81,9 @@ class CWQueries {
       where: options,
       defaults: options,
       transaction,
+      skipOutbox: true,
+    } as FindOrCreateOptions<CommentAttributes> & {
+      skipOutbox: boolean;
     });
     return {
       ...comment.get({ plain: true }),

@@ -1,6 +1,6 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
-import Sequelize from 'sequelize';
+import Sequelize, { CreateOptions } from 'sequelize';
 import { z } from 'zod';
 import { emitEvent } from '../utils';
 import { CommentSubscriptionAttributes } from './comment_subscriptions';
@@ -10,6 +10,10 @@ import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 
 const log = logger(import.meta);
+
+type EnrichedCommentCreateOptions = CreateOptions<CommentAttributes> & {
+  skipOutbox: boolean;
+};
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
@@ -103,16 +107,18 @@ export default (
             );
           }
 
-          await emitEvent(
-            Outbox,
-            [
-              {
-                event_name: EventNames.CommentCreated,
-                event_payload: comment.get({ plain: true }),
-              },
-            ],
-            options.transaction,
-          );
+          if (!(options as EnrichedCommentCreateOptions).skipOutbox) {
+            await emitEvent(
+              Outbox,
+              [
+                {
+                  event_name: EventNames.CommentCreated,
+                  event_payload: comment.get({ plain: true }),
+                },
+              ],
+              options.transaction,
+            );
+          }
         },
         afterDestroy: async (comment: CommentInstance, options) => {
           const { Thread } = sequelize.models;

@@ -11,6 +11,10 @@ import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';
 
+type EnrichedThreadCreateOptions = CreateOptions<ThreadAttributes> & {
+  skipOutbox: boolean;
+};
+
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   version_history_updated?: boolean;
@@ -152,26 +156,32 @@ export default (
             transaction: options.transaction,
           });
 
-          const { topic_id, community_id } = thread.get({
-            plain: true,
-          });
-          const contestManagers = !topic_id
-            ? []
-            : await getThreadContestManagers(sequelize, topic_id, community_id);
+          if (!(options as EnrichedThreadCreateOptions).skipOutbox) {
+            const { topic_id, community_id } = thread.get({
+              plain: true,
+            });
+            const contestManagers = !topic_id
+              ? []
+              : await getThreadContestManagers(
+                  sequelize,
+                  topic_id,
+                  community_id,
+                );
 
-          await emitEvent(
-            Outbox,
-            [
-              {
-                event_name: EventNames.ThreadCreated,
-                event_payload: {
-                  ...thread.get({ plain: true }),
-                  contestManagers,
+            await emitEvent(
+              Outbox,
+              [
+                {
+                  event_name: EventNames.ThreadCreated,
+                  event_payload: {
+                    ...thread.get({ plain: true }),
+                    contestManagers,
+                  },
                 },
-              },
-            ],
-            options.transaction,
-          );
+              ],
+              options.transaction,
+            );
+          }
         },
         afterDestroy: async (
           thread: ThreadInstance,

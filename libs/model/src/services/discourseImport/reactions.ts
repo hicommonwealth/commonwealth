@@ -6,7 +6,12 @@ import {
   ReactionAttributes,
 } from '@hicommonwealth/model';
 import { Reaction } from '@hicommonwealth/schemas';
-import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import {
+  FindOrCreateOptions,
+  QueryTypes,
+  Sequelize,
+  Transaction,
+} from 'sequelize';
 
 type CWReactionWithDiscourseId = z.infer<typeof Reaction> & {
   discoursePostActionId: number | null;
@@ -98,6 +103,9 @@ class CWQueries {
       where: options,
       defaults: options,
       transaction,
+      skipOutbox: true,
+    } as FindOrCreateOptions<ReactionAttributes> & {
+      skipOutbox: boolean;
     });
     return {
       ...reaction.get({ plain: true }),

@@ -1,11 +1,15 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
-import Sequelize from 'sequelize';
+import Sequelize, { CreateOptions } from 'sequelize';
 import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
 
 const log = logger(import.meta);
+
+type EnrichedReactionCreateOptions = CreateOptions<ReactionAttributes> & {
+  skipOutbox: boolean;
+};
 
 export type ReactionAttributes = {
   address_id: number;
@@ -51,7 +55,10 @@ export default (
     },
     {
       hooks: {
-        afterCreate: async (reaction: ReactionInstance, options) => {
+        afterCreate: async (
+          reaction: ReactionInstance,
+          options: CreateOptions,
+        ) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
           const { Thread, Comment, Outbox } = sequelize.models;
@@ -70,7 +77,10 @@ export default (
                     transaction: options.transaction,
                   });
                 }
-                if (reaction.reaction === 'like') {
+                if (
+                  !(options as EnrichedReactionCreateOptions).skipOutbox &&
+                  reaction.reaction === 'like'
+                ) {
                   const { topic_id, community_id } = thread.get({
                     plain: true,
                   });
