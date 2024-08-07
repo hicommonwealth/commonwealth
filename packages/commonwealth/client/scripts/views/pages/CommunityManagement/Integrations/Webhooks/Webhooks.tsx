@@ -2,7 +2,7 @@ import { WebhookCategory } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import { getLinkType } from 'helpers/link';
+import { getLinkType, isLinkValid } from 'helpers/link';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import Webhook from 'models/Webhook';
 import React, { useState } from 'react';
@@ -173,7 +173,7 @@ const Webhooks = () => {
               canDelete: !isDeletingWebhook,
               canConfigure: webhook.canConfigure ? !isEditingWebhook : false,
               customElementAfterLink:
-                webhook.canConfigure && getLinkType(webhook.value) ? (
+                webhook.canConfigure && isLinkValid(webhook.value) ? (
                   <CWTag
                     label={getLinkType(webhook.value)}
                     type="group"

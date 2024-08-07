@@ -5,9 +5,12 @@ type LinkType =
   | 'x (twitter)'
   | 'github'
   | 'matrix'
-  | ''; // TODO: fix this for getLinkType()
+  | '';
 
-export const getLinkType = (link: string, defaultValueWhenValidLink = '') => {
+export const isLinkValid = (link = '') =>
+  /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(link);
+
+export const getLinkType = (link: string) => {
   if (link.includes('discord.com') || link.includes('discord.gg'))
     return 'discord';
   if (link.includes('slack.com')) return 'slack';
@@ -16,8 +19,6 @@ export const getLinkType = (link: string, defaultValueWhenValidLink = '') => {
   if (link.includes('twitter.com')) return 'x (twitter)';
   if (link.includes('github.com')) return 'github';
   if (link.includes('matrix.to')) return 'matrix';
-  if (/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(link))
-    return defaultValueWhenValidLink;
   return '';
 };
 

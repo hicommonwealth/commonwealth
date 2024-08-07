@@ -1,7 +1,7 @@
 import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import { getLinkType } from 'helpers/link';
+import { getLinkType, isLinkValid } from 'helpers/link';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -350,9 +350,9 @@ const EditProfile = () => {
                 links={links.map((link) => ({
                   ...link,
                   customElementAfterLink:
-                    link.value && getLinkType(link.value, 'website') ? (
+                    link.value && isLinkValid(link.value) ? (
                       <CWTag
-                        label={getLinkType(link.value, 'website')}
+                        label={getLinkType(link.value) || 'website'}
                         type="group"
                         classNames="link-type"
                       />
