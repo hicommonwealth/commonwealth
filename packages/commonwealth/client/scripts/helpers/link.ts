@@ -1,4 +1,7 @@
-type LinkType =
+export const isLinkValid = (link = '') =>
+  /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(link);
+
+export type LinkType =
   | 'discord'
   | 'slack'
   | 'telegram'
@@ -7,10 +10,8 @@ type LinkType =
   | 'matrix'
   | '';
 
-export const isLinkValid = (link = '') =>
-  /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(link);
-
-export const getLinkType = (link: string) => {
+export const getLinkType = (link: string): LinkType => {
+  if (!isLinkValid(link)) return '';
   if (link.includes('discord.com') || link.includes('discord.gg'))
     return 'discord';
   if (link.includes('slack.com')) return 'slack';
@@ -46,7 +47,7 @@ export const categorizeSocialLinks = (
   };
 
   links.forEach((link) => {
-    const linkType = getLinkType(link) as LinkType;
+    const linkType = getLinkType(link);
     switch (linkType) {
       case 'discord':
         categorized.discords.push(link);
