@@ -12,6 +12,7 @@ import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as thread from './threads';
 import * as user from './user';
+import * as wallet from './wallet';
 
 /**
  * API v1 - tRPC Router
@@ -29,6 +30,10 @@ const artifacts = {
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
   artifacts['email'] = email.trpcRouter;
+}
+
+if (config.FLAG_COMMON_WALLET) {
+  artifacts['wallet'] = wallet.trpcRouter;
 }
 
 const apiV1 = trpc.router(artifacts);
