@@ -167,7 +167,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                     'requirements', "requirements",
                     'is_system_managed', "is_system_managed",
                     'created_at', "created_at",
-                    'updated_at', "updated_at",
+                    'updated_at', "updated_at"
                 )) as "Groups"
           FROM "Groups"
           WHERE "Groups"."community_id" IN (SELECT "id" FROM "community_CTE")
@@ -196,16 +196,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             count(*) OVER() AS total,
             "CommunityTags_CTE"."CommunityTags" as "CommunityTags",
             "CommunityStakes_CTE"."CommunityStakes" as "CommunityStakes"
-            ${
-              has_groups
-                ? `, (SELECT "Groups" FROM "Groups_CTE" WHERE "community_id" = "community_CTE"."id") AS "Groups"`
-                : ''
-            }
-            ${
-              include_node_info
-                ? `, (SELECT "ChainNode" FROM "ChainNode_CTE" WHERE "id" = "community_CTE"."chain_node_id") AS "ChainNode"`
-                : ''
-            }
+            ${has_groups ? `, "Groups_CTE"."Groups" as "Groups"` : ''}
+            ${include_node_info ? `, "ChainNode_CTE" as "ChainNode"` : ''}
         FROM "community_CTE"
         LEFT OUTER JOIN "CommunityTags_CTE" ON "community_CTE"."id" = "CommunityTags_CTE"."community_id"
         LEFT OUTER JOIN "CommunityStakes_CTE" ON "community_CTE"."id" = "CommunityStakes_CTE"."community_id"

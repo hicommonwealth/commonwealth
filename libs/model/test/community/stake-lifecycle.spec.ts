@@ -39,7 +39,8 @@ describe('Stake lifecycle', () => {
     const [user] = await seed('User', { isAdmin: true });
     const [community_with_stake] = await seed('Community', {
       active: true,
-      chain_node_id: node?.id,
+      chain_node_id: node?.id!,
+      namespace: 'test1',
       Addresses: [
         {
           role: 'admin',
@@ -57,7 +58,8 @@ describe('Stake lifecycle', () => {
     });
     const [community_without_stake_to_set] = await seed('Community', {
       active: true,
-      chain_node_id: node?.id,
+      chain_node_id: node?.id!,
+      namespace: 'test2',
       Addresses: [
         {
           ...community_with_stake!.Addresses!.at(0)!,
@@ -67,7 +69,7 @@ describe('Stake lifecycle', () => {
     });
     const [community_without_stake] = await seed('Community', {
       active: true,
-      chain_node_id: node?.id,
+      chain_node_id: node?.id!,
       Addresses: [
         {
           ...community_with_stake!.Addresses!.at(0)!,
@@ -104,7 +106,7 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { stake_enabled: true } as any,
     });
-    expect(results?.totalResults).to.eq('1');
+    expect(results?.totalResults).to.eq(1);
     expect(results?.results?.at(0)?.id).to.eq(id_with_stake);
   });
 
@@ -143,7 +145,7 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { stake_enabled: true } as any,
     });
-    expect(commr?.totalResults).to.eq('2');
+    expect(commr?.totalResults).to.eq(2);
   });
 
   test('should fail set when community not found', async () => {
