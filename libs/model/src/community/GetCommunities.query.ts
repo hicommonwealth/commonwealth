@@ -204,7 +204,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
 
       return schemas.buildPaginatedResponse(
         communities,
-        communities.at(0)?.total ?? 0,
+        +(communities.at(0)?.total ?? 0),
         {
           limit,
           offset,
