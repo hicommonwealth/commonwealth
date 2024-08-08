@@ -39,7 +39,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
-    console.log(`Starting ${this.meta.name} => `, this.meta);
+    console.log(`Starting ${this.meta.name}`);
 
     // TODO: 8762 -- Do we really need this? -- ask product.
     const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');

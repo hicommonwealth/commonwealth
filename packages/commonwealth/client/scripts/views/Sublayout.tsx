@@ -183,8 +183,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             resizing,
           )}
         >
-          {/* @ts-expect-error StrictNullChecks */}
-          <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+          <SublayoutBanners banner={banner || ''} terms={terms || ''} />
 
           <div className="Body">
             <div

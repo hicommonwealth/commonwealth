@@ -73,9 +73,8 @@ const CommunitiesPage = () => {
 
   const { data: nodes } = useFetchNodesQuery();
 
-  const [selectedCommunity, setSelectedCommunity] =
-    // @ts-expect-error <StrictNullChecks/>
-    React.useState<ChainInfo>(null);
+  const [selectedCommunityId, setSelectedCommunityId] =
+    React.useState<string>();
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 
@@ -192,7 +191,7 @@ const CommunitiesPage = () => {
           memberCount={community.profileCount}
           threadCount={community.threadCount}
           canBuyStake={canBuyStake}
-          onStakeBtnClick={() => setSelectedCommunity(community)}
+          onStakeBtnClick={() => setSelectedCommunityId(community?.id || '')}
           ethUsdRate={ethUsdRate}
           historicalPrice={historicalPriceMap?.get(community.id)}
           onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
@@ -301,7 +300,7 @@ const CommunitiesPage = () => {
               // @ts-expect-error <StrictNullChecks/>
               onModalClose={() => setModeOfManageCommunityStakeModal(null)}
               denomination={
-                findDenominationString(selectedCommunity?.id) || 'ETH'
+                findDenominationString(selectedCommunityId || '') || 'ETH'
               }
             />
           }

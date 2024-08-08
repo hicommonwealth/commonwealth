@@ -152,7 +152,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
             type="input"
             community={{
               iconUrl: community.icon_url || '',
-              name: community.name,
+              name: community.name || '',
             }}
             onClick={() => setShowTag(false)}
           />

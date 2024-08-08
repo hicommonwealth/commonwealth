@@ -51,7 +51,7 @@ export const ExploreCommunitiesSidebar = ({
     ...(app.isLoggedIn()
       ? [
           { type: 'header', label: 'Your communities' } as MenuItem,
-          ...(joinedCommunities.map((c: ChainInfo) => {
+          ...(joinedCommunities.map((c) => {
             return {
               community: c,
               type: 'community',
