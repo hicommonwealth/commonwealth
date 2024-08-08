@@ -62,11 +62,6 @@ const useJoinCommunity = () => {
     return true;
   });
 
-  console.log('samebaseAddresses => ', {
-    samebaseAddresses,
-    ua: user.addresses,
-  });
-
   const uniqueAddresses = [];
   const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
     (addressInfo) => {

@@ -122,7 +122,7 @@ export const loadCommunityChainInfo = async (
   app.chainPreloading = false;
 
   // Instantiate active addresses before chain fully loads
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses(chain?.id || '');
 
   return true;
 };
@@ -150,5 +150,5 @@ export const initChain = async (): Promise<void> => {
   console.log(`${chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses(chain.id || '');
 };

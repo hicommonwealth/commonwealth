@@ -112,14 +112,13 @@ export async function completeClientLogin(account: Account) {
   }
 }
 
-export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
+export async function updateActiveAddresses(chainId: string) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   userStore.getState().setData({
     accounts: userStore
       .getState()
-      .addresses // @ts-expect-error StrictNullChecks
-      .filter((a) => a.community.id === chain.id)
+      .addresses.filter((a) => a.community.id === chainId)
       .map((addr) => {
         const tempAddr = app.chain?.accounts.get(addr.address, false);
         tempAddr.profile = addr.profile;
@@ -131,8 +130,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
 
   // select the address that the new chain should be initialized with
   const memberAddresses = userStore.getState().accounts.filter((account) => {
-    // @ts-expect-error StrictNullChecks
-    return account.community.id === chain.id;
+    return account.community.id === chainId;
   });
 
   if (memberAddresses.length === 1) {
@@ -145,7 +143,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
     const communityAddressesSortedByLastUsed = [
       ...(userStore
         .getState()
-        .addresses.filter((a) => a.community.id === chain?.id) || []),
+        .addresses.filter((a) => a.community.id === chainId) || []),
     ].sort((a, b) => {
       if (b.lastActive && a.lastActive) return b.lastActive.diff(a.lastActive);
       if (!b.lastActive && !a.lastActive) return 0; // no change
@@ -586,7 +584,7 @@ export async function handleSocialLoginCallback({
         });
       }
 
-      chainInfo && (await updateActiveAddresses({ chain: chainInfo }));
+      chainInfo && (await updateActiveAddresses(chainInfo.id));
     }
 
     const { Profiles: profiles, email: ssoEmail } = response.data.result;
