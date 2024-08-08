@@ -1,4 +1,4 @@
-import { Community } from '@hicommonwealth/schemas';
+import { Community, ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
@@ -64,7 +64,9 @@ const useGetCommunityByIdQuery = ({
   includeNodeInfo = false,
   enabled,
 }: UseGetCommunityByIdProps) => {
-  return trpc.community.getCommunity.useQuery<z.infer<typeof Community>>(
+  return trpc.community.getCommunity.useQuery<
+    z.infer<typeof ExtendedCommunity>
+  >(
     {
       id,
       include_node_info: includeNodeInfo,
