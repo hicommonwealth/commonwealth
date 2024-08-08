@@ -174,15 +174,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           GROUP BY "community_id"
         )
         `
-          : '',
-        chainNodeCTE = include_node_info
-          ? `
-        , "ChainNode_CTE" AS (
-          SELECT *
-          FROM "ChainNodes"
-          WHERE "ChainNode"."id" IN (SELECT DISTINCT "chain_node_id" FROM "community_CTE")
-        )
-        `
           : '';
 
       const sql = `
@@ -190,14 +181,34 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           ${communityTagsCTE}
           ${communityStakesCTE}
           ${groupsCTE}
-          ${chainNodeCTE}
         SELECT 
             "community_CTE".*, 
             count(*) OVER() AS total,
             "CommunityTags_CTE"."CommunityTags" as "CommunityTags",
             "CommunityStakes_CTE"."CommunityStakes" as "CommunityStakes"
             ${has_groups ? `, "Groups_CTE"."Groups" as "Groups"` : ''}
-            ${include_node_info ? `, "ChainNode_CTE" as "ChainNode"` : ''}
+            ${
+              include_node_info
+                ? `
+              , "ChainNode"."id"                  AS "ChainNode.id",
+                "ChainNode"."url"                 AS "ChainNode.url",
+                "ChainNode"."eth_chain_id"        AS "ChainNode.eth_chain_id",
+                "ChainNode"."cosmos_chain_id"     AS "ChainNode.cosmos_chain_id",
+                "ChainNode"."alt_wallet_url"      AS "ChainNode.alt_wallet_url",
+                "ChainNode"."balance_type"        AS "ChainNode.balance_type",
+                "ChainNode"."name"                AS "ChainNode.name",
+                "ChainNode"."description"         AS "ChainNode.description",
+                "ChainNode"."health"              AS "ChainNode.health",
+                "ChainNode"."ss58"                AS "ChainNode.ss58",
+                "ChainNode"."bech32"              AS "ChainNode.bech32",
+                "ChainNode"."cosmos_gov_version"  AS "ChainNode.cosmos_gov_version",
+                "ChainNode"."block_explorer"      AS "ChainNode.block_explorer",
+                "ChainNode"."slip44"              AS "ChainNode.slip44",
+                "ChainNode"."created_at"          AS "ChainNode.created_at",
+                "ChainNode"."updated_at"          AS "ChainNode.updated_at"
+              `
+                : ''
+            }
         FROM "community_CTE"
         LEFT OUTER JOIN "CommunityTags_CTE" ON "community_CTE"."id" = "CommunityTags_CTE"."community_id"
         LEFT OUTER JOIN "CommunityStakes_CTE" ON "community_CTE"."id" = "CommunityStakes_CTE"."community_id"
@@ -208,7 +219,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         }
         ${
           include_node_info
-            ? 'LEFT OUTER JOIN "ChainNode_CTE" ON "community_CTE"."chain_node_id" = "ChainNode_CTE"."id"'
+            ? 'LEFT OUTER JOIN "ChainNodes" AS "ChainNode" ON "community_CTE"."chain_node_id" = "ChainNode"."id"'
             : ''
         }
         ORDER BY "community_CTE"."${order_col}" ${direction} LIMIT ${limit} OFFSET ${offset};
