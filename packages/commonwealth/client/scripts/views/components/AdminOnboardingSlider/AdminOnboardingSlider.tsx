@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape3Url from 'assets/img/shapes/shape3.svg';
 import shape4Url from 'assets/img/shapes/shape4.svg';
@@ -117,9 +117,14 @@ export const AdminOnboardingSlider = () => {
     pageName === 'create-topic' && navigate('/manage/topics');
   };
 
-  const isEvmCommunity = community?.base === ChainBase.Ethereum;
+  const isCommunitySupported =
+    community?.base === ChainBase.Ethereum &&
+    [
+      commonProtocol.ValidChains.Base,
+      commonProtocol.ValidChains.SepoliaBase,
+    ].includes(community?.ChainNode?.ethChainId as number);
   const isContestActionCompleted =
-    contestEnabled && isEvmCommunity && contestsData?.length > 0;
+    contestEnabled && isCommunitySupported && contestsData?.length > 0;
 
   const isSliderHidden =
     !app.activeChainId() ||
@@ -155,7 +160,7 @@ export const AdminOnboardingSlider = () => {
         headerText="Finish setting up your community"
         onDismiss={() => setIsModalVisible(true)}
       >
-        {contestEnabled && isEvmCommunity && (
+        {contestEnabled && isCommunitySupported && (
           <ActionCard
             ctaText={CARD_TYPES['launch-contest'].ctaText}
             title={CARD_TYPES['launch-contest'].title}

@@ -12,6 +12,7 @@ import React, {
 import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
 import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import Permissions from 'utils/Permissions';
+import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -92,6 +93,10 @@ export const ThreadOptions = ({
       setIsSubscribed,
     );
   }, [isSubscribed, thread]);
+
+  const handleDownloadMarkdown = () => {
+    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
+  };
 
   const createThreadSubscriptionMutation =
     useCreateThreadSubscriptionMutation();
@@ -226,8 +231,9 @@ export const ThreadOptions = ({
             />
           )}
 
-          {canUpdateThread && thread && (
+          {thread && (
             <AdminActions
+              canUpdateThread={canUpdateThread}
               thread={thread}
               onLockToggle={onLockToggle}
               onCollaboratorsEdit={onCollaboratorsEdit}
@@ -239,6 +245,7 @@ export const ThreadOptions = ({
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onSpamToggle={onSpamToggle}
+              onDownloadMarkdown={handleDownloadMarkdown}
               hasPendingEdits={hasPendingEdits}
               editingDisabled={editingDisabled}
             />

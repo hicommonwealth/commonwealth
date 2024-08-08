@@ -21,7 +21,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import './index.scss';
 
-type NotificationSection = 'community-alerts' | 'subscriptions';
+type NotificationSection = 'community-alerts' | 'threads' | 'comments';
 
 const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
@@ -76,14 +76,20 @@ const NotificationSettings = () => {
 
         <CWTabsRow>
           <CWTab
-            label="Community Alerts"
+            label="Community"
             isSelected={section === 'community-alerts'}
             onClick={() => setSection('community-alerts')}
           />
           <CWTab
-            label="Subscriptions"
-            isSelected={section === 'subscriptions'}
-            onClick={() => setSection('subscriptions')}
+            label="Threads"
+            isSelected={section === 'threads'}
+            onClick={() => setSection('threads')}
+          />
+
+          <CWTab
+            label="Comments"
+            isSelected={section === 'comments'}
+            onClick={() => setSection('comments')}
           />
         </CWTabsRow>
 
@@ -110,17 +116,14 @@ const NotificationSettings = () => {
           </>
         )}
 
-        {section === 'subscriptions' && (
+        {section === 'threads' && (
           <>
-            <CWText type="h4" fontWeight="semiBold" className="section-header">
-              Subscriptions
-            </CWText>
-
-            <CWText className="page-subheader-text">
-              Manage your subscriptions to these discussions
-            </CWText>
             <ThreadSubscriptions />
+          </>
+        )}
 
+        {section === 'comments' && (
+          <>
             <CommentSubscriptions />
           </>
         )}

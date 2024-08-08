@@ -13,8 +13,8 @@ export const Comment = z.object({
   version_history: z.array(z.string()).optional(),
   version_history_updated: z.boolean().optional(),
 
-  canvas_signed_data: z.string(),
-  canvas_hash: z.string(),
+  canvas_signed_data: z.string().nullish(),
+  canvas_hash: z.string().nullish(),
 
   created_by: z.string().nullish(),
   created_at: zDate.nullish(),
