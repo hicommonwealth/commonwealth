@@ -17,9 +17,9 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
   return {
     ...schemas.CreateGroup,
     auth: [isCommunityAdminOrModerator],
-    body: async ({ id, payload }) => {
+    body: async ({ payload }) => {
       const groups = await models.Group.findAll({
-        where: { community_id: id },
+        where: { community_id: payload.id },
         attributes: ['metadata'],
         raw: true,
       });
@@ -37,7 +37,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
           id: {
             [Op.in]: payload.topics || [],
           },
-          community_id: id,
+          community_id: payload.id,
         },
       });
       if (payload.topics?.length !== topicsToAssociate.length)
@@ -48,7 +48,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
           // create group
           const group = await models.Group.create(
             {
-              community_id: id!,
+              community_id: payload.id,
               metadata: payload.metadata,
               requirements: payload.requirements,
               is_system_managed: false,
@@ -83,7 +83,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
       //    groupId: newGroup.id,
       //  })
 
-      return { id, groups: [newGroup] };
+      return { id: payload.id, groups: [newGroup] };
     },
   };
 }

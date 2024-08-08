@@ -1,12 +1,10 @@
 import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { models } from '../database';
 import { rollOverContest } from '../services/commonProtocol/contestHelper';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export function PerformContestRollovers(): Command<
   typeof schemas.PerformContestRollovers

@@ -12,7 +12,6 @@ import {
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
 import { Op } from 'sequelize';
-import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { config } from './config';
 import {
@@ -22,8 +21,7 @@ import {
 
 let isServiceHealthy = false;
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 stats(HotShotsStats());
 
 startHealthCheckLoop({

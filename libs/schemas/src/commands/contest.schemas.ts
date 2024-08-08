@@ -5,6 +5,7 @@ import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
   input: z.object({
+    id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string(),
     image_url: z.string().optional(),
@@ -38,6 +39,7 @@ export const CreateContestManagerMetadata = {
 
 export const UpdateContestManagerMetadata = {
   input: z.object({
+    id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
     image_url: z.string().optional(),
@@ -50,6 +52,7 @@ export const UpdateContestManagerMetadata = {
 
 export const CancelContestManagerMetadata = {
   input: z.object({
+    id: z.string(),
     contest_address: z.string(),
   }),
   output: z.object({
@@ -59,6 +62,7 @@ export const CancelContestManagerMetadata = {
 
 export const ResumeContestManagerMetadata = {
   input: z.object({
+    id: z.string(),
     contest_address: z.string(),
   }),
   output: z.object({
@@ -67,6 +71,6 @@ export const ResumeContestManagerMetadata = {
 };
 
 export const PerformContestRollovers = {
-  input: z.object({}),
+  input: z.object({ id: z.string() }),
   output: z.object({}),
 };

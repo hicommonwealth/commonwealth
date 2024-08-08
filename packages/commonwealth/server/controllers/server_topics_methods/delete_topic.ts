@@ -27,7 +27,7 @@ export async function __deleteTopic(
     throw new AppError(Errors.TopicNotFound);
   }
 
-  const isAdmin = validateOwner({
+  const isAdmin = await validateOwner({
     models: this.models,
     user,
     communityId: topic.community_id,

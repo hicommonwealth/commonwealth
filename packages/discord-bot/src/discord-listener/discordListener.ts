@@ -14,12 +14,10 @@ import {
   MessageType,
   ThreadChannel,
 } from 'discord.js';
-import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;

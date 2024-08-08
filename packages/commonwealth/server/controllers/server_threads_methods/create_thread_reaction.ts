@@ -7,6 +7,7 @@ import {
 } from '@hicommonwealth/model';
 import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -23,6 +24,7 @@ export const Errors = {
   ThreadArchived: 'Thread is archived',
   FailedCreateReaction: 'Failed to create reaction',
   CommunityNotFound: 'Community not found',
+  MustHaveStake: 'Must have stake to upvote',
 };
 
 export type CreateThreadReactionOptions = {
@@ -125,8 +127,13 @@ export async function __createThreadReaction(
           node.eth_chain_id,
           [address.address],
         );
+      const stakeBalance = stakeBalances[address.address];
+      if (BigNumber.from(stakeBalance).lte(0)) {
+        // stake is enabled but user has no stake
+        throw new AppError(Errors.MustHaveStake);
+      }
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalances[address.address],
+        stakeBalance,
         voteWeight,
       );
     }

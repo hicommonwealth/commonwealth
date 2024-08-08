@@ -4,11 +4,9 @@ import { DynamicTemplate } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import { fileURLToPath } from 'url';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 // @ts-expect-error StrictNullChecks
 sgMail.setApiKey(config.SENDGRID.API_KEY);
