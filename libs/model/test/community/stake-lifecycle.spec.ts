@@ -39,7 +39,7 @@ describe('Stake lifecycle', () => {
     const [user] = await seed('User', { isAdmin: true });
     const [community_with_stake] = await seed('Community', {
       active: true,
-      chain_node_id: node?.id!,
+      chain_node_id: node!.id!,
       namespace: 'test1',
       Addresses: [
         {
@@ -58,7 +58,7 @@ describe('Stake lifecycle', () => {
     });
     const [community_without_stake_to_set] = await seed('Community', {
       active: true,
-      chain_node_id: node?.id!,
+      chain_node_id: node!.id!,
       namespace: 'test2',
       Addresses: [
         {
@@ -69,7 +69,7 @@ describe('Stake lifecycle', () => {
     });
     const [community_without_stake] = await seed('Community', {
       active: true,
-      chain_node_id: node?.id!,
+      chain_node_id: node!.id!,
       Addresses: [
         {
           ...community_with_stake!.Addresses!.at(0)!,

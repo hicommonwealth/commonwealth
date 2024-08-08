@@ -36,7 +36,7 @@ describe('Group lifecycle', () => {
     const [node] = await seed('ChainNode', {});
     const [user] = await seed('User', { isAdmin: true });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id!,
+      chain_node_id: node!.id!,
       active: true,
       Addresses: [
         {
