@@ -7,7 +7,7 @@ module.exports = {
   plugins: ['@typescript-eslint', 'n'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: `./tsconfig.build.json`,
+    project: `./tsconfig.json`,
   },
 
   // indicates this is the parent eslint so eslint will stop searching further up for eslint configs
