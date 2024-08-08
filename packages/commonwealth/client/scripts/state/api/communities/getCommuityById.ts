@@ -52,9 +52,10 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
   // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
   // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
   // call from that function
-  const response = await axios.get(`
-    ${app.serverUrl()}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D
-    `);
+  const response = await axios.get(
+    // eslint-disable-next-line max-len
+    `${app.serverUrl()}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
+  );
   return response?.data[0]?.result.data;
 };
 

@@ -7,7 +7,7 @@ import React, { useCallback, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
-  useEditCommunityBannerMutation,
+  // useEditCommunityBannerMutation,
   useEditCommunityTagsMutation,
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
@@ -63,7 +63,7 @@ const CommunityProfileForm = () => {
       enabled: !!app.activeChainId(),
     });
 
-  const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
+  // const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
   const { mutateAsync: editTags } = useEditCommunityTagsMutation();
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
