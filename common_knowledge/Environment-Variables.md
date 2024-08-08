@@ -4,7 +4,7 @@ This entry documents environment variables (both public config and secret auth t
 
 For documentation on feature flags managed through Unleash, see the [dedicated entry](./Feature-Flags.md). For a list of config tokens to get you started developing, see our [.env.example](../.env.example) file.
 
-We use GitHub Secrets to manage our auth tokens; reach out to the documentarian Graham Johnson, or else to an engineering lead, if you need access.
+We use GitHub Secrets to manage our auth tokens; reach out to a team lead if you need access.
 
 If you add a new environment variable, you must add documentation here. Please describe what the variable does and when engineers might need it; tag yourself as an owner if applicable, and list a default value for config tokens. As with [all documentation](./_README.md#updating-the-docs-how--when), these changes should be included in the relevant PR where the variable is added.
 
@@ -255,7 +255,7 @@ Owner: Roger Torres.
 
 ## MAGIC_API_KEY
 
-Secret API key for Magic sign-in. Contact Jake Naviasky or Graham Johnson for access.
+Secret API key for Magic sign-in. Contact Jake Naviasky for access.
 
 ## MAGIC_DEFAULT_CHAIN
 

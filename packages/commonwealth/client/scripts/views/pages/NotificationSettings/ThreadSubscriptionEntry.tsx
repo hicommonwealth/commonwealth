@@ -14,12 +14,14 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { User } from 'views/components/user/user';
 import { z } from 'zod';
 
-interface SubscriptionEntryProps {
+interface ThreadSubscriptionEntryProps {
   readonly subscription: z.infer<typeof ThreadSubscription>;
   readonly onUnsubscribe: (id: number) => void;
 }
 
-export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
+export const ThreadSubscriptionEntry = (
+  props: ThreadSubscriptionEntryProps,
+) => {
   const { subscription, onUnsubscribe } = props;
   const thread = subscription.Thread!;
   const thread_id = thread.id!;
@@ -28,7 +30,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
     {
       chain: thread.community_id,
       id: thread.id!,
-      title: thread.title,
+      title: decodeURIComponent(thread.title),
     },
     undefined,
     true,
@@ -44,7 +46,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
 
   const deleteThreadSubscription = useCallback(async () => {
     await deleteThreadSubscriptionMutation.mutateAsync({
-      id: `${thread_id}`,
+      id: thread_id,
       thread_ids: [thread_id],
     });
   }, [deleteThreadSubscriptionMutation, thread_id]);
@@ -91,9 +93,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <Link to={threadUrl}>
-            <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
-          </Link>
+          <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
         </CWText>
       </div>
 
@@ -108,7 +108,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
         />
 
         <CWThreadAction
-          label="Subscribe"
+          label="Unsubscribe"
           action="subscribe"
           onClick={(e) => {
             e.preventDefault();

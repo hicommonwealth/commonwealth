@@ -1,9 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import fetch from 'node-fetch';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function fetchNewSnapshotProposal(id: string) {
   try {

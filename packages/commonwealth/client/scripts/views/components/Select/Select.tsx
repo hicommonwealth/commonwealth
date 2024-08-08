@@ -13,37 +13,30 @@ import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow'
 import { Option } from './Option';
 import './Select.scss';
 
+export type OptionConfig = {
+  id?: string | number;
+  value?: string;
+  label: string;
+  iconLeft?: IconName;
+  type?: 'header' | 'header-divider' | 'contest';
+};
+
+// TODO: fix `any` type in https://github.com/hicommonwealth/commonwealth/issues/8725
 export type SelectProps = {
   size?: 'default' | 'compact';
   label?: string;
   placeholder?: string;
   selected: string;
-  onSelect?: (
-    v:
-      | string
-      | {
-          id?: string | number;
-          value?: string;
-          label: string;
-          iconLeft?: IconName;
-          type?: 'header' | 'header-divider' | 'contest';
-        },
-  ) => any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSelect?: (v: string | OptionConfig) => any;
   onOpen?: () => {};
   onClose?: () => {};
-  options:
-    | string[]
-    | {
-        id?: string | number;
-        value?: string;
-        label: string;
-        iconLeft?: IconName;
-        type?: 'header' | 'header-divider' | 'contest';
-      }[]
-    | {}[];
+  options: string[] | OptionConfig[] | {}[];
   canEditOption?: boolean;
   onOptionEdit?: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     v: string | { id: string | number; value: any; label: string },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => any;
   dropdownPosition?: Placement;
   containerClassname?: string;
@@ -65,7 +58,9 @@ export const Select = ({
 }: SelectProps) => {
   const popoverProps = usePopover();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const selectedOption = (options as any).find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (o: any) => o.value === selected || o === selected,
   );
 

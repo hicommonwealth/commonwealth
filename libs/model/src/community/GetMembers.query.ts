@@ -127,16 +127,16 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         order_direction ?? 'DESC',
       );
 
-      const sql = search
-        ? membersSqlWithSearch(cte, orderBy, limit, offset)
-        : membersSqlWithoutSearch(orderBy, limit, offset);
+      const sql =
+        search || memberships || addresses.length > 0
+          ? membersSqlWithSearch(cte, orderBy, limit, offset)
+          : membersSqlWithoutSearch(orderBy, limit, offset);
 
       const members = await models.sequelize.query<
         z.infer<typeof schemas.CommunityMember> & { total?: number }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
-        logging: true,
       });
 
       if (!search) {

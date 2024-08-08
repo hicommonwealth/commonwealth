@@ -6,18 +6,22 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 import EmptyCard from './EmptyCard';
 
+import { useFlag } from 'hooks/useFlag';
 import './EmptyContestsList.scss';
 
 interface EmptyContestsListProps {
   isStakeEnabled: boolean;
   isContestAvailable: boolean;
+  onSetContestSelectionView?: () => void;
 }
 
 const EmptyContestsList = ({
   isStakeEnabled,
   isContestAvailable,
+  onSetContestSelectionView,
 }: EmptyContestsListProps) => {
   const navigate = useCommonNavigate();
+  const farcasterContestEnabled = useFlag('farcasterContest');
 
   return (
     <div className="EmptyContestsList">
@@ -38,7 +42,10 @@ const EmptyContestsList = ({
           subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
           button={{
             label: 'Launch a contest',
-            handler: () => navigate('/manage/contests/launch'),
+            handler: () =>
+              farcasterContestEnabled
+                ? onSetContestSelectionView?.()
+                : navigate('/manage/contests/launch'),
           }}
         />
       ) : null}

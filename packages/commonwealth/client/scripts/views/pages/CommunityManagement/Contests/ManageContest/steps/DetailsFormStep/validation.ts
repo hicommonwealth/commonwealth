@@ -7,6 +7,7 @@ export const detailsFormValidationSchema = z.object({
     .string()
     .min(1, { message: 'You must name your contest' })
     .max(255, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
+  contestDescription: z.string().optional(),
   contestImage: z.string().optional(),
   feeType: z.enum([
     ContestFeeType.CommunityStake,

@@ -70,6 +70,7 @@ describe('Thread subscription lifecycle', () => {
 
   test('should create a new thread subscription', async () => {
     const payload = {
+      id: 0,
       thread_id: threadOne!.id!,
     };
     const res = await command(CreateThreadSubscription(), {
@@ -125,6 +126,7 @@ describe('Thread subscription lifecycle', () => {
     ]);
 
     const payload = {
+      id: actor.user.id!,
       thread_ids: [threadOne!.id!, threadTwo!.id!],
     };
 

@@ -1,11 +1,22 @@
 import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
+import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
+import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import Permissions from 'utils/Permissions';
+import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -67,11 +78,9 @@ export const ThreadOptions = ({
 
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
 
-  const handleToggleSubscribe = async (e) => {
-    // prevent clicks from propagating to discussion row
-    e.preventDefault();
-    e.stopPropagation();
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
+  const doToggleSubscribeOld = useCallback(async () => {
     if (!thread) {
       return;
     }
@@ -83,7 +92,74 @@ export const ThreadOptions = ({
       isSubscribed,
       setIsSubscribed,
     );
+  }, [isSubscribed, thread]);
+
+  const handleDownloadMarkdown = () => {
+    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
   };
+
+  const createThreadSubscriptionMutation =
+    useCreateThreadSubscriptionMutation();
+  const deleteThreadSubscriptionMutation =
+    useDeleteThreadSubscriptionMutation();
+
+  const threadSubscriptions = useThreadSubscriptions();
+
+  const hasThreadSubscriptionDefault = useMemo(() => {
+    const matching = (threadSubscriptions.data || []).filter(
+      (current) => current.thread_id === thread.id,
+    );
+
+    return matching.length > 0;
+  }, [thread.id, threadSubscriptions.data]);
+
+  const [hasThreadSubscriptionState, setHasThreadSubscriptionState] = useState<
+    boolean | undefined
+  >(undefined);
+
+  const hasThreadSubscription =
+    hasThreadSubscriptionState !== undefined
+      ? hasThreadSubscriptionState
+      : hasThreadSubscriptionDefault;
+
+  const doToggleSubscribe = useCallback(async () => {
+    if (hasThreadSubscription) {
+      await deleteThreadSubscriptionMutation.mutateAsync({
+        id: thread.id,
+        thread_ids: [thread.id],
+      });
+    } else {
+      await createThreadSubscriptionMutation.mutateAsync({
+        id: thread.id,
+        thread_id: thread.id,
+      });
+    }
+    setHasThreadSubscriptionState(!hasThreadSubscription);
+  }, [
+    createThreadSubscriptionMutation,
+    deleteThreadSubscriptionMutation,
+    hasThreadSubscription,
+    thread.id,
+  ]);
+
+  const handleToggleSubscribe = useCallback(
+    (e: React.MouseEvent) => {
+      async function doAsync() {
+        if (enableKnockInAppNotifications) {
+          await doToggleSubscribe();
+        } else {
+          await doToggleSubscribeOld();
+        }
+      }
+
+      // prevent clicks from propagating to discussion row
+      e.preventDefault();
+      e.stopPropagation();
+
+      doAsync().catch(console.error);
+    },
+    [doToggleSubscribe, doToggleSubscribeOld, enableKnockInAppNotifications],
+  );
 
   return (
     <>
@@ -135,16 +211,29 @@ export const ThreadOptions = ({
           {/* @ts-expect-error StrictNullChecks*/}
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
-          <CWThreadAction
-            action="subscribe"
-            label="Subscribe"
-            onClick={handleToggleSubscribe}
-            selected={!isSubscribed}
-            disabled={!isCommunityMember}
-          />
+          {!enableKnockInAppNotifications && (
+            <CWThreadAction
+              action="subscribe"
+              label="Subscribe"
+              onClick={handleToggleSubscribe}
+              selected={!isSubscribed}
+              disabled={!isCommunityMember}
+            />
+          )}
 
-          {canUpdateThread && thread && (
+          {enableKnockInAppNotifications && (
+            <CWThreadAction
+              action="subscribe"
+              label="Subscribe"
+              onClick={handleToggleSubscribe}
+              selected={!hasThreadSubscription}
+              disabled={!isCommunityMember}
+            />
+          )}
+
+          {thread && (
             <AdminActions
+              canUpdateThread={canUpdateThread}
               thread={thread}
               onLockToggle={onLockToggle}
               onCollaboratorsEdit={onCollaboratorsEdit}
@@ -156,6 +245,7 @@ export const ThreadOptions = ({
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onSpamToggle={onSpamToggle}
+              onDownloadMarkdown={handleDownloadMarkdown}
               hasPendingEdits={hasPendingEdits}
               editingDisabled={editingDisabled}
             />

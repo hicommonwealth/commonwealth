@@ -10,6 +10,8 @@ import {
   RecurringContestManagerDeployed,
 } from './events.schemas';
 
+// TODO: delete this file when we transition from CE v2 to CE v3. It is superseded by chain-event.utils.ts
+
 // ParseType maps an EVM type to a TS type
 type ParseType<T> = T extends 'address'
   ? z.infer<typeof EVM_ADDRESS>

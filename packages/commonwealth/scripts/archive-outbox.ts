@@ -1,19 +1,13 @@
-import { S3 } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
-import { HotShotsStats } from '@hicommonwealth/adapters';
-import { dispose, logger, stats } from '@hicommonwealth/core';
-import { config, formatS3Url } from '@hicommonwealth/model';
+import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
+import { config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
-// REQUIRED for S3 env var
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
-const S3_BUCKET_NAME = 'outbox-event-stream-archive';
+const log = logger(import.meta);
+const _blobStorage = blobStorage(S3BlobStorage());
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
   const databaseUrl = config.DB.URI;
@@ -55,31 +49,18 @@ function compressFile(inputFile: string, outputFile: string): Promise<void> {
 
 async function uploadToS3(filePath: string): Promise<boolean> {
   try {
-    const s3 = new S3();
     const fileStream = createReadStream(filePath);
-
-    const params = {
-      Bucket: S3_BUCKET_NAME,
-      Key: filePath,
-      Body: fileStream,
-    };
-
-    const data = await new Upload({
-      client: s3,
-      params,
-    }).done();
-    log.info(
-      `File uploaded successfully at ${formatS3Url(
-        // @ts-expect-error StrictNullChecks
-        data.Location,
-        S3_BUCKET_NAME,
-      )}`,
-    );
+    const { url } = await _blobStorage.upload({
+      key: filePath,
+      bucket: 'archives',
+      content: fileStream,
+    });
+    log.info(`File uploaded successfully at ${url}`);
     return true;
   } catch (error) {
     log.error(`S3 upload failed`, error, {
-      S3_BUCKET_NAME,
       filePath,
+      bucket: 'archives',
     });
   }
 
@@ -114,23 +95,14 @@ async function getTablesToBackup(): Promise<string[]> {
     tablesInPg,
   });
 
-  const s3 = new S3();
   const archiveExists = await Promise.allSettled(
     tablesInPg.map(async (t) => {
-      try {
-        const objectKey = getCompressedDumpName(getDumpName(t));
-        log.info(
-          `Searching for ${objectKey} in S3 bucket ${S3_BUCKET_NAME}...`,
-        );
-        await s3.headObject({
-          Bucket: S3_BUCKET_NAME,
-          Key: objectKey,
-        });
-        return true;
-      } catch (e) {
-        if (e.statusCode === 404) return false;
-        else throw e;
-      }
+      const objectKey = getCompressedDumpName(getDumpName(t));
+      log.info(`Searching for ${objectKey} in archives...`);
+      return await _blobStorage.exists({
+        key: objectKey,
+        bucket: 'archives',
+      });
     }),
   );
 

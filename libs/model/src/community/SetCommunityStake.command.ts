@@ -9,7 +9,9 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
   return {
     ...schemas.SetCommunityStake,
     auth: [isCommunityAdmin],
-    body: async ({ id, payload }) => {
+    body: async ({ payload }) => {
+      const { id, ...rest } = payload;
+
       // !load
       const community = (
         await models.Community.findOne({
@@ -31,22 +33,22 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
       if (!mustExist('Community', community)) return;
       if (
         community.CommunityStakes &&
-        community.CommunityStakes.find((s) => s.stake_id === payload.stake_id)
+        community.CommunityStakes.find((s) => s.stake_id === rest.stake_id)
       )
         throw new InvalidState(
-          `Stake ${payload.stake_id} already configured in community ${id}`,
+          `Stake ${rest.stake_id} already configured in community ${id}`,
         );
 
       // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
       await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
         community,
-        payload.stake_id,
+        rest.stake_id,
       );
 
       // !side effects
       const [updated] = await models.CommunityStake.upsert({
-        ...payload,
-        community_id: id!,
+        ...rest,
+        community_id: id.toString(),
       });
 
       return {
