@@ -71,6 +71,6 @@ export const Group = z.object({
   metadata: GroupMetadata,
   requirements: z.array(Requirement),
   is_system_managed: z.boolean().nullish(),
-  created_at: z.any(),
-  updated_at: z.any(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });

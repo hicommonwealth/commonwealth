@@ -19,8 +19,8 @@ export const ChainNode = z.object({
   ss58: PG_INT.nullish(),
   bech32: z.string().max(255).nullish(),
   slip44: PG_INT.nullish(),
-  created_at: z.any(),
-  updated_at: z.any(),
+  created_at: z.date(),
+  updated_at: z.date(),
   cosmos_chain_id: z
     .string()
     .regex(/[a-z0-9]+/)

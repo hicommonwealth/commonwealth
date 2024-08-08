@@ -36,8 +36,8 @@ export const User = z.object({
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false),
   profile: UserProfile,
-  created_at: z.any().nullish(),
-  updated_at: z.any().nullish(),
+  created_at: z.date(),
+  updated_at: z.date(),
   ProfileTags: z.array(ProfileTags).nullish(),
 });
 
@@ -76,8 +76,8 @@ export const Address = z.object({
   role: z.enum(Roles).default('member'),
   wallet_sso_source: z.nativeEnum(WalletSsoSource).nullish(),
   hex: z.string().max(64).nullish(),
-  created_at: z.any(),
-  updated_at: z.any(),
+  created_at: z.date(),
+  updated_at: z.date(),
   User: User.nullish(),
 });
 
