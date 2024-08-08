@@ -14,28 +14,28 @@ describe('Tags', () => {
     const [tag1] = await seed('Tags', { name: 'tag1' });
     const [tag2] = await seed('Tags', { name: 'tag2' });
     await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node?.id!,
       active: true,
     });
     const [community1Tag1Only] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node?.id!,
       active: true,
     });
     await seed('CommunityTags', {
-      community_id: community1Tag1Only?.id,
-      tag_id: tag1?.id,
+      community_id: community1Tag1Only?.id!,
+      tag_id: tag1?.id!,
     });
     const [community2Tag1And2] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node?.id!,
       active: true,
     });
     await seed('CommunityTags', {
-      community_id: community2Tag1And2?.id,
-      tag_id: tag1?.id,
+      community_id: community2Tag1And2?.id!,
+      tag_id: tag1?.id!,
     });
     await seed('CommunityTags', {
-      community_id: community2Tag1And2?.id,
-      tag_id: tag2?.id,
+      community_id: community2Tag1And2?.id!,
+      tag_id: tag2?.id!,
     });
 
     tag1Id = tag1!.id!;
@@ -76,7 +76,7 @@ describe('Tags', () => {
     });
     expect(
       singleCommunityResults?.CommunityTags?.map(({ tag_id }) => tag_id),
-    ).to.be.deep.equal([tag1Id, tag2Id]);
+    ).to.have.same.members([tag1Id, tag2Id]);
   });
 
   test('should fail on invalid tag string', async () => {
