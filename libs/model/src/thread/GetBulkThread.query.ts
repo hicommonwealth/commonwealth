@@ -189,6 +189,7 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
       }
 
       // transform thread response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let threads = responseThreads.map((t: any) => {
         const collaborators = JSON.parse(t.collaborators[0]).address?.length
           ? t.collaborators.map((c: any) => JSON.parse(c))
