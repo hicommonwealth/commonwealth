@@ -96,6 +96,7 @@ export const loadThread: ThreadMiddleware = async ({ payload }) => {
   return thread;
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
 export const isThreadAuthor: ThreadMiddleware = async ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
@@ -125,6 +126,7 @@ export const loadComment: CommentMiddleware = async ({ payload }) => {
   return comment;
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
 export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
