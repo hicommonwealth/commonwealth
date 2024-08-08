@@ -230,6 +230,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             restrictedDiscourseConnection,
             {
               users,
+              addresses,
               topics,
               communityId: communityId!,
             },
@@ -350,6 +351,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
 
           log.debug(`DISCOURSE IMPORT SUCCESSFUL ON ${communityId}`);
         } catch (err) {
+          log.error('DISCOURSE IMPORT FAILED: ', err as Error);
           // run cleanup with error and throw
           await runCleanup(err, cleanupStack);
           throw err;

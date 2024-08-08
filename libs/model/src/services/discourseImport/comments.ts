@@ -78,7 +78,13 @@ class CWQueries {
       updated_at: moment(discoursePost.updated_at).toDate(),
     };
     const [comment, created] = await models.Comment.findOrCreate({
-      where: options,
+      where: {
+        community_id: options.community_id,
+        parent_id: options.parent_id,
+        address_id: options.address_id,
+        thread_id: options.thread_id,
+        created_at: options.created_at,
+      },
       defaults: options,
       transaction,
       skipOutbox: true,

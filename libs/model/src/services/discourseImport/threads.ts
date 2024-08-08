@@ -1,4 +1,5 @@
 import {
+  CWAddressWithDiscourseId,
   CWTopicWithDiscourseId,
   CWUserWithDiscourseId,
   models,
@@ -95,7 +96,6 @@ class CWQueries {
         address_id: options.address_id,
         community_id: options.community_id,
         created_at: options.created_at,
-        updated_at: options.updated_at,
       },
       defaults: options,
       transaction,
@@ -115,10 +115,12 @@ export const createAllThreadsInCW = async (
   discourseConnection: Sequelize,
   {
     users,
+    addresses,
     topics,
     communityId,
   }: {
     users: Array<CWUserWithDiscourseId>;
+    addresses: Array<CWAddressWithDiscourseId>;
     topics: Array<CWTopicWithDiscourseId>;
     communityId: string;
   },
@@ -173,13 +175,11 @@ export const createAllThreadsInCW = async (
       }
 
       // find address for user
-      const address = await models.Address.findOne({
-        where: {
-          community_id: communityId,
-          user_id: discourseThread.user!.id,
-        },
-        transaction,
-      });
+      const address = addresses.find(
+        (a) =>
+          a.community_id === communityId &&
+          a.user_id === discourseThread.user!.id,
+      );
       if (!address) {
         throw new Error(
           `could not find address for user ${discourseThread.user!.id}`,
