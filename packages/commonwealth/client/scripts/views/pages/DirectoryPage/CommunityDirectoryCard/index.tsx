@@ -3,7 +3,6 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
-import './CommunityDirectoryCard.scss';
 
 interface CommunityDirectoryCardProps {
   communityId: string;
