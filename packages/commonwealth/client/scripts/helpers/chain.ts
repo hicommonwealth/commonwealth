@@ -3,6 +3,7 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
 
 export const deinitChainOrCommunity = async () => {
@@ -39,7 +40,16 @@ export const loadCommunityChainInfo = async (
     if (activeCommunity) {
       tempChain = activeCommunity;
     } else {
-      tempChain = app.config.chains.getById(DEFAULT_CHAIN);
+      // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
+      // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
+      // call from that function
+      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        DEFAULT_CHAIN,
+        true,
+      );
+      tempChain = ChainInfo.fromJSON({
+        ...(communityInfo as any),
+      });
     }
 
     if (!tempChain) {

@@ -4,6 +4,7 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
 import BlockInfo from '../../../models/BlockInfo';
@@ -99,8 +100,26 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     // try {
     // Create WalletConnect Provider
-    this._chainInfo =
-      app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
+    this._chainInfo = app?.chain?.meta;
+
+    // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
+    // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
+    // call from that function
+    {
+      if (!this._chainInfo && app.activeChainId()) {
+        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+          app.activeChainId() || '',
+          true,
+        );
+
+        const chainInfo = ChainInfo.fromJSON({
+          ...(communityInfo as any),
+        });
+
+        this._chainInfo = chainInfo;
+      }
+    }
+
     const chainId = this._chainInfo.node?.ethChainId || 1;
     const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
       .default;
