@@ -23,7 +23,7 @@ import {
   assertParamExists,
   createRequestFunction,
   serializeDataIfNeeded,
-  setBearerAuthToObject,
+  setOAuthToObject,
   setSearchParams,
   toPathString,
 } from './common';
@@ -5996,9 +5996,14 @@ export const LoadTestApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8450,9 +8455,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8526,9 +8536,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8602,9 +8617,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8678,9 +8698,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8754,9 +8779,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8830,9 +8860,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8910,9 +8945,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -8990,9 +9030,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);
@@ -9066,9 +9111,14 @@ export const SubscriptionApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
 
       if (addressId != null) {
         localVarHeaderParameter['address_id'] = String(addressId);

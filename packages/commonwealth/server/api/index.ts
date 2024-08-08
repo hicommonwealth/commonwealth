@@ -49,6 +49,19 @@ router.get('/v1/openapi.json', (req, res) => {
       title: 'Common API',
       version: '1.0.0',
       baseUrl,
+      securitySchemes: {
+        oauth2: {
+          type: 'oauth2',
+          flows: {
+            authorizationCode: {
+              authorizationUrl: 'https://example.com/oauth/authorize',
+              tokenUrl: 'https://example.com/oauth/token',
+              refreshUrl: 'https://example.com/oauth/refresh',
+              scopes: {},
+            },
+          },
+        },
+      },
     }),
   );
 });
