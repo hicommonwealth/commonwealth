@@ -27,10 +27,10 @@ async function purgeCache(zoneId?: string, apiKey?: string) {
     });
 
     const responseData = await response.json();
-    console.log('Cache purge request successful:');
-    console.log(responseData);
+    log.info('Cache purge request successful:');
+    log.info(responseData);
   } catch (error) {
-    console.error('Error purging cache:', error.message);
+    log.error('Error purging cache:', error.message);
   }
 }
 
