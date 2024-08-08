@@ -132,7 +132,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     () => decodeURIComponent(splitURLPath[3]),
     [splitURLPath],
   );
-  const memoizedTopics = useMemo(() => topics, [topics]);
 
   //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
   useEffect(() => {
@@ -142,15 +141,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       splitURLPath[2] === 'discussions' &&
       splitURLPath.length === 4
     ) {
-      const validTopics = memoizedTopics?.some(
+      const validTopics = topics?.some(
         (topic) => topic?.name === decodedString,
       );
       if (!validTopics) {
         navigate('/discussions');
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [memoizedTopics, decodedString, splitURLPath]);
+  }, [topics, decodedString, splitURLPath, isLoadingTopics, navigate]);
 
   useManageDocumentTitle('Discussions');
 
