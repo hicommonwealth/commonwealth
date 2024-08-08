@@ -25,21 +25,17 @@ export const useForumActionGated = ({
     return new Map();
   }
 
-  const flatMemberships = memberships.flatMap((m) =>
-    m.topicIds.map((t) => ({
-      topic_id: t,
-      allowedActions: m.allowedActions,
-    })),
-  ) as unknown as {
-    topic_id: number;
-    allowedActions: ForumActions[];
-  }[];
+  const flatMemberships = memberships
+    .flatMap((m) =>
+      m.topicIds.map((t) => ({
+        topic_id: t,
+        allowedActions: m.allowedActions,
+      })),
+    )
+    .map((g) => [g.topic_id, g.allowedActions as ForumActions[]]);
 
   const topicIdToIsAllowedMap: Map<number, ForumActions[]> = new Map(
-    flatMemberships.map((g) => [
-      g.topic_id,
-      g.allowedActions as ForumActions[],
-    ]),
+    flatMemberships,
   );
 
   // Each map entry represents a topic and associated forumActions they are allowed to perform. We want to find for
