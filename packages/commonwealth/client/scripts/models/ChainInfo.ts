@@ -51,6 +51,8 @@ class ChainInfo {
   public directoryPageChainNodeId?: number;
   public namespace?: string;
   public redirect?: string;
+  public numTotalThreads?: number;
+  public numVotingThreads?: number;
 
   public get node() {
     return this.ChainNode;
