@@ -195,26 +195,6 @@ jobs:
           name: code-coverage-report
           path: coverage
 
-  # Lint with recommendations
-  commonwealth-code-quality-recommendations:
-    name: Code Quality Recommendations
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        node: [ 20 ]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Run linter
-        run: pnpm lint-branch-warnings
-
   # Lint and Typecheck
   commonwealth-code-quality:
     name: Code Quality checks
