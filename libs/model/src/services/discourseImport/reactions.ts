@@ -6,12 +6,7 @@ import {
   ReactionAttributes,
 } from '@hicommonwealth/model';
 import { Reaction } from '@hicommonwealth/schemas';
-import {
-  FindOrCreateOptions,
-  QueryTypes,
-  Sequelize,
-  Transaction,
-} from 'sequelize';
+import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 
 type CWReactionWithDiscourseId = z.infer<typeof Reaction> & {
   discoursePostActionId: number | null;
@@ -66,53 +61,50 @@ class DiscourseQueries {
   };
 }
 
+type CreateReactionOptions = {
+  discoursePostActionId: number | null | undefined;
+  discourseTopicId: number | null | undefined;
+  communityId: string;
+  addressId: number;
+  threadId: number | null | undefined;
+  commentId: number | null | undefined;
+};
+
 class CWQueries {
-  static createOrFindReaction = async (
-    {
-      discoursePostActionId,
-      discourseTopicId,
-      communityId,
-      addressId,
-      threadId,
-      commentId,
-    }: {
-      discoursePostActionId: number | null | undefined;
-      discourseTopicId: number | null | undefined;
-      communityId: string;
-      addressId: number;
-      threadId: number | null | undefined;
-      commentId: number | null | undefined;
-    },
+  static bulkCreateReactions = async (
+    entries: CreateReactionOptions[],
     { transaction }: { transaction: Transaction | null },
   ): Promise<CWReactionWithDiscourseId> => {
-    const options: ReactionAttributes = {
-      community_id: communityId,
-      address_id: addressId,
-      reaction: 'like',
-      canvas_signed_data: '',
-      canvas_hash: '',
-      calculated_voting_weight: 0,
-    };
-    if (threadId) {
-      options.thread_id = threadId;
-    }
-    if (commentId) {
-      options.comment_id = commentId;
-    }
-    const [reaction, created] = await models.Reaction.findOrCreate({
-      where: options,
-      defaults: options,
+    const reactionsToCreate = entries.map(
+      ({ communityId, addressId, threadId, commentId }) => {
+        const options: ReactionAttributes = {
+          community_id: communityId,
+          address_id: addressId,
+          reaction: 'like',
+          canvas_signed_data: '',
+          canvas_hash: '',
+          calculated_voting_weight: 0,
+        };
+        if (threadId) {
+          options.thread_id = threadId;
+        }
+        if (commentId) {
+          options.comment_id = commentId;
+        }
+        return options;
+      },
+    );
+
+    const reactions = await models.Reaction.bulkCreate(reactionsToCreate, {
       transaction,
-      skipOutbox: true,
-    } as FindOrCreateOptions<ReactionAttributes> & {
-      skipOutbox: boolean;
     });
-    return {
+
+    return reactions.map((reaction, i) => ({
       ...reaction.get({ plain: true }),
-      discoursePostActionId: discoursePostActionId || null,
-      discourseTopicId: discourseTopicId || null,
-      created,
-    };
+      discoursePostActionId: entries[i].discoursePostActionId || null,
+      discourseTopicId: entries[i].discourseTopicId || null,
+      created: true,
+    }));
   };
 }
 
@@ -136,7 +128,7 @@ export const createAllReactionsInCW = async (
     DiscourseQueries.fetchCommentsReactions(discourseConnection),
   ]);
 
-  const reactionPromises: Array<Promise<CWReactionWithDiscourseId | null>> = [
+  const reactionsToCreate: Array<CreateReactionOptions> = [
     ...threadReactions.map(
       ({
         user_id: discourseReactionUserId,
@@ -150,19 +142,16 @@ export const createAllReactionsInCW = async (
             discourseTopicId === discourseReactionTopicId,
         )?.id;
         if (addressId && threadId) {
-          return CWQueries.createOrFindReaction(
-            {
-              discourseTopicId: discourseReactionTopicId,
-              discoursePostActionId: null,
-              communityId,
-              addressId,
-              threadId,
-              commentId: null,
-            },
-            { transaction },
-          );
+          return {
+            discourseTopicId: discourseReactionTopicId,
+            discoursePostActionId: null,
+            communityId,
+            addressId,
+            threadId,
+            commentId: null,
+          };
         }
-        return Promise.resolve(null);
+        return null;
       },
     ),
     ...commentReactions.map(
@@ -178,23 +167,19 @@ export const createAllReactionsInCW = async (
           ({ discoursePostId }) => discoursePostId === discourseReactionPostId,
         )?.id;
         if (addressId && commentId) {
-          return CWQueries.createOrFindReaction(
-            {
-              discourseTopicId: null,
-              discoursePostActionId,
-              communityId,
-              addressId,
-              threadId: null,
-              commentId,
-            },
-            { transaction },
-          );
+          return {
+            discourseTopicId: null,
+            discoursePostActionId,
+            communityId,
+            addressId,
+            threadId: null,
+            commentId,
+          };
         }
-        return Promise.resolve(null);
+        return null;
       },
     ),
-  ];
+  ].filter((entry) => !!entry);
 
-  const createdReactions = await Promise.all(reactionPromises);
-  return createdReactions.filter(Boolean) as Array<CWReactionWithDiscourseId>;
+  return CWQueries.bulkCreateReactions(reactionsToCreate, { transaction });
 };

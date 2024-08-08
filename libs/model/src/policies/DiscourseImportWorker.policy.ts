@@ -6,42 +6,17 @@ import {
   createAllAddressesInCW,
   createAllCommentsInCW,
   createAllReactionsInCW,
-  createAllSubscriptionsInCW,
   createAllThreadsInCW,
   createAllTopicsInCW,
   createAllUsersInCW,
   importDump,
 } from '../services';
+import { CleanupFn, runCleanup } from '../utils';
 
 const log = logger(import.meta);
 
 const Errors = {
   CommunityNotFound: 'community not found',
-};
-
-// Since the import will create a new temp DB and
-// add a new DB role, we need a way to reverse
-// those operations, which is the purpose of
-// the cleanup logic
-
-type CleanupFn = {
-  description: string;
-  runOnErrorOnly?: boolean;
-  fn: () => Promise<void>;
-};
-
-const runCleanup = async (error: any | null, cleanupStack: CleanupFn[]) => {
-  while (cleanupStack.length > 0) {
-    const { description, runOnErrorOnly, fn } = cleanupStack.pop()!;
-    if (!runOnErrorOnly || error) {
-      try {
-        log.debug(`RUNNING CLEANUP: ${description}`);
-        await fn();
-      } catch (err) {
-        log.error('cleanup failed: ', err as Error);
-      }
-    }
-  }
 };
 
 const inputs = {
@@ -152,7 +127,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           await importDump(dumpUrl, restrictedDiscourseDbUri);
         } catch (err) {
           // on error, cleanup and throw
-          log.error('import stage failed: ', err as Error);
+          log.error('INITIAL IMPORT PHASE FAILED: ', err as Error);
           await runCleanup(err, cleanupStack);
           throw err;
         }
@@ -170,7 +145,11 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             restrictedDiscourseConnection,
             { transaction: null },
           );
-          log.debug(`Users: ${users.length}`);
+          const numUsersCreated = users.filter((u) => u.created).length;
+          const numUsersFound = users.filter((u) => !u.created).length;
+          log.debug(
+            `Users: ${numUsersCreated} created, ${numUsersFound} found`,
+          );
           cleanupStack.push({
             description: 'Cleanup created users',
             runOnErrorOnly: true,
@@ -198,7 +177,11 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             },
             { transaction: null },
           );
-          log.debug(`Addresses: ${addresses.length}`);
+          const numAddressesCreated = addresses.filter((a) => a.created).length;
+          const numAddressesFound = addresses.filter((a) => !a.created).length;
+          log.debug(
+            `Addresses: ${numAddressesCreated} created, ${numAddressesFound} found`,
+          );
           cleanupStack.push({
             description: 'Cleanup created addresses',
             runOnErrorOnly: true,
@@ -221,7 +204,11 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             { communityId: communityId! },
             { transaction: null },
           );
-          log.debug(`Topics: ${topics.length}`);
+          const numTopicsCreated = topics.filter((t) => t.created).length;
+          const numTopicsFound = topics.filter((t) => !t.created).length;
+          log.debug(
+            `Topics: ${numTopicsCreated} created, ${numTopicsFound} found`,
+          );
           cleanupStack.push({
             description: 'Cleanup created topics',
             runOnErrorOnly: true,
@@ -248,7 +235,11 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             },
             { transaction: null },
           );
-          log.debug(`Threads: ${threads.length}`);
+          const numThreadsCreated = threads.filter((t) => t.created).length;
+          const numThreadsFound = threads.filter((t) => !t.created).length;
+          log.debug(
+            `Threads: ${numThreadsCreated} created, ${numThreadsFound} found`,
+          );
           cleanupStack.push({
             description: 'Cleanup created threads',
             runOnErrorOnly: true,
@@ -275,7 +266,11 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             },
             { transaction: null },
           );
-          log.debug(`Comments: ${comments.length}`);
+          const numCommentsCreated = comments.filter((c) => c.created).length;
+          const numCommentsFound = comments.filter((c) => !c.created).length;
+          log.debug(
+            `Comments: ${numCommentsCreated} created, ${numCommentsFound} found`,
+          );
           cleanupStack.push({
             description: 'Cleanup created comments',
             runOnErrorOnly: true,
@@ -303,7 +298,11 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             },
             { transaction: null },
           );
-          log.debug(`Reactions: ${reactions.length}`);
+          const numReactionsCreated = reactions.filter((r) => r.created).length;
+          const numReactionsFound = reactions.filter((r) => !r.created).length;
+          log.debug(
+            `Reactions: ${numReactionsCreated} created, ${numReactionsFound} found`,
+          );
           cleanupStack.push({
             description: 'Cleanup created reactions',
             runOnErrorOnly: true,
@@ -320,42 +319,42 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             },
           });
 
-          // insert subscriptions
-          const subscriptions = await createAllSubscriptionsInCW(
-            restrictedDiscourseConnection,
-            {
-              communityId: communityId!,
-              users,
-              threads,
-            },
-            { transaction: null },
-          );
-          log.debug(`Subscriptions: ${subscriptions.length}`);
-          cleanupStack.push({
-            description: 'Cleanup created subscriptions',
-            runOnErrorOnly: true,
-            fn: async () => {
-              await models.Subscription.destroy({
-                where: {
-                  id: {
-                    [Op.in]: subscriptions
-                      .filter((s) => s.id && s.created)
-                      .map((s) => s.id!),
-                  },
-                },
-              });
-            },
-          });
+          // // insert subscriptions
+          // const subscriptions = await createAllSubscriptionsInCW(
+          //   restrictedDiscourseConnection,
+          //   {
+          //     communityId: communityId!,
+          //     users,
+          //     threads,
+          //   },
+          //   { transaction: null },
+          // );
+          // log.debug(`Subscriptions: ${subscriptions.length}`);
+          // cleanupStack.push({
+          //   description: 'Cleanup created subscriptions',
+          //   runOnErrorOnly: true,
+          //   fn: async () => {
+          //     await models.Subscription.destroy({
+          //       where: {
+          //         id: {
+          //           [Op.in]: subscriptions
+          //             .filter((s) => s.id && s.created)
+          //             .map((s) => s.id!),
+          //         },
+          //       },
+          //     });
+          //   },
+          // });
 
-          throw new Error('BOOM');
+          // throw new Error('BOOM');
 
           log.debug(`DISCOURSE IMPORT SUCCESSFUL ON ${communityId}`);
         } catch (err) {
-          // run cleanup with error
+          // run cleanup with error and throw
           await runCleanup(err, cleanupStack);
           throw err;
         }
-        // run cleanup without error
+        // on success, run cleanup without error
         await runCleanup(null, cleanupStack);
       },
     },

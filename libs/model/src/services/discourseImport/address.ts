@@ -33,7 +33,6 @@ class CWQueries {
   ): Promise<CWAddressWithDiscourseId> => {
     const [addr, created] = await models.Address.findOrCreate({
       where: {
-        address: address,
         user_id: userId,
         community_id: communityId,
       },
