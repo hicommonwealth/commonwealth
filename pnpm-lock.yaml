@@ -380,9 +380,9 @@ importers:
       sequelize:
         specifier: ^6.32.1
         version: 6.37.3(pg@8.11.5)
-      trpc-openapi:
-        specifier: 1.1.2
-        version: 1.1.2(@trpc/server@10.45.2)(zod@3.23.6)
+      trpc-swagger:
+        specifier: ^1.2.6
+        version: 1.2.6(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(zod@3.23.6)
       typescript-logging:
         specifier: ^0.6.4
         version: 0.6.4
@@ -8792,6 +8792,12 @@ packages:
         integrity: sha512-13sOfMv2+DWduEU+/xbun3LScLoqN17nBeTLUsmDfKdoiC1fr0n9PU4guu4AhRcOVFk/sW8LyZWHuhWtQZiF+g==,
       }
     engines: { node: '>=4' }
+
+  chalk-scripts@1.2.8:
+    resolution:
+      {
+        integrity: sha512-Mu3mEn4lbqJHZD+wqBE8kwGb1TaNgcMspDIZVDzDHxKhK1zB3Q8q49PP15z0CNNDu5wxSwxhdPV+8UcejOSWxA==,
+      }
 
   chalk@2.4.2:
     resolution:
@@ -17958,13 +17964,14 @@ packages:
       }
     engines: { node: '>=6' }
 
-  trpc-openapi@1.1.2:
+  trpc-swagger@1.2.6:
     resolution:
       {
-        integrity: sha512-G2CT6q0nhhOGcYeAaK+volHNXRE8BFmNY+LwQA1cMXonh+iEUvl6T3OjF2HEGVvF0am9u9uo5hlMuXq5Wdweww==,
+        integrity: sha512-LVh2NicwYZdaUEvshY9IF1oL02z9PWjltY0CwTslHw4mi4DcSAP4bx/FPfp5+371oj75vujjNbOjGG9grNl3Xg==,
       }
     peerDependencies:
-      '@trpc/server': ^10.0.0
+      '@trpc/client': ^10.45.2
+      '@trpc/server': ^10.45.2
       zod: ^3.14.4
 
   ts-api-utils@1.3.0:
@@ -25722,6 +25729,12 @@ snapshots:
       pathval: 1.1.1
       type-detect: 4.0.8
 
+  chalk-scripts@1.2.8:
+    dependencies:
+      chalk: 5.3.0
+      performance-now: 2.1.0
+      uuid: 9.0.1
+
   chalk@2.4.2:
     dependencies:
       ansi-styles: 3.2.1
@@ -31880,9 +31893,11 @@ snapshots:
     dependencies:
       matchit: 1.1.0
 
-  trpc-openapi@1.1.2(@trpc/server@10.45.2)(zod@3.23.6):
+  trpc-swagger@1.2.6(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(zod@3.23.6):
     dependencies:
+      '@trpc/client': 10.45.2(@trpc/server@10.45.2)
       '@trpc/server': 10.45.2
+      chalk-scripts: 1.2.8
       co-body: 6.1.0
       lodash.clonedeep: 4.5.0
       node-mocks-http: 1.14.1

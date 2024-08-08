@@ -8,7 +8,7 @@ async function main() {
   });
 
   const client = new QueryApi(config);
-  const members = await client.queryCommunityGetMembers(
+  const members = await client.communityGetMembers(
     'sushi',
     undefined,
     10,

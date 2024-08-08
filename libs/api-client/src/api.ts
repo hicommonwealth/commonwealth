@@ -33,369 +33,369 @@ import { BASE_PATH, BaseAPI, RequiredError, operationServerMap } from './base';
 /**
  *
  * @export
- * @interface MutationCommunityCreateGroupRequest
+ * @interface CommunityCreateGroupRequest
  */
-export interface MutationCommunityCreateGroupRequest {
+export interface CommunityCreateGroupRequest {
   /**
    *
-   * @type {MutationCommunityCreateGroupRequestMetadata}
-   * @memberof MutationCommunityCreateGroupRequest
+   * @type {CommunityCreateGroupRequestMetadata}
+   * @memberof CommunityCreateGroupRequest
    */
-  metadata: MutationCommunityCreateGroupRequestMetadata;
+  metadata: CommunityCreateGroupRequestMetadata;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner>}
-   * @memberof MutationCommunityCreateGroupRequest
+   * @type {Array<CommunityGetCommunity200ResponseGroupsInnerRequirementsInner>}
+   * @memberof CommunityCreateGroupRequest
    */
-  requirements: Array<QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner>;
+  requirements: Array<CommunityGetCommunity200ResponseGroupsInnerRequirementsInner>;
   /**
    *
    * @type {Array<number>}
-   * @memberof MutationCommunityCreateGroupRequest
+   * @memberof CommunityCreateGroupRequest
    */
   topics?: Array<number>;
 }
 /**
  *
  * @export
- * @interface MutationCommunityCreateGroupRequestMetadata
+ * @interface CommunityCreateGroupRequestMetadata
  */
-export interface MutationCommunityCreateGroupRequestMetadata {
+export interface CommunityCreateGroupRequestMetadata {
   /**
    *
    * @type {string}
-   * @memberof MutationCommunityCreateGroupRequestMetadata
+   * @memberof CommunityCreateGroupRequestMetadata
    */
   name: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunityCreateGroupRequestMetadata
+   * @memberof CommunityCreateGroupRequestMetadata
    */
   description: string;
   /**
    *
    * @type {number}
-   * @memberof MutationCommunityCreateGroupRequestMetadata
+   * @memberof CommunityCreateGroupRequestMetadata
    */
   required_requirements?: number;
   /**
    *
    * @type {number}
-   * @memberof MutationCommunityCreateGroupRequestMetadata
+   * @memberof CommunityCreateGroupRequestMetadata
    */
   membership_ttl?: number;
 }
 /**
  *
  * @export
- * @interface MutationCommunityCreateStakeTransactionRequest
+ * @interface CommunityCreateStakeTransactionRequest
  */
-export interface MutationCommunityCreateStakeTransactionRequest {
+export interface CommunityCreateStakeTransactionRequest {
   /**
    *
    * @type {string}
-   * @memberof MutationCommunityCreateStakeTransactionRequest
+   * @memberof CommunityCreateStakeTransactionRequest
    */
   transaction_hash: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunityCreateStakeTransactionRequest
+   * @memberof CommunityCreateStakeTransactionRequest
    */
   community_id: string;
 }
 /**
  *
  * @export
- * @interface MutationCommunitySetStake200Response
+ * @interface CommunityGetCommunity200Response
  */
-export interface MutationCommunitySetStake200Response {
+export interface CommunityGetCommunity200Response {
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   name: string;
   /**
    *
    * @type {number}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   chain_node_id: number;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   default_symbol?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
-  network?: MutationCommunitySetStake200ResponseNetworkEnum;
+  network?: CommunityGetCommunity200ResponseNetworkEnum;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
-  base: MutationCommunitySetStake200ResponseBaseEnum;
+  base: CommunityGetCommunity200ResponseBaseEnum;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   icon_url?: string | null;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   active: boolean;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
-  type?: MutationCommunitySetStake200ResponseTypeEnum;
+  type?: CommunityGetCommunity200ResponseTypeEnum;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   id?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   description?: string;
   /**
    *
    * @type {Array<string>}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   social_links?: Array<string>;
   /**
    *
    * @type {number}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   ss58_prefix?: number;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   stages_enabled?: boolean;
   /**
    *
    * @type {Array<string>}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   custom_stages?: Array<string>;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   custom_domain?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   block_explorer_ids?: string;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   collapsed_on_homepage?: boolean;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   substrate_spec?: string;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   has_chain_events_listener?: boolean;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   default_summary_view?: boolean;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
-  default_page?: MutationCommunitySetStake200ResponseDefaultPageEnum;
+  default_page?: CommunityGetCommunity200ResponseDefaultPageEnum;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
-  has_homepage?: MutationCommunitySetStake200ResponseHasHomepageEnum | null;
+  has_homepage?: CommunityGetCommunity200ResponseHasHomepageEnum | null;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   terms?: string;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   admin_only_polling?: boolean;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   bech32_prefix?: string;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   hide_projects?: boolean;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   token_name?: string;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   ce_verbose?: boolean;
   /**
    *
    * @type {number}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   discord_config_id?: number | null;
   /**
    *
    * @type {any}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   category?: any;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   discord_bot_webhooks_enabled?: boolean;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   directory_page_enabled?: boolean;
   /**
    *
    * @type {number}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   directory_page_chain_node_id?: number;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   namespace?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   namespace_address?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   redirect?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   created_at?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   updated_at?: string;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseAddressesInner>}
-   * @memberof MutationCommunitySetStake200Response
+   * @type {Array<CommunityGetCommunity200ResponseAddressesInner>}
+   * @memberof CommunityGetCommunity200Response
    */
-  Addresses?: Array<QueryCommunityGetCommunity200ResponseAddressesInner>;
+  Addresses?: Array<CommunityGetCommunity200ResponseAddressesInner>;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseCommunityStakesInner>}
-   * @memberof MutationCommunitySetStake200Response
+   * @type {Array<CommunityGetCommunity200ResponseCommunityStakesInner>}
+   * @memberof CommunityGetCommunity200Response
    */
-  CommunityStakes?: Array<QueryCommunityGetCommunity200ResponseCommunityStakesInner>;
+  CommunityStakes?: Array<CommunityGetCommunity200ResponseCommunityStakesInner>;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseCommunityTagsInner>}
-   * @memberof MutationCommunitySetStake200Response
+   * @type {Array<CommunityGetCommunity200ResponseCommunityTagsInner>}
+   * @memberof CommunityGetCommunity200Response
    */
-  CommunityTags?: Array<QueryCommunityGetCommunity200ResponseCommunityTagsInner>;
+  CommunityTags?: Array<CommunityGetCommunity200ResponseCommunityTagsInner>;
   /**
    *
-   * @type {QueryCommunityGetCommunity200ResponseChainNode}
-   * @memberof MutationCommunitySetStake200Response
+   * @type {CommunityGetCommunity200ResponseChainNode}
+   * @memberof CommunityGetCommunity200Response
    */
-  ChainNode?: QueryCommunityGetCommunity200ResponseChainNode;
+  ChainNode?: CommunityGetCommunity200ResponseChainNode;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseTopicsInner>}
-   * @memberof MutationCommunitySetStake200Response
+   * @type {Array<CommunityGetCommunity200ResponseTopicsInner>}
+   * @memberof CommunityGetCommunity200Response
    */
-  topics?: Array<QueryCommunityGetCommunity200ResponseTopicsInner>;
+  topics?: Array<CommunityGetCommunity200ResponseTopicsInner>;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseGroupsInner>}
-   * @memberof MutationCommunitySetStake200Response
+   * @type {Array<CommunityGetCommunity200ResponseGroupsInner>}
+   * @memberof CommunityGetCommunity200Response
    */
-  groups?: Array<QueryCommunityGetCommunity200ResponseGroupsInner>;
+  groups?: Array<CommunityGetCommunity200ResponseGroupsInner>;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInner>}
-   * @memberof MutationCommunitySetStake200Response
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInner>}
+   * @memberof CommunityGetCommunity200Response
    */
-  contest_managers?: Array<QueryCommunityGetCommunity200ResponseContestManagersInner>;
+  contest_managers?: Array<CommunityGetCommunity200ResponseContestManagersInner>;
   /**
    *
    * @type {Array<string>}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   snapshot_spaces?: Array<string>;
   /**
    *
    * @type {boolean}
-   * @memberof MutationCommunitySetStake200Response
+   * @memberof CommunityGetCommunity200Response
    */
   include_in_digest_email?: boolean | null;
 }
 
-export const MutationCommunitySetStake200ResponseNetworkEnum = {
+export const CommunityGetCommunity200ResponseNetworkEnum = {
   Edgeware: 'edgeware',
   EdgewareTestnet: 'edgeware-testnet',
   Kusama: 'kusama',
@@ -440,9 +440,9 @@ export const MutationCommunitySetStake200ResponseNetworkEnum = {
   Cosmos: 'cosmos',
 } as const;
 
-export type MutationCommunitySetStake200ResponseNetworkEnum =
-  typeof MutationCommunitySetStake200ResponseNetworkEnum[keyof typeof MutationCommunitySetStake200ResponseNetworkEnum];
-export const MutationCommunitySetStake200ResponseBaseEnum = {
+export type CommunityGetCommunity200ResponseNetworkEnum =
+  typeof CommunityGetCommunity200ResponseNetworkEnum[keyof typeof CommunityGetCommunity200ResponseNetworkEnum];
+export const CommunityGetCommunity200ResponseBaseEnum = {
   Cosmos: 'cosmos',
   Substrate: 'substrate',
   Ethereum: 'ethereum',
@@ -450,2071 +450,161 @@ export const MutationCommunitySetStake200ResponseBaseEnum = {
   Solana: 'solana',
 } as const;
 
-export type MutationCommunitySetStake200ResponseBaseEnum =
-  typeof MutationCommunitySetStake200ResponseBaseEnum[keyof typeof MutationCommunitySetStake200ResponseBaseEnum];
-export const MutationCommunitySetStake200ResponseTypeEnum = {
+export type CommunityGetCommunity200ResponseBaseEnum =
+  typeof CommunityGetCommunity200ResponseBaseEnum[keyof typeof CommunityGetCommunity200ResponseBaseEnum];
+export const CommunityGetCommunity200ResponseTypeEnum = {
   Chain: 'chain',
   Dao: 'dao',
   Token: 'token',
   Offchain: 'offchain',
 } as const;
 
-export type MutationCommunitySetStake200ResponseTypeEnum =
-  typeof MutationCommunitySetStake200ResponseTypeEnum[keyof typeof MutationCommunitySetStake200ResponseTypeEnum];
-export const MutationCommunitySetStake200ResponseDefaultPageEnum = {
+export type CommunityGetCommunity200ResponseTypeEnum =
+  typeof CommunityGetCommunity200ResponseTypeEnum[keyof typeof CommunityGetCommunity200ResponseTypeEnum];
+export const CommunityGetCommunity200ResponseDefaultPageEnum = {
   AllDiscussionsView: 'default_all_discussions_view',
   SummaryView: 'default_summary_view',
 } as const;
 
-export type MutationCommunitySetStake200ResponseDefaultPageEnum =
-  typeof MutationCommunitySetStake200ResponseDefaultPageEnum[keyof typeof MutationCommunitySetStake200ResponseDefaultPageEnum];
-export const MutationCommunitySetStake200ResponseHasHomepageEnum = {
+export type CommunityGetCommunity200ResponseDefaultPageEnum =
+  typeof CommunityGetCommunity200ResponseDefaultPageEnum[keyof typeof CommunityGetCommunity200ResponseDefaultPageEnum];
+export const CommunityGetCommunity200ResponseHasHomepageEnum = {
   True: 'true',
   False: 'false',
 } as const;
 
-export type MutationCommunitySetStake200ResponseHasHomepageEnum =
-  typeof MutationCommunitySetStake200ResponseHasHomepageEnum[keyof typeof MutationCommunitySetStake200ResponseHasHomepageEnum];
+export type CommunityGetCommunity200ResponseHasHomepageEnum =
+  typeof CommunityGetCommunity200ResponseHasHomepageEnum[keyof typeof CommunityGetCommunity200ResponseHasHomepageEnum];
 
 /**
  *
  * @export
- * @interface MutationCommunitySetStakeRequest
+ * @interface CommunityGetCommunity200ResponseAddressesInner
  */
-export interface MutationCommunitySetStakeRequest {
+export interface CommunityGetCommunity200ResponseAddressesInner {
   /**
    *
    * @type {number}
-   * @memberof MutationCommunitySetStakeRequest
-   */
-  stake_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationCommunitySetStakeRequest
-   */
-  stake_token?: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationCommunitySetStakeRequest
-   */
-  vote_weight?: number;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationCommunitySetStakeRequest
-   */
-  stake_enabled?: boolean;
-}
-/**
- *
- * @export
- * @interface MutationContestCreateContestMetadata200Response
- */
-export interface MutationContestCreateContestMetadata200Response {
-  /**
-   *
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInner>}
-   * @memberof MutationContestCreateContestMetadata200Response
-   */
-  contest_managers: Array<QueryCommunityGetCommunity200ResponseContestManagersInner>;
-}
-/**
- *
- * @export
- * @interface MutationContestCreateContestMetadataRequest
- */
-export interface MutationContestCreateContestMetadataRequest {
-  /**
-   * On-Chain contest manager address
-   * @type {string}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  contest_address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  name: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  image_url?: string;
-  /**
-   * Provided by admin on creation when stake funds are not used
-   * @type {string}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  funding_token_address?: string;
-  /**
-   * Percentage of pool used for prizes in recurring contests
-   * @type {number}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  prize_percentage?: number;
-  /**
-   * Sorted array of percentages for prize, from first to last
-   * @type {Array<number>}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  payout_structure: Array<number>;
-  /**
-   * Recurring contest interval in seconds, 0 when one-off
-   * @type {number}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  interval: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  ticker?: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  decimals?: number;
-  /**
-   *
-   * @type {Array<number>}
-   * @memberof MutationContestCreateContestMetadataRequest
-   */
-  topic_ids?: Array<number>;
-}
-/**
- *
- * @export
- * @interface MutationContestUpdateContestMetadataRequest
- */
-export interface MutationContestUpdateContestMetadataRequest {
-  /**
-   * On-Chain contest manager address
-   * @type {string}
-   * @memberof MutationContestUpdateContestMetadataRequest
-   */
-  contest_address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationContestUpdateContestMetadataRequest
-   */
-  name?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationContestUpdateContestMetadataRequest
-   */
-  image_url?: string;
-  /**
-   *
-   * @type {Array<number>}
-   * @memberof MutationContestUpdateContestMetadataRequest
-   */
-  topic_ids?: Array<number>;
-}
-/**
- *
- * @export
- * @interface MutationIntegrationsAnalyticsRequest
- */
-export interface MutationIntegrationsAnalyticsRequest {
-  /**
-   *
-   * @type {MutationIntegrationsAnalyticsRequestGroupCreated}
-   * @memberof MutationIntegrationsAnalyticsRequest
-   */
-  GroupCreated: MutationIntegrationsAnalyticsRequestGroupCreated;
-  /**
-   *
-   * @type {MutationIntegrationsAnalyticsRequestThreadCreated}
-   * @memberof MutationIntegrationsAnalyticsRequest
-   */
-  ThreadCreated: MutationIntegrationsAnalyticsRequestThreadCreated;
-  /**
-   *
-   * @type {MutationIntegrationsAnalyticsRequestCommentCreated}
-   * @memberof MutationIntegrationsAnalyticsRequest
-   */
-  CommentCreated: MutationIntegrationsAnalyticsRequestCommentCreated;
-}
-/**
- *
- * @export
- * @interface MutationIntegrationsAnalyticsRequestCommentCreated
- */
-export interface MutationIntegrationsAnalyticsRequestCommentCreated {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  thread_id: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  address_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  text: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  plaintext: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  community_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  parent_id?: string | null;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  version_history?: Array<string>;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  version_history_updated?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  canvas_signed_data: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  canvas_hash: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  created_by?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  created_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  updated_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  deleted_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  marked_as_spam_at?: string | null;
-  /**
-   *
-   * @type {QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  discord_meta?: QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta | null;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  reaction_count: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  reaction_weights_sum?: number;
-  /**
-   *
-   * @type {MutationIntegrationsAnalyticsRequestThreadCreatedAddress}
-   * @memberof MutationIntegrationsAnalyticsRequestCommentCreated
-   */
-  Address?: MutationIntegrationsAnalyticsRequestThreadCreatedAddress | null;
-}
-/**
- *
- * @export
- * @interface MutationIntegrationsAnalyticsRequestGroupCreated
- */
-export interface MutationIntegrationsAnalyticsRequestGroupCreated {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestGroupCreated
-   */
-  groupId: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestGroupCreated
-   */
-  userId: string;
-}
-/**
- *
- * @export
- * @interface MutationIntegrationsAnalyticsRequestThreadCreated
- */
-export interface MutationIntegrationsAnalyticsRequestThreadCreated {
-  /**
-   *
-   * @type {MutationIntegrationsAnalyticsRequestThreadCreatedAddress}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  Address?: MutationIntegrationsAnalyticsRequestThreadCreatedAddress | null;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  address_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  title: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  kind: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  stage: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  body?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  plaintext?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  url?: string | null;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  topic_id?: number | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  pinned?: boolean | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  community_id: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  view_count: number;
-  /**
-   *
-   * @type {Array<QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner>}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  links?: Array<QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner> | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  read_only?: boolean | null;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  version_history?: Array<string> | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  has_poll?: boolean | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  canvas_signed_data?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  canvas_hash?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  created_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  updated_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  last_edited?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  deleted_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  last_commented_on?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  marked_as_spam_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  archived_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  locked_at?: string | null;
-  /**
-   *
-   * @type {QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  discord_meta?: QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta | null;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  reaction_count: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  reaction_weights_sum: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  comment_count: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  activity_rank_date?: string | null;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  max_notif_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  created_by?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  profile_name?: string | null;
-  /**
-   *
-   * @type {Array<MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner>}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreated
-   */
-  contestManagers?: Array<MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner> | null;
-}
-/**
- *
- * @export
- * @interface MutationIntegrationsAnalyticsRequestThreadCreatedAddress
- */
-export interface MutationIntegrationsAnalyticsRequestThreadCreatedAddress {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   id?: number;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   address: string;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   community_id?: string;
   /**
    *
    * @type {number}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   user_id?: number | null;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   verification_token?: string;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   verification_token_expires?: string | null;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   verified?: string | null;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   last_active?: string | null;
   /**
    *
    * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   is_councillor?: boolean;
   /**
    *
    * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   is_validator?: boolean;
   /**
    *
    * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   ghost_address?: boolean;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
-  wallet_id?: MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum;
+  wallet_id?: CommunityGetCommunity200ResponseAddressesInnerWalletIdEnum;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   block_info?: string;
   /**
    *
    * @type {boolean}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   is_user_default?: boolean;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
-  role?: MutationIntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum;
+  role?: CommunityGetCommunity200ResponseAddressesInnerRoleEnum;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
-  wallet_sso_source?: MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum;
+  wallet_sso_source?: CommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum;
   /**
    *
    * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   hex?: string;
   /**
    *
    * @type {any}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   created_at?: any;
   /**
    *
    * @type {any}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   updated_at?: any;
   /**
    *
-   * @type {MutationUserUpdateUser200Response}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedAddress
+   * @type {UserUpdateUser200Response}
+   * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
-  User?: MutationUserUpdateUser200Response;
+  User?: UserUpdateUser200Response;
 }
 
-export const MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum =
-  {
-    Magic: 'magic',
-    Polkadot: 'polkadot',
-    Metamask: 'metamask',
-    Walletconnect: 'walletconnect',
-    KeplrEthereum: 'keplr-ethereum',
-    Keplr: 'keplr',
-    Leap: 'leap',
-    Near: 'near',
-    Terrastation: 'terrastation',
-    TerraWalletconnect: 'terra-walletconnect',
-    CosmMetamask: 'cosm-metamask',
-    Phantom: 'phantom',
-    Coinbase: 'coinbase',
-  } as const;
-
-export type MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum =
-  typeof MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum[keyof typeof MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum];
-export const MutationIntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum =
-  {
-    Admin: 'admin',
-    Moderator: 'moderator',
-    Member: 'member',
-  } as const;
-
-export type MutationIntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum =
-  typeof MutationIntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum[keyof typeof MutationIntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum];
-export const MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum =
-  {
-    Google: 'google',
-    Github: 'github',
-    Discord: 'discord',
-    Twitter: 'twitter',
-    Apple: 'apple',
-    Email: 'email',
-    Unknown: 'unknown',
-  } as const;
-
-export type MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum =
-  typeof MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum[keyof typeof MutationIntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum];
-
-/**
- *
- * @export
- * @interface MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner
- */
-export interface MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner
-   */
-  contest_address: string;
-}
-/**
- *
- * @export
- * @interface MutationLoadTestCreateJWTsRequest
- */
-export interface MutationLoadTestCreateJWTsRequest {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationLoadTestCreateJWTsRequest
-   */
-  number_of_jwt: number;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommentSubscription200Response
- */
-export interface MutationSubscriptionCreateCommentSubscription200Response {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200Response
-   */
-  id?: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200Response
-   */
-  user_id: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200Response
-   */
-  comment_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200Response
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200Response
-   */
-  updated_at?: string;
-  /**
-   *
-   * @type {MutationSubscriptionCreateCommentSubscription200ResponseComment}
-   * @memberof MutationSubscriptionCreateCommentSubscription200Response
-   */
-  Comment?: MutationSubscriptionCreateCommentSubscription200ResponseComment;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommentSubscription200ResponseComment
- */
-export interface MutationSubscriptionCreateCommentSubscription200ResponseComment {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseComment
-   */
-  id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseComment
-   */
-  created_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseComment
-   */
-  updated_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseComment
-   */
-  text: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseComment
-   */
-  plaintext: string;
-  /**
-   *
-   * @type {MutationSubscriptionCreateCommentSubscription200ResponseCommentThread}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseComment
-   */
-  Thread: MutationSubscriptionCreateCommentSubscription200ResponseCommentThread;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
- */
-export interface MutationSubscriptionCreateCommentSubscription200ResponseCommentThread {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  community_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  title: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  comment_count: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  created_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  url?: string | null;
-  /**
-   *
-   * @type {MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  Community: MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity;
-  /**
-   *
-   * @type {MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThread
-   */
-  Address: MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
- */
-export interface MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
-   */
-  id?: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
-   */
-  user_id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
-   */
-  address: string;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
- */
-export interface MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
-   */
-  id?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
-   */
-  name: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
-   */
-  icon_url?: string | null;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommentSubscriptionRequest
- */
-export interface MutationSubscriptionCreateCommentSubscriptionRequest {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommentSubscriptionRequest
-   */
-  comment_id: number;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommunityAlert200Response
- */
-export interface MutationSubscriptionCreateCommunityAlert200Response {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateCommunityAlert200Response
-   */
-  user_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommunityAlert200Response
-   */
-  community_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommunityAlert200Response
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommunityAlert200Response
-   */
-  updated_at?: string;
-  /**
-   *
-   * @type {MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity}
-   * @memberof MutationSubscriptionCreateCommunityAlert200Response
-   */
-  Community?: MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateCommunityAlertRequest
- */
-export interface MutationSubscriptionCreateCommunityAlertRequest {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateCommunityAlertRequest
-   */
-  community_id: string;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateThreadSubscription200Response
- */
-export interface MutationSubscriptionCreateThreadSubscription200Response {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateThreadSubscription200Response
-   */
-  id?: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateThreadSubscription200Response
-   */
-  user_id: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateThreadSubscription200Response
-   */
-  thread_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateThreadSubscription200Response
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateThreadSubscription200Response
-   */
-  updated_at?: string;
-  /**
-   *
-   * @type {MutationSubscriptionCreateThreadSubscription200ResponseThread}
-   * @memberof MutationSubscriptionCreateThreadSubscription200Response
-   */
-  Thread?: MutationSubscriptionCreateThreadSubscription200ResponseThread;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateThreadSubscription200ResponseThread
- */
-export interface MutationSubscriptionCreateThreadSubscription200ResponseThread {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  community_id: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  address_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  title: string;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  comment_count: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  created_at?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  url?: string | null;
-  /**
-   *
-   * @type {MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  Community: MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity;
-  /**
-   *
-   * @type {MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress}
-   * @memberof MutationSubscriptionCreateThreadSubscription200ResponseThread
-   */
-  Address: MutationSubscriptionCreateCommentSubscription200ResponseCommentThreadAddress;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionCreateThreadSubscriptionRequest
- */
-export interface MutationSubscriptionCreateThreadSubscriptionRequest {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationSubscriptionCreateThreadSubscriptionRequest
-   */
-  thread_id: number;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionDeleteCommentSubscriptionRequest
- */
-export interface MutationSubscriptionDeleteCommentSubscriptionRequest {
-  /**
-   *
-   * @type {Array<number>}
-   * @memberof MutationSubscriptionDeleteCommentSubscriptionRequest
-   */
-  comment_ids: Array<number>;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionDeleteCommunityAlertRequest
- */
-export interface MutationSubscriptionDeleteCommunityAlertRequest {
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof MutationSubscriptionDeleteCommunityAlertRequest
-   */
-  community_ids: Array<string>;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionDeleteThreadSubscriptionRequest
- */
-export interface MutationSubscriptionDeleteThreadSubscriptionRequest {
-  /**
-   *
-   * @type {Array<number>}
-   * @memberof MutationSubscriptionDeleteThreadSubscriptionRequest
-   */
-  thread_ids: Array<number>;
-}
-/**
- *
- * @export
- * @interface MutationSubscriptionRegisterClientRegistrationTokenRequest
- */
-export interface MutationSubscriptionRegisterClientRegistrationTokenRequest {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionRegisterClientRegistrationTokenRequest
-   */
-  token: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationSubscriptionRegisterClientRegistrationTokenRequest
-   */
-  channelType: MutationSubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum;
-}
-
-export const MutationSubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum =
-  {
-    Apns: 'APNS',
-    Fcm: 'FCM',
-  } as const;
-
-export type MutationSubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum =
-  typeof MutationSubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum[keyof typeof MutationSubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum];
-
-/**
- *
- * @export
- * @interface MutationSubscriptionUpdateSubscriptionPreferencesRequest
- */
-export interface MutationSubscriptionUpdateSubscriptionPreferencesRequest {
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationSubscriptionUpdateSubscriptionPreferencesRequest
-   */
-  email_notifications_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationSubscriptionUpdateSubscriptionPreferencesRequest
-   */
-  digest_email_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationSubscriptionUpdateSubscriptionPreferencesRequest
-   */
-  recap_email_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationSubscriptionUpdateSubscriptionPreferencesRequest
-   */
-  mobile_push_notifications_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationSubscriptionUpdateSubscriptionPreferencesRequest
-   */
-  mobile_push_discussion_activity_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationSubscriptionUpdateSubscriptionPreferencesRequest
-   */
-  mobile_push_admin_alerts_enabled?: boolean;
-}
-/**
- *
- * @export
- * @interface MutationUserUpdateUser200Response
- */
-export interface MutationUserUpdateUser200Response {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  email?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  isAdmin?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  disableRichText?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  emailVerified?: boolean | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  selected_community_id?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  emailNotificationInterval?: MutationUserUpdateUser200ResponseEmailNotificationIntervalEnum;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  promotional_emails_enabled?: boolean | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  is_welcome_onboard_flow_complete?: boolean;
-  /**
-   *
-   * @type {MutationUserUpdateUserRequestProfile}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  profile: MutationUserUpdateUserRequestProfile;
-  /**
-   *
-   * @type {any}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  created_at?: any;
-  /**
-   *
-   * @type {any}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  updated_at?: any;
-  /**
-   *
-   * @type {Array<MutationUserUpdateUserRequestProfileTagsInner>}
-   * @memberof MutationUserUpdateUser200Response
-   */
-  ProfileTags?: Array<MutationUserUpdateUserRequestProfileTagsInner>;
-}
-
-export const MutationUserUpdateUser200ResponseEmailNotificationIntervalEnum = {
-  Weekly: 'weekly',
-  Never: 'never',
-} as const;
-
-export type MutationUserUpdateUser200ResponseEmailNotificationIntervalEnum =
-  typeof MutationUserUpdateUser200ResponseEmailNotificationIntervalEnum[keyof typeof MutationUserUpdateUser200ResponseEmailNotificationIntervalEnum];
-
-/**
- *
- * @export
- * @interface MutationUserUpdateUserDefaultResponse
- */
-export interface MutationUserUpdateUserDefaultResponse {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserDefaultResponse
-   */
-  message: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserDefaultResponse
-   */
-  code: string;
-  /**
-   *
-   * @type {Array<MutationUserUpdateUserDefaultResponseIssuesInner>}
-   * @memberof MutationUserUpdateUserDefaultResponse
-   */
-  issues?: Array<MutationUserUpdateUserDefaultResponseIssuesInner>;
-}
-/**
- *
- * @export
- * @interface MutationUserUpdateUserDefaultResponseIssuesInner
- */
-export interface MutationUserUpdateUserDefaultResponseIssuesInner {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserDefaultResponseIssuesInner
-   */
-  message: string;
-}
-/**
- *
- * @export
- * @interface MutationUserUpdateUserRequest
- */
-export interface MutationUserUpdateUserRequest {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  email?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  isAdmin?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  disableRichText?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  emailVerified?: boolean | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  selected_community_id?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  emailNotificationInterval?: MutationUserUpdateUserRequestEmailNotificationIntervalEnum;
-  /**
-   *
-   * @type {boolean}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  promotional_emails_enabled?: boolean | null;
-  /**
-   *
-   * @type {MutationUserUpdateUserRequestProfile}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  profile: MutationUserUpdateUserRequestProfile;
-  /**
-   *
-   * @type {any}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  created_at?: any;
-  /**
-   *
-   * @type {any}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  updated_at?: any;
-  /**
-   *
-   * @type {Array<MutationUserUpdateUserRequestProfileTagsInner>}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  ProfileTags?: Array<MutationUserUpdateUserRequestProfileTagsInner>;
-  /**
-   *
-   * @type {Array<number>}
-   * @memberof MutationUserUpdateUserRequest
-   */
-  tag_ids?: Array<number> | null;
-}
-
-export const MutationUserUpdateUserRequestEmailNotificationIntervalEnum = {
-  Weekly: 'weekly',
-  Never: 'never',
-} as const;
-
-export type MutationUserUpdateUserRequestEmailNotificationIntervalEnum =
-  typeof MutationUserUpdateUserRequestEmailNotificationIntervalEnum[keyof typeof MutationUserUpdateUserRequestEmailNotificationIntervalEnum];
-
-/**
- *
- * @export
- * @interface MutationUserUpdateUserRequestProfile
- */
-export interface MutationUserUpdateUserRequestProfile {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  name?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  email?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  website?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  bio?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  avatar_url?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  slug?: string | null;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  socials?: Array<string> | null;
-  /**
-   *
-   * @type {MutationUserUpdateUserRequestProfileBackgroundImage}
-   * @memberof MutationUserUpdateUserRequestProfile
-   */
-  background_image?: MutationUserUpdateUserRequestProfileBackgroundImage | null;
-}
-/**
- *
- * @export
- * @interface MutationUserUpdateUserRequestProfileBackgroundImage
- */
-export interface MutationUserUpdateUserRequestProfileBackgroundImage {
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfileBackgroundImage
-   */
-  url?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfileBackgroundImage
-   */
-  imageBehavior?: string;
-}
-/**
- *
- * @export
- * @interface MutationUserUpdateUserRequestProfileTagsInner
- */
-export interface MutationUserUpdateUserRequestProfileTagsInner {
-  /**
-   *
-   * @type {number}
-   * @memberof MutationUserUpdateUserRequestProfileTagsInner
-   */
-  user_id: number;
-  /**
-   *
-   * @type {number}
-   * @memberof MutationUserUpdateUserRequestProfileTagsInner
-   */
-  tag_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfileTagsInner
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof MutationUserUpdateUserRequestProfileTagsInner
-   */
-  updated_at?: string;
-}
-/**
- *
- * @export
- * @interface QueryCommunityGetCommunity200Response
- */
-export interface QueryCommunityGetCommunity200Response {
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  name: string;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  chain_node_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  default_symbol?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  network?: QueryCommunityGetCommunity200ResponseNetworkEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  base: QueryCommunityGetCommunity200ResponseBaseEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  icon_url?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  active: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  type?: QueryCommunityGetCommunity200ResponseTypeEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  id?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  description?: string;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  social_links?: Array<string>;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  ss58_prefix?: number;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  stages_enabled?: boolean;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  custom_stages?: Array<string>;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  custom_domain?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  block_explorer_ids?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  collapsed_on_homepage?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  substrate_spec?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  has_chain_events_listener?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  default_summary_view?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  default_page?: QueryCommunityGetCommunity200ResponseDefaultPageEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  has_homepage?: QueryCommunityGetCommunity200ResponseHasHomepageEnum | null;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  terms?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  admin_only_polling?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  bech32_prefix?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  hide_projects?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  token_name?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  ce_verbose?: boolean;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  discord_config_id?: number | null;
-  /**
-   *
-   * @type {any}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  category?: any;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  discord_bot_webhooks_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  directory_page_enabled?: boolean;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  directory_page_chain_node_id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  namespace?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  namespace_address?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  redirect?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  updated_at?: string;
-  /**
-   *
-   * @type {Array<QueryCommunityGetCommunity200ResponseAddressesInner>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  Addresses?: Array<QueryCommunityGetCommunity200ResponseAddressesInner>;
-  /**
-   *
-   * @type {Array<QueryCommunityGetCommunity200ResponseCommunityStakesInner>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  CommunityStakes?: Array<QueryCommunityGetCommunity200ResponseCommunityStakesInner>;
-  /**
-   *
-   * @type {Array<QueryCommunityGetCommunity200ResponseCommunityTagsInner>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  CommunityTags?: Array<QueryCommunityGetCommunity200ResponseCommunityTagsInner>;
-  /**
-   *
-   * @type {QueryCommunityGetCommunity200ResponseChainNode}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  ChainNode?: QueryCommunityGetCommunity200ResponseChainNode;
-  /**
-   *
-   * @type {Array<QueryCommunityGetCommunity200ResponseTopicsInner>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  topics?: Array<QueryCommunityGetCommunity200ResponseTopicsInner>;
-  /**
-   *
-   * @type {Array<QueryCommunityGetCommunity200ResponseGroupsInner>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  groups?: Array<QueryCommunityGetCommunity200ResponseGroupsInner>;
-  /**
-   *
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInner>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  contest_managers?: Array<QueryCommunityGetCommunity200ResponseContestManagersInner>;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  snapshot_spaces?: Array<string>;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200Response
-   */
-  include_in_digest_email?: boolean | null;
-}
-
-export const QueryCommunityGetCommunity200ResponseNetworkEnum = {
-  Edgeware: 'edgeware',
-  EdgewareTestnet: 'edgeware-testnet',
-  Kusama: 'kusama',
-  Kulupu: 'kulupu',
-  Polkadot: 'polkadot',
-  Plasm: 'plasm',
-  Stafi: 'stafi',
-  Darwinia: 'darwinia',
-  Phala: 'phala',
-  Centrifuge: 'centrifuge',
-  Straightedge: 'straightedge',
-  Osmosis: 'osmosis',
-  Injective: 'injective',
-  InjectiveTestnet: 'injective-testnet',
-  Terra: 'terra',
-  Ethereum: 'ethereum',
-  Near: 'near',
-  NearTestnet: 'near-testnet',
-  Compound: 'compound',
-  Aave: 'aave',
-  AaveLocal: 'aave-local',
-  Dydx: 'dydx',
-  Metacartel: 'metacartel',
-  Alex: 'alex',
-  Erc20: 'erc20',
-  Erc721: 'erc721',
-  Erc1155: 'erc1155',
-  Cw20: 'cw20',
-  Cw721: 'cw721',
-  Clover: 'clover',
-  Hydradx: 'hydradx',
-  Crust: 'crust',
-  Sputnik: 'sputnik',
-  SolanaDevnet: 'solana-devnet',
-  SolanaTestnet: 'solana-testnet',
-  Solana: 'solana',
-  Spl: 'spl',
-  Evmos: 'evmos',
-  Kava: 'kava',
-  Kyve: 'kyve',
-  Stargaze: 'stargaze',
-  Cosmos: 'cosmos',
-} as const;
-
-export type QueryCommunityGetCommunity200ResponseNetworkEnum =
-  typeof QueryCommunityGetCommunity200ResponseNetworkEnum[keyof typeof QueryCommunityGetCommunity200ResponseNetworkEnum];
-export const QueryCommunityGetCommunity200ResponseBaseEnum = {
-  Cosmos: 'cosmos',
-  Substrate: 'substrate',
-  Ethereum: 'ethereum',
-  Near: 'near',
-  Solana: 'solana',
-} as const;
-
-export type QueryCommunityGetCommunity200ResponseBaseEnum =
-  typeof QueryCommunityGetCommunity200ResponseBaseEnum[keyof typeof QueryCommunityGetCommunity200ResponseBaseEnum];
-export const QueryCommunityGetCommunity200ResponseTypeEnum = {
-  Chain: 'chain',
-  Dao: 'dao',
-  Token: 'token',
-  Offchain: 'offchain',
-} as const;
-
-export type QueryCommunityGetCommunity200ResponseTypeEnum =
-  typeof QueryCommunityGetCommunity200ResponseTypeEnum[keyof typeof QueryCommunityGetCommunity200ResponseTypeEnum];
-export const QueryCommunityGetCommunity200ResponseDefaultPageEnum = {
-  AllDiscussionsView: 'default_all_discussions_view',
-  SummaryView: 'default_summary_view',
-} as const;
-
-export type QueryCommunityGetCommunity200ResponseDefaultPageEnum =
-  typeof QueryCommunityGetCommunity200ResponseDefaultPageEnum[keyof typeof QueryCommunityGetCommunity200ResponseDefaultPageEnum];
-export const QueryCommunityGetCommunity200ResponseHasHomepageEnum = {
-  True: 'true',
-  False: 'false',
-} as const;
-
-export type QueryCommunityGetCommunity200ResponseHasHomepageEnum =
-  typeof QueryCommunityGetCommunity200ResponseHasHomepageEnum[keyof typeof QueryCommunityGetCommunity200ResponseHasHomepageEnum];
-
-/**
- *
- * @export
- * @interface QueryCommunityGetCommunity200ResponseAddressesInner
- */
-export interface QueryCommunityGetCommunity200ResponseAddressesInner {
-  /**
-   *
-   * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  community_id?: string;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  user_id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  verification_token?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  verification_token_expires?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  verified?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  last_active?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  is_councillor?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  is_validator?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  ghost_address?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  wallet_id?: QueryCommunityGetCommunity200ResponseAddressesInnerWalletIdEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  block_info?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  is_user_default?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  role?: QueryCommunityGetCommunity200ResponseAddressesInnerRoleEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  wallet_sso_source?: QueryCommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  hex?: string;
-  /**
-   *
-   * @type {any}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  created_at?: any;
-  /**
-   *
-   * @type {any}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  updated_at?: any;
-  /**
-   *
-   * @type {MutationUserUpdateUser200Response}
-   * @memberof QueryCommunityGetCommunity200ResponseAddressesInner
-   */
-  User?: MutationUserUpdateUser200Response;
-}
-
-export const QueryCommunityGetCommunity200ResponseAddressesInnerWalletIdEnum = {
+export const CommunityGetCommunity200ResponseAddressesInnerWalletIdEnum = {
   Magic: 'magic',
   Polkadot: 'polkadot',
   Metamask: 'metamask',
@@ -2530,17 +620,17 @@ export const QueryCommunityGetCommunity200ResponseAddressesInnerWalletIdEnum = {
   Coinbase: 'coinbase',
 } as const;
 
-export type QueryCommunityGetCommunity200ResponseAddressesInnerWalletIdEnum =
-  typeof QueryCommunityGetCommunity200ResponseAddressesInnerWalletIdEnum[keyof typeof QueryCommunityGetCommunity200ResponseAddressesInnerWalletIdEnum];
-export const QueryCommunityGetCommunity200ResponseAddressesInnerRoleEnum = {
+export type CommunityGetCommunity200ResponseAddressesInnerWalletIdEnum =
+  typeof CommunityGetCommunity200ResponseAddressesInnerWalletIdEnum[keyof typeof CommunityGetCommunity200ResponseAddressesInnerWalletIdEnum];
+export const CommunityGetCommunity200ResponseAddressesInnerRoleEnum = {
   Admin: 'admin',
   Moderator: 'moderator',
   Member: 'member',
 } as const;
 
-export type QueryCommunityGetCommunity200ResponseAddressesInnerRoleEnum =
-  typeof QueryCommunityGetCommunity200ResponseAddressesInnerRoleEnum[keyof typeof QueryCommunityGetCommunity200ResponseAddressesInnerRoleEnum];
-export const QueryCommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum =
+export type CommunityGetCommunity200ResponseAddressesInnerRoleEnum =
+  typeof CommunityGetCommunity200ResponseAddressesInnerRoleEnum[keyof typeof CommunityGetCommunity200ResponseAddressesInnerRoleEnum];
+export const CommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum =
   {
     Google: 'google',
     Github: 'github',
@@ -2551,132 +641,132 @@ export const QueryCommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceE
     Unknown: 'unknown',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum =
-  typeof QueryCommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum[keyof typeof QueryCommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum];
+export type CommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum =
+  typeof CommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum[keyof typeof CommunityGetCommunity200ResponseAddressesInnerWalletSsoSourceEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseChainNode
+ * @interface CommunityGetCommunity200ResponseChainNode
  */
-export interface QueryCommunityGetCommunity200ResponseChainNode {
+export interface CommunityGetCommunity200ResponseChainNode {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   url: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   eth_chain_id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   alt_wallet_url?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   private_url?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
-  balance_type: QueryCommunityGetCommunity200ResponseChainNodeBalanceTypeEnum;
+  balance_type: CommunityGetCommunity200ResponseChainNodeBalanceTypeEnum;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   name: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   description?: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   ss58?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   bech32?: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   slip44?: number;
   /**
    *
    * @type {any}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   created_at?: any;
   /**
    *
    * @type {any}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   updated_at?: any;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   cosmos_chain_id?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
-  cosmos_gov_version?: QueryCommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum;
+  cosmos_gov_version?: CommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
-  health?: QueryCommunityGetCommunity200ResponseChainNodeHealthEnum;
+  health?: CommunityGetCommunity200ResponseChainNodeHealthEnum;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseChainNodeContractsInner>}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @type {Array<CommunityGetCommunity200ResponseChainNodeContractsInner>}
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
-  contracts?: Array<QueryCommunityGetCommunity200ResponseChainNodeContractsInner>;
+  contracts?: Array<CommunityGetCommunity200ResponseChainNodeContractsInner>;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   block_explorer?: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNode
+   * @memberof CommunityGetCommunity200ResponseChainNode
    */
   max_ce_block_range?: number | null;
 }
 
-export const QueryCommunityGetCommunity200ResponseChainNodeBalanceTypeEnum = {
+export const CommunityGetCommunity200ResponseChainNodeBalanceTypeEnum = {
   Terra: 'terra',
   Ethereum: 'ethereum',
   Solana: 'solana',
@@ -2685,792 +775,791 @@ export const QueryCommunityGetCommunity200ResponseChainNodeBalanceTypeEnum = {
   Substrate: 'substrate',
 } as const;
 
-export type QueryCommunityGetCommunity200ResponseChainNodeBalanceTypeEnum =
-  typeof QueryCommunityGetCommunity200ResponseChainNodeBalanceTypeEnum[keyof typeof QueryCommunityGetCommunity200ResponseChainNodeBalanceTypeEnum];
-export const QueryCommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum =
-  {
-    V1: 'v1',
-    V1beta1: 'v1beta1',
-    V1beta1AttemptFailed: 'v1beta1-attempt-failed',
-    V1AttemptFailed: 'v1-attempt-failed',
-  } as const;
+export type CommunityGetCommunity200ResponseChainNodeBalanceTypeEnum =
+  typeof CommunityGetCommunity200ResponseChainNodeBalanceTypeEnum[keyof typeof CommunityGetCommunity200ResponseChainNodeBalanceTypeEnum];
+export const CommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum = {
+  V1: 'v1',
+  V1beta1: 'v1beta1',
+  V1beta1AttemptFailed: 'v1beta1-attempt-failed',
+  V1AttemptFailed: 'v1-attempt-failed',
+} as const;
 
-export type QueryCommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum =
-  typeof QueryCommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum[keyof typeof QueryCommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum];
-export const QueryCommunityGetCommunity200ResponseChainNodeHealthEnum = {
+export type CommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum =
+  typeof CommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum[keyof typeof CommunityGetCommunity200ResponseChainNodeCosmosGovVersionEnum];
+export const CommunityGetCommunity200ResponseChainNodeHealthEnum = {
   Failed: 'failed',
   Healthy: 'healthy',
 } as const;
 
-export type QueryCommunityGetCommunity200ResponseChainNodeHealthEnum =
-  typeof QueryCommunityGetCommunity200ResponseChainNodeHealthEnum[keyof typeof QueryCommunityGetCommunity200ResponseChainNodeHealthEnum];
+export type CommunityGetCommunity200ResponseChainNodeHealthEnum =
+  typeof CommunityGetCommunity200ResponseChainNodeHealthEnum[keyof typeof CommunityGetCommunity200ResponseChainNodeHealthEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+ * @interface CommunityGetCommunity200ResponseChainNodeContractsInner
  */
-export interface QueryCommunityGetCommunity200ResponseChainNodeContractsInner {
+export interface CommunityGetCommunity200ResponseChainNodeContractsInner {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   address: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   chain_node_id: number;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   abi_id?: number | null;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   decimals?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   token_name?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   symbol?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   type: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   created_at: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   updated_at: string;
   /**
    *
    * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   is_factory?: boolean;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseChainNodeContractsInner
+   * @memberof CommunityGetCommunity200ResponseChainNodeContractsInner
    */
   nickname?: string;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseCommunityStakesInner
+ * @interface CommunityGetCommunity200ResponseCommunityStakesInner
  */
-export interface QueryCommunityGetCommunity200ResponseCommunityStakesInner {
+export interface CommunityGetCommunity200ResponseCommunityStakesInner {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   community_id: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   stake_id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   stake_token?: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   vote_weight?: number;
   /**
    *
    * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   stake_enabled?: boolean;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   created_at?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
   updated_at?: string;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInner
+   * @type {Array<CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>}
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInner
    */
-  StakeTransactions?: Array<QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>;
+  StakeTransactions?: Array<CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+ * @interface CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
  */
-export interface QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner {
+export interface CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
   transaction_hash: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
   community_id: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
   stake_id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
   address: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
   stake_amount: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
   stake_price?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
-  stake_direction: QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum;
+  stake_direction: CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner
    */
   timestamp: number;
 }
 
-export const QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
+export const CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
   {
     Buy: 'buy',
     Sell: 'sell',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
-  typeof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum[keyof typeof QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum];
+export type CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
+  typeof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum[keyof typeof CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseCommunityTagsInner
+ * @interface CommunityGetCommunity200ResponseCommunityTagsInner
  */
-export interface QueryCommunityGetCommunity200ResponseCommunityTagsInner {
+export interface CommunityGetCommunity200ResponseCommunityTagsInner {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityTagsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityTagsInner
    */
   id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseCommunityTagsInner
+   * @memberof CommunityGetCommunity200ResponseCommunityTagsInner
    */
   name: string;
 }
 /**
  * On-Chain Contest Manager
  * @export
- * @interface QueryCommunityGetCommunity200ResponseContestManagersInner
+ * @interface CommunityGetCommunity200ResponseContestManagersInner
  */
-export interface QueryCommunityGetCommunity200ResponseContestManagersInner {
+export interface CommunityGetCommunity200ResponseContestManagersInner {
   /**
    * On-Chain contest manager address
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   contest_address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   community_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   name: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   image_url?: string;
   /**
    * Provided by admin on creation when stake funds are not used
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   funding_token_address?: string | null;
   /**
    * Percentage of pool used for prizes in recurring contests
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   prize_percentage?: number | null;
   /**
    * Sorted array of percentages for prize, from first to last
    * @type {Array<number>}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   payout_structure: Array<number>;
   /**
    * Recurring contest interval, 0 when one-off
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   interval: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   ticker?: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   decimals?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   created_at: string;
   /**
    * Flags when contest policy is cancelled by admin
    * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   cancelled?: boolean | null;
   /**
    * Flags when the one-off contest has ended and rollover was completed
    * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
   ended?: boolean | null;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseTopicsInner>}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @type {Array<CommunityGetCommunity200ResponseTopicsInner>}
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
-  topics?: Array<QueryCommunityGetCommunity200ResponseTopicsInner>;
+  topics?: Array<CommunityGetCommunity200ResponseTopicsInner>;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner>}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInner
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInner>}
+   * @memberof CommunityGetCommunity200ResponseContestManagersInner
    */
-  contests?: Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner>;
+  contests?: Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInner>;
 }
 /**
  * On-Chain contest instance
  * @export
- * @interface QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+ * @interface CommunityGetCommunity200ResponseContestManagersInnerContestsInner
  */
-export interface QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner {
+export interface CommunityGetCommunity200ResponseContestManagersInnerContestsInner {
   /**
    * On-Chain contest manager address
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInner
    */
   contest_address: string;
   /**
    * On-Chain contest id, 0 when one-off
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInner
    */
   contest_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInner
    */
   start_time: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInner
    */
   end_time: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInner
    */
   score_updated_at?: string | null;
   /**
    * Contest score, sorted from first to last
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner>}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner>}
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInner
    */
-  score?: Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner> | null;
+  score?: Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner> | null;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner>}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInner
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner>}
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInner
    */
-  actions?: Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner> | null;
+  actions?: Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner> | null;
 }
 /**
  * On-Chain content related actions on contest instance
  * @export
- * @interface QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+ * @interface CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
  */
-export interface QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner {
+export interface CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner {
   /**
    * On-Chain contest manager address
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   contest_address: string;
   /**
    * On-Chain contest id, 0 when one-off
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   contest_id: number;
   /**
    * On-Chain content id, 0 when adding
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   content_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   actor_address: string;
   /**
    * Type of content action
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
-  action: QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum;
+  action: CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum;
   /**
    * Content url
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   content_url?: string | null;
   /**
    * Thread id mapped from content url
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   thread_id?: number | null;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   thread_title?: string | null;
   /**
    * Voting power of address when action was recorded
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   voting_power: number;
   /**
    * Date-time when action was recorded
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner
    */
   created_at: string;
 }
 
-export const QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum =
+export const CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum =
   {
     Added: 'added',
     Upvoted: 'upvoted',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum =
-  typeof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum[keyof typeof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum];
+export type CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum =
+  typeof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum[keyof typeof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInnerActionEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
+ * @interface CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
  */
-export interface QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner {
+export interface CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
    */
   creator_address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
    */
   content_id: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
    */
   votes: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
    */
   prize: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
+   * @memberof CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner
    */
   tickerPrize?: number;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInner
+ * @interface CommunityGetCommunity200ResponseGroupsInner
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInner {
+export interface CommunityGetCommunity200ResponseGroupsInner {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInner
+   * @memberof CommunityGetCommunity200ResponseGroupsInner
    */
   id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInner
+   * @memberof CommunityGetCommunity200ResponseGroupsInner
    */
   community_id: string;
   /**
    *
-   * @type {QueryCommunityGetCommunity200ResponseGroupsInnerMetadata}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInner
+   * @type {CommunityGetCommunity200ResponseGroupsInnerMetadata}
+   * @memberof CommunityGetCommunity200ResponseGroupsInner
    */
-  metadata: QueryCommunityGetCommunity200ResponseGroupsInnerMetadata;
+  metadata: CommunityGetCommunity200ResponseGroupsInnerMetadata;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner>}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInner
+   * @type {Array<CommunityGetCommunity200ResponseGroupsInnerRequirementsInner>}
+   * @memberof CommunityGetCommunity200ResponseGroupsInner
    */
-  requirements: Array<QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner>;
+  requirements: Array<CommunityGetCommunity200ResponseGroupsInnerRequirementsInner>;
   /**
    *
    * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInner
+   * @memberof CommunityGetCommunity200ResponseGroupsInner
    */
   is_system_managed?: boolean;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInner
+   * @memberof CommunityGetCommunity200ResponseGroupsInner
    */
   created_at?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInner
+   * @memberof CommunityGetCommunity200ResponseGroupsInner
    */
   updated_at?: string;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerMetadata
+ * @interface CommunityGetCommunity200ResponseGroupsInnerMetadata
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerMetadata {
+export interface CommunityGetCommunity200ResponseGroupsInnerMetadata {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerMetadata
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerMetadata
    */
   name: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerMetadata
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerMetadata
    */
   description: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerMetadata
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerMetadata
    */
   required_requirements?: number;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerMetadata
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerMetadata
    */
   membership_ttl?: number;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInner
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInner {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInner
    */
-  rule: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum;
+  rule: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum;
   /**
    *
-   * @type {QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInner
+   * @type {CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data}
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInner
    */
-  data: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data;
+  data: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum =
   {
     Allow: 'allow',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerRuleEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf
    */
-  rule: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum;
+  rule: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum;
   /**
    *
-   * @type {QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf
+   * @type {CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData}
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf
    */
-  data: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData;
+  data: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum =
   {
     Threshold: 'threshold',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfRuleEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1 {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1 {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1
    */
-  rule: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum;
+  rule: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum;
   /**
    *
-   * @type {QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1
+   * @type {CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data}
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1
    */
-  data: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data;
+  data: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum =
   {
     Allow: 'allow',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1RuleEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data {
   /**
    *
    * @type {Array<string>}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOf1Data
    */
   allow: Array<string>;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData
    */
   threshold: string;
   /**
    *
-   * @type {QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData
+   * @type {CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource}
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfData
    */
-  source: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource;
+  source: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
    */
-  source_type: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum;
+  source_type: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
    */
   evm_chain_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
    */
   contract_address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
    */
   token_id?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
    */
   cosmos_chain_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSource
    */
   token_symbol: string;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
   {
     Cw721: 'cw721',
     Cw20: 'cw20',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
    */
-  source_type: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum;
+  source_type: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
    */
   evm_chain_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
    */
   contract_address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
    */
   token_id?: string;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
   {
     Erc20: 'erc20',
     Erc721: 'erc721',
@@ -3478,1355 +1567,3262 @@ export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAn
     Spl: 'spl',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1 {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1 {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
    */
-  source_type: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum;
+  source_type: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
    */
   evm_chain_id: number;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
   {
     EthNative: 'eth_native',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2 {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2 {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
    */
-  source_type: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum;
+  source_type: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
    */
   cosmos_chain_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
    */
   token_symbol: string;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
   {
     CosmosNative: 'cosmos_native',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+ * @interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
  */
-export interface QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3 {
+export interface CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3 {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
    */
-  source_type: QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum;
+  source_type: CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
    */
   cosmos_chain_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+   * @memberof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
    */
   contract_address: string;
 }
 
-export const QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
+export const CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
   {
     Cw721: 'cw721',
     Cw20: 'cw20',
   } as const;
 
-export type QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
-  typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum[keyof typeof QueryCommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum];
+export type CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
+  typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum[keyof typeof CommunityGetCommunity200ResponseGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum];
 
 /**
  *
  * @export
- * @interface QueryCommunityGetCommunity200ResponseTopicsInner
+ * @interface CommunityGetCommunity200ResponseTopicsInner
  */
-export interface QueryCommunityGetCommunity200ResponseTopicsInner {
+export interface CommunityGetCommunity200ResponseTopicsInner {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   name?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   community_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   description?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   telegram?: string | null;
   /**
    *
    * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   featured_in_sidebar?: boolean;
   /**
    *
    * @type {boolean}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   featured_in_new_post?: boolean;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   default_offchain_template?: string | null;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   order?: number | null;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   channel_id?: string | null;
   /**
    *
    * @type {Array<number>}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   group_ids?: Array<number>;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetCommunity200ResponseTopicsInner
+   * @memberof CommunityGetCommunity200ResponseTopicsInner
    */
   default_offchain_template_backup?: string | null;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetMembers200Response
+ * @interface CommunityGetMembers200Response
  */
-export interface QueryCommunityGetMembers200Response {
+export interface CommunityGetMembers200Response {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetMembers200Response
+   * @memberof CommunityGetMembers200Response
    */
   limit: number;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetMembers200Response
+   * @memberof CommunityGetMembers200Response
    */
   page: number;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetMembers200Response
+   * @memberof CommunityGetMembers200Response
    */
   totalPages: number;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetMembers200Response
+   * @memberof CommunityGetMembers200Response
    */
   totalResults: number;
   /**
    *
-   * @type {Array<QueryCommunityGetMembers200ResponseResultsInner>}
-   * @memberof QueryCommunityGetMembers200Response
+   * @type {Array<CommunityGetMembers200ResponseResultsInner>}
+   * @memberof CommunityGetMembers200Response
    */
-  results: Array<QueryCommunityGetMembers200ResponseResultsInner>;
+  results: Array<CommunityGetMembers200ResponseResultsInner>;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetMembers200ResponseResultsInner
+ * @interface CommunityGetMembers200ResponseResultsInner
  */
-export interface QueryCommunityGetMembers200ResponseResultsInner {
+export interface CommunityGetMembers200ResponseResultsInner {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInner
+   * @memberof CommunityGetMembers200ResponseResultsInner
    */
   user_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInner
+   * @memberof CommunityGetMembers200ResponseResultsInner
    */
   profile_name?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInner
+   * @memberof CommunityGetMembers200ResponseResultsInner
    */
   avatar_url?: string | null;
   /**
    *
-   * @type {Array<QueryCommunityGetMembers200ResponseResultsInnerAddressesInner>}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInner
+   * @type {Array<CommunityGetMembers200ResponseResultsInnerAddressesInner>}
+   * @memberof CommunityGetMembers200ResponseResultsInner
    */
-  addresses: Array<QueryCommunityGetMembers200ResponseResultsInnerAddressesInner>;
+  addresses: Array<CommunityGetMembers200ResponseResultsInnerAddressesInner>;
   /**
    *
    * @type {Array<number>}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInner
+   * @memberof CommunityGetMembers200ResponseResultsInner
    */
   group_ids: Array<number>;
   /**
    * string or date
    * @type {any}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInner
+   * @memberof CommunityGetMembers200ResponseResultsInner
    */
   last_active?: any | null;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetMembers200ResponseResultsInnerAddressesInner
+ * @interface CommunityGetMembers200ResponseResultsInnerAddressesInner
  */
-export interface QueryCommunityGetMembers200ResponseResultsInnerAddressesInner {
+export interface CommunityGetMembers200ResponseResultsInnerAddressesInner {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInnerAddressesInner
+   * @memberof CommunityGetMembers200ResponseResultsInnerAddressesInner
    */
   id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInnerAddressesInner
+   * @memberof CommunityGetMembers200ResponseResultsInnerAddressesInner
    */
   community_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInnerAddressesInner
+   * @memberof CommunityGetMembers200ResponseResultsInnerAddressesInner
    */
   address: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInnerAddressesInner
+   * @memberof CommunityGetMembers200ResponseResultsInnerAddressesInner
    */
   stake_balance?: number | null;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetMembers200ResponseResultsInnerAddressesInner
+   * @memberof CommunityGetMembers200ResponseResultsInnerAddressesInner
    */
   role: string;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetMembersMembershipsParameter
+ * @interface CommunityGetMembersMembershipsParameter
  */
-export interface QueryCommunityGetMembersMembershipsParameter {}
+export interface CommunityGetMembersMembershipsParameter {}
 /**
  *
  * @export
- * @interface QueryCommunityGetStake200Response
+ * @interface CommunityGetStake200Response
  */
-export interface QueryCommunityGetStake200Response {
+export interface CommunityGetStake200Response {
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   community_id: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   stake_id?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   stake_token?: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   vote_weight?: number;
   /**
    *
    * @type {boolean}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   stake_enabled?: boolean;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   created_at?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStake200Response
+   * @memberof CommunityGetStake200Response
    */
   updated_at?: string;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>}
-   * @memberof QueryCommunityGetStake200Response
+   * @type {Array<CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>}
+   * @memberof CommunityGetStake200Response
    */
-  StakeTransactions?: Array<QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>;
+  StakeTransactions?: Array<CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetStakeHistoricalPrice200ResponseInner
+ * @interface CommunityGetStakeHistoricalPrice200ResponseInner
  */
-export interface QueryCommunityGetStakeHistoricalPrice200ResponseInner {
+export interface CommunityGetStakeHistoricalPrice200ResponseInner {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeHistoricalPrice200ResponseInner
+   * @memberof CommunityGetStakeHistoricalPrice200ResponseInner
    */
   community_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeHistoricalPrice200ResponseInner
+   * @memberof CommunityGetStakeHistoricalPrice200ResponseInner
    */
   old_price?: string | null;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetStakeTransaction200ResponseInner
+ * @interface CommunityGetStakeTransaction200ResponseInner
  */
-export interface QueryCommunityGetStakeTransaction200ResponseInner {
+export interface CommunityGetStakeTransaction200ResponseInner {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
   transaction_hash: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
   address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
   stake_price: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
   stake_amount: number;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
   vote_weight: number;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
   timestamp: number;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
   stake_direction: string;
   /**
    *
-   * @type {QueryCommunityGetStakeTransaction200ResponseInnerCommunity}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInner
+   * @type {CommunityGetStakeTransaction200ResponseInnerCommunity}
+   * @memberof CommunityGetStakeTransaction200ResponseInner
    */
-  community: QueryCommunityGetStakeTransaction200ResponseInnerCommunity;
+  community: CommunityGetStakeTransaction200ResponseInnerCommunity;
 }
 /**
  *
  * @export
- * @interface QueryCommunityGetStakeTransaction200ResponseInnerCommunity
+ * @interface CommunityGetStakeTransaction200ResponseInnerCommunity
  */
-export interface QueryCommunityGetStakeTransaction200ResponseInnerCommunity {
+export interface CommunityGetStakeTransaction200ResponseInnerCommunity {
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInnerCommunity
+   * @memberof CommunityGetStakeTransaction200ResponseInnerCommunity
    */
   id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInnerCommunity
+   * @memberof CommunityGetStakeTransaction200ResponseInnerCommunity
    */
   default_symbol?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInnerCommunity
+   * @memberof CommunityGetStakeTransaction200ResponseInnerCommunity
    */
   icon_url?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInnerCommunity
+   * @memberof CommunityGetStakeTransaction200ResponseInnerCommunity
    */
   name: string;
   /**
    *
    * @type {number}
-   * @memberof QueryCommunityGetStakeTransaction200ResponseInnerCommunity
+   * @memberof CommunityGetStakeTransaction200ResponseInnerCommunity
    */
   chain_node_id?: number | null;
 }
 /**
- * On-Chain Contest Manager
+ *
  * @export
- * @interface QueryContestGetAllContests200ResponseInner
+ * @interface CommunitySetStake200Response
  */
-export interface QueryContestGetAllContests200ResponseInner {
+export interface CommunitySetStake200Response {
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  name: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CommunitySetStake200Response
+   */
+  chain_node_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  default_symbol?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  network?: CommunitySetStake200ResponseNetworkEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  base: CommunitySetStake200ResponseBaseEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  icon_url?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  active: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  type?: CommunitySetStake200ResponseTypeEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  description?: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CommunitySetStake200Response
+   */
+  social_links?: Array<string>;
+  /**
+   *
+   * @type {number}
+   * @memberof CommunitySetStake200Response
+   */
+  ss58_prefix?: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  stages_enabled?: boolean;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CommunitySetStake200Response
+   */
+  custom_stages?: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  custom_domain?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  block_explorer_ids?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  collapsed_on_homepage?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  substrate_spec?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  has_chain_events_listener?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  default_summary_view?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  default_page?: CommunitySetStake200ResponseDefaultPageEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  has_homepage?: CommunitySetStake200ResponseHasHomepageEnum | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  terms?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  admin_only_polling?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  bech32_prefix?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  hide_projects?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  token_name?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  ce_verbose?: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof CommunitySetStake200Response
+   */
+  discord_config_id?: number | null;
+  /**
+   *
+   * @type {any}
+   * @memberof CommunitySetStake200Response
+   */
+  category?: any;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  discord_bot_webhooks_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  directory_page_enabled?: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof CommunitySetStake200Response
+   */
+  directory_page_chain_node_id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  namespace?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  namespace_address?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  redirect?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStake200Response
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {Array<CommunityGetCommunity200ResponseAddressesInner>}
+   * @memberof CommunitySetStake200Response
+   */
+  Addresses?: Array<CommunityGetCommunity200ResponseAddressesInner>;
+  /**
+   *
+   * @type {Array<CommunityGetCommunity200ResponseCommunityStakesInner>}
+   * @memberof CommunitySetStake200Response
+   */
+  CommunityStakes?: Array<CommunityGetCommunity200ResponseCommunityStakesInner>;
+  /**
+   *
+   * @type {Array<CommunityGetCommunity200ResponseCommunityTagsInner>}
+   * @memberof CommunitySetStake200Response
+   */
+  CommunityTags?: Array<CommunityGetCommunity200ResponseCommunityTagsInner>;
+  /**
+   *
+   * @type {CommunityGetCommunity200ResponseChainNode}
+   * @memberof CommunitySetStake200Response
+   */
+  ChainNode?: CommunityGetCommunity200ResponseChainNode;
+  /**
+   *
+   * @type {Array<CommunityGetCommunity200ResponseTopicsInner>}
+   * @memberof CommunitySetStake200Response
+   */
+  topics?: Array<CommunityGetCommunity200ResponseTopicsInner>;
+  /**
+   *
+   * @type {Array<CommunityGetCommunity200ResponseGroupsInner>}
+   * @memberof CommunitySetStake200Response
+   */
+  groups?: Array<CommunityGetCommunity200ResponseGroupsInner>;
+  /**
+   *
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInner>}
+   * @memberof CommunitySetStake200Response
+   */
+  contest_managers?: Array<CommunityGetCommunity200ResponseContestManagersInner>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CommunitySetStake200Response
+   */
+  snapshot_spaces?: Array<string>;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStake200Response
+   */
+  include_in_digest_email?: boolean | null;
+}
+
+export const CommunitySetStake200ResponseNetworkEnum = {
+  Edgeware: 'edgeware',
+  EdgewareTestnet: 'edgeware-testnet',
+  Kusama: 'kusama',
+  Kulupu: 'kulupu',
+  Polkadot: 'polkadot',
+  Plasm: 'plasm',
+  Stafi: 'stafi',
+  Darwinia: 'darwinia',
+  Phala: 'phala',
+  Centrifuge: 'centrifuge',
+  Straightedge: 'straightedge',
+  Osmosis: 'osmosis',
+  Injective: 'injective',
+  InjectiveTestnet: 'injective-testnet',
+  Terra: 'terra',
+  Ethereum: 'ethereum',
+  Near: 'near',
+  NearTestnet: 'near-testnet',
+  Compound: 'compound',
+  Aave: 'aave',
+  AaveLocal: 'aave-local',
+  Dydx: 'dydx',
+  Metacartel: 'metacartel',
+  Alex: 'alex',
+  Erc20: 'erc20',
+  Erc721: 'erc721',
+  Erc1155: 'erc1155',
+  Cw20: 'cw20',
+  Cw721: 'cw721',
+  Clover: 'clover',
+  Hydradx: 'hydradx',
+  Crust: 'crust',
+  Sputnik: 'sputnik',
+  SolanaDevnet: 'solana-devnet',
+  SolanaTestnet: 'solana-testnet',
+  Solana: 'solana',
+  Spl: 'spl',
+  Evmos: 'evmos',
+  Kava: 'kava',
+  Kyve: 'kyve',
+  Stargaze: 'stargaze',
+  Cosmos: 'cosmos',
+} as const;
+
+export type CommunitySetStake200ResponseNetworkEnum =
+  typeof CommunitySetStake200ResponseNetworkEnum[keyof typeof CommunitySetStake200ResponseNetworkEnum];
+export const CommunitySetStake200ResponseBaseEnum = {
+  Cosmos: 'cosmos',
+  Substrate: 'substrate',
+  Ethereum: 'ethereum',
+  Near: 'near',
+  Solana: 'solana',
+} as const;
+
+export type CommunitySetStake200ResponseBaseEnum =
+  typeof CommunitySetStake200ResponseBaseEnum[keyof typeof CommunitySetStake200ResponseBaseEnum];
+export const CommunitySetStake200ResponseTypeEnum = {
+  Chain: 'chain',
+  Dao: 'dao',
+  Token: 'token',
+  Offchain: 'offchain',
+} as const;
+
+export type CommunitySetStake200ResponseTypeEnum =
+  typeof CommunitySetStake200ResponseTypeEnum[keyof typeof CommunitySetStake200ResponseTypeEnum];
+export const CommunitySetStake200ResponseDefaultPageEnum = {
+  AllDiscussionsView: 'default_all_discussions_view',
+  SummaryView: 'default_summary_view',
+} as const;
+
+export type CommunitySetStake200ResponseDefaultPageEnum =
+  typeof CommunitySetStake200ResponseDefaultPageEnum[keyof typeof CommunitySetStake200ResponseDefaultPageEnum];
+export const CommunitySetStake200ResponseHasHomepageEnum = {
+  True: 'true',
+  False: 'false',
+} as const;
+
+export type CommunitySetStake200ResponseHasHomepageEnum =
+  typeof CommunitySetStake200ResponseHasHomepageEnum[keyof typeof CommunitySetStake200ResponseHasHomepageEnum];
+
+/**
+ *
+ * @export
+ * @interface CommunitySetStakeRequest
+ */
+export interface CommunitySetStakeRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof CommunitySetStakeRequest
+   */
+  stake_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CommunitySetStakeRequest
+   */
+  stake_token?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CommunitySetStakeRequest
+   */
+  vote_weight?: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommunitySetStakeRequest
+   */
+  stake_enabled?: boolean;
+}
+/**
+ *
+ * @export
+ * @interface ContestCreateContestMetadata200Response
+ */
+export interface ContestCreateContestMetadata200Response {
+  /**
+   *
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInner>}
+   * @memberof ContestCreateContestMetadata200Response
+   */
+  contest_managers: Array<CommunityGetCommunity200ResponseContestManagersInner>;
+}
+/**
+ *
+ * @export
+ * @interface ContestCreateContestMetadataRequest
+ */
+export interface ContestCreateContestMetadataRequest {
   /**
    * On-Chain contest manager address
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
   contest_address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
   name: string;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
   image_url?: string;
   /**
    * Provided by admin on creation when stake funds are not used
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
-  funding_token_address?: string | null;
+  funding_token_address?: string;
   /**
    * Percentage of pool used for prizes in recurring contests
    * @type {number}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
-  prize_percentage?: number | null;
+  prize_percentage?: number;
   /**
    * Sorted array of percentages for prize, from first to last
    * @type {Array<number>}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
   payout_structure: Array<number>;
   /**
-   * Recurring contest interval, 0 when one-off
+   * Recurring contest interval in seconds, 0 when one-off
    * @type {number}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
   interval: number;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
    */
   ticker?: string;
   /**
    *
    * @type {number}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestCreateContestMetadataRequest
+   */
+  decimals?: number;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof ContestCreateContestMetadataRequest
+   */
+  topic_ids?: Array<number>;
+}
+/**
+ * On-Chain Contest Manager
+ * @export
+ * @interface ContestGetAllContests200ResponseInner
+ */
+export interface ContestGetAllContests200ResponseInner {
+  /**
+   * On-Chain contest manager address
+   * @type {string}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  contest_address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  image_url?: string;
+  /**
+   * Provided by admin on creation when stake funds are not used
+   * @type {string}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  funding_token_address?: string | null;
+  /**
+   * Percentage of pool used for prizes in recurring contests
+   * @type {number}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  prize_percentage?: number | null;
+  /**
+   * Sorted array of percentages for prize, from first to last
+   * @type {Array<number>}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  payout_structure: Array<number>;
+  /**
+   * Recurring contest interval, 0 when one-off
+   * @type {number}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  interval: number;
+  /**
+   *
+   * @type {string}
+   * @memberof ContestGetAllContests200ResponseInner
+   */
+  ticker?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof ContestGetAllContests200ResponseInner
    */
   decimals?: number;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestGetAllContests200ResponseInner
    */
   created_at: string;
   /**
    * Flags when contest policy is cancelled by admin
    * @type {boolean}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestGetAllContests200ResponseInner
    */
   cancelled?: boolean | null;
   /**
    * Flags when the one-off contest has ended and rollover was completed
    * @type {boolean}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @memberof ContestGetAllContests200ResponseInner
    */
   ended?: boolean | null;
   /**
    *
-   * @type {Array<QueryContestGetAllContests200ResponseInnerTopicsInner>}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @type {Array<ContestGetAllContests200ResponseInnerTopicsInner>}
+   * @memberof ContestGetAllContests200ResponseInner
    */
-  topics: Array<QueryContestGetAllContests200ResponseInnerTopicsInner>;
+  topics: Array<ContestGetAllContests200ResponseInnerTopicsInner>;
   /**
    *
-   * @type {Array<QueryContestGetAllContests200ResponseInnerContestsInner>}
-   * @memberof QueryContestGetAllContests200ResponseInner
+   * @type {Array<ContestGetAllContests200ResponseInnerContestsInner>}
+   * @memberof ContestGetAllContests200ResponseInner
    */
-  contests: Array<QueryContestGetAllContests200ResponseInnerContestsInner>;
+  contests: Array<ContestGetAllContests200ResponseInnerContestsInner>;
 }
 /**
  * On-Chain contest instance
  * @export
- * @interface QueryContestGetAllContests200ResponseInnerContestsInner
+ * @interface ContestGetAllContests200ResponseInnerContestsInner
  */
-export interface QueryContestGetAllContests200ResponseInnerContestsInner {
+export interface ContestGetAllContests200ResponseInnerContestsInner {
   /**
    * On-Chain contest id, 0 when one-off
    * @type {number}
-   * @memberof QueryContestGetAllContests200ResponseInnerContestsInner
+   * @memberof ContestGetAllContests200ResponseInnerContestsInner
    */
   contest_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInnerContestsInner
+   * @memberof ContestGetAllContests200ResponseInnerContestsInner
    */
   start_time: string;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInnerContestsInner
+   * @memberof ContestGetAllContests200ResponseInnerContestsInner
    */
   end_time: string;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInnerContestsInner
+   * @memberof ContestGetAllContests200ResponseInnerContestsInner
    */
   score_updated_at?: string | null;
   /**
    * Contest score, sorted from first to last
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner>}
-   * @memberof QueryContestGetAllContests200ResponseInnerContestsInner
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner>}
+   * @memberof ContestGetAllContests200ResponseInnerContestsInner
    */
-  score?: Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner> | null;
+  score?: Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerScoreInner> | null;
   /**
    *
-   * @type {Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner>}
-   * @memberof QueryContestGetAllContests200ResponseInnerContestsInner
+   * @type {Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner>}
+   * @memberof ContestGetAllContests200ResponseInnerContestsInner
    */
-  actions?: Array<QueryCommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner> | null;
+  actions?: Array<CommunityGetCommunity200ResponseContestManagersInnerContestsInnerActionsInner> | null;
 }
 /**
  *
  * @export
- * @interface QueryContestGetAllContests200ResponseInnerTopicsInner
+ * @interface ContestGetAllContests200ResponseInnerTopicsInner
  */
-export interface QueryContestGetAllContests200ResponseInnerTopicsInner {
+export interface ContestGetAllContests200ResponseInnerTopicsInner {
   /**
    *
    * @type {number}
-   * @memberof QueryContestGetAllContests200ResponseInnerTopicsInner
+   * @memberof ContestGetAllContests200ResponseInnerTopicsInner
    */
   id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetAllContests200ResponseInnerTopicsInner
+   * @memberof ContestGetAllContests200ResponseInnerTopicsInner
    */
   name: string;
 }
 /**
  *
  * @export
- * @interface QueryContestGetContestLog200ResponseInner
+ * @interface ContestGetContestLog200ResponseInner
  */
-export interface QueryContestGetContestLog200ResponseInner {
+export interface ContestGetContestLog200ResponseInner {
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   event_name: string;
   /**
    *
    * @type {object}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   event_payload: object;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   contest_address: string;
   /**
    *
    * @type {number}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   contest_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   action?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   actor_address?: string | null;
   /**
    *
    * @type {number}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   voting_power?: number | null;
   /**
    *
    * @type {number}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   thread_id?: number | null;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   thread_title?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryContestGetContestLog200ResponseInner
+   * @memberof ContestGetContestLog200ResponseInner
    */
   created_at: string;
 }
 /**
  *
  * @export
- * @interface QueryFeedGetChainActivity200ResponseInner
+ * @interface ContestUpdateContestMetadataRequest
  */
-export interface QueryFeedGetChainActivity200ResponseInner {
+export interface ContestUpdateContestMetadataRequest {
+  /**
+   * On-Chain contest manager address
+   * @type {string}
+   * @memberof ContestUpdateContestMetadataRequest
+   */
+  contest_address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryFeedGetChainActivity200ResponseInner
+   * @memberof ContestUpdateContestMetadataRequest
+   */
+  name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ContestUpdateContestMetadataRequest
+   */
+  image_url?: string;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof ContestUpdateContestMetadataRequest
+   */
+  topic_ids?: Array<number>;
+}
+/**
+ *
+ * @export
+ * @interface FeedGetChainActivity200ResponseInner
+ */
+export interface FeedGetChainActivity200ResponseInner {
+  /**
+   *
+   * @type {string}
+   * @memberof FeedGetChainActivity200ResponseInner
    */
   community_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryFeedGetChainActivity200ResponseInner
+   * @memberof FeedGetChainActivity200ResponseInner
    */
   network: string;
   /**
    *
    * @type {number}
-   * @memberof QueryFeedGetChainActivity200ResponseInner
+   * @memberof FeedGetChainActivity200ResponseInner
    */
   block_number: number;
   /**
    *
-   * @type {QueryFeedGetChainActivity200ResponseInnerEventData}
-   * @memberof QueryFeedGetChainActivity200ResponseInner
+   * @type {FeedGetChainActivity200ResponseInnerEventData}
+   * @memberof FeedGetChainActivity200ResponseInner
    */
-  event_data: QueryFeedGetChainActivity200ResponseInnerEventData;
+  event_data: FeedGetChainActivity200ResponseInnerEventData;
 }
 /**
  *
  * @export
- * @interface QueryFeedGetChainActivity200ResponseInnerEventData
+ * @interface FeedGetChainActivity200ResponseInnerEventData
  */
-export interface QueryFeedGetChainActivity200ResponseInnerEventData {
+export interface FeedGetChainActivity200ResponseInnerEventData {
   /**
    *
    * @type {string}
-   * @memberof QueryFeedGetChainActivity200ResponseInnerEventData
+   * @memberof FeedGetChainActivity200ResponseInnerEventData
    */
   id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryFeedGetChainActivity200ResponseInnerEventData
+   * @memberof FeedGetChainActivity200ResponseInnerEventData
    */
   kind: string;
 }
 /**
  *
  * @export
- * @interface QueryFeedGetUserActivity200ResponseInner
+ * @interface FeedGetUserActivity200ResponseInner
  */
-export interface QueryFeedGetUserActivity200ResponseInner {
+export interface FeedGetUserActivity200ResponseInner {
   /**
    *
    * @type {number}
-   * @memberof QueryFeedGetUserActivity200ResponseInner
+   * @memberof FeedGetUserActivity200ResponseInner
    */
   thread_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryFeedGetUserActivity200ResponseInner
+   * @memberof FeedGetUserActivity200ResponseInner
    */
   last_activity?: string;
   /**
    *
    * @type {string}
-   * @memberof QueryFeedGetUserActivity200ResponseInner
+   * @memberof FeedGetUserActivity200ResponseInner
    */
   notification_data: string;
   /**
    *
    * @type {string}
-   * @memberof QueryFeedGetUserActivity200ResponseInner
+   * @memberof FeedGetUserActivity200ResponseInner
    */
   category_id: string;
   /**
    *
    * @type {number}
-   * @memberof QueryFeedGetUserActivity200ResponseInner
+   * @memberof FeedGetUserActivity200ResponseInner
    */
   comment_count: number;
   /**
    *
-   * @type {Array<QueryFeedGetUserActivity200ResponseInnerCommentersInner>}
-   * @memberof QueryFeedGetUserActivity200ResponseInner
+   * @type {Array<FeedGetUserActivity200ResponseInnerCommentersInner>}
+   * @memberof FeedGetUserActivity200ResponseInner
    */
-  commenters: Array<QueryFeedGetUserActivity200ResponseInnerCommentersInner>;
+  commenters: Array<FeedGetUserActivity200ResponseInnerCommentersInner>;
 }
 /**
  *
  * @export
- * @interface QueryFeedGetUserActivity200ResponseInnerCommentersInner
+ * @interface FeedGetUserActivity200ResponseInnerCommentersInner
  */
-export interface QueryFeedGetUserActivity200ResponseInnerCommentersInner {
+export interface FeedGetUserActivity200ResponseInnerCommentersInner {
   /**
    *
-   * @type {Array<QueryThreadGetBulkThreads200ResponseThreadsInnerAddress>}
-   * @memberof QueryFeedGetUserActivity200ResponseInnerCommentersInner
+   * @type {Array<ThreadGetBulkThreads200ResponseThreadsInnerAddress>}
+   * @memberof FeedGetUserActivity200ResponseInnerCommentersInner
    */
-  Addresses: Array<QueryThreadGetBulkThreads200ResponseThreadsInnerAddress>;
+  Addresses: Array<ThreadGetBulkThreads200ResponseThreadsInnerAddress>;
 }
 /**
  *
  * @export
- * @interface QuerySubscriptionGetSubscriptionPreferences200Response
+ * @interface IntegrationsAnalyticsRequest
  */
-export interface QuerySubscriptionGetSubscriptionPreferences200Response {
+export interface IntegrationsAnalyticsRequest {
   /**
    *
-   * @type {number}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
+   * @type {IntegrationsAnalyticsRequestGroupCreated}
+   * @memberof IntegrationsAnalyticsRequest
    */
-  id: number;
+  GroupCreated: IntegrationsAnalyticsRequestGroupCreated;
   /**
    *
-   * @type {number}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
+   * @type {IntegrationsAnalyticsRequestThreadCreated}
+   * @memberof IntegrationsAnalyticsRequest
    */
-  user_id: number;
+  ThreadCreated: IntegrationsAnalyticsRequestThreadCreated;
   /**
    *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
+   * @type {IntegrationsAnalyticsRequestCommentCreated}
+   * @memberof IntegrationsAnalyticsRequest
    */
-  email_notifications_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
-   */
-  digest_email_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
-   */
-  recap_email_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
-   */
-  mobile_push_notifications_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
-   */
-  mobile_push_discussion_activity_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
-   */
-  mobile_push_admin_alerts_enabled?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200Response
-   */
-  updated_at?: string;
+  CommentCreated: IntegrationsAnalyticsRequestCommentCreated;
 }
 /**
  *
  * @export
- * @interface QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
+ * @interface IntegrationsAnalyticsRequestCommentCreated
  */
-export interface QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf {
+export interface IntegrationsAnalyticsRequestCommentCreated {
   /**
    *
    * @type {number}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
    */
-  id: number;
+  thread_id: number;
   /**
    *
    * @type {number}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
    */
-  user_id: number;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
-   */
-  email_notifications_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
-   */
-  digest_email_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
-   */
-  recap_email_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
-   */
-  mobile_push_notifications_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
-   */
-  mobile_push_discussion_activity_enabled?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
-   */
-  mobile_push_admin_alerts_enabled?: boolean;
+  address_id: number;
   /**
    *
    * @type {string}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
    */
-  created_at?: string;
+  text: string;
   /**
    *
    * @type {string}
-   * @memberof QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
    */
-  updated_at?: string;
+  plaintext: string;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  community_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  parent_id?: string | null;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  version_history?: Array<string>;
+  /**
+   *
+   * @type {boolean}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  version_history_updated?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  canvas_signed_data: string;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  canvas_hash: string;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  created_by?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  created_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  updated_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  deleted_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  marked_as_spam_at?: string | null;
+  /**
+   *
+   * @type {ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  discord_meta?: ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta | null;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  reaction_count: number;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  reaction_weights_sum?: number;
+  /**
+   *
+   * @type {IntegrationsAnalyticsRequestThreadCreatedAddress}
+   * @memberof IntegrationsAnalyticsRequestCommentCreated
+   */
+  Address?: IntegrationsAnalyticsRequestThreadCreatedAddress | null;
 }
 /**
  *
  * @export
- * @interface QueryThreadGetBulkThreads200Response
+ * @interface IntegrationsAnalyticsRequestGroupCreated
  */
-export interface QueryThreadGetBulkThreads200Response {
+export interface IntegrationsAnalyticsRequestGroupCreated {
   /**
    *
-   * @type {number}
-   * @memberof QueryThreadGetBulkThreads200Response
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestGroupCreated
    */
-  limit: number;
+  groupId: string;
   /**
    *
-   * @type {number}
-   * @memberof QueryThreadGetBulkThreads200Response
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestGroupCreated
    */
-  numVotingThreads: number;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryThreadGetBulkThreads200Response
-   */
-  cursor: number;
-  /**
-   *
-   * @type {Array<QueryThreadGetBulkThreads200ResponseThreadsInner>}
-   * @memberof QueryThreadGetBulkThreads200Response
-   */
-  threads: Array<QueryThreadGetBulkThreads200ResponseThreadsInner>;
+  userId: string;
 }
 /**
  *
  * @export
- * @interface QueryThreadGetBulkThreads200ResponseThreadsInner
+ * @interface IntegrationsAnalyticsRequestThreadCreated
  */
-export interface QueryThreadGetBulkThreads200ResponseThreadsInner {
+export interface IntegrationsAnalyticsRequestThreadCreated {
+  /**
+   *
+   * @type {IntegrationsAnalyticsRequestThreadCreatedAddress}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  Address?: IntegrationsAnalyticsRequestThreadCreatedAddress | null;
   /**
    *
    * @type {number}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
-  id: number;
+  address_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
   title: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  url: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  body: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  last_edited?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
   kind: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
   stage: string;
   /**
    *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  body?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  plaintext?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  url?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  topic_id?: number | null;
+  /**
+   *
    * @type {boolean}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
-  read_only: boolean;
+  pinned?: boolean | null;
   /**
    *
-   * @type {QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
-  discord_meta?: QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta | null;
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  view_count: number;
+  /**
+   *
+   * @type {Array<ThreadGetBulkThreads200ResponseThreadsInnerLinksInner>}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  links?: Array<ThreadGetBulkThreads200ResponseThreadsInnerLinksInner> | null;
   /**
    *
    * @type {boolean}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
-  pinned: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  chain: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  created_at: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  updated_at: string;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  locked_at?: string | null;
-  /**
-   *
-   * @type {Array<QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  links?: Array<QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner> | null;
+  read_only?: boolean | null;
   /**
    *
    * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
-  collaborators: Array<string>;
+  version_history?: Array<string> | null;
   /**
    *
    * @type {boolean}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
   has_poll?: boolean | null;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  canvas_signed_data?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  canvas_hash?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  created_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  updated_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  last_edited?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  deleted_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
   last_commented_on?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  plaintext?: string | null;
-  /**
-   *
-   * @type {QueryThreadGetBulkThreads200ResponseThreadsInnerAddress}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  Address: QueryThreadGetBulkThreads200ResponseThreadsInnerAddress;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  numberOfComments: number;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reactionIds: Array<string>;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reactionTimestamps: Array<string>;
-  /**
-   *
-   * @type {Array<number>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reactionWeights: Array<number>;
-  /**
-   *
-   * @type {number}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reaction_weights_sum: number;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  addressesReacted: Array<string>;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reactedProfileName?: Array<string>;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reactedProfileAvatarUrl?: Array<string>;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reactedAddressLastActive?: Array<string>;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
-   */
-  reactionType: Array<string>;
-  /**
-   *
-   * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
   marked_as_spam_at?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
   archived_at?: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
-  latest_activity?: string | null;
+  locked_at?: string | null;
   /**
    *
-   * @type {QueryThreadGetBulkThreads200ResponseThreadsInnerTopic}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @type {ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
    */
-  topic?: QueryThreadGetBulkThreads200ResponseThreadsInnerTopic;
+  discord_meta?: ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta | null;
   /**
    *
    * @type {number}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  reaction_count: number;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  reaction_weights_sum: number;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  comment_count: number;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  activity_rank_date?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  max_notif_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  created_by?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  profile_name?: string | null;
+  /**
+   *
+   * @type {Array<IntegrationsAnalyticsRequestThreadCreatedContestManagersInner>}
+   * @memberof IntegrationsAnalyticsRequestThreadCreated
+   */
+  contestManagers?: Array<IntegrationsAnalyticsRequestThreadCreatedContestManagersInner> | null;
+}
+/**
+ *
+ * @export
+ * @interface IntegrationsAnalyticsRequestThreadCreatedAddress
+ */
+export interface IntegrationsAnalyticsRequestThreadCreatedAddress {
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  community_id?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  user_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  verification_token?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  verification_token_expires?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  verified?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  last_active?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  is_councillor?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  is_validator?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  ghost_address?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  wallet_id?: IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  block_info?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  is_user_default?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  role?: IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  wallet_sso_source?: IntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  hex?: string;
+  /**
+   *
+   * @type {any}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  created_at?: any;
+  /**
+   *
+   * @type {any}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  updated_at?: any;
+  /**
+   *
+   * @type {UserUpdateUser200Response}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  User?: UserUpdateUser200Response;
+}
+
+export const IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum = {
+  Magic: 'magic',
+  Polkadot: 'polkadot',
+  Metamask: 'metamask',
+  Walletconnect: 'walletconnect',
+  KeplrEthereum: 'keplr-ethereum',
+  Keplr: 'keplr',
+  Leap: 'leap',
+  Near: 'near',
+  Terrastation: 'terrastation',
+  TerraWalletconnect: 'terra-walletconnect',
+  CosmMetamask: 'cosm-metamask',
+  Phantom: 'phantom',
+  Coinbase: 'coinbase',
+} as const;
+
+export type IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum =
+  typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum[keyof typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum];
+export const IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum = {
+  Admin: 'admin',
+  Moderator: 'moderator',
+  Member: 'member',
+} as const;
+
+export type IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum =
+  typeof IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum[keyof typeof IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum];
+export const IntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum =
+  {
+    Google: 'google',
+    Github: 'github',
+    Discord: 'discord',
+    Twitter: 'twitter',
+    Apple: 'apple',
+    Email: 'email',
+    Unknown: 'unknown',
+  } as const;
+
+export type IntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum =
+  typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum[keyof typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum];
+
+/**
+ *
+ * @export
+ * @interface IntegrationsAnalyticsRequestThreadCreatedContestManagersInner
+ */
+export interface IntegrationsAnalyticsRequestThreadCreatedContestManagersInner {
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedContestManagersInner
+   */
+  contest_address: string;
+}
+/**
+ *
+ * @export
+ * @interface LoadTestCreateJWTsRequest
+ */
+export interface LoadTestCreateJWTsRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof LoadTestCreateJWTsRequest
+   */
+  number_of_jwt: number;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommentSubscription200Response
+ */
+export interface SubscriptionCreateCommentSubscription200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200Response
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200Response
+   */
+  user_id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200Response
+   */
+  comment_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200Response
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {SubscriptionCreateCommentSubscription200ResponseComment}
+   * @memberof SubscriptionCreateCommentSubscription200Response
+   */
+  Comment?: SubscriptionCreateCommentSubscription200ResponseComment;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommentSubscription200ResponseComment
+ */
+export interface SubscriptionCreateCommentSubscription200ResponseComment {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseComment
+   */
+  id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseComment
+   */
+  created_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseComment
+   */
+  updated_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseComment
+   */
+  text: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseComment
+   */
+  plaintext: string;
+  /**
+   *
+   * @type {SubscriptionCreateCommentSubscription200ResponseCommentThread}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseComment
+   */
+  Thread: SubscriptionCreateCommentSubscription200ResponseCommentThread;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommentSubscription200ResponseCommentThread
+ */
+export interface SubscriptionCreateCommentSubscription200ResponseCommentThread {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  community_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  title: string;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  comment_count: number;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  created_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  url?: string | null;
+  /**
+   *
+   * @type {SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  Community: SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity;
+  /**
+   *
+   * @type {SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThread
+   */
+  Address: SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
+ */
+export interface SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
+   */
+  user_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress
+   */
+  address: string;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
+ */
+export interface SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity {
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
+   */
+  id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity
+   */
+  icon_url?: string | null;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommentSubscriptionRequest
+ */
+export interface SubscriptionCreateCommentSubscriptionRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommentSubscriptionRequest
+   */
+  comment_id: number;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommunityAlert200Response
+ */
+export interface SubscriptionCreateCommunityAlert200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateCommunityAlert200Response
    */
   user_id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof SubscriptionCreateCommunityAlert200Response
+   */
+  community_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommunityAlert200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommunityAlert200Response
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity}
+   * @memberof SubscriptionCreateCommunityAlert200Response
+   */
+  Community?: SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateCommunityAlertRequest
+ */
+export interface SubscriptionCreateCommunityAlertRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateCommunityAlertRequest
+   */
+  community_id: string;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateThreadSubscription200Response
+ */
+export interface SubscriptionCreateThreadSubscription200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateThreadSubscription200Response
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateThreadSubscription200Response
+   */
+  user_id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateThreadSubscription200Response
+   */
+  thread_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateThreadSubscription200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateThreadSubscription200Response
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {SubscriptionCreateThreadSubscription200ResponseThread}
+   * @memberof SubscriptionCreateThreadSubscription200Response
+   */
+  Thread?: SubscriptionCreateThreadSubscription200ResponseThread;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateThreadSubscription200ResponseThread
+ */
+export interface SubscriptionCreateThreadSubscription200ResponseThread {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  address_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  title: string;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  comment_count: number;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  created_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  url?: string | null;
+  /**
+   *
+   * @type {SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  Community: SubscriptionCreateCommentSubscription200ResponseCommentThreadCommunity;
+  /**
+   *
+   * @type {SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress}
+   * @memberof SubscriptionCreateThreadSubscription200ResponseThread
+   */
+  Address: SubscriptionCreateCommentSubscription200ResponseCommentThreadAddress;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionCreateThreadSubscriptionRequest
+ */
+export interface SubscriptionCreateThreadSubscriptionRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionCreateThreadSubscriptionRequest
+   */
+  thread_id: number;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionDeleteCommentSubscriptionRequest
+ */
+export interface SubscriptionDeleteCommentSubscriptionRequest {
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof SubscriptionDeleteCommentSubscriptionRequest
+   */
+  comment_ids: Array<number>;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionDeleteCommunityAlertRequest
+ */
+export interface SubscriptionDeleteCommunityAlertRequest {
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof SubscriptionDeleteCommunityAlertRequest
+   */
+  community_ids: Array<string>;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionDeleteThreadSubscriptionRequest
+ */
+export interface SubscriptionDeleteThreadSubscriptionRequest {
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof SubscriptionDeleteThreadSubscriptionRequest
+   */
+  thread_ids: Array<number>;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionGetSubscriptionPreferences200Response
+ */
+export interface SubscriptionGetSubscriptionPreferences200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  user_id: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  email_notifications_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  digest_email_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  recap_email_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  mobile_push_notifications_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  mobile_push_discussion_activity_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  mobile_push_admin_alerts_enabled?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionGetSubscriptionPreferences200Response
+   */
+  updated_at?: string;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+ */
+export interface SubscriptionGetSubscriptionPreferences200ResponseAnyOf {
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  user_id: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  email_notifications_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  digest_email_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  recap_email_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  mobile_push_notifications_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  mobile_push_discussion_activity_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  mobile_push_admin_alerts_enabled?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionGetSubscriptionPreferences200ResponseAnyOf
+   */
+  updated_at?: string;
+}
+/**
+ *
+ * @export
+ * @interface SubscriptionRegisterClientRegistrationTokenRequest
+ */
+export interface SubscriptionRegisterClientRegistrationTokenRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionRegisterClientRegistrationTokenRequest
+   */
+  token: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SubscriptionRegisterClientRegistrationTokenRequest
+   */
+  channelType: SubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum;
+}
+
+export const SubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum =
+  {
+    Apns: 'APNS',
+    Fcm: 'FCM',
+  } as const;
+
+export type SubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum =
+  typeof SubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum[keyof typeof SubscriptionRegisterClientRegistrationTokenRequestChannelTypeEnum];
+
+/**
+ *
+ * @export
+ * @interface SubscriptionUpdateSubscriptionPreferencesRequest
+ */
+export interface SubscriptionUpdateSubscriptionPreferencesRequest {
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionUpdateSubscriptionPreferencesRequest
+   */
+  email_notifications_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionUpdateSubscriptionPreferencesRequest
+   */
+  digest_email_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionUpdateSubscriptionPreferencesRequest
+   */
+  recap_email_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionUpdateSubscriptionPreferencesRequest
+   */
+  mobile_push_notifications_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionUpdateSubscriptionPreferencesRequest
+   */
+  mobile_push_discussion_activity_enabled?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SubscriptionUpdateSubscriptionPreferencesRequest
+   */
+  mobile_push_admin_alerts_enabled?: boolean;
+}
+/**
+ *
+ * @export
+ * @interface ThreadGetBulkThreads200Response
+ */
+export interface ThreadGetBulkThreads200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof ThreadGetBulkThreads200Response
+   */
+  limit: number;
+  /**
+   *
+   * @type {number}
+   * @memberof ThreadGetBulkThreads200Response
+   */
+  numVotingThreads: number;
+  /**
+   *
+   * @type {number}
+   * @memberof ThreadGetBulkThreads200Response
+   */
+  cursor: number;
+  /**
+   *
+   * @type {Array<ThreadGetBulkThreads200ResponseThreadsInner>}
+   * @memberof ThreadGetBulkThreads200Response
+   */
+  threads: Array<ThreadGetBulkThreads200ResponseThreadsInner>;
+}
+/**
+ *
+ * @export
+ * @interface ThreadGetBulkThreads200ResponseThreadsInner
+ */
+export interface ThreadGetBulkThreads200ResponseThreadsInner {
+  /**
+   *
+   * @type {number}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  title: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  url: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  body: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  last_edited?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  kind: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  stage: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  read_only: boolean;
+  /**
+   *
+   * @type {ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  discord_meta?: ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  pinned: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  chain: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  created_at: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  updated_at: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  locked_at?: string | null;
+  /**
+   *
+   * @type {Array<ThreadGetBulkThreads200ResponseThreadsInnerLinksInner>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  links?: Array<ThreadGetBulkThreads200ResponseThreadsInnerLinksInner> | null;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  collaborators: Array<string>;
+  /**
+   *
+   * @type {boolean}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  has_poll?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  last_commented_on?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  plaintext?: string | null;
+  /**
+   *
+   * @type {ThreadGetBulkThreads200ResponseThreadsInnerAddress}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  Address: ThreadGetBulkThreads200ResponseThreadsInnerAddress;
+  /**
+   *
+   * @type {number}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  numberOfComments: number;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reactionIds: Array<string>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reactionTimestamps: Array<string>;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reactionWeights: Array<number>;
+  /**
+   *
+   * @type {number}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reaction_weights_sum: number;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  addressesReacted: Array<string>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reactedProfileName?: Array<string>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reactedProfileAvatarUrl?: Array<string>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reactedAddressLastActive?: Array<string>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  reactionType: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  marked_as_spam_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  archived_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  latest_activity?: string | null;
+  /**
+   *
+   * @type {ThreadGetBulkThreads200ResponseThreadsInnerTopic}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  topic?: ThreadGetBulkThreads200ResponseThreadsInnerTopic;
+  /**
+   *
+   * @type {number}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
+   */
+  user_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
    */
   avatar_url: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
    */
   address_last_active: string | null;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInner
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInner
    */
   profile_name: string | null;
 }
 /**
  *
  * @export
- * @interface QueryThreadGetBulkThreads200ResponseThreadsInnerAddress
+ * @interface ThreadGetBulkThreads200ResponseThreadsInnerAddress
  */
-export interface QueryThreadGetBulkThreads200ResponseThreadsInnerAddress {
+export interface ThreadGetBulkThreads200ResponseThreadsInnerAddress {
   /**
    *
    * @type {number}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerAddress
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerAddress
    */
   id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerAddress
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerAddress
    */
   address: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerAddress
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerAddress
    */
   community_id: string;
 }
 /**
  *
  * @export
- * @interface QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
+ * @interface ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
  */
-export interface QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta {
+export interface ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta {
   /**
    *
-   * @type {QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
+   * @type {ThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser}
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
    */
-  user: QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser;
+  user: ThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
    */
   channel_id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerDiscordMeta
    */
   message_id: string;
 }
 /**
  *
  * @export
- * @interface QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser
+ * @interface ThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser
  */
-export interface QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser {
+export interface ThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser {
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser
    */
   id: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerDiscordMetaUser
    */
   username: string;
 }
 /**
  *
  * @export
- * @interface QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner
+ * @interface ThreadGetBulkThreads200ResponseThreadsInnerLinksInner
  */
-export interface QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner {
+export interface ThreadGetBulkThreads200ResponseThreadsInnerLinksInner {
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerLinksInner
    */
-  source: QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum;
+  source: ThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerLinksInner
    */
   identifier: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInner
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerLinksInner
    */
   title?: string | null;
 }
 
-export const QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum =
-  {
-    Snapshot: 'snapshot',
-    Proposal: 'proposal',
-    Thread: 'thread',
-    Web: 'web',
-    Template: 'template',
-  } as const;
+export const ThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum = {
+  Snapshot: 'snapshot',
+  Proposal: 'proposal',
+  Thread: 'thread',
+  Web: 'web',
+  Template: 'template',
+} as const;
 
-export type QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum =
-  typeof QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum[keyof typeof QueryThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum];
+export type ThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum =
+  typeof ThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum[keyof typeof ThreadGetBulkThreads200ResponseThreadsInnerLinksInnerSourceEnum];
 
 /**
  *
  * @export
- * @interface QueryThreadGetBulkThreads200ResponseThreadsInnerTopic
+ * @interface ThreadGetBulkThreads200ResponseThreadsInnerTopic
  */
-export interface QueryThreadGetBulkThreads200ResponseThreadsInnerTopic {
+export interface ThreadGetBulkThreads200ResponseThreadsInnerTopic {
   /**
    *
    * @type {number}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerTopic
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerTopic
    */
   id: number;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerTopic
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerTopic
    */
   name: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerTopic
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerTopic
    */
   description: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerTopic
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerTopic
    */
   chainId: string;
   /**
    *
    * @type {string}
-   * @memberof QueryThreadGetBulkThreads200ResponseThreadsInnerTopic
+   * @memberof ThreadGetBulkThreads200ResponseThreadsInnerTopic
    */
   telegram: string;
+}
+/**
+ *
+ * @export
+ * @interface UserUpdateUser200Response
+ */
+export interface UserUpdateUser200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof UserUpdateUser200Response
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUser200Response
+   */
+  email?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUser200Response
+   */
+  isAdmin?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUser200Response
+   */
+  disableRichText?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUser200Response
+   */
+  emailVerified?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUser200Response
+   */
+  selected_community_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUser200Response
+   */
+  emailNotificationInterval?: UserUpdateUser200ResponseEmailNotificationIntervalEnum;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUser200Response
+   */
+  promotional_emails_enabled?: boolean | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUser200Response
+   */
+  is_welcome_onboard_flow_complete?: boolean;
+  /**
+   *
+   * @type {UserUpdateUserRequestProfile}
+   * @memberof UserUpdateUser200Response
+   */
+  profile: UserUpdateUserRequestProfile;
+  /**
+   *
+   * @type {any}
+   * @memberof UserUpdateUser200Response
+   */
+  created_at?: any;
+  /**
+   *
+   * @type {any}
+   * @memberof UserUpdateUser200Response
+   */
+  updated_at?: any;
+  /**
+   *
+   * @type {Array<UserUpdateUserRequestProfileTagsInner>}
+   * @memberof UserUpdateUser200Response
+   */
+  ProfileTags?: Array<UserUpdateUserRequestProfileTagsInner>;
+}
+
+export const UserUpdateUser200ResponseEmailNotificationIntervalEnum = {
+  Weekly: 'weekly',
+  Never: 'never',
+} as const;
+
+export type UserUpdateUser200ResponseEmailNotificationIntervalEnum =
+  typeof UserUpdateUser200ResponseEmailNotificationIntervalEnum[keyof typeof UserUpdateUser200ResponseEmailNotificationIntervalEnum];
+
+/**
+ *
+ * @export
+ * @interface UserUpdateUserDefaultResponse
+ */
+export interface UserUpdateUserDefaultResponse {
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserDefaultResponse
+   */
+  message: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserDefaultResponse
+   */
+  code: string;
+  /**
+   *
+   * @type {Array<UserUpdateUserDefaultResponseIssuesInner>}
+   * @memberof UserUpdateUserDefaultResponse
+   */
+  issues?: Array<UserUpdateUserDefaultResponseIssuesInner>;
+}
+/**
+ *
+ * @export
+ * @interface UserUpdateUserDefaultResponseIssuesInner
+ */
+export interface UserUpdateUserDefaultResponseIssuesInner {
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserDefaultResponseIssuesInner
+   */
+  message: string;
+}
+/**
+ *
+ * @export
+ * @interface UserUpdateUserRequest
+ */
+export interface UserUpdateUserRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequest
+   */
+  email?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUserRequest
+   */
+  isAdmin?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUserRequest
+   */
+  disableRichText?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUserRequest
+   */
+  emailVerified?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequest
+   */
+  selected_community_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequest
+   */
+  emailNotificationInterval?: UserUpdateUserRequestEmailNotificationIntervalEnum;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserUpdateUserRequest
+   */
+  promotional_emails_enabled?: boolean | null;
+  /**
+   *
+   * @type {UserUpdateUserRequestProfile}
+   * @memberof UserUpdateUserRequest
+   */
+  profile: UserUpdateUserRequestProfile;
+  /**
+   *
+   * @type {any}
+   * @memberof UserUpdateUserRequest
+   */
+  created_at?: any;
+  /**
+   *
+   * @type {any}
+   * @memberof UserUpdateUserRequest
+   */
+  updated_at?: any;
+  /**
+   *
+   * @type {Array<UserUpdateUserRequestProfileTagsInner>}
+   * @memberof UserUpdateUserRequest
+   */
+  ProfileTags?: Array<UserUpdateUserRequestProfileTagsInner>;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof UserUpdateUserRequest
+   */
+  tag_ids?: Array<number> | null;
+}
+
+export const UserUpdateUserRequestEmailNotificationIntervalEnum = {
+  Weekly: 'weekly',
+  Never: 'never',
+} as const;
+
+export type UserUpdateUserRequestEmailNotificationIntervalEnum =
+  typeof UserUpdateUserRequestEmailNotificationIntervalEnum[keyof typeof UserUpdateUserRequestEmailNotificationIntervalEnum];
+
+/**
+ *
+ * @export
+ * @interface UserUpdateUserRequestProfile
+ */
+export interface UserUpdateUserRequestProfile {
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  name?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  email?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  website?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  bio?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  avatar_url?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  slug?: string | null;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  socials?: Array<string> | null;
+  /**
+   *
+   * @type {UserUpdateUserRequestProfileBackgroundImage}
+   * @memberof UserUpdateUserRequestProfile
+   */
+  background_image?: UserUpdateUserRequestProfileBackgroundImage | null;
+}
+/**
+ *
+ * @export
+ * @interface UserUpdateUserRequestProfileBackgroundImage
+ */
+export interface UserUpdateUserRequestProfileBackgroundImage {
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfileBackgroundImage
+   */
+  url?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfileBackgroundImage
+   */
+  imageBehavior?: string;
+}
+/**
+ *
+ * @export
+ * @interface UserUpdateUserRequestProfileTagsInner
+ */
+export interface UserUpdateUserRequestProfileTagsInner {
+  /**
+   *
+   * @type {number}
+   * @memberof UserUpdateUserRequestProfileTagsInner
+   */
+  user_id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof UserUpdateUserRequestProfileTagsInner
+   */
+  tag_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfileTagsInner
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UserUpdateUserRequestProfileTagsInner
+   */
+  updated_at?: string;
 }
 
 /**
@@ -4841,27 +4837,27 @@ export const CommunityApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunityCreateGroupRequest} mutationCommunityCreateGroupRequest
+     * @param {CommunityCreateGroupRequest} communityCreateGroupRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationCommunityCreateGroup: async (
+    communityCreateGroup: async (
       addressId: string,
       id: string,
-      mutationCommunityCreateGroupRequest: MutationCommunityCreateGroupRequest,
+      communityCreateGroupRequest: CommunityCreateGroupRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
-      assertParamExists('mutationCommunityCreateGroup', 'addressId', addressId);
+      assertParamExists('communityCreateGroup', 'addressId', addressId);
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationCommunityCreateGroup', 'id', id);
-      // verify required parameter 'mutationCommunityCreateGroupRequest' is not null or undefined
+      assertParamExists('communityCreateGroup', 'id', id);
+      // verify required parameter 'communityCreateGroupRequest' is not null or undefined
       assertParamExists(
-        'mutationCommunityCreateGroup',
-        'mutationCommunityCreateGroupRequest',
-        mutationCommunityCreateGroupRequest,
+        'communityCreateGroup',
+        'communityCreateGroupRequest',
+        communityCreateGroupRequest,
       );
-      const localVarPath = `/community/{id}/CreateGroup`.replace(
+      const localVarPath = `/CreateGroup/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id)),
       );
@@ -4895,7 +4891,7 @@ export const CommunityApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationCommunityCreateGroupRequest,
+        communityCreateGroupRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -4909,31 +4905,31 @@ export const CommunityApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunityCreateStakeTransactionRequest} mutationCommunityCreateStakeTransactionRequest
+     * @param {CommunityCreateStakeTransactionRequest} communityCreateStakeTransactionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationCommunityCreateStakeTransaction: async (
+    communityCreateStakeTransaction: async (
       addressId: string,
       id: string,
-      mutationCommunityCreateStakeTransactionRequest: MutationCommunityCreateStakeTransactionRequest,
+      communityCreateStakeTransactionRequest: CommunityCreateStakeTransactionRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
       assertParamExists(
-        'mutationCommunityCreateStakeTransaction',
+        'communityCreateStakeTransaction',
         'addressId',
         addressId,
       );
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationCommunityCreateStakeTransaction', 'id', id);
-      // verify required parameter 'mutationCommunityCreateStakeTransactionRequest' is not null or undefined
+      assertParamExists('communityCreateStakeTransaction', 'id', id);
+      // verify required parameter 'communityCreateStakeTransactionRequest' is not null or undefined
       assertParamExists(
-        'mutationCommunityCreateStakeTransaction',
-        'mutationCommunityCreateStakeTransactionRequest',
-        mutationCommunityCreateStakeTransactionRequest,
+        'communityCreateStakeTransaction',
+        'communityCreateStakeTransactionRequest',
+        communityCreateStakeTransactionRequest,
       );
-      const localVarPath = `/community/{id}/CreateStakeTransaction`.replace(
+      const localVarPath = `/CreateStakeTransaction/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id)),
       );
@@ -4967,7 +4963,7 @@ export const CommunityApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationCommunityCreateStakeTransactionRequest,
+        communityCreateStakeTransactionRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -4981,27 +4977,27 @@ export const CommunityApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunitySetStakeRequest} mutationCommunitySetStakeRequest
+     * @param {CommunitySetStakeRequest} communitySetStakeRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationCommunitySetStake: async (
+    communitySetStake: async (
       addressId: string,
       id: string,
-      mutationCommunitySetStakeRequest: MutationCommunitySetStakeRequest,
+      communitySetStakeRequest: CommunitySetStakeRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
-      assertParamExists('mutationCommunitySetStake', 'addressId', addressId);
+      assertParamExists('communitySetStake', 'addressId', addressId);
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationCommunitySetStake', 'id', id);
-      // verify required parameter 'mutationCommunitySetStakeRequest' is not null or undefined
+      assertParamExists('communitySetStake', 'id', id);
+      // verify required parameter 'communitySetStakeRequest' is not null or undefined
       assertParamExists(
-        'mutationCommunitySetStake',
-        'mutationCommunitySetStakeRequest',
-        mutationCommunitySetStakeRequest,
+        'communitySetStake',
+        'communitySetStakeRequest',
+        communitySetStakeRequest,
       );
-      const localVarPath = `/community/{id}/SetCommunityStake`.replace(
+      const localVarPath = `/SetCommunityStake/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id)),
       );
@@ -5035,7 +5031,7 @@ export const CommunityApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationCommunitySetStakeRequest,
+        communitySetStakeRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -5049,35 +5045,30 @@ export const CommunityApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner} mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner
+     * @param {IntegrationsAnalyticsRequestThreadCreatedContestManagersInner} integrationsAnalyticsRequestThreadCreatedContestManagersInner
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationContestCancelContestMetadata: async (
+    contestCancelContestMetadata: async (
       addressId: string,
       id: string,
-      mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner: MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+      integrationsAnalyticsRequestThreadCreatedContestManagersInner: IntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
-      assertParamExists(
-        'mutationContestCancelContestMetadata',
-        'addressId',
-        addressId,
-      );
+      assertParamExists('contestCancelContestMetadata', 'addressId', addressId);
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationContestCancelContestMetadata', 'id', id);
-      // verify required parameter 'mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner' is not null or undefined
+      assertParamExists('contestCancelContestMetadata', 'id', id);
+      // verify required parameter 'integrationsAnalyticsRequestThreadCreatedContestManagersInner' is not null or undefined
       assertParamExists(
-        'mutationContestCancelContestMetadata',
-        'mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner',
-        mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+        'contestCancelContestMetadata',
+        'integrationsAnalyticsRequestThreadCreatedContestManagersInner',
+        integrationsAnalyticsRequestThreadCreatedContestManagersInner,
       );
-      const localVarPath =
-        `/community/{id}/CancelContestManagerMetadata`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
+      const localVarPath = `/CancelContestManagerMetadata/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -5108,7 +5099,7 @@ export const CommunityApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+        integrationsAnalyticsRequestThreadCreatedContestManagersInner,
         localVarRequestOptions,
         configuration,
       );
@@ -5122,35 +5113,30 @@ export const CommunityApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationContestCreateContestMetadataRequest} mutationContestCreateContestMetadataRequest
+     * @param {ContestCreateContestMetadataRequest} contestCreateContestMetadataRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationContestCreateContestMetadata: async (
+    contestCreateContestMetadata: async (
       addressId: string,
       id: string,
-      mutationContestCreateContestMetadataRequest: MutationContestCreateContestMetadataRequest,
+      contestCreateContestMetadataRequest: ContestCreateContestMetadataRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
-      assertParamExists(
-        'mutationContestCreateContestMetadata',
-        'addressId',
-        addressId,
-      );
+      assertParamExists('contestCreateContestMetadata', 'addressId', addressId);
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationContestCreateContestMetadata', 'id', id);
-      // verify required parameter 'mutationContestCreateContestMetadataRequest' is not null or undefined
+      assertParamExists('contestCreateContestMetadata', 'id', id);
+      // verify required parameter 'contestCreateContestMetadataRequest' is not null or undefined
       assertParamExists(
-        'mutationContestCreateContestMetadata',
-        'mutationContestCreateContestMetadataRequest',
-        mutationContestCreateContestMetadataRequest,
+        'contestCreateContestMetadata',
+        'contestCreateContestMetadataRequest',
+        contestCreateContestMetadataRequest,
       );
-      const localVarPath =
-        `/community/{id}/CreateContestManagerMetadata`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
+      const localVarPath = `/CreateContestManagerMetadata/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -5181,7 +5167,7 @@ export const CommunityApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationContestCreateContestMetadataRequest,
+        contestCreateContestMetadataRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -5195,35 +5181,30 @@ export const CommunityApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationContestUpdateContestMetadataRequest} mutationContestUpdateContestMetadataRequest
+     * @param {ContestUpdateContestMetadataRequest} contestUpdateContestMetadataRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationContestUpdateContestMetadata: async (
+    contestUpdateContestMetadata: async (
       addressId: string,
       id: string,
-      mutationContestUpdateContestMetadataRequest: MutationContestUpdateContestMetadataRequest,
+      contestUpdateContestMetadataRequest: ContestUpdateContestMetadataRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
-      assertParamExists(
-        'mutationContestUpdateContestMetadata',
-        'addressId',
-        addressId,
-      );
+      assertParamExists('contestUpdateContestMetadata', 'addressId', addressId);
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationContestUpdateContestMetadata', 'id', id);
-      // verify required parameter 'mutationContestUpdateContestMetadataRequest' is not null or undefined
+      assertParamExists('contestUpdateContestMetadata', 'id', id);
+      // verify required parameter 'contestUpdateContestMetadataRequest' is not null or undefined
       assertParamExists(
-        'mutationContestUpdateContestMetadata',
-        'mutationContestUpdateContestMetadataRequest',
-        mutationContestUpdateContestMetadataRequest,
+        'contestUpdateContestMetadata',
+        'contestUpdateContestMetadataRequest',
+        contestUpdateContestMetadataRequest,
       );
-      const localVarPath =
-        `/community/{id}/UpdateContestManagerMetadata`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
+      const localVarPath = `/UpdateContestManagerMetadata/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -5254,7 +5235,7 @@ export const CommunityApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationContestUpdateContestMetadataRequest,
+        contestUpdateContestMetadataRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -5279,31 +5260,31 @@ export const CommunityApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunityCreateGroupRequest} mutationCommunityCreateGroupRequest
+     * @param {CommunityCreateGroupRequest} communityCreateGroupRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationCommunityCreateGroup(
+    async communityCreateGroup(
       addressId: string,
       id: string,
-      mutationCommunityCreateGroupRequest: MutationCommunityCreateGroupRequest,
+      communityCreateGroupRequest: CommunityCreateGroupRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationCommunitySetStake200Response>
+      ) => AxiosPromise<CommunitySetStake200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationCommunityCreateGroup(
+        await localVarAxiosParamCreator.communityCreateGroup(
           addressId,
           id,
-          mutationCommunityCreateGroupRequest,
+          communityCreateGroupRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['CommunityApi.mutationCommunityCreateGroup']?.[
+        operationServerMap['CommunityApi.communityCreateGroup']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -5318,70 +5299,31 @@ export const CommunityApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunityCreateStakeTransactionRequest} mutationCommunityCreateStakeTransactionRequest
+     * @param {CommunityCreateStakeTransactionRequest} communityCreateStakeTransactionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationCommunityCreateStakeTransaction(
+    async communityCreateStakeTransaction(
       addressId: string,
       id: string,
-      mutationCommunityCreateStakeTransactionRequest: MutationCommunityCreateStakeTransactionRequest,
+      communityCreateStakeTransactionRequest: CommunityCreateStakeTransactionRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>
+      ) => AxiosPromise<CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationCommunityCreateStakeTransaction(
+        await localVarAxiosParamCreator.communityCreateStakeTransaction(
           addressId,
           id,
-          mutationCommunityCreateStakeTransactionRequest,
+          communityCreateStakeTransactionRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap[
-          'CommunityApi.mutationCommunityCreateStakeTransaction'
-        ]?.[localVarOperationServerIndex]?.url;
-      return (axios, basePath) =>
-        createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration,
-        )(axios, localVarOperationServerBasePath || basePath);
-    },
-    /**
-     *
-     * @param {string} addressId
-     * @param {string} id
-     * @param {MutationCommunitySetStakeRequest} mutationCommunitySetStakeRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async mutationCommunitySetStake(
-      addressId: string,
-      id: string,
-      mutationCommunitySetStakeRequest: MutationCommunitySetStakeRequest,
-      options?: RawAxiosRequestConfig,
-    ): Promise<
-      (
-        axios?: AxiosInstance,
-        basePath?: string,
-      ) => AxiosPromise<MutationCommunitySetStake200Response>
-    > {
-      const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationCommunitySetStake(
-          addressId,
-          id,
-          mutationCommunitySetStakeRequest,
-          options,
-        );
-      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-      const localVarOperationServerBasePath =
-        operationServerMap['CommunityApi.mutationCommunitySetStake']?.[
+        operationServerMap['CommunityApi.communityCreateStakeTransaction']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -5396,33 +5338,33 @@ export const CommunityApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner} mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner
+     * @param {CommunitySetStakeRequest} communitySetStakeRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationContestCancelContestMetadata(
+    async communitySetStake(
       addressId: string,
       id: string,
-      mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner: MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+      communitySetStakeRequest: CommunitySetStakeRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationContestCreateContestMetadata200Response>
+      ) => AxiosPromise<CommunitySetStake200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationContestCancelContestMetadata(
+        await localVarAxiosParamCreator.communitySetStake(
           addressId,
           id,
-          mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+          communitySetStakeRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap[
-          'CommunityApi.mutationContestCancelContestMetadata'
-        ]?.[localVarOperationServerIndex]?.url;
+        operationServerMap['CommunityApi.communitySetStake']?.[
+          localVarOperationServerIndex
+        ]?.url;
       return (axios, basePath) =>
         createRequestFunction(
           localVarAxiosArgs,
@@ -5435,33 +5377,33 @@ export const CommunityApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationContestCreateContestMetadataRequest} mutationContestCreateContestMetadataRequest
+     * @param {IntegrationsAnalyticsRequestThreadCreatedContestManagersInner} integrationsAnalyticsRequestThreadCreatedContestManagersInner
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationContestCreateContestMetadata(
+    async contestCancelContestMetadata(
       addressId: string,
       id: string,
-      mutationContestCreateContestMetadataRequest: MutationContestCreateContestMetadataRequest,
+      integrationsAnalyticsRequestThreadCreatedContestManagersInner: IntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationContestCreateContestMetadata200Response>
+      ) => AxiosPromise<ContestCreateContestMetadata200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationContestCreateContestMetadata(
+        await localVarAxiosParamCreator.contestCancelContestMetadata(
           addressId,
           id,
-          mutationContestCreateContestMetadataRequest,
+          integrationsAnalyticsRequestThreadCreatedContestManagersInner,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap[
-          'CommunityApi.mutationContestCreateContestMetadata'
-        ]?.[localVarOperationServerIndex]?.url;
+        operationServerMap['CommunityApi.contestCancelContestMetadata']?.[
+          localVarOperationServerIndex
+        ]?.url;
       return (axios, basePath) =>
         createRequestFunction(
           localVarAxiosArgs,
@@ -5474,33 +5416,72 @@ export const CommunityApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationContestUpdateContestMetadataRequest} mutationContestUpdateContestMetadataRequest
+     * @param {ContestCreateContestMetadataRequest} contestCreateContestMetadataRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationContestUpdateContestMetadata(
+    async contestCreateContestMetadata(
       addressId: string,
       id: string,
-      mutationContestUpdateContestMetadataRequest: MutationContestUpdateContestMetadataRequest,
+      contestCreateContestMetadataRequest: ContestCreateContestMetadataRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationContestCreateContestMetadata200Response>
+      ) => AxiosPromise<ContestCreateContestMetadata200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationContestUpdateContestMetadata(
+        await localVarAxiosParamCreator.contestCreateContestMetadata(
           addressId,
           id,
-          mutationContestUpdateContestMetadataRequest,
+          contestCreateContestMetadataRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap[
-          'CommunityApi.mutationContestUpdateContestMetadata'
-        ]?.[localVarOperationServerIndex]?.url;
+        operationServerMap['CommunityApi.contestCreateContestMetadata']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {string} addressId
+     * @param {string} id
+     * @param {ContestUpdateContestMetadataRequest} contestUpdateContestMetadataRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async contestUpdateContestMetadata(
+      addressId: string,
+      id: string,
+      contestUpdateContestMetadataRequest: ContestUpdateContestMetadataRequest,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<ContestCreateContestMetadata200Response>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.contestUpdateContestMetadata(
+          addressId,
+          id,
+          contestUpdateContestMetadataRequest,
+          options,
+        );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['CommunityApi.contestUpdateContestMetadata']?.[
+          localVarOperationServerIndex
+        ]?.url;
       return (axios, basePath) =>
         createRequestFunction(
           localVarAxiosArgs,
@@ -5527,21 +5508,21 @@ export const CommunityApiFactory = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunityCreateGroupRequest} mutationCommunityCreateGroupRequest
+     * @param {CommunityCreateGroupRequest} communityCreateGroupRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationCommunityCreateGroup(
+    communityCreateGroup(
       addressId: string,
       id: string,
-      mutationCommunityCreateGroupRequest: MutationCommunityCreateGroupRequest,
+      communityCreateGroupRequest: CommunityCreateGroupRequest,
       options?: any,
-    ): AxiosPromise<MutationCommunitySetStake200Response> {
+    ): AxiosPromise<CommunitySetStake200Response> {
       return localVarFp
-        .mutationCommunityCreateGroup(
+        .communityCreateGroup(
           addressId,
           id,
-          mutationCommunityCreateGroupRequest,
+          communityCreateGroupRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -5550,21 +5531,21 @@ export const CommunityApiFactory = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunityCreateStakeTransactionRequest} mutationCommunityCreateStakeTransactionRequest
+     * @param {CommunityCreateStakeTransactionRequest} communityCreateStakeTransactionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationCommunityCreateStakeTransaction(
+    communityCreateStakeTransaction(
       addressId: string,
       id: string,
-      mutationCommunityCreateStakeTransactionRequest: MutationCommunityCreateStakeTransactionRequest,
+      communityCreateStakeTransactionRequest: CommunityCreateStakeTransactionRequest,
       options?: any,
-    ): AxiosPromise<QueryCommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner> {
+    ): AxiosPromise<CommunityGetCommunity200ResponseCommunityStakesInnerStakeTransactionsInner> {
       return localVarFp
-        .mutationCommunityCreateStakeTransaction(
+        .communityCreateStakeTransaction(
           addressId,
           id,
-          mutationCommunityCreateStakeTransactionRequest,
+          communityCreateStakeTransactionRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -5573,21 +5554,39 @@ export const CommunityApiFactory = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationCommunitySetStakeRequest} mutationCommunitySetStakeRequest
+     * @param {CommunitySetStakeRequest} communitySetStakeRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationCommunitySetStake(
+    communitySetStake(
       addressId: string,
       id: string,
-      mutationCommunitySetStakeRequest: MutationCommunitySetStakeRequest,
+      communitySetStakeRequest: CommunitySetStakeRequest,
       options?: any,
-    ): AxiosPromise<MutationCommunitySetStake200Response> {
+    ): AxiosPromise<CommunitySetStake200Response> {
       return localVarFp
-        .mutationCommunitySetStake(
+        .communitySetStake(addressId, id, communitySetStakeRequest, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} addressId
+     * @param {string} id
+     * @param {IntegrationsAnalyticsRequestThreadCreatedContestManagersInner} integrationsAnalyticsRequestThreadCreatedContestManagersInner
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    contestCancelContestMetadata(
+      addressId: string,
+      id: string,
+      integrationsAnalyticsRequestThreadCreatedContestManagersInner: IntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+      options?: any,
+    ): AxiosPromise<ContestCreateContestMetadata200Response> {
+      return localVarFp
+        .contestCancelContestMetadata(
           addressId,
           id,
-          mutationCommunitySetStakeRequest,
+          integrationsAnalyticsRequestThreadCreatedContestManagersInner,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -5596,21 +5595,21 @@ export const CommunityApiFactory = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner} mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner
+     * @param {ContestCreateContestMetadataRequest} contestCreateContestMetadataRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationContestCancelContestMetadata(
+    contestCreateContestMetadata(
       addressId: string,
       id: string,
-      mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner: MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+      contestCreateContestMetadataRequest: ContestCreateContestMetadataRequest,
       options?: any,
-    ): AxiosPromise<MutationContestCreateContestMetadata200Response> {
+    ): AxiosPromise<ContestCreateContestMetadata200Response> {
       return localVarFp
-        .mutationContestCancelContestMetadata(
+        .contestCreateContestMetadata(
           addressId,
           id,
-          mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+          contestCreateContestMetadataRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -5619,44 +5618,21 @@ export const CommunityApiFactory = function (
      *
      * @param {string} addressId
      * @param {string} id
-     * @param {MutationContestCreateContestMetadataRequest} mutationContestCreateContestMetadataRequest
+     * @param {ContestUpdateContestMetadataRequest} contestUpdateContestMetadataRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationContestCreateContestMetadata(
+    contestUpdateContestMetadata(
       addressId: string,
       id: string,
-      mutationContestCreateContestMetadataRequest: MutationContestCreateContestMetadataRequest,
+      contestUpdateContestMetadataRequest: ContestUpdateContestMetadataRequest,
       options?: any,
-    ): AxiosPromise<MutationContestCreateContestMetadata200Response> {
+    ): AxiosPromise<ContestCreateContestMetadata200Response> {
       return localVarFp
-        .mutationContestCreateContestMetadata(
+        .contestUpdateContestMetadata(
           addressId,
           id,
-          mutationContestCreateContestMetadataRequest,
-          options,
-        )
-        .then((request) => request(axios, basePath));
-    },
-    /**
-     *
-     * @param {string} addressId
-     * @param {string} id
-     * @param {MutationContestUpdateContestMetadataRequest} mutationContestUpdateContestMetadataRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    mutationContestUpdateContestMetadata(
-      addressId: string,
-      id: string,
-      mutationContestUpdateContestMetadataRequest: MutationContestUpdateContestMetadataRequest,
-      options?: any,
-    ): AxiosPromise<MutationContestCreateContestMetadata200Response> {
-      return localVarFp
-        .mutationContestUpdateContestMetadata(
-          addressId,
-          id,
-          mutationContestUpdateContestMetadataRequest,
+          contestUpdateContestMetadataRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -5675,22 +5651,42 @@ export class CommunityApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {string} id
-   * @param {MutationCommunityCreateGroupRequest} mutationCommunityCreateGroupRequest
+   * @param {CommunityCreateGroupRequest} communityCreateGroupRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof CommunityApi
    */
-  public mutationCommunityCreateGroup(
+  public communityCreateGroup(
     addressId: string,
     id: string,
-    mutationCommunityCreateGroupRequest: MutationCommunityCreateGroupRequest,
+    communityCreateGroupRequest: CommunityCreateGroupRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return CommunityApiFp(this.configuration)
-      .mutationCommunityCreateGroup(
+      .communityCreateGroup(addressId, id, communityCreateGroupRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} addressId
+   * @param {string} id
+   * @param {CommunityCreateStakeTransactionRequest} communityCreateStakeTransactionRequest
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof CommunityApi
+   */
+  public communityCreateStakeTransaction(
+    addressId: string,
+    id: string,
+    communityCreateStakeTransactionRequest: CommunityCreateStakeTransactionRequest,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return CommunityApiFp(this.configuration)
+      .communityCreateStakeTransaction(
         addressId,
         id,
-        mutationCommunityCreateGroupRequest,
+        communityCreateStakeTransactionRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -5700,22 +5696,42 @@ export class CommunityApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {string} id
-   * @param {MutationCommunityCreateStakeTransactionRequest} mutationCommunityCreateStakeTransactionRequest
+   * @param {CommunitySetStakeRequest} communitySetStakeRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof CommunityApi
    */
-  public mutationCommunityCreateStakeTransaction(
+  public communitySetStake(
     addressId: string,
     id: string,
-    mutationCommunityCreateStakeTransactionRequest: MutationCommunityCreateStakeTransactionRequest,
+    communitySetStakeRequest: CommunitySetStakeRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return CommunityApiFp(this.configuration)
-      .mutationCommunityCreateStakeTransaction(
+      .communitySetStake(addressId, id, communitySetStakeRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} addressId
+   * @param {string} id
+   * @param {IntegrationsAnalyticsRequestThreadCreatedContestManagersInner} integrationsAnalyticsRequestThreadCreatedContestManagersInner
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof CommunityApi
+   */
+  public contestCancelContestMetadata(
+    addressId: string,
+    id: string,
+    integrationsAnalyticsRequestThreadCreatedContestManagersInner: IntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return CommunityApiFp(this.configuration)
+      .contestCancelContestMetadata(
         addressId,
         id,
-        mutationCommunityCreateStakeTransactionRequest,
+        integrationsAnalyticsRequestThreadCreatedContestManagersInner,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -5725,22 +5741,22 @@ export class CommunityApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {string} id
-   * @param {MutationCommunitySetStakeRequest} mutationCommunitySetStakeRequest
+   * @param {ContestCreateContestMetadataRequest} contestCreateContestMetadataRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof CommunityApi
    */
-  public mutationCommunitySetStake(
+  public contestCreateContestMetadata(
     addressId: string,
     id: string,
-    mutationCommunitySetStakeRequest: MutationCommunitySetStakeRequest,
+    contestCreateContestMetadataRequest: ContestCreateContestMetadataRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return CommunityApiFp(this.configuration)
-      .mutationCommunitySetStake(
+      .contestCreateContestMetadata(
         addressId,
         id,
-        mutationCommunitySetStakeRequest,
+        contestCreateContestMetadataRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -5750,72 +5766,22 @@ export class CommunityApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {string} id
-   * @param {MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner} mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner
+   * @param {ContestUpdateContestMetadataRequest} contestUpdateContestMetadataRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof CommunityApi
    */
-  public mutationContestCancelContestMetadata(
+  public contestUpdateContestMetadata(
     addressId: string,
     id: string,
-    mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner: MutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
+    contestUpdateContestMetadataRequest: ContestUpdateContestMetadataRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return CommunityApiFp(this.configuration)
-      .mutationContestCancelContestMetadata(
+      .contestUpdateContestMetadata(
         addressId,
         id,
-        mutationIntegrationsAnalyticsRequestThreadCreatedContestManagersInner,
-        options,
-      )
-      .then((request) => request(this.axios, this.basePath));
-  }
-
-  /**
-   *
-   * @param {string} addressId
-   * @param {string} id
-   * @param {MutationContestCreateContestMetadataRequest} mutationContestCreateContestMetadataRequest
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof CommunityApi
-   */
-  public mutationContestCreateContestMetadata(
-    addressId: string,
-    id: string,
-    mutationContestCreateContestMetadataRequest: MutationContestCreateContestMetadataRequest,
-    options?: RawAxiosRequestConfig,
-  ) {
-    return CommunityApiFp(this.configuration)
-      .mutationContestCreateContestMetadata(
-        addressId,
-        id,
-        mutationContestCreateContestMetadataRequest,
-        options,
-      )
-      .then((request) => request(this.axios, this.basePath));
-  }
-
-  /**
-   *
-   * @param {string} addressId
-   * @param {string} id
-   * @param {MutationContestUpdateContestMetadataRequest} mutationContestUpdateContestMetadataRequest
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof CommunityApi
-   */
-  public mutationContestUpdateContestMetadata(
-    addressId: string,
-    id: string,
-    mutationContestUpdateContestMetadataRequest: MutationContestUpdateContestMetadataRequest,
-    options?: RawAxiosRequestConfig,
-  ) {
-    return CommunityApiFp(this.configuration)
-      .mutationContestUpdateContestMetadata(
-        addressId,
-        id,
-        mutationContestUpdateContestMetadataRequest,
+        contestUpdateContestMetadataRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -5832,21 +5798,21 @@ export const IntegrationApiAxiosParamCreator = function (
   return {
     /**
      *
-     * @param {MutationIntegrationsAnalyticsRequest} mutationIntegrationsAnalyticsRequest
+     * @param {IntegrationsAnalyticsRequest} integrationsAnalyticsRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationIntegrationsAnalytics: async (
-      mutationIntegrationsAnalyticsRequest: MutationIntegrationsAnalyticsRequest,
+    integrationsAnalytics: async (
+      integrationsAnalyticsRequest: IntegrationsAnalyticsRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      // verify required parameter 'mutationIntegrationsAnalyticsRequest' is not null or undefined
+      // verify required parameter 'integrationsAnalyticsRequest' is not null or undefined
       assertParamExists(
-        'mutationIntegrationsAnalytics',
-        'mutationIntegrationsAnalyticsRequest',
-        mutationIntegrationsAnalyticsRequest,
+        'integrationsAnalytics',
+        'integrationsAnalyticsRequest',
+        integrationsAnalyticsRequest,
       );
-      const localVarPath = `/integration/Analytics`;
+      const localVarPath = `/Analytics`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -5873,7 +5839,7 @@ export const IntegrationApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationIntegrationsAnalyticsRequest,
+        integrationsAnalyticsRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -5896,24 +5862,24 @@ export const IntegrationApiFp = function (configuration?: Configuration) {
   return {
     /**
      *
-     * @param {MutationIntegrationsAnalyticsRequest} mutationIntegrationsAnalyticsRequest
+     * @param {IntegrationsAnalyticsRequest} integrationsAnalyticsRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationIntegrationsAnalytics(
-      mutationIntegrationsAnalyticsRequest: MutationIntegrationsAnalyticsRequest,
+    async integrationsAnalytics(
+      integrationsAnalyticsRequest: IntegrationsAnalyticsRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationIntegrationsAnalytics(
-          mutationIntegrationsAnalyticsRequest,
+        await localVarAxiosParamCreator.integrationsAnalytics(
+          integrationsAnalyticsRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['IntegrationApi.mutationIntegrationsAnalytics']?.[
+        operationServerMap['IntegrationApi.integrationsAnalytics']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -5940,19 +5906,16 @@ export const IntegrationApiFactory = function (
   return {
     /**
      *
-     * @param {MutationIntegrationsAnalyticsRequest} mutationIntegrationsAnalyticsRequest
+     * @param {IntegrationsAnalyticsRequest} integrationsAnalyticsRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationIntegrationsAnalytics(
-      mutationIntegrationsAnalyticsRequest: MutationIntegrationsAnalyticsRequest,
+    integrationsAnalytics(
+      integrationsAnalyticsRequest: IntegrationsAnalyticsRequest,
       options?: any,
     ): AxiosPromise<object> {
       return localVarFp
-        .mutationIntegrationsAnalytics(
-          mutationIntegrationsAnalyticsRequest,
-          options,
-        )
+        .integrationsAnalytics(integrationsAnalyticsRequest, options)
         .then((request) => request(axios, basePath));
     },
   };
@@ -5967,20 +5930,17 @@ export const IntegrationApiFactory = function (
 export class IntegrationApi extends BaseAPI {
   /**
    *
-   * @param {MutationIntegrationsAnalyticsRequest} mutationIntegrationsAnalyticsRequest
+   * @param {IntegrationsAnalyticsRequest} integrationsAnalyticsRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof IntegrationApi
    */
-  public mutationIntegrationsAnalytics(
-    mutationIntegrationsAnalyticsRequest: MutationIntegrationsAnalyticsRequest,
+  public integrationsAnalytics(
+    integrationsAnalyticsRequest: IntegrationsAnalyticsRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return IntegrationApiFp(this.configuration)
-      .mutationIntegrationsAnalytics(
-        mutationIntegrationsAnalyticsRequest,
-        options,
-      )
+      .integrationsAnalytics(integrationsAnalyticsRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }
@@ -5997,27 +5957,27 @@ export const LoadTestApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationLoadTestCreateJWTsRequest} mutationLoadTestCreateJWTsRequest
+     * @param {LoadTestCreateJWTsRequest} loadTestCreateJWTsRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationLoadTestCreateJWTs: async (
+    loadTestCreateJWTs: async (
       addressId: string,
       id: number,
-      mutationLoadTestCreateJWTsRequest: MutationLoadTestCreateJWTsRequest,
+      loadTestCreateJWTsRequest: LoadTestCreateJWTsRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
-      assertParamExists('mutationLoadTestCreateJWTs', 'addressId', addressId);
+      assertParamExists('loadTestCreateJWTs', 'addressId', addressId);
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationLoadTestCreateJWTs', 'id', id);
-      // verify required parameter 'mutationLoadTestCreateJWTsRequest' is not null or undefined
+      assertParamExists('loadTestCreateJWTs', 'id', id);
+      // verify required parameter 'loadTestCreateJWTsRequest' is not null or undefined
       assertParamExists(
-        'mutationLoadTestCreateJWTs',
-        'mutationLoadTestCreateJWTsRequest',
-        mutationLoadTestCreateJWTsRequest,
+        'loadTestCreateJWTs',
+        'loadTestCreateJWTsRequest',
+        loadTestCreateJWTsRequest,
       );
-      const localVarPath = `/loadtest/{id}/CreateJWTs`.replace(
+      const localVarPath = `/CreateJWTs/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id)),
       );
@@ -6055,7 +6015,7 @@ export const LoadTestApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationLoadTestCreateJWTsRequest,
+        loadTestCreateJWTsRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -6079,28 +6039,28 @@ export const LoadTestApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationLoadTestCreateJWTsRequest} mutationLoadTestCreateJWTsRequest
+     * @param {LoadTestCreateJWTsRequest} loadTestCreateJWTsRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationLoadTestCreateJWTs(
+    async loadTestCreateJWTs(
       addressId: string,
       id: number,
-      mutationLoadTestCreateJWTsRequest: MutationLoadTestCreateJWTsRequest,
+      loadTestCreateJWTsRequest: LoadTestCreateJWTsRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationLoadTestCreateJWTs(
+        await localVarAxiosParamCreator.loadTestCreateJWTs(
           addressId,
           id,
-          mutationLoadTestCreateJWTsRequest,
+          loadTestCreateJWTsRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['LoadTestApi.mutationLoadTestCreateJWTs']?.[
+        operationServerMap['LoadTestApi.loadTestCreateJWTs']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -6129,23 +6089,18 @@ export const LoadTestApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationLoadTestCreateJWTsRequest} mutationLoadTestCreateJWTsRequest
+     * @param {LoadTestCreateJWTsRequest} loadTestCreateJWTsRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationLoadTestCreateJWTs(
+    loadTestCreateJWTs(
       addressId: string,
       id: number,
-      mutationLoadTestCreateJWTsRequest: MutationLoadTestCreateJWTsRequest,
+      loadTestCreateJWTsRequest: LoadTestCreateJWTsRequest,
       options?: any,
     ): AxiosPromise<Array<string>> {
       return localVarFp
-        .mutationLoadTestCreateJWTs(
-          addressId,
-          id,
-          mutationLoadTestCreateJWTsRequest,
-          options,
-        )
+        .loadTestCreateJWTs(addressId, id, loadTestCreateJWTsRequest, options)
         .then((request) => request(axios, basePath));
     },
   };
@@ -6162,24 +6117,19 @@ export class LoadTestApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationLoadTestCreateJWTsRequest} mutationLoadTestCreateJWTsRequest
+   * @param {LoadTestCreateJWTsRequest} loadTestCreateJWTsRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof LoadTestApi
    */
-  public mutationLoadTestCreateJWTs(
+  public loadTestCreateJWTs(
     addressId: string,
     id: number,
-    mutationLoadTestCreateJWTsRequest: MutationLoadTestCreateJWTsRequest,
+    loadTestCreateJWTsRequest: LoadTestCreateJWTsRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return LoadTestApiFp(this.configuration)
-      .mutationLoadTestCreateJWTs(
-        addressId,
-        id,
-        mutationLoadTestCreateJWTsRequest,
-        options,
-      )
+      .loadTestCreateJWTs(addressId, id, loadTestCreateJWTsRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }
@@ -6200,15 +6150,15 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetCommunity: async (
+    communityGetCommunity: async (
       id: string,
       addressId?: string,
       includeNodeInfo?: boolean,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('queryCommunityGetCommunity', 'id', id);
-      const localVarPath = `/query/GetCommunity`;
+      assertParamExists('communityGetCommunity', 'id', id);
+      const localVarPath = `/GetCommunity`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6256,35 +6206,35 @@ export const QueryApiAxiosParamCreator = function (
      * @param {string} [addressId]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
-     * @param {QueryCommunityGetMembersOrderByEnum} [orderBy]
-     * @param {QueryCommunityGetMembersOrderDirectionEnum} [orderDirection]
+     * @param {CommunityGetMembersOrderByEnum} [orderBy]
+     * @param {CommunityGetMembersOrderDirectionEnum} [orderDirection]
      * @param {string} [search]
      * @param {boolean} [includeRoles]
-     * @param {QueryCommunityGetMembersMembershipsParameter} [memberships]
+     * @param {CommunityGetMembersMembershipsParameter} [memberships]
      * @param {boolean} [includeGroupIds]
      * @param {boolean} [includeStakeBalances]
      * @param {string} [allowedAddresses]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetMembers: async (
+    communityGetMembers: async (
       communityId: string,
       addressId?: string,
       limit?: number | null,
       cursor?: number | null,
-      orderBy?: QueryCommunityGetMembersOrderByEnum,
-      orderDirection?: QueryCommunityGetMembersOrderDirectionEnum,
+      orderBy?: CommunityGetMembersOrderByEnum,
+      orderDirection?: CommunityGetMembersOrderDirectionEnum,
       search?: string,
       includeRoles?: boolean,
-      memberships?: QueryCommunityGetMembersMembershipsParameter,
+      memberships?: CommunityGetMembersMembershipsParameter,
       includeGroupIds?: boolean,
       includeStakeBalances?: boolean,
       allowedAddresses?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'communityId' is not null or undefined
-      assertParamExists('queryCommunityGetMembers', 'communityId', communityId);
-      const localVarPath = `/query/GetMembers`;
+      assertParamExists('communityGetMembers', 'communityId', communityId);
+      const localVarPath = `/GetMembers`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6372,15 +6322,15 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetStake: async (
+    communityGetStake: async (
       communityId: string,
       addressId?: string,
       stakeId?: number,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'communityId' is not null or undefined
-      assertParamExists('queryCommunityGetStake', 'communityId', communityId);
-      const localVarPath = `/query/GetCommunityStake`;
+      assertParamExists('communityGetStake', 'communityId', communityId);
+      const localVarPath = `/GetCommunityStake`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6431,7 +6381,7 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetStakeHistoricalPrice: async (
+    communityGetStakeHistoricalPrice: async (
       pastDateEpoch: number,
       addressId?: string,
       communityId?: string,
@@ -6440,11 +6390,11 @@ export const QueryApiAxiosParamCreator = function (
     ): Promise<RequestArgs> => {
       // verify required parameter 'pastDateEpoch' is not null or undefined
       assertParamExists(
-        'queryCommunityGetStakeHistoricalPrice',
+        'communityGetStakeHistoricalPrice',
         'pastDateEpoch',
         pastDateEpoch,
       );
-      const localVarPath = `/query/GetStakeHistoricalPrice`;
+      const localVarPath = `/GetStakeHistoricalPrice`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6497,12 +6447,12 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetStakeTransaction: async (
+    communityGetStakeTransaction: async (
       addressId?: string,
       addresses?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetStakeTransaction`;
+      const localVarPath = `/GetStakeTransaction`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6550,7 +6500,7 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryContestGetAllContests: async (
+    contestGetAllContests: async (
       communityId: string,
       addressId?: string,
       contestAddress?: string,
@@ -6559,12 +6509,8 @@ export const QueryApiAxiosParamCreator = function (
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'communityId' is not null or undefined
-      assertParamExists(
-        'queryContestGetAllContests',
-        'communityId',
-        communityId,
-      );
-      const localVarPath = `/query/GetAllContests`;
+      assertParamExists('contestGetAllContests', 'communityId', communityId);
+      const localVarPath = `/GetAllContests`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6621,18 +6567,18 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryContestGetContestLog: async (
+    contestGetContestLog: async (
       contestAddress: string,
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'contestAddress' is not null or undefined
       assertParamExists(
-        'queryContestGetContestLog',
+        'contestGetContestLog',
         'contestAddress',
         contestAddress,
       );
-      const localVarPath = `/query/GetContestLog`;
+      const localVarPath = `/GetContestLog`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6676,11 +6622,11 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryFeedGetChainActivity: async (
+    feedGetChainActivity: async (
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetChainActivity`;
+      const localVarPath = `/GetChainActivity`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6720,11 +6666,11 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryFeedGetGlobalActivity: async (
+    feedGetGlobalActivity: async (
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetGlobalActivity`;
+      const localVarPath = `/GetGlobalActivity`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6764,11 +6710,11 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryFeedGetUserActivity: async (
+    feedGetUserActivity: async (
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetUserActivity`;
+      const localVarPath = `/GetUserActivity`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6808,11 +6754,11 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetCommentSubscriptions: async (
+    subscriptionGetCommentSubscriptions: async (
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetCommentSubscriptions`;
+      const localVarPath = `/GetCommentSubscriptions`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6852,11 +6798,11 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetCommunityAlerts: async (
+    subscriptionGetCommunityAlerts: async (
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetCommunityAlerts`;
+      const localVarPath = `/GetCommunityAlerts`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6896,11 +6842,11 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetSubscriptionPreferences: async (
+    subscriptionGetSubscriptionPreferences: async (
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetSubscriptionPreferences`;
+      const localVarPath = `/GetSubscriptionPreferences`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6940,11 +6886,11 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetThreadSubscriptions: async (
+    subscriptionGetThreadSubscriptions: async (
       addressId?: string,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/query/GetThreadSubscriptions`;
+      const localVarPath = `/GetThreadSubscriptions`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -6988,7 +6934,7 @@ export const QueryApiAxiosParamCreator = function (
      * @param {boolean} [includePinnedThreads]
      * @param {number} [topicId]
      * @param {string} [stage]
-     * @param {QueryThreadGetBulkThreadsOrderByEnum} [orderBy]
+     * @param {ThreadGetBulkThreadsOrderByEnum} [orderBy]
      * @param {number} [cursor]
      * @param {number} [limit] The number of objects returned
      * @param {number} [offset] The amount of objects offset from the beginning
@@ -6996,7 +6942,7 @@ export const QueryApiAxiosParamCreator = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryThreadGetBulkThreads: async (
+    threadGetBulkThreads: async (
       communityId: string,
       addressId?: string,
       fromDate?: string,
@@ -7005,7 +6951,7 @@ export const QueryApiAxiosParamCreator = function (
       includePinnedThreads?: boolean,
       topicId?: number,
       stage?: string,
-      orderBy?: QueryThreadGetBulkThreadsOrderByEnum,
+      orderBy?: ThreadGetBulkThreadsOrderByEnum,
       cursor?: number,
       limit?: number,
       offset?: number,
@@ -7013,12 +6959,8 @@ export const QueryApiAxiosParamCreator = function (
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'communityId' is not null or undefined
-      assertParamExists(
-        'queryThreadGetBulkThreads',
-        'communityId',
-        communityId,
-      );
-      const localVarPath = `/query/GetBulkThreads`;
+      assertParamExists('threadGetBulkThreads', 'communityId', communityId);
+      const localVarPath = `/GetBulkThreads`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -7124,7 +7066,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryCommunityGetCommunity(
+    async communityGetCommunity(
       id: string,
       addressId?: string,
       includeNodeInfo?: boolean,
@@ -7133,10 +7075,10 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<QueryCommunityGetCommunity200Response>
+      ) => AxiosPromise<CommunityGetCommunity200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryCommunityGetCommunity(
+        await localVarAxiosParamCreator.communityGetCommunity(
           id,
           addressId,
           includeNodeInfo,
@@ -7144,7 +7086,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryCommunityGetCommunity']?.[
+        operationServerMap['QueryApi.communityGetCommunity']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7161,27 +7103,27 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {string} [addressId]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
-     * @param {QueryCommunityGetMembersOrderByEnum} [orderBy]
-     * @param {QueryCommunityGetMembersOrderDirectionEnum} [orderDirection]
+     * @param {CommunityGetMembersOrderByEnum} [orderBy]
+     * @param {CommunityGetMembersOrderDirectionEnum} [orderDirection]
      * @param {string} [search]
      * @param {boolean} [includeRoles]
-     * @param {QueryCommunityGetMembersMembershipsParameter} [memberships]
+     * @param {CommunityGetMembersMembershipsParameter} [memberships]
      * @param {boolean} [includeGroupIds]
      * @param {boolean} [includeStakeBalances]
      * @param {string} [allowedAddresses]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryCommunityGetMembers(
+    async communityGetMembers(
       communityId: string,
       addressId?: string,
       limit?: number | null,
       cursor?: number | null,
-      orderBy?: QueryCommunityGetMembersOrderByEnum,
-      orderDirection?: QueryCommunityGetMembersOrderDirectionEnum,
+      orderBy?: CommunityGetMembersOrderByEnum,
+      orderDirection?: CommunityGetMembersOrderDirectionEnum,
       search?: string,
       includeRoles?: boolean,
-      memberships?: QueryCommunityGetMembersMembershipsParameter,
+      memberships?: CommunityGetMembersMembershipsParameter,
       includeGroupIds?: boolean,
       includeStakeBalances?: boolean,
       allowedAddresses?: string,
@@ -7190,10 +7132,10 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<QueryCommunityGetMembers200Response>
+      ) => AxiosPromise<CommunityGetMembers200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryCommunityGetMembers(
+        await localVarAxiosParamCreator.communityGetMembers(
           communityId,
           addressId,
           limit,
@@ -7210,7 +7152,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryCommunityGetMembers']?.[
+        operationServerMap['QueryApi.communityGetMembers']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7229,7 +7171,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryCommunityGetStake(
+    async communityGetStake(
       communityId: string,
       addressId?: string,
       stakeId?: number,
@@ -7238,10 +7180,10 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<QueryCommunityGetStake200Response>
+      ) => AxiosPromise<CommunityGetStake200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryCommunityGetStake(
+        await localVarAxiosParamCreator.communityGetStake(
           communityId,
           addressId,
           stakeId,
@@ -7249,7 +7191,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryCommunityGetStake']?.[
+        operationServerMap['QueryApi.communityGetStake']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7269,7 +7211,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryCommunityGetStakeHistoricalPrice(
+    async communityGetStakeHistoricalPrice(
       pastDateEpoch: number,
       addressId?: string,
       communityId?: string,
@@ -7279,12 +7221,10 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<
-        Array<QueryCommunityGetStakeHistoricalPrice200ResponseInner>
-      >
+      ) => AxiosPromise<Array<CommunityGetStakeHistoricalPrice200ResponseInner>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryCommunityGetStakeHistoricalPrice(
+        await localVarAxiosParamCreator.communityGetStakeHistoricalPrice(
           pastDateEpoch,
           addressId,
           communityId,
@@ -7293,7 +7233,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryCommunityGetStakeHistoricalPrice']?.[
+        operationServerMap['QueryApi.communityGetStakeHistoricalPrice']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7311,7 +7251,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryCommunityGetStakeTransaction(
+    async communityGetStakeTransaction(
       addressId?: string,
       addresses?: string,
       options?: RawAxiosRequestConfig,
@@ -7319,19 +7259,17 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<
-        Array<QueryCommunityGetStakeTransaction200ResponseInner>
-      >
+      ) => AxiosPromise<Array<CommunityGetStakeTransaction200ResponseInner>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryCommunityGetStakeTransaction(
+        await localVarAxiosParamCreator.communityGetStakeTransaction(
           addressId,
           addresses,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryCommunityGetStakeTransaction']?.[
+        operationServerMap['QueryApi.communityGetStakeTransaction']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7352,7 +7290,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryContestGetAllContests(
+    async contestGetAllContests(
       communityId: string,
       addressId?: string,
       contestAddress?: string,
@@ -7363,10 +7301,10 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<Array<QueryContestGetAllContests200ResponseInner>>
+      ) => AxiosPromise<Array<ContestGetAllContests200ResponseInner>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryContestGetAllContests(
+        await localVarAxiosParamCreator.contestGetAllContests(
           communityId,
           addressId,
           contestAddress,
@@ -7376,7 +7314,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryContestGetAllContests']?.[
+        operationServerMap['QueryApi.contestGetAllContests']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7394,7 +7332,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryContestGetContestLog(
+    async contestGetContestLog(
       contestAddress: string,
       addressId?: string,
       options?: RawAxiosRequestConfig,
@@ -7402,17 +7340,17 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<Array<QueryContestGetContestLog200ResponseInner>>
+      ) => AxiosPromise<Array<ContestGetContestLog200ResponseInner>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryContestGetContestLog(
+        await localVarAxiosParamCreator.contestGetContestLog(
           contestAddress,
           addressId,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryContestGetContestLog']?.[
+        operationServerMap['QueryApi.contestGetContestLog']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7429,23 +7367,23 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryFeedGetChainActivity(
+    async feedGetChainActivity(
       addressId?: string,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<Array<QueryFeedGetChainActivity200ResponseInner>>
+      ) => AxiosPromise<Array<FeedGetChainActivity200ResponseInner>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryFeedGetChainActivity(
+        await localVarAxiosParamCreator.feedGetChainActivity(
           addressId,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryFeedGetChainActivity']?.[
+        operationServerMap['QueryApi.feedGetChainActivity']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7462,23 +7400,23 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryFeedGetGlobalActivity(
+    async feedGetGlobalActivity(
       addressId?: string,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<Array<QueryFeedGetUserActivity200ResponseInner>>
+      ) => AxiosPromise<Array<FeedGetUserActivity200ResponseInner>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryFeedGetGlobalActivity(
+        await localVarAxiosParamCreator.feedGetGlobalActivity(
           addressId,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryFeedGetGlobalActivity']?.[
+        operationServerMap['QueryApi.feedGetGlobalActivity']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7495,23 +7433,20 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryFeedGetUserActivity(
+    async feedGetUserActivity(
       addressId?: string,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<Array<QueryFeedGetUserActivity200ResponseInner>>
+      ) => AxiosPromise<Array<FeedGetUserActivity200ResponseInner>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryFeedGetUserActivity(
-          addressId,
-          options,
-        );
+        await localVarAxiosParamCreator.feedGetUserActivity(addressId, options);
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryFeedGetUserActivity']?.[
+        operationServerMap['QueryApi.feedGetUserActivity']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7528,60 +7463,23 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async querySubscriptionGetCommentSubscriptions(
+    async subscriptionGetCommentSubscriptions(
       addressId?: string,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<
-        Array<MutationSubscriptionCreateCommentSubscription200Response>
-      >
+      ) => AxiosPromise<Array<SubscriptionCreateCommentSubscription200Response>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.querySubscriptionGetCommentSubscriptions(
+        await localVarAxiosParamCreator.subscriptionGetCommentSubscriptions(
           addressId,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap[
-          'QueryApi.querySubscriptionGetCommentSubscriptions'
-        ]?.[localVarOperationServerIndex]?.url;
-      return (axios, basePath) =>
-        createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration,
-        )(axios, localVarOperationServerBasePath || basePath);
-    },
-    /**
-     *
-     * @param {string} [addressId]
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async querySubscriptionGetCommunityAlerts(
-      addressId?: string,
-      options?: RawAxiosRequestConfig,
-    ): Promise<
-      (
-        axios?: AxiosInstance,
-        basePath?: string,
-      ) => AxiosPromise<
-        Array<MutationSubscriptionCreateCommunityAlert200Response>
-      >
-    > {
-      const localVarAxiosArgs =
-        await localVarAxiosParamCreator.querySubscriptionGetCommunityAlerts(
-          addressId,
-          options,
-        );
-      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-      const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.querySubscriptionGetCommunityAlerts']?.[
+        operationServerMap['QueryApi.subscriptionGetCommentSubscriptions']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7598,25 +7496,25 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async querySubscriptionGetSubscriptionPreferences(
+    async subscriptionGetCommunityAlerts(
       addressId?: string,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<QuerySubscriptionGetSubscriptionPreferences200Response>
+      ) => AxiosPromise<Array<SubscriptionCreateCommunityAlert200Response>>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.querySubscriptionGetSubscriptionPreferences(
+        await localVarAxiosParamCreator.subscriptionGetCommunityAlerts(
           addressId,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap[
-          'QueryApi.querySubscriptionGetSubscriptionPreferences'
-        ]?.[localVarOperationServerIndex]?.url;
+        operationServerMap['QueryApi.subscriptionGetCommunityAlerts']?.[
+          localVarOperationServerIndex
+        ]?.url;
       return (axios, basePath) =>
         createRequestFunction(
           localVarAxiosArgs,
@@ -7631,27 +7529,58 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async querySubscriptionGetThreadSubscriptions(
+    async subscriptionGetSubscriptionPreferences(
       addressId?: string,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<
-        Array<MutationSubscriptionCreateThreadSubscription200Response>
-      >
+      ) => AxiosPromise<SubscriptionGetSubscriptionPreferences200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.querySubscriptionGetThreadSubscriptions(
+        await localVarAxiosParamCreator.subscriptionGetSubscriptionPreferences(
           addressId,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap[
-          'QueryApi.querySubscriptionGetThreadSubscriptions'
-        ]?.[localVarOperationServerIndex]?.url;
+        operationServerMap['QueryApi.subscriptionGetSubscriptionPreferences']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {string} [addressId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async subscriptionGetThreadSubscriptions(
+      addressId?: string,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<Array<SubscriptionCreateThreadSubscription200Response>>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.subscriptionGetThreadSubscriptions(
+          addressId,
+          options,
+        );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['QueryApi.subscriptionGetThreadSubscriptions']?.[
+          localVarOperationServerIndex
+        ]?.url;
       return (axios, basePath) =>
         createRequestFunction(
           localVarAxiosArgs,
@@ -7670,7 +7599,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {boolean} [includePinnedThreads]
      * @param {number} [topicId]
      * @param {string} [stage]
-     * @param {QueryThreadGetBulkThreadsOrderByEnum} [orderBy]
+     * @param {ThreadGetBulkThreadsOrderByEnum} [orderBy]
      * @param {number} [cursor]
      * @param {number} [limit] The number of objects returned
      * @param {number} [offset] The amount of objects offset from the beginning
@@ -7678,7 +7607,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async queryThreadGetBulkThreads(
+    async threadGetBulkThreads(
       communityId: string,
       addressId?: string,
       fromDate?: string,
@@ -7687,7 +7616,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
       includePinnedThreads?: boolean,
       topicId?: number,
       stage?: string,
-      orderBy?: QueryThreadGetBulkThreadsOrderByEnum,
+      orderBy?: ThreadGetBulkThreadsOrderByEnum,
       cursor?: number,
       limit?: number,
       offset?: number,
@@ -7697,10 +7626,10 @@ export const QueryApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<QueryThreadGetBulkThreads200Response>
+      ) => AxiosPromise<ThreadGetBulkThreads200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.queryThreadGetBulkThreads(
+        await localVarAxiosParamCreator.threadGetBulkThreads(
           communityId,
           addressId,
           fromDate,
@@ -7718,7 +7647,7 @@ export const QueryApiFp = function (configuration?: Configuration) {
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['QueryApi.queryThreadGetBulkThreads']?.[
+        operationServerMap['QueryApi.threadGetBulkThreads']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -7751,14 +7680,14 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetCommunity(
+    communityGetCommunity(
       id: string,
       addressId?: string,
       includeNodeInfo?: boolean,
       options?: any,
-    ): AxiosPromise<QueryCommunityGetCommunity200Response> {
+    ): AxiosPromise<CommunityGetCommunity200Response> {
       return localVarFp
-        .queryCommunityGetCommunity(id, addressId, includeNodeInfo, options)
+        .communityGetCommunity(id, addressId, includeNodeInfo, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7767,34 +7696,34 @@ export const QueryApiFactory = function (
      * @param {string} [addressId]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
-     * @param {QueryCommunityGetMembersOrderByEnum} [orderBy]
-     * @param {QueryCommunityGetMembersOrderDirectionEnum} [orderDirection]
+     * @param {CommunityGetMembersOrderByEnum} [orderBy]
+     * @param {CommunityGetMembersOrderDirectionEnum} [orderDirection]
      * @param {string} [search]
      * @param {boolean} [includeRoles]
-     * @param {QueryCommunityGetMembersMembershipsParameter} [memberships]
+     * @param {CommunityGetMembersMembershipsParameter} [memberships]
      * @param {boolean} [includeGroupIds]
      * @param {boolean} [includeStakeBalances]
      * @param {string} [allowedAddresses]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetMembers(
+    communityGetMembers(
       communityId: string,
       addressId?: string,
       limit?: number | null,
       cursor?: number | null,
-      orderBy?: QueryCommunityGetMembersOrderByEnum,
-      orderDirection?: QueryCommunityGetMembersOrderDirectionEnum,
+      orderBy?: CommunityGetMembersOrderByEnum,
+      orderDirection?: CommunityGetMembersOrderDirectionEnum,
       search?: string,
       includeRoles?: boolean,
-      memberships?: QueryCommunityGetMembersMembershipsParameter,
+      memberships?: CommunityGetMembersMembershipsParameter,
       includeGroupIds?: boolean,
       includeStakeBalances?: boolean,
       allowedAddresses?: string,
       options?: any,
-    ): AxiosPromise<QueryCommunityGetMembers200Response> {
+    ): AxiosPromise<CommunityGetMembers200Response> {
       return localVarFp
-        .queryCommunityGetMembers(
+        .communityGetMembers(
           communityId,
           addressId,
           limit,
@@ -7819,14 +7748,14 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetStake(
+    communityGetStake(
       communityId: string,
       addressId?: string,
       stakeId?: number,
       options?: any,
-    ): AxiosPromise<QueryCommunityGetStake200Response> {
+    ): AxiosPromise<CommunityGetStake200Response> {
       return localVarFp
-        .queryCommunityGetStake(communityId, addressId, stakeId, options)
+        .communityGetStake(communityId, addressId, stakeId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7838,17 +7767,15 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetStakeHistoricalPrice(
+    communityGetStakeHistoricalPrice(
       pastDateEpoch: number,
       addressId?: string,
       communityId?: string,
       stakeId?: number,
       options?: any,
-    ): AxiosPromise<
-      Array<QueryCommunityGetStakeHistoricalPrice200ResponseInner>
-    > {
+    ): AxiosPromise<Array<CommunityGetStakeHistoricalPrice200ResponseInner>> {
       return localVarFp
-        .queryCommunityGetStakeHistoricalPrice(
+        .communityGetStakeHistoricalPrice(
           pastDateEpoch,
           addressId,
           communityId,
@@ -7864,13 +7791,13 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryCommunityGetStakeTransaction(
+    communityGetStakeTransaction(
       addressId?: string,
       addresses?: string,
       options?: any,
-    ): AxiosPromise<Array<QueryCommunityGetStakeTransaction200ResponseInner>> {
+    ): AxiosPromise<Array<CommunityGetStakeTransaction200ResponseInner>> {
       return localVarFp
-        .queryCommunityGetStakeTransaction(addressId, addresses, options)
+        .communityGetStakeTransaction(addressId, addresses, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7883,16 +7810,16 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryContestGetAllContests(
+    contestGetAllContests(
       communityId: string,
       addressId?: string,
       contestAddress?: string,
       contestId?: number,
       running?: boolean,
       options?: any,
-    ): AxiosPromise<Array<QueryContestGetAllContests200ResponseInner>> {
+    ): AxiosPromise<Array<ContestGetAllContests200ResponseInner>> {
       return localVarFp
-        .queryContestGetAllContests(
+        .contestGetAllContests(
           communityId,
           addressId,
           contestAddress,
@@ -7909,13 +7836,13 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryContestGetContestLog(
+    contestGetContestLog(
       contestAddress: string,
       addressId?: string,
       options?: any,
-    ): AxiosPromise<Array<QueryContestGetContestLog200ResponseInner>> {
+    ): AxiosPromise<Array<ContestGetContestLog200ResponseInner>> {
       return localVarFp
-        .queryContestGetContestLog(contestAddress, addressId, options)
+        .contestGetContestLog(contestAddress, addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7924,12 +7851,12 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryFeedGetChainActivity(
+    feedGetChainActivity(
       addressId?: string,
       options?: any,
-    ): AxiosPromise<Array<QueryFeedGetChainActivity200ResponseInner>> {
+    ): AxiosPromise<Array<FeedGetChainActivity200ResponseInner>> {
       return localVarFp
-        .queryFeedGetChainActivity(addressId, options)
+        .feedGetChainActivity(addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7938,12 +7865,12 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryFeedGetGlobalActivity(
+    feedGetGlobalActivity(
       addressId?: string,
       options?: any,
-    ): AxiosPromise<Array<QueryFeedGetUserActivity200ResponseInner>> {
+    ): AxiosPromise<Array<FeedGetUserActivity200ResponseInner>> {
       return localVarFp
-        .queryFeedGetGlobalActivity(addressId, options)
+        .feedGetGlobalActivity(addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7952,12 +7879,12 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryFeedGetUserActivity(
+    feedGetUserActivity(
       addressId?: string,
       options?: any,
-    ): AxiosPromise<Array<QueryFeedGetUserActivity200ResponseInner>> {
+    ): AxiosPromise<Array<FeedGetUserActivity200ResponseInner>> {
       return localVarFp
-        .queryFeedGetUserActivity(addressId, options)
+        .feedGetUserActivity(addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7966,14 +7893,12 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetCommentSubscriptions(
+    subscriptionGetCommentSubscriptions(
       addressId?: string,
       options?: any,
-    ): AxiosPromise<
-      Array<MutationSubscriptionCreateCommentSubscription200Response>
-    > {
+    ): AxiosPromise<Array<SubscriptionCreateCommentSubscription200Response>> {
       return localVarFp
-        .querySubscriptionGetCommentSubscriptions(addressId, options)
+        .subscriptionGetCommentSubscriptions(addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7982,14 +7907,12 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetCommunityAlerts(
+    subscriptionGetCommunityAlerts(
       addressId?: string,
       options?: any,
-    ): AxiosPromise<
-      Array<MutationSubscriptionCreateCommunityAlert200Response>
-    > {
+    ): AxiosPromise<Array<SubscriptionCreateCommunityAlert200Response>> {
       return localVarFp
-        .querySubscriptionGetCommunityAlerts(addressId, options)
+        .subscriptionGetCommunityAlerts(addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7998,12 +7921,12 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetSubscriptionPreferences(
+    subscriptionGetSubscriptionPreferences(
       addressId?: string,
       options?: any,
-    ): AxiosPromise<QuerySubscriptionGetSubscriptionPreferences200Response> {
+    ): AxiosPromise<SubscriptionGetSubscriptionPreferences200Response> {
       return localVarFp
-        .querySubscriptionGetSubscriptionPreferences(addressId, options)
+        .subscriptionGetSubscriptionPreferences(addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -8012,14 +7935,12 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    querySubscriptionGetThreadSubscriptions(
+    subscriptionGetThreadSubscriptions(
       addressId?: string,
       options?: any,
-    ): AxiosPromise<
-      Array<MutationSubscriptionCreateThreadSubscription200Response>
-    > {
+    ): AxiosPromise<Array<SubscriptionCreateThreadSubscription200Response>> {
       return localVarFp
-        .querySubscriptionGetThreadSubscriptions(addressId, options)
+        .subscriptionGetThreadSubscriptions(addressId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -8032,7 +7953,7 @@ export const QueryApiFactory = function (
      * @param {boolean} [includePinnedThreads]
      * @param {number} [topicId]
      * @param {string} [stage]
-     * @param {QueryThreadGetBulkThreadsOrderByEnum} [orderBy]
+     * @param {ThreadGetBulkThreadsOrderByEnum} [orderBy]
      * @param {number} [cursor]
      * @param {number} [limit] The number of objects returned
      * @param {number} [offset] The amount of objects offset from the beginning
@@ -8040,7 +7961,7 @@ export const QueryApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    queryThreadGetBulkThreads(
+    threadGetBulkThreads(
       communityId: string,
       addressId?: string,
       fromDate?: string,
@@ -8049,15 +7970,15 @@ export const QueryApiFactory = function (
       includePinnedThreads?: boolean,
       topicId?: number,
       stage?: string,
-      orderBy?: QueryThreadGetBulkThreadsOrderByEnum,
+      orderBy?: ThreadGetBulkThreadsOrderByEnum,
       cursor?: number,
       limit?: number,
       offset?: number,
       page?: number,
       options?: any,
-    ): AxiosPromise<QueryThreadGetBulkThreads200Response> {
+    ): AxiosPromise<ThreadGetBulkThreads200Response> {
       return localVarFp
-        .queryThreadGetBulkThreads(
+        .threadGetBulkThreads(
           communityId,
           addressId,
           fromDate,
@@ -8094,14 +8015,14 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryCommunityGetCommunity(
+  public communityGetCommunity(
     id: string,
     addressId?: string,
     includeNodeInfo?: boolean,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryCommunityGetCommunity(id, addressId, includeNodeInfo, options)
+      .communityGetCommunity(id, addressId, includeNodeInfo, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8111,11 +8032,11 @@ export class QueryApi extends BaseAPI {
    * @param {string} [addressId]
    * @param {number | null} [limit]
    * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
-   * @param {QueryCommunityGetMembersOrderByEnum} [orderBy]
-   * @param {QueryCommunityGetMembersOrderDirectionEnum} [orderDirection]
+   * @param {CommunityGetMembersOrderByEnum} [orderBy]
+   * @param {CommunityGetMembersOrderDirectionEnum} [orderDirection]
    * @param {string} [search]
    * @param {boolean} [includeRoles]
-   * @param {QueryCommunityGetMembersMembershipsParameter} [memberships]
+   * @param {CommunityGetMembersMembershipsParameter} [memberships]
    * @param {boolean} [includeGroupIds]
    * @param {boolean} [includeStakeBalances]
    * @param {string} [allowedAddresses]
@@ -8123,23 +8044,23 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryCommunityGetMembers(
+  public communityGetMembers(
     communityId: string,
     addressId?: string,
     limit?: number | null,
     cursor?: number | null,
-    orderBy?: QueryCommunityGetMembersOrderByEnum,
-    orderDirection?: QueryCommunityGetMembersOrderDirectionEnum,
+    orderBy?: CommunityGetMembersOrderByEnum,
+    orderDirection?: CommunityGetMembersOrderDirectionEnum,
     search?: string,
     includeRoles?: boolean,
-    memberships?: QueryCommunityGetMembersMembershipsParameter,
+    memberships?: CommunityGetMembersMembershipsParameter,
     includeGroupIds?: boolean,
     includeStakeBalances?: boolean,
     allowedAddresses?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryCommunityGetMembers(
+      .communityGetMembers(
         communityId,
         addressId,
         limit,
@@ -8166,14 +8087,14 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryCommunityGetStake(
+  public communityGetStake(
     communityId: string,
     addressId?: string,
     stakeId?: number,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryCommunityGetStake(communityId, addressId, stakeId, options)
+      .communityGetStake(communityId, addressId, stakeId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8187,7 +8108,7 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryCommunityGetStakeHistoricalPrice(
+  public communityGetStakeHistoricalPrice(
     pastDateEpoch: number,
     addressId?: string,
     communityId?: string,
@@ -8195,7 +8116,7 @@ export class QueryApi extends BaseAPI {
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryCommunityGetStakeHistoricalPrice(
+      .communityGetStakeHistoricalPrice(
         pastDateEpoch,
         addressId,
         communityId,
@@ -8213,13 +8134,13 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryCommunityGetStakeTransaction(
+  public communityGetStakeTransaction(
     addressId?: string,
     addresses?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryCommunityGetStakeTransaction(addressId, addresses, options)
+      .communityGetStakeTransaction(addressId, addresses, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8234,7 +8155,7 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryContestGetAllContests(
+  public contestGetAllContests(
     communityId: string,
     addressId?: string,
     contestAddress?: string,
@@ -8243,7 +8164,7 @@ export class QueryApi extends BaseAPI {
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryContestGetAllContests(
+      .contestGetAllContests(
         communityId,
         addressId,
         contestAddress,
@@ -8262,13 +8183,13 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryContestGetContestLog(
+  public contestGetContestLog(
     contestAddress: string,
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryContestGetContestLog(contestAddress, addressId, options)
+      .contestGetContestLog(contestAddress, addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8279,12 +8200,12 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryFeedGetChainActivity(
+  public feedGetChainActivity(
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryFeedGetChainActivity(addressId, options)
+      .feedGetChainActivity(addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8295,12 +8216,12 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryFeedGetGlobalActivity(
+  public feedGetGlobalActivity(
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryFeedGetGlobalActivity(addressId, options)
+      .feedGetGlobalActivity(addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8311,12 +8232,12 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryFeedGetUserActivity(
+  public feedGetUserActivity(
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryFeedGetUserActivity(addressId, options)
+      .feedGetUserActivity(addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8327,12 +8248,12 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public querySubscriptionGetCommentSubscriptions(
+  public subscriptionGetCommentSubscriptions(
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .querySubscriptionGetCommentSubscriptions(addressId, options)
+      .subscriptionGetCommentSubscriptions(addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8343,12 +8264,12 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public querySubscriptionGetCommunityAlerts(
+  public subscriptionGetCommunityAlerts(
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .querySubscriptionGetCommunityAlerts(addressId, options)
+      .subscriptionGetCommunityAlerts(addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8359,12 +8280,12 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public querySubscriptionGetSubscriptionPreferences(
+  public subscriptionGetSubscriptionPreferences(
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .querySubscriptionGetSubscriptionPreferences(addressId, options)
+      .subscriptionGetSubscriptionPreferences(addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8375,12 +8296,12 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public querySubscriptionGetThreadSubscriptions(
+  public subscriptionGetThreadSubscriptions(
     addressId?: string,
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .querySubscriptionGetThreadSubscriptions(addressId, options)
+      .subscriptionGetThreadSubscriptions(addressId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -8394,7 +8315,7 @@ export class QueryApi extends BaseAPI {
    * @param {boolean} [includePinnedThreads]
    * @param {number} [topicId]
    * @param {string} [stage]
-   * @param {QueryThreadGetBulkThreadsOrderByEnum} [orderBy]
+   * @param {ThreadGetBulkThreadsOrderByEnum} [orderBy]
    * @param {number} [cursor]
    * @param {number} [limit] The number of objects returned
    * @param {number} [offset] The amount of objects offset from the beginning
@@ -8403,7 +8324,7 @@ export class QueryApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof QueryApi
    */
-  public queryThreadGetBulkThreads(
+  public threadGetBulkThreads(
     communityId: string,
     addressId?: string,
     fromDate?: string,
@@ -8412,7 +8333,7 @@ export class QueryApi extends BaseAPI {
     includePinnedThreads?: boolean,
     topicId?: number,
     stage?: string,
-    orderBy?: QueryThreadGetBulkThreadsOrderByEnum,
+    orderBy?: ThreadGetBulkThreadsOrderByEnum,
     cursor?: number,
     limit?: number,
     offset?: number,
@@ -8420,7 +8341,7 @@ export class QueryApi extends BaseAPI {
     options?: RawAxiosRequestConfig,
   ) {
     return QueryApiFp(this.configuration)
-      .queryThreadGetBulkThreads(
+      .threadGetBulkThreads(
         communityId,
         addressId,
         fromDate,
@@ -8443,25 +8364,25 @@ export class QueryApi extends BaseAPI {
 /**
  * @export
  */
-export const QueryCommunityGetMembersOrderByEnum = {
+export const CommunityGetMembersOrderByEnum = {
   LastActive: 'last_active',
   Name: 'name',
 } as const;
-export type QueryCommunityGetMembersOrderByEnum =
-  typeof QueryCommunityGetMembersOrderByEnum[keyof typeof QueryCommunityGetMembersOrderByEnum];
+export type CommunityGetMembersOrderByEnum =
+  typeof CommunityGetMembersOrderByEnum[keyof typeof CommunityGetMembersOrderByEnum];
 /**
  * @export
  */
-export const QueryCommunityGetMembersOrderDirectionEnum = {
+export const CommunityGetMembersOrderDirectionEnum = {
   Asc: 'ASC',
   Desc: 'DESC',
 } as const;
-export type QueryCommunityGetMembersOrderDirectionEnum =
-  typeof QueryCommunityGetMembersOrderDirectionEnum[keyof typeof QueryCommunityGetMembersOrderDirectionEnum];
+export type CommunityGetMembersOrderDirectionEnum =
+  typeof CommunityGetMembersOrderDirectionEnum[keyof typeof CommunityGetMembersOrderDirectionEnum];
 /**
  * @export
  */
-export const QueryThreadGetBulkThreadsOrderByEnum = {
+export const ThreadGetBulkThreadsOrderByEnum = {
   CreatedAtasc: 'createdAt:asc',
   CreatedAtdesc: 'createdAt:desc',
   NumberOfCommentsasc: 'numberOfComments:asc',
@@ -8471,8 +8392,8 @@ export const QueryThreadGetBulkThreadsOrderByEnum = {
   LatestActivityasc: 'latestActivity:asc',
   LatestActivitydesc: 'latestActivity:desc',
 } as const;
-export type QueryThreadGetBulkThreadsOrderByEnum =
-  typeof QueryThreadGetBulkThreadsOrderByEnum[keyof typeof QueryThreadGetBulkThreadsOrderByEnum];
+export type ThreadGetBulkThreadsOrderByEnum =
+  typeof ThreadGetBulkThreadsOrderByEnum[keyof typeof ThreadGetBulkThreadsOrderByEnum];
 
 /**
  * SubscriptionApi - axios parameter creator
@@ -8486,112 +8407,31 @@ export const SubscriptionApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateCommentSubscriptionRequest} mutationSubscriptionCreateCommentSubscriptionRequest
+     * @param {SubscriptionCreateCommentSubscriptionRequest} subscriptionCreateCommentSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionCreateCommentSubscription: async (
+    subscriptionCreateCommentSubscription: async (
       addressId: string,
       id: number,
-      mutationSubscriptionCreateCommentSubscriptionRequest: MutationSubscriptionCreateCommentSubscriptionRequest,
+      subscriptionCreateCommentSubscriptionRequest: SubscriptionCreateCommentSubscriptionRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionCreateCommentSubscription',
+        'subscriptionCreateCommentSubscription',
         'addressId',
         addressId,
       );
       // verify required parameter 'id' is not null or undefined
+      assertParamExists('subscriptionCreateCommentSubscription', 'id', id);
+      // verify required parameter 'subscriptionCreateCommentSubscriptionRequest' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionCreateCommentSubscription',
-        'id',
-        id,
+        'subscriptionCreateCommentSubscription',
+        'subscriptionCreateCommentSubscriptionRequest',
+        subscriptionCreateCommentSubscriptionRequest,
       );
-      // verify required parameter 'mutationSubscriptionCreateCommentSubscriptionRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionCreateCommentSubscription',
-        'mutationSubscriptionCreateCommentSubscriptionRequest',
-        mutationSubscriptionCreateCommentSubscriptionRequest,
-      );
-      const localVarPath =
-        `/subscription/{id}/CreateCommentSubscription`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = {
-        method: 'POST',
-        ...baseOptions,
-        ...options,
-      };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      if (addressId != null) {
-        localVarHeaderParameter['address_id'] = String(addressId);
-      }
-
-      localVarHeaderParameter['Content-Type'] = 'application/json';
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions =
-        baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers,
-      };
-      localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionCreateCommentSubscriptionRequest,
-        localVarRequestOptions,
-        configuration,
-      );
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      };
-    },
-    /**
-     *
-     * @param {string} addressId
-     * @param {number} id
-     * @param {MutationSubscriptionCreateCommunityAlertRequest} mutationSubscriptionCreateCommunityAlertRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    mutationSubscriptionCreateCommunityAlert: async (
-      addressId: string,
-      id: number,
-      mutationSubscriptionCreateCommunityAlertRequest: MutationSubscriptionCreateCommunityAlertRequest,
-      options: RawAxiosRequestConfig = {},
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'addressId' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionCreateCommunityAlert',
-        'addressId',
-        addressId,
-      );
-      // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationSubscriptionCreateCommunityAlert', 'id', id);
-      // verify required parameter 'mutationSubscriptionCreateCommunityAlertRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionCreateCommunityAlert',
-        'mutationSubscriptionCreateCommunityAlertRequest',
-        mutationSubscriptionCreateCommunityAlertRequest,
-      );
-      const localVarPath = `/subscription/{id}/CreateCommunityAlert`.replace(
+      const localVarPath = `/CreateCommentSubscription/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id)),
       );
@@ -8629,7 +8469,7 @@ export const SubscriptionApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionCreateCommunityAlertRequest,
+        subscriptionCreateCommentSubscriptionRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -8643,193 +8483,31 @@ export const SubscriptionApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateThreadSubscriptionRequest} mutationSubscriptionCreateThreadSubscriptionRequest
+     * @param {SubscriptionCreateCommunityAlertRequest} subscriptionCreateCommunityAlertRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionCreateThreadSubscription: async (
+    subscriptionCreateCommunityAlert: async (
       addressId: string,
       id: number,
-      mutationSubscriptionCreateThreadSubscriptionRequest: MutationSubscriptionCreateThreadSubscriptionRequest,
+      subscriptionCreateCommunityAlertRequest: SubscriptionCreateCommunityAlertRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionCreateThreadSubscription',
+        'subscriptionCreateCommunityAlert',
         'addressId',
         addressId,
       );
       // verify required parameter 'id' is not null or undefined
+      assertParamExists('subscriptionCreateCommunityAlert', 'id', id);
+      // verify required parameter 'subscriptionCreateCommunityAlertRequest' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionCreateThreadSubscription',
-        'id',
-        id,
+        'subscriptionCreateCommunityAlert',
+        'subscriptionCreateCommunityAlertRequest',
+        subscriptionCreateCommunityAlertRequest,
       );
-      // verify required parameter 'mutationSubscriptionCreateThreadSubscriptionRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionCreateThreadSubscription',
-        'mutationSubscriptionCreateThreadSubscriptionRequest',
-        mutationSubscriptionCreateThreadSubscriptionRequest,
-      );
-      const localVarPath =
-        `/subscription/{id}/CreateThreadSubscription`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = {
-        method: 'POST',
-        ...baseOptions,
-        ...options,
-      };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      if (addressId != null) {
-        localVarHeaderParameter['address_id'] = String(addressId);
-      }
-
-      localVarHeaderParameter['Content-Type'] = 'application/json';
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions =
-        baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers,
-      };
-      localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionCreateThreadSubscriptionRequest,
-        localVarRequestOptions,
-        configuration,
-      );
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      };
-    },
-    /**
-     *
-     * @param {string} addressId
-     * @param {number} id
-     * @param {MutationSubscriptionDeleteCommentSubscriptionRequest} mutationSubscriptionDeleteCommentSubscriptionRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    mutationSubscriptionDeleteCommentSubscription: async (
-      addressId: string,
-      id: number,
-      mutationSubscriptionDeleteCommentSubscriptionRequest: MutationSubscriptionDeleteCommentSubscriptionRequest,
-      options: RawAxiosRequestConfig = {},
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'addressId' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionDeleteCommentSubscription',
-        'addressId',
-        addressId,
-      );
-      // verify required parameter 'id' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionDeleteCommentSubscription',
-        'id',
-        id,
-      );
-      // verify required parameter 'mutationSubscriptionDeleteCommentSubscriptionRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionDeleteCommentSubscription',
-        'mutationSubscriptionDeleteCommentSubscriptionRequest',
-        mutationSubscriptionDeleteCommentSubscriptionRequest,
-      );
-      const localVarPath =
-        `/subscription/{id}/DeleteCommentSubscription`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = {
-        method: 'POST',
-        ...baseOptions,
-        ...options,
-      };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication Authorization required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      if (addressId != null) {
-        localVarHeaderParameter['address_id'] = String(addressId);
-      }
-
-      localVarHeaderParameter['Content-Type'] = 'application/json';
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions =
-        baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers,
-      };
-      localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionDeleteCommentSubscriptionRequest,
-        localVarRequestOptions,
-        configuration,
-      );
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      };
-    },
-    /**
-     *
-     * @param {string} addressId
-     * @param {number} id
-     * @param {MutationSubscriptionDeleteCommunityAlertRequest} mutationSubscriptionDeleteCommunityAlertRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    mutationSubscriptionDeleteCommunityAlert: async (
-      addressId: string,
-      id: number,
-      mutationSubscriptionDeleteCommunityAlertRequest: MutationSubscriptionDeleteCommunityAlertRequest,
-      options: RawAxiosRequestConfig = {},
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'addressId' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionDeleteCommunityAlert',
-        'addressId',
-        addressId,
-      );
-      // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationSubscriptionDeleteCommunityAlert', 'id', id);
-      // verify required parameter 'mutationSubscriptionDeleteCommunityAlertRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionDeleteCommunityAlert',
-        'mutationSubscriptionDeleteCommunityAlertRequest',
-        mutationSubscriptionDeleteCommunityAlertRequest,
-      );
-      const localVarPath = `/subscription/{id}/DeleteCommunityAlerts`.replace(
+      const localVarPath = `/CreateCommunityAlert/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id)),
       );
@@ -8867,7 +8545,7 @@ export const SubscriptionApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionDeleteCommunityAlertRequest,
+        subscriptionCreateCommunityAlertRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -8881,39 +8559,34 @@ export const SubscriptionApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionDeleteThreadSubscriptionRequest} mutationSubscriptionDeleteThreadSubscriptionRequest
+     * @param {SubscriptionCreateThreadSubscriptionRequest} subscriptionCreateThreadSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionDeleteThreadSubscription: async (
+    subscriptionCreateThreadSubscription: async (
       addressId: string,
       id: number,
-      mutationSubscriptionDeleteThreadSubscriptionRequest: MutationSubscriptionDeleteThreadSubscriptionRequest,
+      subscriptionCreateThreadSubscriptionRequest: SubscriptionCreateThreadSubscriptionRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionDeleteThreadSubscription',
+        'subscriptionCreateThreadSubscription',
         'addressId',
         addressId,
       );
       // verify required parameter 'id' is not null or undefined
+      assertParamExists('subscriptionCreateThreadSubscription', 'id', id);
+      // verify required parameter 'subscriptionCreateThreadSubscriptionRequest' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionDeleteThreadSubscription',
-        'id',
-        id,
+        'subscriptionCreateThreadSubscription',
+        'subscriptionCreateThreadSubscriptionRequest',
+        subscriptionCreateThreadSubscriptionRequest,
       );
-      // verify required parameter 'mutationSubscriptionDeleteThreadSubscriptionRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionDeleteThreadSubscription',
-        'mutationSubscriptionDeleteThreadSubscriptionRequest',
-        mutationSubscriptionDeleteThreadSubscriptionRequest,
+      const localVarPath = `/CreateThreadSubscription/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
       );
-      const localVarPath =
-        `/subscription/{id}/DeleteThreadSubscription`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -8948,7 +8621,7 @@ export const SubscriptionApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionDeleteThreadSubscriptionRequest,
+        subscriptionCreateThreadSubscriptionRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -8962,39 +8635,34 @@ export const SubscriptionApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+     * @param {SubscriptionDeleteCommentSubscriptionRequest} subscriptionDeleteCommentSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionRegisterClientRegistrationToken: async (
+    subscriptionDeleteCommentSubscription: async (
       addressId: string,
       id: number,
-      mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+      subscriptionDeleteCommentSubscriptionRequest: SubscriptionDeleteCommentSubscriptionRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionRegisterClientRegistrationToken',
+        'subscriptionDeleteCommentSubscription',
         'addressId',
         addressId,
       );
       // verify required parameter 'id' is not null or undefined
+      assertParamExists('subscriptionDeleteCommentSubscription', 'id', id);
+      // verify required parameter 'subscriptionDeleteCommentSubscriptionRequest' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionRegisterClientRegistrationToken',
-        'id',
-        id,
+        'subscriptionDeleteCommentSubscription',
+        'subscriptionDeleteCommentSubscriptionRequest',
+        subscriptionDeleteCommentSubscriptionRequest,
       );
-      // verify required parameter 'mutationSubscriptionRegisterClientRegistrationTokenRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionRegisterClientRegistrationToken',
-        'mutationSubscriptionRegisterClientRegistrationTokenRequest',
-        mutationSubscriptionRegisterClientRegistrationTokenRequest,
+      const localVarPath = `/DeleteCommentSubscription/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
       );
-      const localVarPath =
-        `/subscription/{id}/RegisterClientRegistrationToken`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -9029,7 +8697,7 @@ export const SubscriptionApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionRegisterClientRegistrationTokenRequest,
+        subscriptionDeleteCommentSubscriptionRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -9043,39 +8711,34 @@ export const SubscriptionApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+     * @param {SubscriptionDeleteCommunityAlertRequest} subscriptionDeleteCommunityAlertRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionUnregisterClientRegistrationToken: async (
+    subscriptionDeleteCommunityAlert: async (
       addressId: string,
       id: number,
-      mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+      subscriptionDeleteCommunityAlertRequest: SubscriptionDeleteCommunityAlertRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionUnregisterClientRegistrationToken',
+        'subscriptionDeleteCommunityAlert',
         'addressId',
         addressId,
       );
       // verify required parameter 'id' is not null or undefined
+      assertParamExists('subscriptionDeleteCommunityAlert', 'id', id);
+      // verify required parameter 'subscriptionDeleteCommunityAlertRequest' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionUnregisterClientRegistrationToken',
-        'id',
-        id,
+        'subscriptionDeleteCommunityAlert',
+        'subscriptionDeleteCommunityAlertRequest',
+        subscriptionDeleteCommunityAlertRequest,
       );
-      // verify required parameter 'mutationSubscriptionRegisterClientRegistrationTokenRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionUnregisterClientRegistrationToken',
-        'mutationSubscriptionRegisterClientRegistrationTokenRequest',
-        mutationSubscriptionRegisterClientRegistrationTokenRequest,
+      const localVarPath = `/DeleteCommunityAlerts/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
       );
-      const localVarPath =
-        `/subscription/{id}/UnregisterClientRegistrationToken`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -9110,7 +8773,7 @@ export const SubscriptionApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionRegisterClientRegistrationTokenRequest,
+        subscriptionDeleteCommunityAlertRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -9124,39 +8787,34 @@ export const SubscriptionApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionUpdateSubscriptionPreferencesRequest} mutationSubscriptionUpdateSubscriptionPreferencesRequest
+     * @param {SubscriptionDeleteThreadSubscriptionRequest} subscriptionDeleteThreadSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionUpdateSubscriptionPreferences: async (
+    subscriptionDeleteThreadSubscription: async (
       addressId: string,
       id: number,
-      mutationSubscriptionUpdateSubscriptionPreferencesRequest: MutationSubscriptionUpdateSubscriptionPreferencesRequest,
+      subscriptionDeleteThreadSubscriptionRequest: SubscriptionDeleteThreadSubscriptionRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionUpdateSubscriptionPreferences',
+        'subscriptionDeleteThreadSubscription',
         'addressId',
         addressId,
       );
       // verify required parameter 'id' is not null or undefined
+      assertParamExists('subscriptionDeleteThreadSubscription', 'id', id);
+      // verify required parameter 'subscriptionDeleteThreadSubscriptionRequest' is not null or undefined
       assertParamExists(
-        'mutationSubscriptionUpdateSubscriptionPreferences',
-        'id',
-        id,
+        'subscriptionDeleteThreadSubscription',
+        'subscriptionDeleteThreadSubscriptionRequest',
+        subscriptionDeleteThreadSubscriptionRequest,
       );
-      // verify required parameter 'mutationSubscriptionUpdateSubscriptionPreferencesRequest' is not null or undefined
-      assertParamExists(
-        'mutationSubscriptionUpdateSubscriptionPreferences',
-        'mutationSubscriptionUpdateSubscriptionPreferencesRequest',
-        mutationSubscriptionUpdateSubscriptionPreferencesRequest,
+      const localVarPath = `/DeleteThreadSubscription/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
       );
-      const localVarPath =
-        `/subscription/{id}/UpdateSubscriptionPreferences`.replace(
-          `{${'id'}}`,
-          encodeURIComponent(String(id)),
-        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -9191,7 +8849,243 @@ export const SubscriptionApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationSubscriptionUpdateSubscriptionPreferencesRequest,
+        subscriptionDeleteThreadSubscriptionRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {string} addressId
+     * @param {number} id
+     * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    subscriptionRegisterClientRegistrationToken: async (
+      addressId: string,
+      id: number,
+      subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'addressId' is not null or undefined
+      assertParamExists(
+        'subscriptionRegisterClientRegistrationToken',
+        'addressId',
+        addressId,
+      );
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists(
+        'subscriptionRegisterClientRegistrationToken',
+        'id',
+        id,
+      );
+      // verify required parameter 'subscriptionRegisterClientRegistrationTokenRequest' is not null or undefined
+      assertParamExists(
+        'subscriptionRegisterClientRegistrationToken',
+        'subscriptionRegisterClientRegistrationTokenRequest',
+        subscriptionRegisterClientRegistrationTokenRequest,
+      );
+      const localVarPath = `/RegisterClientRegistrationToken/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication Authorization required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      if (addressId != null) {
+        localVarHeaderParameter['address_id'] = String(addressId);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        subscriptionRegisterClientRegistrationTokenRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {string} addressId
+     * @param {number} id
+     * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    subscriptionUnregisterClientRegistrationToken: async (
+      addressId: string,
+      id: number,
+      subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'addressId' is not null or undefined
+      assertParamExists(
+        'subscriptionUnregisterClientRegistrationToken',
+        'addressId',
+        addressId,
+      );
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists(
+        'subscriptionUnregisterClientRegistrationToken',
+        'id',
+        id,
+      );
+      // verify required parameter 'subscriptionRegisterClientRegistrationTokenRequest' is not null or undefined
+      assertParamExists(
+        'subscriptionUnregisterClientRegistrationToken',
+        'subscriptionRegisterClientRegistrationTokenRequest',
+        subscriptionRegisterClientRegistrationTokenRequest,
+      );
+      const localVarPath = `/UnregisterClientRegistrationToken/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication Authorization required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      if (addressId != null) {
+        localVarHeaderParameter['address_id'] = String(addressId);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        subscriptionRegisterClientRegistrationTokenRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {string} addressId
+     * @param {number} id
+     * @param {SubscriptionUpdateSubscriptionPreferencesRequest} subscriptionUpdateSubscriptionPreferencesRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    subscriptionUpdateSubscriptionPreferences: async (
+      addressId: string,
+      id: number,
+      subscriptionUpdateSubscriptionPreferencesRequest: SubscriptionUpdateSubscriptionPreferencesRequest,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'addressId' is not null or undefined
+      assertParamExists(
+        'subscriptionUpdateSubscriptionPreferences',
+        'addressId',
+        addressId,
+      );
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('subscriptionUpdateSubscriptionPreferences', 'id', id);
+      // verify required parameter 'subscriptionUpdateSubscriptionPreferencesRequest' is not null or undefined
+      assertParamExists(
+        'subscriptionUpdateSubscriptionPreferences',
+        'subscriptionUpdateSubscriptionPreferencesRequest',
+        subscriptionUpdateSubscriptionPreferencesRequest,
+      );
+      const localVarPath = `/UpdateSubscriptionPreferences/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id)),
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication Authorization required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      if (addressId != null) {
+        localVarHeaderParameter['address_id'] = String(addressId);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        subscriptionUpdateSubscriptionPreferencesRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -9216,32 +9110,32 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateCommentSubscriptionRequest} mutationSubscriptionCreateCommentSubscriptionRequest
+     * @param {SubscriptionCreateCommentSubscriptionRequest} subscriptionCreateCommentSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionCreateCommentSubscription(
+    async subscriptionCreateCommentSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionCreateCommentSubscriptionRequest: MutationSubscriptionCreateCommentSubscriptionRequest,
+      subscriptionCreateCommentSubscriptionRequest: SubscriptionCreateCommentSubscriptionRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationSubscriptionCreateCommentSubscription200Response>
+      ) => AxiosPromise<SubscriptionCreateCommentSubscription200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionCreateCommentSubscription(
+        await localVarAxiosParamCreator.subscriptionCreateCommentSubscription(
           addressId,
           id,
-          mutationSubscriptionCreateCommentSubscriptionRequest,
+          subscriptionCreateCommentSubscriptionRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionCreateCommentSubscription'
+          'SubscriptionApi.subscriptionCreateCommentSubscription'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9255,32 +9149,32 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateCommunityAlertRequest} mutationSubscriptionCreateCommunityAlertRequest
+     * @param {SubscriptionCreateCommunityAlertRequest} subscriptionCreateCommunityAlertRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionCreateCommunityAlert(
+    async subscriptionCreateCommunityAlert(
       addressId: string,
       id: number,
-      mutationSubscriptionCreateCommunityAlertRequest: MutationSubscriptionCreateCommunityAlertRequest,
+      subscriptionCreateCommunityAlertRequest: SubscriptionCreateCommunityAlertRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationSubscriptionCreateCommunityAlert200Response>
+      ) => AxiosPromise<SubscriptionCreateCommunityAlert200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionCreateCommunityAlert(
+        await localVarAxiosParamCreator.subscriptionCreateCommunityAlert(
           addressId,
           id,
-          mutationSubscriptionCreateCommunityAlertRequest,
+          subscriptionCreateCommunityAlertRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionCreateCommunityAlert'
+          'SubscriptionApi.subscriptionCreateCommunityAlert'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9294,32 +9188,32 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateThreadSubscriptionRequest} mutationSubscriptionCreateThreadSubscriptionRequest
+     * @param {SubscriptionCreateThreadSubscriptionRequest} subscriptionCreateThreadSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionCreateThreadSubscription(
+    async subscriptionCreateThreadSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionCreateThreadSubscriptionRequest: MutationSubscriptionCreateThreadSubscriptionRequest,
+      subscriptionCreateThreadSubscriptionRequest: SubscriptionCreateThreadSubscriptionRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationSubscriptionCreateThreadSubscription200Response>
+      ) => AxiosPromise<SubscriptionCreateThreadSubscription200Response>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionCreateThreadSubscription(
+        await localVarAxiosParamCreator.subscriptionCreateThreadSubscription(
           addressId,
           id,
-          mutationSubscriptionCreateThreadSubscriptionRequest,
+          subscriptionCreateThreadSubscriptionRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionCreateThreadSubscription'
+          'SubscriptionApi.subscriptionCreateThreadSubscription'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9333,29 +9227,29 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionDeleteCommentSubscriptionRequest} mutationSubscriptionDeleteCommentSubscriptionRequest
+     * @param {SubscriptionDeleteCommentSubscriptionRequest} subscriptionDeleteCommentSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionDeleteCommentSubscription(
+    async subscriptionDeleteCommentSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionDeleteCommentSubscriptionRequest: MutationSubscriptionDeleteCommentSubscriptionRequest,
+      subscriptionDeleteCommentSubscriptionRequest: SubscriptionDeleteCommentSubscriptionRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionDeleteCommentSubscription(
+        await localVarAxiosParamCreator.subscriptionDeleteCommentSubscription(
           addressId,
           id,
-          mutationSubscriptionDeleteCommentSubscriptionRequest,
+          subscriptionDeleteCommentSubscriptionRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionDeleteCommentSubscription'
+          'SubscriptionApi.subscriptionDeleteCommentSubscription'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9369,29 +9263,29 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionDeleteCommunityAlertRequest} mutationSubscriptionDeleteCommunityAlertRequest
+     * @param {SubscriptionDeleteCommunityAlertRequest} subscriptionDeleteCommunityAlertRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionDeleteCommunityAlert(
+    async subscriptionDeleteCommunityAlert(
       addressId: string,
       id: number,
-      mutationSubscriptionDeleteCommunityAlertRequest: MutationSubscriptionDeleteCommunityAlertRequest,
+      subscriptionDeleteCommunityAlertRequest: SubscriptionDeleteCommunityAlertRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionDeleteCommunityAlert(
+        await localVarAxiosParamCreator.subscriptionDeleteCommunityAlert(
           addressId,
           id,
-          mutationSubscriptionDeleteCommunityAlertRequest,
+          subscriptionDeleteCommunityAlertRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionDeleteCommunityAlert'
+          'SubscriptionApi.subscriptionDeleteCommunityAlert'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9405,29 +9299,29 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionDeleteThreadSubscriptionRequest} mutationSubscriptionDeleteThreadSubscriptionRequest
+     * @param {SubscriptionDeleteThreadSubscriptionRequest} subscriptionDeleteThreadSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionDeleteThreadSubscription(
+    async subscriptionDeleteThreadSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionDeleteThreadSubscriptionRequest: MutationSubscriptionDeleteThreadSubscriptionRequest,
+      subscriptionDeleteThreadSubscriptionRequest: SubscriptionDeleteThreadSubscriptionRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionDeleteThreadSubscription(
+        await localVarAxiosParamCreator.subscriptionDeleteThreadSubscription(
           addressId,
           id,
-          mutationSubscriptionDeleteThreadSubscriptionRequest,
+          subscriptionDeleteThreadSubscriptionRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionDeleteThreadSubscription'
+          'SubscriptionApi.subscriptionDeleteThreadSubscription'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9441,29 +9335,29 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+     * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionRegisterClientRegistrationToken(
+    async subscriptionRegisterClientRegistrationToken(
       addressId: string,
       id: number,
-      mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+      subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionRegisterClientRegistrationToken(
+        await localVarAxiosParamCreator.subscriptionRegisterClientRegistrationToken(
           addressId,
           id,
-          mutationSubscriptionRegisterClientRegistrationTokenRequest,
+          subscriptionRegisterClientRegistrationTokenRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionRegisterClientRegistrationToken'
+          'SubscriptionApi.subscriptionRegisterClientRegistrationToken'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9477,29 +9371,29 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+     * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionUnregisterClientRegistrationToken(
+    async subscriptionUnregisterClientRegistrationToken(
       addressId: string,
       id: number,
-      mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+      subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionUnregisterClientRegistrationToken(
+        await localVarAxiosParamCreator.subscriptionUnregisterClientRegistrationToken(
           addressId,
           id,
-          mutationSubscriptionRegisterClientRegistrationTokenRequest,
+          subscriptionRegisterClientRegistrationTokenRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionUnregisterClientRegistrationToken'
+          'SubscriptionApi.subscriptionUnregisterClientRegistrationToken'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9513,32 +9407,32 @@ export const SubscriptionApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionUpdateSubscriptionPreferencesRequest} mutationSubscriptionUpdateSubscriptionPreferencesRequest
+     * @param {SubscriptionUpdateSubscriptionPreferencesRequest} subscriptionUpdateSubscriptionPreferencesRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationSubscriptionUpdateSubscriptionPreferences(
+    async subscriptionUpdateSubscriptionPreferences(
       addressId: string,
       id: number,
-      mutationSubscriptionUpdateSubscriptionPreferencesRequest: MutationSubscriptionUpdateSubscriptionPreferencesRequest,
+      subscriptionUpdateSubscriptionPreferencesRequest: SubscriptionUpdateSubscriptionPreferencesRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf>
+      ) => AxiosPromise<SubscriptionGetSubscriptionPreferences200ResponseAnyOf>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationSubscriptionUpdateSubscriptionPreferences(
+        await localVarAxiosParamCreator.subscriptionUpdateSubscriptionPreferences(
           addressId,
           id,
-          mutationSubscriptionUpdateSubscriptionPreferencesRequest,
+          subscriptionUpdateSubscriptionPreferencesRequest,
           options,
         );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
         operationServerMap[
-          'SubscriptionApi.mutationSubscriptionUpdateSubscriptionPreferences'
+          'SubscriptionApi.subscriptionUpdateSubscriptionPreferences'
         ]?.[localVarOperationServerIndex]?.url;
       return (axios, basePath) =>
         createRequestFunction(
@@ -9566,21 +9460,21 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateCommentSubscriptionRequest} mutationSubscriptionCreateCommentSubscriptionRequest
+     * @param {SubscriptionCreateCommentSubscriptionRequest} subscriptionCreateCommentSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionCreateCommentSubscription(
+    subscriptionCreateCommentSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionCreateCommentSubscriptionRequest: MutationSubscriptionCreateCommentSubscriptionRequest,
+      subscriptionCreateCommentSubscriptionRequest: SubscriptionCreateCommentSubscriptionRequest,
       options?: any,
-    ): AxiosPromise<MutationSubscriptionCreateCommentSubscription200Response> {
+    ): AxiosPromise<SubscriptionCreateCommentSubscription200Response> {
       return localVarFp
-        .mutationSubscriptionCreateCommentSubscription(
+        .subscriptionCreateCommentSubscription(
           addressId,
           id,
-          mutationSubscriptionCreateCommentSubscriptionRequest,
+          subscriptionCreateCommentSubscriptionRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9589,21 +9483,21 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateCommunityAlertRequest} mutationSubscriptionCreateCommunityAlertRequest
+     * @param {SubscriptionCreateCommunityAlertRequest} subscriptionCreateCommunityAlertRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionCreateCommunityAlert(
+    subscriptionCreateCommunityAlert(
       addressId: string,
       id: number,
-      mutationSubscriptionCreateCommunityAlertRequest: MutationSubscriptionCreateCommunityAlertRequest,
+      subscriptionCreateCommunityAlertRequest: SubscriptionCreateCommunityAlertRequest,
       options?: any,
-    ): AxiosPromise<MutationSubscriptionCreateCommunityAlert200Response> {
+    ): AxiosPromise<SubscriptionCreateCommunityAlert200Response> {
       return localVarFp
-        .mutationSubscriptionCreateCommunityAlert(
+        .subscriptionCreateCommunityAlert(
           addressId,
           id,
-          mutationSubscriptionCreateCommunityAlertRequest,
+          subscriptionCreateCommunityAlertRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9612,21 +9506,21 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionCreateThreadSubscriptionRequest} mutationSubscriptionCreateThreadSubscriptionRequest
+     * @param {SubscriptionCreateThreadSubscriptionRequest} subscriptionCreateThreadSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionCreateThreadSubscription(
+    subscriptionCreateThreadSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionCreateThreadSubscriptionRequest: MutationSubscriptionCreateThreadSubscriptionRequest,
+      subscriptionCreateThreadSubscriptionRequest: SubscriptionCreateThreadSubscriptionRequest,
       options?: any,
-    ): AxiosPromise<MutationSubscriptionCreateThreadSubscription200Response> {
+    ): AxiosPromise<SubscriptionCreateThreadSubscription200Response> {
       return localVarFp
-        .mutationSubscriptionCreateThreadSubscription(
+        .subscriptionCreateThreadSubscription(
           addressId,
           id,
-          mutationSubscriptionCreateThreadSubscriptionRequest,
+          subscriptionCreateThreadSubscriptionRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9635,44 +9529,21 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionDeleteCommentSubscriptionRequest} mutationSubscriptionDeleteCommentSubscriptionRequest
+     * @param {SubscriptionDeleteCommentSubscriptionRequest} subscriptionDeleteCommentSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionDeleteCommentSubscription(
+    subscriptionDeleteCommentSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionDeleteCommentSubscriptionRequest: MutationSubscriptionDeleteCommentSubscriptionRequest,
-      options?: any,
-    ): AxiosPromise<number> {
-      return localVarFp
-        .mutationSubscriptionDeleteCommentSubscription(
-          addressId,
-          id,
-          mutationSubscriptionDeleteCommentSubscriptionRequest,
-          options,
-        )
-        .then((request) => request(axios, basePath));
-    },
-    /**
-     *
-     * @param {string} addressId
-     * @param {number} id
-     * @param {MutationSubscriptionDeleteCommunityAlertRequest} mutationSubscriptionDeleteCommunityAlertRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    mutationSubscriptionDeleteCommunityAlert(
-      addressId: string,
-      id: number,
-      mutationSubscriptionDeleteCommunityAlertRequest: MutationSubscriptionDeleteCommunityAlertRequest,
+      subscriptionDeleteCommentSubscriptionRequest: SubscriptionDeleteCommentSubscriptionRequest,
       options?: any,
     ): AxiosPromise<number> {
       return localVarFp
-        .mutationSubscriptionDeleteCommunityAlert(
+        .subscriptionDeleteCommentSubscription(
           addressId,
           id,
-          mutationSubscriptionDeleteCommunityAlertRequest,
+          subscriptionDeleteCommentSubscriptionRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9681,21 +9552,21 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionDeleteThreadSubscriptionRequest} mutationSubscriptionDeleteThreadSubscriptionRequest
+     * @param {SubscriptionDeleteCommunityAlertRequest} subscriptionDeleteCommunityAlertRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionDeleteThreadSubscription(
+    subscriptionDeleteCommunityAlert(
       addressId: string,
       id: number,
-      mutationSubscriptionDeleteThreadSubscriptionRequest: MutationSubscriptionDeleteThreadSubscriptionRequest,
+      subscriptionDeleteCommunityAlertRequest: SubscriptionDeleteCommunityAlertRequest,
       options?: any,
     ): AxiosPromise<number> {
       return localVarFp
-        .mutationSubscriptionDeleteThreadSubscription(
+        .subscriptionDeleteCommunityAlert(
           addressId,
           id,
-          mutationSubscriptionDeleteThreadSubscriptionRequest,
+          subscriptionDeleteCommunityAlertRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9704,21 +9575,44 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+     * @param {SubscriptionDeleteThreadSubscriptionRequest} subscriptionDeleteThreadSubscriptionRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionRegisterClientRegistrationToken(
+    subscriptionDeleteThreadSubscription(
       addressId: string,
       id: number,
-      mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+      subscriptionDeleteThreadSubscriptionRequest: SubscriptionDeleteThreadSubscriptionRequest,
+      options?: any,
+    ): AxiosPromise<number> {
+      return localVarFp
+        .subscriptionDeleteThreadSubscription(
+          addressId,
+          id,
+          subscriptionDeleteThreadSubscriptionRequest,
+          options,
+        )
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} addressId
+     * @param {number} id
+     * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    subscriptionRegisterClientRegistrationToken(
+      addressId: string,
+      id: number,
+      subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
       options?: any,
     ): AxiosPromise<object> {
       return localVarFp
-        .mutationSubscriptionRegisterClientRegistrationToken(
+        .subscriptionRegisterClientRegistrationToken(
           addressId,
           id,
-          mutationSubscriptionRegisterClientRegistrationTokenRequest,
+          subscriptionRegisterClientRegistrationTokenRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9727,21 +9621,21 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+     * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionUnregisterClientRegistrationToken(
+    subscriptionUnregisterClientRegistrationToken(
       addressId: string,
       id: number,
-      mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+      subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
       options?: any,
     ): AxiosPromise<object> {
       return localVarFp
-        .mutationSubscriptionUnregisterClientRegistrationToken(
+        .subscriptionUnregisterClientRegistrationToken(
           addressId,
           id,
-          mutationSubscriptionRegisterClientRegistrationTokenRequest,
+          subscriptionRegisterClientRegistrationTokenRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9750,21 +9644,21 @@ export const SubscriptionApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationSubscriptionUpdateSubscriptionPreferencesRequest} mutationSubscriptionUpdateSubscriptionPreferencesRequest
+     * @param {SubscriptionUpdateSubscriptionPreferencesRequest} subscriptionUpdateSubscriptionPreferencesRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationSubscriptionUpdateSubscriptionPreferences(
+    subscriptionUpdateSubscriptionPreferences(
       addressId: string,
       id: number,
-      mutationSubscriptionUpdateSubscriptionPreferencesRequest: MutationSubscriptionUpdateSubscriptionPreferencesRequest,
+      subscriptionUpdateSubscriptionPreferencesRequest: SubscriptionUpdateSubscriptionPreferencesRequest,
       options?: any,
-    ): AxiosPromise<QuerySubscriptionGetSubscriptionPreferences200ResponseAnyOf> {
+    ): AxiosPromise<SubscriptionGetSubscriptionPreferences200ResponseAnyOf> {
       return localVarFp
-        .mutationSubscriptionUpdateSubscriptionPreferences(
+        .subscriptionUpdateSubscriptionPreferences(
           addressId,
           id,
-          mutationSubscriptionUpdateSubscriptionPreferencesRequest,
+          subscriptionUpdateSubscriptionPreferencesRequest,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -9783,22 +9677,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionCreateCommentSubscriptionRequest} mutationSubscriptionCreateCommentSubscriptionRequest
+   * @param {SubscriptionCreateCommentSubscriptionRequest} subscriptionCreateCommentSubscriptionRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionCreateCommentSubscription(
+  public subscriptionCreateCommentSubscription(
     addressId: string,
     id: number,
-    mutationSubscriptionCreateCommentSubscriptionRequest: MutationSubscriptionCreateCommentSubscriptionRequest,
+    subscriptionCreateCommentSubscriptionRequest: SubscriptionCreateCommentSubscriptionRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionCreateCommentSubscription(
+      .subscriptionCreateCommentSubscription(
         addressId,
         id,
-        mutationSubscriptionCreateCommentSubscriptionRequest,
+        subscriptionCreateCommentSubscriptionRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9808,22 +9702,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionCreateCommunityAlertRequest} mutationSubscriptionCreateCommunityAlertRequest
+   * @param {SubscriptionCreateCommunityAlertRequest} subscriptionCreateCommunityAlertRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionCreateCommunityAlert(
+  public subscriptionCreateCommunityAlert(
     addressId: string,
     id: number,
-    mutationSubscriptionCreateCommunityAlertRequest: MutationSubscriptionCreateCommunityAlertRequest,
+    subscriptionCreateCommunityAlertRequest: SubscriptionCreateCommunityAlertRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionCreateCommunityAlert(
+      .subscriptionCreateCommunityAlert(
         addressId,
         id,
-        mutationSubscriptionCreateCommunityAlertRequest,
+        subscriptionCreateCommunityAlertRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9833,22 +9727,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionCreateThreadSubscriptionRequest} mutationSubscriptionCreateThreadSubscriptionRequest
+   * @param {SubscriptionCreateThreadSubscriptionRequest} subscriptionCreateThreadSubscriptionRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionCreateThreadSubscription(
+  public subscriptionCreateThreadSubscription(
     addressId: string,
     id: number,
-    mutationSubscriptionCreateThreadSubscriptionRequest: MutationSubscriptionCreateThreadSubscriptionRequest,
+    subscriptionCreateThreadSubscriptionRequest: SubscriptionCreateThreadSubscriptionRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionCreateThreadSubscription(
+      .subscriptionCreateThreadSubscription(
         addressId,
         id,
-        mutationSubscriptionCreateThreadSubscriptionRequest,
+        subscriptionCreateThreadSubscriptionRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9858,22 +9752,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionDeleteCommentSubscriptionRequest} mutationSubscriptionDeleteCommentSubscriptionRequest
+   * @param {SubscriptionDeleteCommentSubscriptionRequest} subscriptionDeleteCommentSubscriptionRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionDeleteCommentSubscription(
+  public subscriptionDeleteCommentSubscription(
     addressId: string,
     id: number,
-    mutationSubscriptionDeleteCommentSubscriptionRequest: MutationSubscriptionDeleteCommentSubscriptionRequest,
+    subscriptionDeleteCommentSubscriptionRequest: SubscriptionDeleteCommentSubscriptionRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionDeleteCommentSubscription(
+      .subscriptionDeleteCommentSubscription(
         addressId,
         id,
-        mutationSubscriptionDeleteCommentSubscriptionRequest,
+        subscriptionDeleteCommentSubscriptionRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9883,22 +9777,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionDeleteCommunityAlertRequest} mutationSubscriptionDeleteCommunityAlertRequest
+   * @param {SubscriptionDeleteCommunityAlertRequest} subscriptionDeleteCommunityAlertRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionDeleteCommunityAlert(
+  public subscriptionDeleteCommunityAlert(
     addressId: string,
     id: number,
-    mutationSubscriptionDeleteCommunityAlertRequest: MutationSubscriptionDeleteCommunityAlertRequest,
+    subscriptionDeleteCommunityAlertRequest: SubscriptionDeleteCommunityAlertRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionDeleteCommunityAlert(
+      .subscriptionDeleteCommunityAlert(
         addressId,
         id,
-        mutationSubscriptionDeleteCommunityAlertRequest,
+        subscriptionDeleteCommunityAlertRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9908,22 +9802,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionDeleteThreadSubscriptionRequest} mutationSubscriptionDeleteThreadSubscriptionRequest
+   * @param {SubscriptionDeleteThreadSubscriptionRequest} subscriptionDeleteThreadSubscriptionRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionDeleteThreadSubscription(
+  public subscriptionDeleteThreadSubscription(
     addressId: string,
     id: number,
-    mutationSubscriptionDeleteThreadSubscriptionRequest: MutationSubscriptionDeleteThreadSubscriptionRequest,
+    subscriptionDeleteThreadSubscriptionRequest: SubscriptionDeleteThreadSubscriptionRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionDeleteThreadSubscription(
+      .subscriptionDeleteThreadSubscription(
         addressId,
         id,
-        mutationSubscriptionDeleteThreadSubscriptionRequest,
+        subscriptionDeleteThreadSubscriptionRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9933,22 +9827,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+   * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionRegisterClientRegistrationToken(
+  public subscriptionRegisterClientRegistrationToken(
     addressId: string,
     id: number,
-    mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+    subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionRegisterClientRegistrationToken(
+      .subscriptionRegisterClientRegistrationToken(
         addressId,
         id,
-        mutationSubscriptionRegisterClientRegistrationTokenRequest,
+        subscriptionRegisterClientRegistrationTokenRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9958,22 +9852,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionRegisterClientRegistrationTokenRequest} mutationSubscriptionRegisterClientRegistrationTokenRequest
+   * @param {SubscriptionRegisterClientRegistrationTokenRequest} subscriptionRegisterClientRegistrationTokenRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionUnregisterClientRegistrationToken(
+  public subscriptionUnregisterClientRegistrationToken(
     addressId: string,
     id: number,
-    mutationSubscriptionRegisterClientRegistrationTokenRequest: MutationSubscriptionRegisterClientRegistrationTokenRequest,
+    subscriptionRegisterClientRegistrationTokenRequest: SubscriptionRegisterClientRegistrationTokenRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionUnregisterClientRegistrationToken(
+      .subscriptionUnregisterClientRegistrationToken(
         addressId,
         id,
-        mutationSubscriptionRegisterClientRegistrationTokenRequest,
+        subscriptionRegisterClientRegistrationTokenRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -9983,22 +9877,22 @@ export class SubscriptionApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationSubscriptionUpdateSubscriptionPreferencesRequest} mutationSubscriptionUpdateSubscriptionPreferencesRequest
+   * @param {SubscriptionUpdateSubscriptionPreferencesRequest} subscriptionUpdateSubscriptionPreferencesRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SubscriptionApi
    */
-  public mutationSubscriptionUpdateSubscriptionPreferences(
+  public subscriptionUpdateSubscriptionPreferences(
     addressId: string,
     id: number,
-    mutationSubscriptionUpdateSubscriptionPreferencesRequest: MutationSubscriptionUpdateSubscriptionPreferencesRequest,
+    subscriptionUpdateSubscriptionPreferencesRequest: SubscriptionUpdateSubscriptionPreferencesRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return SubscriptionApiFp(this.configuration)
-      .mutationSubscriptionUpdateSubscriptionPreferences(
+      .subscriptionUpdateSubscriptionPreferences(
         addressId,
         id,
-        mutationSubscriptionUpdateSubscriptionPreferencesRequest,
+        subscriptionUpdateSubscriptionPreferencesRequest,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -10017,27 +9911,27 @@ export const UserApiAxiosParamCreator = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationUserUpdateUserRequest} mutationUserUpdateUserRequest
+     * @param {UserUpdateUserRequest} userUpdateUserRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationUserUpdateUser: async (
+    userUpdateUser: async (
       addressId: string,
       id: number,
-      mutationUserUpdateUserRequest: MutationUserUpdateUserRequest,
+      userUpdateUserRequest: UserUpdateUserRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'addressId' is not null or undefined
-      assertParamExists('mutationUserUpdateUser', 'addressId', addressId);
+      assertParamExists('userUpdateUser', 'addressId', addressId);
       // verify required parameter 'id' is not null or undefined
-      assertParamExists('mutationUserUpdateUser', 'id', id);
-      // verify required parameter 'mutationUserUpdateUserRequest' is not null or undefined
+      assertParamExists('userUpdateUser', 'id', id);
+      // verify required parameter 'userUpdateUserRequest' is not null or undefined
       assertParamExists(
-        'mutationUserUpdateUser',
-        'mutationUserUpdateUserRequest',
-        mutationUserUpdateUserRequest,
+        'userUpdateUser',
+        'userUpdateUserRequest',
+        userUpdateUserRequest,
       );
-      const localVarPath = `/user/{id}/UpdateUser`.replace(
+      const localVarPath = `/UpdateUser/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id)),
       );
@@ -10071,7 +9965,7 @@ export const UserApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        mutationUserUpdateUserRequest,
+        userUpdateUserRequest,
         localVarRequestOptions,
         configuration,
       );
@@ -10095,31 +9989,30 @@ export const UserApiFp = function (configuration?: Configuration) {
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationUserUpdateUserRequest} mutationUserUpdateUserRequest
+     * @param {UserUpdateUserRequest} userUpdateUserRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async mutationUserUpdateUser(
+    async userUpdateUser(
       addressId: string,
       id: number,
-      mutationUserUpdateUserRequest: MutationUserUpdateUserRequest,
+      userUpdateUserRequest: UserUpdateUserRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => AxiosPromise<MutationUserUpdateUser200Response>
+      ) => AxiosPromise<UserUpdateUser200Response>
     > {
-      const localVarAxiosArgs =
-        await localVarAxiosParamCreator.mutationUserUpdateUser(
-          addressId,
-          id,
-          mutationUserUpdateUserRequest,
-          options,
-        );
+      const localVarAxiosArgs = await localVarAxiosParamCreator.userUpdateUser(
+        addressId,
+        id,
+        userUpdateUserRequest,
+        options,
+      );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
       const localVarOperationServerBasePath =
-        operationServerMap['UserApi.mutationUserUpdateUser']?.[
+        operationServerMap['UserApi.userUpdateUser']?.[
           localVarOperationServerIndex
         ]?.url;
       return (axios, basePath) =>
@@ -10148,23 +10041,18 @@ export const UserApiFactory = function (
      *
      * @param {string} addressId
      * @param {number} id
-     * @param {MutationUserUpdateUserRequest} mutationUserUpdateUserRequest
+     * @param {UserUpdateUserRequest} userUpdateUserRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    mutationUserUpdateUser(
+    userUpdateUser(
       addressId: string,
       id: number,
-      mutationUserUpdateUserRequest: MutationUserUpdateUserRequest,
+      userUpdateUserRequest: UserUpdateUserRequest,
       options?: any,
-    ): AxiosPromise<MutationUserUpdateUser200Response> {
+    ): AxiosPromise<UserUpdateUser200Response> {
       return localVarFp
-        .mutationUserUpdateUser(
-          addressId,
-          id,
-          mutationUserUpdateUserRequest,
-          options,
-        )
+        .userUpdateUser(addressId, id, userUpdateUserRequest, options)
         .then((request) => request(axios, basePath));
     },
   };
@@ -10181,24 +10069,19 @@ export class UserApi extends BaseAPI {
    *
    * @param {string} addressId
    * @param {number} id
-   * @param {MutationUserUpdateUserRequest} mutationUserUpdateUserRequest
+   * @param {UserUpdateUserRequest} userUpdateUserRequest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof UserApi
    */
-  public mutationUserUpdateUser(
+  public userUpdateUser(
     addressId: string,
     id: number,
-    mutationUserUpdateUserRequest: MutationUserUpdateUserRequest,
+    userUpdateUserRequest: UserUpdateUserRequest,
     options?: RawAxiosRequestConfig,
   ) {
     return UserApiFp(this.configuration)
-      .mutationUserUpdateUser(
-        addressId,
-        id,
-        mutationUserUpdateUserRequest,
-        options,
-      )
+      .userUpdateUser(addressId, id, userUpdateUserRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }
