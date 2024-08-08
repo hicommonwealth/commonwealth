@@ -186,7 +186,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             count(*) OVER() AS total,
             "CommunityTags_CTE"."CommunityTags" as "CommunityTags",
             "CommunityStakes_CTE"."CommunityStakes" as "CommunityStakes"
-            ${has_groups ? `, "Groups_CTE"."Groups" as "Groups"` : ''}
+            ${has_groups ? `, "Groups_CTE"."Groups" as "groups"` : ''}
             ${
               include_node_info
                 ? `
