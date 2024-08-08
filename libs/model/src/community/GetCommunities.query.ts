@@ -200,7 +200,9 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
+        nest: true,
       });
+      console.log(communities);
 
       return schemas.buildPaginatedResponse(
         communities,
