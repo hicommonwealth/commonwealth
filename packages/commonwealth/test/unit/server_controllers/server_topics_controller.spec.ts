@@ -78,7 +78,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 
 describe('ServerTopicsController', () => {
   test('#createTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController();
+    const { controller, user, chain } = createMockedTopicsController(true);
     const [topic] = await Promise.all(
       await controller.createTopic({
         user,
@@ -99,7 +99,7 @@ describe('ServerTopicsController', () => {
   });
 
   test('#deleteTopic', async () => {
-    const { controller, user } = createMockedTopicsController();
+    const { controller, user } = createMockedTopicsController(true);
     await controller.deleteTopic({
       user,
       topicId: 1,
