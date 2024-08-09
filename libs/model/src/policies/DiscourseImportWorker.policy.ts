@@ -6,6 +6,7 @@ import {
   createAllAddressesInCW,
   createAllCommentsInCW,
   createAllReactionsInCW,
+  createAllSubscriptionsInCW,
   createAllThreadsInCW,
   createAllTopicsInCW,
   createAllUsersInCW,
@@ -320,32 +321,40 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             },
           });
 
-          // // insert subscriptions
-          // const subscriptions = await createAllSubscriptionsInCW(
-          //   restrictedDiscourseConnection,
-          //   {
-          //     communityId: communityId!,
-          //     users,
-          //     threads,
-          //   },
-          //   { transaction: null },
-          // );
-          // log.debug(`Subscriptions: ${subscriptions.length}`);
-          // cleanupStack.push({
-          //   description: `Cleanup created subscriptions (${subscriptions.length})`,
-          //   runOnErrorOnly: true,
-          //   fn: async () => {
-          //     await models.Subscription.destroy({
-          //       where: {
-          //         id: {
-          //           [Op.in]: subscriptions
-          //             .filter((s) => s.id && s.created)
-          //             .map((s) => s.id!),
-          //         },
-          //       },
-          //     });
-          //   },
-          // });
+          // insert subscriptions
+          const subscriptions = await createAllSubscriptionsInCW(
+            restrictedDiscourseConnection,
+            {
+              communityId: communityId!,
+              users,
+              threads,
+            },
+            { transaction: null },
+          );
+          const numSubscriptionsCreated = reactions.filter(
+            (r) => r.created,
+          ).length;
+          const numSubscriptionsFound = reactions.filter(
+            (r) => !r.created,
+          ).length;
+          log.debug(
+            `Subscriptions: ${numSubscriptionsCreated} created, ${numSubscriptionsFound} found`,
+          );
+          cleanupStack.push({
+            description: `Cleanup created subscriptions (${subscriptions.length})`,
+            runOnErrorOnly: true,
+            fn: async () => {
+              await models.Subscription.destroy({
+                where: {
+                  id: {
+                    [Op.in]: subscriptions
+                      .filter((s) => s.id && s.created)
+                      .map((s) => s.id!),
+                  },
+                },
+              });
+            },
+          });
 
           // throw new Error('BOOM');
 
