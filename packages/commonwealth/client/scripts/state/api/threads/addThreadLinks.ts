@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread, { Link } from 'models/Thread';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -18,7 +18,7 @@ const addThreadLinks = async ({
   isPWA,
 }: AddThreadLinksProps): Promise<Thread> => {
   const response = await axios.post(
-    `${app.serverUrl()}/linking/addThreadLinks`,
+    `${SERVER_URL}/linking/addThreadLinks`,
     {
       thread_id: threadId,
       links,

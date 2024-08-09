@@ -61,3 +61,5 @@ export const ExternalEndpoints = {
     ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',
   },
 };
+
+export const SERVER_URL = '/api';

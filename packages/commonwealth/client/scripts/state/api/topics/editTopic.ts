@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Topic from 'models/Topic';
-import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
 import { userStore } from '../../ui/user';
 
 interface EditTopicProps {
@@ -13,7 +12,7 @@ interface EditTopicProps {
 
 const editTopic = async ({ topic, featuredOrder, isPWA }: EditTopicProps) => {
   const response = await axios.patch(
-    `${app.serverUrl()}/topics/${topic.id}`,
+    `${SERVER_URL}/topics/${topic.id}`,
     {
       id: topic.id,
       community_id: topic.communityId,

@@ -1,9 +1,5 @@
-// import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-// import { ApiEndpoints } from 'state/api/config';
-
-// const THREAD_REACTION_COUNTS_STALE_TIME = 30 * 1_000; // 30 s
+import { SERVER_URL } from 'state/api/config';
 
 interface FetchReactionCountsProps {
   // chainId: string; // this should be used when we fully migrate thread controller to react query
@@ -19,7 +15,7 @@ const fetchReactionCounts = async ({
   proposalIds,
   commentIds,
 }: FetchReactionCountsProps) => {
-  const response = await axios.post(`${app.serverUrl()}/reactionsCounts`, {
+  const response = await axios.post(`${SERVER_URL}/reactionsCounts`, {
     // @ts-expect-error StrictNullChecks
     ...(threadIds?.length > 0 && { thread_ids: threadIds }),
     // @ts-expect-error StrictNullChecks

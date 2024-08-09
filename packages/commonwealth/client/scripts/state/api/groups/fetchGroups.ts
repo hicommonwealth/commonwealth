@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import Group from 'models/Group';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const GROUPS_STALE_TIME = 5000; // 5 seconds
 
@@ -26,7 +25,7 @@ const fetchGroups = async ({
   if (!communityId) return;
 
   const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_GROUPS}`,
+    `${SERVER_URL}${ApiEndpoints.FETCH_GROUPS}`,
     {
       params: {
         community_id: communityId,

@@ -1,16 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import NodeInfo from 'models/NodeInfo';
-import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
 
 const NODES_STALE_TIME = 3 * 60 * 1_000; // 3 min
 const NODES_CACHE_TIME = Infinity;
 
 const fetchNodes = async (): Promise<NodeInfo[]> => {
-  const response = await axios.get(
-    `${app.serverUrl()}/${ApiEndpoints.FETCH_NODES}`,
-  );
+  const response = await axios.get(`${SERVER_URL}/${ApiEndpoints.FETCH_NODES}`);
 
   return response.data.result.map(NodeInfo.fromJSON);
 };

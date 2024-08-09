@@ -4,6 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { signThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
@@ -32,7 +33,7 @@ const createReaction = async ({
   });
 
   return await axios.post(
-    `${app.serverUrl()}/threads/${threadId}/reactions`,
+    `${SERVER_URL}/threads/${threadId}/reactions`,
     {
       author_community_id: userStore.getState().activeAccount?.community?.id,
       thread_id: threadId,

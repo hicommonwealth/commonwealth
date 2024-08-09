@@ -6,6 +6,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import { AnyProposal } from 'models/types';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 
 const PROPOSAL_METADATA_CACHE_TIME = Infinity;
 // onchain metadata URI does not change, but the file it points to might:
@@ -23,7 +24,7 @@ const fetchCosmosProposalMetadata = async (
       return {};
     }
 
-    const metadataUri = `${app.serverUrl()}/ipfsProxy?hash=${fileURI}`;
+    const metadataUri = `${SERVER_URL}/ipfsProxy?hash=${fileURI}`;
     let metadataObj;
 
     return axios.get(metadataUri).then((response) => {

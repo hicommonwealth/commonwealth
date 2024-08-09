@@ -1,10 +1,10 @@
 import axios from 'axios';
 import 'components/Avatar/AvatarUpload.scss';
+import { notifyError } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-
-import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { Avatar } from 'views/components/Avatar/Avatar';
@@ -73,15 +73,12 @@ export const AvatarUpload = ({
     },
     onDropAccepted: async (acceptedFiles: any) => {
       try {
-        const response = await axios.post(
-          `${app.serverUrl()}/getUploadSignature`,
-          {
-            name: acceptedFiles[0].name, // imageName.png
-            mimetype: acceptedFiles[0].type, // image/png
-            auth: true,
-            jwt: user.jwt,
-          },
-        );
+        const response = await axios.post(`${SERVER_URL}/getUploadSignature`, {
+          name: acceptedFiles[0].name, // imageName.png
+          mimetype: acceptedFiles[0].type, // image/png
+          auth: true,
+          jwt: user.jwt,
+        });
         if (response.data.status !== 'Success') throw new Error();
 
         const uploadURL = response.data.result;

@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread from 'models/Thread';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import { formatActivityResponse } from './util';
 
@@ -11,7 +10,7 @@ const USER_ACTIVITY_CACHE_TIME = 5 * 60 * 1_000; // 5 minutes
 
 const fetchUserActivity = async (): Promise<Thread[]> => {
   const response = await axios.post(
-    `${app.serverUrl()}/${ApiEndpoints.FETCH_USER_ACTIVITY}`,
+    `${SERVER_URL}/${ApiEndpoints.FETCH_USER_ACTIVITY}`,
     {
       jwt: userStore.getState().jwt,
     },

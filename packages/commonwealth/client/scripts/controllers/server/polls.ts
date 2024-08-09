@@ -2,6 +2,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import { userStore } from 'state/ui/user';
 import PollStore from 'stores/PollStore';
@@ -49,7 +50,7 @@ class PollsController {
   public async fetchPolls(communityId: string, threadId: number) {
     try {
       const response = await axios.get(
-        `${app.serverUrl()}/threads/${threadId}/polls`,
+        `${SERVER_URL}/threads/${threadId}/polls`,
         {
           params: {
             chain: communityId,
@@ -93,7 +94,7 @@ class PollsController {
     } = args;
 
     const response = await axios.post(
-      `${app.serverUrl()}/threads/${threadId}/polls`,
+      `${SERVER_URL}/threads/${threadId}/polls`,
       {
         community_id: app.activeChainId(),
         author_chain: authorCommunity,
@@ -123,7 +124,7 @@ class PollsController {
     const { authorCommunity, address, threadId, pollId } = args;
 
     try {
-      await axios.delete(`${app.serverUrl()}/polls/${pollId}`, {
+      await axios.delete(`${SERVER_URL}/polls/${pollId}`, {
         data: {
           community_id: app.activeChainId(),
           author_chain: authorCommunity,

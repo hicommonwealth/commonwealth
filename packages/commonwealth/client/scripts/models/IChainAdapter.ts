@@ -5,6 +5,7 @@ import axios from 'axios';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
@@ -44,7 +45,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
     const [response] = await Promise.all([
-      axios.get(`${this.app.serverUrl()}/bulkOffchain`, {
+      axios.get(`${SERVER_URL}/bulkOffchain`, {
         params: {
           chain: this.id,
           community: null,

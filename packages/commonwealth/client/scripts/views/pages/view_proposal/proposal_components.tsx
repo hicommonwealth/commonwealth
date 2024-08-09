@@ -5,7 +5,7 @@ import { LinkSource } from 'models/Thread';
 import type { AnyProposal } from 'models/types';
 import 'pages/view_proposal/proposal_components.scss';
 import React, { useState } from 'react';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import {
@@ -28,7 +28,7 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   useNecessaryEffect(() => {
     if (!linkedThreads) {
       axios
-        .post(`${app.serverUrl()}/linking/getLinks`, {
+        .post(`${SERVER_URL}/linking/getLinks`, {
           link: {
             source: LinkSource.Proposal,
             identifier: proposal.identifier,

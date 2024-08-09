@@ -1,5 +1,6 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
+import { SERVER_URL } from 'state/api/config';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 import axios from 'axios';
@@ -50,13 +51,13 @@ export const subscribeToThread = async (
 export const fetchActivity = async (requestType: DashboardViews) => {
   let activity;
   if (requestType === DashboardViews.ForYou) {
-    const response = await axios.post(`${app.serverUrl()}/viewUserActivity`, {
+    const response = await axios.post(`${SERVER_URL}/viewUserActivity`, {
       jwt: userStore.getState().jwt,
     });
 
     activity = response.data;
   } else if (requestType === DashboardViews.Global) {
-    const response = await axios.post(`${app.serverUrl()}/viewGlobalActivity`);
+    const response = await axios.post(`${SERVER_URL}/viewGlobalActivity`);
     activity = response.data;
   }
 

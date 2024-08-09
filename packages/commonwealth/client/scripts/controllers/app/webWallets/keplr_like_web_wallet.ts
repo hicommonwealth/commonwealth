@@ -12,6 +12,7 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import IWebWallet from '../../../models/IWebWallet';
 
 declare global {
@@ -73,9 +74,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -116,7 +115,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+      const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${
         app.chain?.id || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');

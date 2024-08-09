@@ -1,9 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import app from 'state';
 import { CommunityResult } from 'views/pages/search/helpers';
-import { ApiEndpoints } from '../config';
+import { ApiEndpoints, SERVER_URL } from '../config';
 
 const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
 
@@ -35,7 +34,7 @@ const searchChains = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchChainsResponse }>(
-    `${app.serverUrl()}/communities`,
+    `${SERVER_URL}/communities`,
     {
       headers: {
         'Content-Type': 'application/json',

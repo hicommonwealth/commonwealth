@@ -11,6 +11,7 @@ import app from 'state';
 import { Subscription } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import { NotificationStore } from 'stores';
 import { z } from 'zod';
@@ -19,7 +20,7 @@ import Notification from '../../models/Notification';
 const post = async (route, args, callback) => {
   try {
     args['jwt'] = userStore.getState().jwt;
-    const response = await axios.post(app.serverUrl() + route, args);
+    const response = await axios.post(SERVER_URL + route, args);
 
     if (response.data.status === 'Success') {
       callback(response.data.result);
@@ -34,7 +35,7 @@ const post = async (route, args, callback) => {
 const get = async (route, args, callback) => {
   try {
     args['jwt'] = userStore.getState().jwt;
-    const response = await axios.get(app.serverUrl() + route, { params: args });
+    const response = await axios.get(SERVER_URL + route, { params: args });
 
     if (response.data.status === 'Success') {
       callback(response.data.result);

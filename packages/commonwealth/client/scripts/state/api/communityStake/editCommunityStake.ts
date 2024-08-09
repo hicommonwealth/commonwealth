@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 
 interface EditCommunityStakeProps {
@@ -13,7 +13,7 @@ const editCommunityStake = async ({
   stakeId,
 }: EditCommunityStakeProps) => {
   return await axios.post(
-    `${app.serverUrl()}/communityStakes/${communityId}/${stakeId}`,
+    `${SERVER_URL}/communityStakes/${communityId}/${stakeId}`,
     {
       jwt: userStore.getState().jwt,
       community_id: communityId,

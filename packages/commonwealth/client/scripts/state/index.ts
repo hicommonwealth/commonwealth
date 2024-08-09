@@ -13,7 +13,7 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import StarredCommunity from 'models/StarredCommunity';
-import { queryClient, QueryKeys } from 'state/api/config';
+import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { ChainStore } from 'stores';
@@ -77,8 +77,6 @@ export interface IApp {
 
   isLoggedIn(): boolean;
 
-  serverUrl(): string;
-
   loadingError: string;
 
   _customDomainId: string;
@@ -133,9 +131,6 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  serverUrl: () => {
-    return '/api';
-  },
 
   // @ts-expect-error StrictNullChecks
   loadingError: null,
@@ -160,8 +155,8 @@ export async function initAppState(
 ): Promise<void> {
   try {
     const [{ data: statusRes }, { data: communities }] = await Promise.all([
-      axios.get(`${app.serverUrl()}/status`),
-      axios.get(`${app.serverUrl()}/communities`),
+      axios.get(`${SERVER_URL}/status`),
+      axios.get(`${SERVER_URL}/communities`),
     ]);
 
     const nodesData = await fetchNodesQuery();

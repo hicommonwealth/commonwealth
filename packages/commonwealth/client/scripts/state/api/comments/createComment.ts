@@ -3,8 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { signComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
@@ -38,7 +37,7 @@ const createComment = async ({
   });
 
   const response = await axios.post(
-    `${app.serverUrl()}/threads/${threadId}/comments`,
+    `${SERVER_URL}/threads/${threadId}/comments`,
     {
       author_community_id: communityId,
       community_id: communityId,
