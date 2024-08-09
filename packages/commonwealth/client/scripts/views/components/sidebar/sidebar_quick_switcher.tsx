@@ -5,7 +5,6 @@ import 'components/sidebar/sidebar_quick_switcher.scss';
 import ChainInfo from '../../../models/ChainInfo';
 
 import clsx from 'clsx';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
@@ -22,9 +21,7 @@ export const SidebarQuickSwitcher = ({
   onMobile: boolean;
 }) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const { setMenu } = useSidebarStore();
-
   const user = useUserStore();
 
   const allCommunities = app.config.chains
@@ -49,7 +46,7 @@ export const SidebarQuickSwitcher = ({
       className={clsx('SidebarQuickSwitcher', { onMobile, isInsideCommunity })}
     >
       <div className="community-nav-bar">
-        {isLoggedIn && (
+        {user.isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
             iconButtonTheme="neutral"

@@ -74,7 +74,7 @@ const FinishSocialLogin = () => {
         setValidationError('Error logging in, please try again');
       }
     });
-  }, [navigate]);
+  }, [navigate, user.isLoggedIn]);
 
   if (validationError) {
     return <ErrorPage message={validationError} />;
