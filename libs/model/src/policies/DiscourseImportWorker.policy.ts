@@ -151,7 +151,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             `Users: ${numUsersCreated} created, ${numUsersFound} found`,
           );
           cleanupStack.push({
-            description: 'Cleanup created users',
+            description: `Cleanup created users (${users.length})`,
             runOnErrorOnly: true,
             fn: async () => {
               await models.User.destroy({
@@ -183,7 +183,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             `Addresses: ${numAddressesCreated} created, ${numAddressesFound} found`,
           );
           cleanupStack.push({
-            description: 'Cleanup created addresses',
+            description: `Cleanup created addresses (${addresses.length})`,
             runOnErrorOnly: true,
             fn: async () => {
               await models.Address.destroy({
@@ -210,7 +210,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             `Topics: ${numTopicsCreated} created, ${numTopicsFound} found`,
           );
           cleanupStack.push({
-            description: 'Cleanup created topics',
+            description: `Cleanup created topics (${topics.length})`,
             runOnErrorOnly: true,
             fn: async () => {
               await models.Topic.destroy({
@@ -242,7 +242,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             `Threads: ${numThreadsCreated} created, ${numThreadsFound} found`,
           );
           cleanupStack.push({
-            description: 'Cleanup created threads',
+            description: `Cleanup created threads (${threads.length})`,
             runOnErrorOnly: true,
             fn: async () => {
               await models.Thread.destroy({
@@ -273,7 +273,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             `Comments: ${numCommentsCreated} created, ${numCommentsFound} found`,
           );
           cleanupStack.push({
-            description: 'Cleanup created comments',
+            description: `Cleanup created comments (${comments.length})`,
             runOnErrorOnly: true,
             fn: async () => {
               await models.Comment.destroy({
@@ -305,7 +305,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             `Reactions: ${numReactionsCreated} created, ${numReactionsFound} found`,
           );
           cleanupStack.push({
-            description: 'Cleanup created reactions',
+            description: `Cleanup created reactions (${reactions.length})`,
             runOnErrorOnly: true,
             fn: async () => {
               await models.Reaction.destroy({
@@ -332,7 +332,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
           // );
           // log.debug(`Subscriptions: ${subscriptions.length}`);
           // cleanupStack.push({
-          //   description: 'Cleanup created subscriptions',
+          //   description: `Cleanup created subscriptions (${subscriptions.length})`,
           //   runOnErrorOnly: true,
           //   fn: async () => {
           //     await models.Subscription.destroy({

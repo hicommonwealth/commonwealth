@@ -5,12 +5,9 @@ import {
   models,
   ReactionAttributes,
 } from '@hicommonwealth/model';
-import { Reaction } from '@hicommonwealth/schemas';
-import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { Op, QueryTypes, Sequelize, Transaction } from 'sequelize';
 
-type CWReactionWithDiscourseId = z.infer<typeof Reaction> & {
-  discoursePostActionId: number | null;
-  discourseTopicId: number | null;
+type CWEnrichedReaction = ReactionAttributes & {
   created: boolean;
 };
 
@@ -62,8 +59,6 @@ class DiscourseQueries {
 }
 
 type CreateReactionOptions = {
-  discoursePostActionId: number | null | undefined;
-  discourseTopicId: number | null | undefined;
   communityId: string;
   addressId: number;
   threadId: number | null | undefined;
@@ -74,7 +69,7 @@ class CWQueries {
   static bulkCreateReactions = async (
     entries: CreateReactionOptions[],
     { transaction }: { transaction: Transaction | null },
-  ): Promise<CWReactionWithDiscourseId> => {
+  ): Promise<Array<CWEnrichedReaction>> => {
     const reactionsToCreate = entries.map(
       ({ communityId, addressId, threadId, commentId }) => {
         const options: ReactionAttributes = {
@@ -95,15 +90,32 @@ class CWQueries {
       },
     );
 
-    const reactions = await models.Reaction.bulkCreate(reactionsToCreate, {
-      transaction,
+    const existingReactions = await models.Reaction.findAll({
+      where: {
+        [Op.or]: reactionsToCreate,
+      },
     });
 
-    return reactions.map((reaction, i) => ({
+    const filteredReactionsToCreate = reactionsToCreate.filter(
+      (r) =>
+        !existingReactions.find(
+          (er) =>
+            r.community_id == er.community_id &&
+            r.address_id == er.address_id &&
+            r.reaction == er.reaction,
+        ),
+    );
+
+    const createdReactions = await models.Reaction.bulkCreate(
+      filteredReactionsToCreate,
+      {
+        transaction,
+      },
+    );
+
+    return [...existingReactions, ...createdReactions].map((reaction) => ({
       ...reaction.get({ plain: true }),
-      discoursePostActionId: entries[i].discoursePostActionId || null,
-      discourseTopicId: entries[i].discourseTopicId || null,
-      created: true,
+      created: !!createdReactions.find((r) => r.id === reaction.id),
     }));
   };
 }
@@ -122,7 +134,7 @@ export const createAllReactionsInCW = async (
     comments: Array<CWCommentWithDiscourseId>;
   },
   { transaction }: { transaction: Transaction | null },
-): Promise<Array<CWReactionWithDiscourseId>> => {
+): Promise<Array<CWEnrichedReaction>> => {
   const [threadReactions, commentReactions] = await Promise.all([
     DiscourseQueries.fetchThreadsReactions(discourseConnection),
     DiscourseQueries.fetchCommentsReactions(discourseConnection),
@@ -143,8 +155,6 @@ export const createAllReactionsInCW = async (
         )?.id;
         if (addressId && threadId) {
           return {
-            discourseTopicId: discourseReactionTopicId,
-            discoursePostActionId: null,
             communityId,
             addressId,
             threadId,
@@ -156,7 +166,6 @@ export const createAllReactionsInCW = async (
     ),
     ...commentReactions.map(
       ({
-        id: discoursePostActionId,
         user_id: discourseReactionUserId,
         post_id: discourseReactionPostId,
       }) => {
@@ -168,8 +177,6 @@ export const createAllReactionsInCW = async (
         )?.id;
         if (addressId && commentId) {
           return {
-            discourseTopicId: null,
-            discoursePostActionId,
             communityId,
             addressId,
             threadId: null,
