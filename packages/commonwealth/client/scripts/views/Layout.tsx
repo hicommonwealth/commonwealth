@@ -9,6 +9,8 @@ import { useFetchConfigurationQuery } from 'state/api/configuration';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
+import ChainInfo from '../models/ChainInfo';
+import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
@@ -36,9 +38,9 @@ const LayoutComponent = ({
   const navigate = useCommonNavigate();
   const routerParams = useParams();
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
-  const selectedScope = scoped ? pathScope : null;
+  const providedCommunityScope = scoped ? pathScope : null;
 
-  const [scopeToLoad, setScopeToLoad] = useState<string>();
+  const [communityToLoad, setCommunityToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const { mutateAsync: updateActiveCommunity } =
@@ -49,38 +51,91 @@ const LayoutComponent = ({
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     // @ts-expect-error <StrictNullChecks/>
-    const redirectTo = configurationData?.redirects?.[selectedScope];
+    const redirectTo = configurationData?.redirects?.[providedCommunityScope];
     // @ts-expect-error <StrictNullChecks/>
-    if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
+    if (redirectTo && redirectTo !== providedCommunityScope.toLowerCase()) {
       // @ts-expect-error <StrictNullChecks/>
-      const path = window.location.href.split(selectedScope);
+      const path = window.location.href.split(providedCommunityScope);
       navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
       return;
     }
-  }, [selectedScope]);
+  }, [providedCommunityScope]);
 
-  // @ts-expect-error <StrictNullChecks/>
-  const scopeMatchesCommunity = app.config.chains.getById(selectedScope);
+  const { data: community, isLoading: isVerifyingCommunityExistance } =
+    useGetCommunityByIdQuery({
+      id: providedCommunityScope || '',
+      includeNodeInfo: true,
+      enabled: !!providedCommunityScope,
+    });
 
   // If the navigated-to community scope differs from the active chain id at render time,
   // and we have not begun loading the new navigated-to community data, shouldSelectChain is
   // set to true, and the navigated-to scope is loaded.
   const shouldSelectChain =
-    selectedScope &&
-    selectedScope !== app.activeChainId() &&
-    selectedScope !== scopeToLoad &&
-    scopeMatchesCommunity;
+    providedCommunityScope &&
+    providedCommunityScope !== app.activeChainId() &&
+    providedCommunityScope !== communityToLoad &&
+    community &&
+    !isVerifyingCommunityExistance;
 
   useNecessaryEffect(() => {
     (async () => {
       if (shouldSelectChain) {
         setIsLoading(true);
-        setScopeToLoad(selectedScope);
-        if (await loadCommunityChainInfo(scopeMatchesCommunity)) {
+        setCommunityToLoad(providedCommunityScope);
+        if (
+          await loadCommunityChainInfo(
+            ChainInfo.fromJSON({
+              Addresses: community.Addresses,
+              admin_only_polling: community.admin_only_polling,
+              base: community.base,
+              bech32_prefix: community.bech32_prefix,
+              block_explorer_ids: community.block_explorer_ids,
+              chain_node_id: community.chain_node_id,
+              ChainNode: community.ChainNode,
+              collapsed_on_homepage: community.collapsed_on_homepage,
+              CommunityStakes: community.CommunityStakes,
+              CommunityTags: community.CommunityTags,
+              custom_domain: community.custom_domain,
+              custom_stages: community.custom_stages,
+              default_page: community.default_page,
+              default_summary_view: community.default_summary_view,
+              default_symbol: community.default_symbol,
+              description: community.description,
+              directory_page_chain_node_id:
+                community.directory_page_chain_node_id,
+              directory_page_enabled: community.directory_page_enabled,
+              discord_bot_webhooks_enabled:
+                community.discord_bot_webhooks_enabled,
+              token_name: community.token_name,
+              has_homepage: community.has_homepage,
+              discord_config_id: community.discord_config_id,
+              icon_url: community.icon_url,
+              name: community.name,
+              id: community.id,
+              redirect: community.redirect,
+              namespace: community.namespace,
+              network: community.network,
+              snapshot_spaces: community.snapshot_spaces,
+              stages_enabled: community.stages_enabled,
+              terms: community.terms,
+              thread_count: community.numTotalThreads,
+              social_links: community.social_links,
+              ss58_prefix: community.ss58_prefix,
+              substrate_spec: community.substrate_spec,
+              type: community.type,
+              // TODO: 8762 -- these don't come from /communities/:id response -- still needed?
+              Contracts: [],
+              profile_count: 0,
+              // TODO: 8762 -- the other community.* keys are not accepted by ChainInfo -- check if they are
+              // referenced
+            }),
+          )
+        ) {
           // Update default community on server if logged in
           if (app.isLoggedIn()) {
             await updateActiveCommunity({
-              communityId: scopeMatchesCommunity.id,
+              communityId: community?.id || '',
             });
           }
         }
@@ -92,15 +147,17 @@ const LayoutComponent = ({
   // If scope is not defined (and we are not on a custom domain), deinitialize the loaded chain
   // with deinitChainOrCommunity(), then set loadingScope to null and render a LoadingLayout.
   const shouldDeInitChain =
-    !selectedScope && !app.isCustomDomain() && app.chain && app.chain.network;
+    !providedCommunityScope &&
+    !app.isCustomDomain() &&
+    app.chain &&
+    app.chain.network;
 
   useNecessaryEffect(() => {
     (async () => {
       if (shouldDeInitChain) {
         setIsLoading(true);
         await deinitChainOrCommunity();
-        // @ts-expect-error <StrictNullChecks/>
-        setScopeToLoad(null);
+        setCommunityToLoad(undefined);
         setIsLoading(false);
       }
     })();
@@ -139,7 +196,8 @@ const LayoutComponent = ({
     if (shouldShowLoadingState) return Bobber;
 
     // If attempting to navigate to a community not fetched by the /status query, return a 404
-    const pageNotFound = selectedScope && !scopeMatchesCommunity;
+    const pageNotFound =
+      providedCommunityScope && !community && !isVerifyingCommunityExistance;
     return (
       <Suspense fallback={Bobber}>
         {pageNotFound ? <PageNotFound /> : <Component {...routerParams} />}
