@@ -25,6 +25,7 @@ function anyAddressEqual(
   return false;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function verifyAlchemySignature(req: any) {
   const signature = req.headers['x-alchemy-signature'];
   let hmac: Hmac | undefined;
