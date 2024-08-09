@@ -142,7 +142,6 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
             }
             LEFT JOIN "Addresses" ad ON r.address_id = ad.id
             LEFT JOIN "Users" us ON us.id = ad.user_id
-            WHERE r.community_id = $community_id
             GROUP BY thread_id
         ) reactions
         ON t.id = reactions.thread_id

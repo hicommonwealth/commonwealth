@@ -1,31 +1,14 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
+import { Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
-import type { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
 
 const log = logger(import.meta);
 
-export type ReactionAttributes = {
-  address_id: number;
-  reaction: string;
-  id?: number;
-  community_id: string;
-  thread_id?: number;
-  proposal_id?: number;
-  comment_id?: number;
-
-  calculated_voting_weight: number;
-
-  // canvas-related columns
-  canvas_signed_data: string;
-  canvas_hash: string;
-
-  created_at?: Date;
-  updated_at?: Date;
-
-  Community?: CommunityAttributes;
+export type ReactionAttributes = z.infer<typeof Reaction> & {
   Address?: AddressAttributes;
 };
 
@@ -38,7 +21,6 @@ export default (
     'Reaction',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: Sequelize.STRING, allowNull: false },
       thread_id: { type: Sequelize.INTEGER, allowNull: true },
       proposal_id: { type: Sequelize.STRING, allowNull: true },
       comment_id: { type: Sequelize.INTEGER, allowNull: true },
@@ -64,9 +46,9 @@ export default (
                 await thread.increment('reaction_count', {
                   transaction: options.transaction,
                 });
-                if (reaction.calculated_voting_weight > 0) {
+                if (reaction.calculated_voting_weight ?? 0 > 0) {
                   await thread.increment('reaction_weights_sum', {
-                    by: reaction.calculated_voting_weight,
+                    by: reaction.calculated_voting_weight!,
                     transaction: options.transaction,
                   });
                 }
@@ -90,6 +72,7 @@ export default (
                         event_payload: {
                           ...reaction.get({ plain: true }),
                           reaction: 'like',
+                          community_id,
                           contestManagers,
                         },
                       },
@@ -111,9 +94,9 @@ export default (
                 await comment.increment('reaction_count', {
                   transaction: options.transaction,
                 });
-                if (reaction.calculated_voting_weight > 0) {
+                if (reaction.calculated_voting_weight ?? 0 > 0) {
                   await comment.increment('reaction_weights_sum', {
-                    by: reaction.calculated_voting_weight,
+                    by: reaction.calculated_voting_weight!,
                     transaction: options.transaction,
                   });
                 }
@@ -146,9 +129,9 @@ export default (
                 await thread.decrement('reaction_count', {
                   transaction: options.transaction,
                 });
-                if (reaction.calculated_voting_weight > 0) {
+                if (reaction.calculated_voting_weight ?? 0 > 0) {
                   await thread.decrement('reaction_weights_sum', {
-                    by: reaction.calculated_voting_weight,
+                    by: reaction.calculated_voting_weight!,
                     transaction: options.transaction,
                   });
                 }
@@ -167,9 +150,9 @@ export default (
                 await comment.decrement('reaction_count', {
                   transaction: options.transaction,
                 });
-                if (reaction.calculated_voting_weight > 0) {
+                if (reaction.calculated_voting_weight ?? 0 > 0) {
                   await comment.decrement('reaction_weights_sum', {
-                    by: reaction.calculated_voting_weight,
+                    by: reaction.calculated_voting_weight!,
                     transaction: options.transaction,
                   });
                 }
@@ -198,7 +181,6 @@ export default (
         { fields: ['address_id'] },
         {
           fields: [
-            'community_id',
             'address_id',
             'thread_id',
             'proposal_id',
@@ -208,8 +190,6 @@ export default (
           name: 'reactions_unique',
           unique: true,
         },
-        { fields: ['community_id', 'thread_id'] },
-        { fields: ['community_id', 'comment_id'] },
       ],
     },
   );
