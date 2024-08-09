@@ -21,6 +21,5 @@ export function sanitizeDeletedComment(
     canvas_signed_data: null,
     plaintext: '[deleted]',
     text: '[deleted]',
-    version_history: [],
   };
 }

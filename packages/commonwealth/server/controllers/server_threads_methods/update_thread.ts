@@ -25,7 +25,6 @@ import {
   parseUserMentions,
 } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
-import { addVersionHistory } from '../../util/versioning';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -178,36 +177,25 @@ export async function __updateThread(
   ) {
     throw new AppError(Errors.Unauthorized);
   }
-  const permissions = {
-    isThreadOwner,
-    isMod,
-    isAdmin,
-    isSuperAdmin,
-    isCollaborator,
-  };
-
-  const { latestVersion, versionHistory } = addVersionHistory(
-    // @ts-expect-error StrictNullChecks
-    thread.version_history,
-    body,
-    address,
-  );
 
   // build analytics
   const allAnalyticsOptions: TrackOptions[] = [];
 
   const community = await this.models.Community.findByPk(thread.community_id);
 
-  const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
 
   try {
     const toUpdate: Partial<ThreadAttributes> = {};
+
+    const permissions = {
+      isThreadOwner,
+      isMod,
+      isAdmin,
+      isSuperAdmin,
+      isCollaborator,
+    };
 
     await setThreadAttributes(
       // @ts-expect-error StrictNullChecks
@@ -263,18 +251,18 @@ export async function __updateThread(
       { transaction },
     );
 
-    if (versionHistory && body) {
-      // The update above doesn't work because it can't detect array changes so doesn't write it to db
-      await this.models.Thread.update(
-        {
-          version_history: versionHistory,
+    const latestVersionHistory = await this.models.ThreadVersionHistory.findOne(
+      {
+        where: {
+          thread_id: thread.id,
         },
-        {
-          where: { id: threadId },
-          transaction,
-        },
-      );
+        order: [['timestamp', 'DESC']],
+        transaction,
+      },
+    );
 
+    // if the modification was different from the original body, create a version history for it
+    if (body && latestVersionHistory.body !== body) {
       await this.models.ThreadVersionHistory.create(
         {
           thread_id: threadId!,
@@ -298,13 +286,21 @@ export async function __updateThread(
       transaction,
     );
 
+    const previousDraftMentions = parseUserMentions(latestVersionHistory.body);
+    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
+
+    const mentions = findMentionDiff(
+      previousDraftMentions,
+      currentDraftMentions,
+    );
+
     await emitMentions(this.models, transaction, {
       // @ts-expect-error StrictNullChecks
       authorAddressId: address.id,
       // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
-      mentions: mentions,
+      mentions,
       thread,
     });
 
@@ -400,6 +396,9 @@ export async function __updateThread(
             ],
           },
         ],
+      },
+      {
+        model: this.models.ThreadVersionHistory,
       },
     ],
   });

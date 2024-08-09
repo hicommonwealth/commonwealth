@@ -19,7 +19,6 @@ export const Thread = z.object({
   links: z.object(linksSchema).array().nullish(),
 
   read_only: z.boolean().nullish(),
-  version_history: z.array(z.string()).nullish(),
 
   has_poll: z.boolean().nullish(),
 

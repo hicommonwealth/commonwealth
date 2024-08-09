@@ -70,7 +70,6 @@ describe('Recap email lifecycle', () => {
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
 
     [comment] = await seed('Comment', {

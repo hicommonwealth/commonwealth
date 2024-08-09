@@ -1,10 +1,17 @@
-import { VersionHistory } from 'models/Thread';
 import type momentType from 'moment';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import AddressInfo from './AddressInfo';
 import type { IUniqueId } from './interfaces';
 import { addressToUserProfile, UserProfile } from './MinimumProfile';
 import Reaction from './Reaction';
+
+export interface CommentVersionHistory {
+  id: number;
+  thread_id: number;
+  address: string;
+  body: string;
+  timestamp: Moment;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class Comment<T extends IUniqueId> {
@@ -20,7 +27,7 @@ export class Comment<T extends IUniqueId> {
   public readonly authorChain?: string;
   public readonly parentComment: number;
   public readonly threadId: number;
-  public readonly versionHistory: VersionHistory[];
+  public readonly versionHistory: CommentVersionHistory[];
   public readonly lastEdited: string;
   public markedAsSpamAt: momentType.Moment;
   public readonly deleted: boolean;
@@ -50,30 +57,11 @@ export class Comment<T extends IUniqueId> {
     last_edited,
     canvas_signed_data,
     canvas_hash,
-    version_history,
+    CommentVersionHistories,
     marked_as_spam_at,
     discord_meta,
   }) {
-    const versionHistory = version_history
-      ? version_history.map((v) => {
-          if (!v) return;
-          let history;
-          try {
-            history = JSON.parse(v || '{}');
-            history.author =
-              typeof history.author === 'string'
-                ? JSON.parse(history.author)
-                : typeof history.author === 'object'
-                ? history.author
-                : null;
-            history.timestamp = moment(history.timestamp);
-          } catch (e) {
-            console.log(e);
-          }
-          return history;
-        })
-      : [];
-
+    const versionHistory = CommentVersionHistories;
     this.communityId = community_id;
     this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);

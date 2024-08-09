@@ -75,7 +75,6 @@ describe('CommentCreated Event Handler', () => {
       topic_id: null,
       deleted_at: null,
       read_only: false,
-      version_history: [],
       pinned: false,
     });
     [rootComment] = await tester.seed('Comment', {

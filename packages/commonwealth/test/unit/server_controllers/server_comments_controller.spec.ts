@@ -545,7 +545,6 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         address_id: 1,
         text: 'Wasup',
-        version_history: ['{"body":""}'],
         community_id: 'ethereum',
         Address: {
           id: 1,
@@ -640,7 +639,6 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         address_id: 1,
         text: 'Wasup',
-        version_history: ['{"body":""}'],
         community_id: 'ethereum',
         Address: {
           id: 1,
@@ -706,7 +704,6 @@ describe('ServerCommentsController', () => {
         id: 123,
         thread_id: 2,
         text: 'Wasup',
-        version_history: ['{"body":""}'],
         community_id: 'ethereum',
         Address: {
           address: '0x123',
