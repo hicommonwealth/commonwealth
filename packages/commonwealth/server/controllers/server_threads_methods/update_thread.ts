@@ -291,13 +291,12 @@ export async function __updateThread(
     );
 
     await emitMentions(this.models, transaction, {
-      // @ts-expect-error StrictNullChecks
-      authorAddressId: address.id,
-      // @ts-expect-error StrictNullChecks
-      authorUserId: user.id,
+      authorAddressId: address.id!,
+      authorUserId: user.id!,
       authorAddress: address.address,
       mentions: mentions,
       thread,
+      community_id: thread.community_id,
     });
 
     await transaction.commit();

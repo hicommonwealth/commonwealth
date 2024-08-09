@@ -186,10 +186,7 @@ async function main() {
     ) {
       const [comment] = await models.Comment.findOrCreate({
         where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-          // @ts-expect-error StrictNullChecks
-          thread_id: thread.id,
+          thread_id: thread!.id!,
         },
         // @ts-expect-error StrictNullChecks
         defaults: {
@@ -218,12 +215,8 @@ async function main() {
       });
       await models.Reaction.findOrCreate({
         where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-          // @ts-expect-error StrictNullChecks
-          thread_id: thread.id,
-          // @ts-expect-error StrictNullChecks
-          address_id: anotherAddress.id,
+          thread_id: thread!.id!,
+          address_id: anotherAddress!.id!,
           reaction: 'like',
         },
       });

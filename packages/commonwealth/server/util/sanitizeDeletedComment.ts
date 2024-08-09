@@ -20,9 +20,7 @@ export function sanitizeDeletedComment(
       ghost_address: false,
     },
     address_id: 0,
-    // @ts-expect-error <StrictNullChecks>
     canvas_hash: null,
-    // @ts-expect-error <StrictNullChecks>
     canvas_signed_data: null,
     plaintext: '[deleted]',
     text: '[deleted]',

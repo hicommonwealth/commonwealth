@@ -249,7 +249,6 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1,
-                  community_id: 'cmntest',
                   address_id: -1,
                   text: '',
                   thread_id: -1,
@@ -269,7 +268,6 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
-                  community_id: 'cmntest',
                   address_id: -2,
                   text: '',
                   thread_id: -2,
@@ -292,7 +290,6 @@ export const e2eTestEntities = async function (
                   reaction: 'like',
                   address_id: -1,
                   thread_id: -1,
-                  community_id: 'cmntest',
                 },
               })
             )[0],
@@ -311,7 +308,6 @@ export const e2eTestEntities = async function (
                   reaction: 'like',
                   address_id: -2,
                   comment_id: -2,
-                  community_id: 'cmntest',
                 },
               })
             )[0],

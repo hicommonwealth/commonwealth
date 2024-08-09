@@ -1,20 +1,20 @@
 import { z } from 'zod';
 import { PG_INT, zDate } from '../utils';
+import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
 
 export const Comment = z.object({
-  id: PG_INT.optional(),
   thread_id: PG_INT,
   address_id: PG_INT,
   text: z.string(),
   plaintext: z.string(),
-  community_id: z.string(),
+  id: PG_INT.nullish(),
   parent_id: z.string().nullish(),
   version_history: z.array(z.string()).optional(),
   version_history_updated: z.boolean().optional(),
 
-  canvas_signed_data: z.string(),
-  canvas_hash: z.string(),
+  canvas_signed_data: z.string().nullish(),
+  canvas_hash: z.string().nullish(),
 
   created_by: z.string().nullish(),
   created_at: zDate.nullish(),
@@ -37,6 +37,7 @@ export const Comment = z.object({
   reaction_weights_sum: PG_INT.optional(),
 
   Address: Address.nullish(),
+  Thread: Thread.nullish(),
 });
 
 export const CommentVersionHistory = z.object({

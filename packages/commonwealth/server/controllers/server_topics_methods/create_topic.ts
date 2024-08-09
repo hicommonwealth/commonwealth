@@ -56,7 +56,7 @@ export async function __createTopic(
     true,
   );
 
-  const isAdmin = validateOwner({
+  const isAdmin = await validateOwner({
     models: this.models,
     user,
     // @ts-expect-error StrictNullChecks
