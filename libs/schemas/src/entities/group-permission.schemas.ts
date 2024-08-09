@@ -14,6 +14,7 @@ export type GroupPermissionAction = keyof typeof PermissionEnum;
 export const GroupPermission = z.object({
   group_id: PG_INT.nullish(),
   allowed_actions: z.array(z.nativeEnum(PermissionEnum)),
-  created_at: z.date(),
-  updated_at: z.date(),
+
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });

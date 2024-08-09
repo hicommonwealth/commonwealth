@@ -30,8 +30,6 @@ export const BulkThread = z.object({
   discord_meta: z.object(discordMetaSchema).nullable().optional(),
   pinned: z.boolean(),
   chain: z.string(),
-  created_at: z.date(),
-  updated_at: z.date(),
   locked_at: z.date().nullable().optional(),
   links: z.object(linksSchema).array().nullable().optional(),
   collaborators: z.any().array(),
@@ -69,6 +67,9 @@ export const BulkThread = z.object({
   avatar_url: z.string().nullable(),
   address_last_active: z.date().nullable(),
   profile_name: z.string().nullable(),
+
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const GetBulkThreads = {

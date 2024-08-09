@@ -227,7 +227,6 @@ describe('Linking Tests', () => {
   describe('/linking/getLinks', () => {
     test('Can get all links for thread', async () => {
       const result = await server.seeder.getLinks({
-        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         jwt: userJWT,
       });
@@ -242,8 +241,6 @@ describe('Linking Tests', () => {
     });
     test('Can get filtered links', async () => {
       const result = await server.seeder.getLinks({
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread1.id,
         linkType: [LinkSource.Snapshot],
         jwt: userJWT,
       });
@@ -252,7 +249,6 @@ describe('Linking Tests', () => {
       expect(result.result.links[0].source).to.equal(link1.source.toString());
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
       const result2 = await server.seeder.getLinks({
-        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         linkType: [LinkSource.Snapshot, LinkSource.Proposal],
         jwt: userJWT,

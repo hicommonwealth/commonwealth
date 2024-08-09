@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export const Topic = z.object({
-  id: PG_INT.nullish(),
+  id: PG_INT.optional(),
   name: z.string().max(255).default('General'),
   community_id: z.string().max(255),
   description: z.string().default(''),

@@ -9,8 +9,9 @@ import { Address } from './user.schemas';
 export const NotificationCategory = z.object({
   name: z.string().max(255),
   description: z.string(),
-  created_at: z.date(),
-  updated_at: z.date(),
+
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const Subscription = z.object({
@@ -18,13 +19,14 @@ export const Subscription = z.object({
   subscriber_id: PG_INT,
   category_id: z.nativeEnum(NotificationCategories),
   is_active: z.boolean().default(true),
-  created_at: z.date(),
-  updated_at: z.date(),
   immediate_email: z.boolean().default(false),
   community_id: z.string().max(255).optional().nullable(),
   thread_id: PG_INT.optional().nullable(),
   comment_id: PG_INT.optional().nullable(),
   snapshot_id: z.string().max(255).optional().nullable(),
+
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const SubscriptionPreference = z.object({

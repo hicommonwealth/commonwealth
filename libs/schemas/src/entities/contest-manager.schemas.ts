@@ -30,8 +30,8 @@ export const ContestManager = z
       .min(0)
       .max(MAX_SCHEMA_INT)
       .describe('Recurring contest interval, 0 when one-off'),
-    ticker: z.string().nullish().default(commonProtocol.Denominations.ETH),
-    decimals: PG_INT.nullish().default(
+    ticker: z.string().default(commonProtocol.Denominations.ETH),
+    decimals: PG_INT.default(
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
     created_at: z.date(),

@@ -147,8 +147,7 @@ async function main() {
   } else {
     const thread = await models.Thread.findOne({
       where: {
-        // @ts-expect-error StrictNullChecks
-        community_id: community.id,
+        community_id: community!.id!,
       },
       include: {
         model: models.Address,
@@ -186,7 +185,6 @@ async function main() {
       argv.notificationCategory === NotificationCategories.NewComment
     ) {
       const [comment] = await models.Comment.findOrCreate({
-        // @ts-expect-error StrictNullChecks
         where: {
           // @ts-expect-error StrictNullChecks
           community_id: community.id,
@@ -215,12 +213,10 @@ async function main() {
     ) {
       const anotherAddress = await models.Address.findOne({
         where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
+          community_id: community!.id!,
         },
       });
       await models.Reaction.findOrCreate({
-        // @ts-expect-error StrictNullChecks
         where: {
           // @ts-expect-error StrictNullChecks
           community_id: community.id,

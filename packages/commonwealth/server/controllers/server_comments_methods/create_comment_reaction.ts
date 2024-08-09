@@ -80,7 +80,7 @@ export async function __createCommentReaction(
   // check balance (bypass for admin)
   const addressAdminRoles = await findAllRoles(
     this.models,
-    { where: { address_id: address.id } },
+    { where: { address_id: address.id! } },
     thread.community_id,
     ['admin'],
   );
@@ -143,7 +143,7 @@ export async function __createCommentReaction(
   // create the reaction
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
-    address_id: address.id,
+    address_id: address.id!,
     community_id: thread.community_id,
     comment_id: comment.id!,
   };

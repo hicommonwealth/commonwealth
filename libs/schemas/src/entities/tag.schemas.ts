@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export const Tags = z.object({
-  id: PG_INT.nullish(),
+  id: PG_INT.optional(),
   name: z.string(),
 });
 

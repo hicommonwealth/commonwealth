@@ -135,9 +135,8 @@ export async function __createThreadReaction(
   // create the reaction
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
-    address_id: address.id,
+    address_id: address.id!,
     community_id: thread.community_id,
-    // @ts-expect-error StrictNullChecks
     thread_id: thread.id,
   };
   const reactionData: Partial<ReactionAttributes> = {

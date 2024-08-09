@@ -3,7 +3,7 @@ import { PG_INT, zDate } from '../utils';
 
 // TODO: use this as single source of truth for model?
 export const Reaction = z.object({
-  id: PG_INT.nullish(),
+  id: PG_INT.optional(),
   community_id: z.string().max(255),
   address_id: PG_INT,
   reaction: z.enum(['like']),

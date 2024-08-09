@@ -15,6 +15,9 @@ export function sanitizeDeletedComment(
       verification_token: '',
       role: 'member',
       is_user_default: false,
+      is_councillor: false,
+      is_validator: false,
+      ghost_address: false,
     },
     address_id: 0,
     // @ts-expect-error <StrictNullChecks>
