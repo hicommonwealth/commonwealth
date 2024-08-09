@@ -243,6 +243,7 @@ describe('Linking Tests', () => {
       const result = await server.seeder.getLinks({
         linkType: [LinkSource.Snapshot],
         jwt: userJWT,
+        link: link1,
       });
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
