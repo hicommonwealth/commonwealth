@@ -1,13 +1,11 @@
 import { Actor, events, logger, Policy } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { config, Contest } from '..';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
 import { buildThreadContentUrl } from '../utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const inputs = {
   ThreadCreated: events.ThreadCreated,

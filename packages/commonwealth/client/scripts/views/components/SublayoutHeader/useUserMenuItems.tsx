@@ -242,7 +242,7 @@ const useUserMenuItems = ({
       },
       {
         type: 'default',
-        label: 'Notifications',
+        label: 'Notification settings',
         onClick: () => navigate('/notification-settings', {}, null),
       },
       {

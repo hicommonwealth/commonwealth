@@ -1,12 +1,14 @@
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { randomInt } from 'crypto';
 import { Model, type ModelStatic } from 'sequelize';
 import z, {
   ZodArray,
   ZodNullable,
   ZodObject,
   ZodOptional,
+  ZodString,
   ZodUnknown,
 } from 'zod';
 import type { State } from '../models';
@@ -32,6 +34,11 @@ function isNullable(value: ZodUnknown) {
 function isArray(value: ZodUnknown | ZodOptional<ZodUnknown>) {
   if (value instanceof ZodOptional) return isArray(value._def.innerType);
   return value instanceof ZodArray;
+}
+
+function isString(value: ZodUnknown | ZodOptional<ZodUnknown>) {
+  if (value instanceof ZodOptional) return isString(value._def.innerType);
+  return value instanceof ZodString;
 }
 
 /**
@@ -75,6 +82,9 @@ async function _seed(
           else undefs[key] = undefined;
         } else if (isNullable(value)) undefs[key] = null;
       }
+      // super-randomize string pks to avoid CI failures
+      if (model.primaryKeyAttribute === key && isString(value))
+        (mocked as any)[key] = `${(mocked as any)[key]}-${randomInt(1000)}`;
     });
     values = { ...mocked, ...undefs, ...values };
   }

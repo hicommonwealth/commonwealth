@@ -2,14 +2,13 @@ import clsx from 'clsx';
 import { pluralize } from 'helpers';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import CommunityInfo from '../../../../../models/ChainInfo';
 import { CWCard } from '../../../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import './CommunityPreviewCard.scss';
 
 type CommunityPreviewCardProps = {
-  community?: CommunityInfo;
+  community?: { name: string; icon_url: string };
   monthlyThreadCount?: number;
   isCommunityMember?: boolean;
   hasUnseenPosts?: boolean;
@@ -18,7 +17,7 @@ type CommunityPreviewCardProps = {
 };
 
 const CommunityPreviewCard = ({
-  community = {} as CommunityInfo,
+  community,
   monthlyThreadCount,
   isCommunityMember,
   hasUnseenPosts,
@@ -41,10 +40,16 @@ const CommunityPreviewCard = ({
         </CWText>
       ) : (
         <>
-          <CWCommunityAvatar community={community} size="large" />
-          {community.name && (
+          <CWCommunityAvatar
+            community={{
+              name: community?.name || '',
+              iconUrl: community?.icon_url || '',
+            }}
+            size="large"
+          />
+          {community?.name && (
             <CWText type="h4" fontWeight="medium">
-              {community.name}
+              {community?.name}
             </CWText>
           )}
           {/* @ts-expect-error StrictNullChecks*/}

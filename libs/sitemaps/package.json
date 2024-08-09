@@ -20,8 +20,7 @@
     "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.577.0",
-    "@aws-sdk/lib-storage": "^3.578.0",
+    "@hicommonwealth/adapters": "workspace:*",
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/model": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",

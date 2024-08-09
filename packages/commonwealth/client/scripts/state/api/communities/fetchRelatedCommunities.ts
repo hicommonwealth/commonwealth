@@ -10,7 +10,7 @@ interface FetchRelatedCommunitiesProps {
 }
 
 interface FetchRelatedCommunitiesResponse {
-  address_count: string;
+  profile_count: string;
   community: string;
   description: string;
   icon_url: string;

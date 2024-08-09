@@ -153,9 +153,7 @@ export const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
   }
 
   if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
-    return [...t].sort(
-      (a, b) => b.associatedReactions.length - a.associatedReactions.length,
-    );
+    return [...t].sort((a, b) => b.reactionWeightsSum - a.reactionWeightsSum);
   }
 
   if (featuredFilter === ThreadFeaturedFilterTypes.LatestActivity) {
