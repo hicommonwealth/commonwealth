@@ -26,6 +26,10 @@
         color: $neutral-500;
       }
 
+      & > .Text.b1 {
+        margin-bottom: 8px;
+      }
+
       .Text.h4 {
         display: flex;
         align-items: center;
@@ -46,9 +50,19 @@
 
     .contest-section-name {
       margin-bottom: 64px;
+    }
 
-      .contest-name-input {
-        margin-top: 16px;
+    .contest-section-description {
+      margin-bottom: 64px;
+
+      .Text.h4 {
+        .b1 {
+          margin-left: 4px;
+        }
+      }
+
+      .TextArea {
+        margin-top: 8px;
       }
     }
 
@@ -65,6 +79,21 @@
         font-weight: 500;
         margin-bottom: 8px;
         margin-top: 24px;
+      }
+    }
+
+    .contest-section-funding {
+      margin-bottom: 64px;
+    }
+
+    .contest-section-duration {
+      margin-bottom: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .SelectList {
+        width: 168px;
       }
     }
 

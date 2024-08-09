@@ -70,11 +70,7 @@ describe('ServerThreadsController', () => {
           }),
         },
         CommunityStake: {
-          findOne: sandbox.stub().resolves({
-            id: 5,
-            stake_id: 1,
-            vote_weight: 1,
-          }),
+          findOne: sandbox.stub().resolves(null),
         },
 
         Community: {

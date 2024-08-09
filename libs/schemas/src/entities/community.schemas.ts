@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { ChainNode } from './chain.schemas';
 import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
 import { CommunityStake } from './stake.schemas';
@@ -55,9 +56,13 @@ export const Community = z.object({
   Addresses: z.array(Address).optional(),
   CommunityStakes: z.array(CommunityStake).optional(),
   CommunityTags: z.array(CommunityTag).optional(),
+  ChainNode: ChainNode.optional(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
   snapshot_spaces: z.array(z.string().max(255)).default([]).optional(),
   include_in_digest_email: z.boolean().nullish(),
 });
+
+// aliases
+export const Chain = Community;

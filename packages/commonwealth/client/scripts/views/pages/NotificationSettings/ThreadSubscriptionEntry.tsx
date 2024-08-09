@@ -30,7 +30,7 @@ export const ThreadSubscriptionEntry = (
     {
       chain: thread.community_id,
       id: thread.id!,
-      title: thread.title,
+      title: decodeURIComponent(thread.title),
     },
     undefined,
     true,
@@ -93,9 +93,7 @@ export const ThreadSubscriptionEntry = (
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <Link to={threadUrl}>
-            <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
-          </Link>
+          <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
         </CWText>
       </div>
 

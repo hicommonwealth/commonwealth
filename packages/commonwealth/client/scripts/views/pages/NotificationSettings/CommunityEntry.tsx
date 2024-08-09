@@ -51,19 +51,17 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
 
   return (
     <div key={communityInfo?.id} className="notification-row CommunityEntry">
-      <div className="notification-row-header">
-        <div className="left-content-container">
-          <div className="avatar-and-name">
-            <CommunityInfo
-              name={communityInfo.name}
-              iconUrl={communityInfo.iconUrl}
-              communityId={communityInfo.id}
-            />
+      <div className="section">
+        <div className="avatar-and-name">
+          <CommunityInfo
+            name={communityInfo.name}
+            iconUrl={communityInfo.iconUrl}
+            communityId={communityInfo.id}
+          />
+        </div>
 
-            <div className="toggle">
-              <CWToggle checked={subscribed} onChange={toggleSubscription} />
-            </div>
-          </div>
+        <div className="toggle">
+          <CWToggle checked={subscribed} onChange={toggleSubscription} />
         </div>
       </div>
     </div>

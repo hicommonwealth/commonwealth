@@ -69,7 +69,10 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
 
       case 'ContestLive':
         return (
-          <ContestLiveStep createdContestAddress={createdContestAddress} />
+          <ContestLiveStep
+            createdContestAddress={createdContestAddress}
+            isFarcasterContest={!!contestFormData?.farcasterContestDuration}
+          />
         );
     }
   };

@@ -33,9 +33,9 @@ export const CommentSubscriptionEntry = (
 
   const threadUrl = getThreadUrl(
     {
-      chain: thread.community_id,
-      id: comment.id!,
-      title: thread.title,
+      chain: `${thread.community_id}`,
+      id: `${thread.id}`,
+      title: decodeURIComponent(thread.title),
     },
     comment_id,
     true,
@@ -96,17 +96,11 @@ export const CommentSubscriptionEntry = (
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <Link to={threadUrl}>
-            <QuillRenderer
-              doc={safeTruncateBody(decodeURI(comment.text))}
-              cutoffLines={4}
-              customShowMoreButton={
-                <CWText type="b1" className="show-more-btn">
-                  Show more
-                </CWText>
-              }
-            />
-          </Link>
+          <QuillRenderer
+            doc={safeTruncateBody(decodeURI(comment.text))}
+            cutoffLines={4}
+            customShowMoreButton={<></>}
+          />
         </CWText>
       </div>
 
