@@ -13,9 +13,6 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
       const where = { id: payload.id };
       const include: Includeable[] = [
         {
-          model: models.CommunityBanner,
-        },
-        {
           model: models.CommunityStake,
         },
         {
