@@ -76,7 +76,7 @@ export const ReactionButton = ({
     event.preventDefault();
     if (isLoading || disabled) return;
 
-    if (!app.isLoggedIn() || !user.activeAccount) {
+    if (!user.isLoggedIn || !user.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }

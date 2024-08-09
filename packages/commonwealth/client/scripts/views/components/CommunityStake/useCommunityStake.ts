@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {
@@ -24,7 +23,6 @@ const chainIds = {
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
 
   const activeCommunityId = community?.id || app?.chain?.id;
@@ -53,7 +51,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&
-      isLoggedIn,
+      user.isLoggedIn,
   );
 
   const {

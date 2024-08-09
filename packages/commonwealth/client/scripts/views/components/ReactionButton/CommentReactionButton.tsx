@@ -55,7 +55,7 @@ export const CommentReactionButton = ({
     e.stopPropagation();
     e.preventDefault();
 
-    if (!app.isLoggedIn() || !user.activeAccount) {
+    if (!user.isLoggedIn || !user.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }

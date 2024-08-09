@@ -2,7 +2,6 @@ import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useRef, useState } from 'react';
@@ -123,8 +122,6 @@ export const CommentTree = ({
     };
   }>();
 
-  const { isLoggedIn } = useUserLoggedIn();
-
   const isAdminOrMod =
     Permissions.isSiteAdmin() ||
     Permissions.isCommunityAdmin() ||
@@ -153,7 +150,7 @@ export const CommentTree = ({
     isLocked,
     // @ts-expect-error <StrictNullChecks/>
     fromDiscordBot,
-    isLoggedIn,
+    isLoggedIn: user.isLoggedIn,
   });
 
   const scrollToRef = useRef(null);

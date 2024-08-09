@@ -3,7 +3,6 @@ import React from 'react';
 import app from 'state';
 
 import { useFlag } from 'hooks/useFlag';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
@@ -18,6 +17,7 @@ import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
+import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
 import './DesktopHeader.scss';
@@ -29,9 +29,9 @@ interface DesktopHeaderProps {
 
 const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
+  const user = useUserStore();
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -54,7 +54,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             if (app.isCustomDomain()) {
               navigate('/', {}, null);
             } else {
-              if (isLoggedIn) {
+              if (user.isLoggedIn) {
                 navigate('/dashboard/for-you', {}, null);
               } else {
                 navigate('/dashboard/global', {}, null);
@@ -77,12 +77,12 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       <div className="header-right">
         <div
           className={clsx('DesktopMenuContainerParent', {
-            isLoggedIn,
+            isLoggedIn: user.isLoggedIn,
           })}
         >
           <div
             className={clsx('DesktopMenuContainer', {
-              isLoggedIn,
+              isLoggedIn: user.isLoggedIn,
             })}
           >
             <CreateContentPopover />
@@ -102,21 +102,21 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
 
             <HelpMenuPopover />
 
-            {isLoggedIn && !enableKnockInAppNotifications && (
+            {user.isLoggedIn && !enableKnockInAppNotifications && (
               <NotificationsMenuPopover />
             )}
           </div>
 
-          {isLoggedIn && enableKnockInAppNotifications && (
+          {user.isLoggedIn && enableKnockInAppNotifications && (
             <KnockNotifications />
           )}
         </div>
 
-        {isLoggedIn && (
+        {user.isLoggedIn && (
           <UserDropdown onAuthModalOpen={() => onAuthModalOpen()} />
         )}
 
-        {!isLoggedIn && (
+        {!user.isLoggedIn && (
           <AuthButtons
             smallHeightButtons
             onButtonClick={(selectedType) => onAuthModalOpen(selectedType)}

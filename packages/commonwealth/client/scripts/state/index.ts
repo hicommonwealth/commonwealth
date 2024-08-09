@@ -67,15 +67,12 @@ export interface IApp {
 
   loginState: LoginState;
   loginStateEmitter: EventEmitter;
+  loginStatusLoaded(): boolean;
 
   // stored on server-side
   config: {
     chains: ChainStore;
   };
-
-  loginStatusLoaded(): boolean;
-
-  isLoggedIn(): boolean;
 
   serverUrl(): string;
 
@@ -123,16 +120,14 @@ const app: IApp = {
   user,
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
-
+  loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 
   config: {
     chains: new ChainStore(),
   },
-  // TODO: Collect all getters into an object
-  loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
-  isLoggedIn: () => app.loginState === LoginState.LoggedIn,
+
   serverUrl: () => {
     return '/api';
   },

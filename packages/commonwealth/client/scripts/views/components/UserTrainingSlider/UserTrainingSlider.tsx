@@ -1,4 +1,3 @@
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -12,7 +11,6 @@ import { CARD_TYPES } from './constants';
 import { UserTrainingCardTypes } from './types';
 
 export const UserTrainingSlider = () => {
-  const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const userId = user.id.toString();
@@ -23,7 +21,7 @@ export const UserTrainingSlider = () => {
 
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({
-      apiCallEnabled: isLoggedIn,
+      apiCallEnabled: user.isLoggedIn,
       shouldFetchSelfProfile: true,
     });
 
@@ -79,13 +77,13 @@ export const UserTrainingSlider = () => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn && completedActions.length > 0) {
+    if (!user.isLoggedIn && completedActions.length > 0) {
       clearCompletedActionsState();
     }
-  }, [isLoggedIn, completedActions, clearCompletedActionsState]);
+  }, [user.isLoggedIn, completedActions, clearCompletedActionsState]);
 
   useEffect(() => {
-    if (isLoggedIn && !isLoadingProfile && profile && userId) {
+    if (user.isLoggedIn && !isLoadingProfile && profile && userId) {
       // if user has already given any upvotes, then hide `give-upvote` card
       if (
         profile?.totalUpvotes > 0 &&
@@ -131,7 +129,7 @@ export const UserTrainingSlider = () => {
     }
   }, [
     user.email,
-    isLoggedIn,
+    user.isLoggedIn,
     isLoadingProfile,
     profile,
     userId,
@@ -141,7 +139,7 @@ export const UserTrainingSlider = () => {
 
   if (
     !userId ||
-    !isLoggedIn ||
+    !user.isLoggedIn ||
     isLoadingProfile ||
     (trainingActionPermanentlyHidden?.[userId]?.length === 4 &&
       completedActions.length === 0) ||

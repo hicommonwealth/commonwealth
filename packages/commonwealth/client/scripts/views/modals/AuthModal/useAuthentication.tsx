@@ -223,13 +223,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
       const isAttemptingToConnectAddressToCommunity =
-        app.isLoggedIn() && app.activeChainId();
+        user.isLoggedIn && app.activeChainId();
       const { address: magicAddress, isAddressNew } =
         await startLoginWithMagicLink({
           email: tempEmailToUse,
           isCosmos,
           redirectTo: document.location.pathname + document.location.search,
           chain: app.chain?.id,
+          isLoggedIn: user.isLoggedIn,
         });
       setIsMagicLoading(false);
 
@@ -241,7 +242,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (
         isAddressNew &&
         !isAttemptingToConnectAddressToCommunity &&
-        !app.isLoggedIn()
+        !user.isLoggedIn
       ) {
         authModal
           .getState()
@@ -271,6 +272,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
+        isLoggedIn: user.isLoggedIn,
       });
       setIsMagicLoading(false);
 
@@ -300,7 +302,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setUsername(profile.name);
     }
 
-    if (app.isLoggedIn()) {
+    if (user.isLoggedIn) {
       await completeClientLogin(account);
     } else {
       // log in as the new user
@@ -339,7 +341,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const walletToUse = wallet || selectedWallet;
 
     // Handle Logged in and joining community of different chain base
-    if (app.activeChainId() && app.isLoggedIn()) {
+    if (app.activeChainId() && user.isLoggedIn) {
       // @ts-expect-error StrictNullChecks
       const session = await getSessionFromWallet(walletToUse);
       await account.validate(session);
@@ -505,7 +507,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     });
     const addressExists = profileAddresses?.length > 0;
     const isAttemptingToConnectAddressToCommunity =
-      app.isLoggedIn() && app.activeChainId();
+      user.isLoggedIn && app.activeChainId();
     if (
       !addressExists &&
       !isAttemptingToConnectAddressToCommunity &&
@@ -544,7 +546,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
 
-    if (app.isLoggedIn()) {
+    if (user.isLoggedIn) {
       try {
         const res = await axios.post(`${app.serverUrl()}/getAddressStatus`, {
           address:

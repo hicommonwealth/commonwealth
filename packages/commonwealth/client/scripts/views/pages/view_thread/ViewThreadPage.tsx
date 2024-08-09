@@ -7,7 +7,6 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -76,7 +75,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const navigate = useCommonNavigate();
 
-  const { isLoggedIn } = useUserLoggedIn();
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [polls, setPolls] = useState<Array<Poll>>([]);
@@ -364,7 +362,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
 
   const canUpdateThread =
-    isLoggedIn &&
+    user.isLoggedIn &&
     (Permissions.isSiteAdmin() ||
       Permissions.isCommunityAdmin() ||
       Permissions.isCommunityModerator() ||
@@ -635,7 +633,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         />
                       )}
                     </>
-                  ) : !isGloballyEditing && isLoggedIn ? (
+                  ) : !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
                       <CreateComment

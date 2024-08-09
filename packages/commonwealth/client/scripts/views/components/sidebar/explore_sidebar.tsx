@@ -48,7 +48,7 @@ export const ExploreCommunitiesSidebar = ({
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const communityList: MenuItem[] = [
-    ...(app.isLoggedIn()
+    ...(user.isLoggedIn
       ? [
           { type: 'header', label: 'Your communities' } as MenuItem,
           ...(joinedCommunities.map((c: ChainInfo) => {

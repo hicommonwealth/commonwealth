@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import useSidebarStore from 'state/ui/sidebar';
 
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -32,7 +31,6 @@ const MobileHeader = ({
 }: MobileHeaderProps) => {
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
-  const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
   const userData = useUserStore();
   const user = userData.addresses?.[0];
@@ -80,7 +78,7 @@ const MobileHeader = ({
             />
           )}
 
-          {isLoggedIn && (
+          {userData.isLoggedIn && (
             <div onClick={() => setIsUserDrawerOpen(true)}>
               <User
                 shouldShowAvatarOnly

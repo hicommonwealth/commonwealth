@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import AddressInfo from 'models/AddressInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCommunitySelector, {
@@ -39,10 +38,7 @@ const CommunityTypeStep = ({
     useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const { isLoggedIn } = useUserLoggedIn();
-
   const { isAddedToHomeScreen } = useAppStatus();
-
   const user = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
@@ -64,7 +60,7 @@ const CommunityTypeStep = ({
 
     setSelectedCommunity({ type: selectedType, chainBase: selectedChainBase });
 
-    if (!isLoggedIn) {
+    if (!user.isLoggedIn) {
       setIsAuthModalOpen(true);
     } else {
       setIsNewCommunityAdminModalOpen(true);

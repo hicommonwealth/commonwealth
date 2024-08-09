@@ -72,7 +72,7 @@ const NotificationSettingsPage = () => {
 
   if (!app.loginStatusLoaded()) {
     return <PageLoading />;
-  } else if (!app.isLoggedIn()) {
+  } else if (!user.isLoggedIn) {
     navigate('/', { replace: true });
     return <PageLoading />;
   }
