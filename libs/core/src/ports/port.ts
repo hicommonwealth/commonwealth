@@ -81,6 +81,7 @@ const disposeAndExit = async (
 };
 
 export const disposeAdapter = (name: string): void => {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   adapters.get(name)?.dispose();
   adapters.delete(name);
   adapters.clear();
@@ -99,18 +100,22 @@ export const dispose = (disposer?: Disposer): typeof disposeAndExit => {
 /**
  * Handlers to dispose registered resources on exit or unhandled exceptions
  */
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('SIGINT', async (arg?: any) => {
   log.info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('SIGTERM', async (arg?: any) => {
   log.info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('uncaughtException', async (arg?: any) => {
   log.error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('unhandledRejection', async (arg?: any) => {
   log.error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');

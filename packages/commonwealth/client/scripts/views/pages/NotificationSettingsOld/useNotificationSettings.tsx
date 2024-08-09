@@ -116,10 +116,12 @@ const useNotificationSettings = () => {
     const subIds = [];
 
     // get all subscription ids
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Object.entries(chainEventSubs).map(([_, subs]) =>
       // @ts-expect-error StrictNullChecks
       subIds.push(...(subs || [])),
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Object.entries(bundledSubs).map(([_, subs]) =>
       // @ts-expect-error StrictNullChecks
       subIds.push(...(subs || [])),

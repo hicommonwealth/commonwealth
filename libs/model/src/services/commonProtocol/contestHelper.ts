@@ -35,6 +35,7 @@ export type ContestScores = {
  * @param rpc the rpc of the network to use helper with
  * @returns
  */
+// eslint-disable-next-line @typescript-eslint/require-await
 const createWeb3Provider = async (rpc: string): Promise<Web3> => {
   if (!config.WEB3.PRIVATE_KEY) throw new AppError('WEB3 private key not set!');
   const web3 = new Web3(rpc);

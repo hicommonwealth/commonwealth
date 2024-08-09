@@ -20,6 +20,7 @@ export abstract class JobRunner<CacheT> {
   public start() {
     if (this._jobTimeS > 0) {
       this._timeoutHandle = global.setInterval(
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         () => this.run(),
         this._jobTimeS * 1000,
       );

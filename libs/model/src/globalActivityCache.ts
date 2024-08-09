@@ -125,6 +125,7 @@ export class GlobalActivityCache {
 
   public async start() {
     await this.refreshGlobalActivity();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(this.refreshGlobalActivity.bind(this), this._cacheTTL * 1000);
   }
 

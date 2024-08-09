@@ -37,9 +37,11 @@ async function doExec() {
 
 doExec()
   .then(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('EXIT', true);
   })
   .catch((err) => {
     log.fatal('Unable to process sitemaps: ', err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
   });

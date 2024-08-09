@@ -251,7 +251,7 @@ export class RabbitMQAdapter implements Broker {
                   this._log,
                 );
             })
-            .finally(async () => {
+            .finally(() => {
               try {
                 afterHandleEvent?.(topic, content, context);
               } catch (err) {
