@@ -49,8 +49,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    // TODO: 8762: EXCEPTION_CASE_threadCountersStore can be cleaned up
-    // as a seperate ticket
+    // TODO: https://github.com/hicommonwealth/commonwealth/issues/8812
+    // cleanup EXCEPTION_CASE_threadCountersStore
     EXCEPTION_CASE_threadCountersStore.setState({
       totalThreadsInCommunity: this.meta.numTotalThreads,
       totalThreadsInCommunityForVoting: this.meta.numVotingThreads,
