@@ -15,6 +15,6 @@ export const GroupPermission = z.object({
   group_id: PG_INT.nullish(),
   allowed_actions: z.array(z.nativeEnum(PermissionEnum)),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

@@ -6,8 +6,8 @@ export const CommunityContract = z.object({
   community_id: z.string().max(255),
   contract_id: PG_INT,
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const Contract = z.object({
@@ -22,6 +22,6 @@ export const Contract = z.object({
   is_factory: z.boolean().default(false),
   nickname: z.string().max(255).optional(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

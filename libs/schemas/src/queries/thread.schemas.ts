@@ -68,8 +68,8 @@ export const BulkThread = z.object({
   address_last_active: z.date().nullable(),
   profile_name: z.string().nullable(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const GetBulkThreads = {

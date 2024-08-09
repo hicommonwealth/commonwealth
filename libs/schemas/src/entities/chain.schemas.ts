@@ -29,6 +29,6 @@ export const ChainNode = z.object({
   block_explorer: z.string().nullish(),
   max_ce_block_range: z.number().gte(-1).nullish(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

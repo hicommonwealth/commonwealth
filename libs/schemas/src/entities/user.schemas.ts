@@ -22,8 +22,8 @@ export const ProfileTags = z.object({
   user_id: z.number(),
   tag_id: z.number(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const User = z.object({
@@ -43,8 +43,8 @@ export const User = z.object({
 
   ProfileTags: z.array(ProfileTags).optional(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const Address = z.object({
@@ -68,8 +68,8 @@ export const Address = z.object({
 
   User: User.optional(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const SsoToken = z.object({
@@ -78,8 +78,8 @@ export const SsoToken = z.object({
   issuer: z.string(),
   state_id: z.string().nullish(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const CommunityMember = z.object({

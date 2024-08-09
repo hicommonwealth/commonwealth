@@ -62,6 +62,14 @@ const getInitialFilterMap = (): Record<string, unknown> => {
 const STAKE_FILTER_KEY = 'Stake';
 
 const CommunitiesPage = () => {
+  const { data: community } = trpc.community.getCommunities.useQuery({
+    limit: 5,
+    base: ChainBase.Ethereum,
+    has_groups: true,
+    include_node_info: true,
+  });
+  console.log(community);
+
   useUserLoggedIn();
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
     getInitialFilterMap(),

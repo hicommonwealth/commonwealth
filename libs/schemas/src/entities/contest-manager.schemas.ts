@@ -34,7 +34,7 @@ export const ContestManager = z
     decimals: PG_INT.default(
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
     cancelled: z
       .boolean()
       .nullish()
@@ -54,6 +54,6 @@ export const ContestTopic = z
   .object({
     contest_address: z.string(),
     topic_id: PG_INT,
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   })
   .describe('X-Ref to topics in contest');

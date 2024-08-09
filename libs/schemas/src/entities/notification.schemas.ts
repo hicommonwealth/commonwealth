@@ -10,8 +10,8 @@ export const NotificationCategory = z.object({
   name: z.string().max(255),
   description: z.string(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const Subscription = z.object({
@@ -25,8 +25,8 @@ export const Subscription = z.object({
   comment_id: PG_INT.optional().nullable(),
   snapshot_id: z.string().max(255).optional().nullable(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const SubscriptionPreference = z.object({
@@ -38,8 +38,8 @@ export const SubscriptionPreference = z.object({
   mobile_push_notifications_enabled: z.boolean().default(false),
   mobile_push_discussion_activity_enabled: z.boolean().default(false),
   mobile_push_admin_alerts_enabled: z.boolean().default(false),
-  created_at: z.date().default(new Date()),
-  updated_at: z.date().default(new Date()),
+  created_at: z.coerce.date().default(new Date()),
+  updated_at: z.coerce.date().default(new Date()),
 });
 
 export const ThreadSubscription = z.object({

@@ -56,17 +56,17 @@ export const Community = z.object({
   include_in_digest_email: z.boolean().nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 
   // 3. Associations are optional
-  Addresses: z.array(Address).optional(),
-  CommunityStakes: z.array(CommunityStake).optional(),
-  CommunityTags: z.array(CommunityTags).optional(),
-  ChainNode: ChainNode.optional(),
-  topics: z.array(Topic).optional(),
-  groups: z.array(Group).optional(),
-  contest_managers: z.array(ContestManager).optional(),
+  Addresses: z.array(Address).nullish(),
+  CommunityStakes: z.array(CommunityStake).nullish(),
+  CommunityTags: z.array(CommunityTags).nullish(),
+  ChainNode: ChainNode.nullish(),
+  topics: z.array(Topic).nullish(),
+  groups: z.array(Group).nullish(),
+  contest_managers: z.array(ContestManager).nullish(),
 });
 
 // aliases
