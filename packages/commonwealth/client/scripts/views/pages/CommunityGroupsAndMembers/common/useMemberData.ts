@@ -14,6 +14,7 @@ interface UseMemberDataProps {
   membersPerPage: number;
   page: number;
   allowedAddresses: string[];
+  isStakedEnabled: boolean;
 }
 
 export const useMemberData = ({
@@ -24,6 +25,7 @@ export const useMemberData = ({
   membersPerPage,
   page,
   allowedAddresses,
+  isStakedEnabled,
 }: UseMemberDataProps) => {
   const user = useUserStore();
   const membershipsFilter = (() => {
@@ -51,8 +53,7 @@ export const useMemberData = ({
     cursor: page,
     allowedAddresses: allowedAddresses.join(', '),
     // only include stake balances if community has staking enabled
-    include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-      ?.namespace,
+    include_stake_balances: isStakedEnabled,
   });
 
   const { data: groups } = useFetchGroupsQuery({

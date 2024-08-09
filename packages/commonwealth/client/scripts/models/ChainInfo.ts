@@ -5,10 +5,7 @@ import type {
 } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import axios from 'axios';
-import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
-import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
 import StakeInfo from './StakeInfo';
 import Tag from './Tag';
@@ -54,6 +51,8 @@ class ChainInfo {
   public directoryPageChainNodeId?: number;
   public namespace?: string;
   public redirect?: string;
+  public numTotalThreads?: number;
+  public numVotingThreads?: number;
 
   public get node() {
     return this.ChainNode;
@@ -247,146 +246,5 @@ class ChainInfo {
   public setBanner(banner_text: string) {
     this.communityBanner = banner_text;
   }
-
-  public async updateChainData({
-    name,
-    description,
-    social_links,
-    stagesEnabled,
-    customStages,
-    customDomain,
-    terms,
-    snapshot,
-    iconUrl,
-    defaultOverview,
-    defaultPage,
-    hasHomepage,
-    cosmos_gov_version,
-    chain_node_id,
-    discord_bot_webhooks_enabled,
-    directory_page_enabled,
-    directory_page_chain_node_id,
-    type,
-    isPWA,
-  }: {
-    name?: string;
-    description?: string;
-    social_links?: string[];
-    discord?: string;
-    stagesEnabled?: boolean;
-    customStages?: string[];
-    customDomain?: string;
-    terms?: string;
-    snapshot?: string[];
-    iconUrl?: string;
-    defaultOverview?: boolean;
-    defaultPage?: DefaultPage;
-    hasHomepage?: boolean;
-    cosmos_gov_version?: string;
-    chain_node_id?: string;
-    discord_bot_webhooks_enabled?: boolean;
-    directory_page_enabled?: boolean;
-    directory_page_chain_node_id?: number;
-    type?: string;
-    isPWA?: boolean;
-  }) {
-    const id = app.activeChainId() ?? this.id;
-    const r = await axios.patch(
-      `${app.serverUrl()}/communities/${id}`,
-      {
-        id,
-        name,
-        description,
-        social_links,
-        stages_enabled: stagesEnabled,
-        custom_stages: customStages,
-        custom_domain: customDomain,
-        snapshot,
-        terms,
-        icon_url: iconUrl,
-        default_summary_view: defaultOverview,
-        default_page: defaultPage,
-        has_homepage: hasHomepage,
-        chain_node_id,
-        cosmos_gov_version,
-        discord_bot_webhooks_enabled,
-        directory_page_enabled,
-        directory_page_chain_node_id,
-        type,
-        jwt: userStore.getState().jwt,
-      },
-      {
-        headers: {
-          isPWA: isPWA?.toString(),
-        },
-      },
-    );
-
-    const updatedChain = r.data.result;
-    this.name = updatedChain.name;
-    this.description = updatedChain.description;
-    this.socialLinks = updatedChain.social_links;
-    this.stagesEnabled = updatedChain.stages_enabled;
-    this.customStages = updatedChain.custom_stages;
-    this.customDomain = updatedChain.custom_domain;
-    this.snapshot = updatedChain.snapshot;
-    this.terms = updatedChain.terms;
-    this.iconUrl = updatedChain.icon_url;
-    this.defaultOverview = updatedChain.default_summary_view;
-    this.defaultPage = updatedChain.default_page;
-    this.hasHomepage = updatedChain.has_homepage;
-    this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
-    this.directoryPageEnabled = updatedChain.directory_page_enabled;
-    this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
-    this.type = updatedChain.type;
-  }
-
-  public categorizeSocialLinks(): CategorizedSocialLinks {
-    const categorizedLinks: CategorizedSocialLinks = {
-      discords: [],
-      githubs: [],
-      telegrams: [],
-      twitters: [],
-      elements: [],
-      remainingLinks: [],
-    };
-
-    this.socialLinks
-      .filter((link) => !!link)
-      .forEach((link) => {
-        if (link.includes('://discord.com') || link.includes('://discord.gg')) {
-          categorizedLinks.discords.push(link);
-        } else if (link.includes('://github.com')) {
-          categorizedLinks.githubs.push(link);
-        } else if (link.includes('://t.me')) {
-          categorizedLinks.telegrams.push(link);
-        } else if (link.includes('://matrix.to')) {
-          categorizedLinks.elements.push(link);
-        } else if (
-          link.includes('://twitter.com') ||
-          link.includes('://x.com')
-        ) {
-          categorizedLinks.twitters.push(link);
-        } else {
-          categorizedLinks.remainingLinks.push(link);
-        }
-      });
-
-    return categorizedLinks;
-  }
-
-  public updateTags(tags: Tag[]) {
-    this.CommunityTags = tags;
-  }
 }
-
-export type CategorizedSocialLinks = {
-  discords: string[];
-  githubs: string[];
-  telegrams: string[];
-  twitters: string[];
-  elements: string[];
-  remainingLinks: string[];
-};
-
 export default ChainInfo;

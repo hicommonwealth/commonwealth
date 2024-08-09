@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
 const TagsShowcase = () => {
-  const dydx = app.config.chains.getById('dydx');
-  const [communityId, setCommunityId] = useState(dydx);
+  const [communityId, setCommunityId] = useState<string | null>('dydx');
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId || '',
+    enabled: !!communityId,
+  });
 
   return (
     <>
@@ -47,12 +50,14 @@ const TagsShowcase = () => {
 
       <CWText type="h5">Input</CWText>
       <div className="flex-row">
-        {communityId && (
+        {communityId && community && (
           <CWTag
-            label={dydx.name}
+            label={community?.name || ''}
             type="input"
-            community={dydx}
-            // @ts-expect-error <StrictNullChecks/>
+            community={{
+              iconUrl: community.icon_url || '',
+              name: community.name || '',
+            }}
             onClick={() => setCommunityId(null)}
           />
         )}

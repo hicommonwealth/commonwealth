@@ -26,7 +26,13 @@ const JoinCommunityCard = ({
       : community?.profileCount;
   return (
     <div className="JoinCommunityCard">
-      <CWCommunityAvatar community={community} size="xl" />
+      <CWCommunityAvatar
+        community={{
+          iconUrl: community.iconUrl,
+          name: community.name,
+        }}
+        size="xl"
+      />
 
       <div className="info">
         <CWText type="h4" title={community?.name} fontWeight="semiBold">

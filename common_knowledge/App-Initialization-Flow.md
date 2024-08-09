@@ -32,7 +32,7 @@ The goal of this document is to describe the current state of the app initializa
     3. The `LayoutComponent` operates as follows:
         1. If, _at render time_, `app.loadingError` is set, display an application error.
         2. If, _at render time_, the `app.loginStatusLoaded()` method returns false, a loading spinner is shown, triggered by `shouldShowLoadingState`.
-        3. If, _at render time_, `app.config.chains.getById(scope)` does not return successfully, render a `PageNotFound` view.
+        3. If, _at render time_, `useGetCommunityByIdQuery(scope)` does not return successfully, render a `PageNotFound` view.
         4. If, _at render time_, there is no `selectedScope`, and no custom domain, then whatever chain is currently being loaded is deinitialized by `deinitChainOrCommunity`, and the `ScopeToLoad` state variable set to `null`. A loading spinner is shown, triggered by `shouldShowLoadingState`.
         5. If, _at render time_, the `selectedScope` differs from `app.activeChainId()`, the `isLoading` and `scopeToLoad` global state variables are updated (to `true` and `selectedScope`, respectively). `selectChain()` is fired, receiving new scope's chain as argument; on completion, the `isLoading` state variable is set to `false`.
         6. If none of these conditions apply, the routed-to page is rendered.

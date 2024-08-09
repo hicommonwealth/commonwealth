@@ -132,9 +132,9 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
       } catch (switchError) {
         // This error code indicates that the chain has not been added to coinbase.
         if (switchError.code === 4902) {
-          const wsRpcUrl = new URL(app.chain.meta.node.url);
+          const wsRpcUrl = new URL(app.chain?.meta?.node?.url);
           const rpcUrl =
-            app.chain.meta.node.altWalletUrl || `https://${wsRpcUrl.host}`;
+            app.chain?.meta?.node?.altWalletUrl || `https://${wsRpcUrl.host}`;
 
           const chains = await axios.get('https://chainid.network/chains.json');
           const baseChain = chains.data.find((c) => c.chainId === chainId);

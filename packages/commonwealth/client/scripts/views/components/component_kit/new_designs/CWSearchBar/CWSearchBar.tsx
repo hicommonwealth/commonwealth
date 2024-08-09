@@ -13,6 +13,7 @@ import { ComponentType } from '../../types';
 import { CWTag } from '../CWTag';
 import { SearchBarDropdown } from './SearchBarDropdown';
 
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import './CWSearchBar.scss';
 
 type BaseSearchBarProps = {
@@ -59,7 +60,12 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const communityId = showTag
     ? app.activeChainId() || 'all_communities'
     : 'all_communities';
-  const community = app.config.chains.getById(communityId);
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: communityId === app.activeChainId(), // don't run on communityId = 'all_communities'
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
   const { searchResults } = useSearchResults(searchTerm, [
     'threads',
@@ -144,7 +150,10 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           <CWTag
             label={community.name}
             type="input"
-            community={community}
+            community={{
+              iconUrl: community.icon_url || '',
+              name: community.name || '',
+            }}
             onClick={() => setShowTag(false)}
           />
         )}

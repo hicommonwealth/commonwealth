@@ -2,12 +2,13 @@ import { PopperPlacementType } from '@mui/base/Popper';
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
 import React, { useRef } from 'react';
-import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
@@ -109,19 +110,29 @@ export const AuthorAndPublishInfo = ({
   }));
 
   const isCommunityFirstLayout = layoutType === 'community-first';
-  const communtyInfo = app.config.chains.getById(authorCommunityId);
+  const { data: communtyInfo, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: authorCommunityId,
+      enabled: !!authorCommunityId,
+    });
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
       {isCommunityFirstLayout && (
         <>
-          <CommunityInfo
-            name={communtyInfo.name}
-            iconUrl={communtyInfo.iconUrl}
-            iconSize="regular"
-            communityId={authorCommunityId}
-          />
-          {dotIndicator}
+          {isLoadingCommunity ? (
+            <CWCircleMultiplySpinner />
+          ) : (
+            <>
+              <CommunityInfo
+                name={communtyInfo?.name || ''}
+                iconUrl={communtyInfo?.icon_url || ''}
+                iconSize="regular"
+                communityId={authorCommunityId}
+              />
+              {dotIndicator}
+            </>
+          )}
         </>
       )}
       <FullUser

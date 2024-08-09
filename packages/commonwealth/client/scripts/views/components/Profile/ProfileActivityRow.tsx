@@ -3,12 +3,12 @@ import React from 'react';
 import 'components/Profile/ProfileActivityRow.scss';
 import moment from 'moment';
 
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import Thread from 'models/Thread';
 import withRouter, {
   navigateToCommunity,
   useCommonNavigate,
 } from 'navigation/helpers';
-import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
@@ -30,7 +30,10 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   }
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;
-  const { iconUrl } = app.config.chains.getById(communityId);
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
   const domain = document.location.origin;
   let decodedTitle: string;
 
@@ -70,7 +73,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   return (
     <div className="ProfileActivityRow">
       <div className="chain-info">
-        <img src={iconUrl} alt="chain-logo" />
+        <img src={community?.icon_url || ''} alt="chain-logo" />
         <CWText fontWeight="semiBold" className="link">
           <a
             onClick={(e) => {

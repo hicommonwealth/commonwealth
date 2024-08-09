@@ -10,6 +10,7 @@ import {
   MixpanelPageViewEventPayload,
 } from 'shared/analytics/types';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import {
   useFetchGroupsQuery,
@@ -90,8 +91,11 @@ const CommunityMembersPage = () => {
     500,
   );
 
-  const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
-    .namespace;
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+  });
+  const isStakedCommunity = !!community?.namespace;
 
   const columns: CWTableColumnInfo[] = [
     {
@@ -163,8 +167,7 @@ const CommunityMembersPage = () => {
       }),
       include_group_ids: true,
       // only include stake balances if community has staking enabled
-      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-        .namespace,
+      include_stake_balances: !!community?.namespace,
     },
     {
       initialCursor: 1,

@@ -1,13 +1,11 @@
 import { isNonEmptyString } from 'helpers/typeGuards';
 import React, { useState } from 'react';
 import app from 'state';
-import ChainInfo from '../models/ChainInfo';
 import { CWMessageBanner } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';
 
 type SublayoutBannersProps = {
   banner?: string;
-  chain: ChainInfo | null;
   terms?: string;
 };
 

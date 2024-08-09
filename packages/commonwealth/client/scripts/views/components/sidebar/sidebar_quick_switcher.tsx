@@ -72,7 +72,10 @@ export const SidebarQuickSwitcher = ({
           <CWCommunityAvatar
             key={item.id}
             size="large"
-            community={item}
+            community={{
+              iconUrl: item.iconUrl || '',
+              name: item.name || '',
+            }}
             onClick={() =>
               navigateToCommunity({ navigate, path: '', chain: item.id })
             }

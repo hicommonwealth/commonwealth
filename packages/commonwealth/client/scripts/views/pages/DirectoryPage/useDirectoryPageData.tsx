@@ -1,6 +1,5 @@
 import { isCommandClick } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useMemo } from 'react';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
@@ -95,7 +94,7 @@ const useDirectoryPageData = ({
         >
           <CWCommunityAvatar
             size="medium"
-            community={{ iconUrl: c.iconUrl, name: c.name } as ChainInfo}
+            community={{ iconUrl: c.iconUrl, name: c.name }}
           />
           <CWText type="b2" fontWeight="medium">
             {c.name}

@@ -7,8 +7,8 @@ import 'pages/notification_settings/helper_components.scss';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 
 import { useCommonNavigate } from 'navigation/helpers';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import app from '../../../state';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -24,6 +24,7 @@ const getTextRows = (
     options?: NavigateOptions,
     prefix?: null | string,
   ) => void,
+  communityName?: string,
 ) => {
   if (subscription.Thread) {
     const threadUrl = getNotificationUrlPath(subscription);
@@ -117,8 +118,7 @@ const getTextRows = (
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
-          {/* @ts-expect-error StrictNullChecks*/}
-          {app.config.chains.getById(subscription.communityId)?.name}
+          {communityName}
         </CWText>
       </div>
     );
@@ -136,6 +136,11 @@ export const SubscriptionRowTextContainer = ({
 }: SubscriptionRowProps) => {
   const navigate = useCommonNavigate();
 
+  const { data: community } = useGetCommunityByIdQuery({
+    id: subscription.communityId || '',
+    enabled: !!subscription.communityId,
+  });
+
   return (
     <div className="SubscriptionRowTextContainer">
       <CWIcon
@@ -147,7 +152,7 @@ export const SubscriptionRowTextContainer = ({
         iconSize="small"
       />
       <div className="title-and-body-container">
-        {getTextRows(subscription, navigate)}
+        {getTextRows(subscription, navigate, community?.name || '')}
       </div>
     </div>
   );

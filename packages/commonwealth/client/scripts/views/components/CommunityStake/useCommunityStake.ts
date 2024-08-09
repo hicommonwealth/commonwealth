@@ -1,6 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {
   useFetchCommunityStakeQuery,
@@ -8,10 +7,16 @@ import {
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
-import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
 
 interface UseCommunityStakeProps {
-  community?: ChainInfo | CommunityData;
+  community?: {
+    id?: string;
+    namespace?: string;
+    ChainNode?: {
+      url: string;
+      ethChainId: number;
+    };
+  };
   stakeId?: number;
   walletAddress?: string;
 }

@@ -1,9 +1,7 @@
 import { formatAddressShort } from 'helpers';
-import { getCommunityStakeSymbol } from 'helpers/stakes';
 import useTransactionHistory from 'hooks/useTransactionHistory';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
-import app from 'state';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -59,14 +57,9 @@ const MyCommunityStake = () => {
     filterOptions,
     addressFilter,
   });
-  const updatedData = data.map((info) => {
-    info.chain = getCommunityStakeSymbol(
-      app.config.chains.getById(info.community.id)?.ChainNode?.name || '',
-    );
-    return info;
-  });
 
   if (!isLoggedIn) return <PageNotFound />;
+
   return (
     <CWPageLayout>
       <section className="MyCommunityStake">
@@ -123,11 +116,9 @@ const MyCommunityStake = () => {
             </CWTabsRow>
 
             {activeTabIndex === 0 ? (
-              // @ts-expect-error <StrictNullChecks/>
-              <Stakes transactions={updatedData} />
+              <Stakes transactions={data || []} />
             ) : (
-              // @ts-expect-error <StrictNullChecks/>
-              <Transactions transactions={updatedData} />
+              <Transactions transactions={data || []} />
             )}
           </>
         )}

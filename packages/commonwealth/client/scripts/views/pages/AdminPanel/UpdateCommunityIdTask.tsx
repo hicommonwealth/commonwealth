@@ -1,27 +1,19 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
-import app from 'state';
-import { slugifyPreserveDashes } from 'utils';
+import { slugifyPreserveDashes } from 'shared/utils';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { updateCommunityId } from 'views/pages/AdminPanel/utils';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
 const UpdateCommunityIdTask = () => {
-  const [originalCommunityValue, setOriginalCommunityValue] =
-    useState<string>('');
-  const [originalValueValidated, setOriginalValueValidated] =
-    useState<boolean>(false);
-
-  const [newCommunityValue, setNewCommunityValue] = useState<string>('');
-  const [newValueValidated, setNewValueValidated] = useState<boolean>(false);
-
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update Community Id',
-      description: `Are you sure you want to update ${originalCommunityValue} to ${newCommunityValue}?`,
+      description: `Are you sure you want to update ${originalCommunityId} to ${newCommunityId}?`,
       buttons: [
         {
           label: 'Update',
@@ -30,11 +22,11 @@ const UpdateCommunityIdTask = () => {
           onClick: async () => {
             try {
               await updateCommunityId({
-                community_id: originalCommunityValue,
-                new_community_id: newCommunityValue,
+                community_id: originalCommunityId,
+                new_community_id: newCommunityId,
               });
-              setOriginalCommunityValue('');
-              setNewCommunityValue('');
+              setOriginalCommunityId('');
+              setNewCommunityId('');
               notifySuccess('Community id updated');
             } catch (e) {
               notifyError('Error updating community id');
@@ -51,31 +43,34 @@ const UpdateCommunityIdTask = () => {
     });
   };
 
-  const validateFn = (
-    value: string,
-    isNewCommunityId: boolean,
-  ): [ValidationStatus, string] | [] => {
-    const communityExists = app.config.chains.getById(value);
+  const [originalCommunityId, setOriginalCommunityId] = useState<string>('');
+  const debouncedOriginalCommunityId = useDebounce<string | undefined>(
+    originalCommunityId,
+    500,
+  );
+  const { data: originalCommunity, isLoading: isLoadingOriginalCommunity } =
+    useGetCommunityByIdQuery({
+      id: debouncedOriginalCommunityId || '',
+      enabled: !!debouncedOriginalCommunityId,
+    });
 
-    if (communityExists && isNewCommunityId) {
-      setNewValueValidated(false);
-      return ['failure', 'Community already exists'];
-    } else if (!communityExists && !isNewCommunityId) {
-      setOriginalValueValidated(false);
-      return ['failure', 'Community not found'];
-    } else if (isNewCommunityId && value !== slugifyPreserveDashes(value)) {
-      setNewValueValidated(false);
-      return ['failure', 'Incorrect format.'];
-    } else if (!isNewCommunityId && value !== slugifyPreserveDashes(value)) {
-      setOriginalValueValidated(false);
-      return ['failure', 'Incorrect format'];
-    }
+  const [newCommunityId, setNewCommunityId] = useState<string>('');
+  const debouncedNewCommunityId = useDebounce<string | undefined>(
+    newCommunityId,
+    500,
+  );
+  const { data: newCommunity, isLoading: isLoadingNewCommunity } =
+    useGetCommunityByIdQuery({
+      id: debouncedNewCommunityId || '',
+      enabled: !!debouncedNewCommunityId,
+    });
 
-    if (isNewCommunityId) {
-      setNewValueValidated(true);
-    } else setOriginalValueValidated(true);
-    return [];
-  };
+  const originalCommunityNotFound =
+    !isLoadingOriginalCommunity &&
+    Object.keys(originalCommunity || {})?.length === 0;
+  const newCommunityNameAlreadyExists =
+    !isLoadingNewCommunity && Object.keys(newCommunity || {})?.length > 0;
+  const isNewCommunityNameValid = slugifyPreserveDashes(newCommunityId || '');
 
   return (
     <div className="TaskGroup">
@@ -88,27 +83,35 @@ const UpdateCommunityIdTask = () => {
       </CWText>
       <div className="TaskRow">
         <CWTextInput
-          value={originalCommunityValue}
-          onInput={(e) => {
-            setOriginalCommunityValue(e.target.value);
-            if (e.target.value.length === 0) setOriginalValueValidated(false);
-          }}
-          inputValidationFn={(value) => validateFn(value, false)}
+          value={originalCommunityId}
+          onInput={(e) =>
+            setOriginalCommunityId(e?.target?.value?.trim() || '')
+          }
+          customError={originalCommunityNotFound ? 'Community not found' : ''}
           placeholder="Current community id"
+          fullWidth
         />
         <CWTextInput
-          value={newCommunityValue}
-          onInput={(e) => {
-            setNewCommunityValue(e.target.value);
-            if (e.target.value.length === 0) setNewValueValidated(false);
-          }}
-          inputValidationFn={(value) => validateFn(value, true)}
+          value={newCommunityId}
+          onInput={(e) => setNewCommunityId(e?.target?.value?.trim() || '')}
+          customError={
+            newCommunityNameAlreadyExists
+              ? 'Community name already exists, please use a different name'
+              : ''
+          }
           placeholder="New community id"
+          fullWidth
         />
         <CWButton
           label="Update"
           className="TaskButton"
-          disabled={!newValueValidated || !originalValueValidated}
+          disabled={
+            isLoadingOriginalCommunity ||
+            isLoadingNewCommunity ||
+            originalCommunityNotFound ||
+            newCommunityNameAlreadyExists ||
+            !isNewCommunityNameValid
+          }
           onClick={openConfirmationModal}
         />
       </div>

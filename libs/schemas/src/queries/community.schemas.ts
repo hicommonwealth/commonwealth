@@ -69,6 +69,7 @@ export const GetStakeTransaction = {
         icon_url: z.string().nullish(),
         name: z.string(),
         chain_node_id: PG_INT.nullish(),
+        chain_node_name: z.string().nullish(),
       }),
     })
     .array(),

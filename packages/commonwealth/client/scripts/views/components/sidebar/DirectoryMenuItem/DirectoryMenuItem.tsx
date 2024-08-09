@@ -6,6 +6,7 @@ import app from 'state';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { SubSectionGroup } from '../sidebar_section';
 
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import './DirectoryMenuItem.scss';
 
 const DirectoryMenuItem = () => {
@@ -14,16 +15,19 @@ const DirectoryMenuItem = () => {
 
   const matchesDirectoryRoute = matchRoutes(
     [{ path: '/directory' }, { path: ':scope/directory' }],
-    location
+    location,
   );
 
-  const directoryPageEnabled = app.config.chains.getById(
-    app.activeChainId()
-  )?.directoryPageEnabled;
+  const { data: community, isLoading } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+  });
+
+  if (isLoading || !community) return;
 
   return (
     <SubSectionGroup
-      isVisible={directoryPageEnabled}
+      isVisible={community?.directory_page_enabled}
       isActive={!!matchesDirectoryRoute}
       className="DirectoryMenuItem"
       title="Directory"

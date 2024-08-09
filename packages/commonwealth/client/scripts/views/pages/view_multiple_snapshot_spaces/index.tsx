@@ -3,13 +3,18 @@ import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import 'pages/snapshot/multiple_snapshots_page.scss';
 import React from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { Skeleton } from '../../components/Skeleton';
 import { CardsCollection } from '../../components/cards_collection';
 import { SnapshotSpaceCard } from './SnapshotSpaceCard';
 
 const MultipleSnapshotsPage = () => {
-  const [snapshotSpaces, setSnapshotSpaces] = React.useState<Array<string>>();
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+  });
+  const snapshotSpaces: string[] = community?.snapshot_spaces || [];
+
   const [spacesMetadata, setSpacesMetadata] = React.useState<
     Array<{
       space: SnapshotSpace;
@@ -17,13 +22,7 @@ const MultipleSnapshotsPage = () => {
     }>
   >();
 
-  if (app.chain && !snapshotSpaces) {
-    setSnapshotSpaces(
-      app.config.chains?.getById(app.activeChainId()).snapshot || [],
-    );
-  }
-
-  if (!spacesMetadata && snapshotSpaces) {
+  if (!spacesMetadata && snapshotSpaces.length > 0) {
     loadMultipleSpacesData(snapshotSpaces).then((data) => {
       setSpacesMetadata(data);
     });

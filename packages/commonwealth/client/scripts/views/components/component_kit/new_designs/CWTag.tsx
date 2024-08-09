@@ -36,7 +36,7 @@ export type TagProps = {
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   trimAt?: number;
   classNames?: string;
-  community?: ChainInfo;
+  community?: Pick<ChainInfo, 'iconUrl' | 'name'>;
   onMouseEnter?: (e?: React.MouseEvent<HTMLElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
 };
@@ -78,8 +78,13 @@ export const CWTag = ({
       onMouseLeave={onMouseLeave}
     >
       {type === 'input' && (
-        // @ts-expect-error <StrictNullChecks/>
-        <CWCommunityAvatar size="small" community={community} />
+        <CWCommunityAvatar
+          size="small"
+          community={{
+            iconUrl: community?.iconUrl || '',
+            name: community?.name || '',
+          }}
+        />
       )}
       {type === 'contest' && <CWIcon iconName="trophy" iconSize="small" />}
       {!!iconName && (

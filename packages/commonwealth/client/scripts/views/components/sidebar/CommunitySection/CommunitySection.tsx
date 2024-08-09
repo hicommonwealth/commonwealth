@@ -34,7 +34,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const user = useUserStore();
   const {
     selectedAddress,
-    selectedCommunity,
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
@@ -131,7 +130,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
-            {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
         // @ts-expect-error <StrictNullChecks/>

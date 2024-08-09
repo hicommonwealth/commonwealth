@@ -3,6 +3,7 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
 
 export const deinitChainOrCommunity = async () => {
@@ -39,7 +40,16 @@ export const loadCommunityChainInfo = async (
     if (activeCommunity) {
       tempChain = activeCommunity;
     } else {
-      tempChain = app.config.chains.getById(DEFAULT_CHAIN);
+      // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
+      // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
+      // call from that function
+      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        DEFAULT_CHAIN,
+        true,
+      );
+      tempChain = ChainInfo.fromJSON({
+        ...(communityInfo as any),
+      });
     }
 
     if (!tempChain) {
@@ -112,7 +122,7 @@ export const loadCommunityChainInfo = async (
   app.chainPreloading = false;
 
   // Instantiate active addresses before chain fully loads
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses(chain?.id || '');
 
   return true;
 };
@@ -120,7 +130,7 @@ export const loadCommunityChainInfo = async (
 // Initializes a selected chain. Requires `app.chain` to be defined and valid
 // and not already initialized.
 export const initChain = async (): Promise<void> => {
-  if (!app.chain || !app.chain.meta || app.chain.loaded) {
+  if (!app.chain || !app.chain?.meta || app.chain.loaded) {
     return;
   }
 
@@ -140,5 +150,5 @@ export const initChain = async (): Promise<void> => {
   console.log(`${chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses(chain.id || '');
 };

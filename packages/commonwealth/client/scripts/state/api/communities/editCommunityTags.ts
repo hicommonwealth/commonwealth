@@ -4,6 +4,7 @@ import app from 'state';
 import { userStore } from '../../ui/user';
 import { ApiEndpoints, queryClient } from '../config';
 import { FetchActiveCommunitiesResponse } from './fetchActiveCommunities';
+import { invalidateAllQueriesForCommunity } from './getCommuityById';
 
 interface EditCommunityTagsProps {
   communityId: string;
@@ -30,9 +31,8 @@ const editCommunityTags = async ({
 const useEditCommunityTagsMutation = () => {
   return useMutation({
     mutationFn: editCommunityTags,
-    onSuccess: ({ CommunityTags = [], community_id }) => {
-      const community = app.config.chains.getById(community_id);
-      if (community) community.updateTags(CommunityTags);
+    onSuccess: async ({ CommunityTags = [], community_id }) => {
+      await invalidateAllQueriesForCommunity(community_id);
 
       // update active communities cache
       const key = [ApiEndpoints.FETCH_ACTIVE_COMMUNITIES];

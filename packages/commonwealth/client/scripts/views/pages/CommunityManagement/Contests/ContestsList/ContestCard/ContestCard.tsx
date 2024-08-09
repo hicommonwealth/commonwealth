@@ -100,8 +100,8 @@ const ContestCard = ({
 
   const { data: oneOffContestBalance } = useGetContestBalanceQuery({
     contestAddress: address,
-    chainRpc: app.chain.meta.ChainNode.url,
-    ethChainId: app.chain.meta.ChainNode.ethChainId!,
+    chainRpc: app.chain.meta?.ChainNode?.url,
+    ethChainId: app.chain.meta?.ChainNode?.ethChainId || 0,
     apiEnabled: !isRecurring,
   });
 

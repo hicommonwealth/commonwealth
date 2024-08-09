@@ -35,12 +35,12 @@ const StakeIntegration = () => {
 
   const community = app.chain.meta;
   const communityChainId = `${
-    community.ChainNode?.ethChainId || community.ChainNode?.cosmosChainId
+    community?.ChainNode?.ethChainId || community?.ChainNode?.cosmosChainId
   }`;
   const selectedAddress = user.addresses.find(
     (x) =>
       x.address === user.activeAccount?.address &&
-      x.community.id === community.id,
+      x.community?.id === community?.id,
   );
 
   return (

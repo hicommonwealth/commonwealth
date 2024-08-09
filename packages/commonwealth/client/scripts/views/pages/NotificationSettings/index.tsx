@@ -108,8 +108,10 @@ const NotificationSettings = () => {
               return (
                 <CommunityEntry
                   key={community.id}
-                  communityInfo={community}
-                  communityAlert={communityAlertsIndex[community.id]}
+                  id={community.id || ''}
+                  name={community.name || ''}
+                  iconUrl={community.iconUrl || ''}
+                  alert={communityAlertsIndex[community.id]}
                 />
               );
             })}

@@ -66,8 +66,8 @@ export const ThreadSubscriptionEntry = (
         <div>
           <CWCommunityAvatar
             community={{
-              iconUrl: thread.Community.icon_url!,
-              name: thread.Community.name,
+              iconUrl: thread.Community.icon_url || '',
+              name: thread.Community.name || '',
             }}
             size="small"
           />

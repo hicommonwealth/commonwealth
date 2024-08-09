@@ -1,15 +1,13 @@
 import { APIOrderDirection } from 'helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
-import app from 'state';
-import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
+import CommunityDirectoryCard from './CommunityDirectoryCard';
 import './DirectoryPageContent.scss';
 
 type RowType = {
@@ -84,8 +82,6 @@ const DirectoryPageContent = ({
   tableData,
   filteredRelatedCommunitiesData,
 }: DirectoryPageContentProps) => {
-  const user = useUserStore();
-
   const tableState = useCWTableState({
     columns,
     initialSortColumn: 'members',
@@ -126,20 +122,12 @@ const DirectoryPageContent = ({
   ) : (
     <div className="directory-tiles-container">
       {filteredRelatedCommunitiesData.map((community) => {
-        const chain = app.config.chains.getById(community.id);
-
-        // allow user to buy stake if they have a connected address that matches active community base chain
-        const canBuyStake = !!user.addresses.find?.(
-          (address) => address?.community?.base === chain?.base,
-        );
-
         return (
-          <CWRelatedCommunityCard
+          <CommunityDirectoryCard
             key={community.id}
-            community={chain}
-            canBuyStake={canBuyStake}
-            memberCount={community.members}
-            threadCount={community.threads}
+            communityId={community.id}
+            membersCount={community.members as any} // TODO: 8762 fix type
+            threadsCount={community.threads as any} // TODO: 8762 fix type
           />
         );
       })}

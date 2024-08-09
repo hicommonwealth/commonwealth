@@ -56,9 +56,10 @@ export const GovernanceSection = () => {
   // Conditional Render Details
   const hasProposals =
     app.chain &&
-    (app.chain.base === ChainBase.CosmosSDK || app.chain.meta.snapshot?.length);
+    (app.chain.base === ChainBase.CosmosSDK ||
+      app.chain.meta?.snapshot?.length);
 
-  const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
+  const isNotOffchain = app.chain?.meta?.type !== ChainType.Offchain;
 
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
@@ -157,7 +158,7 @@ export const GovernanceSection = () => {
       setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
       resetSidebarState();
       // Check if we have multiple snapshots for conditional redirect
-      const snapshotSpaces = app.chain.meta.snapshot;
+      const snapshotSpaces = app.chain?.meta?.snapshot;
       if (snapshotSpaces.length > 1) {
         handleRedirectClicks(
           navigate,

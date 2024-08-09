@@ -28,7 +28,10 @@ export const SearchBarCommunityPreviewRow: FC<
 
   return (
     <div className="SearchBarCommunityPreviewRow" onClick={handleClick}>
-      <CommunityLabel community={communityInfo} />
+      <CommunityLabel
+        name={communityInfo.name || ''}
+        iconUrl={communityInfo.iconUrl || ''}
+      />
     </div>
   );
 };
