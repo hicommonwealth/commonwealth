@@ -87,7 +87,9 @@ export const buildAssociations = (db: DB) => {
     asMany: 'threads',
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
-  }).withMany(db.ContestTopic);
+  })
+    .withMany(db.ContestTopic)
+    .withMany(db.GroupPermission);
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {

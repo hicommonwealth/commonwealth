@@ -3,9 +3,8 @@ import {
   CommunityAttributes,
   GroupAttributes,
   UserInstance,
-  sequelize,
 } from '@hicommonwealth/model';
-import { GroupMetadata } from '@hicommonwealth/schemas';
+import { ForumActionsEnum, GroupMetadata } from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import z from 'zod';
@@ -117,25 +116,20 @@ export async function __createGroup(
       { transaction: t },
     );
     if (topicsToAssociate.length > 0) {
-      // add group to all specified topics
-      await this.models.Topic.update(
-        {
-          group_ids: sequelize.fn(
-            'array_append',
-            sequelize.col('group_ids'),
-            group.id,
-          ),
-        },
-        {
-          // @ts-expect-error StrictNullChecks
-          where: {
-            id: {
-              [Op.in]: topicsToAssociate.map(({ id }) => id),
-            },
+      const createPermissionsPromises = topicsToAssociate.map((topic) => {
+        return this.models.GroupPermission.create(
+          {
+            group_id: group.id,
+            topic_id: topic.id,
+            allowed_actions: Object.values(ForumActionsEnum),
           },
-          transaction,
-        },
-      );
+          {
+            transaction: t,
+          },
+        );
+      });
+
+      await Promise.all(createPermissionsPromises);
     }
     return group.toJSON();
   };

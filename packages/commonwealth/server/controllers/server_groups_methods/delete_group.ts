@@ -1,10 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import {
-  AddressInstance,
-  UserInstance,
-  sequelize,
-} from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -48,24 +43,11 @@ export async function __deleteGroup(
   }
 
   await this.models.sequelize.transaction(async (transaction) => {
-    // remove group from all associated topics
-    await this.models.Topic.update(
-      {
-        group_ids: sequelize.fn(
-          'array_remove',
-          sequelize.col('group_ids'),
-          group.id,
-        ),
-      },
-      {
-        where: {
-          group_ids: {
-            [Op.contains]: [group.id],
-          },
-        },
-        transaction,
-      },
-    );
+    // remove all group permissions of the group
+    await this.models.GroupPermission.destroy({
+      where: { group_id: group.id },
+      transaction,
+    });
     // delete all memberships of group
     await this.models.Membership.destroy({
       where: {

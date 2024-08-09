@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import z from 'zod';
+import { z } from 'zod';
 import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -31,7 +31,6 @@ export const refreshMembershipHandler = async (
   } = validationResult.data;
 
   const result = await controllers.groups.refreshMembership({
-    // @ts-expect-error StrictNullChecks
     user,
     // @ts-expect-error StrictNullChecks
     address,

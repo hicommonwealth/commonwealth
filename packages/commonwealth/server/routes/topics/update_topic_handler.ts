@@ -36,7 +36,6 @@ export const updateTopicHandler = async (
     featured_in_new_post: z.coerce.boolean().optional(),
     default_offchain_template: z.string().nullable().optional(),
     telegram: z.string().nullable().optional(),
-    group_ids: z.array(z.number()).optional(),
   });
 
   const validationResult = validationSchema.safeParse({

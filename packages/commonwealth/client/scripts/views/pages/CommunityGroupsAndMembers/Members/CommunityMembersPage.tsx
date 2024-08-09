@@ -240,9 +240,9 @@ const CommunityMembersPage = () => {
     const modifiedGroupsArr = (groups || []).map((group) => ({
       ...group,
       // add is group joined flag based on membership
-      isJoined: (memberships || []).find(
+      isJoined: !!(memberships || []).find(
         (membership) => membership.groupId === group.id,
-      )?.isAllowed,
+      )?.groupId,
     }));
 
     const filteredGroupsArr = (modifiedGroupsArr || [])

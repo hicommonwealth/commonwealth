@@ -38,7 +38,6 @@ describe('Subscriptions Tests', () => {
     const topic = await server.models.Topic.findOne({
       where: {
         community_id,
-        group_ids: [],
       },
     });
 
@@ -50,8 +49,7 @@ describe('Subscriptions Tests', () => {
       body: 't',
       kind: 'discussion',
       stage: 'discussion',
-      // @ts-expect-error StrictNullChecks
-      topicId: topic.id,
+      topicId: topic?.id,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
     });

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
-export enum PermissionEnum {
+export enum ForumActionsEnum {
   CREATE_THREAD = 'CREATE_THREAD',
   CREATE_COMMENT = 'CREATE_COMMENT',
   CREATE_THREAD_REACTION = 'CREATE_THREAD_REACTION',
@@ -9,11 +9,12 @@ export enum PermissionEnum {
   UPDATE_POLL = 'UPDATE_POLL',
 }
 
-export type GroupPermissionAction = keyof typeof PermissionEnum;
+export type ForumActions = keyof typeof ForumActionsEnum;
 
 export const GroupPermission = z.object({
   group_id: PG_INT.optional(),
-  allowed_actions: z.array(z.nativeEnum(PermissionEnum)),
+  topic_id: PG_INT.optional(),
+  allowed_actions: z.array(z.nativeEnum(ForumActionsEnum)),
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
 });

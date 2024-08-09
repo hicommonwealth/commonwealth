@@ -1,7 +1,8 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
-import { models, sequelize } from '../database';
+import { models } from '../database';
 import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
@@ -55,24 +56,20 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
             { transaction },
           );
           if (topicsToAssociate.length > 0) {
-            // add group to all specified topics
-            await models.Topic.update(
-              {
-                group_ids: sequelize.fn(
-                  'array_append',
-                  sequelize.col('group_ids'),
-                  group.id,
-                ),
-              },
-              {
-                where: {
-                  id: {
-                    [Op.in]: topicsToAssociate.map(({ id }) => id!),
-                  },
+            const createPermissionsPromises = topicsToAssociate.map((topic) => {
+              return models.GroupPermission.create(
+                {
+                  group_id: group.id,
+                  topic_id: topic.id,
+                  allowed_actions: Object.values(ForumActionsEnum),
                 },
-                transaction,
-              },
-            );
+                {
+                  transaction,
+                },
+              );
+            });
+
+            await Promise.all(createPermissionsPromises);
           }
           return group.toJSON();
         },

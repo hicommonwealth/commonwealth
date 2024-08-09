@@ -24,6 +24,7 @@ interface APIResponseFormat {
       token_id?: string;
     };
   }[];
+  GroupPermissions?: { Topic: unknown }[];
   topics: any[];
   memberships: any[];
   updated_at: string;
@@ -49,7 +50,7 @@ class Group {
     updated_at,
     metadata,
     requirements,
-    topics,
+    GroupPermissions,
     memberships,
   }: APIResponseFormat) {
     this.id = id;
@@ -59,7 +60,7 @@ class Group {
     this.name = metadata.name;
     this.description = metadata.description;
     this.requirements = requirements;
-    this.topics = topics;
+    this.topics = GroupPermissions?.map((p) => p.Topic) ?? [];
     this.members = memberships;
     // @ts-expect-error StrictNullChecks
     this.requirementsToFulfill = metadata.required_requirements;

@@ -34,7 +34,19 @@ const createMockedGroupsController = () => {
       name: 'hello',
       featured_in_sidebar: false,
       featured_in_new_post: false,
-      group_ids: [1],
+    },
+  ];
+  const groupPermissions = [
+    {
+      group_id: 1,
+      topic_id: 1,
+      allowed_actions: [],
+      created_at: new Date(),
+      updated_at: new Date(),
+      requirements: [],
+      metadata: {
+        required_requirements: 0,
+      },
     },
   ];
   const memberships: MembershipAttributes[] = [
@@ -64,6 +76,13 @@ const createMockedGroupsController = () => {
       },
       findByPk: async (id: number) => topics.find((t) => t.id === id),
       update: async () => {},
+    },
+    GroupPermission: {
+      create: async () => ({
+        ...groupPermissions[0],
+        toJSON: () => groupPermissions[0],
+      }),
+      destroy: async () => {},
     },
     Group: {
       findAll: async (): Promise<(GroupAttributes & { toJSON: any })[]> => {
@@ -128,6 +147,9 @@ const createMockedGroupsController = () => {
       findAll: async () => [{}],
     },
     sequelize: {
+      query: async () => {
+        return groupPermissions;
+      },
       transaction: async (callback) => callback(),
     },
   };
@@ -146,17 +168,17 @@ const createMockParams = () => {
   } as UserInstance;
   const chain = {} as CommunityInstance;
   const address = {} as AddressInstance;
-  return { user, chain, address };
+  const topicId = 1;
+  return { user, chain, address, topicId };
 };
 
 describe('ServerGroupsController', () => {
   test('#refreshMembership', async () => {
     const controller = createMockedGroupsController();
-    const { user, address } = createMockParams();
+    const { topicId, address } = createMockParams();
     const results = await controller.refreshMembership({
-      user,
+      topicId,
       address,
-      topicId: 1,
     });
     expect(results[0]).to.have.property('groupId');
     expect(results[0]).to.have.property('topicIds');
