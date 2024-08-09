@@ -36,6 +36,19 @@ const createMockedGroupsController = () => {
       featured_in_new_post: false,
     },
   ];
+  const groupPermissions = [
+    {
+      group_id: 1,
+      topic_id: 1,
+      allowed_actions: [],
+      created_at: new Date(),
+      updated_at: new Date(),
+      requirements: [],
+      metadata: {
+        required_requirements: 0,
+      },
+    },
+  ];
   const memberships: MembershipAttributes[] = [
     {
       group_id: 1,
@@ -63,6 +76,13 @@ const createMockedGroupsController = () => {
       },
       findByPk: async (id: number) => topics.find((t) => t.id === id),
       update: async () => {},
+    },
+    GroupPermission: {
+      create: async () => ({
+        ...groupPermissions[0],
+        toJSON: () => groupPermissions[0],
+      }),
+      destroy: async () => {},
     },
     Group: {
       findAll: async (): Promise<(GroupAttributes & { toJSON: any })[]> => {
@@ -127,6 +147,9 @@ const createMockedGroupsController = () => {
       findAll: async () => [{}],
     },
     sequelize: {
+      query: async () => {
+        return groupPermissions;
+      },
       transaction: async (callback) => callback(),
     },
   };
