@@ -23,6 +23,25 @@ export const getProposalUrlPath = (
   }
 };
 
+export const getThreadUrlPath = (
+  type: ProposalType,
+  id: number | string,
+  omitActiveId = true,
+  chainId?: string,
+): string => {
+  let basePath: string;
+  if (type === ProposalType.Thread) {
+    basePath = `/discussion/${id}`;
+  } else {
+    basePath = '/discussions';
+  }
+  if (omitActiveId || (app.isCustomDomain() && !chainId)) {
+    return basePath;
+  } else {
+    return `/${chainId || app.activeChainId()}${basePath}`;
+  }
+};
+
 export const getNotificationUrlPath = (
   subscription: NotificationSubscription,
 ): string => {
