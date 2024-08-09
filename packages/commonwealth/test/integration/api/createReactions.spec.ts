@@ -154,7 +154,6 @@ describe('createReaction Integration Tests', () => {
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
-      // @ts-expect-error StrictNullChecks
       thread_id: thread.id,
       author_chain: 'ethereum',
       session: userSession.session,

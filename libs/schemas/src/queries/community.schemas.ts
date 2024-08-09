@@ -1,15 +1,52 @@
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Community, CommunityMember, CommunityStake } from '../entities';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+
+export const GetCommunities = {
+  input: PaginationParamsSchema.extend({
+    base: z.nativeEnum(ChainBase).optional(),
+    // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
+    //    Instead we support comma-separated strings of ids.
+    tag_ids: z
+      .preprocess((value) => {
+        if (typeof value === 'string') {
+          return value.split(',').map((id) => id.trim());
+        }
+        return value;
+      }, z.array(z.coerce.number().positive()))
+      .optional(),
+    include_node_info: z.boolean().optional(),
+    stake_enabled: z.boolean().optional(),
+    has_groups: z.boolean().optional(),
+    order_by: z.enum(['profile_count', 'thread_count']).optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: Community.array(),
+  }),
+};
 
 export const GetCommunity = {
   input: z.object({
     id: z.string(),
     include_node_info: z.boolean().optional(),
   }),
-  output: Community.optional(),
+  output: Community.extend({
+    numVotingThreads: PG_INT,
+    numTotalThreads: PG_INT,
+    adminsAndMods: z.array(
+      z.object({
+        address: z.string(),
+        role: z.enum(['admin', 'moderator']),
+      }),
+    ),
+    communityBanner: z.string().optional(),
+  }).optional(),
 };
 
 export const GetCommunityStake = {

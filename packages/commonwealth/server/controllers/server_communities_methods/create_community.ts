@@ -152,8 +152,8 @@ export async function __createCommunity(
     }
     if (node) {
       url = node.url;
-      altWalletUrl = node.alt_wallet_url;
-      privateUrl = node.private_url;
+      altWalletUrl = node.alt_wallet_url!;
+      privateUrl = node.private_url!;
     }
 
     const node_url = privateUrl || url;
@@ -336,7 +336,6 @@ export async function __createCommunity(
     defaults: {
       url,
       eth_chain_id,
-      // @ts-expect-error StrictNullChecks
       cosmos_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
@@ -492,7 +491,7 @@ export async function __createCommunity(
     await this.models.Address.create({
       user_id: user.id,
       address: addressToBeAdmin.address,
-      community_id: createdCommunity.id,
+      community_id: createdCommunity.id!,
       hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
@@ -501,6 +500,9 @@ export async function __createCommunity(
       is_user_default: true,
       role: 'admin',
       last_active: new Date(),
+      is_councillor: false,
+      is_validator: false,
+      ghost_address: false,
     });
 
     await this.models.Subscription.findOrCreate({

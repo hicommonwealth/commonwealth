@@ -91,6 +91,7 @@ describe('Contests projection lifecycle', () => {
           },
         ],
         url: 'https://test',
+        private_url: 'https://test',
       });
       const [user] = await seed(
         'User',

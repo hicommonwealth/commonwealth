@@ -44,8 +44,8 @@ const fetchProfileById = async ({
         id: a.id!,
         address: a.address,
         communityId: a.community_id!,
-        walletId: a.wallet_id,
-        walletSsoSource: a.wallet_sso_source,
+        walletId: a.wallet_id!,
+        walletSsoSource: a.wallet_sso_source!,
         ghostAddress: a.ghost_address,
       });
     } catch (err) {
@@ -89,12 +89,12 @@ const useFetchProfileByIdQuery = ({
               new AddressInfo({
                 userId: user.id,
                 id: a.id!,
-                walletId: a?.wallet_id,
+                walletId: a.wallet_id!,
                 communityId: a.community_id!,
                 address: a?.address,
                 ghostAddress: a?.ghost_address,
                 lastActive: a.last_active ? moment(a.last_active) : undefined,
-                walletSsoSource: a?.wallet_sso_source,
+                walletSsoSource: a.wallet_sso_source!,
               }),
           ),
         });

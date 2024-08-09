@@ -126,7 +126,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
       },
     ];
     const communityRole: CommunityRoleAttributes = {
-      id: a.id,
+      id: a.id!,
       name: a.role,
       community_id: a.community_id!,
       allow: 0 as any,

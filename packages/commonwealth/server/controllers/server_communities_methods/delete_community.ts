@@ -150,6 +150,7 @@ export async function __deleteCommunity(
             this.models.Notification,
             // @ts-expect-error StrictNullChecks
             this.models.Group,
+            // @ts-expect-error StrictNullChecks
             this.models.Address,
           ];
 

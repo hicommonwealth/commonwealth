@@ -2,8 +2,9 @@ import { z } from 'zod';
 
 export const SnapshotSpace = z.object({
   snapshot_space: z.string().max(255),
-  created_at: z.date(),
-  updated_at: z.date(),
+
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const SnapshotProposal = z.object({

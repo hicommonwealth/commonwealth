@@ -49,6 +49,7 @@ export const getCommunitiesHandler = async (
     return success(res, results);
   }
 
+  // TODO: throw error here -- route no longer accessible
   const results = await controllers.communities.getCommunities({});
   return success(res, results);
 };

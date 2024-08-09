@@ -1,5 +1,12 @@
-import { Actor, InvalidState, command, dispose } from '@hicommonwealth/core';
+import {
+  Actor,
+  InvalidState,
+  command,
+  dispose,
+  query,
+} from '@hicommonwealth/core';
 import { Chance } from 'chance';
+import { GetCommunities } from 'model/src/community';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateGroup,
@@ -29,7 +36,8 @@ describe('Group lifecycle', () => {
     const [node] = await seed('ChainNode', {});
     const [user] = await seed('User', { isAdmin: true });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node!.id!,
+      active: true,
       Addresses: [
         {
           role: 'admin',
@@ -40,7 +48,7 @@ describe('Group lifecycle', () => {
 
     payload.id = community!.id!;
     actor = {
-      user: { id: user!.id!, email: user!.email!, isAdmin: user?.isAdmin },
+      user: { id: user!.id!, email: user!.email!, isAdmin: user!.isAdmin! },
       address_id: community!.Addresses!.at(0)!.address!,
     };
   });
@@ -49,9 +57,23 @@ describe('Group lifecycle', () => {
     await dispose()();
   });
 
+  test('should fail to query community via has_groups when none exists', async () => {
+    const communityResults = await query(GetCommunities(), {
+      actor,
+      payload: { has_groups: true } as any,
+    });
+    expect(communityResults?.results).to.have.length(0);
+  });
+
   test('should create group when none exists', async () => {
     const results = await command(CreateGroup(), { actor, payload });
     expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
+
+    const communityResults = await query(GetCommunities(), {
+      actor,
+      payload: { has_groups: true } as any,
+    });
+    expect(communityResults?.results?.at(0)?.id).to.equal(payload.id);
   });
 
   test('should fail creation when group with same id found', async () => {

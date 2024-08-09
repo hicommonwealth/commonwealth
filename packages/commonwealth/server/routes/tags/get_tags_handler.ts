@@ -1,9 +1,9 @@
-import { Tag } from '@hicommonwealth/schemas';
+import { Tags } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 
-export type GetTagsResponse = z.infer<typeof Tag>[];
+export type GetTagsResponse = z.infer<typeof Tags>[];
 
 export const getTagsHandler = async (
   controllers: ServerControllers,

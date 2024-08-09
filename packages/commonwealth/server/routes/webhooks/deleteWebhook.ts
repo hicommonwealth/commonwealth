@@ -18,8 +18,7 @@ const deleteWebhook = async (
 
   const webhook = await models.Webhook.findOne({
     where: {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
+      community_id: community!.id!,
       url: req.body.webhookUrl,
     },
   });

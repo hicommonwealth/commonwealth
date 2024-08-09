@@ -184,7 +184,7 @@ export async function createAddressHelper(
       return models.Address.create(
         {
           user_id,
-          community_id: req.community_id,
+          community_id: req.community_id!,
           address: encodedAddress,
           hex: addressHex,
           verification_token,
@@ -194,6 +194,10 @@ export async function createAddressHelper(
           wallet_id: req.wallet_id,
           wallet_sso_source: req.wallet_sso_source,
           role: 'member',
+          is_user_default: false,
+          is_councillor: false,
+          is_validator: false,
+          ghost_address: false,
         },
         { transaction },
       );

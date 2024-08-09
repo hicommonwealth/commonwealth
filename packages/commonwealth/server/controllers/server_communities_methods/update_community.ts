@@ -122,9 +122,7 @@ export async function __updateCommunity(
   const invalidSocialLinks = nonEmptySocialLinks?.filter(
     (s) => !urlHasValidHTTPPrefix(s),
   );
-  // @ts-expect-error StrictNullChecks
   if (nonEmptySocialLinks && invalidSocialLinks.length > 0) {
-    // @ts-expect-error StrictNullChecks
     throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     throw new AppError(Errors.InvalidCustomDomain);
@@ -144,7 +142,6 @@ export async function __updateCommunity(
   }
 
   const newSpaces = snapshot.filter((space) => {
-    // @ts-expect-error StrictNullChecks
     return !community.snapshot_spaces.includes(space);
   });
   for (const space of newSpaces) {
@@ -193,7 +190,7 @@ export async function __updateCommunity(
     if (directory_page_enabled) {
       // @ts-expect-error StrictNullChecks
       communitySelected = await this.models.Community.findOne({
-        where: { chain_node_id: directory_page_chain_node_id },
+        where: { chain_node_id: directory_page_chain_node_id! },
       });
     }
   }
@@ -216,7 +213,7 @@ export async function __updateCommunity(
 
     const namespaceAddress =
       await commonProtocol.newNamespaceValidator.validateNamespace(
-        namespace,
+        namespace!,
         transactionHash,
         communityAdmin.address,
         community,

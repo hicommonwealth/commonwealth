@@ -134,8 +134,8 @@ const EditProfile = () => {
               id: a.id!,
               address: a.address,
               communityId: a.community_id!,
-              walletId: a.wallet_id,
-              walletSsoSource: a.wallet_sso_source,
+              walletId: a.wallet_id!,
+              walletSsoSource: a.wallet_sso_source!,
               ghostAddress: a.ghost_address,
             });
           } catch (err) {

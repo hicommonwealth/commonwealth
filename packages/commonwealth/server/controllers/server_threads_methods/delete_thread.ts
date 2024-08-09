@@ -32,7 +32,6 @@ export async function __deleteThread(
       },
     });
     if (existingThread) {
-      // @ts-expect-error StrictNullChecks
       threadId = existingThread.id;
     } else {
       throw new AppError(Errors.ThreadNotFound);

@@ -70,7 +70,7 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const web3 = new Web3(chainNode.private_url);
+  const web3 = new Web3(chainNode.private_url!);
 
   const [tradeTxReceipt, block] = await Promise.all([
     web3.eth.getTransactionReceipt(event.rawLog.transactionHash),

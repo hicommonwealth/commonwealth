@@ -124,7 +124,9 @@ export function buildPaginatedResponse<T>(
     results: items,
     limit: options.limit!,
     page: Math.floor(options.offset! / limit) + 1,
-    totalPages: Math.floor(totalResults / limit) + 1,
+    // account for off-by-one-error if final page would be empty when adding 1
+    totalPages:
+      Math.floor(totalResults / limit) + (totalResults % limit === 0 ? 0 : 1),
     totalResults,
   };
 }

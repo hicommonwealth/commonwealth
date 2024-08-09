@@ -60,5 +60,5 @@ export async function __getCommunities(
         (ct) => (ct as unknown as CommunityWithTags).Tag,
       ),
     },
-  })) as GetCommunitiesResult;
+  })) as unknown as GetCommunitiesResult;
 }
