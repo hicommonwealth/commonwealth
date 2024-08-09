@@ -68,15 +68,14 @@ module.exports = {
             );
           }
         }
+        await queryInterface.removeColumn('Topics', 'group_ids', {
+          transaction,
+        });
       });
     } catch (e) {
       console.log('Migration failed');
       throw e;
     }
-
-    // For whatever reason this cannot be in the transaction, otherwise it will fail.
-    // This should still be safe since we will abort if the above transaction rolls back before we get to this line.
-    await queryInterface.removeColumn('Topics', 'group_ids');
   },
 
   async down() {},
