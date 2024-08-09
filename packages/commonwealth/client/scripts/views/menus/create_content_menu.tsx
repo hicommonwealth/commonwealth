@@ -35,7 +35,7 @@ const resetSidebarState = () => {
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
-    userStore.getState() && !!app.chain?.meta.snapshot.length;
+    userStore.getState() && !!app.chain?.meta?.snapshot?.length;
 
   const showOnChainProposalItem =
     app.chain?.base === ChainBase.CosmosSDK &&
@@ -64,7 +64,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             iconLeft: 'democraticProposal',
             onClick: () => {
               resetSidebarState();
-              const snapshotSpaces = app.chain.meta.snapshot;
+              const snapshotSpaces = app.chain.meta?.snapshot;
               navigate(`/new/snapshot/${snapshotSpaces}`, {
                 action: 'create-proposal',
               });
@@ -89,7 +89,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
   const getDiscordBotConnectionItems = (): PopoverMenuItem[] => {
     const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-    const botNotConnected = app.chain.meta.discordConfigId === null;
+    const botNotConnected = app.chain.meta?.discordConfigId === null;
 
     if (isAdmin && botNotConnected) {
       return [

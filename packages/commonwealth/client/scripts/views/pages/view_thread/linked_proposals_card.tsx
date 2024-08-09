@@ -65,7 +65,7 @@ export const LinkedProposalsCard = ({
           }`,
         );
       } else {
-        loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+        loadMultipleSpacesData(app.chain.meta?.snapshot || []).then((data) => {
           for (const { space: _space, proposals } of data) {
             const matchingSnapshot = proposals.find(
               (sn) => sn.id === proposal.identifier,

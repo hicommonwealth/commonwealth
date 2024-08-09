@@ -136,10 +136,8 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
-  // @ts-expect-error StrictNullChecks
-  const terms = app.chain ? chain.terms : null;
-  // @ts-expect-error StrictNullChecks
-  const banner = app.chain ? chain.communityBanner : null;
+  const terms = app.chain ? chain?.terms : null;
+  const banner = app.chain ? chain?.communityBanner : null;
 
   return (
     <div className="Sublayout">
