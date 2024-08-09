@@ -1,4 +1,4 @@
-import { models } from '@hicommonwealth/model';
+import { models, UserAttributes } from '@hicommonwealth/model';
 import { User } from '@hicommonwealth/schemas';
 import { Op, QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -61,58 +61,15 @@ class DiscourseQueries {
 }
 
 class CWQueries {
-  static fetchImportedUsersByCommunity = async ({
-    communityId,
-  }: {
-    communityId: string;
-  }): Promise<Array<z.infer<typeof User>>> => {
-    return models.User.findAll({
-      include: [
-        {
-          model: models.Address,
-          where: {
-            community_id: communityId,
-            ghost_address: true,
-          },
-          required: true,
-        },
-      ],
-    });
-  };
-
-  static fetchUsersByEmail = async (
-    communityId: string,
-    emails: string[],
-  ): Promise<Array<z.infer<typeof User>>> => {
-    const users = await models.User.findAll({
-      where: {
-        email: {
-          [Op.in]: emails,
-        },
-      },
-      include: [
-        {
-          model: models.Address,
-          where: {
-            community_id: communityId,
-          },
-          required: false,
-        },
-      ],
-    });
-    return users.map((user) => user.get({ plain: true }));
-  };
-
-  static createOrFindUser = async (
-    discourseUser: DiscourseUser,
-    discourseBio: DiscourseWebsiteBio | null,
+  static bulkCreateUsers = async (
+    entries: {
+      discourseUser: DiscourseUser;
+      discourseBio: DiscourseWebsiteBio | null;
+    }[],
     { transaction }: { transaction: Transaction | null },
-  ): Promise<CWUserWithDiscourseId> => {
-    const [user, created] = await models.User.findOrCreate({
-      where: {
-        email: discourseUser.email,
-      },
-      defaults: {
+  ): Promise<Array<CWUserWithDiscourseId>> => {
+    const usersToCreate: UserAttributes[] = entries.map(
+      ({ discourseUser, discourseBio }) => ({
         email: discourseUser.email,
         profile: {
           name: discourseUser.username || discourseUser.name,
@@ -124,14 +81,39 @@ class CWQueries {
         disableRichText: false,
         emailVerified: false,
         emailNotificationInterval: 'never',
+      }),
+    );
+
+    const existingUsers = await models.User.findAll({
+      where: {
+        [Op.or]: usersToCreate.map((u) => ({ email: u.email })),
       },
+    });
+
+    const filteredUsersToCreate = usersToCreate.filter(
+      (r) => !existingUsers.find((er) => r.email === er.email),
+    );
+
+    const createdUsers = await models.User.bulkCreate(filteredUsersToCreate, {
       transaction,
     });
-    return {
-      ...user.get({ plain: true }),
-      discourseUserId: discourseUser.id,
-      created,
-    };
+
+    return [
+      ...existingUsers.map((u) => ({
+        ...u.get({ plain: true }),
+        created: false,
+      })),
+      ...createdUsers.map((u) => ({
+        ...u.get({ plain: true }),
+        created: true,
+      })),
+    ].map((user) => ({
+      ...user,
+      discourseUserId: entries.find(
+        (e) => e.discourseUser.email === user.email,
+      )!.discourseUser.id,
+      created: !!createdUsers.find((u) => u.id === user.id),
+    }));
   };
 }
 
@@ -150,17 +132,16 @@ export const createAllUsersInCW = async (
 
   const allBios = await DiscourseQueries.fetchBios(discourseConnection);
 
-  // create or find new users
-  const cwUsers = await Promise.all(
-    allDiscourseUsers.map((userToCreate) =>
-      CWQueries.createOrFindUser(
-        userToCreate,
-        allBios.find((b) => b.discourse_user_id === userToCreate.id) || null,
-        { transaction },
-      ),
-    ),
-  );
+  const entries = allDiscourseUsers.map((discourseUser) => ({
+    discourseUser,
+    discourseBio:
+      allBios.find((b) => b.discourse_user_id === discourseUser.id) || null,
+  }));
 
+  // create or find new users
+  const cwUsers = await CWQueries.bulkCreateUsers(entries, { transaction });
+
+  // return users along with maps of admins and mods
   return {
     users: cwUsers,
     admins: allDiscourseUsers

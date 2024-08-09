@@ -1,7 +1,11 @@
-import { CWUserWithDiscourseId, models } from '@hicommonwealth/model';
+import {
+  AddressAttributes,
+  CWUserWithDiscourseId,
+  models,
+} from '@hicommonwealth/model';
 import { Address } from '@hicommonwealth/schemas';
 import crypto from 'crypto';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { BASES } from './constants';
@@ -13,30 +17,19 @@ export type CWAddressWithDiscourseId = z.infer<typeof Address> & {
 };
 
 class CWQueries {
-  static createOrFindAddress = async (
-    {
-      userId,
-      address,
-      communityId,
-      isAdmin,
-      isModerator,
-      discourseUserId,
-    }: {
+  static buildCreateAddresses = async (
+    entries: {
       userId: number;
       address: string;
       communityId: string;
       isAdmin: boolean;
       isModerator: boolean;
       discourseUserId: number;
-    },
+    }[],
     { transaction }: { transaction: Transaction | null },
-  ): Promise<CWAddressWithDiscourseId> => {
-    const [addr, created] = await models.Address.findOrCreate({
-      where: {
-        user_id: userId,
-        community_id: communityId,
-      },
-      defaults: {
+  ): Promise<Array<CWAddressWithDiscourseId>> => {
+    const addressesToCreate: AddressAttributes[] = entries.map(
+      ({ userId, address, communityId, isAdmin, isModerator }) => ({
         address,
         community_id: communityId,
         user_id: userId,
@@ -50,14 +43,51 @@ class CWQueries {
         is_validator: false,
         ghost_address: true,
         role: isAdmin ? 'admin' : isModerator ? 'moderator' : 'member',
+      }),
+    );
+
+    // don't compare by address.address because new addresses are randomized
+    const existingAddresses = await models.Address.findAll({
+      where: {
+        [Op.or]: addressesToCreate.map((a) => ({
+          community_id: a.community_id,
+          user_id: a.user_id,
+        })),
       },
-      transaction,
     });
-    return {
-      ...addr.get({ plain: true }),
-      discourseUserId,
-      created,
-    };
+
+    const filteredAddressesToCreate = addressesToCreate.filter(
+      (a) =>
+        !existingAddresses.find(
+          (ea) =>
+            a.community_id === ea.community_id && a.user_id === ea.user_id,
+        ),
+    );
+
+    const createdAddresses = await models.Address.bulkCreate(
+      filteredAddressesToCreate,
+      {
+        transaction,
+      },
+    );
+
+    return [
+      ...existingAddresses.map((a) => ({
+        ...a.get({ plain: true }),
+        created: false,
+      })),
+      ...createdAddresses.map((a) => ({
+        ...a.get({ plain: true }),
+        created: true,
+      })),
+    ].map((address) => ({
+      ...address,
+      discourseUserId: entries.find(
+        (e) =>
+          e.communityId === address.community_id &&
+          e.userId === address.user_id,
+      )!.discourseUserId,
+    }));
   };
 }
 
@@ -77,7 +107,7 @@ export const createAllAddressesInCW = async (
   },
   { transaction }: { transaction: Transaction | null },
 ): Promise<Array<CWAddressWithDiscourseId>> => {
-  const addressPromises = users.map((user) => {
+  const entries = users.map((user) => {
     let ghostAddress;
     if (base.toUpperCase() === BASES.COSMOS) {
       ghostAddress = createCosmosAddress();
@@ -94,19 +124,15 @@ export const createAllAddressesInCW = async (
       const web3 = new Web3();
       ghostAddress = web3.eth.accounts.create().address;
     }
-
-    return CWQueries.createOrFindAddress(
-      {
-        userId: user.id!,
-        address: ghostAddress,
-        communityId,
-        isAdmin: admins[user.id!],
-        isModerator: moderators[user.id!],
-        discourseUserId: user.discourseUserId,
-      },
-      { transaction },
-    );
+    return {
+      userId: user.id!,
+      address: ghostAddress,
+      communityId,
+      isAdmin: admins[user.id!],
+      isModerator: moderators[user.id!],
+      discourseUserId: user.discourseUserId,
+    };
   });
 
-  return Promise.all(addressPromises);
+  return CWQueries.buildCreateAddresses(entries, { transaction });
 };
