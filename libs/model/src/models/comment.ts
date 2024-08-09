@@ -76,39 +76,31 @@ export default (
         afterCreate: async (comment: CommentInstance, options) => {
           const { Thread, Outbox } = sequelize.models;
           const thread_id = comment.thread_id;
-          try {
-            const thread = await Thread.findOne({
-              where: { id: thread_id },
+          const thread = await Thread.findOne({ where: { id: thread_id } });
+          if (thread) {
+            await thread.update(
+              {
+                comment_count: Sequelize.literal('comment_count + 1'),
+                activity_rank_date: comment.created_at,
+              },
+              { transaction: options.transaction },
+            );
+            stats().increment('cw.hook.comment-count', {
+              thread_id: String(thread_id),
             });
-            if (thread) {
-              await thread.update(
+            await emitEvent(
+              Outbox,
+              [
                 {
-                  comment_count: Sequelize.literal('comment_count + 1'),
-                  activity_rank_date: comment.created_at,
-                },
-                { transaction: options.transaction },
-              );
-              stats().increment('cw.hook.comment-count', {
-                thread_id: String(thread_id),
-              });
-              await emitEvent(
-                Outbox,
-                [
-                  {
-                    event_name: EventNames.CommentCreated,
-                    event_payload: {
-                      ...comment.get({ plain: true }),
-                      // @ts-expect-error unknown models
-                      community_id: thread.community_id,
-                    },
+                  event_name: EventNames.CommentCreated,
+                  event_payload: {
+                    ...comment.get({ plain: true }),
+                    // @ts-expect-error unknown models
+                    community_id: thread.community_id,
                   },
-                ],
-                options.transaction,
-              );
-            }
-          } catch (error) {
-            log.error(
-              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`,
+                },
+              ],
+              options.transaction,
             );
           }
         },
