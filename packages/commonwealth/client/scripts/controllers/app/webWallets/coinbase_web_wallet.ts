@@ -134,7 +134,6 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
         if (switchError.code === 4902) {
           const wsRpcUrl = new URL(app.chain?.meta?.node?.url);
           const rpcUrl =
-            // TODO: 8762 -- FIX ChainNode, make it the same type as `ExtendedCommunity`
             app.chain?.meta?.node?.altWalletUrl || `https://${wsRpcUrl.host}`;
 
           const chains = await axios.get('https://chainid.network/chains.json');
