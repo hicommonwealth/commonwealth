@@ -8,7 +8,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { getProposalUrlPath } from 'identifiers';
+import { getThreadUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
@@ -224,7 +224,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
-      const url = getProposalUrlPath(
+      const url = getThreadUrlPath(
         thread.slug,
         `${threadId}-${slugify(thread?.title)}${window.location.search}`,
         true,

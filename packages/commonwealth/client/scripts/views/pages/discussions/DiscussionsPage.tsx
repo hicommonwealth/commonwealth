@@ -1,6 +1,6 @@
-import { getProposalUrlPath } from 'identifiers';
+import { getThreadUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
@@ -58,7 +58,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
   });
   const contestAddress = searchParams.get('contest');
@@ -127,6 +127,29 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
+  const splitURLPath = useMemo(() => location.pathname.split('/'), []);
+  const decodedString = useMemo(
+    () => decodeURIComponent(splitURLPath[3]),
+    [splitURLPath],
+  );
+
+  //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
+  useEffect(() => {
+    if (
+      !isLoadingTopics &&
+      decodedString &&
+      splitURLPath[2] === 'discussions' &&
+      splitURLPath.length === 4
+    ) {
+      const validTopics = topics?.some(
+        (topic) => topic?.name === decodedString,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+  }, [topics, decodedString, splitURLPath, isLoadingTopics, navigate]);
+
   useManageDocumentTitle('Discussions');
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
@@ -151,7 +174,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         data={isInitialLoading ? [] : filteredThreads}
         customScrollParent={containerRef.current}
         itemContent={(i, thread) => {
-          const discussionLink = getProposalUrlPath(
+          const discussionLink = getThreadUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`,
           );
