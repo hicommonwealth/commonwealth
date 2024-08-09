@@ -126,6 +126,7 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
         } else if (
           // Contests
           Object.values(EvmEventSignatures.Contests).includes(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             eventSignature as any,
           )
         ) {
