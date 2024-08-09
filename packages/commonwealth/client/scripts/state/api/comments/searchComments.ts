@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { APIOrderBy, APIOrderDirection, SERVER_URL } from 'helpers/constants';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { ReplyResult } from 'views/pages/search/helpers';
-import { ApiEndpoints } from '../config';
+import { ApiEndpoints, SERVER_URL } from '../config';
 
 const SEARCH_COMMENTS_STALE_TIME = 60 * 1_000; // 60 s
 
