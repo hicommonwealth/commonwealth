@@ -3,16 +3,10 @@ import {
   CWTopicWithDiscourseId,
   CWUserWithDiscourseId,
   models,
-  ThreadAttributes,
 } from '@hicommonwealth/model';
 import { Thread } from '@hicommonwealth/schemas';
 import moment from 'moment';
-import {
-  FindOrCreateOptions,
-  QueryTypes,
-  Sequelize,
-  Transaction,
-} from 'sequelize';
+import { Op, QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
 
 export type CWThreadWithDiscourseId = z.infer<typeof Thread> & {
@@ -66,50 +60,82 @@ class DiscourseQueries {
 }
 
 class CWQueries {
-  static createOrFindThread = async (
-    discourseTopic: DiscourseTopic,
-    communityId: string,
-    cwTopicId: number,
-    addressId: number,
+  static bulkCreateThreads = async (
+    entries: {
+      discourseTopic: DiscourseTopic;
+      communityId: string;
+      cwTopicId: number;
+      addressId: number;
+    }[],
     { transaction }: { transaction: Transaction | null },
-  ): Promise<CWThreadWithDiscourseId> => {
-    const options: z.infer<typeof Thread> = {
-      address_id: addressId,
-      title: encodeURIComponent(discourseTopic.title.replace(/'/g, "''")),
-      body: encodeURIComponent(discourseTopic.cooked.replace(/'/g, "''")),
-      created_at: moment(discourseTopic.created_at).toDate(),
-      updated_at: moment(discourseTopic.updated_at).toDate(),
-      community_id: communityId,
-      pinned: discourseTopic.pinned_globally,
-      kind: 'discussion',
-      topic_id: cwTopicId,
-      plaintext: discourseTopic.raw.replace(/'/g, "''"),
-      stage: 'discussion',
-      view_count: discourseTopic.views,
-      reaction_count: discourseTopic.like_count,
-      reaction_weights_sum: 0,
-      comment_count: 0,
-      max_notif_id: 0,
-    };
-    const [thread, created] = await models.Thread.findOrCreate({
+  ) => {
+    const threadsToCreate: Array<z.infer<typeof Thread>> = entries.map(
+      ({ discourseTopic, communityId, cwTopicId, addressId }) => ({
+        address_id: addressId,
+        title: formatDiscourseContent(discourseTopic.title),
+        body: formatDiscourseContent(discourseTopic.cooked),
+        created_at: moment(discourseTopic.created_at).toDate(),
+        updated_at: moment(discourseTopic.updated_at).toDate(),
+        community_id: communityId,
+        pinned: discourseTopic.pinned_globally,
+        kind: 'discussion',
+        topic_id: cwTopicId,
+        plaintext: discourseTopic.raw.replace(/'/g, "''"),
+        stage: 'discussion',
+        view_count: discourseTopic.views,
+        reaction_count: discourseTopic.like_count,
+        reaction_weights_sum: 0,
+        comment_count: 0,
+        max_notif_id: 0,
+      }),
+    );
+
+    const existingThreads = await models.Thread.findAll({
       where: {
-        address_id: options.address_id,
-        community_id: options.community_id,
-        created_at: options.created_at,
+        [Op.or]: threadsToCreate.map((a) => ({
+          title: a.title,
+          community_id: a.community_id,
+        })),
       },
-      defaults: options,
-      transaction,
-      skipOutbox: true,
-    } as FindOrCreateOptions<ThreadAttributes> & {
-      skipOutbox: boolean;
     });
-    return {
-      ...thread.get({ plain: true }),
-      discourseTopicId: discourseTopic.id,
-      created,
-    };
+
+    const filteredThreadsToCreate = threadsToCreate.filter(
+      (t) =>
+        !existingThreads.find(
+          (et) => t.title === et.title && t.community_id === et.community_id,
+        ),
+    );
+
+    const createdThreads = await models.Thread.bulkCreate(
+      filteredThreadsToCreate,
+      {
+        transaction,
+      },
+    );
+
+    return [
+      ...existingThreads.map((a) => ({
+        ...a.get({ plain: true }),
+        created: false,
+      })),
+      ...createdThreads.map((a) => ({
+        ...a.get({ plain: true }),
+        created: true,
+      })),
+    ].map((thread) => ({
+      ...thread,
+      discourseTopicId: entries.find(
+        (e) =>
+          thread.title === formatDiscourseContent(e.discourseTopic.title) &&
+          thread.community_id === e.communityId &&
+          moment(thread.created_at).isSame(e.discourseTopic.created_at),
+      )!.discourseTopic.id,
+    }));
   };
 }
+
+const formatDiscourseContent = (str: string) =>
+  encodeURIComponent(str.replace(/'/g, "''"));
 
 export const createAllThreadsInCW = async (
   discourseConnection: Sequelize,
@@ -140,8 +166,9 @@ export const createAllThreadsInCW = async (
   const generalDiscourseCategoryId =
     await DiscourseQueries.fetchGeneralCategoryId(discourseConnection);
 
-  const threadPromises = discourseThreads
+  const entries = discourseThreads
     .map((discourseThread) => {
+      // append user
       const user = users.find(
         ({ discourseUserId }) => discourseUserId === discourseThread.user_id,
       );
@@ -154,13 +181,13 @@ export const createAllThreadsInCW = async (
       // filter out threads where the cw user doesn't exist
       return !!discourseThread.user;
     })
-    .map(async (discourseThread): Promise<CWThreadWithDiscourseId> => {
+    .map((discourseThread) => {
       const { category_id: discourseThreadCategoryId } = discourseThread;
 
       // get thread's associated cw topic
       let cwTopicId = generalCwTopic!.id!; // general by default
       if (discourseThreadCategoryId) {
-        // find cw topic that matches the discourse thread's topic
+        // find cw topic that matches the discourse category
         const cwTopic = topics.find(
           ({ discourseCategoryId: discourseCategoryId }) =>
             discourseCategoryId === discourseThreadCategoryId,
@@ -186,17 +213,13 @@ export const createAllThreadsInCW = async (
         );
       }
 
-      // create thread
-      return CWQueries.createOrFindThread(
-        discourseThread,
+      return {
+        discourseTopic: discourseThread,
         communityId,
         cwTopicId,
-        address.id!,
-        {
-          transaction,
-        },
-      );
+        addressId: address.id!,
+      };
     });
 
-  return Promise.all(threadPromises);
+  return CWQueries.bulkCreateThreads(entries, { transaction });
 };
