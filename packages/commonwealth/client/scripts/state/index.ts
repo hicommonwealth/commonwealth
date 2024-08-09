@@ -77,8 +77,6 @@ export interface IApp {
 
   isLoggedIn(): boolean;
 
-  serverUrl(): string;
-
   loadingError: string;
 
   _customDomainId: string;
@@ -133,9 +131,6 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  serverUrl: () => {
-    return '/api';
-  },
 
   // @ts-expect-error StrictNullChecks
   loadingError: null,
