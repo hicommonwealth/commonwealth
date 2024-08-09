@@ -7,6 +7,31 @@ import { z } from 'zod';
 // .default() for the zod schema for each field. We would still need refine()
 // for one field but 70% of our config would go away and be more maintainable.
 //
+// For example, for sitemaps you could have either:
+//
+// This... (AKA an empty object)
+//
+// { }
+//
+// Just an explicit entry disabling it:
+//
+// {
+//    SITEMAP_ENABLED: false
+// }
+//
+// or enabling it:
+//
+// {
+//    SITEMAP_ENABLED: true
+// }
+//
+// or with a custom config:
+//
+// {
+//    SITEMAP_ENABLED: true
+//    SITEMAP_THREAD_PRIORITY: 0.2
+// }
+//
 // I think it also requires a Zod upgrade but that's easy enough.
 
 const SITEMAP_DISABLED_SCHEMA = z.object({
