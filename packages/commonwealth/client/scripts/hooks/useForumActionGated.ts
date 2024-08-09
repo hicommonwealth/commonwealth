@@ -32,7 +32,10 @@ export const useForumActionGated = ({
         allowedActions: m.allowedActions,
       })),
     )
-    .map((g) => [g.topic_id, g.allowedActions as ForumActions[]]);
+    .map((g) => [g.topic_id, g.allowedActions]) as unknown as [
+    number,
+    ForumActions[],
+  ][];
 
   const topicIdToIsAllowedMap: Map<number, ForumActions[]> = new Map(
     flatMemberships,
