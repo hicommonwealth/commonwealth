@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { SERVER_URL } from 'state/api/config';
 import { PageLoading } from './loading';
 
-export default function ThreadRedirect({ identifier }: { identifier: string }) {
+const ThreadRedirect = ({ identifier }: { identifier: string }) => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -30,4 +30,6 @@ export default function ThreadRedirect({ identifier }: { identifier: string }) {
   }, [navigate, identifier]);
 
   return <PageLoading />;
-}
+};
+
+export default ThreadRedirect;
