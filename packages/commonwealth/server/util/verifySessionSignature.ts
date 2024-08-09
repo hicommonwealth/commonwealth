@@ -4,6 +4,7 @@ import assert from 'assert';
 import {
   CANVAS_TOPIC,
   NotificationCategories,
+  addressSwapper,
   getSessionSignerForDid,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
@@ -25,9 +26,20 @@ const verifySessionSignature = async (
   user_id: number | undefined | null,
   session: Session,
 ): Promise<void> => {
-  const expectedAddress = addressModel.address;
+  let expectedAddress = addressModel.address;
 
-  const walletAddress = session.did.split(':')[4];
+  // the session did has the format
+  // did:pkh:<chain>:<chain_id>:<wallet_address>
+  const sessionDidParts = session.did.split(':');
+
+  if (sessionDidParts[2] == 'polkadot') {
+    expectedAddress = addressSwapper({
+      address: expectedAddress,
+      currentPrefix: parseInt(sessionDidParts[3]),
+    });
+  }
+
+  const walletAddress = sessionDidParts[4];
   assert(
     walletAddress === expectedAddress,
     `session.did address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,

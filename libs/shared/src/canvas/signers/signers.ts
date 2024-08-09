@@ -127,12 +127,15 @@ export class SubstrateSignerCW extends SubstrateSigner {
 
   // override AbstractSessionSigner to use ss58 id 42 in hasSession
   hasSession(topic: string, address: string) {
-    const [namespace, chainId, walletAddress] = address.split(':');
+    // TODO: we should have a utility function to access parts of DIDs
+    const addressParts = address.split(':');
+    const walletAddress = addressParts[4];
     const finalAddress = addressSwapper({
       currentPrefix: 42,
       address: walletAddress,
     });
-    const key = `canvas/${topic}/${namespace}:${chainId}:${finalAddress}`;
+    const did = `did:pkh:polkadot:42:${finalAddress}`;
+    const key = `canvas/${topic}/${did}`;
     return this.target.get(key) !== null;
     // return this.#cache.has(key) || target.get(key) !== null
   }
