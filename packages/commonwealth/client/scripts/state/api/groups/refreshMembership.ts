@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 
 const REFRESH_MEMBERSHIP_STALE_TIME = 30 * 1_000; // 30 s
@@ -25,16 +24,13 @@ const refreshMembership = async ({
   address,
   topicId,
 }: RefreshMembershipProps): Promise<Memberships[]> => {
-  const response: any = await axios.put(
-    `${app.serverUrl()}/refresh-membership`,
-    {
-      jwt: userStore.getState().jwt,
-      community_id: communityId,
-      author_community_id: communityId,
-      address,
-      ...(topicId && { topic_id: topicId }),
-    },
-  );
+  const response: any = await axios.put(`${SERVER_URL}/refresh-membership`, {
+    jwt: userStore.getState().jwt,
+    community_id: communityId,
+    author_community_id: communityId,
+    address,
+    ...(topicId && { topic_id: topicId }),
+  });
 
   return response?.data?.result?.map((r) => ({
     groupId: r.groupId,

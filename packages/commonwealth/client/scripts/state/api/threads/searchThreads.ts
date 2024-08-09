@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import app from 'state';
+import { APIOrderBy, APIOrderDirection, SERVER_URL } from 'helpers/constants';
 import { ThreadResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
@@ -42,7 +41,7 @@ const searchThreads = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchThreadsResponse }>(
-    `${app.serverUrl()}/threads`,
+    `${SERVER_URL}/threads`,
     {
       headers: {
         'Content-Type': 'application/json',

@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import app from 'state';
+import { APIOrderBy, APIOrderDirection, SERVER_URL } from 'helpers/constants';
 import { CommunityResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
@@ -35,7 +34,7 @@ const searchChains = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchChainsResponse }>(
-    `${app.serverUrl()}/communities`,
+    `${SERVER_URL}/communities`,
     {
       headers: {
         'Content-Type': 'application/json',

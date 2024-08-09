@@ -6,6 +6,7 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { CosmosSignerCW } from '@hicommonwealth/shared';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import { Transaction, Web3BaseProvider } from 'web3';
 import IWebWallet from '../../../models/IWebWallet';
@@ -61,9 +62,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -132,7 +131,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       }
 
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+      const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${
         app.chain?.network || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');

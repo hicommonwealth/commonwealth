@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import app from 'state';
+import { APIOrderBy, APIOrderDirection, SERVER_URL } from 'helpers/constants';
 import { ReplyResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
@@ -37,7 +36,7 @@ const searchComments = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchCommentsResponse }>(
-    `${app.serverUrl()}/comments`,
+    `${SERVER_URL}/comments`,
     {
       headers: {
         'Content-Type': 'application/json',

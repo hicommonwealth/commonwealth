@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import StarredCommunity from 'models/StarredCommunity';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore, { userStore } from '../../ui/user';
 
 interface ToggleCommunityStarProps {
@@ -11,7 +11,7 @@ interface ToggleCommunityStarProps {
 const toggleCommunityStar = async ({ community }: ToggleCommunityStarProps) => {
   // TODO: the endpoint is really a toggle to star/unstar a community, migrate
   // this to use the new restful standard
-  const response = await axios.post(`${app.serverUrl()}/starCommunity`, {
+  const response = await axios.post(`${SERVER_URL}/starCommunity`, {
     chain: community,
     auth: true,
     jwt: userStore.getState().jwt,
