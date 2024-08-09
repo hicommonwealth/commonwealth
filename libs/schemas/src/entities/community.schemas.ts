@@ -60,13 +60,13 @@ export const Community = z.object({
   updated_at: z.coerce.date().optional(),
 
   // 3. Associations are optional
-  Addresses: z.array(Address).nullish(),
+  Addresses: z.array(Address).optional(),
   CommunityStakes: z.array(CommunityStake).nullish(),
   CommunityTags: z.array(CommunityTags).nullish(),
-  ChainNode: ChainNode.nullish(),
-  topics: z.array(Topic).nullish(),
-  groups: z.array(Group).nullish(),
-  contest_managers: z.array(ContestManager).nullish(),
+  ChainNode: ChainNode.optional(),
+  topics: z.array(Topic).optional(),
+  groups: z.array(Group).optional(),
+  contest_managers: z.array(ContestManager).optional(),
 });
 
 // aliases
