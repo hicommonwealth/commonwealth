@@ -28,7 +28,7 @@ describe('Thread subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id!,
+      chain_node_id: node!.id!,
       Addresses: [
         {
           role: 'member',

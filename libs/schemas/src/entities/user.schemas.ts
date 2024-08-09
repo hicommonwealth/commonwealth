@@ -47,23 +47,6 @@ export const User = z.object({
   updated_at: z.date().optional(),
 });
 
-// export const Profile = z.object({
-//   id: PG_INT,
-//   user_id: PG_INT,
-//   created_at: z.date().nullish(),
-//   updated_at: z.date().nullish(),
-//   profile_name: z.string().max(255).nullish(),
-//   email: z.string().max(255).nullish(),
-//   website: z.string().max(255).nullish(),
-//   bio: z.string().nullish(),
-//   avatar_url: z.string().max(255).nullish(),
-//   slug: z.string().max(255).nullish(),
-//   socials: z.array(z.string()).nullish(),
-//   background_image: z.any().nullish(),
-//   bio_backup: z.string().nullish(),
-//   profile_name_backup: z.string().max(255).nullish(),
-// });
-
 export const Address = z.object({
   id: PG_INT.optional(),
   address: z.string().max(255),
