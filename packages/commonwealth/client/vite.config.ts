@@ -17,7 +17,7 @@ function createScriptsResolver(folder: string): Alias {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const envPath = path.dirname(path.dirname(process.cwd())); // root project .env
+  const envPath = path.dirname(path.dirname(projectRootDir)); // root project .env
   const env = loadEnv(mode, envPath, '');
 
   const unleashConfig = {
