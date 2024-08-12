@@ -82,7 +82,11 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   });
 
   // edge case for deleted communities with orphaned posts
-  if (!community) return;
+  if (!community) {
+    return (
+      <ThreadCard thread={thread} layoutType="community-first" showSkeleton />
+    );
+  }
 
   return (
     <ThreadCard
@@ -92,8 +96,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
-          `${
-            app.isCustomDomain() ? '' : `/${thread.communityId}`
+          `${app.isCustomDomain() ? '' : `/${thread.communityId}`
           }/discussions?stage=${thread.stage}`,
         );
       }}
