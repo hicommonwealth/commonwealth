@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import Comment from 'models/Comment';
 import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const COMMENTS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -13,7 +13,7 @@ interface FetchCommentsProps {
 
 const fetchComments = async ({ communityId, threadId }: FetchCommentsProps) => {
   const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_COMMENTS}`,
+    `${SERVER_URL}${ApiEndpoints.FETCH_COMMENTS}`,
     {
       params: {
         community_id: communityId || app.activeChainId(),

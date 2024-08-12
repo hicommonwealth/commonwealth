@@ -13,7 +13,7 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import StarredCommunity from 'models/StarredCommunity';
-import { queryClient, QueryKeys } from 'state/api/config';
+import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { ChainStore } from 'stores';
@@ -63,8 +63,6 @@ export interface IApp {
   config: {
     chains: ChainStore;
   };
-
-  serverUrl(): string;
 
   loadingError: string;
 
@@ -116,10 +114,6 @@ const app: IApp = {
     chains: new ChainStore(),
   },
 
-  serverUrl: () => {
-    return '/api';
-  },
-
   // @ts-expect-error StrictNullChecks
   loadingError: null,
 
@@ -133,7 +127,6 @@ const app: IApp = {
     app._customDomainId = d;
   },
 };
-
 //allows for FS.identify to be used
 declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
@@ -143,8 +136,8 @@ export async function initAppState(
 ): Promise<void> {
   try {
     const [{ data: statusRes }, { data: communities }] = await Promise.all([
-      axios.get(`${app.serverUrl()}/status`),
-      axios.get(`${app.serverUrl()}/communities`),
+      axios.get(`${SERVER_URL}/status`),
+      axios.get(`${SERVER_URL}/communities`),
     ]);
 
     const nodesData = await fetchNodesQuery();

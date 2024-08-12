@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import moment from 'moment';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
@@ -28,7 +27,7 @@ const toggleCommentSpamStatus = async ({
     author_chain: communityId,
   };
   return await axios[method](
-    `${app.serverUrl()}/comments/${commentId}/spam`,
+    `${SERVER_URL}/comments/${commentId}/spam`,
     isSpam ? body : ({ data: { ...body } } as any),
   );
 };
