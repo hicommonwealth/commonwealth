@@ -62,8 +62,9 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
     return cachedCommunity;
   }
 
-  // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
-  // and update `EXCEPTION_CASE_VANILLA_getCommunityById` name
+  // HACK: with @trpc/react-query v10.x, we can't directly call an endpoint outside of 'react-context'
+  // with this way the api can be used in non-react files. This should be cleaned up when we migrate
+  // to @trpc/react-query v11.x
   const response = await axios.get(
     // eslint-disable-next-line max-len
     `${SERVER_URL}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,

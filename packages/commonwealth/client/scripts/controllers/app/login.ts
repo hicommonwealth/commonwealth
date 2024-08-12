@@ -283,9 +283,6 @@ export async function createUserWithAddress(
 
   const id = response.data.result.id;
 
-  // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
-  // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
-  // call from that function
   const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
     chain || '',
     true,
@@ -423,9 +420,6 @@ export async function handleSocialLoginCallback({
   // a page without a chain, in which case we default to an eth login
   let desiredChain = app.chain?.meta;
   if (!desiredChain && chain) {
-    // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
-    // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
-    // call from that function
     const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
       chain || '',
       true,
@@ -570,9 +564,6 @@ export async function handleSocialLoginCallback({
     if (app.chain) {
       let chainInfo = userStore.getState().activeCommunity;
 
-      // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
-      // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
-      // call from that function
       if (!chainInfo && chain) {
         const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
           chain || '',

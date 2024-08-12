@@ -126,8 +126,8 @@ const DirectoryPageContent = ({
           <CommunityDirectoryCard
             key={community.id}
             communityId={community.id}
-            membersCount={community.members as any} // TODO: 8762 fix type
-            threadsCount={community.threads as any} // TODO: 8762 fix type
+            membersCount={community.members}
+            threadsCount={community.threads}
           />
         );
       })}

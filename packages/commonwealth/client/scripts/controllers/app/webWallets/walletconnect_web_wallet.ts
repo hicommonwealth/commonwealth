@@ -98,26 +98,19 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async enable() {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
-    // try {
-    // Create WalletConnect Provider
     this._chainInfo = app?.chain?.meta;
 
-    // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
-    // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
-    // call from that function
-    {
-      if (!this._chainInfo && app.activeChainId()) {
-        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-          app.activeChainId() || '',
-          true,
-        );
+    if (!this._chainInfo && app.activeChainId()) {
+      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        app.activeChainId() || '',
+        true,
+      );
 
-        const chainInfo = ChainInfo.fromJSON({
-          ...(communityInfo as any),
-        });
+      const chainInfo = ChainInfo.fromJSON({
+        ...(communityInfo as any),
+      });
 
-        this._chainInfo = chainInfo;
-      }
+      this._chainInfo = chainInfo;
     }
 
     const chainId = this._chainInfo.node?.ethChainId || 1;

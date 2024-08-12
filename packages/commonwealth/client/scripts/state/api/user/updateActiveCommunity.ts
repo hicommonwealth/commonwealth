@@ -32,7 +32,7 @@ const useUpdateUserActiveCommunityMutation = () => {
   return useMutation({
     mutationFn: updateActiveCommunity,
     onSuccess: (communityId: string) => {
-      // TODO: 8762: find a better way to set this
+      // TODO: cleanup this with #2617
       const foundChain = app.config.chains
         .getAll()
         .find((c) => c.id == communityId);

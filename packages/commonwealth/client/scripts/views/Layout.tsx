@@ -127,11 +127,10 @@ const LayoutComponent = ({
               substrate_spec: community.substrate_spec,
               type: community.type,
               adminsAndMods: community?.adminsAndMods || [],
-              // TODO: 8762 -- these don't come from /communities/:id response -- still needed?
+              // these don't come from /communities/:id response and need to be added in
+              // api response when needed
               Contracts: [],
               profile_count: 0,
-              // TODO: 8762 -- the other community.* keys are not accepted by ChainInfo -- check if they are
-              // referenced
             }),
           )
         ) {

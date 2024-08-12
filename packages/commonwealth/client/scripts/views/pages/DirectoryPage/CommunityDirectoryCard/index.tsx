@@ -1,13 +1,14 @@
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
+import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 
 interface CommunityDirectoryCardProps {
   communityId: string;
-  threadsCount: number;
-  membersCount: number;
+  threadsCount: number | string;
+  membersCount: number | string;
 }
 
 const CommunityDirectoryCard = ({
@@ -30,7 +31,8 @@ const CommunityDirectoryCard = ({
   );
 
   if (isCommunityLoading) return <CWCircleMultiplySpinner />;
-  if (!community) return <span>Failed to load community</span>; // TODO: 8762 add proper error state
+
+  if (!community) return <CWText>Failed to load community</CWText>;
 
   return (
     <CWRelatedCommunityCard

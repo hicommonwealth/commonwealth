@@ -41,7 +41,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
 
-    // TODO: 8762 -- Do we really need this? -- ask product.
+    // TODO: Do we really need this for 1inch only? -- ask product.
     const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
       darkModePreferenceSet
@@ -49,8 +49,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    // TODO: https://github.com/hicommonwealth/commonwealth/issues/8812
-    // cleanup EXCEPTION_CASE_threadCountersStore
+    // TODO: cleanup EXCEPTION_CASE_threadCountersStore in 8812
     EXCEPTION_CASE_threadCountersStore.setState({
       totalThreadsInCommunity: this.meta.numTotalThreads,
       totalThreadsInCommunityForVoting: this.meta.numVotingThreads,

@@ -40,9 +40,6 @@ export const loadCommunityChainInfo = async (
     if (activeCommunity) {
       tempChain = activeCommunity;
     } else {
-      // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
-      // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
-      // call from that function
       const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
         DEFAULT_CHAIN,
         true,
