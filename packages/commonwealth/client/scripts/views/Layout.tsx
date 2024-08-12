@@ -85,8 +85,7 @@ const LayoutComponent = ({
         setCommunityToLoad(providedCommunityScope);
         if (
           await loadCommunityChainInfo(
-            // TODO: https://github.com/hicommonwealth/commonwealth/issues/8811
-            // cleanup `ChainInfo`
+            // TODO: 8811 cleanup `ChainInfo`
             ChainInfo.fromJSON({
               Addresses: community.Addresses,
               admin_only_polling: community.admin_only_polling,
@@ -127,6 +126,7 @@ const LayoutComponent = ({
               substrate_spec: community.substrate_spec,
               type: community.type,
               adminsAndMods: community?.adminsAndMods || [],
+              communityBanner: community?.communityBanner || '',
               // these don't come from /communities/:id response and need to be added in
               // api response when needed
               Contracts: [],

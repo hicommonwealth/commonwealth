@@ -97,6 +97,7 @@ class ChainInfo {
     thread_count,
     profile_count,
     snapshot_spaces,
+    communityBanner,
   }) {
     this.id = id;
     this.network = network;
@@ -127,8 +128,7 @@ class ChainInfo {
     this.CommunityTags = CommunityTags;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
-    // @ts-expect-error StrictNullChecks
-    this.communityBanner = null;
+    this.communityBanner = communityBanner;
     this.discordConfigId = discord_config_id;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
     this.directoryPageEnabled = directoryPageEnabled;
@@ -180,6 +180,7 @@ class ChainInfo {
     snapshot_spaces,
     Addresses,
     adminsAndMods,
+    communityBanner,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -237,6 +238,7 @@ class ChainInfo {
       profile_count,
       snapshot_spaces,
       adminsAndMods: adminsAndMods || Addresses,
+      communityBanner,
     });
   }
 }

@@ -7,7 +7,7 @@ import React, { useCallback, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
-  // useEditCommunityBannerMutation,
+  useEditCommunityBannerMutation,
   useEditCommunityTagsMutation,
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
@@ -63,7 +63,7 @@ const CommunityProfileForm = () => {
       enabled: !!app.activeChainId(),
     });
 
-  // const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
+  const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
   const { mutateAsync: editTags } = useEditCommunityTagsMutation();
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
@@ -142,11 +142,10 @@ const CommunityProfileForm = () => {
           .map((pt) => pt.item.id),
       });
 
-      // TODO: 8762 fix this, as community obj from app.state won't be available
-      // await editBanner({
-      //   communityId: community.id,
-      //   bannerText: values.communityBanner ?? '',
-      // });
+      await editBanner({
+        communityId: community.id,
+        bannerText: values.communityBanner ?? '',
+      });
 
       await updateCommunity({
         communityId: community.id,
@@ -212,8 +211,7 @@ const CommunityProfileForm = () => {
           (community?.custom_stages || []).length > 0
             ? JSON.stringify(community?.custom_stages || [])
             : '',
-        // TODO: 8762 add this back after merging some /bulkOffchain with GET /communities/:id
-        // communityBanner: community.communityBanner || '',
+        communityBanner: community.communityBanner || '',
       }}
       validationSchema={communityProfileValidationSchema}
       onSubmit={onSubmit}
