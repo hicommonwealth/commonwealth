@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const RELATED_COMMUNITIES_STALE_TIME = 60 * 5 * 1_000; // 5 min
 
@@ -24,7 +23,7 @@ const fetchRelatedCommunities = async ({
   chainNodeId,
 }: FetchRelatedCommunitiesProps) => {
   const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_RELATED_COMMUNITIES}`,
+    `${SERVER_URL}${ApiEndpoints.FETCH_RELATED_COMMUNITIES}`,
     {
       params: {
         chainNodeId,

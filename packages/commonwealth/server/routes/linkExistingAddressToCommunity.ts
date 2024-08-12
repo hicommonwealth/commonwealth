@@ -158,7 +158,7 @@ const linkExistingAddressToCommunity = async (
         {
           user_id: originalAddress.user_id!,
           address: encodedAddress,
-          community_id: community!.id,
+          community_id: community!.id!,
           hex,
           verification_token: verificationToken,
           verification_token_expires: verificationTokenExpires,
@@ -167,6 +167,10 @@ const linkExistingAddressToCommunity = async (
           wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),
           role: 'member',
+          is_user_default: false,
+          is_councillor: false,
+          is_validator: false,
+          ghost_address: false,
         },
         { transaction },
       );

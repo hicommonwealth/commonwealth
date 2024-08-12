@@ -24,6 +24,7 @@ import { Magic } from 'magic-sdk';
 import axios from 'axios';
 import app from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { SERVER_URL } from 'state/api/config';
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import {
   onUpdateEmailError,
@@ -50,7 +51,7 @@ export function linkExistingAddressToChainOrCommunity(
   community: string,
   originChain: string,
 ) {
-  return axios.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
+  return axios.post(`${SERVER_URL}/linkExistingAddressToCommunity`, {
     address,
     community_id: community,
     originChain, // not used
@@ -61,7 +62,7 @@ export function linkExistingAddressToChainOrCommunity(
 export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
   try {
-    const response = await axios.post(`${app.serverUrl()}/setDefaultRole`, {
+    const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
       address: account.address,
       author_community_id: account.community.id,
       community_id: community,
@@ -269,7 +270,7 @@ export async function createUserWithAddress(
   newlyCreated: boolean;
   joinedCommunity: boolean;
 }> {
-  const response = await axios.post(`${app.serverUrl()}/createAddress`, {
+  const response = await axios.post(`${SERVER_URL}/createAddress`, {
     address,
     community_id: chain,
     jwt: userStore.getState().jwt,
@@ -323,9 +324,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
             // so we can't use app.chain.meta?.node?.url
-            rpcUrl: `${
-              document.location.origin
-            }${app.serverUrl()}/magicCosmosProxy/${chain}`,
+            rpcUrl: `${document.location.origin}${SERVER_URL}/magicCosmosProxy/${chain}`,
           }),
         ],
   });
@@ -544,7 +543,7 @@ export async function handleSocialLoginCallback({
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await axios.post(
-    `${app.serverUrl()}/auth/magic`,
+    `${SERVER_URL}/auth/magic`,
     {
       data: {
         community_id: desiredChain?.id,

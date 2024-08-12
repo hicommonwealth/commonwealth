@@ -67,7 +67,7 @@ export function generateDiscussionData(
       community_name: community.name,
       comment_body: 'Testing',
       comment_url: `/${community.id}/discussion/${thread.id}?comment=${comment.id}`,
-      comment_created_event: comment,
+      comment_created_event: { ...comment, community_id: community.id! },
     };
 
   const enrichedUserMentionedNotification: z.infer<

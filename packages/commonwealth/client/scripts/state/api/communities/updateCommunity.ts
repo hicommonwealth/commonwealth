@@ -1,7 +1,8 @@
 import { ChainType } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import app, { initAppState } from 'state';
+import { initAppState } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 import { invalidateAllQueriesForCommunity } from './getCommuityById';
 
@@ -51,7 +52,7 @@ const updateCommunity = async ({
   isPWA,
 }: UpdateCommunityProps) => {
   return await axios.patch(
-    `${app.serverUrl()}/communities/${communityId}`,
+    `${SERVER_URL}/communities/${communityId}`,
     {
       jwt: userStore.getState().jwt,
       id: communityId,

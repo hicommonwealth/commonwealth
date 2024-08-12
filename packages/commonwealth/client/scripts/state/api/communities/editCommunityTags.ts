@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 import { ApiEndpoints, queryClient } from '../config';
 import { FetchActiveCommunitiesResponse } from './fetchActiveCommunities';
@@ -15,15 +15,12 @@ const editCommunityTags = async ({
   communityId,
   tagIds,
 }: EditCommunityTagsProps) => {
-  const response = await axios.post(
-    `${app.serverUrl()}/updateCommunityCategory`,
-    {
-      community_id: communityId,
-      tag_ids: tagIds,
-      auth: true,
-      jwt: userStore.getState().jwt,
-    },
-  );
+  const response = await axios.post(`${SERVER_URL}/updateCommunityCategory`, {
+    community_id: communityId,
+    tag_ids: tagIds,
+    auth: true,
+    jwt: userStore.getState().jwt,
+  });
 
   return response.data.result;
 };

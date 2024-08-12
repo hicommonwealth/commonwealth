@@ -179,7 +179,6 @@ class ChainInfo {
     CommunityTags,
     snapshot_spaces,
     Addresses,
-    adminsAndMods,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -236,7 +235,7 @@ class ChainInfo {
       thread_count,
       profile_count,
       snapshot_spaces,
-      adminsAndMods: adminsAndMods || Addresses,
+      adminsAndMods: Addresses,
     });
   }
 

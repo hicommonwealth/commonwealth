@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore, { userStore } from '../../ui/user';
 import { ApiEndpoints } from '../config';
 
@@ -12,7 +13,7 @@ export const updateActiveCommunity = async ({
   communityId, // assuming this is a valid community id
 }: UpdateActiveCommunityProps) => {
   const res = await axios.post(
-    `${app.serverUrl()}/${ApiEndpoints.UPDATE_USER_ACTIVE_COMMUNTY}`,
+    `${SERVER_URL}/${ApiEndpoints.UPDATE_USER_ACTIVE_COMMUNTY}`,
     {
       community_id: communityId,
       jwt: userStore.getState().jwt,

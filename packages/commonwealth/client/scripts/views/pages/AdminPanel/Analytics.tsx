@@ -3,7 +3,7 @@ import { notifyError } from 'controllers/app/notifications';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -34,7 +34,7 @@ const Analytics = () => {
 
   const getCommunityAnalytics = async (communityId: string) => {
     axios
-      .get(`${app.serverUrl()}/admin/analytics?community_id=${communityId}`, {
+      .get(`${SERVER_URL}/admin/analytics?community_id=${communityId}`, {
         params: {
           auth: true,
           jwt: user.jwt,
@@ -54,7 +54,7 @@ const Analytics = () => {
     // Fetch global analytics on load
     const fetchAnalytics = async () => {
       axios
-        .get(`${app.serverUrl()}/admin/analytics`, {
+        .get(`${SERVER_URL}/admin/analytics`, {
           params: {
             auth: true,
             jwt: user.jwt,
