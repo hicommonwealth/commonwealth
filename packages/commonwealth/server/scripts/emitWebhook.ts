@@ -147,8 +147,7 @@ async function main() {
   } else {
     const thread = await models.Thread.findOne({
       where: {
-        // @ts-expect-error StrictNullChecks
-        community_id: community.id,
+        community_id: community!.id!,
       },
       include: {
         model: models.Address,

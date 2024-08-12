@@ -29,7 +29,7 @@ describe('Comment subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node!.id!,
       Addresses: [
         {
           role: 'member',
@@ -39,7 +39,7 @@ describe('Comment subscription lifecycle', () => {
     });
 
     const [thread] = await seed('Thread', {
-      address_id: community?.Addresses?.at(0)?.id,
+      address_id: community!.Addresses!.at(0)!.id!,
       community_id: community?.id,
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
