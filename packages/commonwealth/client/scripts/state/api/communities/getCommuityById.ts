@@ -2,8 +2,7 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
-import app from '../../index';
-import { queryClient } from '../config';
+import { queryClient, SERVER_URL } from '../config';
 
 const COMMUNITIY_STALE_TIME = 60 * 3_000; // 3 mins
 
@@ -67,7 +66,7 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
   // and update `EXCEPTION_CASE_VANILLA_getCommunityById` name
   const response = await axios.get(
     // eslint-disable-next-line max-len
-    `${app.serverUrl()}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
+    `${SERVER_URL}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
   );
   const fetchedCommunity = response?.data[0]?.result?.data as z.infer<
     typeof ExtendedCommunity
@@ -84,9 +83,7 @@ const useGetCommunityByIdQuery = ({
   includeNodeInfo = false,
   enabled,
 }: UseGetCommunityByIdProps) => {
-  return trpc.community.getCommunity.useQuery<
-    z.infer<typeof ExtendedCommunity>
-  >(
+  return trpc.community.getCommunity.useQuery(
     {
       id,
       include_node_info: includeNodeInfo,

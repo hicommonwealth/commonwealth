@@ -5,6 +5,11 @@ import { z } from 'zod';
 import Thread from '../models/Thread';
 import { userStore } from '../state/ui/user';
 
+type SelectedCommunity = Pick<
+  z.infer<typeof ExtendedCommunity>,
+  'adminsAndMods' | 'id'
+>;
+
 const ROLES = {
   ADMIN: 'admin',
   MODERATOR: 'moderator',
@@ -29,29 +34,26 @@ const isCommunityMember = (communityId = app.activeChainId()) => {
 
 const isCommunityRole = (
   adminOrMod: Role,
-  selectedCommunity?: z.infer<typeof ExtendedCommunity>,
+  selectedCommunity?: SelectedCommunity,
 ) => {
-  const communityInfo = selectedCommunity || app.chain?.meta; // selected or active community
-  if (!communityInfo) return false;
+  const adminAndMods =
+    selectedCommunity?.adminsAndMods || app.chain?.meta?.adminsAndMods; // selected or active community
+  if (!adminAndMods || !selectedCommunity?.id) return false;
   return userStore.getState().addresses.some(({ community, address }) => {
     return (
-      community.id === communityInfo.id &&
-      (communityInfo?.adminsAndMods || []).some(
+      community.id === selectedCommunity?.id &&
+      (adminAndMods || []).some(
         (role) => role.address === address && role.role === adminOrMod,
       )
     );
   });
 };
 
-const isCommunityAdmin = (
-  selectedCommunity?: z.infer<typeof ExtendedCommunity>,
-) => {
+const isCommunityAdmin = (selectedCommunity?: SelectedCommunity) => {
   return isCommunityRole('admin', selectedCommunity);
 };
 
-const isCommunityModerator = (
-  selectedCommunity?: z.infer<typeof ExtendedCommunity>,
-) => {
+const isCommunityModerator = (selectedCommunity?: SelectedCommunity) => {
   return isCommunityRole('moderator', selectedCommunity);
 };
 

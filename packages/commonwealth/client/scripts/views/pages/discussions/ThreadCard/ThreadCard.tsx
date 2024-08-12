@@ -97,10 +97,11 @@ export const ThreadCard = ({
       enabled: !!thread.communityId && !showSkeleton,
     });
 
-  if (showSkeleton || isLoadingCommunity)
+  if (showSkeleton || isLoadingCommunity || !community) {
     return (
       <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
     );
+  }
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
