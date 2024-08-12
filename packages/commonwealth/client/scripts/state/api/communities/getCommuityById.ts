@@ -1,4 +1,4 @@
-import { Community, ExtendedCommunity } from '@hicommonwealth/schemas';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
@@ -48,15 +48,35 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
 export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
   communityId: string,
   includeNodeInfo = false,
-): Promise<z.infer<typeof Community>> => {
+): Promise<z.infer<typeof ExtendedCommunity> | undefined> => {
+  // make trpc query key for this request
+  const queryKey = trpc.community.getCommunity.getQueryKey({
+    id: communityId,
+    include_node_info: includeNodeInfo,
+  });
+
+  // if community already exists in cache, return that
+  const cachedCommunity = queryClient.getQueryData<
+    z.infer<typeof ExtendedCommunity> | undefined
+  >(queryKey);
+  if (cachedCommunity) {
+    return cachedCommunity;
+  }
+
   // HACK: 8762 -- find a way to call getCommunityById trpc in non-react files
-  // when u do, update `EXCEPTION_CASE_VANILLA_getCommunityById` name and make the
-  // call from that function
+  // and update `EXCEPTION_CASE_VANILLA_getCommunityById` name
   const response = await axios.get(
     // eslint-disable-next-line max-len
     `${app.serverUrl()}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
   );
-  return response?.data[0]?.result?.data;
+  const fetchedCommunity = response?.data[0]?.result?.data as z.infer<
+    typeof ExtendedCommunity
+  >;
+
+  // add response in cache
+  queryClient.setQueryData(queryKey, fetchedCommunity);
+
+  return fetchedCommunity;
 };
 
 const useGetCommunityByIdQuery = ({
