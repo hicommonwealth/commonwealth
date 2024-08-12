@@ -73,7 +73,7 @@ const Directory = () => {
 
       await updateCommunity({
         communityId: community?.id,
-        directoryPageChainNodeId: chainNodeId as any,
+        directoryPageChainNodeId: chainNodeId || undefined,
         directoryPageEnabled: isEnabled,
         isPWA: isAddedToHomeScreen,
       });

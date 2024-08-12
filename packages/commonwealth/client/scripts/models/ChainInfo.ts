@@ -1,3 +1,4 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import type {
   AddressRole,
   ChainNetwork,
@@ -5,6 +6,7 @@ import type {
 } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
+import { z } from 'zod';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
 import type NodeInfo from './NodeInfo';
 import StakeInfo from './StakeInfo';
@@ -192,8 +194,8 @@ class ChainInfo {
     let decimals = Contracts
       ? Contracts[0]?.decimals
       : base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+        ? 6
+        : 18;
 
     if (getCosmosChains(true)?.some((c) => c === id)) {
       decimals = 18;
@@ -239,6 +241,56 @@ class ChainInfo {
       snapshot_spaces,
       adminsAndMods: adminsAndMods || Addresses,
       communityBanner,
+    });
+  }
+
+  // TODO: 8811 cleanup `ChainInfo`
+  public static fromTRPCResponse(
+    community: z.infer<typeof ExtendedCommunity>,
+  ): ChainInfo {
+    return ChainInfo.fromJSON({
+      Addresses: community.Addresses,
+      admin_only_polling: community.admin_only_polling,
+      base: community.base,
+      bech32_prefix: community.bech32_prefix,
+      block_explorer_ids: community.block_explorer_ids,
+      chain_node_id: community.chain_node_id,
+      ChainNode: community.ChainNode,
+      collapsed_on_homepage: community.collapsed_on_homepage,
+      CommunityStakes: community.CommunityStakes,
+      CommunityTags: community.CommunityTags,
+      custom_domain: community.custom_domain,
+      custom_stages: community.custom_stages,
+      default_page: community.default_page,
+      default_summary_view: community.default_summary_view,
+      default_symbol: community.default_symbol,
+      description: community.description,
+      directory_page_chain_node_id: community.directory_page_chain_node_id,
+      directory_page_enabled: community.directory_page_enabled,
+      discord_bot_webhooks_enabled: community.discord_bot_webhooks_enabled,
+      token_name: community.token_name,
+      has_homepage: community.has_homepage,
+      discord_config_id: community.discord_config_id,
+      icon_url: community.icon_url,
+      name: community.name,
+      id: community.id,
+      redirect: community.redirect,
+      namespace: community.namespace,
+      network: community.network,
+      snapshot_spaces: community.snapshot_spaces,
+      stages_enabled: community.stages_enabled,
+      terms: community.terms,
+      thread_count: community.numTotalThreads,
+      social_links: community.social_links,
+      ss58_prefix: community.ss58_prefix,
+      substrate_spec: community.substrate_spec,
+      type: community.type,
+      adminsAndMods: community?.adminsAndMods || [],
+      communityBanner: community?.communityBanner || '',
+      // these don't come from /communities/:id response and need to be added in
+      // api response when needed
+      Contracts: [],
+      profile_count: 0,
     });
   }
 }

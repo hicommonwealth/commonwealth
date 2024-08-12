@@ -21,6 +21,7 @@ import { CosmosExtension } from '@magic-ext/cosmos';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { Magic } from 'magic-sdk';
 
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import app from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
@@ -34,6 +35,7 @@ import {
 import { authModal } from 'state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
+import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
@@ -287,9 +289,9 @@ export async function createUserWithAddress(
     chain || '',
     true,
   );
-  const chainInfo = ChainInfo.fromJSON({
-    ...(communityInfo as any),
-  });
+  const chainInfo = ChainInfo.fromTRPCResponse(
+    communityInfo as z.infer<typeof ExtendedCommunity>,
+  );
 
   const account = new Account({
     addressId: id,
@@ -361,7 +363,7 @@ export async function startLoginWithMagicLink({
       redirectTo ? encodeURIComponent(redirectTo) : ''
     }&chain=${chain || ''}&sso=${provider}`;
     await magic.oauth.loginWithRedirect({
-      provider: provider as any,
+      provider,
       redirectURI: new URL(
         '/finishsociallogin' + params,
         window.location.origin,
@@ -424,9 +426,9 @@ export async function handleSocialLoginCallback({
       chain || '',
       true,
     );
-    desiredChain = ChainInfo.fromJSON({
-      ...(communityInfo as any),
-    });
+    desiredChain = ChainInfo.fromTRPCResponse(
+      communityInfo as z.infer<typeof ExtendedCommunity>,
+    );
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
@@ -569,9 +571,9 @@ export async function handleSocialLoginCallback({
           chain || '',
           true,
         );
-        chainInfo = ChainInfo.fromJSON({
-          ...(communityInfo as any),
-        });
+        chainInfo = ChainInfo.fromTRPCResponse(
+          communityInfo as z.infer<typeof ExtendedCommunity>,
+        );
       }
 
       chainInfo && (await updateActiveAddresses(chainInfo.id));

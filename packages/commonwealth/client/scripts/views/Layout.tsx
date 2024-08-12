@@ -1,3 +1,4 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import 'Layout.scss';
 import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
@@ -8,6 +9,7 @@ import app from 'state';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
+import { z } from 'zod';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import ChainInfo from '../models/ChainInfo';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
@@ -85,53 +87,9 @@ const LayoutComponent = ({
         setCommunityToLoad(providedCommunityScope);
         if (
           await loadCommunityChainInfo(
-            // TODO: 8811 cleanup `ChainInfo`
-            ChainInfo.fromJSON({
-              Addresses: community.Addresses,
-              admin_only_polling: community.admin_only_polling,
-              base: community.base,
-              bech32_prefix: community.bech32_prefix,
-              block_explorer_ids: community.block_explorer_ids,
-              chain_node_id: community.chain_node_id,
-              ChainNode: community.ChainNode,
-              collapsed_on_homepage: community.collapsed_on_homepage,
-              CommunityStakes: community.CommunityStakes,
-              CommunityTags: community.CommunityTags,
-              custom_domain: community.custom_domain,
-              custom_stages: community.custom_stages,
-              default_page: community.default_page,
-              default_summary_view: community.default_summary_view,
-              default_symbol: community.default_symbol,
-              description: community.description,
-              directory_page_chain_node_id:
-                community.directory_page_chain_node_id,
-              directory_page_enabled: community.directory_page_enabled,
-              discord_bot_webhooks_enabled:
-                community.discord_bot_webhooks_enabled,
-              token_name: community.token_name,
-              has_homepage: community.has_homepage,
-              discord_config_id: community.discord_config_id,
-              icon_url: community.icon_url,
-              name: community.name,
-              id: community.id,
-              redirect: community.redirect,
-              namespace: community.namespace,
-              network: community.network,
-              snapshot_spaces: community.snapshot_spaces,
-              stages_enabled: community.stages_enabled,
-              terms: community.terms,
-              thread_count: community.numTotalThreads,
-              social_links: community.social_links,
-              ss58_prefix: community.ss58_prefix,
-              substrate_spec: community.substrate_spec,
-              type: community.type,
-              adminsAndMods: community?.adminsAndMods || [],
-              communityBanner: community?.communityBanner || '',
-              // these don't come from /communities/:id response and need to be added in
-              // api response when needed
-              Contracts: [],
-              profile_count: 0,
-            }),
+            ChainInfo.fromTRPCResponse(
+              community as z.infer<typeof ExtendedCommunity>,
+            ),
           )
         ) {
           // Update default community on server if logged in

@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import useNecessaryEffect from './useNecessaryEffect';
 
 type UseRunOnceOnConditionProps = {
-  callback: () => any | Promise<() => any>;
+  callback: () => void | Promise<() => void>;
   shouldRun: boolean;
 };
 
@@ -14,7 +14,7 @@ const useRunOnceOnCondition = ({
 
   useNecessaryEffect(() => {
     if (shouldRun && !isRunComplete.current) {
-      callback?.();
+      callback?.()?.catch?.(console.error);
       isRunComplete.current = true;
     }
   }, [callback, shouldRun]);

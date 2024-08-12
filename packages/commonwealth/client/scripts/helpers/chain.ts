@@ -1,7 +1,9 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
+import { z } from 'zod';
 import ChainInfo from '../models/ChainInfo';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
@@ -44,9 +46,9 @@ export const loadCommunityChainInfo = async (
         DEFAULT_CHAIN,
         true,
       );
-      tempChain = ChainInfo.fromJSON({
-        ...(communityInfo as any),
-      });
+      tempChain = ChainInfo.fromTRPCResponse(
+        communityInfo as z.infer<typeof ExtendedCommunity>,
+      );
     }
 
     if (!tempChain) {

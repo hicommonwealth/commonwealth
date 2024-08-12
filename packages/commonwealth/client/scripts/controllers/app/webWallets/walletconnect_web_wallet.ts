@@ -4,9 +4,11 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
+import { z } from 'zod';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';
 import IWebWallet from '../../../models/IWebWallet';
@@ -106,9 +108,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
         true,
       );
 
-      const chainInfo = ChainInfo.fromJSON({
-        ...(communityInfo as any),
-      });
+      const chainInfo = ChainInfo.fromTRPCResponse(
+        communityInfo as z.infer<typeof ExtendedCommunity>,
+      );
 
       this._chainInfo = chainInfo;
     }

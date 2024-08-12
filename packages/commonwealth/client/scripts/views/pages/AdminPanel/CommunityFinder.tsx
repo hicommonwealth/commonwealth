@@ -8,7 +8,7 @@ import { CWTextInput } from '../../components/component_kit/new_designs/CWTextIn
 type CommunityFinderProps = {
   ctaLabel: string;
   actionDisabled?: boolean;
-  onAction?: (communityId: string) => any;
+  onAction?: (communityId: string) => void;
 };
 
 const CommunityFinder = ({
@@ -47,7 +47,7 @@ const CommunityFinder = ({
         label={ctaLabel}
         className="TaskButton"
         disabled={isLoadingCommunityLookupData || actionDisabled}
-        onClick={async () => await onAction?.(communityLookupId)}
+        onClick={() => onAction?.(communityLookupId)}
       />
     </div>
   );

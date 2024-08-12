@@ -32,7 +32,7 @@ const Analytics = () => {
   const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
   const user = useUserStore();
 
-  const getCommunityAnalytics = async (communityId: string) => {
+  const getCommunityAnalytics = (communityId: string) => {
     axios
       .get(`${SERVER_URL}/admin/analytics?community_id=${communityId}`, {
         params: {
@@ -160,9 +160,7 @@ const Analytics = () => {
             </CWText>
             <CommunityFinder
               ctaLabel="Search"
-              onAction={async (communityId) => {
-                await getCommunityAnalytics(communityId);
-              }}
+              onAction={getCommunityAnalytics}
             />
             {communityAnalytics && communityLookupCompleted && (
               <div className="Stats">

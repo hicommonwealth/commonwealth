@@ -115,7 +115,9 @@ const NotificationSettingsPage = () => {
                   onClick: () => {
                     updateEmailSettings({
                       emailNotificationInterval: 'weekly',
-                    }).catch(console.log);
+                    })
+                      .then(() => undefined)
+                      .catch(console.log);
                     setCurrentFrequency('weekly');
                     forceRerender();
                   },
@@ -125,7 +127,9 @@ const NotificationSettingsPage = () => {
                   onClick: () => {
                     updateEmailSettings({
                       emailNotificationInterval: 'never',
-                    }).catch(console.log);
+                    })
+                      .then(() => undefined)
+                      .catch(console.log);
                     setCurrentFrequency('never');
                     forceRerender();
                   },
@@ -235,11 +239,13 @@ const NotificationSettingsPage = () => {
                 subscriptions={[]}
                 canToggleEmailNotifications={false}
                 areEmailNotificationsEnabled={false}
-                onToggleReceiveEmailsNotifications={() =>
+                onToggleReceiveEmailsNotifications={() => {
                   handleEmailSubscriptions(false, [])
-                }
+                    .then(() => undefined)
+                    .catch(console.error);
+                }}
                 areInAppNotificationsEnabled={false}
-                onToggleReceiveInAppNotifications={() =>
+                onToggleReceiveInAppNotifications={() => {
                   app.user.notifications
                     .subscribe({
                       categoryId: NotificationCategories.ChainEvent,
@@ -248,7 +254,8 @@ const NotificationSettingsPage = () => {
                     .then(() => {
                       forceRerender();
                     })
-                }
+                    .catch(console.error);
+                }}
               />
             );
           })}
@@ -264,13 +271,17 @@ const NotificationSettingsPage = () => {
                 communitId={communityId}
                 subscriptions={subs}
                 areEmailNotificationsEnabled={hasSomeEmailSubs}
-                onToggleReceiveEmailsNotifications={() =>
+                onToggleReceiveEmailsNotifications={() => {
                   handleEmailSubscriptions(hasSomeEmailSubs, subs)
-                }
+                    .then(() => undefined)
+                    .catch(console.error);
+                }}
                 areInAppNotificationsEnabled={hasSomeInAppSubs}
-                onToggleReceiveInAppNotifications={() =>
+                onToggleReceiveInAppNotifications={() => {
                   handleSubscriptions(hasSomeInAppSubs, subs)
-                }
+                    .then(() => undefined)
+                    .catch(console.error);
+                }}
               />
             );
           })}
@@ -320,13 +331,17 @@ const NotificationSettingsPage = () => {
                       subscriptions={subs}
                       showSubscriptionsCount
                       areEmailNotificationsEnabled={hasSomeEmailSubs}
-                      onToggleReceiveEmailsNotifications={() =>
+                      onToggleReceiveEmailsNotifications={() => {
                         handleEmailSubscriptions(hasSomeEmailSubs, subs)
-                      }
+                          .then(() => undefined)
+                          .catch(console.error);
+                      }}
                       areInAppNotificationsEnabled={hasSomeInAppSubs}
-                      onToggleReceiveInAppNotifications={() =>
+                      onToggleReceiveInAppNotifications={() => {
                         handleSubscriptions(hasSomeInAppSubs, subs)
-                      }
+                          .then(() => undefined)
+                          .catch(console.error);
+                      }}
                     />
                   }
                   collapsibleContent={
@@ -511,15 +526,17 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      handleEmailSubscriptions(hasSomeEmailSubs, subs);
+                      handleEmailSubscriptions(hasSomeEmailSubs, subs)
+                        .then(() => undefined)
+                        .catch(console.error);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      handleSubscriptions(hasSomeInAppSubs, subs);
+                      handleSubscriptions(hasSomeInAppSubs, subs)
+                        .then(() => undefined)
+                        .catch(console.error);
                     }}
                   />
                 </div>
