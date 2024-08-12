@@ -4,6 +4,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -29,7 +30,7 @@ export const ManageRoles = ({
 
   const removeRole = async (role: AddressRole) => {
     try {
-      const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
+      const res = await axios.post(`${SERVER_URL}/upgradeMember`, {
         community_id: app.activeChainId(),
         new_role: 'member',
         address: role.address,
@@ -59,7 +60,7 @@ export const ManageRoles = ({
       ({ address }) => address === role.address,
     );
 
-    const res = await axios.get(`${app.serverUrl()}/roles`, {
+    const res = await axios.get(`${SERVER_URL}/roles`, {
       params: {
         chain_id: app.activeChainId(),
         permissions: ['moderator', 'admin'],

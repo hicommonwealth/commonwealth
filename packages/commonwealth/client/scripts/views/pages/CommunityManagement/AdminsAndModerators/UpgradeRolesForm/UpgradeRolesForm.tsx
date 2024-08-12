@@ -4,6 +4,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
@@ -95,7 +96,7 @@ export const UpgradeRolesForm = ({
         : '';
 
     try {
-      const response = await axios.post(`${app.serverUrl()}/upgradeMember`, {
+      const response = await axios.post(`${SERVER_URL}/upgradeMember`, {
         new_role: newRole,
         address: selectedAddress,
         community_id: app.activeChainId(),
