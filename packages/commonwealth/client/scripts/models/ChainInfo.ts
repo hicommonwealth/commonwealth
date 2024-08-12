@@ -239,13 +239,5 @@ class ChainInfo {
       adminsAndMods: adminsAndMods || Addresses,
     });
   }
-
-  public setAdminsAndMods(roles: AddressRole[]) {
-    this.adminsAndMods = roles;
-  }
-
-  public setBanner(banner_text: string) {
-    this.communityBanner = banner_text;
-  }
 }
 export default ChainInfo;

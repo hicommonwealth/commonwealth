@@ -26,9 +26,7 @@ const editCommunityBanner = async ({
 const useEditCommunityBannerMutation = () => {
   return useMutation({
     mutationFn: editCommunityBanner,
-    onSuccess: async (communityBanner) => {
-      app.chain?.meta?.setBanner?.(communityBanner.banner_text);
-
+    onSuccess: async () => {
       const communityBannerKey = `${app.activeChainId()}-banner`;
       if (localStorage.getItem(communityBannerKey) === 'off') {
         localStorage.setItem(communityBannerKey, 'on');
