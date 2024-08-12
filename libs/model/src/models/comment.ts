@@ -4,17 +4,13 @@ import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent } from '../utils';
 import { CommentSubscriptionAttributes } from './comment_subscriptions';
-import type { CommunityAttributes } from './community';
 import type { ReactionAttributes } from './reaction';
-import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 
 const log = logger(import.meta);
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
-  Community?: CommunityAttributes;
-  Thread?: ThreadAttributes;
   reactions?: ReactionAttributes[];
   subscriptions?: CommentSubscriptionAttributes[];
 };
@@ -28,7 +24,6 @@ export default (
     'Comment',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: Sequelize.STRING, allowNull: false },
       thread_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -96,24 +91,28 @@ export default (
               stats().increment('cw.hook.comment-count', {
                 thread_id: String(thread_id),
               });
+              await emitEvent(
+                Outbox,
+                [
+                  {
+                    event_name: EventNames.CommentCreated,
+                    event_payload: {
+                      ...comment.get({ plain: true }),
+                      // @ts-expect-error unknown models
+                      community_id: thread.community_id,
+                    },
+                  },
+                ],
+                options.transaction,
+              );
             }
           } catch (error) {
             log.error(
               `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`,
             );
           }
-
-          await emitEvent(
-            Outbox,
-            [
-              {
-                event_name: EventNames.CommentCreated,
-                event_payload: comment.get({ plain: true }),
-              },
-            ],
-            options.transaction,
-          );
         },
+
         afterDestroy: async (comment: CommentInstance, options) => {
           const { Thread } = sequelize.models;
           const thread_id = comment.thread_id;
@@ -149,8 +148,8 @@ export default (
       indexes: [
         { fields: ['id'] },
         { fields: ['address_id'] },
-        { fields: ['community_id', 'created_at'] },
-        { fields: ['community_id', 'updated_at'] },
+        { fields: ['created_at'] },
+        { fields: ['updated_at'] },
         { fields: ['thread_id'] },
       ],
     },

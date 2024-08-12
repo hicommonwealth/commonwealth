@@ -47,7 +47,7 @@ const editComment = async ({
     profile,
   };
 
-  return new Comment(response.data.result);
+  return new Comment({ community_id: undefined, ...response.data.result });
 };
 
 interface UseEditCommentMutationProps {

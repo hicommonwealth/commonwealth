@@ -80,6 +80,7 @@ type EmitMentionsData = {
   authorUserId: number;
   authorAddress: string;
   mentions: UserMention[];
+  community_id: string;
 } & (
   | {
       thread: z.infer<typeof Thread>;
@@ -105,10 +106,7 @@ export const emitMentions = async (
         authorUserId: data.authorUserId,
         authorAddress: data.authorAddress,
         mentionedUserId: Number(userId),
-        communityId:
-          'comment' in data
-            ? data.comment.community_id
-            : data.thread.community_id,
+        communityId: data.community_id,
         comment: 'comment' in data ? data.comment : undefined,
         thread: 'thread' in data ? data.thread : undefined,
       },

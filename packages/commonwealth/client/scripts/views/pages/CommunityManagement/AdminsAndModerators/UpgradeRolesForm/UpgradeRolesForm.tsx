@@ -1,4 +1,4 @@
-import { AddressRole } from '@hicommonwealth/shared';
+import { AddressRole, DEFAULT_NAME, Role } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
@@ -20,14 +20,23 @@ type UpgradeRolesFormProps = {
   setSearchTerm: (v: string) => void;
 };
 
+type UserDisplayRow = {
+  profile_name: string | null | undefined;
+  user_id: number;
+  avatar_url: string | null | undefined;
+  role: string;
+  address_id: number;
+  address: string;
+};
+
 export const UpgradeRolesForm = ({
   onRoleUpdate,
   roleData,
   searchTerm,
   setSearchTerm,
 }: UpgradeRolesFormProps) => {
-  const [role, setRole] = useState('');
-  const [user, setUser] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedAddress, setSelectedAddress] = useState('');
   const [radioButtons, setRadioButtons] = useState([
     { id: 1, checked: false },
     { id: 2, checked: false },
@@ -43,26 +52,27 @@ export const UpgradeRolesForm = ({
     setRadioButtons(zeroedOutRadioButtons);
   };
 
-  const nonAdmins: MemberResult[] = roleData.filter(({ addresses }) => {
-    return !addresses.some(({ role: r }) => r === 'admin');
+  const rows: UserDisplayRow[] = roleData.flatMap((r) => {
+    return r.addresses.map((address) => ({
+      profile_name: r.profile_name,
+      user_id: r.user_id,
+      avatar_url: r.avatar_url,
+      role: address.role,
+      address_id: address.id,
+      address: address.address,
+    }));
   });
 
-  const nonAdminNames: string[] = nonAdmins.map(
-    ({ profile_name, addresses }) => {
-      const roletext = addresses.some(({ role: r }) => r === 'moderator')
-        ? '(moderator)'
-        : '';
-      // TODO: we don't actually know if this is the right address?
-      const fullText = `${profile_name} - ${formatAddressShort(
-        addresses?.[0].address,
-      )} ${roletext}`;
-      return fullText;
-    },
-  );
-
   const options = useMemo(() => {
-    return nonAdminNames.map((n) => ({ label: n, value: n }));
-  }, [nonAdminNames]);
+    return rows.map((r) => {
+      const roleText = r.role !== 'member' ? `(${r.role})` : '';
+      const text = `${r?.profile_name || DEFAULT_NAME} - ${formatAddressShort(
+        r.address,
+      )} ${roleText}`;
+
+      return { label: text, value: r.address };
+    });
+  }, [rows]);
 
   const roleOptions = [
     { label: 'Admin', value: 'Admin' },
@@ -78,16 +88,17 @@ export const UpgradeRolesForm = ({
   };
 
   const handleUpgradeMember = async () => {
-    const indexOfName = nonAdminNames.indexOf(user);
-    const _user = nonAdmins[indexOfName];
     const newRole =
-      role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
+      selectedRole === 'Admin'
+        ? 'admin'
+        : selectedRole === 'Moderator'
+        ? 'moderator'
+        : '';
 
     try {
       const response = await axios.post(`${SERVER_URL}/upgradeMember`, {
         new_role: newRole,
-        // TODO: allow setting any address (??)
-        address: _user.addresses[0].address,
+        address: selectedAddress,
         community_id: app.activeChainId(),
         jwt: userData.jwt,
       });
@@ -96,14 +107,12 @@ export const UpgradeRolesForm = ({
         notifySuccess('Member upgraded');
         onRoleUpdate(
           {
-            // TODO: allow setting any address (??)
-            address: _user.addresses[0].address,
-            // @ts-expect-error StrictNullChecks
-            role: _user.addresses[0].role,
+            address: selectedAddress as string,
+            role: selectedRole as Role,
           },
           {
-            address: response.data.result.address,
-            role: response.data.result.role,
+            address: response.data.result.address as string,
+            role: response.data.result.role as Role,
           },
         );
         zeroOutRadioButtons();
@@ -127,9 +136,9 @@ export const UpgradeRolesForm = ({
         <CWRadioGroup
           name="members/mods"
           options={options}
-          toggledOption={user}
+          toggledOption={selectedAddress}
           onChange={(e) => {
-            setUser(e.target.value);
+            setSelectedAddress(e.target.value);
           }}
         />
       </div>
@@ -141,7 +150,7 @@ export const UpgradeRolesForm = ({
               checked={radioButtons[i].checked}
               name="roles"
               onChange={(e) => {
-                setRole(e.target.value);
+                setSelectedRole(e.target.value);
                 handleRadioButtonChange(i + 1);
               }}
               value={o.value}
@@ -150,7 +159,7 @@ export const UpgradeRolesForm = ({
         ))}
         <CWButton
           label="Upgrade Member"
-          disabled={!role || !user}
+          disabled={!selectedRole || !selectedAddress}
           onClick={handleUpgradeMember}
         />
       </div>

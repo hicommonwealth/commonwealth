@@ -8,9 +8,10 @@ import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { formatAddressShort } from '../../../../../helpers/index';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../../../components/component_kit/cw_label';
-
+import { CWText } from '../../../../components/component_kit/cw_text';
 import './ManageRoles.scss';
 
 type ManageRoleRowProps = {
@@ -123,7 +124,6 @@ export const ManageRoles = ({
       <div className="roles-container">
         {roledata?.map((r) => {
           const { role, address } = r;
-
           return (
             <div className="role-row" key={address}>
               <User
@@ -133,6 +133,7 @@ export const ManageRoles = ({
                 shouldLinkProfile
                 shouldHideAvatar
               />
+              <CWText>&nbsp;- {formatAddressShort(address)}</CWText>
               <CWIcon
                 iconName="close"
                 iconSize="small"

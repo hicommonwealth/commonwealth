@@ -23,7 +23,9 @@ const fetchComments = async ({ communityId, threadId }: FetchCommentsProps) => {
   );
 
   // transform response
-  return response.data.result.map((c) => new Comment(c));
+  return response.data.result.map(
+    (c) => new Comment({ community_id: undefined, ...c }),
+  );
 };
 
 const useFetchCommentsQuery = ({

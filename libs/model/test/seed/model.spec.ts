@@ -18,14 +18,6 @@ const generateSchemas = async () => {
   const model_schema = await get_info_schema(model.sequelize, {
     ignore_columns: { GroupPermissions: ['allowed_actions'] },
     ignore_constraints: {
-      // Removed in production for performance reasons
-      Comments: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
-      ],
-      Reactions: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
-      ],
-
       // These will be deprecated soon
       Notifications: [
         'FOREIGN KEY Threads(thread_id) UPDATE NO ACTION DELETE NO ACTION',
