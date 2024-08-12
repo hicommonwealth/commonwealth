@@ -109,13 +109,9 @@ const LayoutComponent = ({
   }, [shouldDeInitChain]);
 
   // A loading state (i.e. spinner) is shown in the following cases:
-  // - user login status has not finished loaded
   // - a community is still being initialized or deinitialized
   const shouldShowLoadingState =
-    isLoading ||
-    !app.loginStatusLoaded() ||
-    shouldSelectChain ||
-    shouldDeInitChain;
+    isLoading || shouldSelectChain || shouldDeInitChain;
 
   const childToRender = () => {
     if (app.loadingError) {
