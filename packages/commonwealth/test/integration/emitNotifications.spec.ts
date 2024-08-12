@@ -111,13 +111,10 @@ describe('emitNotifications tests', () => {
       thread_id: thread.id,
       address_id: userAddressId2,
       text: commentBody,
-      community_id: chain,
     });
 
     //reaction = await server.models.Reaction.create({
-    // @ts-expect-error StrictNullChecks
     await server.models.Reaction.create({
-      community_id: chain,
       thread_id: thread.id,
       address_id: userAddressId,
       reaction: 'like',

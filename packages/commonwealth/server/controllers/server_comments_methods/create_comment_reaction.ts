@@ -30,7 +30,7 @@ const Errors = {
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  reaction: string;
+  reaction: 'like';
   commentId: number;
   canvasSignedData?: string;
   canvasHash?: string;
@@ -82,7 +82,7 @@ export async function __createCommentReaction(
   // check balance (bypass for admin)
   const addressAdminRoles = await findAllRoles(
     this.models,
-    { where: { address_id: address.id } },
+    { where: { address_id: address.id! } },
     thread.community_id,
     ['admin'],
   );
@@ -151,12 +151,10 @@ export async function __createCommentReaction(
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: thread.community_id,
     comment_id: comment.id!,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
     canvas_hash: canvasHash,
     canvas_signed_data: canvasSignedData,

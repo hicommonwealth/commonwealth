@@ -3,12 +3,12 @@ import { discordMetaSchema, linksSchema, PG_INT, zDate } from '../utils';
 import { Address } from './user.schemas';
 
 export const Thread = z.object({
+  id: PG_INT.optional(),
   Address: Address.nullish(),
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
   stage: z.string(),
-  id: PG_INT.nullish(),
   body: z.string().nullish(),
   plaintext: z.string().nullish(),
   url: z.string().nullish(),

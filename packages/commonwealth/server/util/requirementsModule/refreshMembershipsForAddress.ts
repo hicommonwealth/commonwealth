@@ -32,7 +32,7 @@ export async function refreshMembershipsForAddress(
       group_id: {
         [Op.in]: groups.map((g) => g.id),
       },
-      address_id: address.id,
+      address_id: address.id!,
     },
     include: [
       {
@@ -137,7 +137,7 @@ function computeMembership(
     address.address,
     requirements as Requirement[],
     balances,
-    group.metadata.required_requirements,
+    group.metadata.required_requirements!,
   );
   return {
     group_id: group.id,

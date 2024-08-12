@@ -12,9 +12,10 @@ export enum ForumActionsEnum {
 export type ForumActions = keyof typeof ForumActionsEnum;
 
 export const GroupPermission = z.object({
-  group_id: PG_INT.optional(),
-  topic_id: PG_INT.optional(),
-  allowed_actions: z.array(z.nativeEnum(ForumActionsEnum)),
-  created_at: z.any().optional(),
-  updated_at: z.any().optional(),
+  group_id: PG_INT.nullish(),
+  allowed_actions: z.array(z.nativeEnum(PermissionEnum)),
+  topic_id: PG_INT.nullish(),
+
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

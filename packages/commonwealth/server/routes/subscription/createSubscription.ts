@@ -91,11 +91,12 @@ export default async (
         // @ts-expect-error StrictNullChecks
         comment = await models.Comment.findOne({
           where: { id: req.body.comment_id },
+          include: [{ model: models.Thread, attributes: ['community_id'] }],
         });
         if (!comment) return next(new AppError(Errors.NoComment));
         obj = {
           comment_id: req.body.comment_id,
-          community_id: comment.community_id,
+          community_id: comment.Thread!.community_id,
         };
       }
       break;

@@ -124,15 +124,14 @@ export const modelFromServer = (
     id,
     category_id,
     is_active,
-    created_at,
+    created_at!,
     immediate_email,
-    // @ts-expect-error StrictNullChecks
-    community_id,
+    community_id!,
     // @ts-expect-error StrictNullChecks
     modeledComment,
     // @ts-expect-error StrictNullChecks
     modeledThread,
-    snapshot_id,
+    snapshot_id!,
   );
 };
 
