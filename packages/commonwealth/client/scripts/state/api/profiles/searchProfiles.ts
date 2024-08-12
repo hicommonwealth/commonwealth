@@ -5,7 +5,7 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { z } from 'zod';
 import { ApiEndpoints } from '../config';
 
@@ -43,7 +43,7 @@ const searchProfiles = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchProfilesResponse }>(
-    `${app.serverUrl()}/profiles`,
+    `${SERVER_URL}/profiles`,
     {
       headers: {
         'Content-Type': 'application/json',

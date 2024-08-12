@@ -103,6 +103,9 @@ const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+const CommunityNotFoundPage = lazy(
+  () => import('views/pages/CommunityNotFoundPage'),
+);
 
 const CommonDomainRoutes = ({
   contestEnabled,
@@ -573,6 +576,15 @@ const CommonDomainRoutes = ({
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
   // LEGACY REDIRECTS END
+
+  // Community not found page - This should be at the end
+  <Route
+    key="/:scope/*"
+    path="/:scope/*"
+    element={withLayout(CommunityNotFoundPage, {
+      scoped: true,
+    })}
+  />,
 ];
 
 export default CommonDomainRoutes;

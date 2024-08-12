@@ -8,7 +8,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
-import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
@@ -169,32 +168,26 @@ const CommunitiesPage = () => {
           );
 
     // Filter by recent thread activity
-    const res = filteredList
-      .sort((a, b) => {
-        const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
-        const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
-        return threadCountB - threadCountA;
-      })
-      .map((community: CommunityInfo, i) => {
-        // allow user to buy stake if they have a connected address that matches this community's base chain
-        const canBuyStake = !!user.addresses.find?.(
-          (address) => address?.community?.base === community?.base,
-        );
+    const res = filteredList.map((community: CommunityInfo, i) => {
+      // allow user to buy stake if they have a connected address that matches this community's base chain
+      const canBuyStake = !!user.addresses.find?.(
+        (address) => address?.community?.base === community?.base,
+      );
 
-        return (
-          <CWRelatedCommunityCard
-            key={i}
-            community={community}
-            memberCount={community.addressCount}
-            threadCount={community.threadCount}
-            canBuyStake={canBuyStake}
-            onStakeBtnClick={() => setSelectedCommunity(community)}
-            ethUsdRate={ethUsdRate}
-            historicalPrice={historicalPriceMap?.get(community.id)}
-            onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
-          />
-        );
-      });
+      return (
+        <CWRelatedCommunityCard
+          key={i}
+          community={community}
+          memberCount={community.profileCount}
+          threadCount={community.threadCount}
+          canBuyStake={canBuyStake}
+          onStakeBtnClick={() => setSelectedCommunity(community)}
+          ethUsdRate={ethUsdRate}
+          historicalPrice={historicalPriceMap?.get(community.id)}
+          onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
+        />
+      );
+    });
 
     return res;
   };

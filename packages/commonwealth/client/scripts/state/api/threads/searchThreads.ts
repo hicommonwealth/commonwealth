@@ -1,9 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import app from 'state';
 import { ThreadResult } from 'views/pages/search/helpers';
-import { ApiEndpoints } from '../config';
+import { ApiEndpoints, SERVER_URL } from '../config';
 
 const SEARCH_THREADS_STALE_TIME = 10 * 1_000; // 10 s
 
@@ -42,7 +41,7 @@ const searchThreads = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchThreadsResponse }>(
-    `${app.serverUrl()}/threads`,
+    `${SERVER_URL}/threads`,
     {
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +101,7 @@ const useSearchThreadsQuery = ({
         return undefined;
       },
       staleTime: SEARCH_THREADS_STALE_TIME,
-      enabled: enabled && searchTerm.length >= 3,
+      enabled,
     },
   );
 };

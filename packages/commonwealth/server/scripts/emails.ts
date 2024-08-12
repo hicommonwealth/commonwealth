@@ -15,7 +15,6 @@ import {
 import sgMail from '@sendgrid/mail';
 import _ from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
 import {
@@ -25,8 +24,7 @@ import {
 } from '../../shared/utils';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 // @ts-expect-error StrictNullChecks
 sgMail.setApiKey(config.SENDGRID.API_KEY);

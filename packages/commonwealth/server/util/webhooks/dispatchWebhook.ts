@@ -8,7 +8,6 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'url';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
 import { sendTelegramWebhook } from './destinations/telegram';
@@ -17,8 +16,7 @@ import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
 import { fetchWebhooks, getWebhookDestination } from './util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(

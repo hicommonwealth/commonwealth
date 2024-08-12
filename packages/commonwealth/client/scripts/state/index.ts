@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
-import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
@@ -14,7 +13,7 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import StarredCommunity from 'models/StarredCommunity';
-import { queryClient, QueryKeys } from 'state/api/config';
+import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { ChainStore } from 'stores';
@@ -60,7 +59,6 @@ export interface IApp {
 
   // User
   user: UserController;
-  recentActivity: RecentActivityController;
 
   // Web3
   snapshot: SnapshotController;
@@ -78,8 +76,6 @@ export interface IApp {
   loginStatusLoaded(): boolean;
 
   isLoggedIn(): boolean;
-
-  serverUrl(): string;
 
   loadingError: string;
 
@@ -123,7 +119,6 @@ const app: IApp = {
 
   // User
   user,
-  recentActivity: new RecentActivityController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
 
@@ -136,9 +131,6 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  serverUrl: () => {
-    return '/api';
-  },
 
   // @ts-expect-error StrictNullChecks
   loadingError: null,
@@ -163,8 +155,8 @@ export async function initAppState(
 ): Promise<void> {
   try {
     const [{ data: statusRes }, { data: communities }] = await Promise.all([
-      axios.get(`${app.serverUrl()}/status`),
-      axios.get(`${app.serverUrl()}/communities`),
+      axios.get(`${SERVER_URL}/status`),
+      axios.get(`${SERVER_URL}/communities`),
     ]);
 
     const nodesData = await fetchNodesQuery();
@@ -201,12 +193,6 @@ export async function initAppState(
           });
         }
       });
-
-    // add recentActivity
-    const { recentThreads } = statusRes.result;
-    recentThreads.forEach(({ communityId, count }) => {
-      app.recentActivity.setCommunityThreadCounts(communityId, count);
-    });
 
     // update the login status
     updateActiveUser(statusRes.result.user);

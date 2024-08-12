@@ -1,8 +1,6 @@
 import { Actor, InvalidState, command, dispose } from '@hicommonwealth/core';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { Chance } from 'chance';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateGroup,
   Errors,
@@ -10,14 +8,13 @@ import {
 } from '../../src/community/CreateGroup.command';
 import { seed } from '../../src/tester';
 
-chai.use(chaiAsPromised);
 const chance = Chance();
 
 describe('Group lifecycle', () => {
-  let id: string;
   let actor: Actor;
 
   const payload = {
+    id: '',
     metadata: {
       name: chance.name(),
       description: chance.sentence(),
@@ -41,9 +38,9 @@ describe('Group lifecycle', () => {
       ],
     });
 
-    id = community!.id!;
+    payload.id = community!.id!;
     actor = {
-      user: { id: user!.id!, email: user!.email! },
+      user: { id: user!.id!, email: user!.email!, isAdmin: user?.isAdmin },
       address_id: community!.Addresses!.at(0)!.address!,
     };
   });
@@ -53,64 +50,58 @@ describe('Group lifecycle', () => {
   });
 
   test('should create group when none exists', async () => {
-    const results = await command(CreateGroup(), { id, actor, payload });
+    const results = await command(CreateGroup(), { actor, payload });
     expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
   });
 
-  test('should fail creation when group with same id found', () => {
-    expect(
-      command(CreateGroup(), { id, actor, payload }),
-    ).to.eventually.be.rejectedWith(InvalidState);
+  test('should fail creation when group with same id found', async () => {
+    await expect(() =>
+      command(CreateGroup(), { actor, payload }),
+    ).rejects.toThrow(InvalidState);
   });
 
-  test('should fail creation when sending invalid topics', () => {
-    const invalid = {
-      id,
-      actor,
-      payload: {
-        metadata: {
-          name: chance.name(),
-          description: chance.sentence(),
-          required_requirements: 1,
+  test('should fail creation when sending invalid topics', async () => {
+    await expect(
+      command(CreateGroup(), {
+        actor,
+        payload: {
+          id: payload.id,
+          metadata: {
+            name: chance.name(),
+            description: chance.sentence(),
+            required_requirements: 1,
+          },
+          requirements: [],
+          topics: [1, 2, 3],
         },
-        requirements: [],
-        topics: [1, 2, 3],
-      },
-    };
-    expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
-      InvalidState,
-      Errors.InvalidTopics,
-    );
+      }),
+    ).rejects.toThrow(Errors.InvalidTopics);
   });
 
   test('should fail creation when community reached max number of groups allowed', async () => {
     // create max groups
     for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
       await command(CreateGroup(), {
-        id,
         actor,
         payload: {
-          ...payload,
+          id: payload.id,
           metadata: { name: chance.name(), description: chance.sentence() },
+          requirements: [],
+          topics: [],
         },
       });
     }
 
-    const invalid = {
-      id,
-      actor,
-      payload: {
-        metadata: {
-          name: chance.name(),
-          description: chance.sentence(),
+    await expect(() =>
+      command(CreateGroup(), {
+        actor,
+        payload: {
+          id: payload.id,
+          metadata: { name: chance.name(), description: chance.sentence() },
+          requirements: [],
+          topics: [],
         },
-        requirements: [],
-        topics: [],
-      },
-    };
-    expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
-      InvalidState,
-      Errors.MaxGroups,
-    );
+      }),
+    ).rejects.toThrow(Errors.MaxGroups);
   });
 });

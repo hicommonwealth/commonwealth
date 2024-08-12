@@ -3,8 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import AddressInfo from 'models/AddressInfo';
 import moment from 'moment';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { z } from 'zod';
 import useUserStore, { userStore } from '../../ui/user';
 
@@ -27,7 +26,7 @@ const fetchProfileById = async ({
 > => {
   const response = await axios.get<{
     result: z.infer<typeof GetNewProfileResp>;
-  }>(`${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ID}`, {
+  }>(`${SERVER_URL}${ApiEndpoints.FETCH_PROFILES_BY_ID}`, {
     params: {
       ...(userId
         ? { userId }

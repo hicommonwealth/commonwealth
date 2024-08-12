@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread from 'models/Thread';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const THREAD_STALE_TIME = 5000; // 5 seconds
 
@@ -17,7 +16,7 @@ const getThreadsById = async ({
   ids,
 }: GetThreadsByIdProps): Promise<Thread[]> => {
   const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
+    `${SERVER_URL}${ApiEndpoints.FETCH_THREADS}`,
     {
       params: {
         community_id: communityId,

@@ -6,7 +6,7 @@ import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
@@ -51,7 +51,7 @@ const createThread = async ({
   });
 
   const response = await axios.post(
-    `${app.serverUrl()}/threads`,
+    `${SERVER_URL}/threads`,
     {
       author_community_id: communityId,
       community_id: communityId,

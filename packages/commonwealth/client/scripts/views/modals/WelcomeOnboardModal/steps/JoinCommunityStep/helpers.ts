@@ -27,7 +27,7 @@ export const findSuggestedCommunities = ({
   // 4. then seperate them into 2 groups, communities that match user preferences and those that don't
   [...app.config.chains.getAll()]
     .filter((community) => community.base === userChainBase)
-    .sort((a, b) => b.addressCount - a.addressCount)
+    .sort((a, b) => b.profileCount - a.profileCount)
     .sort((a, b) => b.threadCount - a.threadCount)
     .map((community) => {
       const communityTagNames = community.CommunityTags.map((t) => t.name);

@@ -40,6 +40,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
       env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
     ),
+    'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
+      env.FLAG_FARCASTER_CONTEST,
+    ),
   };
 
   const config = {
@@ -120,7 +123,7 @@ export default defineConfig(({ mode }) => {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
     // Vite built env var are disabled in all remote apps (only enabled in local/CI environments)
-    define: !['local', 'CI'].includes(env.APP_ENV!.trim())
+    define: !['local', 'CI'].includes((env.APP_ENV ?? '')!.trim())
       ? { ...unleashConfig, ...config }
       : {
           ...unleashConfig,

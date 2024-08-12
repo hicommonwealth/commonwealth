@@ -62,7 +62,6 @@
 }
 
 .Select-Options-Wrapper {
-  @include scrollbarStyles;
   min-width: 224px;
   max-width: 320px;
   text-overflow: ellipsis;

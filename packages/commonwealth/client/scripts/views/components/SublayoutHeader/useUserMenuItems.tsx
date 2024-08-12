@@ -9,6 +9,7 @@ import { setDarkMode } from 'helpers/darkMode';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
 import {
@@ -47,7 +48,7 @@ const resetWalletConnectSession = async () => {
 
 export const handleLogout = async () => {
   try {
-    await axios.get(`${app.serverUrl()}/logout`);
+    await axios.get(`${SERVER_URL}/logout`);
     await initAppState();
     await resetWalletConnectSession();
     for (const signer of getSessionSigners()) {
@@ -242,7 +243,7 @@ const useUserMenuItems = ({
       },
       {
         type: 'default',
-        label: 'Notifications',
+        label: 'Notification settings',
         onClick: () => navigate('/notification-settings', {}, null),
       },
       {

@@ -28,6 +28,7 @@ import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import {
   BaseMixpanelPayload,
@@ -439,7 +440,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       if (username && account?.profile) {
         await updateUser({
-          id: account.profile.userId.toString(),
+          id: account.profile.userId,
           profile: {
             name: username.trim(),
           },
@@ -546,7 +547,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     if (app.isLoggedIn()) {
       try {
-        const res = await axios.post(`${app.serverUrl()}/getAddressStatus`, {
+        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
           address:
             wallet.chain === ChainBase.Substrate
               ? addressSwapper({

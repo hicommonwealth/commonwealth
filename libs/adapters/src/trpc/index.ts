@@ -21,13 +21,11 @@ import {
   type GenerateOpenApiDocumentOptions,
   type OpenApiMeta,
   type OpenApiRouter,
-} from 'trpc-openapi';
-import { fileURLToPath } from 'url';
-import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
+} from 'trpc-swagger';
+import { ZodSchema, ZodUndefined, z } from 'zod';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export interface Context {
   req: Request;
@@ -126,7 +124,10 @@ export enum Tag {
   LoadTest = 'LoadTest',
 }
 
-export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
+export const command = <
+  Input extends core.CommandInput,
+  Output extends ZodSchema,
+>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
 ) => {
@@ -135,13 +136,20 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
     .meta({
       openapi: {
         method: 'POST',
-        path: `/${tag.toLowerCase()}/{id}/${factory.name}`,
+        path: `/${factory.name}/{id}`,
         tags: [tag],
-        headers: [{ name: 'address_id' }],
+        headers: [
+          {
+            in: 'header',
+            name: 'address_id',
+            required: true,
+            schema: { type: 'string' },
+          },
+        ],
         protect: md.secure,
       },
     })
-    .input(md.input.extend({ id: z.string() })) // this might cause client typing issues
+    .input(md.input)
     .output(md.output)
     .mutation(async ({ ctx, input }) => {
       // md.secure must explicitly be false if the route requires no authentication
@@ -152,7 +160,6 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
         return await core.command(
           md,
           {
-            id: input?.id,
             actor: {
               user: ctx.req.user as core.User,
               // TODO: get from JWT?
@@ -181,7 +188,7 @@ export const event = <
     .meta({
       openapi: {
         method: 'POST',
-        path: `/${tag.toLowerCase()}/${factory.name}`,
+        path: `/${factory.name}`,
         tags: [tag],
       },
     })
@@ -205,14 +212,20 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => QueryMetadata<Input, Output>,
 ) => {
   const md = factory();
-  //const input = md.input.extend({ address_id: z.string().optional() });
   return trpc.procedure
     .meta({
       openapi: {
         method: 'GET',
-        path: `/${Tag.Query.toLowerCase()}/${factory.name}`,
+        path: `/${factory.name}`,
         tags: [Tag.Query],
-        headers: [{ name: 'address_id' }],
+        headers: [
+          {
+            in: 'header',
+            name: 'address_id',
+            required: false,
+            schema: { type: 'string' },
+          },
+        ],
       },
       protect: md.secure,
     })

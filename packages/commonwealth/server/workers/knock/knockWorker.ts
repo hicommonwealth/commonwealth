@@ -20,15 +20,14 @@ import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { NotificationsPolicy } from './notificationsPolicy';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: __filename.endsWith(process.argv[1]),
+  enabled: fileURLToPath(import.meta.url).endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {

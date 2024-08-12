@@ -1,11 +1,9 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
-import { fileURLToPath } from 'url';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const logger = _logger(__filename);
+const logger = _logger(import.meta);
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines

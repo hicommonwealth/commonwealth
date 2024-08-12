@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 import { ApiEndpoints } from '../config';
 
 export const updateEmail = async ({ email }: { email: string }) => {
-  await axios.post(`${app.serverUrl()}/${ApiEndpoints.UPDATE_USER_EMAIL}`, {
+  await axios.post(`${SERVER_URL}/${ApiEndpoints.UPDATE_USER_EMAIL}`, {
     email: email,
     jwt: userStore.getState().jwt,
   });

@@ -2,10 +2,7 @@ import { command, dispose, logger } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 async function main() {
   const stakedCommunities = await models.Community.findAll({
@@ -28,11 +25,10 @@ async function main() {
   for (const c of stakedCommunities) {
     if ((c.CommunityStakes || []).length > 0) {
       const result = await command(Community.GenerateStakeholderGroups(), {
-        id: c.id,
         actor: {
           user: { email: 'generate-stakeholder-groups' },
         },
-        payload: {},
+        payload: { id: c.id! },
       });
 
       if (result?.created) {

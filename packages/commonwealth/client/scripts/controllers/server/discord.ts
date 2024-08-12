@@ -1,11 +1,12 @@
 import axios from 'axios';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 
 class DiscordController {
   public async createConfig(verification_token: string) {
     try {
-      await axios.post(`${app.serverUrl()}/createDiscordBotConfig`, {
+      await axios.post(`${SERVER_URL}/createDiscordBotConfig`, {
         community_id: app.activeChainId(),
         verification_token,
         jwt: userStore.getState().jwt,
@@ -22,7 +23,7 @@ class DiscordController {
   ) {
     try {
       await axios.patch(
-        `${app.serverUrl()}/topics/${topicId}/channels/${channelId}`,
+        `${SERVER_URL}/topics/${topicId}/channels/${channelId}`,
         {
           chain: app.activeChainId(),
           jwt: userStore.getState().jwt,
