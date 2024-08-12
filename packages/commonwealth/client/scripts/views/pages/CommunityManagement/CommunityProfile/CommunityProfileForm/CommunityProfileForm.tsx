@@ -92,7 +92,7 @@ const CommunityProfileForm = () => {
     const updatedTags = [...preferenceTags].map((tag) => ({
       ...tag,
       isSelected: !!(community?.CommunityTags || []).find(
-        (t) => t.id === tag.item.id,
+        (t) => t.tag_id === tag.item.id,
       ),
     }));
     setPreferenceTags(updatedTags);

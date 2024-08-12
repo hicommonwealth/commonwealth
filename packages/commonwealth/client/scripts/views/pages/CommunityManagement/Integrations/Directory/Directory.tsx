@@ -41,7 +41,7 @@ const Directory = () => {
 
   const navigate = useCommonNavigate();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  const [chainNodeId, setChainNodeId] = useState<number>();
+  const [chainNodeId, setChainNodeId] = useState<number | null>();
   const [isSaving, setIsSaving] = useState(false);
 
   useRunOnceOnCondition({

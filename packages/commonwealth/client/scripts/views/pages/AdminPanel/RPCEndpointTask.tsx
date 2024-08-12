@@ -98,7 +98,9 @@ const RPCEndpointTask = () => {
       (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
       rpcEndpoint !== '');
 
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({});
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: rpcEndpointCommunityId,
+  });
 
   const setCommunityIdInput = (e) => {
     setRpcEndpointCommunityId(e?.target?.value?.trim() || '');

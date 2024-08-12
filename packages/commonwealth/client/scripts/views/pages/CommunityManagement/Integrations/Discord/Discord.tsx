@@ -219,7 +219,7 @@ const Discord = () => {
               </CWText>
               <CWToggle
                 size="small"
-                checked={isDiscordWebhooksEnabled}
+                checked={!!isDiscordWebhooksEnabled}
                 onChange={onToggleWebhooks}
               />
             </div>

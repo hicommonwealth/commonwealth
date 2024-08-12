@@ -30,6 +30,7 @@ const useReserveCommunityNamespace = ({
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId,
     reInitAppOnSuccess: true,
   });
 
