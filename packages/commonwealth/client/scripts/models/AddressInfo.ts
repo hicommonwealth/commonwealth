@@ -25,7 +25,8 @@ class AddressInfo extends Account {
     ghostAddress?: boolean;
     lastActive?: string | moment.Moment;
   }) {
-    const chain = app.config.chains.getById(communityId);
+    // TODO: 8762: find a better way to set this
+    const chain = app.config.chains.getAll().find((c) => c.id === communityId);
     if (!chain) throw new Error(`Failed to locate chain: ${communityId}`);
     super({
       address,
