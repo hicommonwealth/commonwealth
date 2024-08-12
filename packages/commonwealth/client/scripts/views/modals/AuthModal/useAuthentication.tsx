@@ -292,7 +292,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     account: Account,
     exitOnComplete: boolean,
     newelyCreated = false,
-    shouldRedrawApp = true,
   ) => {
     const profile = account.profile;
 
@@ -306,7 +305,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       await completeClientLogin(account);
     } else {
       // log in as the new user
-      await initAppState(false, shouldRedrawApp);
+      await initAppState(false);
       if (localStorage.getItem('user-dark-mode-state') === 'on') {
         setDarkMode(true);
       }
@@ -403,7 +402,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
-      await onLogInWithAccount(account, false, true, false);
+      await onLogInWithAccount(account, false, true);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
@@ -451,7 +450,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       }
       // @ts-expect-error <StrictNullChecks>
       await handleSuccess(account.profile.address, newelyCreated);
-      app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
     } catch (e) {
       notifyError('Failed to save profile info');
       console.error(`Failed to save profile info: ${e}`);

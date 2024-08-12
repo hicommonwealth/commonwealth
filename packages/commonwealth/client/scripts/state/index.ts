@@ -66,7 +66,6 @@ export interface IApp {
   sidebarRedraw: EventEmitter;
 
   loginState: LoginState;
-  loginStateEmitter: EventEmitter;
   loginStatusLoaded(): boolean;
 
   // stored on server-side
@@ -119,7 +118,6 @@ const app: IApp = {
   // User
   user,
   loginState: LoginState.NotLoaded,
-  loginStateEmitter: new EventEmitter(),
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   // Global nav state
   sidebarRedraw: new EventEmitter(),
@@ -151,7 +149,6 @@ declare const window: any;
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
-  shouldRedraw = true,
 ): Promise<void> {
   try {
     const [{ data: statusRes }, { data: communities }] = await Promise.all([
@@ -194,44 +191,36 @@ export async function initAppState(
         }
       });
 
+    // it is either user object or undefined
+    const userResponse = statusRes.result.user;
+
     // update the login status
-    updateActiveUser(statusRes.result.user);
+    updateActiveUser(userResponse);
     app.loginState = statusRes.result.user
       ? LoginState.LoggedIn
       : LoginState.LoggedOut;
 
-    if (app.loginState === LoginState.LoggedIn) {
-      app.user.notifications.refresh();
-      if (shouldRedraw) {
-        app.loginStateEmitter.emit('redraw');
-      }
-    } else if (app.loginState === LoginState.LoggedOut && shouldRedraw) {
-      app.loginStateEmitter.emit('redraw');
+    if (userResponse) {
+      await app.user.notifications.refresh();
     }
 
     userStore.getState().setData({
-      starredCommunities: (statusRes.result.user?.starredCommunities || []).map(
+      starredCommunities: (userResponse?.starredCommunities || []).map(
         (c) => new StarredCommunity(c),
       ),
     });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
-    if (
-      updateSelectedCommunity &&
-      statusRes.result.user &&
-      statusRes.result.user.selectedCommunity
-    ) {
+    if (updateSelectedCommunity && userResponse?.selectedCommunity) {
       userStore.getState().setData({
-        activeCommunity: ChainInfo.fromJSON(
-          statusRes.result.user.selectedCommunity,
-        ),
+        activeCommunity: ChainInfo.fromJSON(userResponse?.selectedCommunity),
       });
     }
 
-    if (statusRes.result.user) {
+    if (userResponse) {
       try {
         window.FS('setIdentity', {
-          uid: statusRes.result.user.id,
+          uid: userResponse.id,
         });
       } catch (e) {
         console.error('FullStory not found.');

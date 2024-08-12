@@ -21,7 +21,7 @@ The goal of this document is to describe the current state of the app initializa
     3. Active user and sign-in state are updated.
         - The websocket connection is initialized or disconnected depending on whether the user is logged in or out, respectively.
         - Sets the users’ starred communities, selected chain, and display name
-    4. If a custom domain is passed as an argument to the invocation of `initAppState`, the `setCustomDomain` setter is fired. If the function's `shouldRedraw` param is set to true, then the app's `loginStateEmitter` emits a redraw.
+    4. If a custom domain is passed as an argument to the invocation of `initAppState`, the `setCustomDomain` setter is fired.
 7. A `Router` component within the `App` component conditionally renders if state variable `isLoading` is false; this router uses `react-router-dom` library methods to conditionally create either custom domain routes, or common domain routes, depending on whether a custom domain param is passed.
     1. All routes are configured in the `client/scripts/navigation` directory.
     2. `CommonDomainRoutes.tsx` and `CustomDomainRoutes.tsx` declare the routes to front-end pages, switched in `navigation/Router.tsx` based on results of the `/domain` call.
