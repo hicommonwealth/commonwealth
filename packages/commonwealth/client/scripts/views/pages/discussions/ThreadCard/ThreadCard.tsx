@@ -94,7 +94,7 @@ export const ThreadCard = ({
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
       id: thread.communityId,
-      enabled: !showSkeleton || !thread.communityId,
+      enabled: !!thread.communityId && !showSkeleton,
     });
 
   if (showSkeleton || isLoadingCommunity)
