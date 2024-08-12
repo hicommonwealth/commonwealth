@@ -22,11 +22,28 @@ export const slugifyPreserveDashes = (str: string): string => {
     .toLowerCase();
 };
 
+/**
+ * Get the full / canonical URL for the community.
+ */
+export const getCommunityUrlCanonical = (community: string) => {
+  return `https://commonwealth.im/${community}`;
+};
+
 // WARN: Using process.env to avoid webpack failures
+/**
+
+ * Always get the full canonical URL for the community, using
+ * getCommunityUrlCanonical, except when we're on localhost because those will
+ * break.
+ * @param community
+ */
 export const getCommunityUrl = (community: string): string => {
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${community}`
-    : `http://localhost:8080/${community}`;
+  if (typeof document !== 'undefined') {
+    if (['localhost', '127.0.0.1'].includes(document.location.hostname)) {
+      return `${document.location.origin}/${community}`;
+    }
+  }
+  return getCommunityUrlCanonical(community);
 };
 
 export const smartTrim = (text, maxLength = 200) => {
