@@ -78,7 +78,7 @@ const createMockedGroupsController = () => {
       update: async () => {},
     },
     GroupPermission: {
-      create: async () => ({
+      create: () => ({
         ...groupPermissions[0],
         toJSON: () => groupPermissions[0],
       }),
@@ -147,7 +147,7 @@ const createMockedGroupsController = () => {
       findAll: async () => [{}],
     },
     sequelize: {
-      query: async () => {
+      query: () => {
         return groupPermissions;
       },
       transaction: async (callback) => callback(),
