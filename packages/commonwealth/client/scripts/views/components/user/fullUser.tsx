@@ -68,7 +68,7 @@ export const FullUser = ({
   );
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =
-    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(userCommunity);
   const friendlyCommunityName = userCommunity?.name;
   const roleInCommunity = userCommunity?.adminsAndMods?.find(
     ({ address }) => address === userAddress,

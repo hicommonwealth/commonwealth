@@ -68,10 +68,11 @@ export const AdminOnboardingSlider = () => {
     discordBot: community?.discord_config_id !== null,
     discordBotWebhooksEnabled: community?.discord_bot_webhooks_enabled,
   };
-  const hasAnyIntegration =
+  const hasAnyIntegration = !!(
     integrations.snapshot ||
     integrations.discordBot ||
-    integrations.discordBotWebhooksEnabled;
+    integrations.discordBotWebhooksEnabled
+  );
 
   const {
     setIsVisible,
@@ -119,10 +120,11 @@ export const AdminOnboardingSlider = () => {
 
   const isCommunitySupported =
     community?.base === ChainBase.Ethereum &&
+    community?.ChainNode?.eth_chain_id &&
     [
       commonProtocol.ValidChains.Base,
       commonProtocol.ValidChains.SepoliaBase,
-    ].includes(community?.ChainNode?.ethChainId as number);
+    ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
     contestEnabled && isCommunitySupported && contestsData?.length > 0;
 

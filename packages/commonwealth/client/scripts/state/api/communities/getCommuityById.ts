@@ -56,7 +56,7 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
     // eslint-disable-next-line max-len
     `${app.serverUrl()}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
   );
-  return response?.data[0]?.result.data;
+  return response?.data[0]?.result?.data;
 };
 
 const useGetCommunityByIdQuery = ({

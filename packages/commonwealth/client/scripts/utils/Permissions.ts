@@ -1,5 +1,7 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import app from 'state';
+import { z } from 'zod';
 import Thread from '../models/Thread';
 import { userStore } from '../state/ui/user';
 
@@ -25,27 +27,32 @@ const isCommunityMember = (communityId = app.activeChainId()) => {
     .addresses.some(({ community }) => community.id === communityId);
 };
 
-const isCommunityRole = (adminOrMod: Role, communityId?: string) => {
-  const chainInfo = communityId
-    ? app.config.chains.getById(communityId)
-    : app.chain?.meta;
-  if (!chainInfo) return false;
+const isCommunityRole = (
+  adminOrMod: Role,
+  selectedCommunity?: z.infer<typeof ExtendedCommunity>,
+) => {
+  const communityInfo = selectedCommunity || app.chain?.meta; // selected or active community
+  if (!communityInfo) return false;
   return userStore.getState().addresses.some(({ community, address }) => {
     return (
-      community.id === chainInfo.id &&
-      chainInfo.adminsAndMods.some(
+      community.id === communityInfo.id &&
+      (communityInfo?.adminsAndMods || []).some(
         (role) => role.address === address && role.role === adminOrMod,
       )
     );
   });
 };
 
-const isCommunityAdmin = (communityId?: string) => {
-  return isCommunityRole('admin', communityId);
+const isCommunityAdmin = (
+  selectedCommunity?: z.infer<typeof ExtendedCommunity>,
+) => {
+  return isCommunityRole('admin', selectedCommunity);
 };
 
-const isCommunityModerator = (communityId?: string) => {
-  return isCommunityRole('moderator', communityId);
+const isCommunityModerator = (
+  selectedCommunity?: z.infer<typeof ExtendedCommunity>,
+) => {
+  return isCommunityRole('moderator', selectedCommunity);
 };
 
 const isThreadCollaborator = (thread: Thread) => {

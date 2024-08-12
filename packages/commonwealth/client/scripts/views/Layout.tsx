@@ -126,6 +126,7 @@ const LayoutComponent = ({
               ss58_prefix: community.ss58_prefix,
               substrate_spec: community.substrate_spec,
               type: community.type,
+              adminsAndMods: community?.adminsAndMods || [],
               // TODO: 8762 -- these don't come from /communities/:id response -- still needed?
               Contracts: [],
               profile_count: 0,

@@ -49,8 +49,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   });
 
   const isAdmin =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin(thread.communityId);
+    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community);
 
   const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
