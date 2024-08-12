@@ -25,12 +25,6 @@ export enum ApiStatus {
   Connected = 'connected',
 }
 
-export const enum LoginState {
-  NotLoaded = 'not_loaded',
-  LoggedOut = 'logged_out',
-  LoggedIn = 'logged_in',
-}
-
 export interface IApp {
   chain: IChainAdapter<
     any,
@@ -64,8 +58,6 @@ export interface IApp {
   snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
-
-  loginState: LoginState;
 
   // stored on server-side
   config: {
@@ -116,7 +108,7 @@ const app: IApp = {
 
   // User
   user,
-  loginState: LoginState.NotLoaded,
+
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 
@@ -142,7 +134,6 @@ const app: IApp = {
   },
 };
 
-// console.log('222@@app', app.loginState);
 //allows for FS.identify to be used
 declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
@@ -196,10 +187,6 @@ export async function initAppState(
 
     // update the login status
     updateActiveUser(userResponse);
-    // console.log('333!!!app.loginState', app.loginState);
-    app.loginState = statusRes.result.user
-      ? LoginState.LoggedIn
-      : LoginState.LoggedOut;
 
     if (userResponse) {
       await app.user.notifications.refresh();
