@@ -45,6 +45,21 @@ export const computeOrigin = (url: string) => {
   return match[0];
 };
 
+/**
+ * Compute a full URL from an absolute path.
+ */
+const computeFullURL = (absolutePath: string) => {
+  if (typeof document !== 'undefined') {
+    return `${document.location.origin}${absolutePath}`;
+  }
+
+  const origin = computeOrigin(
+    process.env.SERVER_URL || 'https://commonwealth.im',
+  );
+
+  return `${origin}${absolutePath}`;
+};
+
 export const getThreadUrl = (
   thread: {
     chain: string;
@@ -53,42 +68,28 @@ export const getThreadUrl = (
     title?: string;
   },
   comment?: string | number,
-  relative?: boolean,
+  asAbsolute?: boolean,
 ): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
   const cId = comment ? `?comment=${comment}` : '';
 
-  const relativePath = `/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+  const absolutePath = `/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
 
-  if (relative) {
-    return relativePath;
+  if (asAbsolute) {
+    return absolutePath;
   }
 
-  if (typeof document !== 'undefined') {
-    return `${document.location.origin}${relativePath}`;
-  }
-
-  const origin = computeOrigin(
-    process.env.SERVER_URL || 'https://commonwealth.im',
-  );
-
-  return `${origin}${relativePath}`;
+  return computeFullURL(absolutePath);
 };
 
 /**
-
- * Always get the full canonical URL for the community, using
- * getCommunityUrlCanonical, except when we're on localhost because those will
- * break.
- * @param community
+ * Always get the full canonical URL for the community, except when we're on
+ * localhost because those will break.
  */
 export const getCommunityUrl = (community: string): string => {
-  if (typeof document !== 'undefined') {
-    return `${document.location.origin}/${community}`;
-  }
-  return `https://commonwealth.im/${community}`;
+  return computeFullURL(`/${community}`);
 };
 
 export function timeoutPromise(timeout: number) {
