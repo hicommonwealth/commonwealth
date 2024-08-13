@@ -212,6 +212,7 @@ export function updateActiveUser(data) {
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
+      isLoggedIn: false,
     });
   } else {
     const addresses = data.addresses.map(
@@ -256,6 +257,7 @@ export function updateActiveUser(data) {
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+      isLoggedIn: true,
     });
   }
 }
@@ -335,12 +337,14 @@ export async function startLoginWithMagicLink({
   redirectTo,
   chain,
   isCosmos,
+  isLoggedIn,
 }: {
   email?: string;
   provider?: WalletSsoSource;
   redirectTo?: string;
   chain?: string;
   isCosmos: boolean;
+  isLoggedIn: boolean;
 }) {
   if (!email && !provider)
     throw new Error('Must provide email or SSO provider');
@@ -355,6 +359,7 @@ export async function startLoginWithMagicLink({
       walletSsoSource: WalletSsoSource.Email,
       returnEarlyIfNewAddress:
         authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
+      isLoggedIn,
     });
 
     return { bearer, address, isAddressNew };
@@ -412,11 +417,13 @@ export async function handleSocialLoginCallback({
   chain,
   walletSsoSource,
   returnEarlyIfNewAddress = false,
+  isLoggedIn,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
   returnEarlyIfNewAddress?: boolean;
+  isLoggedIn?: boolean;
 }): Promise<{ address: string; isAddressNew: boolean }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -476,7 +483,7 @@ export async function handleSocialLoginCallback({
 
   isAddressNew = profileAddresses?.length === 0;
   const isAttemptingToConnectAddressToCommunity =
-    app.isLoggedIn() && app.activeChainId();
+    isLoggedIn && app.activeChainId();
   if (
     isAddressNew &&
     !isAttemptingToConnectAddressToCommunity &&

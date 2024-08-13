@@ -6,7 +6,7 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
-import useUserStore, { userStore } from 'state/ui/user';
+import useUserStore from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -34,6 +34,8 @@ const resetSidebarState = () => {
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+  const user = useUserStore();
+
   // eslint-disable-next-line react/destructuring-assignment
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
@@ -98,10 +100,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
     /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
     const account =
-      item &&
-      userStore
-        .getState()
-        .accounts.find(({ community }) => item.id === community.id);
+      item && user.accounts.find(({ community }) => item.id == community.id);
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
@@ -125,7 +124,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         {item && (
           <CommunityLabel name={item.name || ''} iconUrl={item.iconUrl} />
         )}
-        {app.isLoggedIn() && account && (
+        {user.isLoggedIn && account && (
           <div className="roles-and-star">
             <User
               avatarSize={18}

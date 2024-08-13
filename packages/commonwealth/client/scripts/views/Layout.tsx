@@ -7,6 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
+import useUserStore from 'state/ui/user';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
@@ -41,6 +42,7 @@ const LayoutComponent = ({
   const routerParams = useParams();
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
   const providedCommunityScope = scoped ? pathScope : null;
+  const user = useUserStore();
 
   const [communityToLoad, setCommunityToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -93,7 +95,7 @@ const LayoutComponent = ({
           )
         ) {
           // Update default community on server if logged in
-          if (app.isLoggedIn()) {
+          if (user.isLoggedIn) {
             await updateActiveCommunity({
               communityId: community?.id || '',
             });
@@ -124,13 +126,9 @@ const LayoutComponent = ({
   }, [shouldDeInitChain]);
 
   // A loading state (i.e. spinner) is shown in the following cases:
-  // - user login status has not finished loaded
   // - a community is still being initialized or deinitialized
   const shouldShowLoadingState =
-    isLoading ||
-    !app.loginStatusLoaded() ||
-    shouldSelectChain ||
-    shouldDeInitChain;
+    isLoading || shouldSelectChain || shouldDeInitChain;
 
   const childToRender = () => {
     if (app.loadingError) {

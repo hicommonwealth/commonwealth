@@ -11,9 +11,8 @@ import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
-import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
-import useUserStore, { userStore } from '../state/ui/user';
+import useUserStore from '../state/ui/user';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
@@ -30,11 +29,10 @@ type SublayoutProps = {
 } & React.PropsWithChildren;
 
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
-  const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const [userId, setUserId] = useState<null | number>(null);
+
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: true,
@@ -50,41 +48,24 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
 
-  useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout> | null = null;
-    if (isLoggedIn) {
-      timeout = setTimeout(() => {
-        user.addresses?.[0]?.profile?.userId &&
-          setUserId(user.addresses?.[0]?.profile?.userId);
-      }, 100);
-    } else {
-      setUserId(null);
-    }
-
-    return () => {
-      if (timeout !== null) clearTimeout(timeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
-
   useNecessaryEffect(() => {
     if (
-      isLoggedIn &&
+      user.isLoggedIn &&
       !isWelcomeOnboardModalOpen &&
-      userId &&
-      !userStore.getState().isWelcomeOnboardFlowComplete
+      user.id &&
+      !user.isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
     }
 
-    if (!isLoggedIn && isWelcomeOnboardModalOpen) {
+    if (!user.isLoggedIn && isWelcomeOnboardModalOpen) {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
-    userId,
+    user.id,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
-    isLoggedIn,
+    user.isLoggedIn,
   ]);
 
   const location = useLocation();
@@ -186,7 +167,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           <div className="Body">
             <div
               className={clsx('mobile-auth-buttons', {
-                isVisible: !isLoggedIn && isWindowExtraSmall,
+                isVisible: !user.isLoggedIn && isWindowExtraSmall,
               })}
               id="mobile-auth-buttons"
             >

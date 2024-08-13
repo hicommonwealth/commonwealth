@@ -224,13 +224,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
       const isAttemptingToConnectAddressToCommunity =
-        app.isLoggedIn() && app.activeChainId();
+        user.isLoggedIn && app.activeChainId();
       const { address: magicAddress, isAddressNew } =
         await startLoginWithMagicLink({
           email: tempEmailToUse,
           isCosmos,
           redirectTo: document.location.pathname + document.location.search,
           chain: app.chain?.id,
+          isLoggedIn: user.isLoggedIn,
         });
       setIsMagicLoading(false);
 
@@ -242,7 +243,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (
         isAddressNew &&
         !isAttemptingToConnectAddressToCommunity &&
-        !app.isLoggedIn()
+        !user.isLoggedIn
       ) {
         authModal
           .getState()
@@ -272,6 +273,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
+        isLoggedIn: user.isLoggedIn,
       });
       setIsMagicLoading(false);
 
@@ -291,7 +293,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     account: Account,
     exitOnComplete: boolean,
     newelyCreated = false,
-    shouldRedrawApp = true,
   ) => {
     const profile = account.profile;
 
@@ -301,11 +302,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setUsername(profile.name);
     }
 
-    if (app.isLoggedIn()) {
+    if (user.isLoggedIn) {
       await completeClientLogin(account);
     } else {
       // log in as the new user
-      await initAppState(false, shouldRedrawApp);
+      await initAppState(false);
       if (localStorage.getItem('user-dark-mode-state') === 'on') {
         setDarkMode(true);
       }
@@ -335,7 +336,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const walletToUse = wallet || selectedWallet;
 
     // Handle Logged in and joining community of different chain base
-    if (app.activeChainId() && app.isLoggedIn()) {
+    if (app.activeChainId() && user.isLoggedIn) {
       // @ts-expect-error StrictNullChecks
       const session = await getSessionFromWallet(walletToUse);
       await account.validate(session);
@@ -397,7 +398,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
-      await onLogInWithAccount(account, false, true, false);
+      await onLogInWithAccount(account, false, true);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
@@ -445,7 +446,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       }
       // @ts-expect-error <StrictNullChecks>
       await handleSuccess(account.profile.address, newelyCreated);
-      app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
     } catch (e) {
       notifyError('Failed to save profile info');
       console.error(`Failed to save profile info: ${e}`);
@@ -501,7 +501,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     });
     const addressExists = profileAddresses?.length > 0;
     const isAttemptingToConnectAddressToCommunity =
-      app.isLoggedIn() && app.activeChainId();
+      user.isLoggedIn && app.activeChainId();
     if (
       !addressExists &&
       !isAttemptingToConnectAddressToCommunity &&
@@ -540,7 +540,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
 
-    if (app.isLoggedIn()) {
+    if (user.isLoggedIn) {
       try {
         const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
           address:

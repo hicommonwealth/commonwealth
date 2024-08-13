@@ -3,10 +3,10 @@ import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -55,8 +55,8 @@ export const CWRelatedCommunityCard = ({
   onlyShowIfStakeEnabled,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
     community: community,
@@ -102,7 +102,7 @@ export const CWRelatedCommunityCard = ({
     });
   };
 
-  const disableStakeButton = !isLoggedIn || !canBuyStake;
+  const disableStakeButton = !user.isLoggedIn || !canBuyStake;
 
   const stakeButton = (
     <CWButton
@@ -201,7 +201,7 @@ export const CWRelatedCommunityCard = ({
               <CWTooltip
                 placement="right"
                 content={disabledStakeButtonTooltipText({
-                  isLoggedIn: isLoggedIn,
+                  isLoggedIn: user.isLoggedIn,
                   connectBaseChainToBuy: community.base,
                 })}
                 renderTrigger={(handleInteraction) => (

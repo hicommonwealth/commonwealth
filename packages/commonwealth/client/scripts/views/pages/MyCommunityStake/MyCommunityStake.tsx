@@ -1,6 +1,5 @@
 import { formatAddressShort } from 'helpers';
 import useTransactionHistory from 'hooks/useTransactionHistory';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -26,7 +25,6 @@ const BASE_ADDRESS_FILTER = {
 };
 
 const MyCommunityStake = () => {
-  const { isLoggedIn } = useUserLoggedIn();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchText: '',
@@ -58,7 +56,9 @@ const MyCommunityStake = () => {
     addressFilter,
   });
 
-  if (!isLoggedIn) return <PageNotFound />;
+  if (!user.isLoggedIn) {
+    return <PageNotFound />;
+  }
 
   return (
     <CWPageLayout>

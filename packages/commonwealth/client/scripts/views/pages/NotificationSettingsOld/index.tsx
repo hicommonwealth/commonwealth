@@ -71,9 +71,7 @@ const NotificationSettingsPage = () => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [forceRerender]);
 
-  if (!app.loginStatusLoaded()) {
-    return <PageLoading />;
-  } else if (!app.isLoggedIn()) {
+  if (!user.isLoggedIn) {
     navigate('/', { replace: true });
     return <PageLoading />;
   }

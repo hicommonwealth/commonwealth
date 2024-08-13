@@ -5,12 +5,12 @@ import {
   GetThreadActionTooltipTextResponse,
   filterLinks,
 } from 'helpers/threads';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import useUserStore from 'state/ui/user';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -81,7 +81,7 @@ export const ThreadCard = ({
   editingDisabled,
 }: CardProps) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
@@ -266,7 +266,7 @@ export const ThreadCard = ({
               commentBtnVisible={!thread.readOnly}
               canUpdateThread={
                 canUpdateThread &&
-                isLoggedIn &&
+                user.isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }
               canReact={canReact}

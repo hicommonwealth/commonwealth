@@ -1,6 +1,5 @@
 /* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -201,11 +200,10 @@ export const CreateContentSidebar = ({
 
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
 
   if (
-    !isLoggedIn ||
+    !user.isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
     !user.activeAccount

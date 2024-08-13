@@ -8,7 +8,7 @@ import {
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
@@ -33,34 +33,21 @@ type VotingActionsProps = {
   proposalRedrawState: boolean;
 };
 
-export const VotingActions = (props: VotingActionsProps) => {
-  const {
-    proposal,
-    toggleVotingModal,
-    votingModalOpen,
-    redrawProposals,
-    proposalRedrawState,
-  } = props;
-
+export const VotingActions = ({
+  proposal,
+  toggleVotingModal,
+  votingModalOpen,
+  redrawProposals,
+  proposalRedrawState,
+}: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
 
   const { isAddedToHomeScreen } = useAppStatus();
   const userData = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
-  useEffect(() => {
-    app.loginStateEmitter.once('redraw', () => {
-      setIsLoggedIn(app.isLoggedIn());
-    });
-
-    return () => {
-      app.loginStateEmitter.removeAllListeners();
-    };
-  }, []);
-
-  if (!isLoggedIn) {
+  if (!userData.isLoggedIn) {
     return <CannotVote label="Sign in to vote" />;
   } else if (!userData.activeAccount) {
     return <CannotVote label="Connect an address to vote" />;

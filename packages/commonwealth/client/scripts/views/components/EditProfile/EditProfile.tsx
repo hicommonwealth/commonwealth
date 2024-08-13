@@ -2,7 +2,6 @@ import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
@@ -44,8 +43,8 @@ export type Image = {
 
 const EditProfile = () => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
+
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
@@ -87,7 +86,7 @@ const EditProfile = () => {
     error,
     refetch,
   } = useFetchProfileByIdQuery({
-    apiCallEnabled: isLoggedIn,
+    apiCallEnabled: user.isLoggedIn,
     shouldFetchSelfProfile: true,
   });
 
