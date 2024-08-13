@@ -34,6 +34,17 @@ export const slugify = (str: string): string => {
 };
 /* eslint-disable */
 
+export const computeOrigin = (url: string) => {
+  const regex = /^(https?:\/\/[\w.-]+)/;
+  const match = url.match(regex);
+
+  if (match === null) {
+    throw new Error('Unable to compute URL origin: ' + url);
+  }
+
+  return match[0];
+};
+
 export const getThreadUrl = (
   thread: {
     chain: string;
@@ -56,12 +67,14 @@ export const getThreadUrl = (
   }
 
   if (typeof document !== 'undefined') {
-    if (['localhost', '127.0.0.1'].includes(document.location.hostname)) {
-      return `${document.location.origin}${relativePath}`;
-    }
+    return `${document.location.origin}${relativePath}`;
   }
 
-  return `https://commonwealth.im${relativePath}`;
+  const origin = computeOrigin(
+    process.env.SERVER_URL || 'https://commonwealth.im',
+  );
+
+  return `${origin}${relativePath}`;
 };
 
 export function timeoutPromise(timeout: number) {
