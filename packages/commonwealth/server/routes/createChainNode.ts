@@ -10,9 +10,9 @@ export const Errors = {
 
 type createChainNodeReq = {
   url: string;
-  name?: string;
-  bech32?: string;
-  balance_type?: string;
+  name: string;
+  balance_type: string;
+  eth_chain_id: number;
 };
 
 const createChainNode = async (
@@ -20,8 +20,7 @@ const createChainNode = async (
   req: TypedRequestBody<createChainNodeReq>,
   res: TypedResponse<{ node_id: number }>,
 ) => {
-  // @ts-expect-error StrictNullChecks
-  if (!req.user.isAdmin) {
+  if (!req.user?.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
@@ -35,10 +34,10 @@ const createChainNode = async (
 
   const newChainNode = await models.ChainNode.create({
     url: req.body.url,
-    // @ts-expect-error StrictNullChecks
     name: req.body.name,
     balance_type: req.body.balance_type as BalanceType,
-    bech32: req.body.bech32,
+    alt_wallet_url: req.body.url,
+    eth_chain_id: req.body.eth_chain_id,
   });
 
   return success(res, { node_id: newChainNode.id });
