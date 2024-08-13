@@ -41,7 +41,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
 
-    // TODO: Do we really need this for 1inch only? -- ask product.
+    // only on `1inch`, force enable dark mode
     const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
       darkModePreferenceSet
