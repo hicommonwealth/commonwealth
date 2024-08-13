@@ -1,6 +1,5 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
@@ -30,7 +29,6 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
   const {
     selectedAddress,
@@ -66,7 +64,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   return (
     <>
       <div className="community-menu">
-        {app.isLoggedIn() && (
+        {user.isLoggedIn && (
           <>
             <AccountConnectionIndicator
               connected={!!user.activeAccount}
@@ -108,7 +106,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <ExternalLinksModule />
         <div className="buttons-container">
-          {isLoggedIn && app.chain && (
+          {user.isLoggedIn && app.chain && (
             <div className="subscription-button">
               <SubscriptionButton />
             </div>

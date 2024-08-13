@@ -1,7 +1,6 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -66,7 +65,6 @@ export const HeaderWithFilters = ({
   // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
-  const forceRerender = useForceRerender();
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
@@ -106,14 +104,6 @@ export const HeaderWithFilters = ({
   }, []);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
-
-  useEffect(() => {
-    app.loginStateEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.loginStateEmitter.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
