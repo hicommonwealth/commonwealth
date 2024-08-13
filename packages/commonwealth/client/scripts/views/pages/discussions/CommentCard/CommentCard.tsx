@@ -14,6 +14,7 @@ import {
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
@@ -100,6 +101,8 @@ export const CommentCard = ({
   shareURL,
 }: CommentCardProps) => {
   const user = useUserStore();
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
+
   const userOwnsComment = comment.profile.userId === user.id;
 
   const [commentText, setCommentText] = useState(comment.text);
@@ -256,7 +259,7 @@ export const CommentCard = ({
                 />
               )}
 
-              {user.id > 0 && (
+              {enableKnockInAppNotifications && user.id > 0 && (
                 <ToggleCommentSubscribe
                   comment={comment}
                   userOwnsComment={userOwnsComment}

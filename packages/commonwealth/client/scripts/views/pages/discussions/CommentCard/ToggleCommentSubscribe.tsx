@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useCreateCommentSubscriptionMutation } from 'state/api/trpc/subscription/useCreateCommentSubscriptionMutation';
@@ -14,8 +13,6 @@ type ToggleCommentSubscribeProps = Readonly<{
 
 export const ToggleCommentSubscribe = (props: ToggleCommentSubscribeProps) => {
   const { userOwnsComment, comment } = props;
-
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   // this is in an inner loop but trpc will batch this, so it's only called once.
   const commentSubscriptions = useCommentSubscriptions();
@@ -74,7 +71,7 @@ export const ToggleCommentSubscribe = (props: ToggleCommentSubscribeProps) => {
 
   return (
     <>
-      {enableKnockInAppNotifications && userOwnsComment && (
+      {userOwnsComment && (
         <CWThreadAction
           action="subscribe"
           label="Subscribe"
