@@ -195,6 +195,26 @@ jobs:
           name: code-coverage-report
           path: coverage
 
+  # Lint with recommendations
+  commonwealth-code-quality-recommendations:
+    name: Code Quality Recommendations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 20 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run linter
+        run: pnpm lint-branch-warnings
+
   # Lint and Typecheck
   commonwealth-code-quality:
     name: Code Quality checks
@@ -231,6 +251,12 @@ jobs:
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: pnpm -F commonwealth run lint-diff-canary
+
+      # fun the *old* linter last because I want to try to migrate away from
+      # this and JUST to eslint-diff but if this fails we still might be able
+      # to salvage the branch
+      - name: Run linter
+        run: pnpm lint-branch
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
@@ -277,6 +303,9 @@ jobs:
       # TODO: use devmode instead to avoid building
       - name: Build
         run: pnpm -r build
+
+      - name: build
+        run: pnpm -r lint
 
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
