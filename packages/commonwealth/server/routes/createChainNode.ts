@@ -6,6 +6,7 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 export const Errors = {
   ChainExists: 'Chain Node already exists',
   NotAdmin: 'Not an admin',
+  MissingChainArguments: 'Missing chain arguments',
 };
 
 type createChainNodeReq = {
@@ -18,14 +19,20 @@ type createChainNodeReq = {
 const createChainNode = async (
   models: DB,
   req: TypedRequestBody<createChainNodeReq>,
-  res: TypedResponse<{ node_id: number }>,
+  res: TypedResponse<{ node_id: number; node_name: string }>,
 ) => {
   if (!req.user?.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
+  const { url, name, balance_type, eth_chain_id } = req.body;
+
+  if (!url || !name || !balance_type || !eth_chain_id) {
+    throw new AppError(Errors.MissingChainArguments);
+  }
+
   const chainNode = await models.ChainNode.findOne({
-    where: { url: req.body.url },
+    where: { eth_chain_id },
   });
 
   if (chainNode) {
@@ -33,14 +40,17 @@ const createChainNode = async (
   }
 
   const newChainNode = await models.ChainNode.create({
-    url: req.body.url,
-    name: req.body.name,
-    balance_type: req.body.balance_type as BalanceType,
-    alt_wallet_url: req.body.url,
-    eth_chain_id: req.body.eth_chain_id,
+    url,
+    name,
+    balance_type: balance_type as BalanceType,
+    alt_wallet_url: url,
+    eth_chain_id,
   });
 
-  return success(res, { node_id: newChainNode.id });
+  return success(res, {
+    node_id: newChainNode.id!,
+    node_name: newChainNode.name!,
+  });
 };
 
 export default createChainNode;
