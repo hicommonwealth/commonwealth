@@ -17,7 +17,7 @@ export const ToggleCommentSubscribe = (props: ToggleCommentSubscribeProps) => {
 
   const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
-  // this is in an inner loop but trpc will batch this so it's only called once.
+  // this is in an inner loop but trpc will batch this, so it's only called once.
   const commentSubscriptions = useCommentSubscriptions();
 
   const hasCommentSubscriptionDefault = useMemo(() => {
