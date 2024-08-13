@@ -44,6 +44,7 @@ export const ToggleThreadSubscribeOld = (props: ToggleThreadSubscribeProps) => {
     <CWThreadAction
       action="subscribe"
       label="Subscribe"
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onClick={handleToggleSubscribe}
       selected={!isSubscribed}
       disabled={!isCommunityMember}
