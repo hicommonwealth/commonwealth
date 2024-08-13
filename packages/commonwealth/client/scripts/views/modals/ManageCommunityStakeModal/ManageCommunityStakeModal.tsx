@@ -14,7 +14,7 @@ import {
 } from './types';
 
 import { ChainBase } from '@hicommonwealth/shared';
-import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import './ManageCommunityStakeModal.scss';
 
 const ManageCommunityStakeModal = ({

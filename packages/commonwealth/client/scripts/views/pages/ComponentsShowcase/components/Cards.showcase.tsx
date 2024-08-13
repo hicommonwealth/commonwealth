@@ -1,6 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import React from 'react';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWContentPageCard } from 'views/components/component_kit/CWContentPageCard';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';

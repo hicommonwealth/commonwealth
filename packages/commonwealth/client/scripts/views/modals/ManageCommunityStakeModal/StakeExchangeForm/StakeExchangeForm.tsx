@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -14,6 +13,7 @@ import {
   useBuyStakeMutation,
   useSellStakeMutation,
 } from 'state/api/communityStake';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import NumberSelector from 'views/components/NumberSelector';

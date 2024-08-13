@@ -3,12 +3,12 @@ import React from 'react';
 import 'components/Profile/ProfileActivityRow.scss';
 import moment from 'moment';
 
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import Thread from 'models/Thread';
 import withRouter, {
   navigateToCommunity,
   useCommonNavigate,
 } from 'navigation/helpers';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';

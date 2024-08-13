@@ -2,7 +2,7 @@ import { NotificationCategories } from '@hicommonwealth/shared';
 import React, { useEffect } from 'react';
 import type Notification from '../../../models/Notification';
 
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import {
   ChainEventNotificationRow,
   DefaultNotificationRow,

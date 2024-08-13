@@ -1,6 +1,6 @@
-import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
