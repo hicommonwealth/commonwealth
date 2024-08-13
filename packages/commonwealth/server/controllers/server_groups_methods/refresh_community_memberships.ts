@@ -166,7 +166,7 @@ async function computeMembership(
     address.address,
     requirements as Requirement[],
     balances,
-    currentGroup.metadata.required_requirements,
+    currentGroup.metadata.required_requirements!,
   );
   const computedMembership = {
     group_id: currentGroup.id,

@@ -28,7 +28,7 @@ const useManageContestForm = ({
 
       setContestFormData({
         contestName: contestData.name,
-        contestImage: contestData.image_url,
+        contestImage: contestData.image_url!,
         feeType: contestData.funding_token_address
           ? ContestFeeType.DirectDeposit
           : ContestFeeType.CommunityStake,

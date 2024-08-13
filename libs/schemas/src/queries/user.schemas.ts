@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Comment } from '../entities/comment.schemas';
-import { Tag } from '../entities/tag.schemas';
+import { Tags } from '../entities/tag.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { Address, UserProfile } from '../entities/user.schemas';
 
@@ -17,7 +17,7 @@ export const GetNewProfileResp = z.object({
   comments: z.array(Comment),
   commentThreads: z.array(Thread),
   isOwner: z.boolean(),
-  tags: z.array(Tag),
+  tags: z.array(Tags),
 });
 
 export const GetAddressProfileReq = z.object({
