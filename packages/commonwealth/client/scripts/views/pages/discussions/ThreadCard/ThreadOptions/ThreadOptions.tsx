@@ -1,5 +1,6 @@
 import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction } from 'react';
 import useUserStore from 'state/ui/user';
@@ -9,6 +10,7 @@ import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
+import { ToggleThreadSubscribeOld } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribeOld';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
@@ -58,12 +60,12 @@ export const ThreadOptions = ({
   editingDisabled,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
+  const userStore = useUserStore();
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   const handleDownloadMarkdown = () => {
     downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
   };
-
-  const userStore = useUserStore();
 
   return (
     <>
@@ -116,10 +118,21 @@ export const ThreadOptions = ({
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
           {userStore.id > 0 && (
-            <ToggleThreadSubscribe
-              thread={thread}
-              isCommunityMember={isCommunityMember}
-            />
+            <>
+              {enableKnockInAppNotifications && (
+                <ToggleThreadSubscribe
+                  thread={thread}
+                  isCommunityMember={isCommunityMember}
+                />
+              )}
+
+              {!enableKnockInAppNotifications && (
+                <ToggleThreadSubscribeOld
+                  thread={thread}
+                  isCommunityMember={isCommunityMember}
+                />
+              )}
+            </>
           )}
 
           {thread && (

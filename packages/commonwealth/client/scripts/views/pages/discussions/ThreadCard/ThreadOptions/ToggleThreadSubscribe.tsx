@@ -1,15 +1,9 @@
-import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
 import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
-import {
-  getCommentSubscription,
-  getReactionSubscription,
-  handleToggleSubscription,
-} from 'views/pages/discussions/helpers';
 
 type ToggleThreadSubscribeProps = Readonly<{
   readonly thread: Thread;
@@ -18,28 +12,6 @@ type ToggleThreadSubscribeProps = Readonly<{
 
 export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
   const { thread, isCommunityMember } = props;
-
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
-
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(
-    thread &&
-      getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive,
-  );
-
-  const doToggleSubscribeOld = useCallback(async () => {
-    if (!thread) {
-      return;
-    }
-
-    await handleToggleSubscription(
-      thread,
-      getCommentSubscription(thread),
-      getReactionSubscription(thread),
-      isSubscribed,
-      setIsSubscribed,
-    );
-  }, [isSubscribed, thread]);
 
   const createThreadSubscriptionMutation =
     useCreateThreadSubscriptionMutation();
@@ -88,11 +60,7 @@ export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
   const handleToggleSubscribe = useCallback(
     (e: React.MouseEvent) => {
       async function doAsync() {
-        if (enableKnockInAppNotifications) {
-          await doToggleSubscribe();
-        } else {
-          await doToggleSubscribeOld();
-        }
+        await doToggleSubscribe();
       }
 
       // prevent clicks from propagating to discussion row
@@ -101,7 +69,7 @@ export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
 
       doAsync().catch(console.error);
     },
-    [doToggleSubscribe, doToggleSubscribeOld, enableKnockInAppNotifications],
+    [doToggleSubscribe],
   );
 
   return (
