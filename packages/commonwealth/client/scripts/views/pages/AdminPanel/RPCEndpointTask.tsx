@@ -258,12 +258,6 @@ const RPCEndpointTask = () => {
       <div className="MultiRow">
         <div className="TaskRow">
           <CWTextInput
-            value={rpcEndpointCommunityValue}
-            onInput={setCommunityIdInput}
-            inputValidationFn={idValidationFn}
-            placeholder="Enter a community id"
-          />
-          <CWTextInput
             value={rpcEndpoint}
             onInput={(e) => {
               setRpcEndpoint(e.target.value);
@@ -281,7 +275,7 @@ const RPCEndpointTask = () => {
         <div>
           <div className="TaskRow">
             <CWDropdown
-              label="balance type"
+              label="Network family"
               options={[
                 { label: 'ethereum', value: BalanceType.Ethereum },
                 { label: 'solana', value: BalanceType.Solana },
