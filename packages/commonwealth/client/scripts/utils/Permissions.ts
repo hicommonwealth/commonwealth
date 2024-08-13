@@ -37,11 +37,12 @@ const isCommunityRole = (
   selectedCommunity?: SelectedCommunity,
 ) => {
   const adminAndMods =
-    selectedCommunity?.adminsAndMods || app.chain?.meta?.adminsAndMods; // selected or active community
-  if (!adminAndMods || !selectedCommunity?.id) return false;
+    selectedCommunity?.adminsAndMods || app.chain?.meta?.adminsAndMods; // selected or active community mods
+  const communityId = selectedCommunity?.id || app.chain?.meta?.id; // selected or active community id
+  if (!adminAndMods || !communityId) return false;
   return userStore.getState().addresses.some(({ community, address }) => {
     return (
-      community.id === selectedCommunity?.id &&
+      community.id === communityId &&
       (adminAndMods || []).some(
         (role) => role.address === address && role.role === adminOrMod,
       )

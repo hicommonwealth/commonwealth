@@ -56,9 +56,10 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isMod = Permissions.isCommunityModerator();
-  const showAdmin = isAdmin || isMod;
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
 
   return (
     <>
@@ -84,7 +85,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CreateCommunityButton />
 
-        {showAdmin && (
+        {isAdmin && (
           <>
             <CWDivider />
             <AdminSection />
