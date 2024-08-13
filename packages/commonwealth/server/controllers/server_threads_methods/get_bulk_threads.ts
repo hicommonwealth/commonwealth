@@ -201,7 +201,7 @@ export async function __getBulkThreads(
         JOIN "Addresses" A ON A.id = R.address_id
         JOIN "Users" U ON U.id = A.user_id
         -- where clause doesn't change query result but forces DB to use the correct indexes
-        WHERE R.community_id = :communityId AND R.thread_id = TT.id
+        WHERE R.thread_id = TT.id
         GROUP BY TT.id
     ), contest_data AS (
       -- get the contest data associated with the thread

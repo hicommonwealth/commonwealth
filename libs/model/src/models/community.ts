@@ -5,6 +5,7 @@ import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
 import type { CommunityAlertAttributes } from './community_alerts';
+import type { CommunityTagsAttributes } from './community_tags';
 import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
@@ -15,6 +16,7 @@ import type { UserAttributes } from './user';
 export type CommunityAttributes = z.infer<typeof Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
+  CommunityTags?: CommunityTagsAttributes[];
   StarredCommunities?: StarredCommunityAttributes[];
   Threads?: ThreadAttributes[] | ThreadAttributes['id'][];
   Comments?: CommentAttributes[] | CommentAttributes['id'][];

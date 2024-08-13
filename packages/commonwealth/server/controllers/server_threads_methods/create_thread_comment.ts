@@ -105,7 +105,6 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        community_id: thread.community_id,
       },
       include: [this.models.Address],
     });
@@ -206,13 +205,12 @@ export async function __createThreadComment(
       );
 
       await emitMentions(this.models, transaction, {
-        // @ts-expect-error StrictNullChecks
-        authorAddressId: address.id,
-        // @ts-expect-error StrictNullChecks
-        authorUserId: user.id,
+        authorAddressId: address.id!,
+        authorUserId: user.id!,
         authorAddress: address.address,
         mentions: mentions,
         comment,
+        community_id: thread.community_id,
       });
 
       await this.models.Subscription.bulkCreate(

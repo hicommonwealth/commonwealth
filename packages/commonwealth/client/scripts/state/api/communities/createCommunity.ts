@@ -3,7 +3,8 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { baseToNetwork } from 'helpers';
-import app, { initAppState } from 'state';
+import { initAppState } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 
 interface CreateCommunityProps {
@@ -44,7 +45,7 @@ const createCommunity = async ({
       : baseToNetwork(chainBase);
 
   return await axios.post(
-    `${app.serverUrl()}/communities`,
+    `${SERVER_URL}/communities`,
     {
       id,
       name,

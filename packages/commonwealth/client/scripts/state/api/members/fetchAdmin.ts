@@ -1,8 +1,7 @@
 import { AddressRole } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const ADMINS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -15,7 +14,7 @@ const fetchAdmin = async ({ communityId }: FetchAdminProps) => {
   const memberAdmins: AddressRole[] = [];
   const memberMods: AddressRole[] = [];
 
-  const res = await axios.get(`${app.serverUrl()}${ApiEndpoints.FETCH_ADMIN}`, {
+  const res = await axios.get(`${SERVER_URL}${ApiEndpoints.FETCH_ADMIN}`, {
     params: {
       chain_id: communityId,
       permissions: ['moderator', 'admin'],

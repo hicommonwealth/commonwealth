@@ -23,6 +23,7 @@ import { Magic } from 'magic-sdk';
 
 import axios from 'axios';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import {
   onUpdateEmailError,
@@ -49,7 +50,7 @@ export function linkExistingAddressToChainOrCommunity(
   community: string,
   originChain: string,
 ) {
-  return axios.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
+  return axios.post(`${SERVER_URL}/linkExistingAddressToCommunity`, {
     address,
     community_id: community,
     originChain, // not used
@@ -60,7 +61,7 @@ export function linkExistingAddressToChainOrCommunity(
 export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
   try {
-    const response = await axios.post(`${app.serverUrl()}/setDefaultRole`, {
+    const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
       address: account.address,
       author_community_id: account.community.id,
       community_id: community,
@@ -210,6 +211,7 @@ export function updateActiveUser(data) {
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
+      isLoggedIn: false,
     });
   } else {
     const addresses = data.addresses.map(
@@ -254,6 +256,7 @@ export function updateActiveUser(data) {
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+      isLoggedIn: true,
     });
   }
 }
@@ -270,7 +273,7 @@ export async function createUserWithAddress(
   newlyCreated: boolean;
   joinedCommunity: boolean;
 }> {
-  const response = await axios.post(`${app.serverUrl()}/createAddress`, {
+  const response = await axios.post(`${SERVER_URL}/createAddress`, {
     address,
     community_id: chain,
     jwt: userStore.getState().jwt,
@@ -313,9 +316,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
             // so we can't use app.chain.meta?.node?.url
-            rpcUrl: `${
-              document.location.origin
-            }${app.serverUrl()}/magicCosmosProxy/${chain}`,
+            rpcUrl: `${document.location.origin}${SERVER_URL}/magicCosmosProxy/${chain}`,
           }),
         ],
   });
@@ -327,12 +328,14 @@ export async function startLoginWithMagicLink({
   redirectTo,
   chain,
   isCosmos,
+  isLoggedIn,
 }: {
   email?: string;
   provider?: WalletSsoSource;
   redirectTo?: string;
   chain?: string;
   isCosmos: boolean;
+  isLoggedIn: boolean;
 }) {
   if (!email && !provider)
     throw new Error('Must provide email or SSO provider');
@@ -347,6 +350,7 @@ export async function startLoginWithMagicLink({
       walletSsoSource: WalletSsoSource.Email,
       returnEarlyIfNewAddress:
         authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
+      isLoggedIn,
     });
 
     return { bearer, address, isAddressNew };
@@ -404,11 +408,13 @@ export async function handleSocialLoginCallback({
   chain,
   walletSsoSource,
   returnEarlyIfNewAddress = false,
+  isLoggedIn,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
   returnEarlyIfNewAddress?: boolean;
+  isLoggedIn?: boolean;
 }): Promise<{ address: string; isAddressNew: boolean }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -460,7 +466,7 @@ export async function handleSocialLoginCallback({
 
   isAddressNew = profileAddresses?.length === 0;
   const isAttemptingToConnectAddressToCommunity =
-    app.isLoggedIn() && app.activeChainId();
+    isLoggedIn && app.activeChainId();
   if (
     isAddressNew &&
     !isAttemptingToConnectAddressToCommunity &&
@@ -523,7 +529,7 @@ export async function handleSocialLoginCallback({
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await axios.post(
-    `${app.serverUrl()}/auth/magic`,
+    `${SERVER_URL}/auth/magic`,
     {
       data: {
         community_id: desiredChain?.id,

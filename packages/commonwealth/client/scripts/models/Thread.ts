@@ -487,6 +487,7 @@ export class Thread implements IUniqueId {
               },
             },
           },
+          Thread: undefined,
           discord_meta: rc?.discord_meta,
           marked_as_spam_at: rc?.marked_as_spam_at,
           deleted_at: rc?.deleted_at,

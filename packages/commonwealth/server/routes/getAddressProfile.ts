@@ -61,7 +61,7 @@ const getAddressProfiles = async (
         userId: address.User!.id!,
         name: address.User?.profile.name ?? DEFAULT_NAME,
         address: address.address,
-        lastActive: address.last_active ?? address.User?.created_at,
+        lastActive: address.last_active ?? address.User!.created_at!,
         avatarUrl: address.User?.profile.avatar_url ?? undefined,
       };
     },

@@ -67,9 +67,17 @@ const getNewProfile = async (
   const comments = await models.Comment.findAll({
     where: {
       address_id: { [Op.in]: addressIds },
-      community_id: { [Op.in]: communityIds },
     },
-    include: [{ model: models.Address, as: 'Address' }],
+    include: [
+      { model: models.Address, as: 'Address' },
+      {
+        model: models.Thread,
+        attributes: ['community_id'],
+        where: {
+          community_id: { [Op.in]: communityIds },
+        },
+      },
+    ],
   });
 
   const commentThreadIds = [
