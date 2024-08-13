@@ -21,7 +21,7 @@ export const ExternalLinksModule = () => {
     elements,
     githubs,
     remainingLinks,
-    // slacks, TODO: maybe add this here as well -- ask product?
+    slacks,
     telegrams,
     twitters,
   } = categorizeSocialLinks(community.social_links || []);
@@ -68,7 +68,7 @@ export const ExternalLinksModule = () => {
           onClick={() => window.open(link)}
         />
       ))}
-      {remainingLinks.map((link) => (
+      {[...remainingLinks, ...slacks].map((link) => (
         <CWIcon
           key={link}
           iconName="website"
