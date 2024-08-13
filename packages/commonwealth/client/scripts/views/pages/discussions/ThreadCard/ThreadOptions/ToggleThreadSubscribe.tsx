@@ -17,7 +17,7 @@ type ToggleThreadSubscribeProps = Readonly<{
 }>;
 
 export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
-  const { thread } = props;
+  const { thread, isCommunityMember } = props;
 
   const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
@@ -110,7 +110,7 @@ export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
       label="Subscribe"
       onClick={handleToggleSubscribe}
       selected={!hasThreadSubscription}
-      disabled={!props.isCommunityMember}
+      disabled={!isCommunityMember}
     />
   );
 };

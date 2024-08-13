@@ -7,6 +7,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { useCommentSubscriptions } from 'views/pages/NotificationSettings/useCommentSubscriptions';
 
 type ToggleCommentSubscribeProps = Readonly<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   comment: Comment<any>;
   userOwnsComment: boolean;
 }>;
