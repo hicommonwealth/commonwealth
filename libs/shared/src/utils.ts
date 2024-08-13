@@ -48,7 +48,7 @@ export const computeOrigin = (url: string) => {
 /**
  * Compute a full URL from an absolute path.
  */
-const computeFullURL = (absolutePath: string) => {
+export const computeFullURL = (absolutePath: string) => {
   if (typeof document !== 'undefined') {
     return `${document.location.origin}${absolutePath}`;
   }
