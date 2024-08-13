@@ -7,6 +7,7 @@ export const Errors = {
   ChainExists: 'Chain Node already exists',
   NotAdmin: 'Not an admin',
   MissingChainArguments: 'Missing chain arguments',
+  BalanceTypeNotSupported: 'Balance type not supported',
 };
 
 type createChainNodeReq = {
@@ -29,6 +30,10 @@ const createChainNode = async (
 
   if (!url || !name || !balance_type || !eth_chain_id) {
     throw new AppError(Errors.MissingChainArguments);
+  }
+
+  if (balance_type != 'ethereum') {
+    throw new AppError(Errors.BalanceTypeNotSupported);
   }
 
   const chainNode = await models.ChainNode.findOne({
