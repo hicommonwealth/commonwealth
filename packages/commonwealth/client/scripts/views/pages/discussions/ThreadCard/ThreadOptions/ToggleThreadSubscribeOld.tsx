@@ -21,6 +21,7 @@ export const ToggleThreadSubscribeOld = (props: ToggleThreadSubscribeProps) => {
       getReactionSubscription(thread)?.isActive,
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const handleToggleSubscribe = async (e) => {
     // prevent clicks from propagating to discussion row
     e.preventDefault();
