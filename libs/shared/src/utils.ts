@@ -77,6 +77,20 @@ export const getThreadUrl = (
   return `${origin}${relativePath}`;
 };
 
+/**
+
+ * Always get the full canonical URL for the community, using
+ * getCommunityUrlCanonical, except when we're on localhost because those will
+ * break.
+ * @param community
+ */
+export const getCommunityUrl = (community: string): string => {
+  if (typeof document !== 'undefined') {
+    return `${document.location.origin}/${community}`;
+  }
+  return `https://commonwealth.im/${community}`;
+};
+
 export function timeoutPromise(timeout: number) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {

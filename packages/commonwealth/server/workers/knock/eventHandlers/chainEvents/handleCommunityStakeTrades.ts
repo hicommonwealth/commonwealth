@@ -6,9 +6,9 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { getCommunityUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
-import { getCommunityUrl } from '../../../../../shared/utils';
 
 const log = logger(import.meta);
 

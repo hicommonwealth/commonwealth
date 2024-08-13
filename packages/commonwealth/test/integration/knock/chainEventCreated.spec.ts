@@ -15,7 +15,7 @@ import {
   tester,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, getCommunityUrl } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
@@ -30,7 +30,6 @@ import {
 import z from 'zod';
 import { processChainEventCreated } from '../../../server/workers/knock/eventHandlers/chainEventCreated';
 import { getChainProposalUrl } from '../../../server/workers/knock/util';
-import { getCommunityUrl } from '../../../shared/utils';
 
 chai.use(chaiAsPromised);
 

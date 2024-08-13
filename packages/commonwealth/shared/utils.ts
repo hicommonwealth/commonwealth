@@ -23,21 +23,6 @@ export const slugifyPreserveDashes = (str: string): string => {
 };
 
 // WARN: Using process.env to avoid webpack failures
-/**
-
- * Always get the full canonical URL for the community, using
- * getCommunityUrlCanonical, except when we're on localhost because those will
- * break.
- * @param community
- */
-export const getCommunityUrl = (community: string): string => {
-  if (typeof document !== 'undefined') {
-    if (['localhost', '127.0.0.1'].includes(document.location.hostname)) {
-      return `${document.location.origin}/${community}`;
-    }
-  }
-  return `https://commonwealth.im/${community}`;
-};
 
 export const smartTrim = (text, maxLength = 200) => {
   if (text.length > maxLength) {

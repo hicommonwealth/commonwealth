@@ -1,4 +1,5 @@
 import {
+  getCommunityUrl,
   getThreadUrl,
   IForumNotificationData,
   NotificationCategories,
@@ -10,7 +11,6 @@ import moment from 'moment';
 import 'pages/notifications/notification_row.scss';
 import React from 'react';
 import app from 'state';
-import { getCommunityUrl } from 'utils';
 import { User } from 'views/components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
