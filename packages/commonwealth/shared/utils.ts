@@ -22,13 +22,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .toLowerCase();
 };
 
-/**
- * Get the full / canonical URL for the community.
- */
-export const getCommunityUrlCanonical = (community: string) => {
-  return `https://commonwealth.im/${community}`;
-};
-
 // WARN: Using process.env to avoid webpack failures
 /**
 
@@ -43,7 +36,7 @@ export const getCommunityUrl = (community: string): string => {
       return `${document.location.origin}/${community}`;
     }
   }
-  return getCommunityUrlCanonical(community);
+  return `https://commonwealth.im/${community}`;
 };
 
 export const smartTrim = (text, maxLength = 200) => {

@@ -55,12 +55,13 @@ export const getThreadUrl = (
     return relativePath;
   }
 
-  // TODO: Should we relocate this?
-  // - cannot use config util in libs/shared
-  // - duplicate found in knock utils
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im${relativePath}`
-    : `http://localhost:8080${relativePath}`;
+  if (typeof document !== 'undefined') {
+    if (['localhost', '127.0.0.1'].includes(document.location.hostname)) {
+      return `${document.location.origin}${relativePath}`;
+    }
+  }
+
+  return `https://commonwealth.im${relativePath}`;
 };
 
 export function timeoutPromise(timeout: number) {
