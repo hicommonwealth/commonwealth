@@ -18,6 +18,17 @@
     width: 100%;
   }
 
+  .topic-select {
+    .cwsl__option {
+      justify-content: start !important;
+      gap: 4px;
+    }
+    .trophy-icon {
+      margin-bottom: -2px;
+      margin-right: 4px;
+    }
+  }
+
   .new-thread-header {
     display: flex;
     justify-content: space-between;

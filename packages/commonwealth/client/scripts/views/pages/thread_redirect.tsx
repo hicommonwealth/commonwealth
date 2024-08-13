@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { PageLoading } from './loading';
 
-export default function ThreadRedirect({ identifier }: { identifier: string }) {
+const ThreadRedirect = ({ identifier }: { identifier: string }) => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -12,7 +12,7 @@ export default function ThreadRedirect({ identifier }: { identifier: string }) {
       const threadId = identifier.split('-')[0];
 
       const response = await axios
-        .get(`${app.serverUrl()}/getThreads`, {
+        .get(`${SERVER_URL}/getThreads`, {
           params: {
             ids: [threadId],
           },
@@ -30,4 +30,6 @@ export default function ThreadRedirect({ identifier }: { identifier: string }) {
   }, [navigate, identifier]);
 
   return <PageLoading />;
-}
+};
+
+export default ThreadRedirect;

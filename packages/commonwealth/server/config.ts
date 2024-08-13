@@ -32,6 +32,8 @@ const {
   MESSAGE_RELAYER_TIMEOUT_MS,
   MESSAGE_RELAYER_PREFETCH,
   EVM_CE_POLL_INTERVAL,
+  CF_ZONE_ID,
+  CF_API_KEY,
 } = process.env;
 
 const SEND_EMAILS = _SEND_EMAILS === 'true';
@@ -113,6 +115,10 @@ export const config = configure(
     DISCORD: {
       CLIENT_ID: DISCORD_CLIENT_ID,
       BOT_TOKEN: DISCORD_BOT_TOKEN,
+    },
+    CLOUDFLARE: {
+      ZONE_ID: CF_ZONE_ID,
+      API_KEY: CF_API_KEY,
     },
     WORKERS: {
       /*
@@ -227,6 +233,22 @@ export const config = configure(
               ) && !data
             ),
           'DISCORD_BOT_TOKEN is required in production, frick, beta (QA), and demo',
+        ),
+    }),
+    CLOUDFLARE: z.object({
+      ZONE_ID: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(['production'].includes(model_config.APP_ENV) && !data),
+          'CF_ZONE_ID is required in production',
+        ),
+      API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(['production'].includes(model_config.APP_ENV) && !data),
+          'CF_API_KEY is required in production',
         ),
     }),
     WORKERS: z.object({

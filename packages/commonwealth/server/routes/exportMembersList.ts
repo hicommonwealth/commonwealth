@@ -45,23 +45,34 @@ const exportMembersList = async (
   try {
     const data = await models.sequelize.query(
       `
-      SELECT 
-          a.address, 
-          u.profile->>'name' AS profile_name, 
-          COUNT(DISTINCT t.id) AS thread_count, 
-          COUNT(DISTINCT c.id) AS comment_count, 
-          COUNT(DISTINCT r.id) AS reaction_count
-      FROM 
-          "Addresses" a
-          LEFT JOIN "Users" u ON a.user_id = u.id
-          LEFT JOIN "Threads" t ON a.id = t.address_id AND t.community_id = :communityId
-          LEFT JOIN "Comments" c ON a.id = c.address_id AND c.community_id = :communityId
-          LEFT JOIN "Reactions" r ON a.id = r.address_id AND r.community_id = :communityId
-      WHERE 
-          a.community_id = :communityId
-      GROUP BY 
-          a.address,
-          u.id
+WITH A AS (
+  SELECT
+    a.id, 
+    a.address, 
+    u.profile->>'name' AS profile_name 
+  FROM 
+    "Addresses" a
+    LEFT JOIN "Users" u ON a.user_id = u.id
+  WHERE 
+    a.community_id = :communityId
+),
+T AS (SELECT id, address_id from "Threads" where community_id = :communityId)
+SELECT 
+  A.address, 
+  A.profile_name, 
+  COUNT(DISTINCT T.id) AS thread_count,
+  COUNT(DISTINCT c.id) AS comment_count,
+  COUNT(DISTINCT tr.id)  + COUNT(DISTINCT cr.id) AS reaction_count
+FROM 
+  A
+  LEFT JOIN T ON A.id = T.address_id
+  LEFT JOIN "Comments" c ON A.id = c.address_id AND T.id = c.thread_id 
+  LEFT JOIN "Reactions" tr ON A.id = tr.address_id AND T.id = tr.thread_id 
+  LEFT JOIN "Reactions" cr ON A.id = cr.address_id 
+  LEFT JOIN "Comments" crc ON cr.comment_id = crc.id AND T.id =crc.thread_id 
+GROUP BY 
+  A.address,
+  A.profile_name;
     `,
       {
         replacements: { communityId },

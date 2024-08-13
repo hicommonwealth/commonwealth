@@ -2,6 +2,7 @@ import { trpc } from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
 
 export const trpcRouter = trpc.router({
+  getCommunities: trpc.query(Community.GetCommunities),
   getCommunity: trpc.query(Community.GetCommunity),
   getStake: trpc.query(Community.GetCommunityStake),
   getStakeTransaction: trpc.query(Community.GetStakeTransaction),

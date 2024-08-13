@@ -23,9 +23,12 @@ export const ThreadCreated = Thread.extend({
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.extend({
+  community_id: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
-export const CommentCreated = Comment;
+export const CommentCreated = Comment.extend({
+  community_id: z.string(),
+});
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
@@ -231,7 +234,7 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
 
-export const DiscourseImportSubmitted = z.object({
+export const DiscourseImportSubmitted = EventMetadata.extend({
   id: z.string(),
   base: z.enum(['ETHEREUM', 'COSMOS', 'NEAR']),
   accountsClaimable: z.boolean(),

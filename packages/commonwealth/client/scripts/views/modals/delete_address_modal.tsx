@@ -1,13 +1,13 @@
 import jdenticon from 'jdenticon';
 import React from 'react';
 
+import { SERVER_URL } from 'state/api/config';
 import {
   notifyError,
   notifySuccess,
 } from '../../controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
 import NewProfile from '../../models/NewProfile';
-import app from '../../state';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
@@ -47,7 +47,7 @@ export const DeleteAddressModal = ({
     }
 
     try {
-      const response = await axios.post(`${app.serverUrl()}/deleteAddress`, {
+      const response = await axios.post(`${SERVER_URL}/deleteAddress`, {
         address,
         chain,
         jwt: user.jwt,

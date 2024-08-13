@@ -71,7 +71,7 @@ export async function __updateComment(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: comment.community_id,
+    communityId: thread.community_id,
     address: address.address,
   });
   if (!canInteract) {
@@ -81,7 +81,7 @@ export async function __updateComment(
   const isAuthor = await validateOwner({
     models: this.models,
     user,
-    communityId: comment.community_id,
+    communityId: thread.community_id,
     entity: comment,
     allowSuperAdmin: true,
   });
@@ -141,13 +141,12 @@ export async function __updateComment(
     }
 
     await emitMentions(this.models, transaction, {
-      // @ts-expect-error StrictNullChecks
-      authorAddressId: address.id,
-      // @ts-expect-error StrictNullChecks
-      authorUserId: user.id,
+      authorAddressId: address.id!,
+      authorUserId: user.id!,
       authorAddress: address.address,
       mentions: mentions,
       comment,
+      community_id: thread.community_id,
     });
   });
 

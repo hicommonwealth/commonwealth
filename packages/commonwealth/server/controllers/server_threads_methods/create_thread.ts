@@ -180,7 +180,7 @@ export async function __createThread(
 
   const threadContent: Partial<ThreadAttributes> = {
     community_id: community.id,
-    address_id: address.id,
+    address_id: address.id!,
     title,
     body,
     plaintext,
@@ -245,13 +245,12 @@ export async function __createThread(
       await address.save({ transaction });
 
       await emitMentions(this.models, transaction, {
-        // @ts-expect-error StrictNullChecks
-        authorAddressId: address.id,
-        // @ts-expect-error StrictNullChecks
-        authorUserId: user.id,
+        authorAddressId: address.id!,
+        authorUserId: user.id!,
         authorAddress: address.address,
         mentions: mentions,
         thread,
+        community_id: thread.community_id,
       });
 
       return thread.id;
@@ -280,7 +279,6 @@ export async function __createThread(
       // @ts-expect-error StrictNullChecks
       subscriber_id: user.id,
       category_id: NotificationCategories.NewComment,
-      // @ts-expect-error StrictNullChecks
       thread_id: finalThread.id,
       community_id: finalThread.community_id,
       is_active: true,
@@ -289,7 +287,6 @@ export async function __createThread(
       // @ts-expect-error StrictNullChecks
       subscriber_id: user.id,
       category_id: NotificationCategories.NewReaction,
-      // @ts-expect-error StrictNullChecks
       thread_id: finalThread.id,
       community_id: finalThread.community_id,
       is_active: true,

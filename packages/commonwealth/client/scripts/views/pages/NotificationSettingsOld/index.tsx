@@ -5,6 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import {
   useUpdateUserEmailMutation,
   useUpdateUserEmailSettingsMutation,
@@ -561,7 +562,7 @@ const NotificationSettingsPage = () => {
                     <div className="avatar-and-name">
                       <img
                         className="snapshot-icon"
-                        src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}&image=true`}
+                        src={`${SERVER_URL}/ipfsProxy?hash=${avatar}&image=true`}
                       />
                       <CWText type="h5" fontWeight="medium">
                         {space.name}

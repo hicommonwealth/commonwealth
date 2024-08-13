@@ -7,6 +7,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
 import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
@@ -292,7 +293,7 @@ class ChainInfo {
   }) {
     const id = app.activeChainId() ?? this.id;
     const r = await axios.patch(
-      `${app.serverUrl()}/communities/${id}`,
+      `${SERVER_URL}/communities/${id}`,
       {
         id,
         name,
