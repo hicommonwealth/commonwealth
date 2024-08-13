@@ -1,4 +1,4 @@
-import { EventNames, logger, stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -6,8 +6,6 @@ import { emitEvent } from '../utils';
 import { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { ReactionAttributes } from './reaction';
 import type { ModelInstance } from './types';
-
-const log = logger(import.meta);
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations

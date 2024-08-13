@@ -1,12 +1,10 @@
-import { EventNames, logger, stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { ModelInstance } from './types';
-
-const log = logger(import.meta);
 
 export type ReactionAttributes = z.infer<typeof Reaction> & {
   Address?: AddressAttributes;
