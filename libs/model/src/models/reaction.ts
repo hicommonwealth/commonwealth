@@ -85,7 +85,7 @@ export default (
             });
           } else if (comment_id) {
             const [, comments] = await (
-              sequelize.models.Thread as Sequelize.ModelStatic<CommentInstance>
+              sequelize.models.Comment as Sequelize.ModelStatic<CommentInstance>
             ).update(
               {
                 reaction_count: Sequelize.literal('reaction_count + 1'),
@@ -131,7 +131,7 @@ export default (
             });
           } else if (comment_id) {
             const [, comments] = await (
-              sequelize.models.Thread as Sequelize.ModelStatic<CommentInstance>
+              sequelize.models.Comment as Sequelize.ModelStatic<CommentInstance>
             ).update(
               {
                 reaction_count: Sequelize.literal('reaction_count - 1'),
