@@ -8,7 +8,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { z } from 'zod';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
-import type NodeInfo from './NodeInfo';
+import NodeInfo from './NodeInfo';
 import StakeInfo from './StakeInfo';
 import Tag from './Tag';
 
@@ -255,7 +255,19 @@ class ChainInfo {
       bech32_prefix: community.bech32_prefix,
       block_explorer_ids: community.block_explorer_ids,
       chain_node_id: community.chain_node_id,
-      ChainNode: community.ChainNode,
+      ChainNode: new NodeInfo({
+        alt_wallet_url: community?.ChainNode?.alt_wallet_url,
+        balance_type: community?.ChainNode?.balance_type,
+        bech32: community?.ChainNode?.bech32,
+        block_explorer: community?.ChainNode?.block_explorer,
+        cosmos_chain_id: community?.ChainNode?.cosmos_chain_id,
+        cosmos_gov_version: community?.ChainNode?.cosmos_gov_version,
+        eth_chain_id: community?.ChainNode?.eth_chain_id,
+        id: community?.ChainNode?.id,
+        name: community?.ChainNode?.name,
+        slip44: community?.ChainNode?.slip44,
+        url: community?.ChainNode?.url,
+      }),
       collapsed_on_homepage: community.collapsed_on_homepage,
       CommunityStakes: community.CommunityStakes,
       CommunityTags: community.CommunityTags,
