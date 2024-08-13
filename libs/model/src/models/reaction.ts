@@ -2,9 +2,13 @@ import { EventNames, stats } from '@hicommonwealth/core';
 import { Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import type {
+  AddressAttributes,
+  CommentInstance,
+  ModelInstance,
+  ThreadInstance,
+} from '.';
 import { emitEvent, getThreadContestManagers } from '../utils';
-import type { AddressAttributes } from './address';
-import type { ModelInstance } from './types';
 
 export type ReactionAttributes = z.infer<typeof Reaction> & {
   Address?: AddressAttributes;
@@ -31,111 +35,119 @@ export default (
     },
     {
       hooks: {
-        afterCreate: async (reaction: ReactionInstance, options) => {
-          const { Thread, Comment, Outbox } = sequelize.models;
+        afterCreate: async (reaction, options) => {
           const { thread_id, comment_id } = reaction;
-
           if (thread_id) {
-            const thread = await Thread.findOne({ where: { id: thread_id } });
-            if (thread) {
-              await thread.increment('reaction_count', {
+            const [, threads] = await (
+              sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
+            ).update(
+              {
+                reaction_count: Sequelize.literal('reaction_count + 1'),
+                reaction_weights_sum: Sequelize.literal(
+                  `reaction_weights_sum + ${
+                    reaction.calculated_voting_weight ?? 0
+                  }`,
+                ),
+              },
+              {
+                where: { id: thread_id },
+                returning: true,
                 transaction: options.transaction,
-              });
-              if (reaction.calculated_voting_weight ?? 0 > 0) {
-                await thread.increment('reaction_weights_sum', {
-                  by: reaction.calculated_voting_weight!,
-                  transaction: options.transaction,
-                });
-              }
-              if (reaction.reaction === 'like') {
-                const { topic_id, community_id } = thread.get({ plain: true });
-                const contestManagers = !topic_id
-                  ? []
-                  : await getThreadContestManagers(
-                      sequelize,
-                      topic_id,
-                      community_id,
-                    );
-
-                await emitEvent(
-                  Outbox,
-                  [
-                    {
-                      event_name: EventNames.ThreadUpvoted,
-                      event_payload: {
-                        ...reaction.get({ plain: true }),
-                        reaction: 'like',
-                        community_id,
-                        contestManagers,
-                      },
+              },
+            );
+            const thread = threads.at(0)!;
+            if (reaction.reaction === 'like') {
+              const contestManagers = !thread.topic_id
+                ? []
+                : await getThreadContestManagers(
+                    sequelize,
+                    thread.topic_id,
+                    thread.community_id,
+                  );
+              await emitEvent(
+                sequelize.models.Outbox,
+                [
+                  {
+                    event_name: EventNames.ThreadUpvoted,
+                    event_payload: {
+                      ...reaction.toJSON(),
+                      reaction: 'like',
+                      community_id: thread.community_id,
+                      contestManagers,
                     },
-                  ],
-                  options.transaction,
-                );
-              }
-              stats().increment('cw.hook.reaction-count', {
-                thread_id: String(thread_id),
-              });
+                  },
+                ],
+                options.transaction,
+              );
             }
-          } else if (comment_id) {
-            const comment = await Comment.findOne({
-              where: { id: comment_id },
+            stats().increment('cw.hook.reaction-count', {
+              thread_id: String(thread_id),
             });
-            if (comment) {
-              await comment.increment('reaction_count', {
+          } else if (comment_id) {
+            const [, comments] = await (
+              sequelize.models.Thread as Sequelize.ModelStatic<CommentInstance>
+            ).update(
+              {
+                reaction_count: Sequelize.literal('reaction_count + 1'),
+                reaction_weights_sum: Sequelize.literal(
+                  `reaction_weights_sum + ${
+                    reaction.calculated_voting_weight ?? 0
+                  }`,
+                ),
+              },
+              {
+                where: { id: comment_id },
+                returning: true,
                 transaction: options.transaction,
-              });
-              if (reaction.calculated_voting_weight ?? 0 > 0) {
-                await comment.increment('reaction_weights_sum', {
-                  by: reaction.calculated_voting_weight!,
-                  transaction: options.transaction,
-                });
-              }
-              stats().increment('cw.hook.reaction-count', {
-                thread_id: String(comment.get('thread_id')),
-              });
-            }
+              },
+            );
+            stats().increment('cw.hook.reaction-count', {
+              thread_id: String(comments.at(0)!.thread_id),
+            });
           }
         },
 
-        afterDestroy: async (reaction: ReactionInstance, options) => {
-          const { Thread, Comment } = sequelize.models;
-          const { thread_id, comment_id } = reaction;
-
+        afterDestroy: async (
+          { thread_id, comment_id, calculated_voting_weight },
+          options,
+        ) => {
           if (thread_id) {
-            const thread = await Thread.findOne({ where: { id: thread_id } });
-            if (thread) {
-              await thread.decrement('reaction_count', {
+            await (
+              sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
+            ).update(
+              {
+                reaction_count: Sequelize.literal('reaction_count - 1'),
+                reaction_weights_sum: Sequelize.literal(
+                  `reaction_weights_sum - ${calculated_voting_weight ?? 0}`,
+                ),
+              },
+              {
+                where: { id: thread_id },
                 transaction: options.transaction,
-              });
-              if (reaction.calculated_voting_weight ?? 0 > 0) {
-                await thread.decrement('reaction_weights_sum', {
-                  by: reaction.calculated_voting_weight!,
-                  transaction: options.transaction,
-                });
-              }
-              stats().decrement('cw.hook.reaction-count', {
-                thread_id: String(thread_id),
-              });
-            }
-          } else if (comment_id) {
-            const comment = await Comment.findOne({
-              where: { id: comment_id },
+              },
+            );
+            stats().decrement('cw.hook.reaction-count', {
+              thread_id: String(thread_id),
             });
-            if (comment) {
-              await comment.decrement('reaction_count', {
+          } else if (comment_id) {
+            const [, comments] = await (
+              sequelize.models.Thread as Sequelize.ModelStatic<CommentInstance>
+            ).update(
+              {
+                reaction_count: Sequelize.literal('reaction_count - 1'),
+                reaction_weights_sum: Sequelize.literal(
+                  `reaction_weights_sum - ${calculated_voting_weight ?? 0}`,
+                ),
+              },
+              {
+                where: { id: comment_id },
+                returning: true,
                 transaction: options.transaction,
-              });
-              if (reaction.calculated_voting_weight ?? 0 > 0) {
-                await comment.decrement('reaction_weights_sum', {
-                  by: reaction.calculated_voting_weight!,
-                  transaction: options.transaction,
-                });
-              }
-              stats().decrement('cw.hook.reaction-count', {
-                thread_id: String(comment.get('thread_id')),
-              });
-            }
+              },
+            );
+            stats().decrement('cw.hook.reaction-count', {
+              thread_id: String(comments.at(0)!.thread_id),
+            });
           }
         },
       },
