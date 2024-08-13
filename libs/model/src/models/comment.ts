@@ -108,23 +108,14 @@ export default (
         afterDestroy: async (comment: CommentInstance, options) => {
           const { Thread } = sequelize.models;
           const thread_id = comment.thread_id;
-          try {
-            const thread = await Thread.findOne({
-              where: { id: thread_id },
+          const thread = await Thread.findOne({
+            where: { id: thread_id },
+          });
+          if (thread) {
+            await thread.decrement('comment_count', {
+              transaction: options.transaction,
             });
-            if (thread) {
-              await thread.decrement('comment_count', {
-                transaction: options.transaction,
-              });
-              stats().decrement('cw.hook.comment-count', {
-                thread_id: String(thread_id),
-              });
-            }
-          } catch (error) {
-            log.error(
-              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
-            );
-            stats().increment('cw.hook.comment-count-error', {
+            stats().decrement('cw.hook.comment-count', {
               thread_id: String(thread_id),
             });
           }

@@ -101,58 +101,43 @@ export default (
         },
 
         afterDestroy: async (reaction: ReactionInstance, options) => {
-          let thread_id = reaction.thread_id;
-          const comment_id = reaction.comment_id;
           const { Thread, Comment } = sequelize.models;
-          try {
-            if (thread_id) {
-              const thread = await Thread.findOne({
-                where: { id: thread_id },
-              });
-              if (thread) {
-                await thread.decrement('reaction_count', {
-                  transaction: options.transaction,
-                });
-                if (reaction.calculated_voting_weight ?? 0 > 0) {
-                  await thread.decrement('reaction_weights_sum', {
-                    by: reaction.calculated_voting_weight!,
-                    transaction: options.transaction,
-                  });
-                }
-                stats().decrement('cw.hook.reaction-count', {
-                  thread_id: String(thread_id),
-                });
-              }
-            }
+          const { thread_id, comment_id } = reaction;
 
-            if (comment_id) {
-              const comment = await Comment.findOne({
-                where: { id: comment_id },
+          if (thread_id) {
+            const thread = await Thread.findOne({ where: { id: thread_id } });
+            if (thread) {
+              await thread.decrement('reaction_count', {
+                transaction: options.transaction,
               });
-              if (comment) {
-                thread_id = Number(comment.get('thread_id'));
-                await comment.decrement('reaction_count', {
+              if (reaction.calculated_voting_weight ?? 0 > 0) {
+                await thread.decrement('reaction_weights_sum', {
+                  by: reaction.calculated_voting_weight!,
                   transaction: options.transaction,
                 });
-                if (reaction.calculated_voting_weight ?? 0 > 0) {
-                  await comment.decrement('reaction_weights_sum', {
-                    by: reaction.calculated_voting_weight!,
-                    transaction: options.transaction,
-                  });
-                }
-                stats().decrement('cw.hook.reaction-count', {
-                  thread_id: String(thread_id),
+              }
+              stats().decrement('cw.hook.reaction-count', {
+                thread_id: String(thread_id),
+              });
+            }
+          } else if (comment_id) {
+            const comment = await Comment.findOne({
+              where: { id: comment_id },
+            });
+            if (comment) {
+              await comment.decrement('reaction_count', {
+                transaction: options.transaction,
+              });
+              if (reaction.calculated_voting_weight ?? 0 > 0) {
+                await comment.decrement('reaction_weights_sum', {
+                  by: reaction.calculated_voting_weight!,
+                  transaction: options.transaction,
                 });
               }
+              stats().decrement('cw.hook.reaction-count', {
+                thread_id: String(comment.get('thread_id')),
+              });
             }
-          } catch (error) {
-            log.error(
-              `incrementing thread reaction count afterDestroy: ` +
-                `thread_id ${thread_id} comment_id ${comment_id} ${error}`,
-            );
-            stats().increment('cw.hook.reaction-count-error', {
-              thread_id: String(thread_id),
-            });
           }
         },
       },
