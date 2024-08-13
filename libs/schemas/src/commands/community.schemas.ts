@@ -34,12 +34,7 @@ export const CreateCommunity = {
     // hidden optional params
     user_address: z.string().optional(), // address for the user
     alt_wallet_url: z.string().url().optional(),
-    eth_chain_id: z.coerce
-      .number()
-      .int()
-      .min(MIN_SCHEMA_INT)
-      .max(MAX_SCHEMA_INT)
-      .optional(),
+    eth_chain_id: PG_INT.optional(),
     cosmos_chain_id: z.string().optional(),
     address: z.string().optional(), // address for the contract of the chain
     decimals: PG_INT.optional(),

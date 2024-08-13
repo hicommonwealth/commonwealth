@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ContestManager } from '../entities';
 import { Contest, ContestAction } from '../projections';
-import { PG_INT, zDate } from '../utils';
+import { PG_INT } from '../utils';
 
 export const ContestResults = ContestManager.extend({
   topics: z.array(z.object({ id: z.number(), name: z.string() })),
@@ -51,7 +51,7 @@ export const ContestLogEntry = z.object({
   voting_power: PG_INT.nullish(),
   thread_id: PG_INT.nullish(),
   thread_title: z.string().nullish(),
-  created_at: zDate,
+  created_at: z.coerce.date(),
 });
 
 export const GetContestLog = {
