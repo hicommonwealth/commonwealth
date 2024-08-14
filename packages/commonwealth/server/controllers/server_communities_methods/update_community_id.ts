@@ -4,7 +4,6 @@ import {
   CommunityInstance,
   ModelInstance,
 } from '@hicommonwealth/model';
-import { ChainNetwork } from '@hicommonwealth/shared';
 import { type ModelStatic } from 'sequelize';
 import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -61,9 +60,10 @@ export async function __updateCommunityId(
         id: new_community_id,
         ...communityData,
         redirect: community_id,
-        network: (communityData.network === id
-          ? new_community_id
-          : communityData.network) as ChainNetwork,
+        network:
+          communityData.network === id
+            ? new_community_id
+            : communityData.network,
       },
       { transaction },
     );

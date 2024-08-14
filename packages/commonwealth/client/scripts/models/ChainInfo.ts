@@ -1,9 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import type {
-  AddressRole,
-  ChainNetwork,
-  DefaultPage,
-} from '@hicommonwealth/shared';
+import type { AddressRole, DefaultPage } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { z } from 'zod';
@@ -23,7 +19,7 @@ class ChainInfo {
   public readonly profileCount: number;
   public readonly default_symbol: string;
   public name: string;
-  public readonly network: ChainNetwork;
+  public readonly network: string;
   public readonly base: ChainBase;
   public iconUrl: string;
   public description: string;

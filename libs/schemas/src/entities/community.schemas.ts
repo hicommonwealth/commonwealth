@@ -20,7 +20,7 @@ export const Community = z.object({
   name: z.string(),
   chain_node_id: PG_INT,
   default_symbol: z.string().default(''),
-  network: z.nativeEnum(ChainNetwork).default(ChainNetwork.Ethereum),
+  network: z.string().default(ChainNetwork.Ethereum),
   base: z.nativeEnum(ChainBase),
   icon_url: z.string().nullish(),
   active: z.boolean(),
