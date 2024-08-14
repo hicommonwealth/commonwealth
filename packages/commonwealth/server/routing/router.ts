@@ -209,8 +209,10 @@ function setupRouter(
   router.use(useragent.express());
 
   // API routes
-  app.use(api.internal.API_PATH, api.internal.router);
-  app.use(api.external.API_PATH, api.external.router);
+  app.use(api.internal.PATH, api.internal.router);
+  app.use(api.external.PATH, api.external.router);
+  config.NODE_ENV !== 'production' &&
+    app.use(api.internal_oas.PATH, api.internal_oas.router);
 
   registerRoute(
     router,

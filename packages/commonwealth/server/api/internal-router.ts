@@ -27,10 +27,12 @@ if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
   api['email'] = email.trpcRouter;
 }
 
+const PATH = '/api/internal';
 const router = Router();
 const trpcRouter = trpc.router(api);
 export type API = typeof trpcRouter;
-export const API_PATH = '/api/internal';
+
+router.use(express.statsMiddleware, trpc.toExpress(trpcRouter));
 
 /**
  * Special integration endpoints
@@ -50,6 +52,4 @@ router.post(
   express.command(ChainEvents.ChainEventCreated()),
 );
 
-router.use(express.statsMiddleware, trpc.toExpress(trpcRouter));
-
-export { router };
+export { PATH, router, trpcRouter };
