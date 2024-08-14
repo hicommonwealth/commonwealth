@@ -5,6 +5,7 @@ import {
   sepolia,
 } from '@alchemy/aa-core';
 import { AppError } from '@hicommonwealth/core';
+import { equalEvmAddresses } from '@hicommonwealth/model';
 import Web3 from 'web3';
 
 const message =
@@ -20,7 +21,7 @@ export const verifySignature = (
     message,
     signedMessage,
   );
-  if (signerAddress.toLowerCase() !== recoveredSignerAddress.toLowerCase()) {
+  if (equalEvmAddresses(signerAddress, recoveredSignerAddress)) {
     throw new AppError('Validation Error: Invalid signature');
   }
 };
