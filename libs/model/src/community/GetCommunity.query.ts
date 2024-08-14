@@ -24,6 +24,7 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
           ],
         },
       ];
+
       if (payload.include_node_info) {
         include.push({
           model: models.ChainNode,

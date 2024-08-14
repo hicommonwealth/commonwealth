@@ -204,7 +204,10 @@ const CommunityResultRow = ({
       className="community-result-row"
       onClick={handleClick}
     >
-      <CommunityLabel community={communityInfo} />
+      <CommunityLabel
+        name={communityInfo?.name || ''}
+        iconUrl={communityInfo?.iconUrl || ''}
+      />
     </div>
   );
 };

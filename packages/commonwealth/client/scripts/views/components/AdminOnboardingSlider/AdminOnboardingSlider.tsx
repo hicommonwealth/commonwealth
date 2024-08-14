@@ -8,6 +8,7 @@ import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -56,16 +57,22 @@ export const AdminOnboardingSlider = () => {
 
   const navigate = useCommonNavigate();
 
-  const community = app.config.chains.getById(app.activeChainId());
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
+
   const integrations = {
-    snapshot: community?.snapshot?.length > 0,
-    discordBot: community?.discordConfigId !== null,
-    discordBotWebhooksEnabled: community?.discordBotWebhooksEnabled,
+    snapshot: (community?.snapshot_spaces || [])?.length > 0,
+    discordBot: community?.discord_config_id !== null,
+    discordBotWebhooksEnabled: community?.discord_bot_webhooks_enabled,
   };
-  const hasAnyIntegration =
+  const hasAnyIntegration = !!(
     integrations.snapshot ||
     integrations.discordBot ||
-    integrations.discordBotWebhooksEnabled;
+    integrations.discordBotWebhooksEnabled
+  );
 
   const {
     setIsVisible,
@@ -113,15 +120,17 @@ export const AdminOnboardingSlider = () => {
 
   const isCommunitySupported =
     community?.base === ChainBase.Ethereum &&
+    community?.ChainNode?.eth_chain_id &&
     [
       commonProtocol.ValidChains.Base,
       commonProtocol.ValidChains.SepoliaBase,
-    ].includes(community?.ChainNode?.ethChainId as number);
+    ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
     contestEnabled && isCommunitySupported && contestsData?.length > 0;
 
   const isSliderHidden =
     !app.activeChainId() ||
+    isLoadingCommunity ||
     isContestDataLoading ||
     isLoadingTopics ||
     isLoadingGroups ||

@@ -33,10 +33,12 @@ export function GetStakeTransaction(): Query<
            'default_symbol', c.default_symbol,
            'icon_url', c.icon_url,
            'name', c.name,
-           'chain_node_id', c.chain_node_id
+           'chain_node_id', c.chain_node_id,
+           'chain_node_name', cn.name
          ) AS community
        FROM "StakeTransactions" AS t
        LEFT JOIN "Communities" AS c ON c.id = t.community_id
+       LEFT JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
        LEFT JOIN "CommunityStakes" AS cs ON cs.community_id = t.community_id
        ${addressFilter}
       `,

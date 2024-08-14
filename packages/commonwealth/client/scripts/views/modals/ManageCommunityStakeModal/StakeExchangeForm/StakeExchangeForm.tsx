@@ -2,7 +2,6 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import ChainInfo from 'models/ChainInfo';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
@@ -14,6 +13,7 @@ import {
   useBuyStakeMutation,
   useSellStakeMutation,
 } from 'state/api/communityStake';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import NumberSelector from 'views/components/NumberSelector';
@@ -61,7 +61,6 @@ interface StakeExchangeFormProps {
   numberOfStakeToExchange: number;
   onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
   denomination: string;
-  community?: ChainInfo;
 }
 
 const StakeExchangeForm = ({
@@ -74,9 +73,10 @@ const StakeExchangeForm = ({
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
   denomination,
-  community,
 }: StakeExchangeFormProps) => {
   const user = useUserStore();
+
+  const { selectedCommunity: community } = useManageCommunityStakeModalStore();
 
   const chainRpc =
     community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
@@ -96,7 +96,10 @@ const StakeExchangeForm = ({
     mode,
     address: selectedAddress?.value,
     numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
-    community,
+    community: {
+      namespace: community?.namespace,
+      ChainNode: community?.ChainNode,
+    },
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
