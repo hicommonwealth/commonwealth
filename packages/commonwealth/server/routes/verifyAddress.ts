@@ -227,6 +227,7 @@ const verifyAddress = async (
     req.login(user, (err) => {
       const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
@@ -235,6 +236,7 @@ const verifyAddress = async (
         );
         return next(err);
       }
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,

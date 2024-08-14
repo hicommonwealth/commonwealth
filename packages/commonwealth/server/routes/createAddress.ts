@@ -222,6 +222,7 @@ const createAddress = async (
       );
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     serverAnalyticsController.track(
       {
         event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
