@@ -96,14 +96,15 @@ export const loadThread: ThreadMiddleware = async ({ payload }) => {
   return thread;
 };
 
-export const isThreadAuthor: ThreadMiddleware = async ({ actor }, state) => {
+export const isThreadAuthor: ThreadMiddleware = ({ actor }, state) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return;
+  if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   if (!state) throw new InvalidActor(actor, 'Must load thread');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the thread');
+  return Promise.resolve();
 };
 
 /**
@@ -125,12 +126,14 @@ export const loadComment: CommentMiddleware = async ({ payload }) => {
   return comment;
 };
 
-export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
+export const isCommentAuthor: CommentMiddleware = ({ actor }, state) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return;
+  if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   if (!state) throw new InvalidActor(actor, 'Must load comment');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the comment');
+
+  return Promise.resolve();
 };

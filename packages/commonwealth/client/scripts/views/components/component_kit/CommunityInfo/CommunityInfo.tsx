@@ -1,4 +1,3 @@
-import ChainInfo from 'models/ChainInfo';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
@@ -23,10 +22,7 @@ const CommunityInfo = ({
 }: CommunityInfoProps) => {
   return (
     <Link className="CommunityInfo" rel="noreferrer" to={`/${communityId}`}>
-      <CWCommunityAvatar
-        size={iconSize}
-        community={{ iconUrl, name } as ChainInfo}
-      />
+      <CWCommunityAvatar size={iconSize} community={{ iconUrl, name }} />
       <div className="info-container">
         {symbol && (
           <CWText type="b1" fontWeight="semiBold" className="symbol">

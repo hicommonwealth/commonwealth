@@ -29,6 +29,7 @@ function anyAddressEqual(
   return false;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function verifyAlchemySignature(req: any) {
   const signature = req.headers['x-alchemy-signature'];
   let hmac: Hmac | undefined;
@@ -87,7 +88,7 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
   return {
     ...schemas.ChainEventCreated,
     auth: [],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
     body: async ({ payload }) => {
       // The name of the chain e.g. BaseSepolia (ex webhook url: /v1/rest/chainevent/ChainEventCreated/BaseSepolia)
       // let chain = id!;
@@ -125,6 +126,7 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
         } else if (
           // Contests
           Object.values(EvmEventSignatures.Contests).includes(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             eventSignature as any,
           )
         ) {

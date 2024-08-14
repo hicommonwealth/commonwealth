@@ -34,6 +34,7 @@ export const verify_db = async (name: string): Promise<void> => {
     console.error(`Error verifying db [${name}]:`, error);
     throw error;
   } finally {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     pg && pg.close();
   }
 };

@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {
   useFetchEthUsdRateQuery,
@@ -8,13 +7,18 @@ import {
 } from 'state/api/communityStake';
 import useGetUserEthBalanceQuery from 'state/api/communityStake/getUserEthBalance';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
-import { CommunityData } from 'views/pages/DirectoryPage/DirectoryPageContent';
 
 interface UseStakeExchangeProps {
   mode: ManageCommunityStakeModalMode;
   address: string;
   numberOfStakeToExchange: number;
-  community?: ChainInfo | CommunityData;
+  community?: {
+    namespace?: string;
+    ChainNode?: {
+      url: string;
+      ethChainId: number;
+    };
+  };
 }
 
 const useStakeExchange = ({

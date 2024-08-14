@@ -4,7 +4,12 @@ import {
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, CommunityMember, CommunityStake } from '../entities';
+import {
+  Community,
+  CommunityMember,
+  CommunityStake,
+  ExtendedCommunity,
+} from '../entities';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -36,17 +41,7 @@ export const GetCommunity = {
     id: z.string(),
     include_node_info: z.boolean().optional(),
   }),
-  output: Community.extend({
-    numVotingThreads: PG_INT,
-    numTotalThreads: PG_INT,
-    adminsAndMods: z.array(
-      z.object({
-        address: z.string(),
-        role: z.enum(['admin', 'moderator']),
-      }),
-    ),
-    communityBanner: z.string().optional(),
-  }).optional(),
+  output: ExtendedCommunity,
 };
 
 export const GetCommunityStake = {
@@ -106,6 +101,7 @@ export const GetStakeTransaction = {
         icon_url: z.string().nullish(),
         name: z.string(),
         chain_node_id: PG_INT.nullish(),
+        chain_node_name: z.string().nullish(),
       }),
     })
     .array(),

@@ -490,18 +490,6 @@ export interface GetCommunities200ResponseResultsInnerAddressesInner {
    * @type {boolean}
    * @memberof GetCommunities200ResponseResultsInnerAddressesInner
    */
-  is_councillor?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  is_validator?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
   ghost_address?: boolean;
   /**
    *
@@ -2370,12 +2358,120 @@ export interface GetCommunity200ResponseAdminsAndModsInner {
   /**
    *
    * @type {string}
-   * @memberof GetCommunity200ResponseAdminsAndModsInner
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
    */
-  role: GetCommunity200ResponseAdminsAndModsInnerRoleEnum;
+  community_id?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  user_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  verification_token?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  verification_token_expires?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  verified?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  last_active?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  ghost_address?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  wallet_id?: IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  block_info?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  is_user_default?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  role?: IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  wallet_sso_source?: IntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  hex?: string;
+  /**
+   *
+   * @type {any}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  created_at?: any;
+  /**
+   *
+   * @type {any}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  updated_at?: any;
+  /**
+   *
+   * @type {UserUpdateUser200Response}
+   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   */
+  User?: UserUpdateUser200Response;
 }
 
-export const GetCommunity200ResponseAdminsAndModsInnerRoleEnum = {
+export const IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum = {
+  Magic: 'magic',
+  Polkadot: 'polkadot',
+  Metamask: 'metamask',
+  Walletconnect: 'walletconnect',
+  KeplrEthereum: 'keplr-ethereum',
+  Keplr: 'keplr',
+  Leap: 'leap',
+  Near: 'near',
+  Terrastation: 'terrastation',
+  TerraWalletconnect: 'terra-walletconnect',
+  CosmMetamask: 'cosm-metamask',
+  Phantom: 'phantom',
+  Coinbase: 'coinbase',
+} as const;
+
+export type IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum =
+  typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum[keyof typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum];
+export const IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum = {
   Admin: 'admin',
   Moderator: 'moderator',
 } as const;

@@ -31,6 +31,7 @@ export const seedDb = async () => {
           isAdmin: true,
           is_welcome_onboard_flow_complete: true,
           disableRichText: false,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           emailNotificationInterval: 'never' as any,
           profile: {},
         }),
@@ -292,6 +293,7 @@ export const seedDb = async () => {
         custom_stages: [],
         snapshot_spaces: [],
         stages_enabled: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         has_homepage: 'false' as any,
         collapsed_on_homepage: false,
         has_chain_events_listener: false,
@@ -444,8 +446,6 @@ export const seedDb = async () => {
         verified: new Date(),
         role: 'admin' as Role,
         is_user_default: false,
-        is_councillor: false,
-        is_validator: false,
         ghost_address: false,
       })),
     );

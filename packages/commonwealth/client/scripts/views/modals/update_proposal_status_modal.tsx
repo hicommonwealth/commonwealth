@@ -83,7 +83,7 @@ export const UpdateProposalStatusModal = ({
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const showSnapshot = !!app.chain.meta.snapshot?.length;
+  const showSnapshot = !!app.chain.meta?.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -125,9 +125,9 @@ export const UpdateProposalStatusModal = ({
         );
 
         if (toAdd.length > 0) {
-          if (app.chain.meta.snapshot?.length === 1) {
+          if (app.chain.meta?.snapshot?.length === 1) {
             const enrichedSnapshot = {
-              id: `${app.chain.meta.snapshot[0]}/${toAdd[0].id}`,
+              id: `${app.chain.meta?.snapshot?.[0]}/${toAdd[0].id}`,
               title: toAdd[0].title,
             };
             return addThreadLinks({
@@ -146,7 +146,7 @@ export const UpdateProposalStatusModal = ({
               return { toDelete, links };
             });
           } else {
-            return loadMultipleSpacesData(app.chain.meta.snapshot)
+            return loadMultipleSpacesData(app.chain.meta?.snapshot)
               .then((data) => {
                 let enrichedSnapshot;
                 for (const { space: _space, proposals } of data) {

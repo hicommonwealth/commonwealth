@@ -46,16 +46,6 @@ export default (
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
       user_id: { type: Sequelize.INTEGER, allowNull: true },
-      is_councillor: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      is_validator: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       ghost_address: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

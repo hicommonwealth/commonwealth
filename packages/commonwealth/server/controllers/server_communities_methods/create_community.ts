@@ -11,7 +11,6 @@ import { CreateCommunity } from '@hicommonwealth/schemas';
 import {
   BalanceType,
   ChainBase,
-  ChainNetwork,
   ChainType,
   DefaultPage,
   NotificationCategories,
@@ -354,7 +353,7 @@ export async function __createCommunity(
     default_symbol,
     icon_url,
     description,
-    network: network as ChainNetwork,
+    network,
     type,
     // @ts-expect-error StrictNullChecks
     social_links: uniqueLinksArray,
@@ -483,8 +482,6 @@ export async function __createCommunity(
       is_user_default: true,
       role: 'admin',
       last_active: new Date(),
-      is_councillor: false,
-      is_validator: false,
       ghost_address: false,
     });
 

@@ -65,22 +65,24 @@ export const LinkedProposalsCard = ({
           }`,
         );
       } else {
-        loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-          for (const { space: _space, proposals } of data) {
-            const matchingSnapshot = proposals.find(
-              (sn) => sn.id === proposal.identifier,
-            );
-            if (matchingSnapshot) {
-              setSnapshotTitle(matchingSnapshot.title);
-              setSnapshotUrl(
-                `${
-                  app.isCustomDomain() ? '' : `/${thread.communityId}`
-                }/snapshot/${_space.id}/${matchingSnapshot.id}`,
+        loadMultipleSpacesData(app.chain.meta?.snapshot || [])
+          .then((data) => {
+            for (const { space: _space, proposals } of data) {
+              const matchingSnapshot = proposals.find(
+                (sn) => sn.id === proposal.identifier,
               );
-              break;
+              if (matchingSnapshot) {
+                setSnapshotTitle(matchingSnapshot.title);
+                setSnapshotUrl(
+                  `${
+                    app.isCustomDomain() ? '' : `/${thread.communityId}`
+                  }/snapshot/${_space.id}/${matchingSnapshot.id}`,
+                );
+                break;
+              }
             }
-          }
-        });
+          })
+          .catch(console.error);
       }
       setSnapshotProposalsLoaded(true);
     }
