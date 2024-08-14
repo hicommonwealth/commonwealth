@@ -175,12 +175,6 @@ export interface GetCommunities200ResponseResultsInner {
   collapsed_on_homepage?: boolean;
   /**
    *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInner
-   */
-  substrate_spec?: string | null;
-  /**
-   *
    * @type {boolean}
    * @memberof GetCommunities200ResponseResultsInner
    */
