@@ -28,7 +28,9 @@ const verifySessionSignature = async (
 ): Promise<void> => {
   const storedAddress = addressModel.address;
 
-  // re-encode address if needed for substrate verification
+  // Re-encode BOTH address if needed for substrate verification, to ensure matching
+  //  between stored address (re-encoded based on community joined at creation time)
+  //  and address provided directly from wallet.
   const expectedAddress = addressModel.Community?.ss58_prefix
     ? addressSwapper({
         address: storedAddress,
@@ -36,13 +38,13 @@ const verifySessionSignature = async (
       })
     : addressModel.address;
 
-  const walletAddress = session.address.split(':')[2];
-  console.log(
-    addressModel.Community?.ss58_prefix,
-    storedAddress,
-    expectedAddress,
-    walletAddress,
-  );
+  const sessionRawAddress = session.address.split(':')[2];
+  const walletAddress = addressModel.Community?.ss58_prefix
+    ? addressSwapper({
+        address: sessionRawAddress,
+        currentPrefix: 42,
+      })
+    : sessionRawAddress;
   assert(
     walletAddress === expectedAddress,
     `session.address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
