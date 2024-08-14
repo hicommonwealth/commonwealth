@@ -103,7 +103,7 @@ const CommunitiesPage = () => {
     return list.filter((data) => {
       const communityNetwork =
         Object.keys(ChainNetwork)[
-          Object.values(ChainNetwork).indexOf(data.network)
+          Object.values(ChainNetwork).indexOf(data.network as ChainNetwork)
         ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
       if (communityNetworks.includes(communityNetwork)) {
