@@ -46,6 +46,7 @@ export * from './ban';
 export * from './chain_node';
 export * from './collaboration';
 export * from './comment';
+export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
 export * from './community_banner';

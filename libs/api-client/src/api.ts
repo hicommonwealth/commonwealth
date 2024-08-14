@@ -215,12 +215,6 @@ export interface CommunityGetCommunity200Response {
   collapsed_on_homepage?: boolean;
   /**
    *
-   * @type {string}
-   * @memberof CommunityGetCommunity200Response
-   */
-  substrate_spec?: string;
-  /**
-   *
    * @type {boolean}
    * @memberof CommunityGetCommunity200Response
    */
@@ -2149,12 +2143,6 @@ export interface CommunitySetStake200Response {
    * @memberof CommunitySetStake200Response
    */
   collapsed_on_homepage?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof CommunitySetStake200Response
-   */
-  substrate_spec?: string;
   /**
    *
    * @type {boolean}

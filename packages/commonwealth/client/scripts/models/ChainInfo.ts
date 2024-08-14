@@ -1,7 +1,6 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import type { AddressRole, DefaultPage } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
-import type { RegisteredTypes } from '@polkadot/types/types';
 import { z } from 'zod';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
 import NodeInfo from './NodeInfo';
@@ -40,7 +39,6 @@ class ChainInfo {
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
-  public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
@@ -79,7 +77,6 @@ class ChainInfo {
     bech32_prefix,
     type,
     decimals,
-    substrateSpec,
     chain_node_id,
     ChainNode,
     CommunityStakes,
@@ -119,7 +116,6 @@ class ChainInfo {
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
-    this.substrateSpec = substrateSpec;
     this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
     this.CommunityStakes = CommunityStakes;
@@ -159,7 +155,6 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    substrate_spec,
     token_name,
     Contracts,
     chain_node_id,
@@ -219,7 +214,6 @@ class ChainInfo {
       bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
-      substrateSpec: substrate_spec,
       tokenName: token_name,
       chain_node_id,
       ChainNode: ChainNode,
@@ -291,7 +285,6 @@ class ChainInfo {
       thread_count: community.numTotalThreads,
       social_links: community.social_links,
       ss58_prefix: community.ss58_prefix,
-      substrate_spec: community.substrate_spec,
       type: community.type,
       adminsAndMods: community?.adminsAndMods || [],
       communityBanner: community?.communityBanner || '',

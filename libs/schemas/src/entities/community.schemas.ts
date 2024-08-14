@@ -33,7 +33,6 @@ export const Community = z.object({
   custom_domain: z.string().nullish(),
   block_explorer_ids: z.string().nullish(),
   collapsed_on_homepage: z.boolean().default(false),
-  substrate_spec: z.string().nullish(),
   has_chain_events_listener: z.boolean().default(false),
   default_summary_view: z.boolean().nullish(),
   default_page: z.nativeEnum(DefaultPage).nullish(),

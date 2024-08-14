@@ -3,7 +3,6 @@ import {
   Reaction,
   SubscriptionPreference,
   Thread,
-  zDate,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import {
@@ -203,8 +202,8 @@ const ContestManagerEvent = EventMetadata.extend({
 });
 
 export const ContestStarted = ContestManagerEvent.extend({
-  start_time: zDate.describe('Contest start time'),
-  end_time: zDate.describe('Contest end time'),
+  start_time: z.coerce.date().describe('Contest start time'),
+  end_time: z.coerce.date().describe('Contest end time'),
   contest_id: z.number().int().gte(1).describe('Recurring contest id'),
 }).describe('When a contest instance gets started');
 

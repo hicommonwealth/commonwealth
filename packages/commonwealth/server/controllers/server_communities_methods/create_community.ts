@@ -24,7 +24,6 @@ import Web3 from 'web3';
 import { z } from 'zod';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { config } from '../../config';
-import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 // Warning: Probably part of zod validation
@@ -112,7 +111,6 @@ export async function __createCommunity(
   let url = community.node_url;
   let altWalletUrl = community.alt_wallet_url;
   let privateUrl: string | undefined;
-  let sanitizedSpec;
   let hex;
 
   // Warning: this looks like input validation
@@ -229,7 +227,6 @@ export async function __createCommunity(
         `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
       );
     }
-
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       throw new AppError(Errors.InvalidNodeUrl);
@@ -240,21 +237,8 @@ export async function __createCommunity(
     } catch (err) {
       throw new AppError(Errors.InvalidNode);
     }
-
-    // TODO: test altWalletUrl if available
-  } else if (
-    community.base === ChainBase.Substrate &&
-    community.type !== ChainType.Offchain
-  ) {
-    const spec = community.substrate_spec || '{}';
-    if (community.substrate_spec) {
-      try {
-        sanitizedSpec = await testSubstrateSpec(spec, community.node_url);
-      } catch (e) {
-        throw new AppError(Errors.InvalidNode);
-      }
-    }
   } else {
+    // TODO: test altWalletUrl if available
     if (!url || !url.trim()) {
       throw new AppError(Errors.InvalidNodeUrl);
     }
@@ -376,7 +360,6 @@ export async function __createCommunity(
     base,
     bech32_prefix,
     active: true,
-    substrate_spec: sanitizedSpec || '',
     // @ts-expect-error StrictNullChecks
     chain_node_id: node.id,
     token_name,
