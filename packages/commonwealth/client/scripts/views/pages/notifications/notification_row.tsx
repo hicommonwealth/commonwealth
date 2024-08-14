@@ -2,6 +2,7 @@ import { NotificationCategories } from '@hicommonwealth/shared';
 import React, { useEffect } from 'react';
 import type Notification from '../../../models/Notification';
 
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import {
   ChainEventNotificationRow,
   DefaultNotificationRow,
@@ -12,6 +13,7 @@ export type NotificationRowProps = {
   notification: Notification;
   onListPage?: boolean;
   allRead: boolean;
+  communityName?: string;
 };
 
 export const NotificationRow = (props: NotificationRowProps) => {
@@ -27,11 +29,17 @@ export const NotificationRow = (props: NotificationRowProps) => {
 
   const category = notification.categoryId;
 
+  const { data: community } = useGetCommunityByIdQuery({
+    id: notification.chainEvent?.chain || '',
+    enabled: !!notification.chainEvent?.chain,
+  });
+
   if (category === NotificationCategories.ChainEvent) {
     return (
       <ChainEventNotificationRow
         notification={notification}
         onListPage={onListPage}
+        communityName={community?.name}
       />
     );
   } else if (category === NotificationCategories.SnapshotProposal) {
@@ -50,6 +58,7 @@ export const NotificationRow = (props: NotificationRowProps) => {
         handleSetMarkingRead={handleSetMarkingRead}
         markingRead={markingRead}
         allRead={allRead}
+        communityName={community?.name}
       />
     );
   }

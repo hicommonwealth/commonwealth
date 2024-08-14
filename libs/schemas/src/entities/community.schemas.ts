@@ -20,7 +20,7 @@ export const Community = z.object({
   name: z.string(),
   chain_node_id: PG_INT,
   default_symbol: z.string().default(''),
-  network: z.nativeEnum(ChainNetwork).default(ChainNetwork.Ethereum),
+  network: z.string().default(ChainNetwork.Ethereum),
   base: z.nativeEnum(ChainBase),
   icon_url: z.string().nullish(),
   active: z.boolean(),
@@ -66,6 +66,18 @@ export const Community = z.object({
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+});
+
+export const ExtendedCommunity = Community.extend({
+  numVotingThreads: PG_INT,
+  numTotalThreads: PG_INT,
+  adminsAndMods: z.array(
+    z.object({
+      address: z.string(),
+      role: z.enum(['admin', 'moderator']),
+    }),
+  ),
+  communityBanner: z.string().nullish(),
 });
 
 // aliases
