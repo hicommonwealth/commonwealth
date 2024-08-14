@@ -68,7 +68,6 @@ export const config = configure(
       model_config.APP_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
-    FLAG_COMMON_WALLET,
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(
       GENERATE_IMAGE_RATE_LIMIT ?? DEFAULTS.GENERATE_IMAGE_RATE_LIMIT,
@@ -153,7 +152,6 @@ export const config = configure(
       .refine((data) => !(model_config.APP_ENV !== 'production' && data)),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
-    FLAG_COMMON_WALLET: z.boolean().optional(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     DEFAULT_COMMONWEALTH_LOGO: z.string().url(),

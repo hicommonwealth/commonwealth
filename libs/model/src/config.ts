@@ -16,6 +16,10 @@ const {
   ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
   ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
   ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+  ALCHEMY_AA_PRIVATE_KEY,
+  ALCHEMY_AA_KEY,
+  ALCHEMY_AA_GAS_POLICY,
+  FLAG_COMMON_WALLET,
 } = process.env;
 
 const NAME =
@@ -66,6 +70,12 @@ export const config = configure(
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY:
         ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+      AA: {
+        FLAG_COMMON_WALLET: FLAG_COMMON_WALLET === 'true',
+        ALCHEMY_KEY: ALCHEMY_AA_KEY,
+        PRIVATE_KEY: ALCHEMY_AA_PRIVATE_KEY,
+        GAS_POLICY: ALCHEMY_AA_GAS_POLICY,
+      },
     },
   },
   z.object({
@@ -128,6 +138,18 @@ export const config = configure(
       BASE_WEBHOOK_SIGNING_KEY: z.string().optional(),
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY: z.string().optional(),
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: z.string().optional(),
-    }), // TODO: make these mandatory in production before chain-event v3 (Alchemy Webhooks) goes live
+      AA: z
+        .object({
+          FLAG_COMMON_WALLET: z.boolean().optional(),
+          PRIVATE_KEY: z.string().optional(),
+          ALCHEMY_KEY: z.string().optional(),
+          GAS_POLICY: z.string().optional(),
+        })
+        .refine((data) => {
+          if (data.FLAG_COMMON_WALLET && target.APP_ENV === 'production')
+            return data.PRIVATE_KEY && data.ALCHEMY_KEY && data.GAS_POLICY;
+          return true;
+        }),
+    }),
   }),
 );

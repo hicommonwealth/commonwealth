@@ -32,7 +32,7 @@ if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
   artifacts['email'] = email.trpcRouter;
 }
 
-if (config.FLAG_COMMON_WALLET) {
+if (config.ALCHEMY.AA.FLAG_COMMON_WALLET) {
   artifacts['wallet'] = wallet.trpcRouter;
 }
 
