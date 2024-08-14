@@ -48,7 +48,7 @@ export const computeOrigin = (url: string) => {
 /**
  * Compute a full URL from an absolute path.
  */
-export const computeFullURL = (absolutePath: string) => {
+export const computeFullUrl = (absolutePath: string) => {
   if (typeof document !== 'undefined') {
     return `${document.location.origin}${absolutePath}`;
   }
@@ -81,7 +81,7 @@ export const getThreadUrl = (
     return absolutePath;
   }
 
-  return computeFullURL(absolutePath);
+  return computeFullUrl(absolutePath);
 };
 
 /**
@@ -89,7 +89,7 @@ export const getThreadUrl = (
  * localhost because those will break.
  */
 export const getCommunityUrl = (community: string): string => {
-  return computeFullURL(`/${community}`);
+  return computeFullUrl(`/${slugify(community)}`);
 };
 
 export function timeoutPromise(timeout: number) {
