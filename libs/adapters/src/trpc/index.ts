@@ -118,7 +118,6 @@ export enum Tag {
   Thread = 'Thread',
   Comment = 'Comment',
   Reaction = 'Reaction',
-  Query = 'Query',
   Integration = 'Integration',
   Subscription = 'Subscription',
   LoadTest = 'LoadTest',
@@ -210,6 +209,7 @@ export const event = <
 
 export const query = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => QueryMetadata<Input, Output>,
+  tag: Tag,
 ) => {
   const md = factory();
   return trpc.procedure
@@ -217,7 +217,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
       openapi: {
         method: 'GET',
         path: `/${factory.name}`,
-        tags: [Tag.Query],
+        tags: [tag],
         headers: [
           {
             in: 'header',
@@ -274,7 +274,6 @@ export const toOpenApiExpress = (router: OpenApiRouter) =>
 export const toOpenApiDocument = (
   router: OpenApiRouter,
   opts: GenerateOpenApiDocumentOptions,
-): OpenAPIV3.Document =>
-  generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
+): OpenAPIV3.Document => generateOpenApiDocument(router, { ...opts });
 
 export const router = trpc.router;
