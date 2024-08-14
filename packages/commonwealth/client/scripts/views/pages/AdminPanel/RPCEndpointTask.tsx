@@ -6,7 +6,6 @@ import CommunityInfo from 'models/ChainInfo';
 import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
 import { getNodeByCosmosChainId, getNodeByUrl } from 'state/api/nodes/utils';
 import useFetchNodesQuery from '../../../state/api/nodes/fetchNodes';
 import {
@@ -78,10 +77,10 @@ const RPCEndpointTask = () => {
       (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
       rpcEndpoint !== '');
 
-  const setCommunityIdInput = (e) => {
-    setRpcEndpointCommunityValue(e.target.value);
-    if (e.target.value.length === 0) setCommunityInfoValueValidated(false);
-  };
+  // const setCommunityIdInput = (e) => {
+  //   setRpcEndpointCommunityValue(e.target.value);
+  //   if (e.target.value.length === 0) setCommunityInfoValueValidated(false);
+  // };
 
   const RPCEndpointValidationFn = (
     value: string,
@@ -139,25 +138,25 @@ const RPCEndpointTask = () => {
     return ['failure', err];
   };
 
-  const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
-    const communityInfoData = app.config.chains.getById(value);
-    if (!communityInfoData) {
-      setCommunityInfoValueValidated(false);
-      const err = 'Community not found';
-      setErrorMsg(err);
-      return ['failure', err];
-    }
-    if (communityInfoData.type !== ChainType.Chain) {
-      setCommunityInfoValueValidated(false);
-      const err = 'Community is not a chain';
-      setErrorMsg(err);
-      return ['failure', err];
-    }
-    setCommunityInfo(communityInfoData);
-    setCommunityInfoValueValidated(true);
-    setErrorMsg(null);
-    return [];
-  };
+  // const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
+  //   const communityInfoData = app.config.chains.getById(value);
+  //   if (!communityInfoData) {
+  //     setCommunityInfoValueValidated(false);
+  //     const err = 'Community not found';
+  //     setErrorMsg(err);
+  //     return ['failure', err];
+  //   }
+  //   if (communityInfoData.type !== ChainType.Chain) {
+  //     setCommunityInfoValueValidated(false);
+  //     const err = 'Community is not a chain';
+  //     setErrorMsg(err);
+  //     return ['failure', err];
+  //   }
+  //   setCommunityInfo(communityInfoData);
+  //   setCommunityInfoValueValidated(true);
+  //   setErrorMsg(null);
+  //   return [];
+  // };
 
   const update = async () => {
     try {
@@ -256,22 +255,24 @@ const RPCEndpointTask = () => {
         Node if it doesn&apos;t yet exist.
       </CWText>
       <div className="MultiRow">
-        <div className="TaskRow">
-          <CWTextInput
-            value={rpcEndpoint}
-            onInput={(e) => {
-              setRpcEndpoint(e.target.value);
-            }}
-            inputValidationFn={RPCEndpointValidationFn}
-            placeholder="Enter an RPC endpoint"
-          />
-          <CWButton
-            label={chainNodeNotCreated ? 'Create' : 'Update'}
-            className="TaskButton"
-            disabled={!buttonEnabled}
-            onClick={openConfirmationModal}
-          />
-        </div>
+        {balanceType === BalanceType.Ethereum && (
+          <div className="TaskRow">
+            <CWTextInput
+              value={rpcEndpoint}
+              onInput={(e) => {
+                setRpcEndpoint(e.target.value);
+              }}
+              inputValidationFn={RPCEndpointValidationFn}
+              placeholder="Enter an RPC endpoint (Required)"
+            />
+            <CWButton
+              label={chainNodeNotCreated ? 'Create' : 'Update'}
+              className="TaskButton"
+              disabled={!buttonEnabled}
+              onClick={openConfirmationModal}
+            />
+          </div>
+        )}
         <div>
           <div className="TaskRow">
             <CWDropdown
@@ -287,18 +288,18 @@ const RPCEndpointTask = () => {
                 setBalanceType(item.value as BalanceType);
               }}
             />
-            <CWTextInput
-              label="name"
-              value={rpcName}
-              onInput={(e) => {
-                setRpcName(e.target.value);
-              }}
-              placeholder={`Enter chain node name ${
-                chainNodeNotCreated ? '' : ' (optional)'
-              }`}
-            />
+            {balanceType === BalanceType.Ethereum && (
+              <CWTextInput
+                label="Chain name"
+                value={rpcName}
+                onInput={(e) => {
+                  setRpcName(e.target.value);
+                }}
+                placeholder="Enter chain node name (Required)"
+              />
+            )}
           </div>
-          {balanceType === BalanceType.Ethereum && (
+          {balanceType === BalanceType.Ethereum ? (
             <div className="TaskRow">
               <CWTextInput
                 value={ethChainId}
@@ -306,9 +307,14 @@ const RPCEndpointTask = () => {
                   setEthChainId(parseInt(e.target.value));
                 }}
                 inputValidationFn={ethChainIdEndpointValidationFn}
-                placeholder="Enter an ETH chain id"
+                placeholder="Enter an ETH chain id (Required)"
                 label="eth chain id"
               />
+            </div>
+          ) : (
+            <div className="nonEVMMessage">
+              Please contact an engineer to add any chains that are not
+              EVM/Ethereum
             </div>
           )}
           {balanceType === BalanceType.Cosmos && (
