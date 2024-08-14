@@ -56,8 +56,6 @@ export const Address = z.object({
   verification_token_expires: z.date().nullable().nullish(),
   verified: z.date().nullable().nullish(),
   last_active: z.date().nullable().nullish(),
-  is_councillor: z.boolean().default(false),
-  is_validator: z.boolean().default(false),
   ghost_address: z.boolean().default(false),
   wallet_id: z.nativeEnum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
