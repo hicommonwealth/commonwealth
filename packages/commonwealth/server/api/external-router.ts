@@ -54,8 +54,8 @@ router.get(
 router.use(cors());
 
 const asyncExpressHandler = trpc.toOpenApiExpress(trpcRouter);
-router.use(express.statsMiddleware, (req, res, next) =>
-  asyncExpressHandler(req, res).catch(next),
-);
+router.use(express.statsMiddleware, (req, res, next) => {
+  asyncExpressHandler(req, res).catch(next);
+});
 
 export { router };
