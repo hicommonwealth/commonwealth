@@ -37,7 +37,7 @@ const buildCommunityString = (numCommunities: number) =>
 
 // Handle mapping provided by ChainCategories table
 const communityCategories = Object.values(CommunityCategoryType);
-const communityNetworks = Object.keys(ChainNetwork).filter(
+const communityNetworks: string[] = Object.keys(ChainNetwork).filter(
   (val) => val === 'ERC20',
 ); // We only are allowing ERC20 for now
 const communityBases = Object.keys(ChainBase);
@@ -71,9 +71,8 @@ const CommunitiesPage = () => {
 
   const { data: nodes } = useFetchNodesQuery();
 
-  const [selectedCommunity, setSelectedCommunity] =
-    // @ts-expect-error <StrictNullChecks/>
-    React.useState<ChainInfo>(null);
+  const [selectedCommunityId, setSelectedCommunityId] =
+    React.useState<string>();
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 
@@ -104,7 +103,7 @@ const CommunitiesPage = () => {
     return list.filter((data) => {
       const communityNetwork =
         Object.keys(ChainNetwork)[
-          Object.values(ChainNetwork).indexOf(data.network)
+          Object.values(ChainNetwork).indexOf(data.network as ChainNetwork)
         ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
       if (communityNetworks.includes(communityNetwork)) {
@@ -175,11 +174,22 @@ const CommunitiesPage = () => {
       return (
         <CWRelatedCommunityCard
           key={i}
-          community={community}
+          community={{
+            id: community.id || '',
+            name: community.name || '',
+            base: community.base || '',
+            description: community.description || '',
+            iconUrl: community.iconUrl || '',
+            ChainNode: {
+              url: community?.ChainNode?.url || '',
+              ethChainId: community?.ChainNode?.ethChainId || 0,
+            },
+            namespace: community.namespace || '',
+          }}
           memberCount={community.profileCount}
           threadCount={community.threadCount}
           canBuyStake={canBuyStake}
-          onStakeBtnClick={() => setSelectedCommunity(community)}
+          onStakeBtnClick={() => setSelectedCommunityId(community?.id || '')}
           ethUsdRate={ethUsdRate}
           historicalPrice={historicalPriceMap?.get(community.id)}
           onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
@@ -287,9 +297,8 @@ const CommunitiesPage = () => {
               mode={modeOfManageCommunityStakeModal}
               // @ts-expect-error <StrictNullChecks/>
               onModalClose={() => setModeOfManageCommunityStakeModal(null)}
-              community={selectedCommunity}
               denomination={
-                findDenominationString(selectedCommunity?.id) || 'ETH'
+                findDenominationString(selectedCommunityId || '') || 'ETH'
               }
             />
           }

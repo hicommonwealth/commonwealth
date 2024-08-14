@@ -257,7 +257,6 @@ erDiagram
     boolean collapsed_on_homepage 
     character-varying(255) base 
     integer ss58_prefix 
-    jsonb substrate_spec 
     boolean has_chain_events_listener 
     character-varying(255) custom_domain 
     character-varying(255) terms 

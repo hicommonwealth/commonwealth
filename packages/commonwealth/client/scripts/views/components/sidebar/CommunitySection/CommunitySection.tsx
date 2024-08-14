@@ -32,7 +32,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const user = useUserStore();
   const {
     selectedAddress,
-    selectedCommunity,
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
@@ -57,9 +56,10 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isMod = Permissions.isCommunityModerator();
-  const showAdmin = isAdmin || isMod;
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
 
   return (
     <>
@@ -85,7 +85,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CreateCommunityButton />
 
-        {showAdmin && (
+        {isAdmin && (
           <>
             <CWDivider />
             <AdminSection />
@@ -129,7 +129,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
-            {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
         // @ts-expect-error <StrictNullChecks/>

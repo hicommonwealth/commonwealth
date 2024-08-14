@@ -1,11 +1,11 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
+import { getUniqueUserAddresses } from 'helpers/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';

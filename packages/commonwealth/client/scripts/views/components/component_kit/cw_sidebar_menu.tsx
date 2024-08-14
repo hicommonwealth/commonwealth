@@ -121,8 +121,9 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           });
         }}
       >
-        {/*// @ts-expect-error <StrictNullChecks/>*/}
-        <CommunityLabel community={item} />
+        {item && (
+          <CommunityLabel name={item.name || ''} iconUrl={item.iconUrl} />
+        )}
         {user.isLoggedIn && account && (
           <div className="roles-and-star">
             <User

@@ -78,7 +78,7 @@ const Stakes = ({ transactions }: TransactionsProps) => {
       accumulatedStakes[key] = {
         ...transaction,
         ...(accumulatedStakes[key] || {}),
-        chain: transaction.chain,
+        chain: transaction?.community?.chain_node_name,
         stake:
           (accumulatedStakes[key]?.stake || 0) + transaction.stake * action,
         voteWeight:

@@ -7,7 +7,6 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -29,6 +28,7 @@ import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
+import { useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
   BaseMixpanelPayload,
@@ -311,12 +311,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         setDarkMode(true);
       }
       if (app.chain) {
-        const community =
-          user.activeCommunity ||
-          app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses({
-          chain: community,
-        });
+        await updateActiveAddresses(app.activeChainId());
       }
     }
 

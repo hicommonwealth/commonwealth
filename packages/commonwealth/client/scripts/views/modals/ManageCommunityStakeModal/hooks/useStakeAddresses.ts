@@ -1,29 +1,28 @@
 import { useState } from 'react';
 import app from 'state';
 
+import { ChainBase } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'helpers/user';
-import ChainInfo from 'models/ChainInfo';
 import useUserStore from 'state/ui/user';
-import { CommunityData } from 'views/pages/DirectoryPage/DirectoryPageContent';
 import {
   getAvailableAddressesForStakeExchange,
   getInitialAccountValue,
 } from '../utils';
 
 interface UseStakeAddressesProps {
-  community?: ChainInfo | CommunityData;
+  stakedCommunityChainBase: ChainBase;
 }
 
-const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
+const useStakeAddresses = ({
+  stakedCommunityChainBase,
+}: UseStakeAddressesProps) => {
   const user = useUserStore();
 
   const communityAddresses = (() => {
-    if (community) {
+    if (stakedCommunityChainBase) {
       // get all the addresses of the user that matches base chain of selected `community`
       const userAddresses = user.addresses
-        .filter(
-          (addr) => addr.community.base === (community as ChainInfo)?.base,
-        )
+        .filter((addr) => addr.community.base === stakedCommunityChainBase)
         .map((addr) => addr.address);
 
       // return all the unique addresses
