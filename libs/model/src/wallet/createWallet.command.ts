@@ -18,7 +18,7 @@ export function CreateWallet(): Command<typeof schemas.CreateWallet> {
       if (existingWallet) {
         return {
           walletAddress: existingWallet.wallet_address,
-          new: false,
+          isNew: false,
         };
       }
       const { address, signedMessage } = payload;
@@ -37,7 +37,7 @@ export function CreateWallet(): Command<typeof schemas.CreateWallet> {
 
       return {
         walletAddress: newAccount.walletAddress,
-        new: true,
+        isNew: true,
       };
     },
   };
