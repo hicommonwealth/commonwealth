@@ -25,7 +25,7 @@ export type NotificationCategory =
 // TODO: @Timothee remove this type in favor of the one below once webhook and email functions are fixed + tested and
 //  their types are updated
 export interface IForumNotificationData {
-  created_at: any;
+  created_at: Date;
   thread_id: number | string;
   root_title: string;
   root_type: string;
@@ -51,7 +51,7 @@ export interface IForumNotificationData {
 //   | ICommentEditNotificationData;
 
 export interface IBaseForumNotificationData {
-  created_at: any;
+  created_at: Date;
   thread_id: number | string;
   root_title: string;
   root_type: string;

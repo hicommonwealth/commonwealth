@@ -1,7 +1,6 @@
 import { formatAddressShort } from 'helpers';
 import { getCommunityStakeSymbol } from 'helpers/stakes';
 import useTransactionHistory from 'hooks/useTransactionHistory';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
@@ -28,7 +27,6 @@ const BASE_ADDRESS_FILTER = {
 };
 
 const MyCommunityStake = () => {
-  const { isLoggedIn } = useUserLoggedIn();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchText: '',
@@ -66,7 +64,10 @@ const MyCommunityStake = () => {
     return info;
   });
 
-  if (!isLoggedIn) return <PageNotFound />;
+  if (!user.isLoggedIn) {
+    return <PageNotFound />;
+  }
+
   return (
     <CWPageLayout>
       <section className="MyCommunityStake">

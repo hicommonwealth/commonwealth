@@ -4,7 +4,6 @@ import {
   CommunityCategoryType,
 } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
@@ -62,7 +61,6 @@ const getInitialFilterMap = (): Record<string, unknown> => {
 const STAKE_FILTER_KEY = 'Stake';
 
 const CommunitiesPage = () => {
-  useUserLoggedIn();
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
     getInitialFilterMap(),
   );

@@ -214,6 +214,7 @@ export class CacheDecorator {
     ) => string | CacheKeyDuration | null = defaultKeyGenerator,
     namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): RequestHandler {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return async function cache(
       this: CacheDecorator,
       req: Request,
