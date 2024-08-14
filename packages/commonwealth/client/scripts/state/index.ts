@@ -13,7 +13,7 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import StarredCommunity from 'models/StarredCommunity';
-import { queryClient, QueryKeys } from 'state/api/config';
+import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { ChainStore } from 'stores';
@@ -23,12 +23,6 @@ export enum ApiStatus {
   Disconnected = 'disconnected',
   Connecting = 'connecting',
   Connected = 'connected',
-}
-
-export const enum LoginState {
-  NotLoaded = 'not_loaded',
-  LoggedOut = 'logged_out',
-  LoggedIn = 'logged_in',
 }
 
 export interface IApp {
@@ -65,19 +59,10 @@ export interface IApp {
 
   sidebarRedraw: EventEmitter;
 
-  loginState: LoginState;
-  loginStateEmitter: EventEmitter;
-
   // stored on server-side
   config: {
     chains: ChainStore;
   };
-
-  loginStatusLoaded(): boolean;
-
-  isLoggedIn(): boolean;
-
-  serverUrl(): string;
 
   loadingError: string;
 
@@ -121,20 +106,12 @@ const app: IApp = {
 
   // User
   user,
-  loginState: LoginState.NotLoaded,
-  loginStateEmitter: new EventEmitter(),
 
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 
   config: {
     chains: new ChainStore(),
-  },
-  // TODO: Collect all getters into an object
-  loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
-  isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  serverUrl: () => {
-    return '/api';
   },
 
   // @ts-expect-error StrictNullChecks
@@ -156,12 +133,11 @@ declare const window: any;
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
-  shouldRedraw = true,
 ): Promise<void> {
   try {
     const [{ data: statusRes }, { data: communities }] = await Promise.all([
-      axios.get(`${app.serverUrl()}/status`),
-      axios.get(`${app.serverUrl()}/communities`),
+      axios.get(`${SERVER_URL}/status`),
+      axios.get(`${SERVER_URL}/communities`),
     ]);
 
     const nodesData = await fetchNodesQuery();
@@ -199,44 +175,33 @@ export async function initAppState(
         }
       });
 
-    // update the login status
-    updateActiveUser(statusRes.result.user);
-    app.loginState = statusRes.result.user
-      ? LoginState.LoggedIn
-      : LoginState.LoggedOut;
+    // it is either user object or undefined
+    const userResponse = statusRes.result.user;
 
-    if (app.loginState === LoginState.LoggedIn) {
-      app.user.notifications.refresh();
-      if (shouldRedraw) {
-        app.loginStateEmitter.emit('redraw');
-      }
-    } else if (app.loginState === LoginState.LoggedOut && shouldRedraw) {
-      app.loginStateEmitter.emit('redraw');
+    // update the login status
+    updateActiveUser(userResponse);
+
+    if (userResponse) {
+      await app.user.notifications.refresh();
     }
 
     userStore.getState().setData({
-      starredCommunities: (statusRes.result.user?.starredCommunities || []).map(
+      starredCommunities: (userResponse?.starredCommunities || []).map(
         (c) => new StarredCommunity(c),
       ),
     });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
-    if (
-      updateSelectedCommunity &&
-      statusRes.result.user &&
-      statusRes.result.user.selectedCommunity
-    ) {
+    if (updateSelectedCommunity && userResponse?.selectedCommunity) {
       userStore.getState().setData({
-        activeCommunity: ChainInfo.fromJSON(
-          statusRes.result.user.selectedCommunity,
-        ),
+        activeCommunity: ChainInfo.fromJSON(userResponse?.selectedCommunity),
       });
     }
 
-    if (statusRes.result.user) {
+    if (userResponse) {
       try {
         window.FS('setIdentity', {
-          uid: statusRes.result.user.id,
+          uid: userResponse.id,
         });
       } catch (e) {
         console.error('FullStory not found.');

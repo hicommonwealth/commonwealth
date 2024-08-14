@@ -21,7 +21,7 @@ import {
   type GenerateOpenApiDocumentOptions,
   type OpenApiMeta,
   type OpenApiRouter,
-} from 'trpc-openapi';
+} from 'trpc-swagger';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 import { config } from '../config';
 
@@ -137,9 +137,16 @@ export const command = <
     .meta({
       openapi: {
         method: 'POST',
-        path: `/${tag.toLowerCase()}/{id}/${factory.name}`,
+        path: `/${factory.name}/{id}`,
         tags: [tag],
-        headers: [{ name: 'address_id' }],
+        headers: [
+          {
+            in: 'header',
+            name: 'address_id',
+            required: true,
+            schema: { type: 'string' },
+          },
+        ],
         protect: md.secure,
       },
     })
@@ -182,7 +189,7 @@ export const event = <
     .meta({
       openapi: {
         method: 'POST',
-        path: `/${tag.toLowerCase()}/${factory.name}`,
+        path: `/${factory.name}`,
         tags: [tag],
       },
     })
@@ -206,14 +213,20 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => QueryMetadata<Input, Output>,
 ) => {
   const md = factory();
-  //const input = md.input.extend({ address_id: z.string().optional() });
   return trpc.procedure
     .meta({
       openapi: {
         method: 'GET',
-        path: `/${Tag.Query.toLowerCase()}/${factory.name}`,
+        path: `/${factory.name}`,
         tags: [Tag.Query],
-        headers: [{ name: 'address_id' }],
+        headers: [
+          {
+            in: 'header',
+            name: 'address_id',
+            required: false,
+            schema: { type: 'string' },
+          },
+        ],
       },
       protect: md.secure,
     })

@@ -1,15 +1,9 @@
-import type {
-  AddressRole,
-  ChainNetwork,
-  DefaultPage,
-} from '@hicommonwealth/shared';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import type { AddressRole, DefaultPage } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
-import type { RegisteredTypes } from '@polkadot/types/types';
-import axios from 'axios';
-import app from 'state';
+import { z } from 'zod';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
-import { userStore } from '../state/ui/user';
-import type NodeInfo from './NodeInfo';
+import NodeInfo from './NodeInfo';
 import StakeInfo from './StakeInfo';
 import Tag from './Tag';
 
@@ -24,7 +18,7 @@ class ChainInfo {
   public readonly profileCount: number;
   public readonly default_symbol: string;
   public name: string;
-  public readonly network: ChainNetwork;
+  public readonly network: string;
   public readonly base: ChainBase;
   public iconUrl: string;
   public description: string;
@@ -45,7 +39,6 @@ class ChainInfo {
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
-  public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
@@ -54,6 +47,8 @@ class ChainInfo {
   public directoryPageChainNodeId?: number;
   public namespace?: string;
   public redirect?: string;
+  public numTotalThreads?: number;
+  public numVotingThreads?: number;
 
   public get node() {
     return this.ChainNode;
@@ -82,7 +77,6 @@ class ChainInfo {
     bech32_prefix,
     type,
     decimals,
-    substrateSpec,
     chain_node_id,
     ChainNode,
     CommunityStakes,
@@ -98,6 +92,7 @@ class ChainInfo {
     thread_count,
     profile_count,
     snapshot_spaces,
+    communityBanner,
   }) {
     this.id = id;
     this.network = network;
@@ -121,15 +116,13 @@ class ChainInfo {
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
-    this.substrateSpec = substrateSpec;
     this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
     this.CommunityStakes = CommunityStakes;
     this.CommunityTags = CommunityTags;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
-    // @ts-expect-error StrictNullChecks
-    this.communityBanner = null;
+    this.communityBanner = communityBanner;
     this.discordConfigId = discord_config_id;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
     this.directoryPageEnabled = directoryPageEnabled;
@@ -162,7 +155,6 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    substrate_spec,
     token_name,
     Contracts,
     chain_node_id,
@@ -180,6 +172,8 @@ class ChainInfo {
     CommunityTags,
     snapshot_spaces,
     Addresses,
+    adminsAndMods,
+    communityBanner,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -220,7 +214,6 @@ class ChainInfo {
       bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
-      substrateSpec: substrate_spec,
       tokenName: token_name,
       chain_node_id,
       ChainNode: ChainNode,
@@ -236,157 +229,70 @@ class ChainInfo {
       thread_count,
       profile_count,
       snapshot_spaces,
-      adminsAndMods: Addresses,
+      adminsAndMods: adminsAndMods || Addresses,
+      communityBanner,
     });
   }
 
-  public setAdminsAndMods(roles: AddressRole[]) {
-    this.adminsAndMods = roles;
-  }
-
-  public setBanner(banner_text: string) {
-    this.communityBanner = banner_text;
-  }
-
-  public async updateChainData({
-    name,
-    description,
-    social_links,
-    stagesEnabled,
-    customStages,
-    customDomain,
-    terms,
-    snapshot,
-    iconUrl,
-    defaultOverview,
-    defaultPage,
-    hasHomepage,
-    cosmos_gov_version,
-    chain_node_id,
-    discord_bot_webhooks_enabled,
-    directory_page_enabled,
-    directory_page_chain_node_id,
-    type,
-    isPWA,
-  }: {
-    name?: string;
-    description?: string;
-    social_links?: string[];
-    discord?: string;
-    stagesEnabled?: boolean;
-    customStages?: string[];
-    customDomain?: string;
-    terms?: string;
-    snapshot?: string[];
-    iconUrl?: string;
-    defaultOverview?: boolean;
-    defaultPage?: DefaultPage;
-    hasHomepage?: boolean;
-    cosmos_gov_version?: string;
-    chain_node_id?: string;
-    discord_bot_webhooks_enabled?: boolean;
-    directory_page_enabled?: boolean;
-    directory_page_chain_node_id?: number;
-    type?: string;
-    isPWA?: boolean;
-  }) {
-    const id = app.activeChainId() ?? this.id;
-    const r = await axios.patch(
-      `${app.serverUrl()}/communities/${id}`,
-      {
-        id,
-        name,
-        description,
-        social_links,
-        stages_enabled: stagesEnabled,
-        custom_stages: customStages,
-        custom_domain: customDomain,
-        snapshot,
-        terms,
-        icon_url: iconUrl,
-        default_summary_view: defaultOverview,
-        default_page: defaultPage,
-        has_homepage: hasHomepage,
-        chain_node_id,
-        cosmos_gov_version,
-        discord_bot_webhooks_enabled,
-        directory_page_enabled,
-        directory_page_chain_node_id,
-        type,
-        jwt: userStore.getState().jwt,
-      },
-      {
-        headers: {
-          isPWA: isPWA?.toString(),
-        },
-      },
-    );
-
-    const updatedChain = r.data.result;
-    this.name = updatedChain.name;
-    this.description = updatedChain.description;
-    this.socialLinks = updatedChain.social_links;
-    this.stagesEnabled = updatedChain.stages_enabled;
-    this.customStages = updatedChain.custom_stages;
-    this.customDomain = updatedChain.custom_domain;
-    this.snapshot = updatedChain.snapshot;
-    this.terms = updatedChain.terms;
-    this.iconUrl = updatedChain.icon_url;
-    this.defaultOverview = updatedChain.default_summary_view;
-    this.defaultPage = updatedChain.default_page;
-    this.hasHomepage = updatedChain.has_homepage;
-    this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
-    this.directoryPageEnabled = updatedChain.directory_page_enabled;
-    this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
-    this.type = updatedChain.type;
-  }
-
-  public categorizeSocialLinks(): CategorizedSocialLinks {
-    const categorizedLinks: CategorizedSocialLinks = {
-      discords: [],
-      githubs: [],
-      telegrams: [],
-      twitters: [],
-      elements: [],
-      remainingLinks: [],
-    };
-
-    this.socialLinks
-      .filter((link) => !!link)
-      .forEach((link) => {
-        if (link.includes('://discord.com') || link.includes('://discord.gg')) {
-          categorizedLinks.discords.push(link);
-        } else if (link.includes('://github.com')) {
-          categorizedLinks.githubs.push(link);
-        } else if (link.includes('://t.me')) {
-          categorizedLinks.telegrams.push(link);
-        } else if (link.includes('://matrix.to')) {
-          categorizedLinks.elements.push(link);
-        } else if (
-          link.includes('://twitter.com') ||
-          link.includes('://x.com')
-        ) {
-          categorizedLinks.twitters.push(link);
-        } else {
-          categorizedLinks.remainingLinks.push(link);
-        }
-      });
-
-    return categorizedLinks;
-  }
-
-  public updateTags(tags: Tag[]) {
-    this.CommunityTags = tags;
+  // TODO: 8811 cleanup `ChainInfo`
+  public static fromTRPCResponse(
+    community: z.infer<typeof ExtendedCommunity>,
+  ): ChainInfo {
+    return ChainInfo.fromJSON({
+      Addresses: community.Addresses,
+      admin_only_polling: community.admin_only_polling,
+      base: community.base,
+      bech32_prefix: community.bech32_prefix,
+      block_explorer_ids: community.block_explorer_ids,
+      chain_node_id: community.chain_node_id,
+      ChainNode: new NodeInfo({
+        alt_wallet_url: community?.ChainNode?.alt_wallet_url,
+        balance_type: community?.ChainNode?.balance_type,
+        bech32: community?.ChainNode?.bech32,
+        block_explorer: community?.ChainNode?.block_explorer,
+        cosmos_chain_id: community?.ChainNode?.cosmos_chain_id,
+        cosmos_gov_version: community?.ChainNode?.cosmos_gov_version,
+        eth_chain_id: community?.ChainNode?.eth_chain_id,
+        id: community?.ChainNode?.id,
+        name: community?.ChainNode?.name,
+        slip44: community?.ChainNode?.slip44,
+        url: community?.ChainNode?.url,
+      }),
+      collapsed_on_homepage: community.collapsed_on_homepage,
+      CommunityStakes: community.CommunityStakes,
+      CommunityTags: community.CommunityTags,
+      custom_domain: community.custom_domain,
+      custom_stages: community.custom_stages,
+      default_page: community.default_page,
+      default_summary_view: community.default_summary_view,
+      default_symbol: community.default_symbol,
+      description: community.description,
+      directory_page_chain_node_id: community.directory_page_chain_node_id,
+      directory_page_enabled: community.directory_page_enabled,
+      discord_bot_webhooks_enabled: community.discord_bot_webhooks_enabled,
+      token_name: community.token_name,
+      has_homepage: community.has_homepage,
+      discord_config_id: community.discord_config_id,
+      icon_url: community.icon_url,
+      name: community.name,
+      id: community.id,
+      redirect: community.redirect,
+      namespace: community.namespace,
+      network: community.network,
+      snapshot_spaces: community.snapshot_spaces,
+      stages_enabled: community.stages_enabled,
+      terms: community.terms,
+      thread_count: community.numTotalThreads,
+      social_links: community.social_links,
+      ss58_prefix: community.ss58_prefix,
+      type: community.type,
+      adminsAndMods: community?.adminsAndMods || [],
+      communityBanner: community?.communityBanner || '',
+      // these don't come from /communities/:id response and need to be added in
+      // api response when needed
+      Contracts: [],
+      profile_count: 0,
+    });
   }
 }
-
-export type CategorizedSocialLinks = {
-  discords: string[];
-  githubs: string[];
-  telegrams: string[];
-  twitters: string[];
-  elements: string[];
-  remainingLinks: string[];
-};
-
 export default ChainInfo;

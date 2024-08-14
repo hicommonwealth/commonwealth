@@ -62,7 +62,6 @@ describe('UpdateChain Tests', () => {
     response = await controller.updateCommunity({
       ...baseRequest,
       directory_page_enabled: false,
-      // @ts-expect-error StrictNullChecks
       directory_page_chain_node_id: null,
       type: ChainType.Chain,
       user: user,

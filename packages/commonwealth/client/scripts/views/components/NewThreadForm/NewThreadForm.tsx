@@ -18,7 +18,9 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -173,8 +175,8 @@ export const NewThreadForm = () => {
       const thread = await createThread({
         address: user.activeAccount?.address || '',
         kind: threadKind,
-        stage: app.chain.meta.customStages
-          ? parseCustomStages(app.chain.meta.customStages)[0]
+        stage: app.chain.meta?.customStages
+          ? parseCustomStages(app.chain.meta?.customStages)[0]
           : ThreadStage.Discussion,
         communityId: app.activeChainId(),
         title: threadTitle,
@@ -228,7 +230,7 @@ export const NewThreadForm = () => {
   const isDisabledBecauseOfContestsConsent =
     contestThreadBannerVisible && !submitEntryChecked;
 
-  const contestTopicBannerVisible =
+  const contestTopicAffordanceVisible =
     contestsEnabled && isContestAvailable && hasTopicOngoingContest;
 
   const walletBalanceError =
@@ -260,6 +262,29 @@ export const NewThreadForm = () => {
 
               {!!hasTopics && (
                 <CWSelectList
+                  className="topic-select"
+                  components={{
+                    // eslint-disable-next-line react/no-multi-comp
+                    Option: (originalProps) =>
+                      CustomTopicOption({
+                        originalProps,
+                        topic: topicsForSelector.find(
+                          (t) => String(t.id) === originalProps.data.value,
+                        ),
+                      }),
+                  }}
+                  formatOptionLabel={(option) => (
+                    <>
+                      {contestTopicAffordanceVisible && (
+                        <CWIcon
+                          className="trophy-icon"
+                          iconName="trophy"
+                          iconSize="small"
+                        />
+                      )}
+                      {option.label}
+                    </>
+                  )}
                   options={sortedTopics.map((topic) => ({
                     label: topic?.name,
                     value: `${topic?.id}`,
@@ -288,7 +313,7 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {contestTopicBannerVisible && (
+              {contestTopicAffordanceVisible && (
                 <ContestTopicBanner
                   contests={threadTopic?.activeContestManagers.map((acm) => {
                     return {

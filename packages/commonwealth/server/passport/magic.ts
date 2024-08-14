@@ -65,12 +65,15 @@ async function createMagicAddressInstances(
       },
       defaults: {
         address,
+        community_id,
         user_id,
         verification_token: decodedMagicToken.claim.tid, // to prevent re-use
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
         role: 'member',
+        is_user_default: false,
+        ghost_address: false,
       },
       transaction: t,
     });
@@ -216,28 +219,28 @@ async function replaceGhostAddresses(
     if (replacementAddress) {
       // update data objects and delete ghost address
       await models.Collaboration.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
+        { address_id: replacementAddress.id! },
+        { where: { address_id: ghost.id! }, transaction },
       );
       await models.Comment.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
+        { address_id: replacementAddress.id! },
+        { where: { address_id: ghost.id! }, transaction },
       );
       await models.Reaction.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
+        { address_id: replacementAddress.id! },
+        { where: { address_id: ghost.id! }, transaction },
       );
       await models.Thread.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
+        { address_id: replacementAddress.id! },
+        { where: { address_id: ghost.id! }, transaction },
       );
       // should be no memberships or SsoTokens, but handle case for completeness sake
       await models.Membership.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
+        { address_id: replacementAddress.id! },
+        { where: { address_id: ghost.id! }, transaction },
       );
       await models.SsoToken.destroy({
-        where: { address_id: ghost.id },
+        where: { address_id: ghost.id! },
         transaction,
       });
       await models.Address.destroy({

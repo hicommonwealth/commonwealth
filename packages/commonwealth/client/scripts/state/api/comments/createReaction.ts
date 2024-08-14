@@ -1,10 +1,10 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { signCommentReaction } from 'controllers/server/sessions';
 import Reaction from 'models/Reaction';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
@@ -30,18 +30,15 @@ const createReaction = async ({
     like: reactionType === 'like',
   });
 
-  return await axios.post(
-    `${app.serverUrl()}/comments/${commentId}/reactions`,
-    {
-      author_community_id: userStore.getState().activeAccount?.community?.id,
-      community_id: communityId,
-      address,
-      reaction: reactionType,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-      comment_id: commentId,
-    },
-  );
+  return await axios.post(`${SERVER_URL}/comments/${commentId}/reactions`, {
+    author_community_id: userStore.getState().activeAccount?.community?.id,
+    community_id: communityId,
+    address,
+    reaction: reactionType,
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+    comment_id: commentId,
+  });
 };
 
 const useCreateCommentReactionMutation = ({
@@ -87,7 +84,14 @@ const useCreateCommentReactionMutation = ({
 
       return reaction;
     },
-    onError: (error) => checkForSessionKeyRevalidationErrors(error),
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.data?.error?.toLowerCase().includes('stake')) {
+          notifyError('Buy stake in community to upvote comments');
+        }
+      }
+      return checkForSessionKeyRevalidationErrors(error);
+    },
   });
 };
 

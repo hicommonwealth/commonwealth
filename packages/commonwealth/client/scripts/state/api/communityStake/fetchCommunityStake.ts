@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const COMMUNITY_STAKE_STALE_TIME = 3 * 60 * 1_000; // 3 min
 
@@ -15,9 +14,7 @@ const fetchCommunityStake = async ({
   stakeId,
 }: FetchCommunityStakeProps) => {
   return await axios.get(
-    `${app.serverUrl()}/${
-      ApiEndpoints.FETCH_COMMUNITY_STAKES
-    }/${communityId}/${stakeId}`,
+    `${SERVER_URL}/${ApiEndpoints.FETCH_COMMUNITY_STAKES}/${communityId}/${stakeId}`,
   );
 };
 

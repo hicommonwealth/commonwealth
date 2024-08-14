@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { userStore } from '../../ui/user';
@@ -25,7 +25,7 @@ const deleteThread = async ({
     thread_id: threadId,
   });
 
-  return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
+  return await axios.delete(`${SERVER_URL}/threads/${threadId}`, {
     data: {
       author_community_id: communityId,
       community_id: communityId,

@@ -5,6 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import {
   useUpdateUserEmailMutation,
   useUpdateUserEmailSettingsMutation,
@@ -15,7 +16,6 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
-import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
@@ -23,6 +23,7 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
+import SubscriptionEntry from './SubscriptionEntry';
 import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
@@ -70,9 +71,7 @@ const NotificationSettingsPage = () => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [forceRerender]);
 
-  if (!app.loginStatusLoaded()) {
-    return <PageLoading />;
-  } else if (!app.isLoggedIn()) {
+  if (!user.isLoggedIn) {
     navigate('/', { replace: true });
     return <PageLoading />;
   }
@@ -114,7 +113,9 @@ const NotificationSettingsPage = () => {
                   onClick: () => {
                     updateEmailSettings({
                       emailNotificationInterval: 'weekly',
-                    }).catch(console.log);
+                    })
+                      .then(() => undefined)
+                      .catch(console.log);
                     setCurrentFrequency('weekly');
                     forceRerender();
                   },
@@ -124,7 +125,9 @@ const NotificationSettingsPage = () => {
                   onClick: () => {
                     updateEmailSettings({
                       emailNotificationInterval: 'never',
-                    }).catch(console.log);
+                    })
+                      .then(() => undefined)
+                      .catch(console.log);
                     setCurrentFrequency('never');
                     forceRerender();
                   },
@@ -226,90 +229,58 @@ const NotificationSettingsPage = () => {
         </div>
         {relevantSubscribedCommunities
           .sort((x, y) => x.name.localeCompare(y.name))
-          .map((community) => {
+          .map((community, index) => {
             return (
-              <div
-                className="notification-row chain-events-subscriptions-padding"
-                key={community.id}
-              >
-                <div className="notification-row-header">
-                  <div className="left-content-container">
-                    <div className="avatar-and-name">
-                      <CWCommunityAvatar size="medium" community={community} />
-                      <CWText type="h5" fontWeight="medium">
-                        {community.name}
-                      </CWText>
-                    </div>
-                  </div>
-                  <CWCheckbox
-                    label="Receive Emails"
-                    disabled={true}
-                    checked={false}
-                    onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      handleEmailSubscriptions(false, []);
-                    }}
-                  />
-                  <CWToggle
-                    checked={false}
-                    onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      app.user.notifications
-                        .subscribe({
-                          categoryId: NotificationCategories.ChainEvent,
-                          options: { communityId: community.id },
-                        })
-                        .then(() => {
-                          forceRerender();
-                        });
-                    }}
-                  />
-                </div>
-              </div>
+              <SubscriptionEntry
+                key={`${community.id}-${index}`}
+                communitId={community.id}
+                subscriptions={[]}
+                canToggleEmailNotifications={false}
+                areEmailNotificationsEnabled={false}
+                onToggleReceiveEmailsNotifications={() => {
+                  handleEmailSubscriptions(false, [])
+                    .then(() => undefined)
+                    .catch(console.error);
+                }}
+                areInAppNotificationsEnabled={false}
+                onToggleReceiveInAppNotifications={() => {
+                  app.user.notifications
+                    .subscribe({
+                      categoryId: NotificationCategories.ChainEvent,
+                      options: { communityId: community.id },
+                    })
+                    .then(() => {
+                      forceRerender();
+                    })
+                    .catch(console.error);
+                }}
+              />
             );
           })}
 
         {Object.entries(chainEventSubs)
           .sort((x, y) => x[0].localeCompare(y[0]))
-          .map(([communityName, subs]) => {
-            const communityInfo = app.config.chains.getById(communityName);
+          .map(([communityId, subs], index) => {
             const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
             const hasSomeInAppSubs = subs.some((s) => s.isActive);
-
             return (
-              <div
-                className="notification-row chain-events-subscriptions-padding"
-                key={communityInfo?.id}
-              >
-                <div className="notification-row-header">
-                  <div className="left-content-container">
-                    <div className="avatar-and-name">
-                      <CWCommunityAvatar
-                        size="medium"
-                        community={communityInfo}
-                      />
-                      <CWText type="h5" fontWeight="medium">
-                        {communityInfo?.name}
-                      </CWText>
-                    </div>
-                  </div>
-                  <CWCheckbox
-                    label="Receive Emails"
-                    checked={hasSomeEmailSubs}
-                    onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      handleEmailSubscriptions(hasSomeEmailSubs, subs);
-                    }}
-                  />
-                  <CWToggle
-                    checked={hasSomeInAppSubs}
-                    onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      handleSubscriptions(hasSomeInAppSubs, subs);
-                    }}
-                  />
-                </div>
-              </div>
+              <SubscriptionEntry
+                key={`${communityId}-${index}`}
+                communitId={communityId}
+                subscriptions={subs}
+                areEmailNotificationsEnabled={hasSomeEmailSubs}
+                onToggleReceiveEmailsNotifications={() => {
+                  handleEmailSubscriptions(hasSomeEmailSubs, subs)
+                    .then(() => undefined)
+                    .catch(console.error);
+                }}
+                areInAppNotificationsEnabled={hasSomeInAppSubs}
+                onToggleReceiveInAppNotifications={() => {
+                  handleSubscriptions(hasSomeInAppSubs, subs)
+                    .then(() => undefined)
+                    .catch(console.error);
+                }}
+              />
             );
           })}
         <CWText
@@ -344,51 +315,32 @@ const NotificationSettingsPage = () => {
         </div>
         {Object.entries(bundledSubs)
           .sort((x, y) => x[0].localeCompare(y[0]))
-          .map(([communityName, subs]) => {
-            const communityInfo = app?.config.chains.getById(communityName);
-            const sortedSubs = subs.sort((a, b) =>
-              a.category.localeCompare(b.category),
-            );
-            const hasSomeEmailSubs = sortedSubs.some((s) => s.immediateEmail);
-            const hasSomeInAppSubs = sortedSubs.some((s) => s.isActive);
-
-            if (!communityInfo?.id) return null; // handles incomplete loading case
+          .map(([communityId, subs], index) => {
+            const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
+            const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
             return (
-              <div key={communityInfo?.id} className="notification-row">
+              <div key={communityId} className="notification-row">
                 <CWCollapsible
                   headerContent={
-                    <div className="notification-row-header">
-                      <div className="left-content-container">
-                        <div className="avatar-and-name">
-                          <CWCommunityAvatar
-                            size="medium"
-                            community={communityInfo}
-                          />
-                          <CWText type="h5" fontWeight="medium">
-                            {communityInfo?.name}
-                          </CWText>
-                        </div>
-                        <CWText type="b2" className="subscriptions-count-text">
-                          {subs.length} subscriptions
-                        </CWText>
-                      </div>
-                      <CWCheckbox
-                        label="Receive Emails"
-                        checked={hasSomeEmailSubs}
-                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                        onChange={() =>
-                          handleEmailSubscriptions(hasSomeEmailSubs, subs)
-                        }
-                      />
-                      <CWToggle
-                        checked={hasSomeInAppSubs}
-                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                        onChange={() =>
-                          handleSubscriptions(hasSomeInAppSubs, subs)
-                        }
-                      />
-                    </div>
+                    <SubscriptionEntry
+                      key={`${communityId}-${index}`}
+                      communitId={communityId}
+                      subscriptions={subs}
+                      showSubscriptionsCount
+                      areEmailNotificationsEnabled={hasSomeEmailSubs}
+                      onToggleReceiveEmailsNotifications={() => {
+                        handleEmailSubscriptions(hasSomeEmailSubs, subs)
+                          .then(() => undefined)
+                          .catch(console.error);
+                      }}
+                      areInAppNotificationsEnabled={hasSomeInAppSubs}
+                      onToggleReceiveInAppNotifications={() => {
+                        handleSubscriptions(hasSomeInAppSubs, subs)
+                          .then(() => undefined)
+                          .catch(console.error);
+                      }}
+                    />
                   }
                   collapsibleContent={
                     <div className="subscriptions-list-container">
@@ -561,7 +513,7 @@ const NotificationSettingsPage = () => {
                     <div className="avatar-and-name">
                       <img
                         className="snapshot-icon"
-                        src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}&image=true`}
+                        src={`${SERVER_URL}/ipfsProxy?hash=${avatar}&image=true`}
                       />
                       <CWText type="h5" fontWeight="medium">
                         {space.name}
@@ -572,15 +524,17 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      handleEmailSubscriptions(hasSomeEmailSubs, subs);
+                      handleEmailSubscriptions(hasSomeEmailSubs, subs)
+                        .then(() => undefined)
+                        .catch(console.error);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      handleSubscriptions(hasSomeInAppSubs, subs);
+                      handleSubscriptions(hasSomeInAppSubs, subs)
+                        .then(() => undefined)
+                        .catch(console.error);
                     }}
                   />
                 </div>

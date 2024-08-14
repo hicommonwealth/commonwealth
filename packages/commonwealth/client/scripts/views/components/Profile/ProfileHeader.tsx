@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import 'components/Profile/ProfileHeader.scss';
 
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { renderQuillDeltaToText } from '../../../../../shared/utils';
 import type NewProfile from '../../../models/NewProfile';
@@ -20,12 +20,12 @@ type ProfileHeaderProps = {
 
 const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   if (!profile) return;
   const { bio, name } = profile;
 
-  const isCurrentUser = isLoggedIn && isOwner;
+  const isCurrentUser = user.isLoggedIn && isOwner;
   const hasBio = () => {
     try {
       if (!bio || bio.trim().length === 0) return false;

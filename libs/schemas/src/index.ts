@@ -24,6 +24,8 @@ export type Aggregates = Extract<
   | 'CommunityContract'
   | 'Wallets'
   | 'GroupPermission'
+  | 'Tags'
+  | 'CommunityTags'
 >;
 
 export * from './commands';
