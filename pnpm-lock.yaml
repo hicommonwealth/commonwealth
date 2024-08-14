@@ -982,24 +982,12 @@ importers:
       '@phosphor-icons/react':
         specifier: ^2.0.8
         version: 2.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@polkadot/api':
-        specifier: 6.0.5
-        version: 6.0.5
-      '@polkadot/api-derive':
-        specifier: 6.0.5
-        version: 6.0.5
       '@polkadot/extension-dapp':
         specifier: 0.40.3
         version: 0.40.3(@polkadot/api@6.0.5)(@polkadot/util-crypto@12.6.2(@polkadot/util@12.6.2))(@polkadot/util@12.6.2)
       '@polkadot/extension-inject':
         specifier: 0.47.4
         version: 0.47.4(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@polkadot/keyring':
-        specifier: 12.6.2
-        version: 12.6.2(@polkadot/util-crypto@12.6.2(@polkadot/util@12.6.2))(@polkadot/util@12.6.2)
-      '@polkadot/types':
-        specifier: 6.0.5
-        version: 6.0.5
       '@polkadot/util':
         specifier: 12.6.2
         version: 12.6.2

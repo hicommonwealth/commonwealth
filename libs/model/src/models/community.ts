@@ -94,7 +94,6 @@ export default (
         defaultValue: false,
       },
       type: { type: Sequelize.STRING, allowNull: false, defaultValue: 'chain' },
-      substrate_spec: { type: Sequelize.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

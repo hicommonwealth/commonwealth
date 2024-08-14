@@ -2081,12 +2081,6 @@ export interface GetCommunity200Response {
   collapsed_on_homepage?: boolean;
   /**
    *
-   * @type {string}
-   * @memberof GetCommunity200Response
-   */
-  substrate_spec?: string | null;
-  /**
-   *
    * @type {boolean}
    * @memberof GetCommunity200Response
    */
