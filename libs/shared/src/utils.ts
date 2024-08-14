@@ -87,9 +87,14 @@ export const getThreadUrl = (
 /**
  * Always get the full canonical URL for the community, except when we're on
  * localhost because those will break.
+ *
+ * Note we build the URL based on the community id which is the 'id' property
+ * on the Communities column.  This is a slug, so we do not need to slugify or
+ * URL encode it. DO NOT pass in a community name.
+ *
  */
-export const getCommunityUrl = (community: string): string => {
-  return computeFullUrl(`/${slugify(community)}`);
+export const getCommunityUrl = (community_id: string): string => {
+  return computeFullUrl(`/${community_id}`);
 };
 
 export function timeoutPromise(timeout: number) {

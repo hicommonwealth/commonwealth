@@ -79,7 +79,7 @@ export const CommentSubscriptionEntry = (
           />
         </div>
         <div>
-          <Link to={getCommunityUrl(thread.Community.name)}>
+          <Link to={getCommunityUrl(thread.Community.id!)}>
             <CWText fontWeight="semiBold">{thread.Community.name}</CWText>
           </Link>
         </div>
