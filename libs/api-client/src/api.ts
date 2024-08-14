@@ -535,18 +535,6 @@ export interface CommunityGetCommunity200ResponseAddressesInner {
    * @type {boolean}
    * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
-  is_councillor?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommunityGetCommunity200ResponseAddressesInner
-   */
-  is_validator?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommunityGetCommunity200ResponseAddressesInner
-   */
   ghost_address?: boolean;
   /**
    *
@@ -3334,18 +3322,6 @@ export interface IntegrationsAnalyticsRequestThreadCreatedAddress {
    * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
    */
   last_active?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  is_councillor?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  is_validator?: boolean;
   /**
    *
    * @type {boolean}

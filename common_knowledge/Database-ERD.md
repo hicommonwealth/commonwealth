@@ -359,8 +359,6 @@ erDiagram
     timestamp-with-time-zone verification_token_expires 
     timestamp-with-time-zone verified 
     timestamp-with-time-zone last_active 
-    boolean is_councillor 
-    boolean is_validator 
     boolean ghost_address 
     integer profile_id 
     character-varying(255) wallet_id 

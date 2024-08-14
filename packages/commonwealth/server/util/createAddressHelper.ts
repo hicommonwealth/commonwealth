@@ -195,8 +195,6 @@ export async function createAddressHelper(
           wallet_sso_source: req.wallet_sso_source,
           role: 'member',
           is_user_default: false,
-          is_councillor: false,
-          is_validator: false,
           ghost_address: false,
         },
         { transaction },

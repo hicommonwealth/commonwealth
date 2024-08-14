@@ -444,8 +444,6 @@ export const seedDb = async () => {
         verified: new Date(),
         role: 'admin' as Role,
         is_user_default: false,
-        is_councillor: false,
-        is_validator: false,
         ghost_address: false,
       })),
     );

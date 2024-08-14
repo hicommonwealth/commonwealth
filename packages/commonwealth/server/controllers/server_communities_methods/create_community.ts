@@ -500,8 +500,6 @@ export async function __createCommunity(
       is_user_default: true,
       role: 'admin',
       last_active: new Date(),
-      is_councillor: false,
-      is_validator: false,
       ghost_address: false,
     });
 
