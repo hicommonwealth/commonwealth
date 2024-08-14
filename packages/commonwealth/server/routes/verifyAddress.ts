@@ -44,6 +44,10 @@ const processAddress = async (
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: community.id, address },
+      include: {
+        model: models.Community,
+        attributes: ['ss58_prefix'],
+      },
     },
   );
   if (!addressInstance) {

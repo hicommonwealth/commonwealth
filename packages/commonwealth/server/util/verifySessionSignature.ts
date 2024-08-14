@@ -4,6 +4,7 @@ import assert from 'assert';
 import {
   CANVAS_TOPIC,
   NotificationCategories,
+  addressSwapper,
   getSessionSignerForAddress,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
@@ -25,9 +26,23 @@ const verifySessionSignature = async (
   user_id: number | undefined | null,
   session: Session,
 ): Promise<void> => {
-  const expectedAddress = addressModel.address;
+  const storedAddress = addressModel.address;
+
+  // re-encode address if needed for substrate verification
+  const expectedAddress = addressModel.Community?.ss58_prefix
+    ? addressSwapper({
+        address: storedAddress,
+        currentPrefix: 42,
+      })
+    : addressModel.address;
 
   const walletAddress = session.address.split(':')[2];
+  console.log(
+    addressModel.Community?.ss58_prefix,
+    storedAddress,
+    expectedAddress,
+    walletAddress,
+  );
   assert(
     walletAddress === expectedAddress,
     `session.address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
