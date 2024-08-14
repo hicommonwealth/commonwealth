@@ -8,7 +8,7 @@ export const trpc = createTRPCReact<API>();
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: '/api/internal',
+      url: '/api/internal/trpc',
       async headers() {
         return {
           authorization: userStore.getState().jwt || '',

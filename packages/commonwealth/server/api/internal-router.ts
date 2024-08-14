@@ -1,5 +1,6 @@
 import { express, trpc } from '@hicommonwealth/adapters';
 import { ChainEvents } from '@hicommonwealth/model';
+import cors from 'cors';
 import { Router, raw } from 'express';
 import { config } from '../config';
 import * as community from './community';
@@ -32,7 +33,7 @@ const router = Router();
 const trpcRouter = trpc.router(api);
 export type API = typeof trpcRouter;
 
-router.use(express.statsMiddleware, trpc.toExpress(trpcRouter));
+router.use('/trpc', express.statsMiddleware, trpc.toExpress(trpcRouter));
 
 /**
  * Special integration endpoints
@@ -51,5 +52,14 @@ router.post(
   },
   express.command(ChainEvents.ChainEventCreated()),
 );
+
+if (config.NODE_ENV !== 'production') {
+  router.use(cors());
+  trpc.useOAS(router, trpcRouter, {
+    title: 'Internal API',
+    path: PATH,
+    version: '0.0.1',
+  });
+}
 
 export { PATH, router, trpcRouter };
