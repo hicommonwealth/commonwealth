@@ -100,7 +100,7 @@ export interface GetCommunities200ResponseResultsInner {
    * @type {string}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  network?: GetCommunities200ResponseResultsInnerNetworkEnum;
+  network?: string;
   /**
    *
    * @type {string}
@@ -349,53 +349,6 @@ export interface GetCommunities200ResponseResultsInner {
   contest_managers?: Array<GetCommunities200ResponseResultsInnerContestManagersInner>;
 }
 
-export const GetCommunities200ResponseResultsInnerNetworkEnum = {
-  Edgeware: 'edgeware',
-  EdgewareTestnet: 'edgeware-testnet',
-  Kusama: 'kusama',
-  Kulupu: 'kulupu',
-  Polkadot: 'polkadot',
-  Plasm: 'plasm',
-  Stafi: 'stafi',
-  Darwinia: 'darwinia',
-  Phala: 'phala',
-  Centrifuge: 'centrifuge',
-  Straightedge: 'straightedge',
-  Osmosis: 'osmosis',
-  Injective: 'injective',
-  InjectiveTestnet: 'injective-testnet',
-  Terra: 'terra',
-  Ethereum: 'ethereum',
-  Near: 'near',
-  NearTestnet: 'near-testnet',
-  Compound: 'compound',
-  Aave: 'aave',
-  AaveLocal: 'aave-local',
-  Dydx: 'dydx',
-  Metacartel: 'metacartel',
-  Alex: 'alex',
-  Erc20: 'erc20',
-  Erc721: 'erc721',
-  Erc1155: 'erc1155',
-  Cw20: 'cw20',
-  Cw721: 'cw721',
-  Clover: 'clover',
-  Hydradx: 'hydradx',
-  Crust: 'crust',
-  Sputnik: 'sputnik',
-  SolanaDevnet: 'solana-devnet',
-  SolanaTestnet: 'solana-testnet',
-  Solana: 'solana',
-  Spl: 'spl',
-  Evmos: 'evmos',
-  Kava: 'kava',
-  Kyve: 'kyve',
-  Stargaze: 'stargaze',
-  Cosmos: 'cosmos',
-} as const;
-
-export type GetCommunities200ResponseResultsInnerNetworkEnum =
-  typeof GetCommunities200ResponseResultsInnerNetworkEnum[keyof typeof GetCommunities200ResponseResultsInnerNetworkEnum];
 export const GetCommunities200ResponseResultsInnerBaseEnum = {
   Cosmos: 'cosmos',
   Substrate: 'substrate',
@@ -1988,7 +1941,7 @@ export interface GetCommunity200Response {
    * @type {string}
    * @memberof GetCommunity200Response
    */
-  network?: GetCommunity200ResponseNetworkEnum;
+  network?: string;
   /**
    *
    * @type {string}
@@ -2258,56 +2211,9 @@ export interface GetCommunity200Response {
    * @type {string}
    * @memberof GetCommunity200Response
    */
-  communityBanner?: string;
+  communityBanner?: string | null;
 }
 
-export const GetCommunity200ResponseNetworkEnum = {
-  Edgeware: 'edgeware',
-  EdgewareTestnet: 'edgeware-testnet',
-  Kusama: 'kusama',
-  Kulupu: 'kulupu',
-  Polkadot: 'polkadot',
-  Plasm: 'plasm',
-  Stafi: 'stafi',
-  Darwinia: 'darwinia',
-  Phala: 'phala',
-  Centrifuge: 'centrifuge',
-  Straightedge: 'straightedge',
-  Osmosis: 'osmosis',
-  Injective: 'injective',
-  InjectiveTestnet: 'injective-testnet',
-  Terra: 'terra',
-  Ethereum: 'ethereum',
-  Near: 'near',
-  NearTestnet: 'near-testnet',
-  Compound: 'compound',
-  Aave: 'aave',
-  AaveLocal: 'aave-local',
-  Dydx: 'dydx',
-  Metacartel: 'metacartel',
-  Alex: 'alex',
-  Erc20: 'erc20',
-  Erc721: 'erc721',
-  Erc1155: 'erc1155',
-  Cw20: 'cw20',
-  Cw721: 'cw721',
-  Clover: 'clover',
-  Hydradx: 'hydradx',
-  Crust: 'crust',
-  Sputnik: 'sputnik',
-  SolanaDevnet: 'solana-devnet',
-  SolanaTestnet: 'solana-testnet',
-  Solana: 'solana',
-  Spl: 'spl',
-  Evmos: 'evmos',
-  Kava: 'kava',
-  Kyve: 'kyve',
-  Stargaze: 'stargaze',
-  Cosmos: 'cosmos',
-} as const;
-
-export type GetCommunity200ResponseNetworkEnum =
-  typeof GetCommunity200ResponseNetworkEnum[keyof typeof GetCommunity200ResponseNetworkEnum];
 export const GetCommunity200ResponseBaseEnum = {
   Cosmos: 'cosmos',
   Substrate: 'substrate',
@@ -2358,120 +2264,12 @@ export interface GetCommunity200ResponseAdminsAndModsInner {
   /**
    *
    * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
+   * @memberof GetCommunity200ResponseAdminsAndModsInner
    */
-  community_id?: string;
-  /**
-   *
-   * @type {number}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  user_id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  verification_token?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  verification_token_expires?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  verified?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  last_active?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  ghost_address?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  wallet_id?: IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  block_info?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  is_user_default?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  role?: IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  wallet_sso_source?: IntegrationsAnalyticsRequestThreadCreatedAddressWalletSsoSourceEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  hex?: string;
-  /**
-   *
-   * @type {any}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  created_at?: any;
-  /**
-   *
-   * @type {any}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  updated_at?: any;
-  /**
-   *
-   * @type {UserUpdateUser200Response}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  User?: UserUpdateUser200Response;
+  role: GetCommunity200ResponseAdminsAndModsInnerRoleEnum;
 }
 
-export const IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum = {
-  Magic: 'magic',
-  Polkadot: 'polkadot',
-  Metamask: 'metamask',
-  Walletconnect: 'walletconnect',
-  KeplrEthereum: 'keplr-ethereum',
-  Keplr: 'keplr',
-  Leap: 'leap',
-  Near: 'near',
-  Terrastation: 'terrastation',
-  TerraWalletconnect: 'terra-walletconnect',
-  CosmMetamask: 'cosm-metamask',
-  Phantom: 'phantom',
-  Coinbase: 'coinbase',
-} as const;
-
-export type IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum =
-  typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum[keyof typeof IntegrationsAnalyticsRequestThreadCreatedAddressWalletIdEnum];
-export const IntegrationsAnalyticsRequestThreadCreatedAddressRoleEnum = {
+export const GetCommunity200ResponseAdminsAndModsInnerRoleEnum = {
   Admin: 'admin',
   Moderator: 'moderator',
 } as const;
