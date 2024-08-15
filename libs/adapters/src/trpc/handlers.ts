@@ -1,13 +1,17 @@
-import * as core from '@hicommonwealth/core';
 import {
   AuthStrategies,
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  command as coreCommand,
+  query as coreQuery,
+  handleEvent,
+  type CommandInput,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
   type QueryMetadata,
+  type User,
 } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { Request } from 'express';
@@ -21,6 +25,9 @@ export interface Context {
 }
 
 const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
+
+const isSecure = (md: { secure?: boolean; auth: unknown[] }) =>
+  md.secure !== false || md.auth.length > 0;
 
 const authenticate = async (
   req: Request,
@@ -54,10 +61,7 @@ const authenticate = async (
     }
 
     if (!req.user) throw new Error('Not authenticated');
-    if (
-      authStrategy.userId &&
-      (req.user as core.User).id !== authStrategy.userId
-    ) {
+    if (authStrategy.userId && (req.user as User).id !== authStrategy.userId) {
       throw new Error('Not authenticated');
     }
   } catch (error) {
@@ -103,10 +107,7 @@ export enum Tag {
   LoadTest = 'LoadTest',
 }
 
-export const command = <
-  Input extends core.CommandInput,
-  Output extends ZodSchema,
->(
+export const command = <Input extends CommandInput, Output extends ZodSchema>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
 ) => {
@@ -125,7 +126,7 @@ export const command = <
             schema: { type: 'string' },
           },
         ],
-        protect: md.secure,
+        protect: isSecure(md),
       },
     })
     .input(md.input)
@@ -133,14 +134,13 @@ export const command = <
     .mutation(async ({ ctx, input }) => {
       // md.secure must explicitly be false if the route requires no authentication
       // if we provide any authorization method we force authentication as well
-      if (md.secure !== false || md.auth?.length)
-        await authenticate(ctx.req, md.authStrategy);
+      if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
       try {
-        return await core.command(
+        return await coreCommand(
           md,
           {
             actor: {
-              user: ctx.req.user as core.User,
+              user: ctx.req.user as User,
               // TODO: get from JWT?
               address_id: ctx.req.headers['address_id'] as string,
             },
@@ -176,11 +176,7 @@ export const event = <
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);
-        return await core.handleEvent(
-          md,
-          { name: name as Events, payload },
-          false,
-        );
+        return await handleEvent(md, { name: name as Events, payload }, false);
       } catch (error) {
         throw trpcerror(error);
       }
@@ -207,19 +203,19 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
           },
         ],
       },
-      protect: md.secure,
+      protect: isSecure(md),
     })
     .input(md.input)
     .output(md.output)
     .query(async ({ ctx, input }) => {
       // enable secure by default
-      if (md.secure !== false) await authenticate(ctx.req, md.authStrategy);
+      if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
       try {
-        return await core.query(
+        return await coreQuery(
           md,
           {
             actor: {
-              user: ctx.req.user as core.User,
+              user: ctx.req.user as User,
               address_id: ctx.req.headers['address_id'] as string,
             },
             payload: input!,
