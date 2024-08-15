@@ -1,13 +1,16 @@
 import { DefaultPage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import getLinkType from 'helpers/linkType';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { getLinkType, isLinkValid } from 'helpers/link';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import React, { useCallback, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
   useEditCommunityBannerMutation,
   useEditCommunityTagsMutation,
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
 } from 'state/api/communities';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
 import {
@@ -22,21 +25,18 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import ErrorPage from '../../../error';
 import './CommunityProfileForm.scss';
 import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
 
 const CommunityProfileForm = () => {
-  const community = app.config.chains.getById(app.activeChainId());
-
-  const [communityId] = useState(
-    slugifyPreserveDashes(community.id.toLowerCase()),
-  );
   // `formKey` remounts the CWForm with new community default values after a
   // successful update, using the updated formKey.
   const [formKey, setFormKey] = useState(1);
@@ -44,57 +44,37 @@ const CommunityProfileForm = () => {
     isDisabled: true,
     canDisable: true,
   });
-  const [isCustomStagesEnabled, setIsCustomStagesEnabled] = useState(
-    community.stagesEnabled,
-  );
+  const [isCustomStagesEnabled, setIsCustomStagesEnabled] = useState<boolean>();
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [initialLinks, setInitialLinks] = useState(
-    (community.socialLinks || []).map((link) => ({
-      value: link,
-      canUpdate: true,
-      canDelete: true,
-      error: '',
-    })),
-  );
+  const [initialLinks, setInitialLinks] = useState<
+    {
+      value: string;
+      canUpdate: boolean;
+      canDelete: boolean;
+      error: string;
+    }[]
+  >([]);
 
-  const areTagsInitiallySet = useRef(false);
+  const { data: community, isLoading: isCommunityLoading } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
+
+  const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
+  const { mutateAsync: editTags } = useEditCommunityTagsMutation();
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
+
   const {
     isLoadingTags,
     preferenceTags,
     setPreferenceTags,
     toggleTagFromSelection,
   } = usePreferenceTags();
-
-  const updatePreferenceTags = useCallback(() => {
-    const updatedTags = [...preferenceTags].map((tag) => ({
-      ...tag,
-      isSelected: !!(community.CommunityTags || []).find(
-        (t) => t.id === tag.item.id,
-      ),
-    }));
-    setPreferenceTags(updatedTags);
-  }, [preferenceTags, setPreferenceTags, community]);
-
-  useEffect(() => {
-    if (
-      !isLoadingTags &&
-      preferenceTags?.length > 0 &&
-      community &&
-      !areTagsInitiallySet.current
-    ) {
-      updatePreferenceTags();
-
-      areTagsInitiallySet.current = true;
-    }
-  }, [
-    isLoadingTags,
-    preferenceTags,
-    setPreferenceTags,
-    community,
-    updatePreferenceTags,
-  ]);
 
   const {
     links,
@@ -108,11 +88,44 @@ const CommunityProfileForm = () => {
     linkValidation: linkValidationSchema.required,
   });
 
-  const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
-  const { mutateAsync: editTags } = useEditCommunityTagsMutation();
+  const updatePreferenceTags = useCallback(() => {
+    const updatedTags = [...preferenceTags].map((tag) => ({
+      ...tag,
+      isSelected: !!(community?.CommunityTags || []).find(
+        (t) => t.tag_id === tag.item.id,
+      ),
+    }));
+    setPreferenceTags(updatedTags);
+  }, [preferenceTags, setPreferenceTags, community]);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      setIsCustomStagesEnabled(community?.stages_enabled);
+
+      const linksFromCommunity = (community?.social_links || []).map(
+        (link) => ({
+          value: link,
+          canUpdate: true,
+          canDelete: true,
+          error: '',
+        }),
+      );
+      setLinks(linksFromCommunity);
+      setInitialLinks(linksFromCommunity);
+
+      preferenceTags?.length > 0 && updatePreferenceTags();
+    },
+    shouldRun:
+      !isCommunityLoading && !!community && preferenceTags && !isLoadingTags,
+  });
+
+  const communityIdForUrl = slugifyPreserveDashes(
+    community?.id?.toLowerCase() || '',
+  );
 
   const onSubmit = async (values: FormSubmitValues) => {
     if (
+      !community?.id ||
       isSubmitting ||
       (links.filter((x) => x.value).length > 0 ? !areLinksValid() : false)
     ) {
@@ -134,10 +147,11 @@ const CommunityProfileForm = () => {
         bannerText: values.communityBanner ?? '',
       });
 
-      await community.updateChainData({
+      await updateCommunity({
+        communityId: community.id,
         name: values.communityName,
         description: values.communityDescription,
-        social_links: links.map((link) => link.value.trim()),
+        socialLinks: links.map((link) => link.value.trim()),
         stagesEnabled: values.hasStagesEnabled,
         customStages: values.customStages
           ? JSON.parse(values.customStages)
@@ -169,21 +183,33 @@ const CommunityProfileForm = () => {
     }
   };
 
+  if (isCommunityLoading || isLoadingTags) {
+    return <CWCircleMultiplySpinner />;
+  }
+
+  if (!community) {
+    return (
+      <div className="m-auto">
+        <ErrorPage message="Failed to load community info" />
+      </div>
+    );
+  }
+
   return (
     <CWForm
       key={formKey}
       className="CommunityProfileForm"
       initialValues={{
-        communityName: community.name,
-        communityDescription: community.description,
-        communityProfileImageURL: community.iconUrl,
-        defaultPage: community.defaultOverview
+        communityName: community.name || '',
+        communityDescription: community.description || '',
+        communityProfileImageURL: community.icon_url || '',
+        defaultPage: community?.default_summary_view
           ? DefaultPage.Overview
           : DefaultPage.Discussions,
-        hasStagesEnabled: community.stagesEnabled,
+        hasStagesEnabled: !!community.stages_enabled,
         customStages:
-          community.customStages.length > 0
-            ? JSON.stringify(community.customStages)
+          (community?.custom_stages || []).length > 0
+            ? JSON.stringify(community?.custom_stages || [])
             : '',
         communityBanner: community.communityBanner || '',
       }}
@@ -204,7 +230,7 @@ const CommunityProfileForm = () => {
                 setNameFieldDisabledState((prevVal) => ({
                   ...prevVal,
                   canDisable:
-                    e?.target?.value?.trim() === community.name.trim(),
+                    e?.target?.value?.trim() === community?.name?.trim(),
                 }));
               }}
               iconRight={
@@ -233,7 +259,7 @@ const CommunityProfileForm = () => {
               fullWidth
               label="Community URL"
               placeholder="Community URL"
-              value={`${window.location.origin}/${communityId}`}
+              value={`${window.location.origin}/${communityIdForUrl}`}
             />
 
             <CWTextInput
@@ -241,14 +267,14 @@ const CommunityProfileForm = () => {
               fullWidth
               label="Community Namespace"
               placeholder="Community Namespace"
-              value={community.namespace}
+              value={community?.namespace || ''}
             />
             <CWTextInput
               disabled
               fullWidth
               label="Community Symbol"
               placeholder="Community Symbol"
-              value={community.default_symbol || ''}
+              value={community?.default_symbol || ''}
             />
 
             <CWTextArea
@@ -282,9 +308,9 @@ const CommunityProfileForm = () => {
               links={links.map((link) => ({
                 ...link,
                 customElementAfterLink:
-                  link.value && getLinkType(link.value, 'website') ? (
+                  link.value && isLinkValid(link.value) ? (
                     <CWTag
-                      label={getLinkType(link.value, 'website')}
+                      label={getLinkType(link.value) || 'website'}
                       type="group"
                       classNames="link-type"
                     />
@@ -393,13 +419,13 @@ const CommunityProfileForm = () => {
               type="button"
               disabled={
                 !formState.isDirty &&
-                (community.CommunityTags || []).length ===
+                (community?.CommunityTags || []).length ===
                   preferenceTags.filter(({ isSelected }) => isSelected)
                     .length &&
                 links.filter((x) => x.value).length ===
-                  (community.socialLinks || []).length &&
+                  (community?.social_links || []).length &&
                 links.every((x) =>
-                  (community.socialLinks || []).includes(x.value.trim()),
+                  (community?.social_links || []).includes(x.value.trim()),
                 )
               }
               onClick={() => {

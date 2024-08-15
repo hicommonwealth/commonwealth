@@ -314,6 +314,8 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action!.thread_id,
           created_at: new Date(),
         });
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },

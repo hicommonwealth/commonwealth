@@ -9,12 +9,15 @@ import _ from 'lodash';
 import moment from 'moment';
 import 'pages/notifications/notification_row.scss';
 import React from 'react';
-import app from 'state';
 import { getCommunityUrl } from 'utils';
 import { User } from 'views/components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
-const getNotificationFields = (category, data: IForumNotificationData) => {
+const getNotificationFields = (
+  category,
+  data: IForumNotificationData,
+  communityName = '',
+) => {
   const {
     created_at,
     thread_id,
@@ -30,9 +33,6 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
 
   let notificationHeader;
   let notificationBody;
-
-  const communityName =
-    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   const decodedTitle = decodeURIComponent(root_title).trim();
 
@@ -112,9 +112,10 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
 export const getBatchNotificationFields = (
   category,
   data: IForumNotificationData[],
+  communityName: string = 'Unknown chain',
 ) => {
   if (data.length === 1) {
-    return getNotificationFields(category, data[0]);
+    return getNotificationFields(category, data[0], communityName);
   }
 
   const {
@@ -135,9 +136,6 @@ export const getBatchNotificationFields = (
   ).map((u) => u.split('#'));
 
   const length = authorInfo.length - 1;
-
-  const communityName =
-    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;

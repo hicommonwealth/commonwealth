@@ -215,12 +215,6 @@ export interface CommunityGetCommunity200Response {
   collapsed_on_homepage?: boolean;
   /**
    *
-   * @type {string}
-   * @memberof CommunityGetCommunity200Response
-   */
-  substrate_spec?: string;
-  /**
-   *
    * @type {boolean}
    * @memberof CommunityGetCommunity200Response
    */
@@ -530,18 +524,6 @@ export interface CommunityGetCommunity200ResponseAddressesInner {
    * @memberof CommunityGetCommunity200ResponseAddressesInner
    */
   last_active?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommunityGetCommunity200ResponseAddressesInner
-   */
-  is_councillor?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommunityGetCommunity200ResponseAddressesInner
-   */
-  is_validator?: boolean;
   /**
    *
    * @type {boolean}
@@ -2151,12 +2133,6 @@ export interface CommunitySetStake200Response {
   collapsed_on_homepage?: boolean;
   /**
    *
-   * @type {string}
-   * @memberof CommunitySetStake200Response
-   */
-  substrate_spec?: string;
-  /**
-   *
    * @type {boolean}
    * @memberof CommunitySetStake200Response
    */
@@ -3334,18 +3310,6 @@ export interface IntegrationsAnalyticsRequestThreadCreatedAddress {
    * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
    */
   last_active?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  is_councillor?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof IntegrationsAnalyticsRequestThreadCreatedAddress
-   */
-  is_validator?: boolean;
   /**
    *
    * @type {boolean}

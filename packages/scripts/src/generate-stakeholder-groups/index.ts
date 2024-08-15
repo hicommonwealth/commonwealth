@@ -52,5 +52,6 @@ main()
     } else {
       log.fatal('Fatal error occurred', undefined, { err });
     }
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
   });
