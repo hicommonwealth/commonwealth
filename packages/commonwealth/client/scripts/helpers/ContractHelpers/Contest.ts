@@ -1,5 +1,6 @@
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
+import { getContestBalanceShared } from '../../../../../../libs/shared/src/commonProtocol';
 import { ContestAbi } from './Abi/ContestAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -204,22 +205,13 @@ class Contest extends ContractBase {
       await this.initialize(true);
     }
     this.reInitContract();
-    const tokenAddress = await this.contract.methods.contestToken().call();
-    if (tokenAddress === ZERO_ADDRESS) {
-      const balance = await this.web3.eth.getBalance(this.contractAddress);
-      return parseFloat(this.web3.utils.fromWei(balance, 'ether'));
-    } else {
-      const calldata =
-        '0x70a08231' +
-        this.web3.eth.abi
-          .encodeParameters(['address'], [this.contractAddress])
-          .substring(2);
-      const returnData = await this.web3.eth.call({
-        to: tokenAddress,
-        data: calldata,
-      });
-      return Number(this.web3.eth.abi.decodeParameter('uint256', returnData));
-    }
+    const balance = await getContestBalanceShared(
+      this.contract,
+      this.contractAddress,
+      this.web3,
+      true,
+    );
+    return balance;
   }
 }
 

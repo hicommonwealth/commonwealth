@@ -9,7 +9,7 @@ export const launchToken = async (
   totalSupply: number,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehtods
+  const txReceipt = await contract.methods
     .launchTokenWithLiquidity(
       name,
       symbol,
