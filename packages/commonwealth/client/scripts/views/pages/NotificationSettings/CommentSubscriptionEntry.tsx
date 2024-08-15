@@ -29,16 +29,6 @@ export const CommentSubscriptionEntry = (
   const deleteCommentSubscriptionMutation =
     useDeleteCommentSubscriptionMutation();
 
-  const threadUrl = getThreadUrl(
-    {
-      chain: `${thread.community_id}`,
-      id: `${thread.id}`,
-      title: decodeURIComponent(thread.title),
-    },
-    comment_id,
-    true,
-  );
-
   const handleDeleteSubscription = useCallback(() => {
     async function doAsync() {
       await deleteCommentSubscriptionMutation.mutateAsync({
@@ -57,7 +47,21 @@ export const CommentSubscriptionEntry = (
 
   const navigate = useCommonNavigate();
 
+  if (!thread) {
+    return;
+  }
+
   const handleNavigateToThread = () => {
+    const threadUrl = getThreadUrl(
+      {
+        chain: `${thread.community_id}`,
+        id: `${thread.id}`,
+        title: decodeURIComponent(thread.title),
+      },
+      comment_id,
+      true,
+    );
+
     navigate(threadUrl);
   };
 
