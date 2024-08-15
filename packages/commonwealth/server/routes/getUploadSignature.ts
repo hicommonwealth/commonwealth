@@ -22,6 +22,11 @@ const getUploadSignature = async (
     return next(new AppError(Errors.MissingParams));
   }
   const extension = req.body.name.split('.').pop();
+
+  if (!['gif', 'png', 'jpeg', 'webp'].includes(extension)) {
+    return next(new AppError(Errors.ImageType));
+  }
+
   const filename = `${uuidv4()}.${extension}`;
   const contentType = req.body.mimetype;
   if (
