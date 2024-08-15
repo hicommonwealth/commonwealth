@@ -2,7 +2,7 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
-import apiRouter from '../api';
+import * as api from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 
@@ -206,11 +206,11 @@ function setupRouter(
   // ---
 
   const router = express.Router();
-
   router.use(useragent.express());
 
-  // Routes API
-  app.use('/api', apiRouter);
+  // API routes
+  app.use(api.internal.PATH, api.internal.router);
+  app.use(api.external.PATH, api.external.router);
 
   registerRoute(
     router,
