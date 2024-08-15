@@ -32,7 +32,6 @@ type StatusResp = {
     unseenPosts: { [communityId: string]: number };
   };
   evmTestEnv?: string;
-  enforceSessionKeys?: boolean;
 };
 
 export const getUserStatus = async (models: DB, user: UserInstance) => {
@@ -239,7 +238,6 @@ export const status = async (
     if (!reqUser) {
       return success(res, {
         evmTestEnv: config.EVM.ETH_RPC,
-        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     } else {
       // user is logged in
@@ -261,7 +259,6 @@ export const status = async (
         // @ts-expect-error StrictNullChecks
         user,
         evmTestEnv: config.EVM.ETH_RPC,
-        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     }
   } catch (error) {

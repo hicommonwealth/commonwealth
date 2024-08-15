@@ -7,7 +7,6 @@ import {
 } from '@hicommonwealth/shared';
 import { canvas } from 'server';
 import { DeleteCommentOptions } from 'server/controllers/server_comments_methods/delete_comment';
-import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -36,12 +35,10 @@ export const deleteCommentHandler = async (
     commentId: parseInt(commentId, 10),
   };
   if (hasCanvasSignedDataApiArgs(req.body)) {
-    if (config.ENFORCE_SESSION_KEYS) {
-      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      const comment_msg_id =
-        canvasSignedData.actionMessage.payload.args.comment_id; // TODO
-      await verifyDeleteComment(canvasSignedData, { comment_msg_id });
-    }
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    const comment_msg_id =
+      canvasSignedData.actionMessage.payload.args.comment_id; // TODO
+    await verifyDeleteComment(canvasSignedData, { comment_msg_id });
   }
 
   await controllers.comments.deleteComment(commentFields);

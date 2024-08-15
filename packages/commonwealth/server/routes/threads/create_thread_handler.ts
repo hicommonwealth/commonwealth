@@ -9,7 +9,6 @@ import {
 } from '@hicommonwealth/shared';
 import { canvas } from 'server';
 import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
-import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -72,26 +71,24 @@ export const createThreadHandler = async (
     threadFields.canvasSignedData = req.body.canvas_signed_data;
     threadFields.canvasMsgId = req.body.canvas_msg_id;
 
-    if (config.ENFORCE_SESSION_KEYS) {
-      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
 
-      const canvasThread = {
-        title,
-        body,
-        address:
-          canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                // @ts-expect-error <StrictNullChecks>
-                address: address.address,
-              })
-            : // @ts-expect-error <StrictNullChecks>
-              address.address,
-        community: community.id,
-        topic: topicId ? parseInt(topicId, 10) : null,
-      };
-      await verifyThread(canvasSignedData, canvasThread);
-    }
+    const canvasThread = {
+      title,
+      body,
+      address:
+        canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
+          ? addressSwapper({
+              currentPrefix: 42,
+              // @ts-expect-error <StrictNullChecks>
+              address: address.address,
+            })
+          : // @ts-expect-error <StrictNullChecks>
+            address.address,
+      community: community.id,
+      topic: topicId ? parseInt(topicId, 10) : null,
+    };
+    await verifyThread(canvasSignedData, canvasThread);
   }
   // create thread
   const [thread, notificationOptions, analyticsOptions] =

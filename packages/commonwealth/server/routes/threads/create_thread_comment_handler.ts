@@ -10,7 +10,6 @@ import {
 } from '@hicommonwealth/shared';
 import { canvas } from 'server';
 import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
-import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -79,24 +78,22 @@ export const createThreadCommentHandler = async (
     threadCommentFields.canvasSignedData = req.body.canvas_signed_data;
     threadCommentFields.canvasMsgId = req.body.canvas_msg_id;
 
-    if (config.ENFORCE_SESSION_KEYS) {
-      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      const canvasComment = {
-        thread_id: threadMsgId ?? null,
-        text,
-        address:
-          canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                // @ts-expect-error <StrictNullChecks>
-                address: address.address,
-              })
-            : // @ts-expect-error <StrictNullChecks>
-              address.address,
-        parent_comment_id: parentCommentMsgId ?? null,
-      };
-      await verifyComment(canvasSignedData, canvasComment);
-    }
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    const canvasComment = {
+      thread_id: threadMsgId ?? null,
+      text,
+      address:
+        canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
+          ? addressSwapper({
+              currentPrefix: 42,
+              // @ts-expect-error <StrictNullChecks>
+              address: address.address,
+            })
+          : // @ts-expect-error <StrictNullChecks>
+            address.address,
+      parent_comment_id: parentCommentMsgId ?? null,
+    };
+    await verifyComment(canvasSignedData, canvasComment);
   }
 
   // create thread comment

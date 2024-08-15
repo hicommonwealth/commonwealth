@@ -9,7 +9,6 @@ import {
 } from '@hicommonwealth/shared';
 import { canvas } from 'server';
 import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
-import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -62,23 +61,21 @@ export const createThreadReactionHandler = async (
     reactionFields.canvasSignedData = req.body.canvas_signed_data;
     reactionFields.canvasMsgId = req.body.canvas_msg_id;
 
-    if (config.ENFORCE_SESSION_KEYS) {
-      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      const canvasThreadReaction = {
-        thread_id: threadMsgId ?? null,
-        address:
-          canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                // @ts-expect-error <StrictNullChecks>
-                address: address.address,
-              })
-            : // @ts-expect-error <StrictNullChecks>
-              address.address,
-        value: reaction,
-      };
-      await verifyReaction(canvasSignedData, canvasThreadReaction);
-    }
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    const canvasThreadReaction = {
+      thread_id: threadMsgId ?? null,
+      address:
+        canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
+          ? addressSwapper({
+              currentPrefix: 42,
+              // @ts-expect-error <StrictNullChecks>
+              address: address.address,
+            })
+          : // @ts-expect-error <StrictNullChecks>
+            address.address,
+      value: reaction,
+    };
+    await verifyReaction(canvasSignedData, canvasThreadReaction);
   }
 
   // create thread reaction

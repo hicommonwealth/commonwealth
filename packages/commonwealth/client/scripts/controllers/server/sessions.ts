@@ -136,9 +136,6 @@ async function sign(
       const config = fetchCachedConfiguration();
 
       if (!savedSessionMessage) {
-        if (!config?.enforceSessionKeys) {
-          return null;
-        }
         throw new SessionKeyError({
           name: 'Authentication Error',
           message: `No session found for ${did}`,
@@ -153,9 +150,6 @@ async function sign(
         const sessionExpirationTime =
           session.context.timestamp + session.context.duration;
         if (Date.now() > sessionExpirationTime) {
-          if (!config?.enforceSessionKeys) {
-            return null;
-          }
           throw new SessionKeyError({
             name: 'Authentication Error',
             message: `Session expired for ${did}`,

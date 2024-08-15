@@ -7,7 +7,6 @@ import {
 } from '@hicommonwealth/shared';
 import { canvas } from 'server';
 import { DeleteThreadOptions } from 'server/controllers/server_threads_methods/delete_thread';
-import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -47,12 +46,9 @@ export const deleteThreadHandler = async (
     threadFields.canvasSignedData = req.body.canvas_signed_data;
     threadFields.canvasMsgId = req.body.canvas_msg_id;
 
-    if (config.ENFORCE_SESSION_KEYS) {
-      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      const thread_msg_id =
-        canvasSignedData.actionMessage.payload.args.thread_id; // TODO
-      await verifyDeleteThread(canvasSignedData, { thread_msg_id });
-    }
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    const thread_msg_id = canvasSignedData.actionMessage.payload.args.thread_id; // TODO
+    await verifyDeleteThread(canvasSignedData, { thread_msg_id });
   }
 
   await controllers.threads.deleteThread(threadFields);

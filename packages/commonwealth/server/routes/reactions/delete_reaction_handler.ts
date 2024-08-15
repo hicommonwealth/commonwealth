@@ -7,7 +7,6 @@ import {
 } from '@hicommonwealth/shared';
 import { canvas } from 'server';
 import { ServerControllers } from 'server/routing/router';
-import { config } from '../../config';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
 const Errors = {
@@ -35,25 +34,23 @@ export const deleteReactionHandler = async (
   }
 
   if (hasCanvasSignedDataApiArgs(req.body)) {
-    if (config.ENFORCE_SESSION_KEYS) {
-      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      if (canvasSignedData.actionMessage.payload.name === 'unreactComment') {
-        const comment_msg_id =
-          canvasSignedData.actionMessage.payload.args.comment_id; // TODO
-        await verifyDeleteReaction(canvasSignedData, {
-          comment_id: comment_msg_id,
-        });
-      } else if (
-        canvasSignedData.actionMessage.payload.name === 'unreactThread'
-      ) {
-        const thread_msg_id =
-          canvasSignedData.actionMessage.payload.args.thread_id; // TODO
-        await verifyDeleteReaction(canvasSignedData, {
-          thread_id: thread_msg_id,
-        });
-      } else {
-        throw new Error('unexpected signed message');
-      }
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    if (canvasSignedData.actionMessage.payload.name === 'unreactComment') {
+      const comment_msg_id =
+        canvasSignedData.actionMessage.payload.args.comment_id; // TODO
+      await verifyDeleteReaction(canvasSignedData, {
+        comment_id: comment_msg_id,
+      });
+    } else if (
+      canvasSignedData.actionMessage.payload.name === 'unreactThread'
+    ) {
+      const thread_msg_id =
+        canvasSignedData.actionMessage.payload.args.thread_id; // TODO
+      await verifyDeleteReaction(canvasSignedData, {
+        thread_id: thread_msg_id,
+      });
+    } else {
+      throw new Error('unexpected signed message');
     }
   }
 

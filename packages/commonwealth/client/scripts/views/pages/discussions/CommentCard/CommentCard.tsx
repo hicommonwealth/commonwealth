@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 
 import {
@@ -122,23 +122,14 @@ export const CommentCard = ({
 
   const { data: config } = useFetchConfigurationQuery();
 
-  const doVerify = useCallback(async () => {
-    try {
-      const canvasSignedData: CanvasSignedData = deserializeCanvas(
-        comment.canvasSignedData,
-      );
-      await verify(canvasSignedData);
-      setVerifiedCanvasSignedData(canvasSignedData);
-    } catch (err) {
-      // ignore invalid signed comments
-    }
-  }, [comment.canvasSignedData]);
-
   useEffect(() => {
-    if (!config?.enforceSessionKeys) return;
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    doVerify();
-  }, [config?.enforceSessionKeys, doVerify]);
+    const canvasSignedData: CanvasSignedData = deserializeCanvas(
+      comment.canvasSignedData,
+    );
+    verify(canvasSignedData).then(() => {
+      setVerifiedCanvasSignedData(canvasSignedData);
+    });
+  }, [comment.canvasSignedData]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);

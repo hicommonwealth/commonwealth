@@ -145,13 +145,13 @@ const useUserMenuItems = ({
       type: 'default',
       label: (
         <UserMenuItem
-          isSignedIn={!configurationData?.enforceSessionKeys || signed}
+          isSignedIn={signed}
           hasJoinedCommunity={isActive}
           address={account.address}
         />
       ),
       onClick: async () => {
-        if (!configurationData?.enforceSessionKeys || signed) {
+        if (signed) {
           onAddressItemClick?.();
           return await setActiveAccount(account);
         }

@@ -533,14 +533,12 @@ async function magicLoginRoute(
       }
     }
 
-    if (config.ENFORCE_SESSION_KEYS) {
-      // verify the session signature using session signer
-      const sessionSigner = getSessionSignerForDid(session.did);
-      if (!sessionSigner) {
-        throw new Error('No session signer found for address');
-      }
-      await sessionSigner.verifySession(CANVAS_TOPIC, session);
+    // verify the session signature using session signer
+    const sessionSigner = getSessionSignerForDid(session.did);
+    if (!sessionSigner) {
+      throw new Error('No session signer found for address');
     }
+    await sessionSigner.verifySession(CANVAS_TOPIC, session);
   } catch (err) {
     log.warn(
       `Could not set up a valid client-side magic address ${req.body.magicAddress}`,
