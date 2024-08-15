@@ -1,5 +1,7 @@
 'use strict';
 
+const { QueryTypes } = require('sequelize');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -54,6 +56,57 @@ module.exports = {
         `,
         { transaction },
       );
+
+      // Fix broken contest managers (that have no Contests) by emitting the outbox event
+      // which will trigger the policy to create EvmEventSources
+      const [contestManagers] = await queryInterface.sequelize.query(
+        `
+          SELECT cm.contest_address, cm.community_id, cm.interval
+          FROM "ContestManagers" cm
+          LEFT JOIN "Contests" c
+          ON cm.contest_address = c.contest_address
+          WHERE c.contest_address IS NULL;
+        `,
+        { transaction },
+      );
+
+      for (const {
+        community_id,
+        contest_address,
+        interval,
+      } of contestManagers) {
+        const [community] = await queryInterface.sequelize.query(
+          `SELECT namespace_address FROM "Communities" c WHERE c.id = :community_id`,
+          {
+            replacements: { community_id },
+            type: QueryTypes.SELECT,
+          },
+        );
+        if (!community.namespace_address) {
+          throw new Error(`no namespace for community: ${community_id}`);
+        }
+        const event = {
+          event_name:
+            interval === 0
+              ? 'OneOffContestManagerDeployed'
+              : 'RecurringContestManagerDeployed',
+          event_payload: {
+            interval,
+            contest_address,
+            namespace: community.namespace_address,
+          },
+        };
+        await queryInterface.sequelize.query(
+          `INSERT INTO "Outbox" (event_name, event_payload, created_at, updated_at) VALUES (:event_name, :event_payload, NOW(), NOW())`,
+          {
+            replacements: {
+              event_name: event.event_name,
+              event_payload: JSON.stringify(event.event_payload),
+            },
+            type: queryInterface.sequelize.QueryTypes.INSERT,
+          },
+        );
+      }
     });
   },
 
