@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import { getContestBalanceShared } from 'shared/src/commonProtocol';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
@@ -255,7 +255,7 @@ export const getContestBalance = async (
     contestABI as AbiItem[],
     contest,
   );
-  const balance = await getContestBalanceShared(
+  const balance = await commonProtocol.getContestBalanceShared(
     contestInstance,
     contest,
     web3,
