@@ -49,11 +49,11 @@ export const CommentSubscriptionEntry = (
 
   const navigate = useCommonNavigate();
 
-  const handleNavigateToThread = () => {
-    if (!thread) {
-      return;
-    }
+  if (!thread) {
+    return;
+  }
 
+  const handleNavigateToThread = () => {
     const threadUrl = getThreadUrl(
       {
         chain: `${thread.community_id}`,
@@ -66,10 +66,6 @@ export const CommentSubscriptionEntry = (
 
     navigate(threadUrl);
   };
-
-  if (!thread) {
-    return null;
-  }
 
   return (
     <div className="SubscriptionEntry">
