@@ -4,7 +4,6 @@ import {
   linksSchema,
   paginationSchema,
   PG_INT,
-  zBoolean,
 } from '../utils';
 
 export const OrderByQueriesKeys = z.enum([
@@ -30,8 +29,6 @@ export const BulkThread = z.object({
   discord_meta: z.object(discordMetaSchema).nullable().optional(),
   pinned: z.boolean(),
   chain: z.string(),
-  created_at: z.date(),
-  updated_at: z.date(),
   locked_at: z.date().nullable().optional(),
   links: z.object(linksSchema).array().nullable().optional(),
   collaborators: z.any().array(),
@@ -69,6 +66,9 @@ export const BulkThread = z.object({
   avatar_url: z.string().nullable(),
   address_last_active: z.date().nullable(),
   profile_name: z.string().nullable(),
+
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const GetBulkThreads = {
@@ -76,8 +76,8 @@ export const GetBulkThreads = {
     community_id: z.string(),
     fromDate: z.coerce.date().optional(),
     toDate: z.coerce.date().optional(),
-    archived: zBoolean.default(false),
-    includePinnedThreads: zBoolean.default(false),
+    archived: z.coerce.boolean().default(false),
+    includePinnedThreads: z.coerce.boolean().default(false),
     topicId: PG_INT.optional(),
     stage: z.string().optional(),
     orderBy: OrderByQueriesKeys.default('createdAt:desc'),

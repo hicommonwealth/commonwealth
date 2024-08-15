@@ -74,7 +74,6 @@ describe('Recap email lifecycle', () => {
 
     [comment] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
-      community_id: community?.id,
       thread_id: thread!.id!,
     });
   });

@@ -89,7 +89,7 @@ export class RedisCache implements Cache {
    * @returns
    */
   public ready(retries = 3, retryDelay = 1000) {
-    // eslint-disable-next-line no-async-promise-executor
+    // eslint-disable-next-line no-async-promise-executor, @typescript-eslint/no-misused-promises
     return new Promise<boolean>(async (resolve, reject) => {
       for (let i = 0; i < retries; i++) {
         if (this.isReady()) {

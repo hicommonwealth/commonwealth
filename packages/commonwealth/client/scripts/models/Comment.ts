@@ -43,9 +43,10 @@ export class Comment<T extends IUniqueId> {
   constructor({
     id,
     text,
-    community_id,
     author,
+    community_id,
     Address,
+    Thread,
     thread_id,
     parent_id,
     plaintext,

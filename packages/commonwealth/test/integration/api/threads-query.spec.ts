@@ -50,7 +50,6 @@ describe('Thread queries', () => {
     expect(thread.id).to.be.greaterThan(0);
     expect(thread.address_id).to.to.be.greaterThan(0);
     const collaboration = await models.Collaboration.findOrCreate({
-      // @ts-expect-error StrictNullChecks
       where: {
         address_id: thread.address_id,
         thread_id: thread.id,

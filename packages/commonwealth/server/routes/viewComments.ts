@@ -28,8 +28,6 @@ const viewComments = async (
   }
 
   const comments = await models.Comment.findAll({
-    // @ts-expect-error StrictNullChecks
-    where: { community_id: community.id, thread_id: threadId },
     include: [
       {
         model: models.Address,
@@ -41,6 +39,12 @@ const viewComments = async (
             attributes: ['id', 'profile'],
           },
         ],
+      },
+      {
+        model: models.Thread,
+        attributes: ['id'],
+        required: true,
+        where: { id: threadId, community_id: community!.id },
       },
       {
         model: models.Reaction,

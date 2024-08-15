@@ -19,7 +19,9 @@ export const CommunityStake = z.object({
   stake_token: z.string().default(''),
   vote_weight: PG_INT.default(1),
   stake_enabled: z.boolean().default(false),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  StakeTransactions: z.array(StakeTransaction).optional(),
+
+  StakeTransactions: z.array(StakeTransaction).nullish(),
+
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

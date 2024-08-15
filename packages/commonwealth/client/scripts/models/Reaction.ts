@@ -44,7 +44,7 @@ class Reaction {
     this.author_chain = author_chain;
     this.canvasSignedData = canvas_signed_data;
     this.canvasHash = canvas_hash;
-    this.calculatedVotingWeight = calculated_voting_weight || 1;
+    this.calculatedVotingWeight = calculated_voting_weight || 0;
     this.updatedAt = updated_at;
 
     this.profile = addressToUserProfile(Address);

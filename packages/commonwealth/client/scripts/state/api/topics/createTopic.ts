@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
 import { userStore } from '../../ui/user';
 
 interface CreateTopicProps {
@@ -25,7 +25,7 @@ const createTopic = async ({
   isPWA,
 }: CreateTopicProps) => {
   const response = await axios.post(
-    `${app.serverUrl()}/topics`,
+    `${SERVER_URL}/topics`,
     {
       name,
       description,

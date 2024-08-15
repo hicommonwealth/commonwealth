@@ -21,7 +21,10 @@ const SidebarHeader = ({
     <div className="SidebarHeader">
       <CWCommunityAvatar
         showSkeleton={!app?.chain?.meta}
-        community={app?.chain?.meta}
+        community={{
+          iconUrl: app?.chain?.meta?.iconUrl || '',
+          name: app?.chain?.meta?.name || '',
+        }}
         onClick={() =>
           navigateToCommunity({ navigate, path: '', chain: app.chain.id })
         }

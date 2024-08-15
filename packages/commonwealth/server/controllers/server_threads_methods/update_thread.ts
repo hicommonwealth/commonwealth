@@ -198,7 +198,6 @@ export async function __updateThread(
     };
 
     await setThreadAttributes(
-      // @ts-expect-error StrictNullChecks
       permissions,
       thread,
       {
@@ -212,32 +211,26 @@ export async function __updateThread(
       toUpdate,
     );
 
-    // @ts-expect-error StrictNullChecks
     await setThreadPinned(permissions, pinned, toUpdate);
 
-    // @ts-expect-error StrictNullChecks
     await setThreadSpam(permissions, spam, toUpdate);
 
-    // @ts-expect-error StrictNullChecks
     await setThreadLocked(permissions, locked, toUpdate);
 
-    // @ts-expect-error StrictNullChecks
     await setThreadArchived(permissions, archived, toUpdate);
 
     await setThreadStage(
-      // @ts-expect-error StrictNullChecks
       permissions,
       stage,
-      community,
+      community!,
       allAnalyticsOptions,
       toUpdate,
     );
 
     await setThreadTopic(
-      // @ts-expect-error StrictNullChecks
       permissions,
-      community,
-      topicId,
+      community!,
+      topicId!,
       this.models,
       isContestThread,
       toUpdate,
@@ -277,7 +270,6 @@ export async function __updateThread(
     }
 
     await updateThreadCollaborators(
-      // @ts-expect-error StrictNullChecks
       permissions,
       thread,
       collaborators,
@@ -295,13 +287,12 @@ export async function __updateThread(
     );
 
     await emitMentions(this.models, transaction, {
-      // @ts-expect-error StrictNullChecks
-      authorAddressId: address.id,
-      // @ts-expect-error StrictNullChecks
-      authorUserId: user.id,
+      authorAddressId: address.id!,
+      authorUserId: user.id!,
       authorAddress: address.address,
       mentions,
       thread,
+      community_id: thread.community_id,
     });
 
     await transaction.commit();
@@ -795,7 +786,6 @@ async function updateThreadCollaborators(
       await Promise.all(
         collaboratorAddresses.map(async (address) => {
           return models.Collaboration.findOrCreate({
-            // @ts-expect-error StrictNullChecks
             where: {
               thread_id: thread.id,
               address_id: address.id,
@@ -809,7 +799,6 @@ async function updateThreadCollaborators(
     // remove collaborators
     if (toRemoveUnique.length > 0) {
       await models.Collaboration.destroy({
-        // @ts-expect-error StrictNullChecks
         where: {
           thread_id: thread.id,
           address_id: {

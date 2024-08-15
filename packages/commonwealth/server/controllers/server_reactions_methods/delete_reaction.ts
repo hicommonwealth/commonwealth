@@ -34,7 +34,6 @@ export async function __deleteReaction(
     where: {
       id: reactionId,
       address_id: { [Op.in]: userOwnedAddressIds },
-      community_id: community.id,
     },
     include: [this.models.Address],
   });
@@ -45,7 +44,7 @@ export async function __deleteReaction(
 
   // check if author is banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: reaction.community_id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
