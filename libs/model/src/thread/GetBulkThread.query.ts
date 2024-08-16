@@ -4,20 +4,6 @@ import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
-import { CommentAttributes } from '../models/index';
-
-const getLastEdited = (post: CommentAttributes) => {
-  let lastEdited;
-  if (post.version_history && post.version_history?.length > 1) {
-    try {
-      const latestVersion = JSON.parse(post.version_history[0]);
-      lastEdited = latestVersion ? latestVersion.timestamp : null;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  return lastEdited;
-};
 
 // TODO: improve type safety (avoid using any)
 export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
@@ -194,14 +180,12 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
           ? t.collaborators.map((c: any) => JSON.parse(c))
           : [];
 
-        const last_edited = getLastEdited(t);
-
         const data: z.infer<typeof schemas.BulkThread> = {
           id: t.thread_id,
           title: t.thread_title,
           url: t.url,
           body: t.body,
-          last_edited,
+          last_edited: t.updated_at,
           kind: t.kind,
           stage: t.stage,
           read_only: t.read_only,
