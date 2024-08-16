@@ -1,5 +1,6 @@
 import {
   ChainBase,
+  ChainNetwork,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -15,6 +16,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
+    network: z.nativeEnum(ChainNetwork).optional(),
     base: z.nativeEnum(ChainBase).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
     //    Instead we support comma-separated strings of ids.

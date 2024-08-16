@@ -12,6 +12,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
     body: async ({ payload }) => {
       const {
         base,
+        network,
         include_node_info,
         stake_enabled,
         has_groups,
@@ -80,7 +81,13 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                           AND "Community"."base" = '${base}'
                         `
                             : ''
-                        }
+                        }${
+          network
+            ? `
+                          AND "Community"."network" = '${network}'
+                        `
+            : ''
+        }
                         ${
                           has_groups
                             ? `
