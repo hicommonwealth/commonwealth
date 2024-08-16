@@ -399,7 +399,7 @@ export const PollCard = ({
           content={
             <DeletePollModal
               onDelete={async () => {
-                if (onDeleteClick) onDeleteClick();
+                onDeleteClick?.();
                 setDeleteModalOpen(false);
               }}
               onClose={() => setDeleteModalOpen(false)}

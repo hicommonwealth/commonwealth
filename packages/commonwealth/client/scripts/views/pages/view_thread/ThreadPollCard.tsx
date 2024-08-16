@@ -2,7 +2,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import 'pages/view_thread/poll_cards.scss';
 import React, { useState } from 'react';
-import app from 'state';
+import { useDeletePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
 import type Poll from '../../../models/Poll';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -29,11 +29,30 @@ export const ThreadPollCard = ({
 
   const user = useUserStore();
 
+  const { mutateAsync: deletePoll } = useDeletePollMutation({
+    threadId: poll.threadId,
+  });
+
   const getTooltipErrorMessage = () => {
     if (!user.activeAccount)
       return 'Error: You must join this community to vote.';
     if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
     return '';
+  };
+
+  const handleDeletePoll = async () => {
+    try {
+      await deletePoll({
+        pollId: poll.id,
+        address: user.activeAccount?.address || '',
+        authorCommunity: user.activeAccount?.community.id || '',
+      });
+      onDelete?.();
+      notifySuccess('Poll deleted');
+    } catch (e) {
+      console.error(e);
+      notifyError('Failed to delete poll');
+    }
   };
 
   return (
@@ -88,21 +107,7 @@ export const ThreadPollCard = ({
           }
         }}
         showDeleteButton={showDeleteButton}
-        onDeleteClick={async () => {
-          try {
-            await app.polls.deletePoll({
-              threadId: poll.threadId,
-              pollId: poll.id,
-              address: user.activeAccount?.address || '',
-              authorCommunity: user.activeAccount?.community.id || '',
-            });
-            if (onDelete) onDelete();
-            notifySuccess('Poll deleted');
-          } catch (e) {
-            console.error(e);
-            notifyError('Failed to delete poll');
-          }
-        }}
+        onDeleteClick={handleDeletePoll}
       />
       <CWModal
         size="small"
