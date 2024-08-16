@@ -101,4 +101,10 @@ export const Outbox = z.union([
       event_payload: events.SubscriptionPreferencesUpdated,
     })
     .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscourseImportSubmitted),
+      event_payload: events.DiscourseImportSubmitted,
+    })
+    .merge(BaseOutboxProperties),
 ]);
