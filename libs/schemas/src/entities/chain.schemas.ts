@@ -8,13 +8,13 @@ import { PG_INT } from '../utils';
 import { Contract } from './contract.schemas';
 
 export const ChainNode = z.object({
-  id: PG_INT.optional(),
-  url: z.string().max(255),
+  id: PG_INT.optional().nullish(),
+  url: z.string().max(255).nullish(),
   eth_chain_id: PG_INT.nullish(),
   alt_wallet_url: z.string().max(255).nullish(),
   private_url: z.string().max(255).nullish(),
-  balance_type: z.nativeEnum(BalanceType),
-  name: z.string().max(255),
+  balance_type: z.nativeEnum(BalanceType).nullish(),
+  name: z.string().max(255).nullish(),
   description: z.string().max(255).nullish(),
   ss58: PG_INT.nullish(),
   bech32: z.string().max(255).nullish(),
