@@ -53,6 +53,8 @@ export const Community = z.object({
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
+  profile_count: PG_INT.nullish(),
+  thread_count: PG_INT.nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
