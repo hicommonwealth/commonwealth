@@ -10,7 +10,7 @@ import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
-import React, { Dispatch, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
@@ -78,13 +78,17 @@ export const ThreadOptions = ({
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
     useState<CanvasSignedData | null>(null);
   useEffect(() => {
-    const canvasSignedData: CanvasSignedData = deserializeCanvas(
-      thread.canvasSignedData,
-    );
-    if (!canvasSignedData) return;
-    verify(canvasSignedData).then(() => {
-      setVerifiedCanvasSignedData(canvasSignedData);
-    });
+    try {
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        thread.canvasSignedData,
+      );
+      if (!canvasSignedData) return;
+      verify(canvasSignedData).then(() => {
+        setVerifiedCanvasSignedData(canvasSignedData);
+      });
+    } catch (error) {
+      // ignore errors or missing data
+    }
   }, [thread.canvasSignedData]);
 
   return (

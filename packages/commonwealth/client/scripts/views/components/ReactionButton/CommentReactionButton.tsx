@@ -75,7 +75,7 @@ export const CommentReactionButton = ({
       deleteCommentReaction({
         communityId: app.activeChainId(),
         address: user.activeAccount?.address,
-        reactionMsgId: foundReaction.canvasMsgId,
+        commentMsgId: comment.canvasMsgId,
         reactionId: foundReaction.id,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {

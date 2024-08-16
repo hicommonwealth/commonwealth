@@ -9,10 +9,10 @@ import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
-  communityId: string;
   address: string;
-  threadId: number;
+  communityId: string;
   threadMsgId: string;
+  threadId: number;
 }
 
 interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
@@ -20,11 +20,11 @@ interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
 }
 
 const deleteReaction = async ({
-  communityId,
   address,
+  communityId,
+  threadMsgId,
   reactionId,
   threadId,
-  threadMsgId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteThreadReaction(address, {
     thread_id: threadMsgId,

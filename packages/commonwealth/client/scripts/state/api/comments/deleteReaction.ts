@@ -8,20 +8,20 @@ import { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
-  communityId: string;
   address: string;
-  reactionMsgId: string;
+  communityId: string;
+  commentMsgId: string;
   reactionId: number;
 }
 
 const deleteReaction = async ({
-  communityId,
   address,
-  reactionMsgId,
+  communityId,
+  commentMsgId,
   reactionId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteCommentReaction(address, {
-    comment_id: reactionMsgId,
+    comment_id: commentMsgId,
   });
 
   return await axios

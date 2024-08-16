@@ -123,13 +123,17 @@ export const CommentCard = ({
   const { data: config } = useFetchConfigurationQuery();
 
   useEffect(() => {
-    const canvasSignedData: CanvasSignedData = deserializeCanvas(
-      comment.canvasSignedData,
-    );
-    if (!canvasSignedData) return;
-    verify(canvasSignedData).then(() => {
-      setVerifiedCanvasSignedData(canvasSignedData);
-    });
+    try {
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        comment.canvasSignedData,
+      );
+      if (!canvasSignedData) return;
+      verify(canvasSignedData).then(() => {
+        setVerifiedCanvasSignedData(canvasSignedData);
+      });
+    } catch (error) {
+      // ignore errors or missing data
+    }
   }, [comment.canvasSignedData]);
 
   const handleReaction = () => {
