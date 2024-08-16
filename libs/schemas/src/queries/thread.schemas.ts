@@ -4,7 +4,6 @@ import {
   linksSchema,
   paginationSchema,
   PG_INT,
-  zBoolean,
 } from '../utils';
 
 export const OrderByQueriesKeys = z.enum([
@@ -60,7 +59,7 @@ export const BulkThread = z.object({
       name: z.string(),
       description: z.string(),
       chainId: z.string(),
-      telegram: z.string(),
+      telegram: z.string().nullish(),
     })
     .optional(),
   user_id: PG_INT,
@@ -77,8 +76,8 @@ export const GetBulkThreads = {
     community_id: z.string(),
     fromDate: z.coerce.date().optional(),
     toDate: z.coerce.date().optional(),
-    archived: zBoolean.default(false),
-    includePinnedThreads: zBoolean.default(false),
+    archived: z.coerce.boolean().default(false),
+    includePinnedThreads: z.coerce.boolean().default(false),
     topicId: PG_INT.optional(),
     stage: z.string().optional(),
     orderBy: OrderByQueriesKeys.default('createdAt:desc'),

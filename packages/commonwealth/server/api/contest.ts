@@ -2,7 +2,7 @@ import { trpc } from '@hicommonwealth/adapters';
 import { Contest } from '@hicommonwealth/model';
 
 export const trpcRouter = trpc.router({
-  getAllContests: trpc.query(Contest.GetAllContests),
+  getAllContests: trpc.query(Contest.GetAllContests, trpc.Tag.Community),
   createContestMetadata: trpc.command(
     Contest.CreateContestManagerMetadata,
     trpc.Tag.Community,
@@ -15,5 +15,5 @@ export const trpcRouter = trpc.router({
     Contest.CancelContestManagerMetadata,
     trpc.Tag.Community,
   ),
-  getContestLog: trpc.query(Contest.GetContestLog),
+  getContestLog: trpc.query(Contest.GetContestLog, trpc.Tag.Community),
 });

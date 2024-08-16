@@ -29,7 +29,13 @@ const Address = (props: AddressProps) => {
 
   return (
     <div className="AddressContainer">
-      <CWTruncatedAddress address={address} communityInfo={community} />
+      <CWTruncatedAddress
+        address={address}
+        communityInfo={{
+          iconUrl: community.iconUrl || '',
+          name: community.name || '',
+        }}
+      />
       <PopoverMenu
         menuItems={[
           {

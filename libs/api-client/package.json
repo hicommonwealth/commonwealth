@@ -17,7 +17,7 @@
     "clean": "rm -rf build && rm -rf coverage",
     "run-test": "tsx ./test/index.ts",
     "check-types": "tsc --noEmit",
-    "generate-client": "openapi-generator-cli generate -i http://localhost:8080/api/v1/openapi.json -g typescript-axios -o ./src --skip-validate-spec"
+    "generate-client": "openapi-generator-cli generate -i http://localhost:8080/api/v1/openapi.json -g typescript-axios -o ./src"
   },
   "keywords": [],
   "author": "",

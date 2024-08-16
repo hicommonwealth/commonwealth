@@ -1,6 +1,6 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { PG_INT, zDate } from '../utils';
+import { PG_INT } from '../utils';
 import { Comment } from './comment.schemas';
 import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
@@ -38,8 +38,8 @@ export const SubscriptionPreference = z.object({
   mobile_push_notifications_enabled: z.boolean().default(false),
   mobile_push_discussion_activity_enabled: z.boolean().default(false),
   mobile_push_admin_alerts_enabled: z.boolean().default(false),
-  created_at: z.coerce.date().default(new Date()),
-  updated_at: z.coerce.date().default(new Date()),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const ThreadSubscription = z.object({
@@ -96,20 +96,22 @@ export const CommentSubscription = z.object({
           comment_count: true,
           created_at: true,
           url: true,
-        }).merge(
-          z.object({
-            Community: Community.pick({
-              id: true,
-              name: true,
-              icon_url: true,
+        })
+          .merge(
+            z.object({
+              Community: Community.pick({
+                id: true,
+                name: true,
+                icon_url: true,
+              }),
+              Address: Address.pick({
+                id: true,
+                user_id: true,
+                address: true,
+              }),
             }),
-            Address: Address.pick({
-              id: true,
-              user_id: true,
-              address: true,
-            }),
-          }),
-        ),
+          )
+          .optional(),
       }),
     )
     .optional(),
@@ -119,8 +121,8 @@ export const CommunityAlert = z
   .object({
     user_id: PG_INT,
     community_id: z.string(),
-    created_at: zDate.optional(),
-    updated_at: zDate.optional(),
+    created_at: z.coerce.date().optional(),
+    updated_at: z.coerce.date().optional(),
   })
   .merge(
     z.object({

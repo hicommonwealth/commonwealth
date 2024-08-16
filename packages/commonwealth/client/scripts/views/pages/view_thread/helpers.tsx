@@ -3,7 +3,6 @@ import type Poll from '../../../models/Poll';
 
 import { notifyError } from 'controllers/app/notifications';
 import React from 'react';
-import app from 'state';
 import { userStore } from 'state/ui/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
@@ -13,12 +12,15 @@ export const handlePollVote = async (
   isSelected: boolean,
   callback: () => any,
 ) => {
-  if (!app.isLoggedIn() || !userStore.getState().activeAccount || isSelected)
+  const user = userStore.getState();
+
+  if (!user.isLoggedIn || !user.activeAccount || isSelected) {
     return;
+  }
 
   const userInfo = [
-    userStore.getState().activeAccount?.community?.id || '',
-    userStore.getState().activeAccount?.address || '',
+    user.activeAccount?.community?.id || '',
+    user.activeAccount?.address || '',
   ] as const;
 
   const confirmationText = poll.getUserVote(...userInfo)
