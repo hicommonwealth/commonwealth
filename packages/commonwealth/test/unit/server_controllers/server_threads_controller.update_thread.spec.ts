@@ -109,6 +109,7 @@ describe('ServerThreadsController', () => {
         },
         ThreadVersionHistory: {
           create: () => null,
+          findOne: () => null,
         },
         Topic: {
           findOne: async () => ({

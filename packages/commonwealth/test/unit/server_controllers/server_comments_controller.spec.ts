@@ -572,6 +572,7 @@ describe('ServerCommentsController', () => {
         },
         CommentVersionHistory: {
           create: () => null,
+          findOne: () => null,
         },
         sequelize: {
           transaction: (callback?: () => Promise<void>) => {
