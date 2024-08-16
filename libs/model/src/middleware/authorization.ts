@@ -1,6 +1,7 @@
 import {
   InvalidActor,
   InvalidInput,
+  QueryHandler,
   type CommandContext,
   type CommandHandler,
   type CommandInput,
@@ -8,6 +9,7 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
+import { ZodSchema } from 'zod';
 import { AddressAttributes, models } from '..';
 
 /**
@@ -63,6 +65,13 @@ export const isCommunityAdmin: CommunityMiddleware = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin']);
+};
+
+export const isSuperAdmin: QueryHandler<ZodSchema, ZodSchema> &
+  CommandHandler<CommandInput, ZodSchema> = async (ctx) => {
+  if (!ctx.actor.user.isAdmin) {
+    await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
+  }
 };
 
 export const isCommunityModerator: CommunityMiddleware = async (ctx) => {
