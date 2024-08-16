@@ -131,13 +131,9 @@ export const contract = {
       });
     },
     async unreactThread(db, { thread_id }, { did, timestamp }) {
-      await db.set('thread_reactions', {
-        id: `${thread_id}/${did}`,
-        author: did,
-        thread_id,
-        value: null,
-        updated_at: timestamp,
-      });
+      const r = await db.get('thread_reactions', `${thread_id}/${did}`);
+      if (!r || !r.id) throw new Error('reaction does not exist');
+      await db.delete('thread_reactions', `${thread_id}/${did}`);
     },
     async reactComment(db, { comment_id, value }, { did, timestamp }) {
       if (value !== 'like' && value !== 'dislike') {
@@ -152,13 +148,9 @@ export const contract = {
       });
     },
     async unreactComment(db, { comment_id }, { did, timestamp }) {
-      await db.set('comment_reactions', {
-        id: `${comment_id}/${did}`,
-        author: did,
-        comment_id,
-        value: null,
-        updated_at: timestamp,
-      });
+      const r = await db.get('comment_reactions', `${comment_id}/${did}`);
+      if (!r || !r.id) throw new Error('reaction does not exist');
+      await db.delete('comment_reactions', `${comment_id}/${did}`);
     },
   },
 } satisfies Contract;
