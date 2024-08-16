@@ -294,7 +294,6 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
             restrictedDiscourseConnection,
             {
               addresses,
-              communityId: communityId!,
               threads,
               comments,
             },

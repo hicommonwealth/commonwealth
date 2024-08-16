@@ -94,6 +94,7 @@ export const createAllTopicsInCW = async (
     discourseConnection,
   );
   const entries = discourseCategories.map((discourseTopic) => ({
+    // eslint-disable-next-line no-useless-escape
     name: discourseTopic.name.replace(/[\/\\]/g, ' '),
     description: discourseTopic.description,
     communityId,

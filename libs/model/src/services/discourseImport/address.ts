@@ -43,6 +43,7 @@ class CWQueries {
         is_validator: false,
         ghost_address: true,
         role: isAdmin ? 'admin' : isModerator ? 'moderator' : 'member',
+        is_user_default: false,
       }),
     );
 

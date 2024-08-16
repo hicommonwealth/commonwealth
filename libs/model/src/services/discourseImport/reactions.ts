@@ -59,7 +59,6 @@ class DiscourseQueries {
 }
 
 type CreateReactionOptions = {
-  communityId: string;
   addressId: number;
   threadId: number | null | undefined;
   commentId: number | null | undefined;
@@ -71,9 +70,8 @@ class CWQueries {
     { transaction }: { transaction: Transaction | null },
   ): Promise<Array<CWEnrichedReaction>> => {
     const reactionsToCreate = entries.map(
-      ({ communityId, addressId, threadId, commentId }) => {
+      ({ addressId, threadId, commentId }) => {
         const options: ReactionAttributes = {
-          community_id: communityId,
           address_id: addressId,
           reaction: 'like',
           canvas_signed_data: '',
@@ -99,10 +97,7 @@ class CWQueries {
     const filteredReactionsToCreate = reactionsToCreate.filter(
       (r) =>
         !existingReactions.find(
-          (er) =>
-            r.community_id == er.community_id &&
-            r.address_id == er.address_id &&
-            r.reaction == er.reaction,
+          (er) => r.address_id == er.address_id && r.reaction == er.reaction,
         ),
     );
 
@@ -123,12 +118,10 @@ class CWQueries {
 export const createAllReactionsInCW = async (
   discourseConnection: Sequelize,
   {
-    communityId,
     addresses,
     threads,
     comments,
   }: {
-    communityId: string;
     addresses: Array<CWAddressWithDiscourseId>;
     threads: Array<CWThreadWithDiscourseId>;
     comments: Array<CWCommentWithDiscourseId>;
@@ -155,7 +148,6 @@ export const createAllReactionsInCW = async (
         )?.id;
         if (addressId && threadId) {
           return {
-            communityId,
             addressId,
             threadId,
             commentId: null,
@@ -177,7 +169,6 @@ export const createAllReactionsInCW = async (
         )?.id;
         if (addressId && commentId) {
           return {
-            communityId,
             addressId,
             threadId: null,
             commentId,
@@ -186,7 +177,7 @@ export const createAllReactionsInCW = async (
         return null;
       },
     ),
-  ].filter((entry) => !!entry);
+  ].filter((entry) => !!entry) as Array<CreateReactionOptions>;
 
   return CWQueries.bulkCreateReactions(reactionsToCreate, { transaction });
 };

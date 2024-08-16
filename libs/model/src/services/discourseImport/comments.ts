@@ -1,4 +1,5 @@
 import {
+  CommentAttributes,
   CWAddressWithDiscourseId,
   CWThreadWithDiscourseId,
   models,
@@ -63,7 +64,7 @@ class CWQueries {
     entries: CommentEntry[],
     { transaction }: { transaction: Transaction | null },
   ): Promise<Array<CWCommentWithDiscourseId>> => {
-    const commentsToCreate: Array<z.infer<typeof Comment>> = entries.map(
+    const commentsToCreate: Array<CommentAttributes> = entries.map(
       ({
         discoursePost,
         parentCommentId,
@@ -88,7 +89,6 @@ class CWQueries {
     const existingComments = await models.Comment.findAll({
       where: {
         [Op.or]: commentsToCreate.map((c) => ({
-          community_id: c.community_id,
           thread_id: threadId,
           created_at: c.created_at,
         })),
@@ -99,9 +99,7 @@ class CWQueries {
       (c) =>
         !existingComments.find(
           (ec) =>
-            c.community_id === ec.community_id &&
-            c.thread_id === ec.thread_id &&
-            c.created_at === ec.created_at,
+            c.thread_id === ec.thread_id && c.created_at === ec.created_at,
         ),
     );
 
