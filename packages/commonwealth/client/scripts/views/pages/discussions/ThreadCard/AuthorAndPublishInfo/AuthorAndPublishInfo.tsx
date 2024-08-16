@@ -14,6 +14,7 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CommentVersionHistory } from '../../../../../models/Comment';
 import { UserProfile } from '../../../../../models/MinimumProfile';
 import {
   IThreadCollaborator,
@@ -53,7 +54,7 @@ export type AuthorAndPublishInfoProps = {
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
-  versionHistory?: ThreadVersionHistory[];
+  versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
   changeContentText?: (text: string) => void;
 };
 
@@ -99,7 +100,7 @@ export const AuthorAndPublishInfo = ({
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
   const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.body,
+    value: v.body || v.text,
     label: formatVersionText(
       moment(v.timestamp),
       v.address,

@@ -13,7 +13,7 @@ export const formatVersionText = (
     ?.format?.('Do MMMM, YYYY • h:mm A');
 
   if (Object.keys(collabInfo).length === 0) {
-    return formattedTime + '\n' + profileName ?? DEFAULT_NAME;
+    return !profileName ? DEFAULT_NAME : formattedTime + '\n' + profileName;
   }
 
   const formattedName = collabInfo[address] ?? DEFAULT_NAME;
