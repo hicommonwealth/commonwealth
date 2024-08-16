@@ -203,7 +203,7 @@ export function updateActiveUser(data) {
       emailNotificationInterval: '',
       knockJWT: '',
       addresses: [],
-      starredCommunities: [],
+      communities: [],
       joinedCommunitiesWithNewContent: [],
       accounts: [],
       activeAccount: null,

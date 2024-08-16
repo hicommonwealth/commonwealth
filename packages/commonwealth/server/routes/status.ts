@@ -56,9 +56,43 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ]);
 
   // get starred communities for user
-  const starredCommunitiesPromise = models.StarredCommunity.findAll({
-    where: { user_id: user.id },
-  });
+  const userCommunitiesPromise = sequelize.query(
+    `
+      SELECT 
+        id, 
+        icon_url, 
+        name,
+        CASE 
+          WHEN sc.community_id IS NOT NULL THEN TRUE
+          ELSE FALSE
+        END AS is_starred
+      FROM 
+        "Communities" c
+      LEFT JOIN 
+        "StarredCommunities" sc 
+      ON 
+        c.id = sc.community_id 
+        AND sc.user_id = :user_id
+      WHERE 
+        id IN (
+          SELECT 
+            a.community_id
+          FROM 
+            "Addresses" a
+          WHERE 
+            a.verified IS NOT NULL 
+            AND a.last_active IS NOT NULL 
+            AND a.user_id = :user_id
+          GROUP BY 
+            a.community_id
+        );
+    `,
+    {
+      replacements: {
+        user_id: user.id,
+      },
+    },
+  );
 
   // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
   /**
@@ -105,8 +139,8 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   });
 
   // wait for all the promises to resolve
-  const [starredCommunities, threadNum] = await Promise.all([
-    starredCommunitiesPromise,
+  const [userCommunities, threadNum] = await Promise.all([
+    userCommunitiesPromise,
     threadNumPromise,
   ]);
 
@@ -221,7 +255,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       selectedCommunity,
       isAdmin,
       disableRichText,
-      starredCommunities,
+      communities: userCommunities?.[0] || [],
       unseenPosts,
     },
     id: user.id,

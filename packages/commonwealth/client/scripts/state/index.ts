@@ -12,7 +12,6 @@ import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
-import StarredCommunity from 'models/StarredCommunity';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
@@ -186,9 +185,12 @@ export async function initAppState(
     }
 
     userStore.getState().setData({
-      starredCommunities: (userResponse?.starredCommunities || []).map(
-        (c) => new StarredCommunity(c),
-      ),
+      communities: (userResponse?.communities || []).map((c) => ({
+        id: c.id || '',
+        iconUrl: c.icon_url || '',
+        name: c.name || '',
+        isStarred: c.is_starred || false,
+      })),
     });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)

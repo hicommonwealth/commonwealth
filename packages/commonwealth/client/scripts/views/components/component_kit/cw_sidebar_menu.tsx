@@ -8,7 +8,6 @@ import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
-import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses, isWindowSmallInclusive } from './helpers';
@@ -99,12 +98,11 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   } else if (props.type === 'community') {
     /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
-    const account =
-      item && user.accounts.find(({ community }) => item.id == community.id);
+    if (!item) return <></>;
+
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
-          // @ts-expect-error <StrictNullChecks/>
           { isSelected: app.activeChainId() === item.id },
           'SidebarMenuItem community',
         )}
@@ -116,7 +114,6 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           navigateToCommunity({
             navigate,
             path: '/',
-            // @ts-expect-error <StrictNullChecks/>
             chain: item.id,
           });
         }}
@@ -124,14 +121,8 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         {item && (
           <CommunityLabel name={item.name || ''} iconUrl={item.iconUrl} />
         )}
-        {user.isLoggedIn && account && (
+        {user.isLoggedIn && (
           <div className="roles-and-star">
-            <User
-              avatarSize={18}
-              shouldShowAvatarOnly
-              userAddress={account.address}
-              userCommunityId={account.community.id}
-            />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
@@ -161,8 +152,6 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
 
-  const user = useUserStore();
-
   return (
     <div
       className={getClasses<{ className: string }>(
@@ -184,13 +173,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
           const itemProps = {
             ...item,
             isStarred:
-              item.type === 'community'
-                ? !!user.starredCommunities.find(
-                    (starCommunity) =>
-                      starCommunity.community_id ===
-                      (item?.community?.id || ''),
-                  )
-                : false,
+              item.type === 'community' ? item.community?.isStarred : false,
           };
 
           return (

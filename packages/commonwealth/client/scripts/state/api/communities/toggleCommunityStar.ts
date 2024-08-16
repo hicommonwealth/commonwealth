@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import StarredCommunity from 'models/StarredCommunity';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore, { userStore } from '../../ui/user';
 
@@ -30,26 +29,17 @@ const useToggleCommunityStarMutation = () => {
     mutationFn: toggleCommunityStar,
     onSuccess: async ({ response, community }) => {
       // Update existing object state
-      const starredCommunity = response.data.result;
+      const responseCommunity = response.data.result;
 
-      if (starredCommunity) {
-        user.setData({
-          starredCommunities: [
-            ...user.starredCommunities,
-            new StarredCommunity(starredCommunity),
-          ],
-        });
-      } else {
-        const star = user.starredCommunities.find((c) => {
-          return c.community_id === community;
-        }) as StarredCommunity;
-
-        user.setData({
-          starredCommunities: [...user.starredCommunities].filter(
-            (s) => s.community_id !== star.community_id,
-          ),
-        });
-      }
+      user.setData({
+        communities: user.communities.map((c) => ({
+          ...c,
+          isStarred:
+            !responseCommunity && community === c.id
+              ? !c.isStarred
+              : c.isStarred,
+        })),
+      });
     },
   });
 };
