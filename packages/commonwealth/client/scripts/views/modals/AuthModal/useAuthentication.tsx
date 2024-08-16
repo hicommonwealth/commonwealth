@@ -579,7 +579,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      const session = await getSessionFromWallet(wallet);
+      const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       const validationBlockInfo = await getWalletRecentBlock(

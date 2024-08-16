@@ -126,6 +126,7 @@ export const CommentCard = ({
     const canvasSignedData: CanvasSignedData = deserializeCanvas(
       comment.canvasSignedData,
     );
+    if (!canvasSignedData) return;
     verify(canvasSignedData).then(() => {
       setVerifiedCanvasSignedData(canvasSignedData);
     });

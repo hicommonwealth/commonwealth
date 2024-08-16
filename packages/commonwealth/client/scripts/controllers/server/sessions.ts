@@ -69,8 +69,15 @@ export const getMagicCosmosSessionSigner = (
 export async function getSessionFromWallet(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   wallet: IWebWallet<any>,
+  { newSession }: { newSession: boolean } = { newSession: false },
 ) {
   const sessionSigner = await wallet.getSessionSigner();
+
+  if (newSession) {
+    const { payload } = await sessionSigner.newSession(CANVAS_TOPIC);
+    return payload;
+  }
+
   const session = await sessionSigner.getSession(CANVAS_TOPIC);
   if (session) {
     return session.payload;

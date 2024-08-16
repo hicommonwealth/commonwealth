@@ -144,7 +144,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         if (switchError.code === 4902) {
           const wsRpcUrl = app.chain?.meta?.node.url ?? '';
           const rpcUrl =
-            app.chain?.meta?.node.altWalletUrl ?? wsRpcUrl
+            (app.chain?.meta?.node.altWalletUrl ?? wsRpcUrl)
               ? new URL(wsRpcUrl).host
               : '';
 
