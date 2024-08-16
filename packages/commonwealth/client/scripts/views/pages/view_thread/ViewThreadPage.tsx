@@ -22,7 +22,7 @@ import {
 } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
-  useGetThreadPolls,
+  useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
@@ -119,7 +119,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
 
-  const { data: pollsData = [] } = useGetThreadPolls({
+  const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
     communityId: app.activeChainId(),
     apiCallEnabled: !!threadId,

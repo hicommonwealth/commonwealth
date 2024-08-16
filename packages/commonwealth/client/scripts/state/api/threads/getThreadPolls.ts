@@ -27,21 +27,17 @@ const getThreadPolls = async ({
   return response.data.result.map((poll) => Poll.fromJSON(poll));
 };
 
-const useGetThreadPolls = ({
+const useGetThreadPollsQuery = ({
   threadId,
   communityId,
   apiCallEnabled,
 }: GetThreadPollsProps) => {
   return useQuery({
-    queryKey: [
-      ApiEndpoints.fetchThreadPolls(threadId),
-      communityId,
-      apiCallEnabled,
-    ],
+    queryKey: [ApiEndpoints.fetchThreadPolls(threadId), communityId],
     queryFn: () => getThreadPolls({ threadId, communityId }),
     staleTime: POLLS_STALE_TIME,
     enabled: apiCallEnabled,
   });
 };
 
-export default useGetThreadPolls;
+export default useGetThreadPollsQuery;
