@@ -455,7 +455,7 @@ export async function handleSocialLoginCallback({
       magicAddress = metadata.publicAddress;
     } else {
       const { utils } = await import('ethers');
-      if (metadata.publicAddress === undefined) {
+      if (metadata.publicAddress === null) {
         throw new Error('Expected magic to return publicAddress');
       }
       magicAddress = utils.getAddress(metadata.publicAddress);
