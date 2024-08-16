@@ -1,7 +1,7 @@
 name: "Product: Feature Request"
 description: "For product team to request a new feature."
 labels: ["refinement", "needs estimate", "enhancement"]
-projects: ["hicommonwealth/33"]
+projects: ["hicommonwealth/40"]
 body:
   - type: textarea
     id: feature-description
