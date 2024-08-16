@@ -46,7 +46,7 @@ const chainIdsWithStakeEnabled = Object.values(
   commonProtocol.factoryContracts,
 ).map((c) => c.chainId);
 
-// Get chain id's from the app.config.chains for all eth and cosmos chains
+// Get chain id's from the fetchCachedNodes for all eth and cosmos chains
 export const chainTypes =
   fetchCachedNodes()
     ?.filter(particularChainNodes)
