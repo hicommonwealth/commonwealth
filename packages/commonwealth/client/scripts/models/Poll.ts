@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type moment from 'moment';
+import moment from 'moment';
 import { SERVER_URL } from 'state/api/config';
 import { notifyError } from '../controllers/app/notifications';
 import { userStore } from '../state/ui/user';
@@ -13,8 +13,8 @@ class Poll {
   public readonly endsAt: moment.Moment;
   public readonly prompt: string;
   public readonly options: string[];
+  private readonly _votes: Vote[];
 
-  private _votes: Vote[];
   public get votes() {
     return this._votes;
   }
@@ -92,6 +92,38 @@ class Poll {
     // Add new or updated vote
     this.votes.push(vote);
     return vote;
+  }
+
+  public static fromJSON(json) {
+    const {
+      id,
+      thread_id,
+      community_id,
+      prompt,
+      options,
+      ends_at,
+      votes = [],
+      created_at,
+    } = json;
+
+    let pollOptions;
+
+    try {
+      pollOptions = JSON.parse(options);
+    } catch (e) {
+      pollOptions = [];
+    }
+
+    return new Poll({
+      id,
+      threadId: thread_id,
+      communityId: community_id,
+      prompt,
+      options: pollOptions,
+      endsAt: moment(ends_at),
+      votes: votes.map((v) => new Vote(v)),
+      createdAt: moment(created_at),
+    });
   }
 }
 
