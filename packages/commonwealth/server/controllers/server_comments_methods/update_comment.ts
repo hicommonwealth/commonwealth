@@ -120,7 +120,7 @@ export async function __updateComment(
         transaction,
       });
 
-    if (latestVersionHistory.text !== text) {
+    if (latestVersionHistory?.text !== text) {
       await this.models.CommentVersionHistory.create(
         {
           comment_id: comment.id!,
@@ -133,7 +133,7 @@ export async function __updateComment(
       );
     }
 
-    const previousDraftMentions = parseUserMentions(latestVersionHistory.text);
+    const previousDraftMentions = parseUserMentions(latestVersionHistory?.text);
     const currentDraftMentions = parseUserMentions(
       decodeURIComponent(commentBody),
     );

@@ -64,30 +64,6 @@ function processAssociatedContests(
   return [];
 }
 
-function processVersionHistory(versionHistory: any[]) {
-  let versionHistoryProcessed;
-  if (versionHistory) {
-    versionHistoryProcessed = versionHistory.map((v) => {
-      if (!v) return;
-      let history;
-      try {
-        history = JSON.parse(v);
-        history.author =
-          typeof history.author === 'string'
-            ? JSON.parse(history.author)
-            : typeof history.author === 'object'
-            ? history.author
-            : null;
-        history.timestamp = moment(history.timestamp);
-      } catch (e) {
-        console.log(e);
-      }
-      return history;
-    });
-  }
-  return versionHistoryProcessed;
-}
-
 function emptyStringToNull(input: string) {
   return input === '' ? null : input;
 }

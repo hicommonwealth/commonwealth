@@ -167,7 +167,7 @@ export async function __updateThread(
   const isAdmin = !!roles.find(
     (r) => r.community_id === thread.community_id && r.permission === 'admin',
   );
-  const isSuperAdmin = user.isAdmin;
+  const isSuperAdmin = user.isAdmin ?? false;
   if (
     !isThreadOwner &&
     !isMod &&
@@ -255,7 +255,7 @@ export async function __updateThread(
     );
 
     // if the modification was different from the original body, create a version history for it
-    if (body && latestVersionHistory.body !== body) {
+    if (body && latestVersionHistory?.body !== body) {
       await this.models.ThreadVersionHistory.create(
         {
           thread_id: threadId!,
@@ -278,7 +278,7 @@ export async function __updateThread(
       transaction,
     );
 
-    const previousDraftMentions = parseUserMentions(latestVersionHistory.body);
+    const previousDraftMentions = parseUserMentions(latestVersionHistory?.body);
     const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
     const mentions = findMentionDiff(

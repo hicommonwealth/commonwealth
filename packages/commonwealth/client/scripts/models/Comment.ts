@@ -46,7 +46,6 @@ export class Comment<T extends IUniqueId> {
     author,
     community_id,
     Address,
-    Thread,
     thread_id,
     parent_id,
     plaintext,

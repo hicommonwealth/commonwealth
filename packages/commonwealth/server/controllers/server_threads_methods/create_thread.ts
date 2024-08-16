@@ -1,5 +1,4 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import moment from 'moment';
 
 import { Actor, AppError } from '@hicommonwealth/core';
 import {
@@ -169,22 +168,12 @@ export async function __createThread(
     }
   })();
 
-  // New threads get an empty version history initialized, which is passed
-  // the thread's first version, formatted on the frontend with timestamps
-  const firstVersion: any = {
-    timestamp: moment(),
-    author: address,
-    body: decodeURIComponent(body),
-  };
-  const version_history: string[] = [JSON.stringify(firstVersion)];
-
   const threadContent: Partial<ThreadAttributes> = {
     community_id: community.id,
     address_id: address.id!,
     title,
     body,
     plaintext,
-    version_history,
     kind,
     stage,
     url,
