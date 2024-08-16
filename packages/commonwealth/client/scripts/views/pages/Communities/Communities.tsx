@@ -4,31 +4,31 @@ import {
   CommunityCategoryType,
 } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
+import {
+  default as ChainInfo,
+  default as CommunityInfo,
+} from 'models/ChainInfo';
 import numeral from 'numeral';
-import 'pages/communities.scss';
 import React, { useRef } from 'react';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import { useFetchEthUsdRateQuery } from 'state/api/communityStake/index';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import {
-  default as ChainInfo,
-  default as CommunityInfo,
-} from '../../models/ChainInfo';
-import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
-import { trpc } from '../../utils/trpcClient';
-import { NewCommunityCard } from '../components/CommunityCard';
-import { CWDivider } from '../components/component_kit/cw_divider';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWModal } from '../components/component_kit/new_designs/CWModal';
-import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
-import CreateCommunityButton from '../components/sidebar/CreateCommunityButton';
-import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import { NewCommunityCard } from '../../components/CommunityCard';
+import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
+import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import '/Communities.scss';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
