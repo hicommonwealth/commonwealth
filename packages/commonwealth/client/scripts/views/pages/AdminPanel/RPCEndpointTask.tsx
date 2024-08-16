@@ -31,8 +31,6 @@ const RPCEndpointTask = () => {
   // @ts-expect-error <StrictNullChecks/>
   const [communityInfo, setCommunityInfo] = useState<CommunityInfo>(null);
   const [rpcEndpoint, setRpcEndpoint] = useState<string>('');
-  const [communityInfoValueValidated, setCommunityInfoValueValidated] =
-    useState<boolean>(false);
   // @ts-expect-error <StrictNullChecks/>
   const [communityChainNode, setCommunityChainNode] = useState<NodeInfo>(null);
   const [communityChainNodeValidated, setCommunityChainNodeValidated] =
@@ -70,17 +68,11 @@ const RPCEndpointTask = () => {
   const buttonEnabled =
     (communityChainNodeValidated &&
       communityChainNode &&
-      communityInfoValueValidated &&
       balanceType !== BalanceType.Ethereum &&
       !ethChainIdValueValidated) ||
     (rpcName !== '' &&
       (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
       rpcEndpoint !== '');
-
-  // const setCommunityIdInput = (e) => {
-  //   setRpcEndpointCommunityValue(e.target.value);
-  //   if (e.target.value.length === 0) setCommunityInfoValueValidated(false);
-  // };
 
   const RPCEndpointValidationFn = (
     value: string,
@@ -138,26 +130,6 @@ const RPCEndpointTask = () => {
     return ['failure', err];
   };
 
-  // const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
-  //   const communityInfoData = app.config.chains.getById(value);
-  //   if (!communityInfoData) {
-  //     setCommunityInfoValueValidated(false);
-  //     const err = 'Community not found';
-  //     setErrorMsg(err);
-  //     return ['failure', err];
-  //   }
-  //   if (communityInfoData.type !== ChainType.Chain) {
-  //     setCommunityInfoValueValidated(false);
-  //     const err = 'Community is not a chain';
-  //     setErrorMsg(err);
-  //     return ['failure', err];
-  //   }
-  //   setCommunityInfo(communityInfoData);
-  //   setCommunityInfoValueValidated(true);
-  //   setErrorMsg(null);
-  //   return [];
-  // };
-
   const update = async () => {
     try {
       let nodeId = null;
@@ -186,7 +158,7 @@ const RPCEndpointTask = () => {
         nodeId = communityChainNode.id;
       }
 
-      if (communityInfo && communityInfoValueValidated) {
+      if (communityInfo) {
         await communityInfo.updateChainData({
           chain_node_id: nodeId ?? communityChainNode.id.toString(),
           type: ChainType.Chain,
