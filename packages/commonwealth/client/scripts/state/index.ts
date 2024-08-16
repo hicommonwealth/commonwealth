@@ -16,6 +16,7 @@ import StarredCommunity from 'models/StarredCommunity';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
+import { errorStore } from 'state/ui/error';
 import { ChainStore } from 'stores';
 import { userStore } from './ui/user';
 
@@ -208,8 +209,11 @@ export async function initAppState(
       }
     }
   } catch (err) {
-    app.loadingError =
-      err.response?.data?.error || 'Error loading application state';
+    errorStore
+      .getState()
+      .setLoadingError(
+        err.response?.data?.error || 'Error loading application state',
+      );
     throw err;
   }
 }
