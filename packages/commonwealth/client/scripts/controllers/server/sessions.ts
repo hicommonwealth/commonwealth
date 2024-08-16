@@ -14,7 +14,6 @@ import {
 import axios from 'axios';
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
-import { fetchCachedConfiguration } from 'state/api/configuration';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 
@@ -116,15 +115,8 @@ async function sign(
     if (signer.match(did)) {
       let lookupDid = did;
 
-      const [
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _did,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _pkh,
-        chainBaseFromAddress,
-        chainIdFromAddress,
-        walletAddress,
-      ] = did.split(':');
+      const [, , chainBaseFromAddress, chainIdFromAddress, walletAddress] =
+        did.split(':');
 
       // if using polkadot, we need to convert the address so that it has the prefix 42
       if (chainBaseFromAddress === 'polkadot') {
@@ -137,10 +129,8 @@ async function sign(
       }
 
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
-        did, // TODO: lookupDid?
+        did,
       });
-
-      const config = fetchCachedConfiguration();
 
       if (!savedSessionMessage) {
         throw new SessionKeyError({
