@@ -1,7 +1,6 @@
 import React from 'react';
 
 import ghostImg from 'assets/img/ghost.svg';
-import ChainInfo from 'models/ChainInfo';
 import { CWAvatar } from 'views/components/component_kit/cw_avatar';
 import {
   CWAvatarGroup,
@@ -130,19 +129,10 @@ const AvatarsShowcase = () => {
 
       <CWText type="h5">Community Avatar</CWText>
       <div className="flex-row">
-        <CWCommunityAvatar
-          size="small"
-          community={communityAvatar as ChainInfo}
-        />
-        <CWCommunityAvatar
-          size="medium"
-          community={communityAvatar as ChainInfo}
-        />
-        <CWCommunityAvatar size="xl" community={communityAvatar as ChainInfo} />
-        <CWCommunityAvatar
-          size="xxl"
-          community={communityAvatar as ChainInfo}
-        />
+        <CWCommunityAvatar size="small" community={communityAvatar} />
+        <CWCommunityAvatar size="medium" community={communityAvatar} />
+        <CWCommunityAvatar size="xl" community={communityAvatar} />
+        <CWCommunityAvatar size="xxl" community={communityAvatar} />
       </div>
     </>
   );

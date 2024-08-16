@@ -52,7 +52,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."block_explorer_ids",
                   "Community"."collapsed_on_homepage",
                   "Community"."type",
-                  "Community"."substrate_spec",
                   "Community"."has_chain_events_listener",
                   "Community"."default_summary_view",
                   "Community"."default_page",

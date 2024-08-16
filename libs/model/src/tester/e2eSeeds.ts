@@ -123,6 +123,7 @@ export const e2eTestEntities = async function (
           custom_stages: [],
           snapshot_spaces: [],
           stages_enabled: true,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           has_homepage: 'false' as any,
           collapsed_on_homepage: false,
           has_chain_events_listener: false,

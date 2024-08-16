@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore, { userStore } from '../../ui/user';
@@ -13,8 +12,6 @@ type UpdateActiveCommunityProps = {
 export const updateActiveCommunity = async ({
   communityId, // assuming this is a valid community id
 }: UpdateActiveCommunityProps) => {
-  const community = app.config.chains.getById(communityId);
-
   const res = await axios.post(
     `${SERVER_URL}/${ApiEndpoints.UPDATE_USER_ACTIVE_COMMUNTY}`,
     {
@@ -26,7 +23,7 @@ export const updateActiveCommunity = async ({
 
   if (res.data.status !== 'Success') throw new Error(res.data.status);
 
-  return community;
+  return communityId;
 };
 
 const useUpdateUserActiveCommunityMutation = () => {
@@ -34,10 +31,18 @@ const useUpdateUserActiveCommunityMutation = () => {
 
   return useMutation({
     mutationFn: updateActiveCommunity,
-    onSuccess: (community: ChainInfo) =>
-      user.setData({
-        activeCommunity: community,
-      }),
+    onSuccess: (communityId: string) => {
+      // TODO: cleanup this with #2617
+      const foundChain = app.config.chains
+        .getAll()
+        .find((c) => c.id == communityId);
+
+      if (foundChain) {
+        user.setData({
+          activeCommunity: foundChain,
+        });
+      }
+    },
     onError: (error) =>
       console.error(`Failed to update active community: ${error}`),
   });

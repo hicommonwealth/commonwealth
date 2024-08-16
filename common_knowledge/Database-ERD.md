@@ -257,7 +257,6 @@ erDiagram
     boolean collapsed_on_homepage 
     character-varying(255) base 
     integer ss58_prefix 
-    jsonb substrate_spec 
     boolean has_chain_events_listener 
     character-varying(255) custom_domain 
     character-varying(255) terms 
@@ -359,8 +358,6 @@ erDiagram
     timestamp-with-time-zone verification_token_expires 
     timestamp-with-time-zone verified 
     timestamp-with-time-zone last_active 
-    boolean is_councillor 
-    boolean is_validator 
     boolean ghost_address 
     integer profile_id 
     character-varying(255) wallet_id 

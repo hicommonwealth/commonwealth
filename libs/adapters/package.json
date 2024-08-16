@@ -17,7 +17,9 @@
     "build": "tsc -b tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
+    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
+    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.577.0",
@@ -41,6 +43,7 @@
     "redis": "4.2.0",
     "rollbar": "^2.6.1",
     "sequelize": "^6.32.1",
+    "swagger-ui-express": "^5.0.0",
     "trpc-swagger": "^1.2.6",
     "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
@@ -51,6 +54,7 @@
     "@types/qs": "^6.9.14",
     "@types/sinon": "^17.0.3",
     "@types/superagent": "4.1.13",
+    "@types/swagger-ui-express": "^4.1.6",
     "sinon": "^17.0.2",
     "superagent": "^5.2.2",
     "tsx": "^4.7.2"

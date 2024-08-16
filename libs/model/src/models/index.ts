@@ -12,11 +12,13 @@ export const syncDb = async (db: DB, log = false) => {
   const fks = Object.keys(Factories).flatMap(
     (k) => db[k as keyof typeof Factories]._fks,
   );
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   fks.forEach((fk) => dropFk(db.sequelize, fk));
   await db.sequelize.sync({
     force: true,
     logging: log ? console.log : false,
   });
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   fks.forEach((fk) => createFk(db.sequelize, fk));
 };
 
@@ -46,6 +48,7 @@ export * from './ban';
 export * from './chain_node';
 export * from './collaboration';
 export * from './comment';
+export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
 export * from './community_banner';

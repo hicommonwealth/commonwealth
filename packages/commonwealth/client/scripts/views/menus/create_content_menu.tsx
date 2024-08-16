@@ -1,6 +1,5 @@
 /* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -35,7 +34,7 @@ const resetSidebarState = () => {
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
-    userStore.getState() && !!app.chain?.meta.snapshot.length;
+    userStore.getState() && !!app.chain?.meta?.snapshot?.length;
 
   const showOnChainProposalItem =
     app.chain?.base === ChainBase.CosmosSDK &&
@@ -64,7 +63,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             iconLeft: 'democraticProposal',
             onClick: () => {
               resetSidebarState();
-              const snapshotSpaces = app.chain.meta.snapshot;
+              const snapshotSpaces = app.chain.meta?.snapshot;
               navigate(`/new/snapshot/${snapshotSpaces}`, {
                 action: 'create-proposal',
               });
@@ -89,7 +88,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
   const getDiscordBotConnectionItems = (): PopoverMenuItem[] => {
     const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-    const botNotConnected = app.chain.meta.discordConfigId === null;
+    const botNotConnected = app.chain.meta?.discordConfigId === null;
 
     if (isAdmin && botNotConnected) {
       return [
@@ -201,11 +200,10 @@ export const CreateContentSidebar = ({
 
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
 
   if (
-    !isLoggedIn ||
+    !user.isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
     !user.activeAccount

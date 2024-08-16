@@ -26,12 +26,22 @@ export const trpcRouter = trpc.router({
     Subscription.DeleteThreadSubscription,
     trpc.Tag.Subscription,
   ),
-  getCommentSubscriptions: trpc.query(Subscription.GetCommentSubscriptions),
-  getCommunityAlerts: trpc.query(Subscription.GetCommunityAlerts),
+  getCommentSubscriptions: trpc.query(
+    Subscription.GetCommentSubscriptions,
+    trpc.Tag.Subscription,
+  ),
+  getCommunityAlerts: trpc.query(
+    Subscription.GetCommunityAlerts,
+    trpc.Tag.Subscription,
+  ),
   getSubscriptionPreferences: trpc.query(
     Subscription.GetSubscriptionPreferences,
+    trpc.Tag.Subscription,
   ),
-  getThreadSubscriptions: trpc.query(Subscription.GetThreadSubscriptions),
+  getThreadSubscriptions: trpc.query(
+    Subscription.GetThreadSubscriptions,
+    trpc.Tag.Subscription,
+  ),
   updateSubscriptionPreferences: trpc.command(
     Subscription.UpdateSubscriptionPreferences,
     trpc.Tag.Subscription,

@@ -63,8 +63,8 @@ export const VotingResults = (props: VotingResultsProps) => {
 
       // TODO: move this marshalling into controller
       const formatCurrency = (n: BN) => {
-        const decimals = new BN(10).pow(new BN(app.chain.meta.decimals || 6));
-        const denom = app.chain.meta.default_symbol;
+        const decimals = new BN(10).pow(new BN(app.chain.meta?.decimals || 6));
+        const denom = app.chain.meta?.default_symbol;
         const coin = new Coin(denom, n, false, decimals);
         return coin.format();
       };

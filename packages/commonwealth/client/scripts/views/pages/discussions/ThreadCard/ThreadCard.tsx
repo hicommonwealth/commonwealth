@@ -5,11 +5,12 @@ import {
   GetThreadActionTooltipTextResponse,
   filterLinks,
 } from 'helpers/threads';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import useUserStore from 'state/ui/user';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -80,7 +81,7 @@ export const ThreadCard = ({
   editingDisabled,
 }: CardProps) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
@@ -90,15 +91,22 @@ export const ThreadCard = ({
     }
   }, []);
 
-  if (showSkeleton)
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: thread.communityId,
+      enabled: !!thread.communityId && !showSkeleton,
+    });
+
+  if (showSkeleton || isLoadingCommunity || !community) {
     return (
       <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
     );
+  }
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin(thread.communityId) ||
-    Permissions.isCommunityModerator(thread.communityId);
+    Permissions.isCommunityAdmin(community) ||
+    Permissions.isCommunityModerator(community);
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 
@@ -258,7 +266,7 @@ export const ThreadCard = ({
               commentBtnVisible={!thread.readOnly}
               canUpdateThread={
                 canUpdateThread &&
-                isLoggedIn &&
+                user.isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }
               canReact={canReact}
