@@ -1,23 +1,13 @@
-import {
-  ChainBase,
-  ChainNetwork,
-  CommunityCategoryType,
-} from '@hicommonwealth/shared';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
-import {
-  default as ChainInfo,
-  default as CommunityInfo,
-} from 'models/ChainInfo';
-import numeral from 'numeral';
-import React, { useRef } from 'react';
-import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
-import { useFetchEthUsdRateQuery } from 'state/api/communityStake/index';
-import { useFetchNodesQuery } from 'state/api/nodes';
-import { getNodeById } from 'state/api/nodes/utils';
+import React, { Fragment, useMemo, useRef, useState } from 'react';
+import { Virtuoso } from 'react-virtuoso';
+import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
-import { trpc } from 'utils/trpcClient';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { useFetchEthUsdRateQuery } from '../../../state/api/communityStake/index';
+import { trpc } from '../../../utils/trpcClient';
 import { NewCommunityCard } from '../../components/CommunityCard';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -28,193 +18,105 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import '/Communities.scss';
+import './Communities.scss';
+import { getCommunityCountsString } from './helpers';
 
-const buildCommunityString = (numCommunities: number) =>
-  numCommunities >= 1000
-    ? `${numeral(numCommunities).format('0.0a')} Communities`
-    : `${numCommunities} Communities`;
-
-// Handle mapping provided by ChainCategories table
-const communityCategories = Object.values(CommunityCategoryType);
 const communityNetworks: string[] = Object.keys(ChainNetwork).filter(
   (val) => val === 'ERC20',
 ); // We only are allowing ERC20 for now
-const communityBases = Object.keys(ChainBase);
 
-const getInitialFilterMap = (): Record<string, unknown> => {
-  const filterMapCommunityCategories = communityCategories.map((c) => ({
-    [c]: false,
-  }));
-  const filterMapCommunityBases = communityBases.map((c) => ({ [c]: false }));
-  const filterMapCommunityNetworks = communityNetworks.map((c) => ({
-    [c]: false,
-  }));
-  const allArrays = filterMapCommunityCategories.concat(
-    filterMapCommunityBases,
-    filterMapCommunityNetworks,
-  );
-
-  return Object.assign({}, ...allArrays);
-};
-
-const STAKE_FILTER_KEY = 'Stake';
+const communityBases = Object.keys(ChainBase) as ChainBase[];
 
 const CommunitiesPage = () => {
-  const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
-    getInitialFilterMap(),
-  );
+  const containerRef = useRef();
+
   const {
     setModeOfManageCommunityStakeModal,
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
-  const { data: nodes } = useFetchNodesQuery();
+  const [filters, setFilters] = useState<{
+    withNetwork?: ChainNetwork;
+    withChainBase?: ChainBase;
+    withStakeEnabled?: boolean;
+    withTagsIds?: number[];
+  }>({
+    withChainBase: undefined,
+    withStakeEnabled: undefined,
+    withTagsIds: undefined,
+  });
 
-  const [selectedCommunityId, setSelectedCommunityId] =
-    React.useState<string>();
-
-  const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string>();
 
   const user = useUserStore();
+  const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 
-  const { data: historicalPrices, isLoading: historicalPriceLoading } =
+  const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
+
+  const {
+    data: communities,
+    fetchNextPage: fetchMoreCommunities,
+    hasNextPage,
+    isInitialLoading: isInitialCommunitiesLoading,
+  } = trpc.community.getCommunities.useInfiniteQuery(
+    {
+      limit: 50,
+      include_node_info: true,
+      order_by: 'thread_count',
+      order_direction: 'DESC',
+      base: filters.withChainBase
+        ? ChainBase[filters.withChainBase]
+        : undefined,
+      network: filters.withNetwork,
+      stake_enabled: filters.withStakeEnabled,
+      ...(filters.withTagsIds &&
+        filters.withTagsIds?.length > 0 && {
+          tag_ids: filters.withTagsIds.join(','),
+        }),
+    },
+    {
+      staleTime: 60 * 3_000,
+      enabled: true,
+      initialCursor: 1,
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) return nextPageNum;
+        return undefined;
+      },
+    },
+  );
+
+  const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
     trpc.community.getStakeHistoricalPrice.useQuery({
       past_date_epoch: oneDayAgo.current / 1000, // 24 hours ago
     });
 
-  const handleSetFilterMap = (key: string) => {
-    setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
-  };
-
-  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
+  const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
+    useFetchEthUsdRateQuery();
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
-  const chainBaseFilter = (list: CommunityInfo[]) => {
-    return list.filter((data) => {
-      const chainBase =
-        Object.keys(ChainBase)[Object.values(ChainBase).indexOf(data.base)];
-      // Converts chain.base into a ChainBase key to match our filterMap keys
-      return filterMap[chainBase];
-    });
-  };
+  const isLoading =
+    isLoadingTags ||
+    isInitialCommunitiesLoading ||
+    isLoadingHistoricalPrices ||
+    isLoadingEthUsdRate;
 
-  const communityNetworkFilter = (list: CommunityInfo[]) => {
-    return list.filter((data) => {
-      const communityNetwork =
-        Object.keys(ChainNetwork)[
-          Object.values(ChainNetwork).indexOf(data.network as ChainNetwork)
-        ]; // Converts chain.base into a ChainBase key to match our filterMap keys
+  const communitiesList = useMemo(() => {
+    const flatList = (communities?.pages || []).flatMap((page) => page.results);
 
-      if (communityNetworks.includes(communityNetwork)) {
-        return filterMap[communityNetwork];
-      } else {
-        return false;
-      }
-    });
-  };
+    const SLICE_SIZE = 2;
+    const twoCommunitiesPerEntry: any = [];
 
-  const communityCategoryFilter = (communities: ChainInfo[]) => {
-    return communities.filter((community) =>
-      community.CommunityTags.some((tag) => filterMap[tag.name] === true),
-    );
-  };
-
-  const sortCommunities = (list: CommunityInfo[]) => {
-    let filteredList = list;
-
-    if (Object.values(filterMap).includes(true)) {
-      // Handle Overlaps
-      if (communityBases.filter((val) => filterMap[val]).length > 1) {
-        filteredList = [];
-      }
-
-      if (communityNetworks.filter((val) => filterMap[val]).length > 1) {
-        filteredList = [];
-      }
-
-      // Filter for ChainBase
-      if (communityBases.filter((base) => filterMap[base]).length > 0) {
-        filteredList = chainBaseFilter(filteredList);
-      }
-
-      // Filter for ChainNetwork
-      if (
-        communityNetworks.filter((network) => filterMap[network]).length > 0
-      ) {
-        filteredList = communityNetworkFilter(filteredList);
-      }
-
-      // Filter for ChainCategory
-      if (communityCategories.filter((cat) => filterMap[cat]).length > 0) {
-        filteredList = communityCategoryFilter(filteredList);
-      }
+    for (let i = 0; i < flatList.length; i += SLICE_SIZE) {
+      twoCommunitiesPerEntry.push(flatList.slice(i, i + SLICE_SIZE));
     }
 
-    // @ts-expect-error <StrictNullChecks/>
-    const historicalPriceMap: Map<string, string> =
-      historicalPriceLoading || !historicalPrices
-        ? null
-        : new Map(
-            Object.entries(
-              historicalPrices?.reduce((acc, { community_id, old_price }) => {
-                acc[community_id] = old_price;
-                return acc;
-              }, {}),
-            ),
-          );
-
-    // Filter by recent thread activity
-    const res = filteredList.map((community: CommunityInfo, i) => {
-      // allow user to buy stake if they have a connected address that matches this community's base chain
-      const canBuyStake = !!user.addresses.find?.(
-        (address) => address?.community?.base === community?.base,
-      );
-
-      return (
-        <CWRelatedCommunityCard
-          key={i}
-          community={{
-            id: community.id || '',
-            name: community.name || '',
-            base: community.base || '',
-            description: community.description || '',
-            iconUrl: community.iconUrl || '',
-            ChainNode: {
-              url: community?.ChainNode?.url || '',
-              ethChainId: community?.ChainNode?.ethChainId || 0,
-            },
-            namespace: community.namespace || '',
-          }}
-          memberCount={community.profileCount}
-          threadCount={community.threadCount}
-          canBuyStake={canBuyStake}
-          onStakeBtnClick={() => setSelectedCommunityId(community?.id || '')}
-          ethUsdRate={ethUsdRate}
-          historicalPrice={historicalPriceMap?.get(community.id)}
-          onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
-        />
-      );
-    });
-
-    return res;
-  };
-
-  const { data: activeCommunities, isLoading } =
-    useFetchActiveCommunitiesQuery();
-  const sortedCommunities = activeCommunities
-    ? sortCommunities(
-        activeCommunities.communities.map((c: any) =>
-          CommunityInfo.fromJSON({
-            ...c,
-            ChainNode: getNodeById(c.chain_node_id, nodes),
-          }),
-        ),
-      )
-    : [];
+    return twoCommunitiesPerEntry;
+  }, [communities?.pages]);
 
   return (
-    <CWPageLayout>
+    // @ts-expect-error <StrictNullChecks/>
+    <CWPageLayout ref={containerRef}>
       <div className="CommunitiesPage">
         <div className="header-section">
           <div className="description">
@@ -223,8 +125,11 @@ const CommunitiesPage = () => {
             </CWText>
             <div className="actions">
               <CWText type="caption" className="communities-count">
-                {activeCommunities &&
-                  buildCommunityString(activeCommunities.totalCommunitiesCount)}
+                {!isLoading && communities?.pages?.[0]?.totalResults
+                  ? getCommunityCountsString(
+                      communities?.pages?.[0]?.totalResults,
+                    )
+                  : 'No communities found'}
               </CWText>
               <CreateCommunityButton />
             </div>
@@ -232,63 +137,179 @@ const CommunitiesPage = () => {
           <div className="filters">
             <CWIcon iconName="funnelSimple" />
             <CWButton
-              label={STAKE_FILTER_KEY}
+              label="Stake"
               buttonHeight="sm"
-              buttonType={filterMap[STAKE_FILTER_KEY] ? 'primary' : 'secondary'}
-              onClick={() => {
-                handleSetFilterMap(STAKE_FILTER_KEY);
-              }}
+              buttonType={filters.withStakeEnabled ? 'primary' : 'secondary'}
+              onClick={() =>
+                setFilters((f) => ({
+                  ...f,
+                  withStakeEnabled: !f.withStakeEnabled,
+                }))
+              }
               iconLeft="coins"
             />
             <CWDivider isVertical />
-            {communityCategories.map((cat, i) => {
+            {(tags || [])
+              .filter((t) => ['dao', 'defi'].includes(t.name.toLowerCase()))
+              .map((tag) => {
+                return (
+                  <CWButton
+                    key={tag.name}
+                    label={tag.name}
+                    buttonHeight="sm"
+                    buttonType={
+                      filters.withTagsIds?.includes(tag.id)
+                        ? 'primary'
+                        : 'secondary'
+                    }
+                    onClick={() => {
+                      setFilters((f) => ({
+                        ...f,
+                        withTagsIds: (f.withTagsIds || [])?.includes(tag.id)
+                          ? [...(f.withTagsIds || [])].filter(
+                              (id) => id !== tag.id,
+                            )
+                          : [...(f.withTagsIds || []), tag.id],
+                      }));
+                    }}
+                  />
+                );
+              })}
+            <CWDivider isVertical />
+            {communityNetworks.map((network) => {
               return (
                 <CWButton
-                  key={i}
-                  label={cat}
-                  buttonHeight="sm"
-                  buttonType={filterMap[cat] ? 'primary' : 'secondary'}
-                  onClick={() => {
-                    handleSetFilterMap(cat);
-                  }}
-                />
-              );
-            })}
-            {communityNetworks.map((network, i) => {
-              return (
-                <CWButton
-                  key={i}
+                  key={network}
                   label={network}
                   buttonHeight="sm"
-                  buttonType={filterMap[network] ? 'primary' : 'secondary'}
+                  buttonType={
+                    filters.withNetwork === ChainNetwork[network]
+                      ? 'primary'
+                      : 'secondary'
+                  }
                   onClick={() => {
-                    handleSetFilterMap(network);
+                    setFilters((f) => ({
+                      ...f,
+                      withNetwork:
+                        filters.withNetwork === ChainNetwork[network]
+                          ? undefined
+                          : ChainNetwork[network],
+                    }));
                   }}
                 />
               );
             })}
-            {communityBases.map((base, i) => {
+            <CWDivider isVertical />
+            {/* TODO: 2617 not allowing to filter by multiple bases, do we really need that? */}
+            {communityBases.map((base) => {
               return (
                 <CWButton
-                  key={i}
+                  key={base}
                   label={base}
                   buttonHeight="sm"
-                  buttonType={filterMap[base] ? 'primary' : 'secondary'}
+                  buttonType={
+                    filters.withChainBase === base ? 'primary' : 'secondary'
+                  }
                   onClick={() => {
-                    handleSetFilterMap(base);
+                    setFilters((f) => ({
+                      ...f,
+                      withChainBase:
+                        f.withChainBase === base ? undefined : base,
+                    }));
                   }}
                 />
               );
             })}
           </div>
         </div>
-        {isLoading ? (
+        {isLoading || communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
         ) : (
-          <div className="communities-list">
-            {sortedCommunities}
-            <NewCommunityCard />
-          </div>
+          <Virtuoso
+            className="communities-list-v"
+            style={{ height: '100%', width: '100%' }}
+            data={isInitialCommunitiesLoading ? [] : communitiesList}
+            customScrollParent={containerRef.current}
+            itemContent={(listIndex, slicedCommunities) => {
+              return slicedCommunities.map((community, sliceIndex) => {
+                const canBuyStake = !!user.addresses.find?.(
+                  (address) => address?.community?.base === community?.base,
+                );
+
+                const historicalPriceMap: Map<string, string> = new Map(
+                  Object.entries(
+                    (historicalPrices || [])?.reduce(
+                      (acc, { community_id, old_price }) => {
+                        acc[community_id] = old_price;
+                        return acc;
+                      },
+                      {},
+                    ),
+                  ),
+                );
+
+                return (
+                  <Fragment key={community.id}>
+                    <CWRelatedCommunityCard
+                      community={{
+                        id: community.id || '',
+                        name: community.name || '',
+                        base: community.base || '',
+                        description: community.description || '',
+                        iconUrl: community.icon_url || '',
+                        ChainNode: {
+                          url: community?.ChainNode?.url || '',
+                          ethChainId: community?.ChainNode?.eth_chain_id || 0,
+                        },
+                        namespace: community.namespace || '',
+                      }}
+                      memberCount={community.profile_count || 0}
+                      threadCount={community.thread_count || 0}
+                      canBuyStake={canBuyStake}
+                      onStakeBtnClick={() =>
+                        setSelectedCommunityId(community?.id || '')
+                      }
+                      ethUsdRate={ethUsdRate}
+                      {...(historicalPriceMap &&
+                        community.id && {
+                          historicalPrice: historicalPriceMap?.get(
+                            community.id,
+                          ),
+                        })}
+                      onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
+                    />
+                    {listIndex === communitiesList.length - 1 &&
+                      sliceIndex === slicedCommunities.length - 1 && (
+                        <NewCommunityCard />
+                      )}
+                  </Fragment>
+                );
+              });
+            }}
+            endReached={() => {
+              // TODO: 2617 bug, called infinitely
+              hasNextPage && fetchMoreCommunities();
+            }}
+            overscan={50}
+            components={{
+              // eslint-disable-next-line react/no-multi-comp
+              EmptyPlaceholder: () => (
+                <>
+                  {/* TODO: 2617 better not found state */}
+                  <CWText>
+                    No communities found
+                    {filters.withChainBase ||
+                    filters.withNetwork ||
+                    filters.withStakeEnabled ||
+                    filters.withTagsIds
+                      ? ` for the applied filters`
+                      : ''}
+                  </CWText>
+                  <NewCommunityCard />
+                </>
+              ),
+            }}
+          />
         )}
         <CWModal
           size="small"
