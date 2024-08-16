@@ -1,4 +1,4 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { ExtendedCommunity, ForumActionsEnum } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import app from 'state';
 import { z } from 'zod';
