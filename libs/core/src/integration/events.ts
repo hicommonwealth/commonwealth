@@ -27,6 +27,7 @@ export enum EventNames {
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
 
+  // Discourse Import
   DiscourseImportSubmitted = 'DiscourseImportSubmitted',
 }
 
