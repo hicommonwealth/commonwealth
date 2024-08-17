@@ -8,7 +8,10 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './JoinCommunityCard.scss';
 
 type JoinCommunityCardProps = {
-  community: ChainInfo;
+  community: Pick<
+    ChainInfo,
+    'name' | 'iconUrl' | 'profileCount' | 'threadCount'
+  >;
   isJoined?: boolean;
   canJoin?: boolean;
   onJoinClick?: () => void;
@@ -67,8 +70,7 @@ const JoinCommunityCard = ({
           iconLeftWeight: 'fill',
         })}
         disabled={!canJoin}
-        // @ts-expect-error <StrictNullChecks/>
-        onClick={canJoin ? onJoinClick : null}
+        onClick={canJoin ? onJoinClick : undefined}
       />
     </div>
   );
