@@ -16,6 +16,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
+    loose_filter: z.enum(['tag_ids']).optional(),
     network: z.nativeEnum(ChainNetwork).optional(),
     base: z.nativeEnum(ChainBase).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
