@@ -251,18 +251,7 @@ const CommunitiesPage = () => {
                 return (
                   <Fragment key={community.id}>
                     <CWRelatedCommunityCard
-                      community={{
-                        id: community.id || '',
-                        name: community.name || '',
-                        base: community.base || '',
-                        description: community.description || '',
-                        iconUrl: community.icon_url || '',
-                        ChainNode: {
-                          url: community?.ChainNode?.url || '',
-                          ethChainId: community?.ChainNode?.eth_chain_id || 0,
-                        },
-                        namespace: community.namespace || '',
-                      }}
+                      community={community}
                       memberCount={community.profile_count || 0}
                       threadCount={community.thread_count || 0}
                       canBuyStake={canBuyStake}
@@ -288,7 +277,7 @@ const CommunitiesPage = () => {
             }}
             endReached={() => {
               // TODO: 2617 bug, called infinitely
-              hasNextPage && fetchMoreCommunities();
+              // hasNextPage && fetchMoreCommunities();
             }}
             overscan={50}
             components={{
