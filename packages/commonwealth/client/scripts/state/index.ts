@@ -17,6 +17,7 @@ import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 // ATM communities with id redirect will be broken
 // import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
+import { errorStore } from 'state/ui/error';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -176,8 +177,11 @@ export async function initAppState(
       }
     }
   } catch (err) {
-    app.loadingError =
-      err.response?.data?.error || 'Error loading application state';
+    errorStore
+      .getState()
+      .setLoadingError(
+        err.response?.data?.error || 'Error loading application state',
+      );
     throw err;
   }
 }

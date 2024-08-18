@@ -380,6 +380,9 @@ importers:
       sequelize:
         specifier: ^6.32.1
         version: 6.37.3(pg@8.11.5)
+      swagger-ui-express:
+        specifier: ^5.0.0
+        version: 5.0.0(express@4.19.2)
       trpc-swagger:
         specifier: ^1.2.6
         version: 1.2.6(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(zod@3.23.6)
@@ -405,6 +408,9 @@ importers:
       '@types/superagent':
         specifier: 4.1.13
         version: 4.1.13
+      '@types/swagger-ui-express':
+        specifier: ^4.1.6
+        version: 4.1.6
       sinon:
         specifier: ^17.0.2
         version: 17.0.2
@@ -1024,9 +1030,6 @@ importers:
       '@types/react-helmet-async':
         specifier: ^1.0.3
         version: 1.0.3(react@18.3.1)
-      '@types/swagger-ui-express':
-        specifier: ^4.1.6
-        version: 4.1.6
       '@viem/anvil':
         specifier: ^0.0.10
         version: 0.0.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -1084,6 +1087,9 @@ importers:
       core-js:
         specifier: ^3.34.0
         version: 3.37.0
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.5
       cosmjs-types:
         specifier: 0.8.0
         version: 0.8.0
@@ -1333,9 +1339,6 @@ importers:
       superagent:
         specifier: ^5.2.2
         version: 5.3.1
-      swagger-ui-express:
-        specifier: ^5.0.0
-        version: 5.0.0(express@4.19.2)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0

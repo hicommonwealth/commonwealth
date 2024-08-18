@@ -59,7 +59,7 @@ export const BulkThread = z.object({
       name: z.string(),
       description: z.string(),
       chainId: z.string(),
-      telegram: z.string(),
+      telegram: z.string().nullish(),
     })
     .optional(),
   user_id: PG_INT,

@@ -20,6 +20,7 @@ import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
+import * as api from './server/api';
 import { config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
@@ -132,7 +133,7 @@ export async function main(
       );
 
     app.use((req, res, next) => {
-      if (req.path.startsWith('/api/v1/rest/chainevent/')) next();
+      if (req.path.startsWith(`${api.internal.PATH}/chainevent/`)) next();
       else parseJson(req, res, next);
     });
 
