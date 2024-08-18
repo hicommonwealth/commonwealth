@@ -101,7 +101,7 @@ export async function completeClientLogin(account: Account) {
         userId: user.id,
         id: account.addressId,
         address: account.address,
-        communityId: account.community.id,
+        community: account.community,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
@@ -221,7 +221,11 @@ export function updateActiveUser(data) {
           userId: user.id,
           id: a.id,
           address: a.address,
-          communityId: a.community_id,
+          community: {
+            id: a.community_id,
+            base: a.Community.base,
+            ss58Prefix: a.Community.ss58_prefix,
+          },
           walletId: a.wallet_id,
           walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,
@@ -298,7 +302,11 @@ export async function createUserWithAddress(
   const account = new Account({
     addressId: id,
     address,
-    community: chainInfo,
+    community: {
+      id: chainInfo.id,
+      base: chainInfo.base,
+      ss58Prefix: chainInfo.ss58Prefix,
+    },
     validationToken: response.data.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,

@@ -1,7 +1,6 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import moment from 'moment';
-import app from 'state';
-import Account from './Account';
+import Account, { AccountCommunity } from './Account';
 
 class AddressInfo extends Account {
   public readonly userId: number;
@@ -10,7 +9,7 @@ class AddressInfo extends Account {
     userId,
     id,
     address,
-    communityId,
+    community,
     walletId,
     walletSsoSource,
     ghostAddress,
@@ -19,18 +18,15 @@ class AddressInfo extends Account {
     userId: number;
     id: number;
     address: string;
-    communityId: string;
+    community: AccountCommunity;
     walletId?: WalletId;
     walletSsoSource?: WalletSsoSource;
     ghostAddress?: boolean;
     lastActive?: string | moment.Moment;
   }) {
-    // TODO: cleanup this with #2617
-    const chain = app.config.chains.getAll().find((c) => c.id === communityId);
-    if (!chain) throw new Error(`Failed to locate chain: ${communityId}`);
     super({
       address,
-      community: chain,
+      community,
       addressId: id,
       walletId,
       walletSsoSource,

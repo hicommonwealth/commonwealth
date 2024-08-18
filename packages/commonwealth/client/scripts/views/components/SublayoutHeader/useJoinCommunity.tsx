@@ -116,7 +116,11 @@ const useJoinCommunity = () => {
               userId: user.id,
               id: a.id,
               address: a.address,
-              communityId: a.community_id,
+              community: {
+                id: a.community_id,
+                base: a.Community?.base,
+                ss58Prefix: a.Community?.ss58_prefix,
+              },
               walletId: a.wallet_id,
             });
           }),
