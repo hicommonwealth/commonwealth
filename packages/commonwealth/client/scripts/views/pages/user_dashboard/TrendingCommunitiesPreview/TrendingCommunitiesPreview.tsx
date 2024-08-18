@@ -11,6 +11,7 @@ export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
+  // TODO: https://github.com/hicommonwealth/commonwealth/issues/8760
   const { data: activeCommunities } = useFetchActiveCommunitiesQuery();
 
   const sortedCommunities = (activeCommunities?.communities || [])
