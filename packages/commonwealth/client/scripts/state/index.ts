@@ -13,9 +13,10 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
-import { Configuration } from 'state/api/configuration';
+// TODO: 2617, need a way make this query somewhere else and get the redirected communities list
+// ATM communities with id redirect will be broken
+// import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
-import { ChainStore } from 'stores';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -57,11 +58,6 @@ export interface IApp {
   snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
-
-  // stored on server-side
-  config: {
-    chains: ChainStore;
-  };
 
   loadingError: string;
 
@@ -109,10 +105,6 @@ const app: IApp = {
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 
-  config: {
-    chains: new ChainStore(),
-  },
-
   // @ts-expect-error StrictNullChecks
   loadingError: null,
 
@@ -134,14 +126,12 @@ export async function initAppState(
   updateSelectedCommunity = true,
 ): Promise<void> {
   try {
-    const [{ data: statusRes }, { data: communities }] = await Promise.all([
+    const [{ data: statusRes }] = await Promise.all([
       axios.get(`${SERVER_URL}/status`),
-      axios.get(`${SERVER_URL}/communities`),
     ]);
 
-    const nodesData = await fetchNodesQuery();
+    await fetchNodesQuery();
 
-    app.config.chains.clear();
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
 
@@ -149,30 +139,6 @@ export async function initAppState(
       enforceSessionKeys: statusRes.result.enforceSessionKeys,
       evmTestEnv: statusRes.result.evmTestEnv,
     });
-
-    communities.result
-      .filter((c) => c.community.active)
-      .forEach((c) => {
-        const chainInfo = ChainInfo.fromJSON({
-          ChainNode: nodesData.find((n) => n.id === c.community.chain_node_id),
-          ...c.community,
-        });
-        app.config.chains.add(chainInfo);
-
-        if (chainInfo.redirect) {
-          const cachedConfig = queryClient.getQueryData<Configuration>([
-            QueryKeys.CONFIGURATION,
-          ]);
-
-          queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-            ...cachedConfig,
-            redirects: {
-              ...cachedConfig?.redirects,
-              [chainInfo.redirect]: chainInfo.id,
-            },
-          });
-        }
-      });
 
     // it is either user object or undefined
     const userResponse = statusRes.result.user;
