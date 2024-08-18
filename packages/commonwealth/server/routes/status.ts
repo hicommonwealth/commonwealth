@@ -41,7 +41,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     attributes: ['id'],
   });
 
-  const unfilteredAddresses = await user.getAddresses();
+  const unfilteredAddresses = await user.getAddresses({
+    include: [
+      {
+        model: models.Community,
+        attributes: ['id', 'base', 'ss58_prefix'],
+      },
+    ],
+  });
   // TODO: fetch all this data with a single query
   const [addresses, selectedCommunity, isAdmin, disableRichText] =
     await Promise.all([
