@@ -277,7 +277,7 @@ const CommunitiesPage = () => {
             }}
             endReached={() => {
               // TODO: 2617 bug, called infinitely
-              // hasNextPage && fetchMoreCommunities();
+              hasNextPage && fetchMoreCommunities();
             }}
             overscan={50}
             components={{

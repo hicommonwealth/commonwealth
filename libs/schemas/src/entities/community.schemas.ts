@@ -1,4 +1,5 @@
 import {
+  BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
@@ -64,7 +65,11 @@ export const Community = z.object({
   Addresses: z.array(Address).optional(),
   CommunityStakes: z.array(CommunityStake).nullish(),
   CommunityTags: z.array(CommunityTags).nullish(),
-  ChainNode: ChainNode.optional(),
+  ChainNode: ChainNode.extend({
+    url: z.string().max(255).nullish(),
+    balance_type: z.nativeEnum(BalanceType).nullish(),
+    name: z.string().max(255).nullish(),
+  }).optional(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),

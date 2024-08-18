@@ -9,12 +9,12 @@ import { Contract } from './contract.schemas';
 
 export const ChainNode = z.object({
   id: PG_INT.optional().nullish(),
-  url: z.string().max(255).nullish(),
+  url: z.string().max(255),
   eth_chain_id: PG_INT.nullish(),
   alt_wallet_url: z.string().max(255).nullish(),
   private_url: z.string().max(255).nullish(),
-  balance_type: z.nativeEnum(BalanceType).nullish(),
-  name: z.string().max(255).nullish(),
+  balance_type: z.nativeEnum(BalanceType),
+  name: z.string().max(255),
   description: z.string().max(255).nullish(),
   ss58: PG_INT.nullish(),
   bech32: z.string().max(255).nullish(),
