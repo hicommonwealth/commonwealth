@@ -809,7 +809,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               <ThreadPollCard
                                 poll={poll}
                                 key={poll.id}
-                                onVote={() => setInitializedPolls(false)}
                                 isTopicMembershipRestricted={
                                   isRestrictedMembership
                                 }

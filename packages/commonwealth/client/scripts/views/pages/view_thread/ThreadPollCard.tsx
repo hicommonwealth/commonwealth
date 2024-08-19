@@ -2,17 +2,17 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import 'pages/view_thread/poll_cards.scss';
 import React, { useState } from 'react';
-import { useDeletePollMutation } from 'state/api/polls';
+import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Poll from '../../../models/Poll';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
-import { getPollTimestamp, handlePollVote } from './helpers';
+import { getPollTimestamp } from './helpers';
 
 type ThreadPollCardProps = {
   poll: Poll;
-  onVote: () => void;
   showDeleteButton?: boolean;
   onDelete?: () => void;
   isTopicMembershipRestricted?: boolean;
@@ -20,7 +20,6 @@ type ThreadPollCardProps = {
 
 export const ThreadPollCard = ({
   poll,
-  onVote,
   showDeleteButton,
   onDelete,
   isTopicMembershipRestricted = false,
@@ -30,6 +29,10 @@ export const ThreadPollCard = ({
   const user = useUserStore();
 
   const { mutateAsync: deletePoll } = useDeletePollMutation({
+    threadId: poll.threadId,
+  });
+
+  const { mutateAsync: votePoll } = useVotePollMutation({
     threadId: poll.threadId,
   });
 
@@ -45,7 +48,7 @@ export const ThreadPollCard = ({
       await deletePoll({
         pollId: poll.id,
         address: user.activeAccount?.address || '',
-        authorCommunity: user.activeAccount?.community.id || '',
+        authorCommunity: user.activeAccount?.community?.id || '',
       });
       onDelete?.();
       notifySuccess('Poll deleted');
@@ -53,6 +56,65 @@ export const ThreadPollCard = ({
       console.error(e);
       notifyError('Failed to delete poll');
     }
+  };
+
+  const handlePollVote = async (
+    votedPoll: Poll,
+    option: string,
+    isSelected: boolean,
+  ) => {
+    if (!user.isLoggedIn || !user.activeAccount || isSelected) {
+      return;
+    }
+
+    const userInfo = [
+      user.activeAccount?.community?.id || '',
+      user.activeAccount?.address || '',
+    ] as const;
+
+    const confirmationText = votedPoll.getUserVote(...userInfo)
+      ? `Change your vote to '${option}'?`
+      : `Submit a vote for '${option}'?`;
+
+    openConfirmation({
+      title: 'Info',
+      description: <>{confirmationText}</>,
+      buttons: [
+        {
+          label: 'Submit',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
+          onClick: () => {
+            const selectedOption = votedPoll.options.find((o) => o === option);
+
+            if (!selectedOption) {
+              notifyError('Invalid voting option');
+              return;
+            }
+
+            try {
+              votePoll({
+                pollId: votedPoll.id,
+                communityId: votedPoll.communityId,
+                authorCommunityId: user.activeAccount?.community?.id || '',
+                address: user.activeAccount?.address || '',
+                selectedOption,
+              });
+            } catch (err) {
+              console.error(err);
+              notifyError(
+                'Error submitting vote. Maybe the poll has already ended?',
+              );
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
   };
 
   return (
@@ -98,7 +160,7 @@ export const ThreadPollCard = ({
         tooltipErrorMessage={getTooltipErrorMessage()}
         onVoteCast={(option, isSelected) => {
           // @ts-expect-error <StrictNullChecks/>
-          handlePollVote(poll, option, isSelected, onVote);
+          handlePollVote(poll, option, isSelected);
         }}
         onResultsClick={(e) => {
           e.preventDefault();

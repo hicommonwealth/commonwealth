@@ -71,6 +71,7 @@ class Poll {
     if (!selectedOption) {
       notifyError('Invalid voting option');
     }
+    // TODO move put to RQ
     const response = await axios.put(`${SERVER_URL}/polls/${this.id}/votes`, {
       poll_id: this.id,
       chain_id: this.communityId,

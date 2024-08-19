@@ -1,3 +1,4 @@
 import useDeletePollMutation from './deletePoll';
+import useVotePollMutation from './votePoll';
 
-export { useDeletePollMutation };
+export { useDeletePollMutation, useVotePollMutation };
