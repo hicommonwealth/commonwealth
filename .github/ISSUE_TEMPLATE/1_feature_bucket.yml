@@ -2,7 +2,7 @@ name: "Product: Feature Bucket"
 description: "For product team to outline a new feature."
 labels: ["refinement", "bucket 🪣", "enhancement"]
 title: "🪣 "
-projects: ["hicommonwealth/33"]
+projects: ["hicommonwealth/40"]
 body:
   - type: textarea
     id: feature-description
