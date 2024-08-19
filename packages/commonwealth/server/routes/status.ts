@@ -15,6 +15,8 @@ import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
+type CommunityWithRedirects = { id: string; redirect: string };
+
 type StatusResp = {
   loggedIn?: boolean;
   user?: {
@@ -31,6 +33,7 @@ type StatusResp = {
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [communityId: string]: number };
   };
+  communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
 };
@@ -297,10 +300,20 @@ export const status = async (
       user.jwt = jwtToken as string;
       user.knockJwtToken = knockJwtToken!;
 
+      // get communities with redirects (this should be a very small list and should'n cause performance issues)
+      const communityWithRedirects =
+        await models.sequelize.query<CommunityWithRedirects>(
+          `SELECT id, redirect FROM "Communities" WHERE redirect IS NOT NULL;`,
+          {
+            type: QueryTypes.SELECT,
+          },
+        );
+
       return success(res, {
         loggedIn: true,
         // @ts-expect-error StrictNullChecks
         user,
+        communityWithRedirects: communityWithRedirects || [],
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });

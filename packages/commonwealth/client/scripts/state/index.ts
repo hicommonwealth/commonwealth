@@ -13,9 +13,7 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
-// TODO: 2617, need a way make this query somewhere else and get the redirected communities list
-// ATM communities with id redirect will be broken
-// import { Configuration } from 'state/api/configuration';
+import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
 import { userStore } from './ui/user';
@@ -140,6 +138,25 @@ export async function initAppState(
       enforceSessionKeys: statusRes.result.enforceSessionKeys,
       evmTestEnv: statusRes.result.evmTestEnv,
     });
+
+    // store community redirect's map in configuration cache
+    const communityWithRedirects =
+      statusRes.result?.communityWithRedirects || [];
+    if (communityWithRedirects.length > 0) {
+      communityWithRedirects.map(({ id, redirect }) => {
+        const cachedConfig = queryClient.getQueryData<Configuration>([
+          QueryKeys.CONFIGURATION,
+        ]);
+
+        queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+          ...cachedConfig,
+          redirects: {
+            ...cachedConfig?.redirects,
+            [redirect]: id,
+          },
+        });
+      });
+    }
 
     // it is either user object or undefined
     const userResponse = statusRes.result.user;
