@@ -46,7 +46,10 @@ export function startHealthCheckLoop({
       stats().off(key);
     }
     const durationUntilNextCheck = nextCheckAt - Date.now();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setTimeout(loop, durationUntilNextCheck);
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(loop, PING_INTERVAL);
 }

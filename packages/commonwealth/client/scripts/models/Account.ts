@@ -1,5 +1,4 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
-import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import { Session } from '@canvas-js/interfaces';
@@ -7,8 +6,9 @@ import { serializeCanvas } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
+import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
-import { userStore } from '../state/ui/user';
+import { userStore } from 'state/ui/user';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
 
@@ -183,7 +183,7 @@ class Account {
       wallet_sso_source: this.walletSsoSource,
     };
 
-    return await axios.post(`${app.serverUrl()}/verifyAddress`, params);
+    return await axios.post(`${SERVER_URL}/verifyAddress`, params);
   }
 }
 

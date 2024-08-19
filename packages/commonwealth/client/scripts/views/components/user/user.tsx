@@ -4,6 +4,7 @@ import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
@@ -46,7 +47,13 @@ export const User = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  if (showSkeleton) {
+  const { data: userCommunity, isLoading: isLoadingUserCommunity } =
+    useGetCommunityByIdQuery({
+      id: userCommunityId || '',
+      enabled: !!userCommunityId,
+    });
+
+  if (showSkeleton || isLoadingUserCommunity) {
     return (
       <UserSkeleton
         shouldShowAvatarOnly={shouldShowAvatarOnly}
@@ -69,8 +76,7 @@ export const User = ({
   );
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =
-    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const userCommunity = app.config.chains.getById(userCommunityId);
+    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(userCommunity);
   const friendlyCommunityName = userCommunity?.name;
   const roleInCommunity = userCommunity?.adminsAndMods?.find(
     ({ address }) => address === userAddress,

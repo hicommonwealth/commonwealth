@@ -1,9 +1,9 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
 import { getUniqueCommunities } from 'helpers/addresses';
 import { useFlag } from 'hooks/useFlag';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
@@ -28,7 +28,7 @@ const NotificationSettings = () => {
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlertsQuery();
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     (communityAlerts.data as unknown as ReadonlyArray<
@@ -41,7 +41,7 @@ const NotificationSettings = () => {
 
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
-  } else if (!isLoggedIn) {
+  } else if (!user.isLoggedIn) {
     return <PageNotFound />;
   }
 
@@ -108,8 +108,10 @@ const NotificationSettings = () => {
               return (
                 <CommunityEntry
                   key={community.id}
-                  communityInfo={community}
-                  communityAlert={communityAlertsIndex[community.id]}
+                  id={community.id || ''}
+                  name={community.name || ''}
+                  iconUrl={community.iconUrl || ''}
+                  alert={communityAlertsIndex[community.id]}
                 />
               );
             })}

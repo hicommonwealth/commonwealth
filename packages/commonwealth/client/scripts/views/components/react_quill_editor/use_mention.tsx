@@ -3,6 +3,7 @@ import { RangeStatic } from 'quill';
 import QuillMention from 'quill-mention';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
+import { SERVER_URL } from 'state/api/config';
 import MinimumProfile from '../../../models/MinimumProfile';
 
 import axios from 'axios';
@@ -92,7 +93,7 @@ export const useMention = ({
             ];
           } else {
             // try to get results from cache
-            const { data } = await axios.get(`${app.serverUrl()}/profiles`, {
+            const { data } = await axios.get(`${SERVER_URL}/profiles`, {
               headers: {
                 'Content-Type': 'application/json',
               },

@@ -1,9 +1,9 @@
 import { DeltaStatic } from 'quill';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill from 'react-quill';
+import { SERVER_URL } from 'state/api/config';
 import { SerializableDeltaStatic, uploadFileToS3 } from './utils';
 
-import app from 'state';
 import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 
@@ -41,7 +41,7 @@ export const useImageUploader = ({
 
         const uploadedFileUrl = await uploadFileToS3(
           compressedFile,
-          app.serverUrl(),
+          SERVER_URL,
           user.jwt || '',
         );
 

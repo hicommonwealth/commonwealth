@@ -87,16 +87,12 @@ const Transactions = ({ transactions }: TransactionsProps) => {
         rowData={transactions.map((tx) => ({
           ...tx,
           community: {
-            // @ts-expect-error <StrictNullChecks/>
-            sortValue: tx.community.name.toLowerCase(),
+            sortValue: tx?.community?.name?.toLowerCase(),
             customElement: (
               <CommunityInfo
-                symbol={tx.community.default_symbol}
-                // @ts-expect-error <StrictNullChecks/>
-                iconUrl={tx.community.icon_url}
-                // @ts-expect-error <StrictNullChecks/>
+                symbol={tx.community.default_symbol || ''}
+                iconUrl={tx.community.icon_url || ''}
                 name={tx.community.name}
-                // @ts-expect-error <StrictNullChecks/>
                 communityId={tx.community.id}
               />
             ),

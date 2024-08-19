@@ -1,8 +1,7 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import { cache, dispose, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { cache, dispose, logger, query } from '@hicommonwealth/core';
+import { Community, models } from '@hicommonwealth/model';
 import { config } from '../server/config';
-import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
 
@@ -13,18 +12,29 @@ async function main() {
 
   const banCache = new BanCache(models);
 
-  const communitiesController = new ServerCommunitiesController(
-    models,
-    banCache,
-  );
-
   const groupsController = new ServerGroupsController(models, banCache);
 
-  const communitiesResult = await communitiesController.getCommunities({
-    hasGroups: true,
+  // fetch all communities via pagination
+  const limit = 50;
+  let cursor = 1;
+  const communitiesResult = await query(Community.GetCommunities(), {
+    // no need for an actor, but argument is mandatory
+    actor: { user: { email: '' } },
+    payload: { has_groups: true, cursor, limit },
   });
+  const totalPages = communitiesResult!.totalPages;
+  const communities = communitiesResult!.results;
+  while (cursor < totalPages) {
+    cursor += 1;
+    const cr = await query(Community.GetCommunities(), {
+      actor: { user: { email: '' } },
+      payload: { has_groups: true, cursor, limit },
+    });
+    communities.push(...cr!.results);
+  }
 
-  for (const { community } of communitiesResult) {
+  // refresh memberships on all fetched communities
+  for (const community of communities) {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     await groupsController.refreshCommunityMemberships({
@@ -33,7 +43,11 @@ async function main() {
     });
   }
 
-  log.info(`done- refreshed ${communitiesResult.length} communities`);
+  log.info(
+    `done- refreshed ${
+      process.env.COMMUNITY_ID ? 1 : communities.length
+    } communities`,
+  );
 }
 
 main()

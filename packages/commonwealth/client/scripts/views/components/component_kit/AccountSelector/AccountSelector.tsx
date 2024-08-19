@@ -1,4 +1,3 @@
-import type { ChainNetwork } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import React from 'react';
@@ -13,7 +12,7 @@ type LinkAccountItemProps = {
   idx: number;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
-  walletNetwork: ChainNetwork;
+  walletNetwork: string;
 };
 
 const LinkAccountItem = ({
@@ -78,7 +77,7 @@ type AccountSelectorProps = {
   onModalClose: () => void;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
-  walletNetwork: ChainNetwork;
+  walletNetwork: string;
 };
 
 // eslint-disable-next-line react/no-multi-comp

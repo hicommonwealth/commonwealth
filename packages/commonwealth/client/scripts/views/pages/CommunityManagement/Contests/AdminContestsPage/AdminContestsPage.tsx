@@ -12,6 +12,7 @@ import {
 } from 'shared/analytics/types';
 import app from 'state';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -32,7 +33,7 @@ const AdminContestsPage = () => {
   const [contestView, setContestView] = useState<ContestView>(ContestView.List);
 
   const navigate = useCommonNavigate();
-
+  const user = useUserStore();
   const { isAddedToHomeScreen } = useAppStatus();
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -70,7 +71,7 @@ const AdminContestsPage = () => {
       : navigate('/manage/contests/launch');
   };
 
-  if (!app.isLoggedIn() || !isAdmin) {
+  if (!user.isLoggedIn || !isAdmin) {
     return <PageNotFound />;
   }
 

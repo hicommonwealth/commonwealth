@@ -255,10 +255,10 @@ export const AdminActions = ({
   };
 
   const handleSnapshotProposalClick = () => {
-    const snapshotSpaces = app.chain.meta.snapshot;
+    const snapshotSpaces = app.chain.meta?.snapshot;
     onSnapshotProposalFromThread && onSnapshotProposalFromThread();
     navigate(
-      snapshotSpaces.length > 1
+      snapshotSpaces?.length > 1
         ? '/multiple-snapshots'
         : `/snapshot/${snapshotSpaces}`,
     );
@@ -372,7 +372,7 @@ export const AdminActions = ({
             ],
             ...(canUpdateThread && (isThreadAuthor || hasAdminPermissions)
               ? [
-                  ...(app.chain?.meta.snapshot.length
+                  ...(app.chain?.meta?.snapshot?.length
                     ? [
                         {
                           label: 'Snapshot proposal from thread',
@@ -389,7 +389,7 @@ export const AdminActions = ({
                           iconLeft: 'democraticProposal' as const,
                           iconLeftWeight: 'bold' as const,
                           onClick: () => {
-                            const snapshotSpaces = app.chain.meta.snapshot;
+                            const snapshotSpaces = app?.chain?.meta?.snapshot;
                             // @ts-expect-error StrictNullChecks
                             onSnapshotProposalFromThread();
                             navigate(

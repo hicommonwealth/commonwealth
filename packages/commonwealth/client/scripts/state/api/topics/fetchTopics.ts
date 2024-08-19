@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const TOPICS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -16,15 +16,12 @@ const fetchTopics = async ({
   communityId,
   includeContestData = false,
 }: FetchTopicsProps): Promise<Topic[]> => {
-  const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.BULK_TOPICS}`,
-    {
-      params: {
-        community_id: communityId || app.activeChainId(),
-        with_contest_managers: includeContestData,
-      },
+  const response = await axios.get(`${SERVER_URL}${ApiEndpoints.BULK_TOPICS}`, {
+    params: {
+      community_id: communityId || app.activeChainId(),
+      with_contest_managers: includeContestData,
     },
-  );
+  });
 
   return response.data.result.map((t) => new Topic(t));
 };
