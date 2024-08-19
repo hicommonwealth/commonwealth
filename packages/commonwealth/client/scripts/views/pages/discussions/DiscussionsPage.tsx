@@ -128,19 +128,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const splitURLPath = useMemo(() => location.pathname.split('/'), []);
-  const decodedString = useMemo(
-    () => decodeURIComponent(splitURLPath[3]),
-    [splitURLPath],
-  );
+  const decodedString = useMemo(() => {
+    if (splitURLPath[2] === 'discussions') {
+      return decodeURIComponent(splitURLPath[3]);
+    }
+    splitURLPath[1] === 'discussions';
+    return decodeURIComponent(splitURLPath[2]);
+  }, [splitURLPath]);
 
   //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
   useEffect(() => {
-    if (
-      !isLoadingTopics &&
-      decodedString &&
-      splitURLPath[2] === 'discussions' &&
-      splitURLPath.length === 4
-    ) {
+    if (!isLoadingTopics && decodedString) {
       const validTopics = topics?.some(
         (topic) => topic?.name === decodedString,
       );
