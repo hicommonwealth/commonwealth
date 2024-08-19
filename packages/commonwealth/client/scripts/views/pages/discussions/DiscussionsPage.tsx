@@ -146,7 +146,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         navigate('/discussions');
       }
     }
-  }, [topics, decodedString, splitURLPath, isLoadingTopics, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics, decodedString, splitURLPath, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
