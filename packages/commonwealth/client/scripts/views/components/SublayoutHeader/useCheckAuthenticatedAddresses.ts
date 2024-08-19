@@ -36,7 +36,7 @@ const useCheckAuthenticatedAddresses = ({
     const newAuthenticatedAddresses: Record<string, boolean> = {};
 
     for (const account of user.accounts) {
-      // TODO: 2617 making a fresh query to get chain and community info for this address
+      // making a fresh query to get chain and community info for this address
       // as all the necessary fields don't exist on user.address, these should come
       // from api in the user address response, and the extra api call here removed
       const community = await EXCEPTION_CASE_VANILLA_getCommunityById(
