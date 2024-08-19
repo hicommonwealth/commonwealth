@@ -15,7 +15,7 @@ import {
 } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
 
-import 'views/components/Polls/PollCard/PollCard.scss';
+import '../../components/Polls/PollCard/PollCard.scss';
 
 export type SnapshotPollCardProps = Omit<
   PollCardProps & {
