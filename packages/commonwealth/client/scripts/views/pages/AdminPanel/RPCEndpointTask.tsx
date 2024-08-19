@@ -226,6 +226,19 @@ const RPCEndpointTask = () => {
         Changes the RPC endpoint for a specific chain community, or adds a Chain
         Node if it doesn&apos;t yet exist.
       </CWText>
+      <CWText type="caption">
+        Chain name, ETH chain id, and RPC enpoint can be found here:
+      </CWText>
+      <div>
+        <a
+          href="https://chainlist.org/"
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: 'blue' }}
+        >
+          https://chainlist.org/
+        </a>
+      </div>
       <div className="MultiRow">
         {balanceType === BalanceType.Ethereum && (
           <div className="TaskRow">
