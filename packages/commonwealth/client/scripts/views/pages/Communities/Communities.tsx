@@ -1,3 +1,4 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
 import React, { Fragment, useMemo, useRef, useState } from 'react';
@@ -7,6 +8,7 @@ import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { z } from 'zod';
 import { useFetchEthUsdRateQuery } from '../../../state/api/communityStake/index';
 import { trpc } from '../../../utils/trpcClient';
 import { NewCommunityCard } from '../../components/CommunityCard';
@@ -27,6 +29,12 @@ const communityNetworks: string[] = Object.keys(ChainNetwork).filter(
 ); // We only are allowing ERC20 for now
 
 const communityBases = Object.keys(ChainBase) as ChainBase[];
+
+type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
+type ExtendedCommunitySliceType = [
+  ExtendedCommunityType,
+  ExtendedCommunityType,
+];
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
@@ -106,10 +114,12 @@ const CommunitiesPage = () => {
     const flatList = (communities?.pages || []).flatMap((page) => page.results);
 
     const SLICE_SIZE = 2;
-    const twoCommunitiesPerEntry: any = [];
+    const twoCommunitiesPerEntry: ExtendedCommunitySliceType[] = [];
 
     for (let i = 0; i < flatList.length; i += SLICE_SIZE) {
-      twoCommunitiesPerEntry.push(flatList.slice(i, i + SLICE_SIZE));
+      twoCommunitiesPerEntry.push(
+        flatList.slice(i, i + SLICE_SIZE) as ExtendedCommunitySliceType,
+      );
     }
 
     return twoCommunitiesPerEntry;

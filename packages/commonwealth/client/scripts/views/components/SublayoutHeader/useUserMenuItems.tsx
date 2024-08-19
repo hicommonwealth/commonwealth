@@ -164,7 +164,7 @@ const useUserMenuItems = ({
   }, [authenticatedAddresses, userData.accounts]);
 
   useEffect(() => {
-    updateCanvasSignedAddresses();
+    updateCanvasSignedAddresses().catch(console.error);
   }, [updateCanvasSignedAddresses]);
 
   const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {

@@ -77,7 +77,7 @@ const useCheckAuthenticatedAddresses = ({
   }, [user.accounts]);
 
   useEffect(() => {
-    updateAuthenticatedAddresses();
+    updateAuthenticatedAddresses().catch(console.error);
   }, [updateAuthenticatedAddresses, canvasChainId, chainBase, recheck]);
 
   return { authenticatedAddresses };
