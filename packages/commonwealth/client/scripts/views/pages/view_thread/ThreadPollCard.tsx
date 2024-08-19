@@ -72,7 +72,7 @@ export const ThreadPollCard = ({
           label: 'Submit',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          // @typescript-eslint/no-misused-promises
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick: async () => {
             const selectedOption = votedPoll.options.find((o) => o === option);
 
