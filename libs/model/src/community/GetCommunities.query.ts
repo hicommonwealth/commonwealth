@@ -11,7 +11,10 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
     secure: false,
     body: async ({ payload }) => {
       const {
-        loose_filter,
+        // Indicates that a filter key, ex: `tag_ids`, shouldn't be strictly checked for when querying.
+        // Results should include matching `tag_ids` first, then items with non-matching `tag_ids`, then
+        // items with no `tag_ids`.
+        relevance_by,
         base,
         network,
         include_node_info,
@@ -117,7 +120,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             : ''
                         }
                         ${
-                          filtering_tags && loose_filter !== 'tag_ids'
+                          filtering_tags && relevance_by !== 'tag_ids'
                             ? `
                           AND (
                             SELECT COUNT  ( DISTINCT "CommunityTags"."tag_id" )
@@ -231,7 +234,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         }
         ORDER BY 
           ${
-            filtering_tags && loose_filter === 'tag_ids'
+            filtering_tags && relevance_by === 'tag_ids'
               ? `CASE 
               WHEN jsonb_array_length("CommunityTags_CTE"."CommunityTags"::jsonb) = 0 IS NULL THEN 2
 				      WHEN EXISTS (

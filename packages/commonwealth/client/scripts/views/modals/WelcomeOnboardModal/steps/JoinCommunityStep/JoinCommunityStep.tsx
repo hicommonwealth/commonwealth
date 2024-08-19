@@ -34,7 +34,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
   const { data: communitiesList, isLoading: isLoadingCommunities } =
     useFetchCommunitiesQuery({
       limit: 4,
-      loose_filter: 'tag_ids',
+      relevance_by: 'tag_ids',
       include_node_info: true,
       order_by: 'thread_count',
       order_direction: 'DESC',

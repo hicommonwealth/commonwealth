@@ -12,7 +12,7 @@ const useFetchCommunitiesQuery = ({
   base,
   has_groups,
   include_node_info,
-  loose_filter,
+  relevance_by,
   network,
   stake_enabled,
   tag_ids,
@@ -32,7 +32,7 @@ const useFetchCommunitiesQuery = ({
       stake_enabled,
       tag_ids,
       has_groups,
-      loose_filter,
+      relevance_by,
       ...(tag_ids &&
         tag_ids?.length > 0 && {
           tag_ids: tag_ids.join(','),
