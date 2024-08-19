@@ -1,5 +1,5 @@
 import { BalanceType } from '@hicommonwealth/shared';
-import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
+import { fetchCachedNodes } from 'state/api/nodes';
 
 export const getCosmosChains = (isEvm?: boolean): string[] => {
   const nodes = fetchCachedNodes();
