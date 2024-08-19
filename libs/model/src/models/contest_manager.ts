@@ -40,6 +40,7 @@ export default (
       created_at: { type: Sequelize.DATE, allowNull: false },
       cancelled: { type: Sequelize.BOOLEAN },
       ended: { type: Sequelize.BOOLEAN },
+      farcaster_frame_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'ContestManagers',

@@ -74,3 +74,13 @@ export const PerformContestRollovers = {
   input: z.object({ id: z.string() }),
   output: z.object({}),
 };
+
+export const FarcasterCastReplyWebhook = {
+  input: z.object({
+    id: z.string(),
+    root_hash: z.string(),
+    cast_hash: z.string(),
+    user_address: z.string(),
+  }),
+  output: z.object({}),
+};

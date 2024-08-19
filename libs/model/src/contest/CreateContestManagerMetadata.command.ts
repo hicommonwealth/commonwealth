@@ -44,6 +44,8 @@ export function CreateContestManagerMetadata(): Command<
         }));
       }
 
+      const farcaster_frame_url = `/api/farcaster/${payload.contest_address}`;
+
       const contestManager = await models.sequelize.transaction(
         async (transaction) => {
           const manager = await models.ContestManager.create(
@@ -52,6 +54,7 @@ export function CreateContestManagerMetadata(): Command<
               community_id: id.toString(),
               created_at: new Date(),
               cancelled: false,
+              farcaster_frame_url,
             },
             { transaction },
           );
