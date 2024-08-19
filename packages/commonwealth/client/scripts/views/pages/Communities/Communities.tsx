@@ -1,6 +1,7 @@
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
 import React, { Fragment, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
@@ -221,11 +222,11 @@ const CommunitiesPage = () => {
             })}
           </div>
         </div>
-        {isLoading || communitiesList.length === 0 ? (
+        {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
         ) : (
           <Virtuoso
-            className="communities-list-v"
+            className="communities-list"
             style={{ height: '100%', width: '100%' }}
             data={isInitialCommunitiesLoading ? [] : communitiesList}
             customScrollParent={containerRef.current}
@@ -279,19 +280,19 @@ const CommunitiesPage = () => {
             components={{
               // eslint-disable-next-line react/no-multi-comp
               EmptyPlaceholder: () => (
-                <>
-                  {/* TODO: 2617 better not found state */}
-                  <CWText>
+                <section className="empty-placeholder">
+                  <CWText type="h2">
                     No communities found
                     {filters.withChainBase ||
                     filters.withNetwork ||
                     filters.withStakeEnabled ||
                     filters.withTagsIds
-                      ? ` for the applied filters`
-                      : ''}
+                      ? ` for the applied filters.`
+                      : '.'}
+                    <br />
+                    Create a new community <Link to="/communities">here</Link>.
                   </CWText>
-                  <NewCommunityCard />
-                </>
+                </section>
               ),
             }}
           />

@@ -64,7 +64,7 @@
     }
   }
 
-  .communities-list-v {
+  .communities-list {
     width: 100%;
     min-height: 500px;
 
@@ -89,19 +89,29 @@
     }
   }
 
-  .communities-list {
-    display: grid;
-    grid-gap: 28px;
-    grid-template-columns: repeat(auto-fit, 506px);
+  .empty-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
     justify-content: center;
-    padding-top: 24px;
+    align-items: center;
 
-    @include mediumSmall {
-      grid-template-columns: 1fr 1fr;
-    }
+    .h2 {
+      display: inline;
+      text-align: center;
 
-    @include extraSmall {
-      grid-template-columns: 1fr;
+      a {
+        color: $primary-500;
+        text-decoration: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+          color: $primary-500;
+          text-decoration: underline;
+        }
+      }
     }
   }
 }
