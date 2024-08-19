@@ -67,18 +67,9 @@ export const ThreadPollCard = ({
       return;
     }
 
-    const userInfo = [
-      user.activeAccount?.community?.id || '',
-      user.activeAccount?.address || '',
-    ] as const;
-
-    const confirmationText = votedPoll.getUserVote(...userInfo)
-      ? `Change your vote to '${option}'?`
-      : `Submit a vote for '${option}'?`;
-
     openConfirmation({
       title: 'Info',
-      description: <>{confirmationText}</>,
+      description: `Submit a vote for '${option}'?`,
       buttons: [
         {
           label: 'Submit',
@@ -117,31 +108,19 @@ export const ThreadPollCard = ({
     });
   };
 
+  const userVote = poll.getUserVote(
+    user.activeAccount?.community?.id || '',
+    user.activeAccount?.address || '',
+  );
+
   return (
     <>
       <PollCard
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
-        hasVoted={
-          !!(
-            user.activeAccount?.community?.id &&
-            user.activeAccount?.address &&
-            poll.getUserVote(
-              user.activeAccount?.community?.id,
-              user.activeAccount?.address,
-            )
-          )
-        }
+        hasVoted={!!userVote}
         disableVoteButton={!user.activeAccount || isTopicMembershipRestricted}
-        // @ts-expect-error <StrictNullChecks/>
-        votedFor={
-          user.activeAccount?.community?.id &&
-          user.activeAccount?.address &&
-          poll.getUserVote(
-            user.activeAccount?.community?.id,
-            user.activeAccount?.address,
-          )?.option
-        }
+        votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
