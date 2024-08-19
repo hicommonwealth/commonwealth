@@ -24,7 +24,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { CWTypeaheadSelectList } from '../../components/component_kit/new_designs/CWTypeaheadSelectList';
 import { openConfirmation } from '../../modals/confirmation_modal';
-import { createChainNode, updateChainNode } from './utils';
+import { updateChainNode } from './utils';
 
 const RPCEndpointTask = () => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
@@ -143,27 +143,15 @@ const RPCEndpointTask = () => {
   const update = async () => {
     if (!communityLookupData?.id) return;
     try {
-      if (chainNodeNotCreated) {
-        // Create Chain Node if not yet created
-        const res = await createChainNode({
-          url: rpcEndpoint,
-          name: rpcName,
-          bech32,
-          balance_type: balanceType,
-          eth_chain_id: ethChainId,
-          cosmos_chain_id: cosmosChainId,
-        });
-      } else {
-        await updateChainNode({
-          id: communityChainNode.id,
-          url: rpcEndpoint,
-          name: rpcName,
-          bech32,
-          balance_type: balanceType,
-          eth_chain_id: ethChainId,
-          cosmos_chain_id: cosmosChainId,
-        });
-      }
+      await updateChainNode({
+        id: communityChainNode.id,
+        url: rpcEndpoint,
+        name: rpcName,
+        bech32,
+        balance_type: balanceType,
+        eth_chain_id: ethChainId,
+        cosmos_chain_id: cosmosChainId,
+      });
 
       setRpcEndpointCommunityId('');
       setRpcEndpoint('');
