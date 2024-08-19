@@ -102,14 +102,14 @@ const CommunityProfileForm = () => {
     callback: () => {
       setIsCustomStagesEnabled(community?.stages_enabled);
 
-      const linksFromCommunity = (community?.social_links || []).map(
-        (link) => ({
-          value: link,
+      const linksFromCommunity = (community?.social_links || [])
+        .filter((x) => x)
+        .map((link) => ({
+          value: link || '',
           canUpdate: true,
           canDelete: true,
           error: '',
-        }),
-      );
+        }));
       setLinks(linksFromCommunity);
       setInitialLinks(linksFromCommunity);
 

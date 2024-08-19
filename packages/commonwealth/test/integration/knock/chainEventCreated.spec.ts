@@ -66,7 +66,7 @@ describe('chainEventCreated Event Handler', () => {
     });
     const [contract] = await tester.seed('Contract', {
       address: communityStakesAddress,
-      chain_node_id: chainNode!.id,
+      chain_node_id: chainNode!.id!,
       abi_id: null,
     });
     await tester.seed('CommunityContract', {

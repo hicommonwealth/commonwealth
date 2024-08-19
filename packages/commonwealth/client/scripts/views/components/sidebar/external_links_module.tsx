@@ -24,7 +24,11 @@ export const ExternalLinksModule = () => {
     slacks,
     telegrams,
     twitters,
-  } = categorizeSocialLinks(community.social_links || []);
+  } = categorizeSocialLinks(
+    (community.social_links || [])
+      .filter((link) => link)
+      .map((link) => link || ''),
+  );
 
   return (
     <div className="ExternalLinksModule">
