@@ -1,8 +1,8 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
-import { trpc } from 'utils/trpcClient';
+import { BASE_API_PATH, trpc } from 'utils/trpcClient';
 import { z } from 'zod';
-import { queryClient, SERVER_URL } from '../config';
+import { queryClient } from '../config';
 
 const COMMUNITIY_STALE_TIME = 60 * 3_000; // 3 mins
 
@@ -60,7 +60,7 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
   // to @trpc/react-query v11.x
   const response = await axios.get(
     // eslint-disable-next-line max-len
-    `${SERVER_URL}/v1/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
+    `${BASE_API_PATH}/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
   );
   const fetchedCommunity = response?.data[0]?.result?.data as z.infer<
     typeof ExtendedCommunity
