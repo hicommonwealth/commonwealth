@@ -1,37 +1,29 @@
-import { CommunityCategoryType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
-import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
-import { RolesController } from 'controllers/server/roles';
-import SearchController from 'controllers/server/search';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
-import NodeInfo from 'models/NodeInfo';
-import NotificationCategory from 'models/NotificationCategory';
 import StarredCommunity from 'models/StarredCommunity';
-import { ChainStore, NodeStore } from 'stores';
+import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
+import { Configuration } from 'state/api/configuration';
+import { fetchNodesQuery } from 'state/api/nodes';
+import { errorStore } from 'state/ui/error';
+import { ChainStore } from 'stores';
+import { userStore } from './ui/user';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
   Connecting = 'connecting',
   Connected = 'connected',
-}
-
-export const enum LoginState {
-  NotLoaded = 'not_loaded',
-  LoggedOut = 'logged_out',
-  LoggedIn = 'logged_in',
 }
 
 export interface IApp {
@@ -57,49 +49,21 @@ export interface IApp {
   // Polls
   polls: PollsController;
 
-  // Proposals
-  proposalEmitter: EventEmitter;
-
-  // Search
-  search: SearchController;
-  searchAddressCache: any;
-
-  // Contracts
-  contracts: ContractsController;
-
   // Discord
   discord: DiscordController;
 
   // User
   user: UserController;
-  roles: RolesController;
-  recentActivity: RecentActivityController;
 
   // Web3
   snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
 
-  loginState: LoginState;
-  loginStateEmitter: EventEmitter;
-
   // stored on server-side
   config: {
     chains: ChainStore;
-    redirects: Record<string, string>;
-    nodes: NodeStore;
-    notificationCategories?: NotificationCategory[];
-    defaultChain: string;
-    evmTestEnv?: string;
-    enforceSessionKeys?: boolean;
-    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
-
-  loginStatusLoaded(): boolean;
-
-  isLoggedIn(): boolean;
-
-  serverUrl(): string;
 
   loadingError: string;
 
@@ -110,14 +74,10 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
-
-  // bandaid fix to skip next deinit chain on layout.tsx transition
-  skipDeinitChain: boolean;
 }
 
 // INJECT DEPENDENCIES
 const user = new UserController();
-const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
@@ -139,43 +99,20 @@ const app: IApp = {
   // Polls
   polls: new PollsController(),
 
-  // Proposals
-  proposalEmitter: new EventEmitter(),
-
-  // Contracts
-  contracts: new ContractsController(),
-
   // Discord
   discord: new DiscordController(),
-
-  // Search
-  search: new SearchController(),
-  searchAddressCache: {},
 
   // Web3
   snapshot: new SnapshotController(),
 
   // User
   user,
-  roles,
-  recentActivity: new RecentActivityController(),
-  loginState: LoginState.NotLoaded,
-  loginStateEmitter: new EventEmitter(),
 
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 
   config: {
     chains: new ChainStore(),
-    redirects: {},
-    nodes: new NodeStore(),
-    defaultChain: 'edgeware',
-  },
-  // TODO: Collect all getters into an object
-  loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
-  isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  serverUrl: () => {
-    return '/api';
   },
 
   // @ts-expect-error StrictNullChecks
@@ -190,7 +127,6 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
-  skipDeinitChain: false,
 };
 //allows for FS.identify to be used
 declare const window: any;
@@ -198,101 +134,86 @@ declare const window: any;
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
-  shouldRedraw = true,
 ): Promise<void> {
   try {
-    const [{ data: statusRes }, { data: communities }, { data: nodesRes }] =
-      await Promise.all([
-        axios.get(`${app.serverUrl()}/status`),
-        axios.get(`${app.serverUrl()}/communities`),
-        axios.get(`${app.serverUrl()}/nodes`),
-      ]);
+    const [{ data: statusRes }, { data: communities }] = await Promise.all([
+      axios.get(`${SERVER_URL}/status`),
+      axios.get(`${SERVER_URL}/communities`),
+    ]);
+
+    const nodesData = await fetchNodesQuery();
 
     app.config.chains.clear();
-    app.config.nodes.clear();
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
-    app.config.evmTestEnv = statusRes.result.evmTestEnv;
-    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
 
-    nodesRes.result
-      .sort((a, b) => a.id - b.id)
-      .forEach((node) => {
-        app.config.nodes.add(NodeInfo.fromJSON(node));
-      });
+    queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+      enforceSessionKeys: statusRes.result.enforceSessionKeys,
+      evmTestEnv: statusRes.result.evmTestEnv,
+    });
 
     communities.result
       .filter((c) => c.community.active)
       .forEach((c) => {
         const chainInfo = ChainInfo.fromJSON({
-          ChainNode: app.config.nodes.getById(c.community.chain_node_id),
+          ChainNode: nodesData.find((n) => n.id === c.community.chain_node_id),
           ...c.community,
         });
         app.config.chains.add(chainInfo);
+
         if (chainInfo.redirect) {
-          app.config.redirects[chainInfo.redirect] = chainInfo.id;
+          const cachedConfig = queryClient.getQueryData<Configuration>([
+            QueryKeys.CONFIGURATION,
+          ]);
+
+          queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+            ...cachedConfig,
+            redirects: {
+              ...cachedConfig?.redirects,
+              [chainInfo.redirect]: chainInfo.id,
+            },
+          });
         }
       });
 
-    app.roles.setRoles(statusRes.result.roles);
-    app.config.notificationCategories =
-      statusRes.result.notificationCategories.map((json) =>
-        NotificationCategory.fromJSON(json),
-      );
-    app.config.chainCategoryMap = statusRes.result.communityCategoryMap;
-
-    // add recentActivity
-    const { recentThreads } = statusRes.result;
-    recentThreads.forEach(({ communityId, count }) => {
-      app.recentActivity.setCommunityThreadCounts(communityId, count);
-    });
+    // it is either user object or undefined
+    const userResponse = statusRes.result.user;
 
     // update the login status
-    updateActiveUser(statusRes.result.user);
-    app.loginState = statusRes.result.user
-      ? LoginState.LoggedIn
-      : LoginState.LoggedOut;
+    updateActiveUser(userResponse);
 
-    if (app.loginState === LoginState.LoggedIn) {
-      app.user.notifications.refresh();
-      if (shouldRedraw) {
-        app.loginStateEmitter.emit('redraw');
-      }
-    } else if (app.loginState === LoginState.LoggedOut && shouldRedraw) {
-      app.loginStateEmitter.emit('redraw');
+    if (userResponse) {
+      await app.user.notifications.refresh();
     }
 
-    app.user.setStarredCommunities(
-      statusRes.result.user?.starredCommunities
-        ? statusRes.result.user?.starredCommunities.map(
-            (c) => new StarredCommunity(c),
-          )
-        : [],
-    );
+    userStore.getState().setData({
+      starredCommunities: (userResponse?.starredCommunities || []).map(
+        (c) => new StarredCommunity(c),
+      ),
+    });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
-    if (
-      updateSelectedCommunity &&
-      statusRes.result.user &&
-      statusRes.result.user.selectedCommunity
-    ) {
-      app.user.setSelectedCommunity(
-        ChainInfo.fromJSON(statusRes.result.user.selectedCommunity),
-      );
+    if (updateSelectedCommunity && userResponse?.selectedCommunity) {
+      userStore.getState().setData({
+        activeCommunity: ChainInfo.fromJSON(userResponse?.selectedCommunity),
+      });
     }
 
-    if (statusRes.result.user) {
+    if (userResponse) {
       try {
         window.FS('setIdentity', {
-          uid: statusRes.result.user.profileId,
+          uid: userResponse.id,
         });
       } catch (e) {
         console.error('FullStory not found.');
       }
     }
   } catch (err) {
-    app.loadingError =
-      err.response?.data?.error || 'Error loading application state';
+    errorStore
+      .getState()
+      .setLoadingError(
+        err.response?.data?.error || 'Error loading application state',
+      );
     throw err;
   }
 }

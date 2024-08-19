@@ -14,14 +14,13 @@ import { CWModal } from './component_kit/new_designs/CWModal';
 type AddressProps = {
   profile: NewProfile;
   addressInfo: AddressInfo;
-  refreshProfiles: (address: string) => void;
   toggleRemoveModal: (val: boolean, address: AddressInfo) => void;
 };
 
 type LinkedAddressesProps = {
   profile: NewProfile;
   addresses: AddressInfo[];
-  refreshProfiles: (address: string) => void;
+  refreshProfiles: (addressInfo: AddressInfo) => void;
 };
 
 const Address = (props: AddressProps) => {
@@ -30,7 +29,13 @@ const Address = (props: AddressProps) => {
 
   return (
     <div className="AddressContainer">
-      <CWTruncatedAddress address={address} communityInfo={community} />
+      <CWTruncatedAddress
+        address={address}
+        communityInfo={{
+          iconUrl: community.iconUrl || '',
+          name: community.name || '',
+        }}
+      />
       <PopoverMenu
         menuItems={[
           {
@@ -49,7 +54,9 @@ const Address = (props: AddressProps) => {
 
 export const LinkedAddresses = (props: LinkedAddressesProps) => {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<AddressInfo>();
+  const [currentAddress, setCurrentAddress] = useState<AddressInfo | null>(
+    null,
+  );
 
   const { profile, addresses, refreshProfiles } = props;
 
@@ -61,7 +68,6 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
             key={i}
             profile={profile}
             addressInfo={addr}
-            refreshProfiles={refreshProfiles}
             toggleRemoveModal={(val: boolean, address: AddressInfo) => {
               setIsRemoveModalOpen(val);
               setCurrentAddress(address);
@@ -72,23 +78,21 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       <CWModal
         size="small"
         content={
-          <DeleteAddressModal
-            profile={profile}
-            addresses={addresses}
-            // @ts-expect-error <StrictNullChecks/>
-            address={currentAddress?.address}
-            // @ts-expect-error <StrictNullChecks/>
-            chain={currentAddress?.community.id}
-            closeModal={() => {
-              setIsRemoveModalOpen(false);
-              // @ts-expect-error <StrictNullChecks/>
-              refreshProfiles(currentAddress.address);
-            }}
-          />
+          currentAddress && (
+            <DeleteAddressModal
+              profile={profile}
+              addresses={addresses}
+              address={currentAddress?.address}
+              chain={currentAddress?.community?.id}
+              closeModal={() => {
+                setIsRemoveModalOpen(false);
+                refreshProfiles(currentAddress);
+              }}
+            />
+          )
         }
         onClose={() => {
           setIsRemoveModalOpen(false);
-          // @ts-expect-error <StrictNullChecks/>
           setCurrentAddress(null);
         }}
         open={isRemoveModalOpen}

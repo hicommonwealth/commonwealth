@@ -17,10 +17,20 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "echo No tests for @hicommonwealth/shared"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
+    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
+    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "moment": "^2.23.0"
+    "@canvas-js/chain-cosmos": "0.10.0-beta.3",
+    "@canvas-js/chain-ethereum": "0.10.0-beta.3",
+    "@canvas-js/chain-solana": "0.10.0-beta.3",
+    "@canvas-js/chain-substrate": "0.10.0-beta.3",
+    "@canvas-js/interfaces": "0.10.0-beta.3",
+    "@canvas-js/signatures": "0.10.0-beta.3",
+    "@ipld/dag-json": "^10.2.0",
+    "moment": "^2.23.0",
+    "safe-stable-stringify": "^2.4.2"
   },
   "devDependencies": {
     "@types/moment": "^2.13.0"

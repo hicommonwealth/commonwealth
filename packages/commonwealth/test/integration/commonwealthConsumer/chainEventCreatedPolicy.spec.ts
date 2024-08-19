@@ -72,6 +72,7 @@ describe('ChainEventCreated Policy', () => {
       'ChainNode',
       {
         url: 'https://ethereum-sepolia.publicnode.com',
+        private_url: 'https://ethereum-sepolia.publicnode.com',
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
@@ -91,7 +92,6 @@ describe('ChainEventCreated Policy', () => {
         {
           role: 'admin',
           user_id: user!.id,
-          profile_id: undefined,
         },
       ],
       CommunityStakes: [

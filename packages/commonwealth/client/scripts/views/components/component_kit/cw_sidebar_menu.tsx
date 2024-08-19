@@ -6,6 +6,7 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -33,9 +34,13 @@ const resetSidebarState = () => {
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+  const user = useUserStore();
+
+  // eslint-disable-next-line react/destructuring-assignment
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   if (props.type === 'default') {
     const {
       disabled,
@@ -82,16 +87,20 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'header') {
     return (
       <div className="SidebarMenuItem header">
+        {/* eslint-disable-next-line react/destructuring-assignment */}
         <CWText type="caption">{props.label}</CWText>
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'community') {
+    /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
-    // @ts-expect-error <StrictNullChecks/>
-    const roles = app.roles.getAllRolesInCommunity({ community: item.id });
+    const account =
+      item && user.accounts.find(({ community }) => item.id == community.id);
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
@@ -112,28 +121,22 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           });
         }}
       >
-        {/*// @ts-expect-error <StrictNullChecks/>*/}
-        <CommunityLabel community={item} />
-        {app.isLoggedIn() && roles.length > 0 && (
+        {item && (
+          <CommunityLabel name={item.name || ''} iconUrl={item.iconUrl} />
+        )}
+        {user.isLoggedIn && account && (
           <div className="roles-and-star">
             <User
               avatarSize={18}
               shouldShowAvatarOnly
-              userAddress={roles?.[0]?.address}
-              userCommunityId={
-                roles?.[0]?.address_chain || roles?.[0]?.community_id
-              }
-              shouldShowAsDeleted={
-                !roles?.[0]?.address &&
-                !(roles?.[0]?.address_chain || roles?.[0]?.community_id)
-              }
+              userAddress={account.address}
+              userCommunityId={account.community.id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  // @ts-expect-error <StrictNullChecks/>
                   community: item.id,
                 });
                 setIsStarred((prevState) => !prevState);
@@ -152,10 +155,13 @@ type SidebarMenuProps = {
   menuItems: Array<MenuItem>;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+
+  const user = useUserStore();
 
   return (
     <div
@@ -179,8 +185,11 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             ...item,
             isStarred:
               item.type === 'community'
-                ? // @ts-expect-error <StrictNullChecks/>
-                  app.user.isCommunityStarred(item.community.id)
+                ? !!user.starredCommunities.find(
+                    (starCommunity) =>
+                      starCommunity.community_id ===
+                      (item?.community?.id || ''),
+                  )
                 : false,
           };
 

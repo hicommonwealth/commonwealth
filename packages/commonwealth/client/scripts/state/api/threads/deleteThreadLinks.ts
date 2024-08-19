@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread, { Link } from 'models/Thread';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface DeleteThreadLinksProps {
@@ -14,16 +15,13 @@ const deleteThreadLinks = async ({
   threadId,
   links,
 }: DeleteThreadLinksProps): Promise<Thread> => {
-  const response = await axios.delete(
-    `${app.serverUrl()}/linking/deleteLinks`,
-    {
-      data: {
-        thread_id: threadId,
-        links,
-        jwt: app.user.jwt,
-      },
+  const response = await axios.delete(`${SERVER_URL}/linking/deleteLinks`, {
+    data: {
+      thread_id: threadId,
+      links,
+      jwt: userStore.getState().jwt,
     },
-  );
+  });
 
   return new Thread(response.data.result);
 };

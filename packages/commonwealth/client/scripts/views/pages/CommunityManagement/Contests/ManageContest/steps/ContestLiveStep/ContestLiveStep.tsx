@@ -14,9 +14,13 @@ import './ContestLiveStep.scss';
 
 interface ContestLiveStepProps {
   createdContestAddress: string;
+  isFarcasterContest: boolean;
 }
 
-const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
+const ContestLiveStep = ({
+  createdContestAddress,
+  isFarcasterContest,
+}: ContestLiveStepProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const navigate = useCommonNavigate();
@@ -45,8 +49,14 @@ const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
               />
               <CWButton
                 containerClassName="cta-btn"
-                label="Go to contests"
-                onClick={() => navigate('/manage/contests')}
+                label={
+                  isFarcasterContest ? 'Copy Farcaster Frame' : 'Go to contests'
+                }
+                onClick={() =>
+                  isFarcasterContest
+                    ? console.log('Farcaster frame copied')
+                    : navigate('/manage/contests')
+                }
               />
             </div>
           </div>

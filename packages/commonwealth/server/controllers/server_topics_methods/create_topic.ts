@@ -3,8 +3,8 @@ import {
   CommunityInstance,
   TopicAttributes,
   UserInstance,
+  sanitizeQuillText,
 } from '@hicommonwealth/model';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -52,12 +52,11 @@ export async function __createTopic(
     throw new AppError(Errors.DefaultTemplateRequired);
   }
   default_offchain_template = sanitizeQuillText(
-    // @ts-expect-error StrictNullChecks
-    default_offchain_template,
+    default_offchain_template!,
     true,
   );
 
-  const isAdmin = validateOwner({
+  const isAdmin = await validateOwner({
     models: this.models,
     user,
     // @ts-expect-error StrictNullChecks

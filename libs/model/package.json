@@ -18,7 +18,9 @@
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false --coverage run test",
-    "test-select": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run"
+    "test-select": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run",
+    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
+    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",
@@ -32,9 +34,10 @@
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "@solana/spl-token": "^0.4.6",
-    "async-mutex": "^0.5.0",
     "@solana/web3.js": "^1.91.6",
+    "async-mutex": "^0.5.0",
     "ethers": "5.7.2",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",
     "node-fetch": "2",

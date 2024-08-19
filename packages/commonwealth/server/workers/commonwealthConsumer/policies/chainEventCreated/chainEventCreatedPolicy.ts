@@ -4,12 +4,10 @@ import {
   deployedNamespaceEventSignature,
   models,
 } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export const processChainEventCreated: EventHandler<
   'ChainEventCreated',

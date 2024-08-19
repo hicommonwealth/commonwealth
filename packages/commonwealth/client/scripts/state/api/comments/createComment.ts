@@ -1,14 +1,14 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signComment } from 'client/scripts/controllers/server/sessions';
-import { useFlag } from 'hooks/useFlag';
+import { signComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { useAuthModalStore } from '../../ui/modals';
+import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -17,8 +17,9 @@ interface CreateCommentProps {
   threadId: number;
   communityId: string;
   unescapedText: string;
-  parentCommentId: number;
+  parentCommentId: number | null;
   existingNumberOfComments: number;
+  isPWA?: boolean;
 }
 
 const createComment = async ({
@@ -26,8 +27,8 @@ const createComment = async ({
   profile,
   threadId,
   unescapedText,
-  // @ts-expect-error StrictNullChecks
   parentCommentId = null,
+  isPWA,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(profile.address, {
     thread_id: threadId,
@@ -36,23 +37,32 @@ const createComment = async ({
   });
 
   const response = await axios.post(
-    `${app.serverUrl()}/threads/${threadId}/comments`,
+    `${SERVER_URL}/threads/${threadId}/comments`,
     {
       author_community_id: communityId,
       community_id: communityId,
       address: profile.address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
     },
   );
 
+  // map profile to server schema
   response.data.result.Address.User = {
-    Profiles: [profile],
+    profile: {
+      ...profile,
+      avatar_url: profile.avatarUrl,
+      last_active: profile.lastActive,
+    },
   };
-
-  return new Comment(response.data.result);
+  return new Comment({ community_id: undefined, ...response.data.result });
 };
 
 const useCreateCommentMutation = ({
@@ -60,7 +70,6 @@ const useCreateCommentMutation = ({
   threadId,
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     // @ts-expect-error StrictNullChecks
@@ -69,8 +78,12 @@ const useCreateCommentMutation = ({
     threadId,
   });
 
+  const user = useUserStore();
+
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: createComment,
@@ -93,17 +106,16 @@ const useCreateCommentMutation = ({
         'combineAndRemoveDups',
       );
 
-      if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          // @ts-expect-error StrictNullChecks
-          profileId,
+          userId,
         );
-      }
 
       return newComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

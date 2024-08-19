@@ -4,37 +4,33 @@ import app from 'state';
 import Account from './Account';
 
 class AddressInfo extends Account {
-  public readonly keytype: string;
-  public readonly id: number;
-  public readonly profileId: number;
+  public readonly userId: number;
 
   constructor({
+    userId,
     id,
     address,
     communityId,
-    keytype,
     walletId,
     walletSsoSource,
     ghostAddress,
-    profileId,
     lastActive,
   }: {
-    id: number | null | undefined;
+    userId: number;
+    id: number;
     address: string;
     communityId: string;
-    keytype?: string;
     walletId?: WalletId;
     walletSsoSource?: WalletSsoSource;
     ghostAddress?: boolean;
-    profileId?: number;
     lastActive?: string | moment.Moment;
   }) {
-    const chain = app.config.chains.getById(communityId);
+    // TODO: cleanup this with #2617
+    const chain = app.config.chains.getAll().find((c) => c.id === communityId);
     if (!chain) throw new Error(`Failed to locate chain: ${communityId}`);
     super({
       address,
       community: chain,
-      // @ts-expect-error StrictNullChecks
       addressId: id,
       walletId,
       walletSsoSource,
@@ -42,12 +38,7 @@ class AddressInfo extends Account {
       ignoreProfile: false,
       lastActive,
     });
-    // @ts-expect-error StrictNullChecks
-    this.id = id;
-    // @ts-expect-error StrictNullChecks
-    this.keytype = keytype;
-    // @ts-expect-error StrictNullChecks
-    this.profileId = profileId;
+    this.userId = userId;
   }
 }
 

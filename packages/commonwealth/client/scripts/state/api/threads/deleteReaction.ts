@@ -1,8 +1,11 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signDeleteThreadReaction } from 'client/scripts/controllers/server/sessions';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { signDeleteThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
@@ -25,18 +28,15 @@ const deleteReaction = async ({
     thread_id: threadId,
   });
 
-  const response = await axios.delete(
-    `${app.serverUrl()}/reactions/${reactionId}`,
-    {
-      data: {
-        author_community_id: communityId,
-        address: address,
-        community_id: app.chain.id,
-        jwt: app.user.jwt,
-        ...toCanvasSignedDataApiArgs(canvasSignedData),
-      },
+  const response = await axios.delete(`${SERVER_URL}/reactions/${reactionId}`, {
+    data: {
+      author_community_id: communityId,
+      address: address,
+      community_id: app.chain.id,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
-  );
+  });
 
   return {
     ...response,
@@ -54,6 +54,8 @@ const useDeleteThreadReactionMutation = ({
   communityId,
   threadId,
 }: UseDeleteThreadReactionMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
@@ -68,6 +70,7 @@ const useDeleteThreadReactionMutation = ({
         'removeFromExisting',
       );
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

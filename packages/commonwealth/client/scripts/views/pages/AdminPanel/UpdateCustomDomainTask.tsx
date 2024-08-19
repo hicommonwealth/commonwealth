@@ -1,20 +1,17 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { updateCommunityCustomDomain } from 'views/pages/AdminPanel/utils';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
 const UpdateCustomDomainTask = () => {
   const [communityId, setCommunityId] = useState<string>('');
-  const [communityIdValidated, setCommunityIdValidated] =
-    useState<boolean>(false);
   const [customDomain, setCustomDomain] = useState<string>('');
-  const [customDomainValidated, setCustomDomainValidated] =
-    useState<boolean>(false);
 
   const openConfirmationModal = () => {
     openConfirmation({
@@ -52,50 +49,43 @@ const UpdateCustomDomainTask = () => {
     });
   };
 
-  const validateCommunityFn = (
-    value: string,
-  ): [ValidationStatus, string] | [] => {
-    const communityExists = app.config.chains.getById(value);
-    if (!communityExists) {
-      setCommunityIdValidated(false);
-      return ['failure', 'Community not found'];
-    }
-    setCommunityIdValidated(true);
-    return [];
-  };
+  const debouncedCommunityId = useDebounce<string | undefined>(
+    communityId,
+    500,
+  );
 
-  const validateCustomDomain = (
-    value: string,
-  ): [ValidationStatus, string] | [] => {
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: debouncedCommunityId || '',
+      enabled: !!debouncedCommunityId,
+    });
+  const communityNotFound =
+    !isLoadingCommunity && Object.keys(community || {})?.length === 0;
+
+  const customDomainValidatonError = (() => {
+    if (!customDomain) return 'Required';
+
     const validCustomDomainUrl = new RegExp(
       '^(([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}$',
     );
     // TODO: enhance this validation to ensure a tighter format (no dangling paths)
-    if (!validCustomDomainUrl.test(value)) {
-      setCustomDomainValidated(false);
-      return ['failure', 'Invalid URL (try removing the http prefix)'];
+    if (!validCustomDomainUrl.test(customDomain)) {
+      return 'Invalid URL (try removing the http prefix)';
     }
 
     // there's probably a better way to remove prefixes for duplicate finding purposes
     const existingCustomDomain = app.config.chains
       .getAll()
       .find(
-        (community) =>
-          community.customDomain &&
-          community.customDomain
-            .replace('https://', '')
-            .replace('http://', '') === value,
+        (c) =>
+          c.customDomain &&
+          c.customDomain.replace('https://', '').replace('http://', '') ===
+            customDomain,
       );
     if (existingCustomDomain) {
-      setCustomDomainValidated(false);
-      return [
-        'failure',
-        `Custom domain in use by community '${existingCustomDomain.id}'`,
-      ];
+      return `Custom domain in use by community '${existingCustomDomain.id}'`;
     }
-    setCustomDomainValidated(true);
-    return [];
-  };
+  })();
 
   return (
     <div className="TaskGroup">
@@ -106,29 +96,25 @@ const UpdateCustomDomainTask = () => {
       </CWText>
       <div className="TaskRow">
         <CWTextInput
-          value={communityId}
           label="Community Id"
-          onInput={(e) => {
-            setCommunityId(e.target.value);
-            if (e.target.value.length === 0) setCommunityIdValidated(false);
-          }}
-          inputValidationFn={(value) => validateCommunityFn(value)}
-          placeholder="dydx"
+          value={communityId}
+          onInput={(e) => setCommunityId(e?.target?.value?.trim() || '')}
+          customError={communityNotFound ? 'Community not found' : ''}
+          placeholder="Enter a community id"
+          fullWidth
         />
         <CWTextInput
-          value={customDomain}
           label="Custom Domain URL"
-          onInput={(e) => {
-            setCustomDomain(e.target.value);
-            if (e.target.value.length === 0) setCustomDomainValidated(false);
-          }}
-          inputValidationFn={(value) => validateCustomDomain(value)}
+          value={customDomain}
+          onInput={(e) => setCustomDomain(e?.target?.value?.trim() || '')}
+          customError={customDomain && customDomainValidatonError}
           placeholder="my.customdomain.com"
+          fullWidth
         />
         <CWButton
           label="Update"
           className="TaskButton"
-          disabled={!customDomainValidated || !communityIdValidated}
+          disabled={communityNotFound || !!customDomainValidatonError}
           onClick={openConfirmationModal}
         />
       </div>

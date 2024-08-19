@@ -1,4 +1,4 @@
-import { AvatarUpload } from './AvatarUpload';
 import { Avatar } from './Avatar';
+import { AvatarUpload } from './AvatarUpload';
 
-export { AvatarUpload, Avatar };
+export { Avatar, AvatarUpload };

@@ -4,24 +4,29 @@ import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
 } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useUserStore from 'state/ui/user';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -34,12 +39,11 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import ContestThreadBanner from './ContestThreadBanner';
+import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
-import {
-  checkIsTopicInContest,
-  checkNewThreadErrors,
-  useNewThreadForm,
-} from './helpers';
+import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+
+const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -48,11 +52,14 @@ export const NewThreadForm = () => {
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
-  const { data: topics = [] } = useFetchTopicsQuery({
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
+    includeContestData: contestsEnabled,
   });
 
-  const { contestsData, isContestAvailable } = useCommunityContests();
+  const { isContestAvailable } = useCommunityContests();
 
   const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
   const communityId = app.chain.id;
@@ -77,11 +84,23 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
-  const isTopicInContest = checkIsTopicInContest(contestsData, threadTopic?.id);
+  const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
+
+  const user = useUserStore();
+
+  const contestTopicError = threadTopic?.activeContestManagers?.length
+    ? threadTopic?.activeContestManagers
+        ?.map(
+          (acm) =>
+            acm?.content?.filter(
+              (c) => c.actor_address === user.activeAccount?.address,
+            ).length || 0,
+        )
+        ?.every((n) => n >= 2)
+    : false;
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -89,21 +108,25 @@ export const NewThreadForm = () => {
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
-  const {
-    mutateAsync: createThread,
-    error: createThreadError,
-    reset: resetCreateThreadMutation,
-  } = useCreateThreadMutation({
+  const { mutateAsync: createThread } = useCreateThreadMutation({
     communityId: app.activeChainId(),
   });
 
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetCreateThreadMutation,
-    error: createThreadError,
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+
+  const { data: userEthBalance } = useGetUserEthBalanceQuery({
+    chainRpc,
+    walletAddress: user.activeAccount?.address || '',
+    apiEnabled:
+      isContestAvailable &&
+      !!user.activeAccount?.address &&
+      Number(ethChainId) > 0,
+    ethChainId: ethChainId || 0,
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -150,18 +173,18 @@ export const NewThreadForm = () => {
 
     try {
       const thread = await createThread({
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address || '',
         kind: threadKind,
-        stage: app.chain.meta.customStages
-          ? parseCustomStages(app.chain.meta.customStages)[0]
+        stage: app.chain.meta?.customStages
+          ? parseCustomStages(app.chain.meta?.customStages)[0]
           : ThreadStage.Discussion,
         communityId: app.activeChainId(),
         title: threadTitle,
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        // @ts-expect-error <StrictNullChecks/>
-        authorProfile: app.user.activeAccount.profile,
+        authorProfile: user.activeAccount?.profile as MinimumProfile,
+        isPWA: isAddedToHomeScreen,
       });
 
       setThreadContentDelta(createDeltaFromText(''));
@@ -172,6 +195,14 @@ export const NewThreadForm = () => {
       if (err instanceof SessionKeyError) {
         return;
       }
+
+      if (err?.message?.includes('limit')) {
+        notifyError(
+          'Limit of submitted threads in selected contest has been exceeded.',
+        );
+        return;
+      }
+
       console.error(err.response.data.error || err?.message);
       notifyError('Failed to create thread');
     } finally {
@@ -188,16 +219,28 @@ export const NewThreadForm = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const showBanner = !user.activeAccount && isBannerVisible;
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,
   });
 
   const contestThreadBannerVisible =
-    contestsEnabled && isContestAvailable && isTopicInContest;
+    contestsEnabled && isContestAvailable && hasTopicOngoingContest;
   const isDisabledBecauseOfContestsConsent =
     contestThreadBannerVisible && !submitEntryChecked;
+
+  const contestTopicAffordanceVisible =
+    contestsEnabled && isContestAvailable && hasTopicOngoingContest;
+
+  const walletBalanceError =
+    isContestAvailable &&
+    hasTopicOngoingContest &&
+    parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
+
+  useEffect(() => {
+    refreshTopics().catch(console.error);
+  }, [refreshTopics]);
 
   return (
     <>
@@ -219,6 +262,29 @@ export const NewThreadForm = () => {
 
               {!!hasTopics && (
                 <CWSelectList
+                  className="topic-select"
+                  components={{
+                    // eslint-disable-next-line react/no-multi-comp
+                    Option: (originalProps) =>
+                      CustomTopicOption({
+                        originalProps,
+                        topic: topicsForSelector.find(
+                          (t) => String(t.id) === originalProps.data.value,
+                        ),
+                      }),
+                  }}
+                  formatOptionLabel={(option) => (
+                    <>
+                      {contestTopicAffordanceVisible && (
+                        <CWIcon
+                          className="trophy-icon"
+                          iconName="trophy"
+                          iconSize="small"
+                        />
+                      )}
+                      {option.label}
+                    </>
+                  )}
                   options={sortedTopics.map((topic) => ({
                     label: topic?.name,
                     value: `${topic?.id}`,
@@ -232,6 +298,11 @@ export const NewThreadForm = () => {
                       },
                     })}
                   placeholder="Select topic"
+                  customError={
+                    contestTopicError
+                      ? 'Can no longer post in this topic while contest is active.'
+                      : ''
+                  }
                   onChange={(topic) => {
                     setCanShowGatingBanner(true);
                     setThreadTopic(
@@ -239,6 +310,22 @@ export const NewThreadForm = () => {
                       topicsForSelector.find((t) => `${t.id}` === topic.value),
                     );
                   }}
+                />
+              )}
+
+              {contestTopicAffordanceVisible && (
+                <ContestTopicBanner
+                  contests={threadTopic?.activeContestManagers.map((acm) => {
+                    return {
+                      name: acm?.contest_manager?.name,
+                      address: acm?.contest_manager?.contest_address,
+                      submittedEntries:
+                        acm?.content?.filter(
+                          (c) =>
+                            c.actor_address === user.activeAccount?.address,
+                        ).length || 0,
+                    };
+                  })}
                 />
               )}
 
@@ -254,7 +341,7 @@ export const NewThreadForm = () => {
               <ReactQuillEditor
                 contentDelta={threadContentDelta}
                 setContentDelta={setThreadContentDelta}
-                isDisabled={isRestrictedMembership || !hasJoinedCommunity}
+                isDisabled={isRestrictedMembership || !user.activeAccount}
                 tooltipLabel={
                   typeof disabledActionsTooltipText === 'function'
                     ? disabledActionsTooltipText?.('submit')
@@ -270,8 +357,15 @@ export const NewThreadForm = () => {
                 />
               )}
 
+              <MessageRow
+                hasFeedback={walletBalanceError}
+                statusMessage={`Ensure that your connected wallet has at least 
+                ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
+                validationStatus="failure"
+              />
+
               <div className="buttons-row">
-                {isPopulated && hasJoinedCommunity && (
+                {isPopulated && user.activeAccount && (
                   <CWButton
                     buttonType="tertiary"
                     onClick={handleCancel}
@@ -284,8 +378,10 @@ export const NewThreadForm = () => {
                   label="Create thread"
                   disabled={
                     isDisabled ||
-                    !hasJoinedCommunity ||
-                    isDisabledBecauseOfContestsConsent
+                    !user.activeAccount ||
+                    isDisabledBecauseOfContestsConsent ||
+                    walletBalanceError ||
+                    contestTopicError
                   }
                   onClick={handleNewThreadCreation}
                   tabIndex={4}
@@ -313,7 +409,6 @@ export const NewThreadForm = () => {
         </div>
       </CWPageLayout>
       {JoinCommunityModals}
-      {RevalidationModal}
     </>
   );
 };

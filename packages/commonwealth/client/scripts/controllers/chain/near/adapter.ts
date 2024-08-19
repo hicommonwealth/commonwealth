@@ -1,12 +1,12 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import type { NearToken } from 'adapters/chain/near/types';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import IChainAdapter from '../../../models/IChainAdapter';
 import { NearAccounts } from './account';
 import NearChain from './chain';
 
-export default class Near extends IChainAdapter<NearToken, any> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default class Near extends IChainAdapter<any, any> {
   public base = ChainBase.NEAR;
   public chain: NearChain;
   public accounts: NearAccounts;
@@ -18,7 +18,7 @@ export default class Near extends IChainAdapter<NearToken, any> {
   }
 
   public async initApi() {
-    await this.chain.init(this.meta, this.accounts);
+    await this.chain.init(this.meta);
     await this.accounts.init(this.chain);
     await super.initApi();
   }

@@ -44,7 +44,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 1, isAdmin: true },
+      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
     }) as UserInstance;
 
     let response = await controller.updateCommunity({
@@ -62,7 +62,6 @@ describe('UpdateChain Tests', () => {
     response = await controller.updateCommunity({
       ...baseRequest,
       directory_page_enabled: false,
-      // @ts-expect-error StrictNullChecks
       directory_page_chain_node_id: null,
       type: ChainType.Chain,
       user: user,
@@ -78,7 +77,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: false },
+      userAttributes: { email: '', id: 2, isAdmin: false, profile: {} },
     }) as UserInstance;
 
     try {
@@ -98,8 +97,14 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: false },
+      userAttributes: { email: '', id: 2, isAdmin: false, profile: {} },
     }) as UserInstance;
+
+    const incorrectChainNode = await models.ChainNode.findOne({
+      where: {
+        name: 'Edgeware Mainnet',
+      },
+    });
 
     try {
       await controller.updateCommunity({
@@ -107,7 +112,7 @@ describe('UpdateChain Tests', () => {
         user: user,
         namespace: 'tempNamespace',
         transactionHash: '0x1234',
-        chain_node_id: 100000,
+        chain_node_id: incorrectChainNode!.id!,
       });
     } catch (e) {
       assert.equal(e.message, 'Namespace not supported on selected chain');
@@ -125,7 +130,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: false },
+      userAttributes: { email: '', id: 2, isAdmin: false, profile: {} },
     }) as UserInstance;
 
     // change chain node to one that supports namespace

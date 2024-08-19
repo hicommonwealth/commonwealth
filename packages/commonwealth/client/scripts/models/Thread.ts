@@ -1,11 +1,18 @@
+import {
+  Contest,
+  ContestAction,
+  ContestManager,
+  ContestScore,
+} from '@hicommonwealth/schemas';
 import { ProposalType } from '@hicommonwealth/shared';
 import type MinimumProfile from 'models/MinimumProfile';
-import { addressToUserProfile, UserProfile } from 'models/MinimumProfile';
+import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
+import { z } from 'zod';
 import Comment from './Comment';
-import type { IUniqueId } from './interfaces';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
+import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
 function getDecodedString(str: string) {
@@ -15,6 +22,47 @@ function getDecodedString(str: string) {
     console.error(`Could not decode str: "${str}"`);
     return str;
   }
+}
+
+function processAssociatedContests(
+  associatedContests?: AssociatedContest[] | null,
+  contestActions?: ContestActionT[] | null,
+): AssociatedContest[] | [] {
+  if (associatedContests) {
+    /**
+     * TODO: Ticket 8423, When we fix the content_id issue for 'added' contests, we should remove this deduplication
+     * logic
+     **/
+    const uniqueContestIds = new Set<string>();
+
+    const deduplicatedContests = associatedContests.filter((ac) => {
+      const key = `${ac.contest_id}:${ac.content_id}`;
+      if (!uniqueContestIds.has(key)) {
+        uniqueContestIds.add(key);
+        return true;
+      }
+      return false;
+    });
+
+    return deduplicatedContests;
+  }
+
+  if (contestActions) {
+    return contestActions.map((action) => ({
+      contest_id: action.Contest.contest_id,
+      contest_name: action.Contest.ContestManager.name,
+      contest_address: action.Contest.contest_address,
+      score: action.Contest.score,
+      contest_cancelled: action.Contest.ContestManager.cancelled,
+      thread_id: action.thread_id,
+      content_id: action.content_id,
+      start_time: action.Contest.start_time,
+      end_time: action.Contest.end_time,
+      contest_interval: action.Contest.ContestManager.interval,
+    }));
+  }
+
+  return [];
 }
 
 function processVersionHistory(versionHistory: any[]) {
@@ -89,7 +137,7 @@ function processAssociatedReactions(
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
         updated_at: tempReactionTimestamps[i],
-        voting_weight: tempReactionWeights[i] || 1,
+        voting_weight: tempReactionWeights[i] || 0,
         reactedProfileName: emptyStringToNull(reactedProfileName?.[i]),
         reactedProfileAvatarUrl: emptyStringToNull(
           reactedProfileAvatarUrl?.[i],
@@ -103,8 +151,38 @@ function processAssociatedReactions(
   return temp;
 }
 
+const ScoreZ = ContestScore.element.omit({
+  tickerPrize: true,
+});
+
+const ContestManagerZ = ContestManager.pick({
+  name: true,
+  cancelled: true,
+  interval: true,
+});
+
+const ContestZ = Contest.pick({
+  contest_id: true,
+  contest_address: true,
+  end_time: true,
+}).extend({
+  score: ScoreZ.array(),
+  ContestManager: ContestManagerZ,
+  start_time: z.string(),
+  end_time: z.string(),
+});
+
+const ContestActionZ = ContestAction.pick({
+  content_id: true,
+  thread_id: true,
+}).extend({
+  Contest: ContestZ,
+});
+
+type ContestActionT = z.infer<typeof ContestActionZ>;
+
 export interface VersionHistory {
-  author?: MinimumProfile & { profile_id: number };
+  author?: MinimumProfile;
   timestamp: Moment;
   body: string;
 }
@@ -112,7 +190,7 @@ export interface VersionHistory {
 export interface IThreadCollaborator {
   address: string;
   community_id: string;
-  User: { Profiles: UserProfile[] };
+  User: { profile: UserProfile };
 }
 
 export type AssociatedReaction = {
@@ -126,12 +204,22 @@ export type AssociatedReaction = {
   last_active?: string;
 };
 
-type AssociatedContest = {
-  id: number;
-  thread_id: number;
+export type AssociatedContest = {
+  contest_id: number;
+  contest_name: string;
+  contest_address: string;
+  score: {
+    prize: string;
+    votes: number;
+    content_id: string;
+    creator_address: string;
+  }[];
+  contest_cancelled?: boolean | null;
+  thread_id: number | null | undefined;
   content_id: number;
   start_time: string;
   end_time: string;
+  contest_interval: number;
 };
 
 type RecentComment = {
@@ -144,7 +232,6 @@ type RecentComment = {
   marked_as_spam_at?: string;
   deleted_at?: string;
   discord_meta?: string;
-  profile_id: number;
   profile_name?: string;
   profile_avatar_url?: string;
   user_id: string;
@@ -258,13 +345,15 @@ export class Thread implements IUniqueId {
     canvasHash,
     links,
     discord_meta,
-    profile_id,
+    userId,
+    user_id,
     profile_name,
     avatar_url,
     address_last_active,
     associatedReactions,
     associatedContests,
     recentComments,
+    ContestActions,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -303,13 +392,15 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
-    profile_id: number;
+    userId: number;
+    user_id: number;
     profile_name: string;
     avatar_url: string;
     address_last_active: string;
     associatedReactions?: AssociatedReaction[];
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
+    ContestActions: ContestActionT[];
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
@@ -370,7 +461,10 @@ export class Thread implements IUniqueId {
         reactedProfileAvatarUrl,
         reactedAddressLastActive,
       );
-    this.associatedContests = associatedContests || [];
+    this.associatedContests = processAssociatedContests(
+      associatedContests,
+      ContestActions,
+    );
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({
@@ -384,17 +478,16 @@ export class Thread implements IUniqueId {
           plaintext: rc?.plainText,
           text: rc?.text,
           Address: {
+            user_id: rc?.user_id,
             address: rc?.address,
             User: {
-              Profiles: [
-                {
-                  id: rc?.profile_id,
-                  profile_name: rc?.profile_name,
-                  avatar_url: rc?.profile_avatar_url,
-                },
-              ],
+              profile: {
+                name: rc?.profile_name,
+                avatar_url: rc?.profile_avatar_url,
+              },
             },
           },
+          Thread: undefined,
           discord_meta: rc?.discord_meta,
           marked_as_spam_at: rc?.marked_as_spam_at,
           deleted_at: rc?.deleted_at,
@@ -416,7 +509,7 @@ export class Thread implements IUniqueId {
       this.profile = addressToUserProfile(Address);
     } else {
       this.profile = {
-        id: profile_id,
+        userId: userId ?? user_id,
         name: profile_name,
         address: Address?.address,
         lastActive: address_last_active,

@@ -70,11 +70,7 @@ describe('ServerThreadsController', () => {
           }),
         },
         CommunityStake: {
-          findOne: sandbox.stub().resolves({
-            id: 5,
-            stake_id: 1,
-            vote_weight: 1,
-          }),
+          findOne: sandbox.stub().resolves(null),
         },
 
         Community: {
@@ -537,6 +533,9 @@ describe('ServerThreadsController', () => {
               }),
             };
           },
+        },
+        CommentVersionHistory: {
+          create: () => null,
         },
         Subscription: {
           bulkCreate: async () => ({}),
@@ -1294,6 +1293,12 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        CommentVersionHistory: {
+          create: () => null,
+        },
+        ThreadVersionHistory: {
+          create: () => null,
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');

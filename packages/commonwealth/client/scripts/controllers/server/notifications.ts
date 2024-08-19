@@ -11,14 +11,16 @@ import app from 'state';
 import { Subscription } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
+import { SERVER_URL } from 'state/api/config';
+import { userStore } from 'state/ui/user';
 import { NotificationStore } from 'stores';
 import { z } from 'zod';
 import Notification from '../../models/Notification';
 
 const post = async (route, args, callback) => {
   try {
-    args['jwt'] = app.user.jwt;
-    const response = await axios.post(app.serverUrl() + route, args);
+    args['jwt'] = userStore.getState().jwt;
+    const response = await axios.post(SERVER_URL + route, args);
 
     if (response.data.status === 'Success') {
       callback(response.data.result);
@@ -32,8 +34,8 @@ const post = async (route, args, callback) => {
 
 const get = async (route, args, callback) => {
   try {
-    args['jwt'] = app.user.jwt;
-    const response = await axios.get(app.serverUrl() + route, { params: args });
+    args['jwt'] = userStore.getState().jwt;
+    const response = await axios.get(SERVER_URL + route, { params: args });
 
     if (response.data.status === 'Success') {
       callback(response.data.result);
@@ -319,7 +321,7 @@ class NotificationsController {
   }
 
   public getChainEventNotifications() {
-    if (!app.user || !app.user.jwt) {
+    if (!userStore.getState().jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
 
@@ -337,7 +339,7 @@ class NotificationsController {
   }
 
   public getDiscussionNotifications() {
-    if (!app.user || !app.user.jwt) {
+    if (!userStore.getState().jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
     // @ts-expect-error StrictNullChecks

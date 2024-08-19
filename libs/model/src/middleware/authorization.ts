@@ -3,11 +3,11 @@ import {
   InvalidInput,
   type CommandContext,
   type CommandHandler,
+  type CommandInput,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { ZodSchema } from 'zod';
 import { AddressAttributes, models } from '..';
 
 /**
@@ -21,15 +21,15 @@ import { AddressAttributes, models } from '..';
 /**
  * Finds one active community address that meets the arguments
  * @param actor command actor
- * @param id community id
+ * @param payload command payload including aggregate id
  * @param roles roles filter
  * @returns authorized address or throws
  */
 const authorizeAddress = async (
-  { actor, id }: CommandContext<any>,
+  { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<AddressAttributes> => {
-  if (!id) throw new InvalidActor(actor, 'Must provide a community id');
+  if (!payload.id) throw new InvalidActor(actor, 'Must provide a community id');
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   // TODO: cache
@@ -38,7 +38,7 @@ const authorizeAddress = async (
       where: {
         user_id: actor.user.id,
         address: actor.address_id,
-        community_id: id,
+        community_id: payload.id,
         role: { [Op.in]: roles },
       },
       order: [['role', 'DESC']],
@@ -49,9 +49,12 @@ const authorizeAddress = async (
   return addr;
 };
 
-type CommunityMiddleware = CommandHandler<ZodSchema, typeof schemas.Community>;
-type ThreadMiddleware = CommandHandler<ZodSchema, typeof schemas.Thread>;
-type CommentMiddleware = CommandHandler<ZodSchema, typeof schemas.Comment>;
+type CommunityMiddleware = CommandHandler<
+  CommandInput,
+  typeof schemas.Community
+>;
+type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
+type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
 
 /**
  * Community middleware
@@ -77,11 +80,11 @@ export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
 /**
  * Thread middleware
  */
-export const loadThread: ThreadMiddleware = async ({ id }) => {
-  if (!id) throw new InvalidInput('Must provide a thread id');
+export const loadThread: ThreadMiddleware = async ({ payload }) => {
+  if (!payload.id) throw new InvalidInput('Must provide a thread id');
   const thread = (
     await models.Thread.findOne({
-      where: { id },
+      where: { id: payload.id },
       include: {
         model: models.Address,
         required: true,
@@ -89,28 +92,29 @@ export const loadThread: ThreadMiddleware = async ({ id }) => {
       },
     })
   )?.get({ plain: true });
-  if (!thread) throw new InvalidInput(`Thread ${id} not found`);
+  if (!thread) throw new InvalidInput(`Thread ${payload.id} not found`);
   return thread;
 };
 
-export const isThreadAuthor: ThreadMiddleware = async ({ actor }, state) => {
+export const isThreadAuthor: ThreadMiddleware = ({ actor }, state) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return;
+  if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   if (!state) throw new InvalidActor(actor, 'Must load thread');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the thread');
+  return Promise.resolve();
 };
 
 /**
  * Comment middleware
  */
-export const loadComment: CommentMiddleware = async ({ id }) => {
-  if (!id) throw new InvalidInput('Must provide a comment id');
+export const loadComment: CommentMiddleware = async ({ payload }) => {
+  if (!payload.id) throw new InvalidInput('Must provide a comment id');
   const comment = (
     await models.Comment.findOne({
-      where: { id },
+      where: { id: payload.id },
       include: {
         model: models.Address,
         required: true,
@@ -118,16 +122,18 @@ export const loadComment: CommentMiddleware = async ({ id }) => {
       },
     })
   )?.get({ plain: true });
-  if (!comment) throw new InvalidInput(`Comment ${id} not found`);
+  if (!comment) throw new InvalidInput(`Comment ${payload.id} not found`);
   return comment;
 };
 
-export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
+export const isCommentAuthor: CommentMiddleware = ({ actor }, state) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return;
+  if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   if (!state) throw new InvalidActor(actor, 'Must load comment');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the comment');
+
+  return Promise.resolve();
 };

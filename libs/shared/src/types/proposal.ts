@@ -3,7 +3,6 @@ export enum ProposalType {
   CosmosProposal = 'cosmosproposal',
   CompoundProposal = 'compoundproposal',
   AaveProposal = 'onchainproposal',
-  SputnikProposal = 'sputnikproposal',
 }
 
 export type SnapshotProposalAttributes = {

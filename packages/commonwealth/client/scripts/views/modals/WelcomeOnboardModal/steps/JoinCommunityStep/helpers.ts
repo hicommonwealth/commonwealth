@@ -1,35 +1,15 @@
-import { ChainNetwork, CommunityCategoryType } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import ChainInfo from 'models/ChainInfo';
 import app from 'state';
-import { getCommunityTags } from 'views/pages/CommunityManagement/CommunityProfile/CommunityProfileForm/helpers';
 
 type FindSuggestedCommunitiesProps = {
-  userChainNetwork: ChainNetwork;
+  userChainBase: ChainBase;
   userPreferenceTags: string[];
   maxCommunitiesToFind: number;
 };
 
-// TODO: this method should be deprecated after https://github.com/hicommonwealth/commonwealth/issues/7835
-const getAllCommunityTags = (community: ChainInfo): string[] => {
-  const deprecatedTags = getCommunityTags(community.id);
-  const aggregatedTags = [
-    // filter out `defi` and `dao` tags from newer `CommunityTags` array
-    ...community.CommunityTags.filter(
-      (t) =>
-        ![
-          CommunityCategoryType.DeFi.toLowerCase(),
-          CommunityCategoryType.DeFi.toLowerCase(),
-        ].includes(t.name.toLowerCase()),
-    ).map((t) => t.name),
-  ];
-  // add `defi`, `dao` tags from older community category map
-  deprecatedTags.DeFi && aggregatedTags.push(CommunityCategoryType.DeFi);
-  deprecatedTags.DAO && aggregatedTags.push(CommunityCategoryType.DAO);
-  return aggregatedTags;
-};
-
 export const findSuggestedCommunities = ({
-  userChainNetwork,
+  userChainBase,
   userPreferenceTags,
   maxCommunitiesToFind,
 }: FindSuggestedCommunitiesProps): ChainInfo[] => {
@@ -41,23 +21,23 @@ export const findSuggestedCommunities = ({
     communitiesNotMatchingUserPreferences: [],
   };
 
-  // 1. filter communities that match user wallet chain network
+  // 1. filter communities that match user wallet chain base
   // 2. then sort them by the count of members (from higher to lower)
   // 3. then sort them by the count of threads (from higher to lower)
   // 4. then seperate them into 2 groups, communities that match user preferences and those that don't
   [...app.config.chains.getAll()]
-    .filter((community) => community.network === userChainNetwork)
-    .sort((a, b) => b.addressCount - a.addressCount)
+    .filter((community) => community.base === userChainBase)
+    .sort((a, b) => b.profileCount - a.profileCount)
     .sort((a, b) => b.threadCount - a.threadCount)
     .map((community) => {
-      const aggregatedCommunityTags = getAllCommunityTags(community);
+      const communityTagNames = community.CommunityTags.map((t) => t.name);
 
       // We dont want this community here
       // 1. if there are no tags
       // 2. if the community tags don't overlap user preference tags
       if (
-        aggregatedCommunityTags.length === 0 ||
-        !userPreferenceTags.some((tag) => aggregatedCommunityTags.includes(tag))
+        communityTagNames.length === 0 ||
+        !userPreferenceTags.some((tag) => communityTagNames.includes(tag))
       ) {
         communityPreferenceMap.communitiesNotMatchingUserPreferences.push(
           community,

@@ -1,19 +1,15 @@
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import getLinkType from 'helpers/linkType';
-import { useFlag } from 'hooks/useFlag';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { getLinkType, isLinkValid } from 'helpers/link';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
-import {
-  useFetchProfileByIdQuery,
-  useUpdateProfileByAddressMutation,
-} from 'state/api/profiles';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
@@ -46,9 +42,9 @@ export type Image = {
 };
 
 const EditProfile = () => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
+
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
@@ -76,8 +72,8 @@ const EditProfile = () => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
-    useUpdateProfileByAddressMutation({
+  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+    useUpdateUserMutation({
       addressesWithChainsToUpdate: addresses?.map((a) => ({
         address: a.address,
         chain: a.community.id,
@@ -90,7 +86,7 @@ const EditProfile = () => {
     error,
     refetch,
   } = useFetchProfileByIdQuery({
-    apiCallEnabled: isLoggedIn,
+    apiCallEnabled: user.isLoggedIn,
     shouldFetchSelfProfile: true,
   });
 
@@ -106,7 +102,14 @@ const EditProfile = () => {
     }
 
     if (data) {
-      setProfile(new NewProfile(data.profile));
+      setProfile(
+        new NewProfile({
+          ...data.profile,
+          userId: data.userId,
+          isOwner: data.userId === user.id,
+        }),
+      );
+      // @ts-expect-error <StrictNullChecks/>
       setAvatarUrl(data.profile.avatar_url);
       setPreferenceTags((tags) =>
         [...(tags || [])].map((t) => ({
@@ -122,15 +125,16 @@ const EditProfile = () => {
         })),
       );
       setAddresses(
+        // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
-              id: a.id,
+              userId: a.user_id!,
+              id: a.id!,
               address: a.address,
-              communityId: a.community_id,
-              keytype: a.keytype,
-              walletId: a.wallet_id,
-              walletSsoSource: a.wallet_sso_source,
+              communityId: a.community_id!,
+              walletId: a.wallet_id!,
+              walletSsoSource: a.wallet_sso_source!,
               ghostAddress: a.ghost_address,
             });
           } catch (err) {
@@ -141,7 +145,7 @@ const EditProfile = () => {
       );
       return;
     }
-  }, [data, isLoadingProfile, error, setPreferenceTags, setLinks]);
+  }, [data, isLoadingProfile, error, setPreferenceTags, setLinks, user.id]);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload
@@ -149,31 +153,25 @@ const EditProfile = () => {
     // should refactor AvatarUpload to make it work with new profiles
     // @ts-expect-error <StrictNullChecks/>
     if (addresses?.length > 0) {
+      const address = addresses![0];
       const oldProfile = new MinimumProfile(
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].community.name,
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].address,
+        address.address,
+        address.community.name,
       );
 
       oldProfile.initialize(
-        name,
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].address,
-        avatarUrl,
-        // @ts-expect-error <StrictNullChecks/>
-        profile.id,
-        // @ts-expect-error <StrictNullChecks/>
-        addresses[0].community.name,
+        profile!.userId,
+        profile!.name,
+        address.address,
+        avatarUrl!,
+        address.community.name,
         null,
       );
 
       setAccount(
         new Account({
-          // @ts-expect-error <StrictNullChecks/>
-          community: addresses[0].community,
-          // @ts-expect-error <StrictNullChecks/>
-          address: addresses[0].address,
+          community: address.community,
+          address: address.address,
           profile: oldProfile,
           ignoreProfile: false,
         }),
@@ -184,7 +182,7 @@ const EditProfile = () => {
     }
   }, [addresses, avatarUrl, profile]);
 
-  if (isLoadingProfile || isUpdatingProfile || !profile?.id) {
+  if (isLoadingProfile || isUpdatingProfile) {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
@@ -211,31 +209,32 @@ const EditProfile = () => {
             imageBehavior: backgroundImageBehaviour,
           })
         : null;
-      updateProfile({
-        name: values.username.trim(),
-        ...(backgroundImage && { backgroundImage }),
-        avatarUrl,
-        email: values.email.trim(),
-        socials: JSON.stringify(
-          (links || [])
-            .filter((link) => link.value.trim())
-            .map((link) => link.value.trim()),
-        ),
-        bio: serializeDelta(values.bio),
-        tagIds: preferenceTags
+
+      const updates = {
+        id: user.id,
+        profile: {
+          name: values.username.trim(),
+          email: values.email.trim(),
+          bio: serializeDelta(values.bio).trim(),
+          background_image: backgroundImage && JSON.parse(backgroundImage),
+          avatar_url: avatarUrl,
+          socials: (links || [])
+            .filter((l) => l.value.trim())
+            .map((l) => l.value.trim()),
+        },
+        tag_ids: preferenceTags
           .filter((tag) => tag.isSelected)
           .map((tag) => tag.item.id),
-        profileId: profile?.id,
-        address: app.user?.activeAccount?.address,
-        chain: app.user?.activeAccount?.community?.id,
-      })
-        .then(() => {
-          navigate(`/profile/id/${profile.id}`);
+      };
 
-          if (userOnboardingEnabled && links?.length > 0) {
+      updateUser(updates)
+        .then(() => {
+          navigate(`/profile/id/${user.id}`);
+
+          if (links?.length > 0) {
             markTrainingActionAsComplete(
               UserTrainingCardTypes.FinishProfile,
-              profile.id,
+              user.id,
             );
           }
         })
@@ -253,7 +252,7 @@ const EditProfile = () => {
             buttonType="secondary"
             buttonWidth="wide"
             disabled={isUploadingProfileImage || isUploadingCoverImage}
-            onClick={() => navigate(`/profile/id/${profile.id}`)}
+            onClick={() => navigate(`/profile/id/${user.id}`)}
           />
           <CWButton
             type="submit"
@@ -271,10 +270,10 @@ const EditProfile = () => {
         <div className="EditProfile">
           <CWForm
             initialValues={{
-              username: data?.profile?.profile_name || '',
+              username: data?.profile?.name || '',
               email: data?.profile?.email || '',
               backgroundImg: data?.profile?.background_image?.url || '',
-              bio: deserializeDelta(data?.profile?.bio),
+              bio: deserializeDelta(data?.profile?.bio ?? ''),
             }}
             onSubmit={handleSubmit}
             validationSchema={editProfileValidation}
@@ -350,9 +349,9 @@ const EditProfile = () => {
                 links={links.map((link) => ({
                   ...link,
                   customElementAfterLink:
-                    link.value && getLinkType(link.value, 'website') ? (
+                    link.value && isLinkValid(link.value) ? (
                       <CWTag
-                        label={getLinkType(link.value, 'website')}
+                        label={getLinkType(link.value) || 'website'}
                         type="group"
                         classNames="link-type"
                       />
@@ -393,12 +392,15 @@ const EditProfile = () => {
                 // @ts-expect-error <StrictNullChecks/>
                 addresses={addresses}
                 profile={profile}
-                refreshProfiles={(address: string) => {
+                refreshProfiles={(addressInfo) => {
                   refetch().catch(console.error);
-                  app.user.removeAddress(
-                    // @ts-expect-error <StrictNullChecks/>
-                    addresses.find((a) => a.address === address),
-                  );
+                  user.setData({
+                    addresses: [...user.addresses].filter(
+                      (addr) =>
+                        addr.community.id !== addressInfo.community.id &&
+                        addr.address !== addressInfo.address,
+                    ),
+                  });
                 }}
               />
               <CWText type="caption" fontWeight="medium">
@@ -406,23 +408,21 @@ const EditProfile = () => {
                 community
               </CWText>
             </ProfileSection>
-            {userOnboardingEnabled && (
-              <ProfileSection
-                title="Preferences"
-                description="Set your preferences to enhance your experience"
-              >
-                <div className="preferences-header">
-                  <CWText type="h4" fontWeight="semiBold">
-                    What are you interested in?
-                  </CWText>
-                  <CWText type="h5">(Select all that apply)</CWText>
-                </div>
-                <PreferenceTags
-                  preferenceTags={preferenceTags}
-                  onTagClick={toggleTagFromSelection}
-                />
-              </ProfileSection>
-            )}
+            <ProfileSection
+              title="Preferences"
+              description="Set your preferences to enhance your experience"
+            >
+              <div className="preferences-header">
+                <CWText type="h4" fontWeight="semiBold">
+                  What are you interested in?
+                </CWText>
+                <CWText type="h5">(Select all that apply)</CWText>
+              </div>
+              <PreferenceTags
+                preferenceTags={preferenceTags}
+                onTagClick={toggleTagFromSelection}
+              />
+            </ProfileSection>
             {actionButtons}
           </CWForm>
         </div>

@@ -1,13 +1,16 @@
-import { OpenFeature } from '@openfeature/web-sdk';
 import { handleSocialLoginCallback } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
 import { authModal } from 'state/ui/modals/authModal';
+import useUserStore from 'state/ui/user';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 
-const validate = async (setRoute: (route: string) => void) => {
+const validate = async (
+  setRoute: (route: string) => void,
+  isLoggedIn: boolean,
+) => {
   const params = new URLSearchParams(window.location.search);
   const chain = params.get('chain');
   const walletSsoSource = params.get('sso');
@@ -15,23 +18,18 @@ const validate = async (setRoute: (route: string) => void) => {
   if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
   const authModalState = authModal.getState();
-  const client = OpenFeature.getClient();
-  const userOnboardingEnabled = client.getBooleanValue(
-    'userOnboardingEnabled',
-    false,
-  );
 
   try {
     const isAttemptingToConnectAddressToCommunity =
-      app.isLoggedIn() && app.activeChainId();
+      isLoggedIn && app.activeChainId();
     const { isAddressNew } = await handleSocialLoginCallback({
       // @ts-expect-error <StrictNullChecks/>
       chain,
       // @ts-expect-error <StrictNullChecks/>
       walletSsoSource,
       returnEarlyIfNewAddress:
-        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect &&
-        userOnboardingEnabled,
+        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
+      isLoggedIn,
     });
     await initAppState();
 
@@ -48,11 +46,7 @@ const validate = async (setRoute: (route: string) => void) => {
     // and the user isn't trying to link address to community,
     // then open the user auth type guidance modal
     // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-    if (
-      isAddressNew &&
-      !isAttemptingToConnectAddressToCommunity &&
-      userOnboardingEnabled
-    ) {
+    if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
       authModalState.validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
     }
   } catch (error) {
@@ -63,9 +57,10 @@ const validate = async (setRoute: (route: string) => void) => {
 const FinishSocialLogin = () => {
   const navigate = useCommonNavigate();
   const [validationError, setValidationError] = useState<string>('');
+  const user = useUserStore();
 
   useEffect(() => {
-    validate(navigate).catch((error) => {
+    validate(navigate, user.isLoggedIn).catch((error) => {
       // useEffect will be called twice in development because of React strict mode,
       // causing an error to be displayed until validate() finishes
       if (document.location.host === 'localhost:8080') {
@@ -79,7 +74,7 @@ const FinishSocialLogin = () => {
         setValidationError('Error logging in, please try again');
       }
     });
-  }, [navigate]);
+  }, [navigate, user.isLoggedIn]);
 
   if (validationError) {
     return <ErrorPage message={validationError} />;

@@ -2,16 +2,13 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
@@ -20,32 +17,21 @@ import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
-import AuthButtons from 'client/scripts/views/components/SublayoutHeader/AuthButtons';
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import useUserStore from 'state/ui/user';
+import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
+import { AuthModalType } from 'views/modals/AuthModal';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
   onMobile: boolean;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
-  onRevalidationModalData: ({
-    walletSsoSource,
-    walletAddress,
-  }: {
-    walletSsoSource: WalletSsoSource;
-    walletAddress: string;
-  }) => void;
 }
 
-const DesktopHeader = ({
-  onMobile,
-  onAuthModalOpen,
-  onRevalidationModalData,
-}: DesktopHeaderProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
+  const user = useUserStore();
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -68,7 +54,7 @@ const DesktopHeader = ({
             if (app.isCustomDomain()) {
               navigate('/', {}, null);
             } else {
-              if (isLoggedIn) {
+              if (user.isLoggedIn) {
                 navigate('/dashboard/for-you', {}, null);
               } else {
                 navigate('/dashboard/global', {}, null);
@@ -91,12 +77,12 @@ const DesktopHeader = ({
       <div className="header-right">
         <div
           className={clsx('DesktopMenuContainerParent', {
-            isLoggedIn,
+            isLoggedIn: user.isLoggedIn,
           })}
         >
           <div
             className={clsx('DesktopMenuContainer', {
-              isLoggedIn,
+              isLoggedIn: user.isLoggedIn,
             })}
           >
             <CreateContentPopover />
@@ -116,41 +102,25 @@ const DesktopHeader = ({
 
             <HelpMenuPopover />
 
-            {isLoggedIn && !enableKnockInAppNotifications && (
+            {user.isLoggedIn && !enableKnockInAppNotifications && (
               <NotificationsMenuPopover />
             )}
           </div>
 
-          {isLoggedIn && enableKnockInAppNotifications && (
+          {user.isLoggedIn && enableKnockInAppNotifications && (
             <KnockNotifications />
           )}
         </div>
 
-        {isLoggedIn && (
-          <UserDropdown
-            onAuthModalOpen={() => onAuthModalOpen()}
-            onRevalidationModalData={onRevalidationModalData}
-          />
+        {user.isLoggedIn && (
+          <UserDropdown onAuthModalOpen={() => onAuthModalOpen()} />
         )}
 
-        {!isLoggedIn && (
-          <>
-            {userOnboardingEnabled ? (
-              <AuthButtons
-                smallHeightButtons
-                onButtonClick={(selectedType) => onAuthModalOpen(selectedType)}
-              />
-            ) : (
-              <CWButton
-                buttonType="primary"
-                buttonHeight="sm"
-                label="Sign in"
-                buttonWidth="wide"
-                disabled={location.pathname.includes('/finishsociallogin')}
-                onClick={() => onAuthModalOpen()}
-              />
-            )}
-          </>
+        {!user.isLoggedIn && (
+          <AuthButtons
+            smallHeightButtons
+            onButtonClick={(selectedType) => onAuthModalOpen(selectedType)}
+          />
         )}
       </div>
     </div>

@@ -1,22 +1,28 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
-import { AppError } from '@hicommonwealth/core';
+import { Actor, AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
+  Contest,
   ThreadAttributes,
   UserInstance,
+  config,
+  sanitizeQuillText,
+  tokenBalanceCache,
 } from '@hicommonwealth/model';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
+import {
+  BalanceSourceType,
+  NotificationCategories,
+  ProposalType,
+} from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
-  createThreadMentionNotifications,
   emitMentions,
   parseUserMentions,
-  queryMentionedUsers,
   uniqueMentions,
 } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -34,6 +40,7 @@ export const Errors = {
   FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
   NoBody: 'Thread body cannot be blank',
+  PostLimitReached: 'Post limit reached',
 };
 
 export type CreateThreadOptions = {
@@ -108,6 +115,51 @@ export async function __createThread(
     throw new AppError(`Ban error: ${banError}`);
   }
 
+  // check contest limits
+  const activeContestManagers = await Contest.GetActiveContestManagers().body({
+    actor: {} as Actor,
+    payload: {
+      community_id: community.id!,
+      topic_id: topicId!,
+    },
+  });
+  if (activeContestManagers && activeContestManagers.length > 0) {
+    // ensure that user has non-dust ETH value
+    const balances = await tokenBalanceCache.getBalances({
+      balanceSourceType: BalanceSourceType.ETHNative,
+      addresses: [address.address],
+      sourceOptions: {
+        evmChainId: activeContestManagers[0]!.eth_chain_id,
+      },
+      cacheRefresh: true,
+    });
+    const minUserEthBigNumber = BigNumber.from(
+      (config.CONTESTS.MIN_USER_ETH * 1e18).toFixed(),
+    );
+    if (BigNumber.from(balances[address.address]).lt(minUserEthBigNumber)) {
+      throw new AppError(
+        `user ETH balance insufficient (${
+          balances[address.address]
+        } of ${minUserEthBigNumber})`,
+      );
+    }
+
+    // ensure post limit not reached on all contests
+    const validActiveContests = activeContestManagers.filter((c) => {
+      const userPostsInContest = c.actions.filter(
+        (action) =>
+          action.actor_address === address.address && action.action === 'added',
+      );
+      const quotaReached =
+        userPostsInContest.length >= config.CONTESTS.MAX_USER_POSTS_PER_CONTEST;
+      return !quotaReached;
+    });
+    if (validActiveContests.length === 0) {
+      // limit reached for all active contests
+      throw new AppError(Errors.PostLimitReached);
+    }
+  }
+
   // Render a copy of the thread to plaintext for the search indexer
   const plaintext = (() => {
     try {
@@ -128,7 +180,7 @@ export async function __createThread(
 
   const threadContent: Partial<ThreadAttributes> = {
     community_id: community.id,
-    address_id: address.id,
+    address_id: address.id!,
     title,
     body,
     plaintext,
@@ -168,7 +220,6 @@ export async function __createThread(
 
   const bodyText = decodeURIComponent(body);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   // begin essential database changes within transaction
   const newThreadId = await this.models.sequelize.transaction(
@@ -178,19 +229,28 @@ export async function __createThread(
         transaction,
       });
 
+      await this.models.ThreadVersionHistory.create(
+        {
+          thread_id: thread.id!,
+          body,
+          address: address.address!,
+          timestamp: thread.created_at!,
+        },
+        {
+          transaction,
+        },
+      );
+
       address.last_active = new Date();
       await address.save({ transaction });
 
       await emitMentions(this.models, transaction, {
-        // @ts-expect-error StrictNullChecks
-        authorAddressId: address.id,
-        // @ts-expect-error StrictNullChecks
-        authorUserId: user.id,
+        authorAddressId: address.id!,
+        authorUserId: user.id!,
         authorAddress: address.address,
-        // @ts-expect-error StrictNullChecks
-        authorProfileId: address.profile_id,
-        mentions: mentionedAddresses,
+        mentions: mentions,
         thread,
+        community_id: thread.community_id,
       });
 
       return thread.id;
@@ -219,7 +279,6 @@ export async function __createThread(
       // @ts-expect-error StrictNullChecks
       subscriber_id: user.id,
       category_id: NotificationCategories.NewComment,
-      // @ts-expect-error StrictNullChecks
       thread_id: finalThread.id,
       community_id: finalThread.community_id,
       is_active: true,
@@ -228,7 +287,6 @@ export async function __createThread(
       // @ts-expect-error StrictNullChecks
       subscriber_id: user.id,
       category_id: NotificationCategories.NewReaction,
-      // @ts-expect-error StrictNullChecks
       thread_id: finalThread.id,
       community_id: finalThread.community_id,
       is_active: true,
@@ -236,10 +294,6 @@ export async function __createThread(
   ]);
 
   const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push(
-    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
-  );
 
   allNotificationOptions.push({
     notification: {

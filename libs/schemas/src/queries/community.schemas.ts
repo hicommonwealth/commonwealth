@@ -1,8 +1,48 @@
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { CommunityMember, CommunityStake } from '../entities';
+import {
+  Community,
+  CommunityMember,
+  CommunityStake,
+  ExtendedCommunity,
+} from '../entities';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+
+export const GetCommunities = {
+  input: PaginationParamsSchema.extend({
+    base: z.nativeEnum(ChainBase).optional(),
+    // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
+    //    Instead we support comma-separated strings of ids.
+    tag_ids: z
+      .preprocess((value) => {
+        if (typeof value === 'string') {
+          return value.split(',').map((id) => id.trim());
+        }
+        return value;
+      }, z.array(z.coerce.number().positive()))
+      .optional(),
+    include_node_info: z.boolean().optional(),
+    stake_enabled: z.boolean().optional(),
+    has_groups: z.boolean().optional(),
+    order_by: z.enum(['profile_count', 'thread_count']).optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: Community.array(),
+  }),
+};
+
+export const GetCommunity = {
+  input: z.object({
+    id: z.string(),
+    include_node_info: z.boolean().optional(),
+  }),
+  output: ExtendedCommunity,
+};
 
 export const GetCommunityStake = {
   input: z.object({
@@ -35,6 +75,7 @@ export const GetCommunityMembers = {
     include_group_ids: z.coerce.boolean().optional(),
     include_stake_balances: z.coerce.boolean().optional(),
     allowedAddresses: z.string().optional(),
+    order_by: z.enum(['last_active', 'name']).optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
@@ -56,10 +97,11 @@ export const GetStakeTransaction = {
       stake_direction: z.string(),
       community: z.object({
         id: z.string(),
-        default_symbol: z.string(),
-        icon_url: z.string(),
+        default_symbol: z.string().nullish(),
+        icon_url: z.string().nullish(),
         name: z.string(),
-        chain_node_id: PG_INT.nullable(),
+        chain_node_id: PG_INT.nullish(),
+        chain_node_name: z.string().nullish(),
       }),
     })
     .array(),
@@ -74,7 +116,7 @@ export const GetStakeHistoricalPrice = {
   output: z
     .object({
       community_id: z.string(),
-      old_price: z.string().nullable(),
+      old_price: z.string().nullish(),
     })
     .array(),
 };

@@ -91,6 +91,7 @@ describe('Contests projection lifecycle', () => {
           },
         ],
         url: 'https://test',
+        private_url: 'https://test',
       });
       const [user] = await seed(
         'User',
@@ -111,7 +112,6 @@ describe('Contests projection lifecycle', () => {
             {
               user_id: user?.id,
               role: 'admin',
-              profile_id: undefined,
             },
           ],
           CommunityStakes: [],

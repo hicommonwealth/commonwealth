@@ -1,7 +1,7 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useEffect, useMemo, useRef } from 'react';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWIconButton } from './cw_icon_button';
 import { CWButton } from './new_designs/CWButton';
@@ -9,6 +9,7 @@ import { CWButton } from './new_designs/CWButton';
 import axios from 'axios';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
@@ -67,6 +68,7 @@ export const CWCoverImageUploader = ({
   onImageBehaviourChange,
   onImageProcessStatusChange = () => {},
 }: CoverImageUploaderProps) => {
+  const user = useUserStore();
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
   const [uploadStatus, setUploadStatus] = React.useState<
@@ -137,12 +139,12 @@ export const CWCoverImageUploader = ({
   ): Promise<[string, ValidationStatus]> => {
     try {
       const signatureResponse = await axios.post(
-        `${app.serverUrl()}/getUploadSignature`,
+        `${SERVER_URL}/getUploadSignature`,
         {
           name: file.name,
           mimetype: file.type,
           auth: true,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         },
       );
       if (signatureResponse.data.status !== 'Success') throw new Error();
@@ -168,9 +170,9 @@ export const CWCoverImageUploader = ({
   const generateImage = async () => {
     try {
       setImageURL('');
-      const res = await axios.post(`${app.serverUrl()}/generateImage`, {
+      const res = await axios.post(`${SERVER_URL}/generateImage`, {
         description: prompt,
-        jwt: app.user.jwt,
+        jwt: user.jwt,
       });
 
       const generatedImageURL = res.data.result.imageUrl;

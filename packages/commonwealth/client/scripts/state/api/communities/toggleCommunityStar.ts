@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import StarredCommunity from 'models/StarredCommunity';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface ToggleCommunityStarProps {
   community: string;
@@ -10,10 +11,10 @@ interface ToggleCommunityStarProps {
 const toggleCommunityStar = async ({ community }: ToggleCommunityStarProps) => {
   // TODO: the endpoint is really a toggle to star/unstar a community, migrate
   // this to use the new restful standard
-  const response = await axios.post(`${app.serverUrl()}/starCommunity`, {
+  const response = await axios.post(`${SERVER_URL}/starCommunity`, {
     chain: community,
     auth: true,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return {
@@ -23,6 +24,8 @@ const toggleCommunityStar = async ({ community }: ToggleCommunityStarProps) => {
 };
 
 const useToggleCommunityStarMutation = () => {
+  const user = useUserStore();
+
   return useMutation({
     mutationFn: toggleCommunityStar,
     onSuccess: async ({ response, community }) => {
@@ -30,13 +33,22 @@ const useToggleCommunityStarMutation = () => {
       const starredCommunity = response.data.result;
 
       if (starredCommunity) {
-        app.user.addStarredCommunity(new StarredCommunity(starredCommunity));
-      } else {
-        const star = app.user.starredCommunities.find((c) => {
-          return c.community_id === community;
+        user.setData({
+          starredCommunities: [
+            ...user.starredCommunities,
+            new StarredCommunity(starredCommunity),
+          ],
         });
-        // @ts-expect-error StrictNullChecks
-        app.user.removeStarredCommunity(star.community_id, star.user_id);
+      } else {
+        const star = user.starredCommunities.find((c) => {
+          return c.community_id === community;
+        }) as StarredCommunity;
+
+        user.setData({
+          starredCommunities: [...user.starredCommunities].filter(
+            (s) => s.community_id !== star.community_id,
+          ),
+        });
       }
     },
   });

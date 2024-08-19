@@ -5,10 +5,12 @@ export type Aggregates = Extract<
   Entities,
   | 'ChainNode'
   | 'Comment'
+  | 'CommentVersionHistory'
   | 'Community'
   | 'NotificationCategory'
   | 'Subscription'
   | 'Thread'
+  | 'ThreadVersionHistory'
   | 'Reaction'
   | 'User'
   | 'StakeTransaction'
@@ -16,12 +18,13 @@ export type Aggregates = Extract<
   | 'CommunityAlert'
   | 'Address'
   | 'Topic'
-  | 'Profile'
   | 'CommentSubscription'
   | 'ThreadSubscription'
   | 'Contract'
   | 'CommunityContract'
   | 'GroupPermission'
+  | 'Tags'
+  | 'CommunityTags'
 >;
 
 export * from './commands';

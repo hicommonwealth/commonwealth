@@ -1,10 +1,11 @@
 import axios from 'axios';
 import 'components/Avatar/AvatarUpload.scss';
-import React, { useEffect, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-
 import { notifyError } from 'controllers/app/notifications';
+import React, { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { Avatar } from 'views/components/Avatar/Avatar';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
@@ -49,6 +50,7 @@ export const AvatarUpload = ({
   uploadStartedCallback,
 }: AvatarUploadProps) => {
   const [files, setFiles] = useState([]);
+  const user = useUserStore();
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 10000000,
@@ -71,15 +73,12 @@ export const AvatarUpload = ({
     },
     onDropAccepted: async (acceptedFiles: any) => {
       try {
-        const response = await axios.post(
-          `${app.serverUrl()}/getUploadSignature`,
-          {
-            name: acceptedFiles[0].name, // imageName.png
-            mimetype: acceptedFiles[0].type, // image/png
-            auth: true,
-            jwt: app.user.jwt,
-          },
-        );
+        const response = await axios.post(`${SERVER_URL}/getUploadSignature`, {
+          name: acceptedFiles[0].name, // imageName.png
+          mimetype: acceptedFiles[0].type, // image/png
+          auth: true,
+          jwt: user.jwt,
+        });
         if (response.data.status !== 'Success') throw new Error();
 
         const uploadURL = response.data.result;
@@ -100,17 +99,12 @@ export const AvatarUpload = ({
     },
   });
 
-  useEffect(() => {
-    // @ts-expect-error StrictNullChecks
-    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
-  }, []);
-
   const avatarSize = size === 'small' ? 60 : 108;
   const forUser = scope === 'user';
   const avatarUrl = forUser
     ? account?.profile?.avatarUrl
     : app.chain?.meta?.iconUrl;
-  const address = forUser ? account?.profile?.id : undefined;
+  const address = forUser ? account?.profile?.userId : undefined;
   const showAvatar = avatarUrl || address;
 
   return (

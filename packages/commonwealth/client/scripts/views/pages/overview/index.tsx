@@ -1,13 +1,12 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
-import React, { useEffect } from 'react';
+import React from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import type Thread from '../../../models/Thread';
@@ -19,9 +18,8 @@ import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
-  const forceRerender = useForceRerender();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
@@ -30,14 +28,6 @@ const OverviewPage = () => {
     withXRecentComments: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
   });
-
-  useEffect(() => {
-    app.loginStateEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.loginStateEmitter.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
 
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -105,7 +95,7 @@ const OverviewPage = () => {
               onClick={() => {
                 navigate('/new/discussion');
               }}
-              disabled={!hasJoinedCommunity}
+              disabled={!user.activeAccount}
             />
           )}
         </div>

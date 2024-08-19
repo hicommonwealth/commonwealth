@@ -1,16 +1,17 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useStickyHeader from 'hooks/useStickyHeader';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
-import React, { useEffect } from 'react';
-import app, { LoginState } from 'state';
+import React, { useEffect, useRef } from 'react';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
+import {
+  MixpanelPWAEvent,
+  MixpanelPageViewEvent,
+} from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
@@ -18,7 +19,6 @@ import {
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
 import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
-import { fetchActivity } from './helpers';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -29,26 +29,27 @@ type UserDashboardProps = {
   type?: string;
 };
 
-const UserDashboard = (props: UserDashboardProps) => {
-  const { type } = props;
-  const { isLoggedIn } = useUserLoggedIn();
+const UserDashboard = ({ type }: UserDashboardProps) => {
+  const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   useStickyHeader({
     elementId: 'dashboard-header',
     zIndex: 70,
     // To account for new authentication buttons, shown in small screen sizes
-    top: !isLoggedIn && userOnboardingEnabled ? 68 : 0,
-    stickyBehaviourEnabled: !!isWindowExtraSmall,
+    top: !user.isLoggedIn ? 68 : 0,
+    stickyBehaviourEnabled: isWindowExtraSmall,
   });
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
   );
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DASHBOARD_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -56,18 +57,26 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const [scrollElement, setScrollElement] = React.useState(null);
 
-  const loggedIn = app.loginState === LoginState.LoggedIn;
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: isAddedToHomeScreen
+        ? MixpanelPWAEvent.PWA_USED
+        : MixpanelPWAEvent.PWA_NOT_USED,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
   useEffect(() => {
     if (!type) {
-      navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
-    } else if (type === 'for-you' && !loggedIn) {
+      navigate(`/dashboard/${user.isLoggedIn ? 'for-you' : 'global'}`);
+    } else if (type === 'for-you' && !user.isLoggedIn) {
       navigate('/dashboard/global');
     }
-  }, [loggedIn, navigate, type]);
+  }, [user.isLoggedIn, navigate, type]);
 
   const subpage: DashboardViews =
-    loggedIn && type !== 'global'
+    user.isLoggedIn && type !== 'global'
       ? DashboardViews.ForYou
       : DashboardViews.Global;
 
@@ -78,8 +87,8 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage, subpage]);
 
   return (
-    <CWPageLayout>
-      <div className="UserDashboard" key={`${isLoggedIn}`}>
+    <CWPageLayout ref={containerRef} className="UserDashboard">
+      <div key={`${user.isLoggedIn}`}>
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
@@ -92,7 +101,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   label={DashboardViews.ForYou}
                   isSelected={activePage === DashboardViews.ForYou}
                   onClick={() => {
-                    if (!loggedIn) {
+                    if (!user.isLoggedIn) {
                       notifyInfo(
                         'Sign in or create an account for custom activity feed',
                       );
@@ -113,18 +122,16 @@ const UserDashboard = (props: UserDashboardProps) => {
             <>
               {activePage === DashboardViews.ForYou && (
                 <Feed
-                  fetchData={() => fetchActivity(activePage)}
+                  dashboardView={DashboardViews.ForYou}
                   noFeedMessage="Join some communities to see Activity!"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
               {activePage === DashboardViews.Global && (
                 <Feed
-                  fetchData={() => fetchActivity(activePage)}
+                  dashboardView={DashboardViews.Global}
                   noFeedMessage="No Activity"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />

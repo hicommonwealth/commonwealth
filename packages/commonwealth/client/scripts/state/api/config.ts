@@ -20,6 +20,7 @@ export const ApiEndpoints = {
   FETCH_THREADS: '/threads',
   FETCH_PROFILES_BY_ADDRESS: '/getAddressProfile',
   FETCH_PROFILES_BY_ID: '/profile/v2',
+  FETCH_NODES: '/nodes',
   DISCORD_CHANNELS: '/getDiscordChannels',
   SET_DISCORD_CONFIG: '/setDiscordBotConfig',
   FETCH_PROPOSALS: '/proposals',
@@ -28,11 +29,17 @@ export const ApiEndpoints = {
   REFRESH_MEMBERSHIP: '/refresh-membership',
   FETCH_WEBHOOKS: '/getWebhooks',
   FETCH_TAGS: '/tags',
+  UPDATE_USER_EMAIL: '/updateEmail',
+  UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
+  UPDATE_USER_ACTIVE_COMMUNTY: '/selectCommunity',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   REMOVE_DISCORD_BOT_CONFIG: '/removeDiscordBotConfig',
+  VIEW_COUNT: '/viewCount',
+  FETCH_USER_ACTIVITY: '/viewUserActivity',
+  FETCH_GLOBAL_ACTIVITY: '/viewGlobalActivity',
 };
 
 export const ContractMethods = {
@@ -41,6 +48,12 @@ export const ContractMethods = {
   GET_BUY_PRICE: 'getBuyPrice',
   GET_SELL_PRICE: 'getSellPrice',
   GET_CONTEST_BALANCE: 'getContestBalance',
+  GET_FEE_MANAGER_BALANCE: 'getFeeManagerBalance',
+};
+
+// keys that are not (yet) associated with API routes
+export const QueryKeys = {
+  CONFIGURATION: 'configuration',
 };
 
 export const ExternalEndpoints = {
@@ -48,3 +61,5 @@ export const ExternalEndpoints = {
     ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',
   },
 };
+
+export const SERVER_URL = '/api';

@@ -2,8 +2,8 @@ import { WebhookCategory } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Webhook from 'models/Webhook';
-import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface EditWebhookProps {
   communityId: string;
@@ -16,11 +16,11 @@ const editWebhook = async ({
   webhookId,
   webhookCategories,
 }: EditWebhookProps): Promise<Webhook> => {
-  const response = await axios.post(`${app.serverUrl()}/updateWebhook`, {
+  const response = await axios.post(`${SERVER_URL}/updateWebhook`, {
     chain: communityId,
     webhookId,
     categories: webhookCategories,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   const updatedWebhook = response.data.result;

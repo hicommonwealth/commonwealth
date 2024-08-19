@@ -1,3 +1,11 @@
+import * as schemas from '@hicommonwealth/schemas';
+import { z } from 'zod';
+
+const ActiveContestManagers = z.object({
+  content: z.array(schemas.ContestAction),
+  contest_manager: schemas.ContestManager,
+});
+
 export type TopicAttributes = {
   name: string;
   id: number;
@@ -10,6 +18,7 @@ export type TopicAttributes = {
   default_offchain_template?: string;
   total_threads: number;
   channel_id?: string;
+  active_contest_managers: Array<z.infer<typeof ActiveContestManagers>>;
 };
 
 class Topic {
@@ -24,6 +33,9 @@ class Topic {
   public order?: number;
   public readonly defaultOffchainTemplate?: string;
   public totalThreads?: number;
+  public readonly activeContestManagers: Array<
+    z.infer<typeof ActiveContestManagers>
+  >;
 
   constructor({
     name,
@@ -37,6 +49,7 @@ class Topic {
     default_offchain_template,
     total_threads,
     channel_id,
+    active_contest_managers,
   }: TopicAttributes) {
     this.name = name;
     this.id = id;
@@ -50,6 +63,7 @@ class Topic {
     this.defaultOffchainTemplate = default_offchain_template;
     this.totalThreads = total_threads || 0;
     this.channelId = channel_id;
+    this.activeContestManagers = active_contest_managers || [];
   }
 }
 

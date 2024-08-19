@@ -1,11 +1,12 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signComment } from 'client/scripts/controllers/server/sessions';
+import { signComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { useAuthModalStore } from '../../ui/modals';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -32,24 +33,21 @@ const editComment = async ({
     parent_comment_id: parentCommentId,
   });
 
-  const response = await axios.patch(
-    `${app.serverUrl()}/comments/${commentId}`,
-    {
-      address: profile.address,
-      author_community_id: communityId,
-      id: commentId,
-      community_id: communityId,
-      body: encodeURIComponent(updatedBody),
-      jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
-  );
+  const response = await axios.patch(`${SERVER_URL}/comments/${commentId}`, {
+    address: profile.address,
+    author_community_id: communityId,
+    id: commentId,
+    community_id: communityId,
+    body: encodeURIComponent(updatedBody),
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+  });
 
   response.data.result.Address.User = {
-    Profiles: [profile],
+    profile,
   };
 
-  return new Comment(response.data.result);
+  return new Comment({ community_id: undefined, ...response.data.result });
 };
 
 interface UseEditCommentMutationProps {
@@ -66,6 +64,8 @@ const useEditCommentMutation = ({
     communityId,
     threadId,
   });
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: editComment,
@@ -89,6 +89,7 @@ const useEditCommentMutation = ({
 
       return updatedComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

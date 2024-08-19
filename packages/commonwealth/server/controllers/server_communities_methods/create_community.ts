@@ -11,7 +11,6 @@ import { CreateCommunity } from '@hicommonwealth/schemas';
 import {
   BalanceType,
   ChainBase,
-  ChainNetwork,
   ChainType,
   DefaultPage,
   NotificationCategories,
@@ -25,8 +24,6 @@ import Web3 from 'web3';
 import { z } from 'zod';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { config } from '../../config';
-import { RoleInstanceWithPermission } from '../../util/roles';
-import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 // Warning: Probably part of zod validation
@@ -114,7 +111,6 @@ export async function __createCommunity(
   let url = community.node_url;
   let altWalletUrl = community.alt_wallet_url;
   let privateUrl: string | undefined;
-  let sanitizedSpec;
   let hex;
 
   // Warning: this looks like input validation
@@ -153,8 +149,8 @@ export async function __createCommunity(
     }
     if (node) {
       url = node.url;
-      altWalletUrl = node.alt_wallet_url;
-      privateUrl = node.private_url;
+      altWalletUrl = node.alt_wallet_url!;
+      privateUrl = node.private_url!;
     }
 
     const node_url = privateUrl || url;
@@ -231,7 +227,6 @@ export async function __createCommunity(
         `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
       );
     }
-
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       throw new AppError(Errors.InvalidNodeUrl);
@@ -242,21 +237,8 @@ export async function __createCommunity(
     } catch (err) {
       throw new AppError(Errors.InvalidNode);
     }
-
-    // TODO: test altWalletUrl if available
-  } else if (
-    community.base === ChainBase.Substrate &&
-    community.type !== ChainType.Offchain
-  ) {
-    const spec = community.substrate_spec || '{}';
-    if (community.substrate_spec) {
-      try {
-        sanitizedSpec = await testSubstrateSpec(spec, community.node_url);
-      } catch (e) {
-        throw new AppError(Errors.InvalidNode);
-      }
-    }
   } else {
+    // TODO: test altWalletUrl if available
     if (!url || !url.trim()) {
       throw new AppError(Errors.InvalidNodeUrl);
     }
@@ -337,7 +319,6 @@ export async function __createCommunity(
     defaults: {
       url,
       eth_chain_id,
-      // @ts-expect-error StrictNullChecks
       cosmos_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
@@ -350,9 +331,7 @@ export async function __createCommunity(
           : base === ChainBase.Ethereum
           ? BalanceType.Ethereum
           : // beyond here should never really happen, but just to make sure...
-          base === ChainBase.NEAR
-          ? BalanceType.NEAR
-          : base === ChainBase.Solana
+          base === ChainBase.Solana
           ? BalanceType.Solana
           : undefined,
       // use first chain name as node name
@@ -372,22 +351,20 @@ export async function __createCommunity(
     id,
     name,
     default_symbol,
-    // @ts-expect-error StrictNullChecks
     icon_url,
     description,
-    network: network as ChainNetwork,
+    network,
     type,
     // @ts-expect-error StrictNullChecks
     social_links: uniqueLinksArray,
     base,
     bech32_prefix,
     active: true,
-    substrate_spec: sanitizedSpec || '',
     // @ts-expect-error StrictNullChecks
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
-    default_page: DefaultPage.Homepage,
+    default_page: DefaultPage.Discussions,
     has_homepage: 'true',
   });
 
@@ -403,8 +380,6 @@ export async function __createCommunity(
   });
 
   // try to make admin one of the user's addresses
-  // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (user_address) {
@@ -445,24 +420,7 @@ export async function __createCommunity(
       ],
     });
   } else if (createdCommunity.base === ChainBase.NEAR) {
-    // @ts-expect-error StrictNullChecks
-    addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData',
-    ).findOne({
-      where: {
-        user_id: user.id,
-        address: {
-          [Op.endsWith]: '.near',
-        },
-      },
-      include: [
-        {
-          model: this.models.Community,
-          where: { base: createdCommunity.base },
-          required: true,
-        },
-      ],
-    });
+    throw new AppError(Errors.InvalidBase);
   } else if (createdCommunity.base === ChainBase.Solana) {
     // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
@@ -512,31 +470,20 @@ export async function __createCommunity(
       hex = await bech32ToHex(addressToBeAdmin.address);
     }
 
-    const newAddress = await this.models.Address.create({
+    await this.models.Address.create({
       user_id: user.id,
-      profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      // @ts-expect-error StrictNullChecks
-      community_id: createdCommunity.id,
+      community_id: createdCommunity.id!,
       hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
-      keytype: addressToBeAdmin.keytype,
       wallet_id: addressToBeAdmin.wallet_id,
       is_user_default: true,
       role: 'admin',
       last_active: new Date(),
+      ghost_address: false,
     });
-
-    role = new RoleInstanceWithPermission(
-      // @ts-expect-error StrictNullChecks
-      { community_role_id: 0, address_id: newAddress.id },
-      createdCommunity.id,
-      'admin',
-      0,
-      0,
-    );
 
     await this.models.Subscription.findOrCreate({
       where: {
@@ -551,8 +498,6 @@ export async function __createCommunity(
   return {
     community: createdCommunity.toJSON(),
     node: nodeJSON,
-    // @ts-expect-error StrictNullChecks
-    role: role?.toJSON(),
     // @ts-expect-error StrictNullChecks
     admin_address: addressToBeAdmin?.address,
   };

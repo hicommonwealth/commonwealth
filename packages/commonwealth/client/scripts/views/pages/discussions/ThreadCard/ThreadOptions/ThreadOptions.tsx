@@ -1,16 +1,16 @@
-import { pluralize } from 'client/scripts/helpers';
-import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
-import Permissions from 'client/scripts/utils/Permissions';
-import { ViewUpvotesDrawerTrigger } from 'client/scripts/views/components/UpvoteDrawer';
+import { pluralize } from 'helpers';
+import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
+import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import { SharePopover } from 'views/components/SharePopover';
+import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import {
-  getCommentSubscription,
-  getReactionSubscription,
-  handleToggleSubscription,
-} from '../../helpers';
+import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
+import { ToggleThreadSubscribeOld } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribeOld';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
@@ -59,30 +59,12 @@ export const ThreadOptions = ({
   setIsUpvoteDrawerOpen,
   editingDisabled,
 }: OptionsProps) => {
-  const [isSubscribed, setIsSubscribed] = useState(
-    thread &&
-      getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive,
-  );
-
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
+  const userStore = useUserStore();
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
-  const handleToggleSubscribe = async (e) => {
-    // prevent clicks from propagating to discussion row
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!thread) {
-      return;
-    }
-
-    await handleToggleSubscription(
-      thread,
-      getCommentSubscription(thread),
-      getReactionSubscription(thread),
-      isSubscribed,
-      setIsSubscribed,
-    );
+  const handleDownloadMarkdown = () => {
+    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
   };
 
   return (
@@ -135,16 +117,27 @@ export const ThreadOptions = ({
           {/* @ts-expect-error StrictNullChecks*/}
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
-          <CWThreadAction
-            action="subscribe"
-            label="Subscribe"
-            onClick={handleToggleSubscribe}
-            selected={!isSubscribed}
-            disabled={!isCommunityMember}
-          />
+          {userStore.id > 0 && (
+            <>
+              {enableKnockInAppNotifications && (
+                <ToggleThreadSubscribe
+                  thread={thread}
+                  isCommunityMember={isCommunityMember}
+                />
+              )}
 
-          {canUpdateThread && thread && (
+              {!enableKnockInAppNotifications && (
+                <ToggleThreadSubscribeOld
+                  thread={thread}
+                  isCommunityMember={isCommunityMember}
+                />
+              )}
+            </>
+          )}
+
+          {thread && (
             <AdminActions
+              canUpdateThread={canUpdateThread}
               thread={thread}
               onLockToggle={onLockToggle}
               onCollaboratorsEdit={onCollaboratorsEdit}
@@ -156,6 +149,7 @@ export const ThreadOptions = ({
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onSpamToggle={onSpamToggle}
+              onDownloadMarkdown={handleDownloadMarkdown}
               hasPendingEdits={hasPendingEdits}
               editingDisabled={editingDisabled}
             />

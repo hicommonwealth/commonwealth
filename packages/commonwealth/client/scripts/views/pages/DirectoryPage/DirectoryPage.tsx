@@ -1,10 +1,12 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useFetchNodesQuery } from 'state/api/nodes';
+import { getNodeById } from 'state/api/nodes/utils';
 import { useDebounce } from 'usehooks-ts';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -18,24 +20,33 @@ import useDirectoryPageData, {
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './DirectoryPage.scss';
 
 const DirectoryPage = () => {
-  useUserActiveAccount();
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
-  const directoryPageEnabled = app.config.chains.getById(
-    app.activeChainId(),
-  )?.directoryPageEnabled;
-  const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
-  const selectedChainNodeId = app.config.chains.getById(
-    app.activeChainId(),
-  )?.directoryPageChainNodeId;
+  const { data: nodes } = useFetchNodesQuery();
+
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+      includeNodeInfo: true,
+    });
+  const directoryPageEnabled = community?.directory_page_enabled;
+  const communityDefaultChainNodeId = community?.ChainNode?.id;
+  const selectedChainNodeId = community?.directory_page_chain_node_id;
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
-  const baseChain = app.config.nodes.getById(defaultChainNodeId);
+  const baseChain = defaultChainNodeId
+    ? getNodeById(defaultChainNodeId, nodes)
+    : undefined;
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const {
     tableData,
@@ -44,7 +55,7 @@ const DirectoryPage = () => {
     noFilteredCommunities,
     noCommunitiesInChain,
   } = useDirectoryPageData({
-    chainNodeId: baseChain.id,
+    chainNodeId: baseChain?.id,
     searchTerm: communitySearchDebounced.toLowerCase().trim(),
     selectedViewType,
   });
@@ -56,8 +67,13 @@ const DirectoryPage = () => {
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DIRECTORY_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
+
+  if (isLoadingCommunity) {
+    return <CWCircleMultiplySpinner />;
+  }
 
   if (!directoryPageEnabled) {
     return (

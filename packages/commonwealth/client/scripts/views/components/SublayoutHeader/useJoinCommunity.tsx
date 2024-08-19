@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { addressSwapper, ChainBase } from '@hicommonwealth/shared';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -7,8 +7,8 @@ import { isSameAccount } from 'helpers';
 import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import app from 'state';
-import { addressSwapper } from 'utils';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import useUserStore from 'state/ui/user';
+import { AccountSelector } from 'views/components/component_kit/AccountSelector/AccountSelector';
 import TOSModal from 'views/modals/TOSModal';
 import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
@@ -21,29 +21,29 @@ const useJoinCommunity = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
+  const user = useUserStore();
+
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
   const hasTermsOfService = !!activeChainInfo?.terms;
   const activeCommunityId = activeChainInfo?.id;
 
-  const samebaseAddresses = app.user.addresses.filter((a, idx) => {
+  const samebaseAddresses = user.addresses.filter((a, idx) => {
     // if no active chain, add all addresses
     if (!activeBase) {
       return true;
     }
 
     // add all items on same base as active chain
-    const addressChainInfo = app.config.chains.getById(a.community.id);
-    if (addressChainInfo?.base !== activeBase) {
+    if (a?.community?.base !== activeBase) {
       return false;
     }
 
     // // ensure doesn't already exist
-    const addressExists = !!app.user.addresses.slice(idx + 1).find(
+    const addressExists = !!user.addresses.slice(idx + 1).find(
       (prev) =>
         activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.community.id)?.base ===
-        ChainBase.Substrate
+        (prev.community?.base === ChainBase.Substrate
           ? addressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -110,60 +110,36 @@ const useJoinCommunity = () => {
           res.data.result;
 
         // update addresses
-        app.user.setAddresses(
-          addresses.map((a) => {
+        user.setData({
+          addresses: addresses.map((a) => {
             return new AddressInfo({
+              userId: user.id,
               id: a.id,
               address: a.address,
               communityId: a.community_id,
-              keytype: a.keytype,
               walletId: a.wallet_id,
             });
           }),
-        );
-
-        // get newly added address info
-        const addressInfo = app.user.addresses.find(
-          (a) => a.address === encodedAddress && a.community.id === communityId,
-        );
+        });
 
         // set verification token for the newly created account
-        const account = app?.chain?.accounts?.get?.(
-          encodedAddress,
-          // @ts-expect-error <StrictNullChecks/>
-          addressInfo.keytype,
-        );
+        const account = app?.chain?.accounts?.get?.(encodedAddress);
         if (account && app.chain) {
           account?.setValidationToken?.(verification_token);
         }
 
         // set active address if in a community
         if (activeChainId) {
-          // set role in community
-          if (
-            !app.roles.getRoleInCommunity({
-              account,
-              community: activeChainId,
-            })
-          ) {
-            await app.roles.createRole({
-              // @ts-expect-error <StrictNullChecks/>
-              address: addressInfo,
-              community: activeChainId,
-            });
-          }
-
           account && (await setActiveAccount(account));
 
           // update active accounts
           if (
             account &&
-            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
-              .length === 0
+            user.accounts.filter((a) => isSameAccount(a, account)).length === 0
           ) {
-            app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account]),
-            );
+            user.setData({
+              accounts: [...user.accounts, account],
+            });
           }
         }
       } else {
@@ -205,7 +181,7 @@ const useJoinCommunity = () => {
     if (
       sameBaseAddressesRemoveDuplicates.length === 0 ||
       app.chain?.meta?.id === 'injective' ||
-      (app.user.activeAccount?.address?.slice(0, 3) === 'inj' &&
+      (user.activeAccount?.address?.slice(0, 3) === 'inj' &&
         app.chain?.meta.id !== 'injective')
     ) {
       setIsAuthModalOpen(true);

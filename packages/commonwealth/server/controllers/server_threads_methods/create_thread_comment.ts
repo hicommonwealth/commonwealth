@@ -4,19 +4,17 @@ import {
   CommentAttributes,
   CommentInstance,
   UserInstance,
+  sanitizeQuillText,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import {
-  createCommentMentionNotifications,
   emitMentions,
   parseUserMentions,
-  queryMentionedUsers,
   uniqueMentions,
 } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -107,7 +105,6 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        community_id: thread.community_id,
       },
       include: [this.models.Address],
     });
@@ -172,11 +169,8 @@ export async function __createThreadComment(
     // @ts-expect-error StrictNullChecks
     address_id: address.id,
     community_id: thread.community_id,
-    // @ts-expect-error StrictNullChecks
     parent_id: null,
-    // @ts-expect-error <StrictNullChecks>
     canvas_signed_data: canvasSignedData,
-    // @ts-expect-error <StrictNullChecks>
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,
@@ -191,7 +185,6 @@ export async function __createThreadComment(
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   let comment: CommentInstance;
   try {
@@ -200,16 +193,24 @@ export async function __createThreadComment(
         transaction,
       });
 
+      await this.models.CommentVersionHistory.create(
+        {
+          comment_id: comment.id!,
+          text: comment.text!,
+          timestamp: comment.created_at!,
+        },
+        {
+          transaction,
+        },
+      );
+
       await emitMentions(this.models, transaction, {
-        // @ts-expect-error StrictNullChecks
-        authorAddressId: address.id,
-        // @ts-expect-error StrictNullChecks
-        authorUserId: user.id,
+        authorAddressId: address.id!,
+        authorUserId: user.id!,
         authorAddress: address.address,
-        // @ts-expect-error StrictNullChecks
-        authorProfileId: address.profile_id,
-        mentions: mentionedAddresses,
+        mentions: mentions,
         comment,
+        community_id: thread.community_id,
       });
 
       await this.models.Subscription.bulkCreate(
@@ -220,7 +221,7 @@ export async function __createThreadComment(
             category_id: NotificationCategories.NewReaction,
             // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
-            comment_id: comment.id,
+            comment_id: comment.id!,
             is_active: true,
           },
           {
@@ -229,7 +230,7 @@ export async function __createThreadComment(
             category_id: NotificationCategories.NewComment,
             // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
-            comment_id: comment.id,
+            comment_id: comment.id!,
             is_active: true,
           },
         ],
@@ -242,12 +243,7 @@ export async function __createThreadComment(
 
   const allNotificationOptions: EmitOptions[] = [];
 
-  allNotificationOptions.push(
-    // @ts-expect-error StrictNullChecks
-    ...createCommentMentionNotifications(mentionedAddresses, comment, address),
-  );
-
-  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
+  const excludedAddrs: string[] = [];
   excludedAddrs.push(address.address);
 
   const rootNotifExcludeAddresses = [...excludedAddrs];
@@ -273,7 +269,7 @@ export async function __createThreadComment(
         // @ts-expect-error StrictNullChecks
         community_id: comment.community_id,
         author_address: address.address,
-        author_community_id: address.community_id,
+        author_community_id: address.community_id!,
       },
     },
     excludeAddresses: rootNotifExcludeAddresses,
@@ -298,7 +294,7 @@ export async function __createThreadComment(
           // @ts-expect-error StrictNullChecks
           community_id: comment.community_id,
           author_address: address.address,
-          author_community_id: address.community_id,
+          author_community_id: address.community_id!,
         },
       },
       excludeAddresses: excludedAddrs,

@@ -126,7 +126,6 @@ describe('Seed functions', () => {
         Addresses: [
           {
             user_id: user.id,
-            profile_id: undefined,
             address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
             community_id: 'ethereum',
             verification_token: 'PLACEHOLDER',
@@ -152,7 +151,6 @@ describe('Seed functions', () => {
         Addresses: [
           {
             user_id: user.id,
-            profile_id: undefined,
             address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
             community_id: 'ethereum',
             verification_token: 'PLACEHOLDER',

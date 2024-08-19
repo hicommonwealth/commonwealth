@@ -1,13 +1,12 @@
 import { AppError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
+import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import { validateCommunity } from '../../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import { validateOwner } from '../../util/validateOwner';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 enum SetDiscordBotConfigErrors {
   NoCommunity = 'Must supply a community ID',
@@ -120,20 +119,13 @@ const setDiscordBotConfig = async (
   }
 
   await models.sequelize.transaction(async (transaction) => {
-    const profile = await models.Profile.findOne({
-      where: {
-        profile_name: 'Discord Bot',
-      },
-      transaction,
+    const user = await models.User.findOne({
+      where: { email: DISCORD_BOT_EMAIL },
     });
-
     const [address, created] = await models.Address.findOrCreate({
       where: {
-        // @ts-expect-error StrictNullChecks
-        user_id: profile.user_id,
-        // @ts-expect-error StrictNullChecks
-        profile_id: profile.id,
-        address: '0xdiscordbot',
+        user_id: user?.id,
+        address: DISCORD_BOT_ADDRESS,
         community_id,
       },
       // @ts-expect-error StrictNullChecks

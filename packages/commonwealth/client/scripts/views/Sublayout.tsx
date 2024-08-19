@@ -1,5 +1,4 @@
 import 'Sublayout.scss';
-import ideacoinSurveyGrowlImage from 'assets/img/ideacoinSurveyGrowlImage.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -10,17 +9,15 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
-import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
+import useUserStore from '../state/ui/user';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -32,72 +29,43 @@ type SublayoutProps = {
 } & React.PropsWithChildren;
 
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
-  const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const [authModalType, setAuthModalType] = useState<AuthModalType>();
-  const [profileId, setProfileId] = useState(null);
+
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
-    stickyBehaviourEnabled: userOnboardingEnabled,
+    stickyBehaviourEnabled: true,
     zIndex: 70,
   });
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
-
-  useEffect(() => {
-    if (triggerOpenModalType) {
-      setAuthModalType(triggerOpenModalType);
-      // @ts-expect-error StrictNullChecks
-      setTriggerOpenModalType(undefined);
-    }
-  }, [triggerOpenModalType, setTriggerOpenModalType]);
+  const { authModalType, setAuthModalType } = useAuthModalStore();
+  const user = useUserStore();
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
 
-  useEffect(() => {
-    let timeout = null;
-    if (isLoggedIn) {
-      // @ts-expect-error StrictNullChecks
-      timeout = setTimeout(() => {
-        // @ts-expect-error StrictNullChecks
-        setProfileId(app?.user?.addresses?.[0]?.profile?.id);
-      }, 100);
-    } else {
-      setProfileId(null);
-    }
-
-    return () => {
-      if (timeout !== null) clearTimeout(timeout);
-    };
-  }, [isLoggedIn]);
-
   useNecessaryEffect(() => {
     if (
-      isLoggedIn &&
-      userOnboardingEnabled &&
+      user.isLoggedIn &&
       !isWelcomeOnboardModalOpen &&
-      profileId &&
-      !app.user.isWelcomeOnboardFlowComplete
+      user.id &&
+      !user.isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
     }
 
-    if (!isLoggedIn && isWelcomeOnboardModalOpen) {
+    if (!user.isLoggedIn && isWelcomeOnboardModalOpen) {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
-    profileId,
-    userOnboardingEnabled,
+    user.id,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
-    isLoggedIn,
+    user.isLoggedIn,
   ]);
 
   const location = useLocation();
@@ -149,10 +117,8 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
-  // @ts-expect-error StrictNullChecks
-  const terms = app.chain ? chain.terms : null;
-  // @ts-expect-error StrictNullChecks
-  const banner = app.chain ? chain.communityBanner : null;
+  const terms = app.chain ? chain?.terms : null;
+  const banner = app.chain ? chain?.communityBanner : null;
 
   return (
     <div className="Sublayout">
@@ -196,14 +162,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             resizing,
           )}
         >
-          {/* @ts-expect-error StrictNullChecks */}
-          <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+          <SublayoutBanners banner={banner || ''} terms={terms || ''} />
 
           <div className="Body">
             <div
               className={clsx('mobile-auth-buttons', {
-                isVisible:
-                  !isLoggedIn && userOnboardingEnabled && isWindowExtraSmall,
+                isVisible: !user.isLoggedIn && isWindowExtraSmall,
               })}
               id="mobile-auth-buttons"
             >
@@ -213,28 +177,17 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {userOnboardingEnabled && !routesWithoutGenericSliders && (
-              <UserTrainingSlider />
-            )}
+            {!routesWithoutGenericSliders && <UserTrainingSlider />}
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
             {children}
           </div>
-          <CWGrowlTemplate
-            headerText="Shape the Future of Crypto with Ideacoin!"
-            bodyText="Degen? Want an NFT? Share your thoughts in our survey and influence our upcoming features."
-            buttonText="Take the Survey for an NFT"
-            buttonLink="https://kgqkthedh35.typeform.com/to/ONwG4vaI"
-            growlImage={ideacoinSurveyGrowlImage}
-          />
         </div>
-        {userOnboardingEnabled && (
-          <WelcomeOnboardModal
-            isOpen={isWelcomeOnboardModalOpen}
-            onClose={() => setIsWelcomeOnboardModalOpen(false)}
-          />
-        )}
+        <WelcomeOnboardModal
+          isOpen={isWelcomeOnboardModalOpen}
+          onClose={() => setIsWelcomeOnboardModalOpen(false)}
+        />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

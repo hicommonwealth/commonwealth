@@ -22,11 +22,11 @@ import { UserGallery } from '../../components/user/user_gallery';
 import { getBatchNotificationFields } from './helpers';
 import type { NotificationRowProps } from './notification_row';
 
-export const ChainEventNotificationRow = (
-  props: Omit<NotificationRowProps, 'allRead'>,
-) => {
-  const { notification, onListPage } = props;
-
+export const ChainEventNotificationRow = ({
+  notification,
+  communityName,
+  onListPage,
+}: Omit<NotificationRowProps, 'allRead'>) => {
   const navigate = useCommonNavigate();
 
   if (!notification.chainEvent) {
@@ -45,8 +45,6 @@ export const ChainEventNotificationRow = (
     network: notification.chainEvent.network,
     data: notification.chainEvent.data,
   };
-
-  const communityName = app.config.chains.getById(communityId)?.name;
 
   let label: IEventLabel | undefined;
   try {
@@ -76,10 +74,6 @@ export const ChainEventNotificationRow = (
   let proposalType: ProposalType;
   if (chainEvent.network === SupportedNetwork.Cosmos) {
     proposalType = ProposalType.CosmosProposal;
-  } else if (chainEvent.network === SupportedNetwork.Aave) {
-    proposalType = ProposalType.AaveProposal;
-  } else if (chainEvent.network === SupportedNetwork.Compound) {
-    proposalType = ProposalType.CompoundProposal;
   }
 
   // @ts-expect-error <StrictNullChecks/>
@@ -133,7 +127,13 @@ type ExtendedNotificationRowProps = NotificationRowProps & {
 
 // eslint-disable-next-line react/no-multi-comp
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
-  const { handleSetMarkingRead, markingRead, notification, allRead } = props;
+  const {
+    handleSetMarkingRead,
+    markingRead,
+    notification,
+    allRead,
+    communityName,
+  } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
 
   const category = notification.categoryId;
@@ -144,10 +144,14 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
     typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data,
   );
 
+  const response = getBatchNotificationFields(
+    category,
+    notificationData,
+    communityName,
+  );
   const { authorInfo, createdAt, notificationHeader, notificationBody } =
-    getBatchNotificationFields(category, notificationData);
-
-  let { path } = getBatchNotificationFields(category, notificationData);
+    response;
+  let { path } = response;
 
   if (app.isCustomDomain()) {
     if (
@@ -185,7 +189,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
           users={authorInfo.map(
             (auth) =>
               new AddressInfo({
-                id: null,
+                userId: 0, // TODO: is this OK?
+                id: 0, // TODO: is this OK?
                 address: auth[1],
                 communityId: auth[0],
               }),

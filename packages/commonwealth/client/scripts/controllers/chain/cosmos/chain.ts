@@ -14,12 +14,13 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
-
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import { LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { userStore } from 'state/ui/user';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,
@@ -97,9 +98,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _tmClient: Tendermint34Client;
 
   public async init(chain: ChainInfo, reset = false) {
-    const url = `${window.location.origin}${this.app.serverUrl()}/cosmosProxy/${
-      chain.id
-    }`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chain.id}`;
 
     // TODO: configure broadcast mode
     try {
@@ -127,9 +126,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         CosmosGovernanceVersion.v1beta1Failed
     ) {
       try {
-        const lcdUrl = `${
-          window.location.origin
-        }${this.app.serverUrl()}/cosmosProxy/v1/${chain.id}`;
+        const lcdUrl = `${window.location.origin}${SERVER_URL}/cosmosProxy/v1/${chain.id}`;
         console.log(`Starting LCD API at ${lcdUrl}...`);
         const lcd = await getLCDClient(lcdUrl);
         this._lcd = lcd;
@@ -191,10 +188,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       throw new Error('Tx not yet supported on Terra');
     }
 
-    const activeAddress = this._app.user.activeAccount?.address;
-    const walletId = this._app.user.addresses?.find(
-      (a) => a.address === activeAddress && a.community?.id === chain.id,
-    )?.walletId;
+    const activeAddress = userStore.getState().activeAccount?.address;
+    const walletId = userStore
+      .getState()
+      .addresses.find(
+        (a) => a.address === activeAddress && a.community?.id === chain.id,
+      )?.walletId;
     const isKeplr = walletId === WalletId.Keplr;
     const isKeplrEvm = walletId === WalletId.KeplrEthereum;
     const isLeap = walletId === WalletId.Leap;
@@ -235,9 +234,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
       client = EthSigningClient(
         {
-          restUrl: `${
-            window.location.origin
-          }${this.app.serverUrl()}/cosmosProxy/v1/${dbId}`,
+          restUrl: `${window.location.origin}${SERVER_URL}/cosmosProxy/v1/${dbId}`,
           chainId,
           path: dbId,
         },

@@ -5,10 +5,10 @@ import 'components/sidebar/sidebar_quick_switcher.scss';
 import ChainInfo from '../../../models/ChainInfo';
 
 import clsx from 'clsx';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -21,8 +21,8 @@ export const SidebarQuickSwitcher = ({
   onMobile: boolean;
 }) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const { setMenu } = useSidebarStore();
+  const user = useUserStore();
 
   const allCommunities = app.config.chains
     .getAll()
@@ -34,7 +34,10 @@ export const SidebarQuickSwitcher = ({
   const starredCommunities = allCommunities.filter((item) => {
     // filter out non-starred communities
     return !(
-      item instanceof ChainInfo && !app.user.isCommunityStarred(item.id)
+      item instanceof ChainInfo &&
+      !user.starredCommunities.find(
+        (starCommunity) => starCommunity.community_id === item.id,
+      )
     );
   });
 
@@ -43,7 +46,7 @@ export const SidebarQuickSwitcher = ({
       className={clsx('SidebarQuickSwitcher', { onMobile, isInsideCommunity })}
     >
       <div className="community-nav-bar">
-        {isLoggedIn && (
+        {user.isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
             iconButtonTheme="neutral"
@@ -66,7 +69,10 @@ export const SidebarQuickSwitcher = ({
           <CWCommunityAvatar
             key={item.id}
             size="large"
-            community={item}
+            community={{
+              iconUrl: item.iconUrl || '',
+              name: item.name || '',
+            }}
             onClick={() =>
               navigateToCommunity({ navigate, path: '', chain: item.id })
             }

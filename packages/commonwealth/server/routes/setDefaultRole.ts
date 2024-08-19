@@ -1,9 +1,8 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { ChainBase } from '@hicommonwealth/shared';
+import { addressSwapper, ChainBase } from '@hicommonwealth/shared';
 import type { NextFunction, Response } from 'express';
 import Sequelize from 'sequelize';
-import { addressSwapper } from 'shared/utils';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -35,7 +34,6 @@ const setDefaultRole = async (
       : req.body.address;
 
   const validAddress = await models.Address.findOne({
-    // @ts-expect-error StrictNullChecks
     where: {
       address: encodedAddress,
       community_id: req.body.author_community_id,
@@ -52,7 +50,6 @@ const setDefaultRole = async (
   await models.Address.update(
     { is_user_default: false },
     {
-      // @ts-expect-error StrictNullChecks
       where: {
         address: { [Sequelize.Op.ne]: encodedAddress },
         community_id: req.body.author_community_id,

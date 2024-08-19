@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 import 'components/Profile/ProfileHeader.scss';
 
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { renderQuillDeltaToText } from '../../../../../shared/utils';
 import type NewProfile from '../../../models/NewProfile';
@@ -19,12 +20,12 @@ type ProfileHeaderProps = {
 
 const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   if (!profile) return;
   const { bio, name } = profile;
 
-  const isCurrentUser = isLoggedIn && isOwner;
+  const isCurrentUser = user.isLoggedIn && isOwner;
   const hasBio = () => {
     try {
       if (!bio || bio.trim().length === 0) return false;
@@ -53,14 +54,14 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         ) : (
           <img
             src={`data:image/svg+xml;utf8,${encodeURIComponent(
-              jdenticon.toSvg(profile.id, 90),
+              jdenticon.toSvg(profile.userId, 90),
             )}`}
           />
         )}
       </div>
       <div className="profile-name-and-bio">
         <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-          {name || 'Anonymous user'}
+          {name || DEFAULT_NAME}
         </CWText>
         <SocialAccounts profile={profile} />
         {hasBio() && (

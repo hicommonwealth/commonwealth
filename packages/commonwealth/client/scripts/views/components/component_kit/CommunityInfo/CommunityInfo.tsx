@@ -1,8 +1,7 @@
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CWCommunityAvatar } from 'client/scripts/views/components/component_kit/cw_community_avatar';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { IconSize } from '../cw_icons/types';
 import './CommunityInfo.scss';
 
@@ -23,10 +22,7 @@ const CommunityInfo = ({
 }: CommunityInfoProps) => {
   return (
     <Link className="CommunityInfo" rel="noreferrer" to={`/${communityId}`}>
-      <CWCommunityAvatar
-        size={iconSize}
-        community={{ iconUrl, name } as ChainInfo}
-      />
+      <CWCommunityAvatar size={iconSize} community={{ iconUrl, name }} />
       <div className="info-container">
         {symbol && (
           <CWText type="b1" fontWeight="semiBold" className="symbol">

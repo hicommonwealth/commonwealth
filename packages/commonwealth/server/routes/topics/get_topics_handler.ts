@@ -11,9 +11,12 @@ export const getTopicsHandler = async (
   res: TypedResponse<GetTopicsResponse>,
 ) => {
   const { community } = req;
+  const { with_contest_managers } = req.query;
 
-  // @ts-expect-error StrictNullChecks
-  const topics = await controllers.topics.getTopics({ community });
+  const topics = await controllers.topics.getTopics({
+    community: community!,
+    with_contest_managers: with_contest_managers === 'true',
+  });
 
   return success(res, topics);
 };

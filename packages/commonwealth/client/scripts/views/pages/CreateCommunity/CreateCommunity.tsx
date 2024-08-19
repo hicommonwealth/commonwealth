@@ -4,7 +4,6 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import { useFlag } from '../../../hooks/useFlag';
 import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
@@ -13,10 +12,10 @@ import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
-  const communityStakeEnabled = useFlag('communityStake');
   const {
     createCommunityStep,
     selectedCommunity,
@@ -32,8 +31,13 @@ const CreateCommunity = () => {
     selectedChainId,
   } = useCreateCommunity();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
+    payload: {
+      event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED,
+      isPWA: isAddedToHomeScreen,
+    },
   });
 
   const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
@@ -84,11 +88,7 @@ const CreateCommunity = () => {
       <div className="CreateCommunity">
         {!isSuccessStep && (
           <CWFormSteps
-            steps={getFormSteps(
-              createCommunityStep,
-              showCommunityStakeStep,
-              communityStakeEnabled,
-            )}
+            steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
           />
         )}
 

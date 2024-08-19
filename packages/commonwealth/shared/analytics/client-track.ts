@@ -3,9 +3,9 @@ import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 
 // WARN: Using process.env to avoid webpack failures
 try {
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.APP_ENV === 'production') {
     mixpanel.init(process.env.MIXPANEL_PROD_TOKEN, { debug: true });
-  } else if (process.env.NODE_ENV === 'development') {
+  } else if (process.env.APP_ENV === 'development') {
     // NOTE: Only works if NODE_ENV defined in .env
     // Make sure that is set to development if you want to use backend Mixpanel locally.
     mixpanel.init(process.env.MIXPANEL_DEV_TOKEN, { debug: true });

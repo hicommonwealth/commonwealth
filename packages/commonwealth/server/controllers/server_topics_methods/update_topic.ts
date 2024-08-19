@@ -1,6 +1,9 @@
 import { AppError } from '@hicommonwealth/core';
-import { TopicAttributes, UserInstance } from '@hicommonwealth/model';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
+import {
+  TopicAttributes,
+  UserInstance,
+  sanitizeQuillText,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -63,8 +66,7 @@ export async function __updateTopic(
     throw new AppError(Errors.DefaultTemplateRequired);
   }
   // sanitize text
-  // @ts-expect-error StrictNullChecks
-  default_community_template = sanitizeQuillText(default_community_template);
+  default_community_template = sanitizeQuillText(default_community_template!);
 
   if (typeof name !== 'undefined') {
     if (name.match(/["<>%{}|\\/^`]/g)) {

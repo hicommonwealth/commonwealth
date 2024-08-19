@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Webhook from 'models/Webhook';
-import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface CreateWebhookProps {
   communityId: string;
@@ -13,11 +13,11 @@ const createWebhook = async ({
   communityId,
   webhookUrl,
 }: CreateWebhookProps): Promise<Webhook> => {
-  const response = await axios.post(`${app.serverUrl()}/createWebhook`, {
+  const response = await axios.post(`${SERVER_URL}/createWebhook`, {
     chain: communityId,
     webhookUrl,
     auth: true,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   const newWebhook = response.data.result;

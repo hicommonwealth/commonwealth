@@ -2,6 +2,8 @@ import 'components/sidebar/explore_sidebar.scss';
 import React from 'react';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import ChainInfo from '../../../models/ChainInfo';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import { getClasses } from '../component_kit/helpers';
@@ -14,6 +16,8 @@ export const ExploreCommunitiesSidebar = ({
 }) => {
   const { setMenu } = useSidebarStore();
 
+  const user = useUserStore();
+
   const allCommunities = app.config.chains
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -24,33 +28,30 @@ export const ExploreCommunitiesSidebar = ({
 
   const isInCommunity = (item) => {
     if (item instanceof ChainInfo) {
-      return (
-        app.roles.getAllRolesInCommunity({ community: item.id }).length > 0
-      );
+      return Permissions.isCommunityMember(item.id);
     } else {
       return false;
     }
   };
 
   const starredCommunities = allCommunities.filter((c) => {
-    return c instanceof ChainInfo && app.user.isCommunityStarred(c.id);
+    return (
+      c instanceof ChainInfo &&
+      user.starredCommunities.find(
+        (starCommunity) => starCommunity.community_id === c.id,
+      )
+    );
   });
 
-  const joinedCommunities = allCommunities.filter(
-    (c) => isInCommunity(c) && !app.user.isCommunityStarred(c.id),
-  );
+  const joinedCommunities = [...allCommunities]
+    .filter(isInCommunity)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const communityList: MenuItem[] = [
-    ...(app.isLoggedIn()
+    ...(user.isLoggedIn
       ? [
           { type: 'header', label: 'Your communities' } as MenuItem,
-          ...(starredCommunities.map((c: ChainInfo) => {
-            return {
-              community: c,
-              type: 'community',
-            };
-          }) as MenuItem[]),
-          ...(joinedCommunities.map((c: ChainInfo) => {
+          ...(joinedCommunities.map((c) => {
             return {
               community: c,
               type: 'community',

@@ -21,15 +21,14 @@ import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: __filename.endsWith(process.argv[1]),
+  enabled: fileURLToPath(import.meta.url).endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {
@@ -74,6 +73,16 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     BrokerSubscriptions.ContestWorkerPolicy,
     ContestWorker(),
     buildRetryStrategy(undefined, 20_000),
+    {
+      beforeHandleEvent: (topic, event, context) => {
+        context.start = Date.now();
+      },
+      afterHandleEvent: (topic, event, context) => {
+        const duration = Date.now() - context.start;
+        const handler = `${topic}.${event.name}`;
+        stats().histogram(`cw.handlerExecutionTime`, duration, { handler });
+      },
+    },
   );
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
@@ -121,7 +130,7 @@ function startRolloverLoop() {
       Contest.PerformContestRollovers(),
       {
         actor: {} as Actor,
-        payload: {},
+        payload: { id: '' },
       },
       false,
     ).catch(console.error);

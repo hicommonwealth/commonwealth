@@ -1,6 +1,5 @@
 import {
-  EvmRecurringContestEventSignatures,
-  EvmSingleContestEventSignatures,
+  EvmEventSignatures,
   InvalidState,
   Projection,
   events,
@@ -8,7 +7,6 @@ import {
 } from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -16,8 +14,7 @@ import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
 import { decodeThreadContentUrl } from '../utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export class MissingContestManager extends Error {
   constructor(
@@ -38,6 +35,15 @@ const inputs = {
   ContestContentUpvoted: events.ContestContentUpvoted,
 };
 
+// TODO: remove kind column from EvmEventSources
+const signatureToKind = {
+  [EvmEventSignatures.Contests.ContentAdded]: 'ContentAdded',
+  [EvmEventSignatures.Contests.RecurringContestStarted]: 'ContestStarted',
+  [EvmEventSignatures.Contests.RecurringContestVoterVoted]: 'VoterVoted',
+  [EvmEventSignatures.Contests.SingleContestStarted]: 'ContestStarted',
+  [EvmEventSignatures.Contests.SingleContestVoterVoted]: 'VoterVoted',
+};
+
 /**
  * Makes sure contest manager (off-chain metadata) record exists
  * - Alerts when not found and inserts default record to patch distributed transaction
@@ -55,7 +61,7 @@ async function updateOrCreateWithAlert(
       required: false,
     },
   });
-  const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
+  const url = community?.ChainNode?.private_url;
   if (!url)
     throw new InvalidState(
       `Chain node url not found on namespace ${namespace}`,
@@ -124,16 +130,23 @@ async function updateOrCreateWithAlert(
     });
     if (mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi)) {
       const sigs = isOneOff
-        ? EvmSingleContestEventSignatures
-        : EvmRecurringContestEventSignatures;
-      const sourcesToCreate: EvmEventSourceAttributes[] = Object.keys(sigs).map(
-        (eventName) => {
-          const eventSignature = (sigs as Record<string, string>)[eventName];
+        ? [
+            EvmEventSignatures.Contests.ContentAdded,
+            EvmEventSignatures.Contests.SingleContestStarted,
+            EvmEventSignatures.Contests.SingleContestVoterVoted,
+          ]
+        : [
+            EvmEventSignatures.Contests.ContentAdded,
+            EvmEventSignatures.Contests.RecurringContestStarted,
+            EvmEventSignatures.Contests.RecurringContestVoterVoted,
+          ];
+      const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
+        (eventSignature) => {
           return {
             chain_node_id: community!.ChainNode!.id!,
             contract_address: contest_address,
             event_signature: eventSignature,
-            kind: eventName,
+            kind: signatureToKind[eventSignature],
             abi_id: contestAbi.id,
           };
         },
@@ -148,6 +161,7 @@ type ContestDetails = {
   prize_percentage: number;
   payout_structure: number[];
 };
+
 /**
  * Gets chain node url from contest address
  */
@@ -156,17 +170,14 @@ async function getContestDetails(
 ): Promise<ContestDetails | undefined> {
   const [result] = await models.sequelize.query<ContestDetails>(
     `
-  select
-    coalesce(cn.private_url, cn.url) as url,
-    cm.prize_percentage,
-    cm.payout_structure
-  from
-    "ContestManagers" cm
-    join "Communities" c on cm.community_id = c.id
-    join "ChainNodes" cn on c.chain_node_id = cn.id
-  where
-    cm.contest_address = :contest_address;
-  `,
+        select coalesce(cn.private_url, cn.url) as url,
+               cm.prize_percentage,
+               cm.payout_structure
+        from "ContestManagers" cm
+                 join "Communities" c on cm.community_id = c.id
+                 join "ChainNodes" cn on c.chain_node_id = cn.id
+        where cm.contest_address = :contest_address;
+    `,
     {
       type: QueryTypes.SELECT,
       raw: true,
@@ -303,6 +314,8 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action!.thread_id,
           created_at: new Date(),
         });
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },

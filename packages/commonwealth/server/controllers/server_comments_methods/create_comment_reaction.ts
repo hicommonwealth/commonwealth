@@ -7,6 +7,7 @@ import {
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -23,12 +24,13 @@ const Errors = {
   BalanceCheckFailed: 'Could not verify user token balance',
   FailedCreateReaction: 'Failed to create reaction',
   CommunityNotFound: 'Community not found',
+  MustHaveStake: 'Must have stake to upvote',
 };
 
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  reaction: string;
+  reaction: 'like';
   commentId: number;
   canvasSignedData?: string;
   canvasHash?: string;
@@ -80,7 +82,7 @@ export async function __createCommentReaction(
   // check balance (bypass for admin)
   const addressAdminRoles = await findAllRoles(
     this.models,
-    { where: { address_id: address.id } },
+    { where: { address_id: address.id! } },
     thread.community_id,
     ['admin'],
   );
@@ -127,17 +129,19 @@ export async function __createCommentReaction(
       );
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          // @ts-expect-error StrictNullChecks
-          community.namespace_address,
+          community.namespace_address!,
           stake.stake_id,
           // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
-          // @ts-expect-error StrictNullChecks
-          node.url,
         );
+      const stakeBalance = stakeBalances[address.address];
+      if (BigNumber.from(stakeBalance).lte(0)) {
+        // stake is enabled but user has no stake
+        throw new AppError(Errors.MustHaveStake);
+      }
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalances[address.address],
+        stakeBalance,
         voteWeight,
       );
     }
@@ -147,12 +151,10 @@ export async function __createCommentReaction(
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: thread.community_id,
-    comment_id: comment.id,
+    comment_id: comment.id!,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
     canvas_hash: canvasHash,
     canvas_signed_data: canvasSignedData,
@@ -181,7 +183,7 @@ export async function __createCommentReaction(
         root_type: null, // What is this for?
         community_id: thread.community_id,
         author_address: address.address,
-        author_community_id: address.community_id,
+        author_community_id: address.community_id!,
       },
     },
     excludeAddresses: [address.address],

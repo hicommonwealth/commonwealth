@@ -4,13 +4,31 @@
   max-width: 600px;
   width: unset;
   padding: 0;
+  position: relative;
+
+  &.isHorizontal {
+    flex-direction: row;
+    max-width: unset;
+
+    .contest-image {
+      border-radius: 5px 0 0 5px;
+      max-height: 240px;
+      max-width: 522px;
+    }
+  }
+
+  .active-contest-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
 
   .contest-image {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     width: 100%;
     max-height: 275px;
-    object-fit: cover;
+    object-fit: contain;
 
     @include extraSmall {
       min-height: 195px;
@@ -79,6 +97,36 @@
             height: 24px;
           }
         }
+      }
+    }
+
+    .farcaster-cta {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      padding-block: 8px;
+      border: 1px solid $neutral-200;
+      border-radius: 6px;
+      margin-top: 8px;
+
+      &:hover {
+        cursor: pointer;
+        background-color: $neutral-25;
+      }
+
+      &:active {
+        background-color: $neutral-50;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      img {
+        width: 32px;
+        height: 32px;
       }
     }
   }

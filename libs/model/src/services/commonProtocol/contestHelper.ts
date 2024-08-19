@@ -35,6 +35,7 @@ export type ContestScores = {
  * @param rpc the rpc of the network to use helper with
  * @returns
  */
+// eslint-disable-next-line @typescript-eslint/require-await
 const createWeb3Provider = async (rpc: string): Promise<Web3> => {
   if (!config.WEB3.PRIVATE_KEY) throw new AppError('WEB3 private key not set!');
   const web3 = new Web3(rpc);
@@ -69,11 +70,16 @@ const addContent = async (
     contestABI as AbiItem[],
     contest,
   );
+
+  const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt;
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
       gas: '1000000',
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -125,11 +131,15 @@ const voteContent = async (
     contest,
   );
 
+  const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt;
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
       gas: '1000000',
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -390,11 +400,29 @@ export const rollOverContest = async (
     } catch {
       return false;
     }
-
+    const maxFeePerGasEst = await estimateGas(web3);
     await contractCall.send({
       from: web3.eth.defaultAccount,
       gas: gasResult.toString(),
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
     });
     return true;
   });
+};
+
+const estimateGas = async (web3: Web3): Promise<bigint | null> => {
+  try {
+    const latestBlock = await web3.eth.getBlock('latest');
+
+    // Calculate maxFeePerGas and maxPriorityFeePerGas
+    const baseFeePerGas = latestBlock.baseFeePerGas;
+    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
+    const maxFeePerGas =
+      baseFeePerGas! * BigInt(2) + BigInt(parseInt(maxPriorityFeePerGas));
+    return maxFeePerGas;
+  } catch {
+    return null;
+  }
 };

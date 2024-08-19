@@ -9,11 +9,9 @@ import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
-  createCommentMentionNotifications,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  queryMentionedUsers,
 } from '../../util/parseUserMentions';
 import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
@@ -73,7 +71,7 @@ export async function __updateComment(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: comment.community_id,
+    communityId: thread.community_id,
     address: address.address,
   });
   if (!canInteract) {
@@ -83,7 +81,7 @@ export async function __updateComment(
   const isAuthor = await validateOwner({
     models: this.models,
     user,
-    communityId: comment.community_id,
+    communityId: thread.community_id,
     entity: comment,
     allowSuperAdmin: true,
   });
@@ -115,7 +113,6 @@ export async function __updateComment(
   );
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   await this.models.sequelize.transaction(async (transaction) => {
     await this.models.Comment.update(
@@ -130,16 +127,26 @@ export async function __updateComment(
       },
     );
 
+    if (versionHistory) {
+      await this.models.CommentVersionHistory.create(
+        {
+          comment_id: comment.id!,
+          text: text!,
+          timestamp: new Date(),
+        },
+        {
+          transaction,
+        },
+      );
+    }
+
     await emitMentions(this.models, transaction, {
-      // @ts-expect-error StrictNullChecks
-      authorAddressId: address.id,
-      // @ts-expect-error StrictNullChecks
-      authorUserId: user.id,
+      authorAddressId: address.id!,
+      authorUserId: user.id!,
       authorAddress: address.address,
-      // @ts-expect-error StrictNullChecks
-      authorProfileId: address.profile_id,
-      mentions: mentionedAddresses,
+      mentions: mentions,
       comment,
+      community_id: thread.community_id,
     });
   });
 
@@ -175,15 +182,6 @@ export async function __updateComment(
     // @ts-expect-error StrictNullChecks
     excludeAddresses: [finalComment.Address.address],
   });
-
-  allNotificationOptions.push(
-    ...createCommentMentionNotifications(
-      mentionedAddresses,
-      finalComment,
-      // @ts-expect-error StrictNullChecks
-      finalComment.Address,
-    ),
-  );
 
   // update address last active
   address.last_active = new Date();

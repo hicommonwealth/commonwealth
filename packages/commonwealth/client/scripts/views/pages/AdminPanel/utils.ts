@@ -1,6 +1,7 @@
 import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { userStore } from 'state/ui/user';
 
 export const createChainNode = async ({
   url,
@@ -17,14 +18,14 @@ export const createChainNode = async ({
   eth_chain_id: number;
   cosmos_chain_id: string;
 }) => {
-  return await axios.post(`${app.serverUrl()}/nodes`, {
+  return await axios.post(`${SERVER_URL}/nodes`, {
     url,
     name,
     bech32,
     balance_type,
     eth_chain_id,
     cosmos_chain_id,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 
@@ -45,28 +46,28 @@ export const updateChainNode = async ({
   eth_chain_id: number;
   cosmos_chain_id: string;
 }) => {
-  return await axios.put(`${app.serverUrl()}/nodes/${id}`, {
+  return await axios.put(`${SERVER_URL}/nodes/${id}`, {
     url,
     name,
     bech32,
     balance_type,
     eth_chain_id,
     cosmos_chain_id,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 
 export const deleteCommunity = async ({ id }: { id: string }) => {
-  await axios.delete(`${app.serverUrl()}/communities/${id}`, {
+  await axios.delete(`${SERVER_URL}/communities/${id}`, {
     data: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
   });
 };
 
 export const updateCommunityId = async ({ community_id, new_community_id }) => {
-  await axios.patch(`${app.serverUrl()}/communities/update_id`, {
-    jwt: app.user.jwt,
+  await axios.patch(`${SERVER_URL}/communities/update_id`, {
+    jwt: userStore.getState().jwt,
     community_id,
     new_community_id,
     redirect: true,
@@ -80,8 +81,8 @@ export const updateCommunityCustomDomain = async ({
   community_id: string;
   custom_domain: string;
 }) => {
-  await axios.patch(`${app.serverUrl()}/communities/${community_id}`, {
-    jwt: app.user.jwt,
+  await axios.patch(`${SERVER_URL}/communities/${community_id}`, {
+    jwt: userStore.getState().jwt,
     id: community_id,
     custom_domain,
   });
@@ -94,26 +95,26 @@ export const updateSiteAdmin = async ({
   address: string;
   siteAdmin: boolean;
 }) => {
-  await axios.post(`${app.serverUrl()}/updateSiteAdmin`, {
+  await axios.post(`${SERVER_URL}/updateSiteAdmin`, {
     address,
     siteAdmin,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 
 export const getCSVContent = async ({ id }: { id: string }) => {
-  const res = await axios.post(`${app.serverUrl()}/exportMembersList`, {
+  const res = await axios.post(`${SERVER_URL}/exportMembersList`, {
     communityId: id,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return res.data.result.data[0];
 };
 
 export const getTopUsersList = async () => {
-  const res = await axios.get(`${app.serverUrl()}/admin/top-users`, {
+  const res = await axios.get(`${SERVER_URL}/admin/top-users`, {
     params: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
   });
   return res.data.result;

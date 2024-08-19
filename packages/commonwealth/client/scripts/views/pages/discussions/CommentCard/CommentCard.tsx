@@ -2,6 +2,11 @@ import type { DeltaStatic } from 'quill';
 import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 
+import {
+  CanvasSignedData,
+  deserializeCanvas,
+  verify,
+} from '@hicommonwealth/shared';
 import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
 import { SharePopover } from 'client/scripts/views/components/SharePopover';
 import {
@@ -9,9 +14,10 @@ import {
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
-import { verify } from 'shared/canvas';
-import { CanvasSignedData, deserializeCanvas } from 'shared/canvas/types';
+import { useFetchConfigurationQuery } from 'state/api/configuration';
+import useUserStore from 'state/ui/user';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -23,6 +29,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
+import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -93,6 +100,11 @@ export const CommentCard = ({
   className,
   shareURL,
 }: CommentCardProps) => {
+  const user = useUserStore();
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
+
+  const userOwnsComment = comment.profile.userId === user.id;
+
   const [commentText, setCommentText] = useState(comment.text);
   const commentBody = deserializeDelta(
     (editDraft || commentText) ?? comment.text,
@@ -108,6 +120,8 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
+  const { data: config } = useFetchConfigurationQuery();
+
   const doVerify = useCallback(async () => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
@@ -116,15 +130,15 @@ export const CommentCard = ({
       await verify(canvasSignedData);
       setVerifiedCanvasSignedData(canvasSignedData);
     } catch (err) {
-      console.log('Unexpected error while verifying action/session');
-      return;
+      // ignore invalid signed comments
     }
   }, [comment.canvasSignedData]);
 
   useEffect(() => {
+    if (!config?.enforceSessionKeys) return;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     doVerify();
-  }, [doVerify]);
+  }, [config?.enforceSessionKeys, doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
@@ -242,6 +256,13 @@ export const CommentCard = ({
                     // @ts-expect-error <StrictNullChecks/>
                     await onReply();
                   }}
+                />
+              )}
+
+              {enableKnockInAppNotifications && user.id > 0 && (
+                <ToggleCommentSubscribe
+                  comment={comment}
+                  userOwnsComment={userOwnsComment}
                 />
               )}
 

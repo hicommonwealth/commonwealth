@@ -13,12 +13,15 @@
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
     "test-dev": "NODE_ENV=test vitest --config ../../vite.config.ts test",
-    "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
+    "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups",
+    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
+    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/model": "workspace:*",
     "@hicommonwealth/sitemaps": "workspace:*",
+    "@hicommonwealth/adapters": "workspace:*",
     "moment": "^2.23.0",
     "sequelize": "^6.32.1",
     "tsx": "^4.7.2"

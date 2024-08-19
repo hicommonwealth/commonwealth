@@ -6,10 +6,15 @@ import {
 } from '@keplr-wallet/types';
 
 import { fromBech32 } from '@cosmjs/encoding';
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  CosmosSignerCW,
+  WalletId,
+} from '@hicommonwealth/shared';
 import { bytesToHex } from '@noble/hashes/utils';
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import IWebWallet from '../../../models/IWebWallet';
 import { getCosmosChains } from './utils';
 
@@ -61,9 +66,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -100,7 +103,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           const { data: addressData } = fromBech32(this.accounts[0].address);
           return `0x${bytesToHex(addressData)}`;
         },
-        getChainId: () => this._chainId,
+        getChainId: () => this._chainId || 'evmos_9001-2',
       },
     });
   }
@@ -118,9 +121,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
-        app.chain.id
-      }`;
+      const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${app.chain.id}`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();

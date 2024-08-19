@@ -1,5 +1,4 @@
-import ChainInfo from '../models/ChainInfo';
-import StakeInfo from '../models/StakeInfo';
+import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useGetBuyPriceQuery } from '../state/api/communityStake/index';
 import { convertEthToUsd } from '../views/modals/ManageCommunityStakeModal/utils';
 
@@ -12,32 +11,36 @@ function fromWei(value: string | null): number | null {
 }
 
 export const useCommunityCardPrice = ({
-  community,
+  communityId,
   stakeId,
   ethUsdRate,
   historicalPrice,
 }: {
-  community: ChainInfo;
+  communityId: string;
   stakeId: number;
   ethUsdRate: string;
   historicalPrice: string;
 }) => {
-  // @ts-expect-error StrictNullChecks
-  const communityStake: StakeInfo = community?.CommunityStakes?.find(
-    (s) => s.stakeId === stakeId,
+  const { data: community, isLoading: isCommunityLoading } =
+    useGetCommunityByIdQuery({
+      id: communityId,
+      enabled: !!communityId,
+      includeNodeInfo: true,
+    });
+
+  const communityStake = (community?.CommunityStakes || [])?.find(
+    (s) => s.stake_id === stakeId,
   );
-  const stakeEnabled = !!communityStake?.stakeEnabled;
+  const stakeEnabled = !!communityStake?.stake_enabled;
 
   // The price of buying one stake
   const { data: buyPriceData, isLoading } = useGetBuyPriceQuery({
-    // @ts-expect-error StrictNullChecks
-    namespace: community.namespace,
+    namespace: community?.namespace || '',
     stakeId: stakeId,
     amount: 1,
-    apiEnabled: stakeEnabled,
-    chainRpc: community.ChainNode.url,
-    // @ts-expect-error StrictNullChecks
-    ethChainId: community.ChainNode.ethChainId,
+    apiEnabled: stakeEnabled && !isCommunityLoading,
+    chainRpc: community?.ChainNode?.url || '',
+    ethChainId: community?.ChainNode?.eth_chain_id || 0,
   });
 
   if (!stakeEnabled || isLoading) {

@@ -7,13 +7,11 @@ import {
 import { CommunityAttributes, DB } from '@hicommonwealth/model';
 import { ETHERS_BIG_NUMBER } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { getChainProposalUrl } from '../../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 const web3 = new Web3();
 
 export async function handleGovernanceProposalEvents(

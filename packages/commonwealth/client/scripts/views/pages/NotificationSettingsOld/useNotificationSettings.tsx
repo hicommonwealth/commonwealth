@@ -4,6 +4,7 @@ import useForceRerender from 'hooks/useForceRerender';
 import 'pages/notification_settings/index.scss';
 import { useEffect, useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
 
@@ -23,8 +24,10 @@ const useNotificationSettings = () => {
   const [sentEmail, setSentEmail] = useState(false);
   const [snapshotsInfo, setSnapshotsInfo] = useState(null);
 
+  const user = useUserStore();
+
   const [currentFrequency, setCurrentFrequency] = useState(
-    app.user.emailInterval,
+    user.emailNotificationInterval,
   );
 
   useEffect(() => {
@@ -102,7 +105,7 @@ const useNotificationSettings = () => {
     app?.user.notifications.chainEventSubscribedChainIds;
 
   // communities the user has addresses for but does not have existing subscriptions for
-  const relevantSubscribedCommunities = app?.user?.addresses
+  const relevantSubscribedCommunities = user.addresses
     ?.map?.((x) => x?.community)
     ?.filter?.(
       (x) =>
@@ -113,10 +116,12 @@ const useNotificationSettings = () => {
     const subIds = [];
 
     // get all subscription ids
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Object.entries(chainEventSubs).map(([_, subs]) =>
       // @ts-expect-error StrictNullChecks
       subIds.push(...(subs || [])),
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Object.entries(bundledSubs).map(([_, subs]) =>
       // @ts-expect-error StrictNullChecks
       subIds.push(...(subs || [])),

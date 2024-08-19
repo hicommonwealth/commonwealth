@@ -1,27 +1,29 @@
 import { useState } from 'react';
 import app from 'state';
 
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
+import { ChainBase } from '@hicommonwealth/shared';
+import { getUniqueUserAddresses } from 'helpers/user';
+import useUserStore from 'state/ui/user';
 import {
   getAvailableAddressesForStakeExchange,
   getInitialAccountValue,
 } from '../utils';
 
 interface UseStakeAddressesProps {
-  community?: ChainInfo | CommunityData;
+  stakedCommunityChainBase: ChainBase;
 }
 
-const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
+const useStakeAddresses = ({
+  stakedCommunityChainBase,
+}: UseStakeAddressesProps) => {
+  const user = useUserStore();
+
   const communityAddresses = (() => {
-    if (community) {
+    if (stakedCommunityChainBase) {
       // get all the addresses of the user that matches base chain of selected `community`
-      const userAddresses = (app?.user?.addresses || [])
-        ?.filter(
-          (addr) => addr.community.base === (community as ChainInfo)?.base,
-        )
-        ?.map((addr) => addr.address);
+      const userAddresses = user.addresses
+        .filter((addr) => addr.community.base === stakedCommunityChainBase)
+        .map((addr) => addr.address);
 
       // return all the unique addresses
       return [...new Set(userAddresses)];
@@ -31,7 +33,7 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
   })();
 
   const activeAccountAddress =
-    communityAddresses?.[0] || app?.user?.activeAccount?.address;
+    communityAddresses?.[0] || user.activeAccount?.address || '';
 
   const availableAddresses = (() => {
     // if filtering addresses for a specific community
@@ -42,10 +44,10 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
     }
 
     // if user is a community member, we show active accounts connected to community
-    if (app?.user?.activeAccount) {
+    if (user.activeAccount) {
       return getAvailableAddressesForStakeExchange(
-        app.user.activeAccounts,
-        app.user.addresses,
+        user.accounts,
+        user.addresses,
       );
     }
 

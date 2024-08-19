@@ -1,12 +1,12 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import CommunityInfo from 'client/scripts/views/components/component_kit/CommunityInfo';
-import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { formatAddressShort } from 'helpers';
+import { APIOrderDirection } from 'helpers/constants';
 import { getRelativeTimestamp } from 'helpers/dates';
 import React from 'react';
+import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { TransactionsProps } from '../types';
 import './Transactions.scss';
@@ -87,16 +87,12 @@ const Transactions = ({ transactions }: TransactionsProps) => {
         rowData={transactions.map((tx) => ({
           ...tx,
           community: {
-            // @ts-expect-error <StrictNullChecks/>
-            sortValue: tx.community.name.toLowerCase(),
+            sortValue: tx?.community?.name?.toLowerCase(),
             customElement: (
               <CommunityInfo
-                symbol={tx.community.default_symbol}
-                // @ts-expect-error <StrictNullChecks/>
-                iconUrl={tx.community.icon_url}
-                // @ts-expect-error <StrictNullChecks/>
+                symbol={tx.community.default_symbol || ''}
+                iconUrl={tx.community.icon_url || ''}
                 name={tx.community.name}
-                // @ts-expect-error <StrictNullChecks/>
                 communityId={tx.community.id}
               />
             ),

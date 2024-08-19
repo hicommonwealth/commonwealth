@@ -1,9 +1,9 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
 const tagTypes = [

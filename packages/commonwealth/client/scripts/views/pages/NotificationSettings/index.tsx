@@ -1,37 +1,34 @@
-import { CommunityAlert, ThreadSubscription } from '@hicommonwealth/schemas';
+import { CommunityAlert } from '@hicommonwealth/schemas';
+import { getUniqueCommunities } from 'helpers/addresses';
 import { useFlag } from 'hooks/useFlag';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import React, { useCallback, useState } from 'react';
-import app from 'state';
+import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
-// eslint-disable-next-line max-len
-import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from 'views/pages/404';
+import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
-import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
+import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
+import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
+import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
-import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
-import { SubscriptionEntry } from './SubscriptionEntry';
 import './index.scss';
 
-type NotificationSection = 'community-alerts' | 'subscriptions';
+type NotificationSection = 'community-alerts' | 'threads' | 'comments';
 
 const NotificationSettings = () => {
+  const supportsPushNotifications = useSupportsPushNotifications();
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlertsQuery();
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
-  const { isLoggedIn } = useUserLoggedIn();
-  const registerClientRegistrationToken =
-    useRegisterClientRegistrationTokenMutation();
+  const user = useUserStore();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     (communityAlerts.data as unknown as ReadonlyArray<
@@ -39,38 +36,12 @@ const NotificationSettings = () => {
     >) || [],
   );
 
-  const { bundledSubs } = useNotificationSettings();
-
-  const [threadsFilter, setThreadsFilter] = useState<readonly number[]>([]);
   const [section, setSection] =
     useState<NotificationSection>('community-alerts');
 
-  const handleUnsubscribe = useCallback(
-    (id: number) => {
-      setThreadsFilter([...threadsFilter, id]);
-    },
-    [threadsFilter],
-  );
-
-  const handlePushNotificationSubscription = useCallback(() => {
-    async function doAsync() {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        console.log('Notification permission granted.');
-        const token = await getFirebaseMessagingToken();
-        await registerClientRegistrationToken.mutateAsync({
-          id: 'none',
-          token,
-        });
-      }
-    }
-
-    doAsync().catch(console.error);
-  }, [registerClientRegistrationToken]);
-
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
-  } else if (!isLoggedIn) {
+  } else if (!user.isLoggedIn) {
     return <PageNotFound />;
   }
 
@@ -85,29 +56,40 @@ const NotificationSettings = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
-        {enableKnockPushNotifications && (
+        {enableKnockPushNotifications && supportsPushNotifications && (
           <div>
             <CWText type="h5">Push Notifications</CWText>
 
-            <p>
-              <CWButton
-                label="Subscribe to Push Notifications"
-                onClick={handlePushNotificationSubscription}
-              />
-            </p>
+            <div className="setting-container">
+              <div className="setting-container-left">
+                <CWText className="text-muted">
+                  Turn on notifications to receive alerts on your device.
+                </CWText>
+              </div>
+
+              <div className="setting-container-right">
+                <PushNotificationsToggle />
+              </div>
+            </div>
           </div>
         )}
 
         <CWTabsRow>
           <CWTab
-            label="Community Alerts"
+            label="Community"
             isSelected={section === 'community-alerts'}
             onClick={() => setSection('community-alerts')}
           />
           <CWTab
-            label="Subscriptions"
-            isSelected={section === 'subscriptions'}
-            onClick={() => setSection('subscriptions')}
+            label="Threads"
+            isSelected={section === 'threads'}
+            onClick={() => setSection('threads')}
+          />
+
+          <CWTab
+            label="Comments"
+            isSelected={section === 'comments'}
+            onClick={() => setSection('comments')}
           />
         </CWTabsRow>
 
@@ -118,47 +100,33 @@ const NotificationSettings = () => {
             </CWText>
 
             <CWText className="page-subheader-text">
-              Get updates on new threads and discussions from these communities
+              Get updates on onchain activity and proposals in these
+              communities.
             </CWText>
 
-            {Object.entries(bundledSubs)
-              .sort((x, y) => x[0].localeCompare(y[0]))
-              .map(([communityName]) => {
-                const communityInfo = app?.config.chains.getById(communityName);
-                return (
-                  <CommunityEntry
-                    key={communityInfo.id}
-                    communityInfo={communityInfo}
-                    communityAlert={communityAlertsIndex[communityInfo.id]}
-                  />
-                );
-              })}
+            {getUniqueCommunities().map((community) => {
+              return (
+                <CommunityEntry
+                  key={community.id}
+                  id={community.id || ''}
+                  name={community.name || ''}
+                  iconUrl={community.iconUrl || ''}
+                  alert={communityAlertsIndex[community.id]}
+                />
+              );
+            })}
           </>
         )}
 
-        {section === 'subscriptions' && (
+        {section === 'threads' && (
           <>
-            <CWText type="h4" fontWeight="semiBold" className="section-header">
-              Subscriptions
-            </CWText>
+            <ThreadSubscriptions />
+          </>
+        )}
 
-            <CWText className="page-subheader-text">
-              Manage your subscriptions to these discussions
-            </CWText>
-
-            {(threadSubscriptions.data || [])
-              .filter((current) => current.Thread)
-              .filter((current) => !threadsFilter.includes(current.Thread!.id!))
-              .map((current) => (
-                <>
-                  <SubscriptionEntry
-                    key={current.Thread!.id!}
-                    subscription={current as z.infer<typeof ThreadSubscription>}
-                    onUnsubscribe={handleUnsubscribe}
-                  />
-                  {/*<ThreadCard thread={current.Thread!}/>*/}
-                </>
-              ))}
+        {section === 'comments' && (
+          <>
+            <CommentSubscriptions />
           </>
         )}
       </div>

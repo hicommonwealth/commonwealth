@@ -12,14 +12,12 @@ import {
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const Errors = {
   GroupNotFound: 'Group not found',
@@ -117,7 +115,6 @@ async function paginateAddresses(
   callback: (addresses: AddressAttributes[]) => Promise<void>,
 ): Promise<void> {
   const addresses = await models.Address.findAll({
-    // @ts-expect-error StrictNullChecks
     where: {
       community_id: communityId,
       verified: {
@@ -146,7 +143,7 @@ async function paginateAddresses(
   return paginateAddresses(
     models,
     communityId,
-    addresses[addresses.length - 1].id,
+    addresses[addresses.length - 1].id!,
     callback,
   );
 }
@@ -169,7 +166,7 @@ async function computeMembership(
     address.address,
     requirements as Requirement[],
     balances,
-    currentGroup.metadata.required_requirements,
+    currentGroup.metadata.required_requirements!,
   );
   const computedMembership = {
     group_id: currentGroup.id,

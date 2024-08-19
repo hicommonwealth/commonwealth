@@ -31,7 +31,6 @@ describe('Reactions lifecycle', () => {
             id: addressId,
             user_id: user?.id,
             role: 'admin',
-            profile_id: undefined,
           },
         ],
         // CommunityStakes: [],
@@ -63,7 +62,6 @@ describe('Reactions lifecycle', () => {
 
   test('should create an outbox entry when a thread is liked', async () => {
     await models.Reaction.create({
-      community_id: communityId,
       address_id: addressId,
       thread_id: threadId,
       reaction: 'like',

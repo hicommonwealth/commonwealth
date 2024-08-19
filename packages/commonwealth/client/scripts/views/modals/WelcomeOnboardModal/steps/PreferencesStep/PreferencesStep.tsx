@@ -1,12 +1,12 @@
-import app from 'client/scripts/state';
-import { useUpdateProfileByAddressMutation } from 'client/scripts/state/api/profiles';
+import React from 'react';
+import { useUpdateUserMutation } from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import {
   PreferenceTags,
   usePreferenceTags,
-} from 'client/scripts/views/components/PreferenceTags';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import React from 'react';
+} from 'views/components/PreferenceTags';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './PreferencesStep.scss';
 
 type PreferencesStepProps = {
@@ -15,19 +15,18 @@ type PreferencesStepProps = {
 
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
   const { preferenceTags, toggleTagFromSelection } = usePreferenceTags();
+  const user = useUserStore();
 
-  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
-    useUpdateProfileByAddressMutation();
+  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+    useUpdateUserMutation();
 
   const handleSavePreferences = () => {
     if (isUpdatingProfile) return;
 
-    updateProfile({
-      // @ts-expect-error <StrictNullChecks/>
-      address: app.user.activeAccount?.profile?.address,
-      // @ts-expect-error <StrictNullChecks/>
-      chain: app.user.activeAccount?.profile?.chain,
-      tagIds: preferenceTags
+    updateUser({
+      id: user.id,
+      profile: {},
+      tag_ids: preferenceTags
         .filter((tag) => tag.isSelected)
         .map((tag) => tag.item.id),
     })

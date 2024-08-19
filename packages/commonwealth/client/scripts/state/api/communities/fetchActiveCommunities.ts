@@ -1,12 +1,12 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import Tag from 'models/Tag';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const ACTIVE_COMMUNITIES_STALE_TIME = 60 * 1_000; // 1 min
 
-interface FetchActiveCommunitiesResponse {
+export interface FetchActiveCommunitiesResponse {
   communities: {
     id: string;
     name: string;
@@ -14,19 +14,21 @@ interface FetchActiveCommunitiesResponse {
     ethChainId?: string;
     cosmosChainId?: string;
     description: string;
-    iconUrl: string;
+    icon_url: string;
     socialLinks: string[];
     nodeUrl: string;
     altWalletUrl: string;
     userAddress: string;
     bech32Prefix?: string;
+    CommunityTags: Tag[];
+    recentThreadsCount: string;
   }[];
   totalCommunitiesCount: number;
 }
 
 const fetchActiveCommunities = async () => {
   const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_ACTIVE_COMMUNITIES}?active=true`,
+    `${SERVER_URL}${ApiEndpoints.FETCH_ACTIVE_COMMUNITIES}?active=true`,
   );
   return response.data.result;
 };

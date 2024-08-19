@@ -1,14 +1,13 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { APIOrderDirection } from 'helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
-import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
+import CommunityDirectoryCard from './CommunityDirectoryCard';
 import './DirectoryPageContent.scss';
 
 type RowType = {
@@ -31,14 +30,14 @@ export type CommunityData = {
   iconUrl: string;
   id: string;
   namespace: string;
-  ChainNode: NodeInfo;
+  ChainNode?: NodeInfo;
 };
 
 interface DirectoryPageContentProps {
   isLoading: boolean;
   noFilteredCommunities: boolean;
   noCommunitiesInChain: boolean;
-  chainName: string;
+  chainName?: string;
   communitySearch: string;
   selectedViewType: ViewType;
   tableData: RowType[];
@@ -123,20 +122,12 @@ const DirectoryPageContent = ({
   ) : (
     <div className="directory-tiles-container">
       {filteredRelatedCommunitiesData.map((community) => {
-        const chain = app.config.chains.getById(community.id);
-
-        // allow user to buy stake if they have a connected address that matches active community base chain
-        const canBuyStake = !!app?.user?.addresses?.find?.(
-          (address) => address?.community?.base === chain?.base,
-        );
-
         return (
-          <CWRelatedCommunityCard
+          <CommunityDirectoryCard
             key={community.id}
-            community={chain}
-            canBuyStake={canBuyStake}
-            memberCount={community.members}
-            threadCount={community.threads}
+            communityId={community.id}
+            membersCount={community.members}
+            threadsCount={community.threads}
           />
         );
       })}

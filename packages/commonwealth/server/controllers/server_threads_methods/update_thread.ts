@@ -10,15 +10,19 @@ import {
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import _ from 'lodash';
-import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
+import {
+  Op,
+  QueryTypes,
+  Sequelize,
+  Transaction,
+  WhereOptions,
+} from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import {
-  createThreadMentionNotifications,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  queryMentionedUsers,
 } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { addVersionHistory } from '../../util/versioning';
@@ -40,6 +44,7 @@ export const Errors = {
   MissingCollaborators: 'Failed to find all provided collaborators',
   CollaboratorsOverlap:
     'Cannot overlap addresses when adding/removing collaborators',
+  ContestLock: 'Cannot edit thread that is in a contest',
 };
 
 export type UpdateThreadOptions = {
@@ -47,7 +52,7 @@ export type UpdateThreadOptions = {
   address: AddressInstance;
   threadId?: number;
   title?: string;
-  body?: string;
+  body: string;
   stage?: string;
   url?: string;
   locked?: boolean;
@@ -114,6 +119,23 @@ export async function __updateThread(
     throw new AppError(Errors.ThreadNotFound);
   }
 
+  // check if thread is part of a contest topic
+  const contestManagers = await this.models.sequelize.query(
+    `
+    SELECT cm.contest_address FROM "Threads" t
+    JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
+    JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
+    WHERE t.id = :thread_id
+  `,
+    {
+      type: QueryTypes.SELECT,
+      replacements: {
+        thread_id: thread!.id,
+      },
+    },
+  );
+  const isContestThread = contestManagers.length > 0;
+
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     communityId: thread.community_id,
@@ -156,11 +178,11 @@ export async function __updateThread(
   ) {
     throw new AppError(Errors.Unauthorized);
   }
-  const permissions = {
+  const permissions: UpdateThreadPermissions = {
     isThreadOwner,
     isMod,
     isAdmin,
-    isSuperAdmin,
+    isSuperAdmin: isSuperAdmin!,
     isCollaborator,
   };
 
@@ -177,11 +199,9 @@ export async function __updateThread(
   const community = await this.models.Community.findByPk(thread.community_id);
 
   const previousDraftMentions = parseUserMentions(latestVersion);
-  // @ts-expect-error StrictNullChecks
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
@@ -190,7 +210,6 @@ export async function __updateThread(
     const toUpdate: Partial<ThreadAttributes> = {};
 
     await setThreadAttributes(
-      // @ts-expect-error StrictNullChecks
       permissions,
       thread,
       {
@@ -200,36 +219,32 @@ export async function __updateThread(
         canvasHash,
         canvasSignedData,
       },
+      isContestThread,
       toUpdate,
     );
 
-    // @ts-expect-error StrictNullChecks
     await setThreadPinned(permissions, pinned, toUpdate);
 
-    // @ts-expect-error StrictNullChecks
     await setThreadSpam(permissions, spam, toUpdate);
 
-    // @ts-expect-error StrictNullChecks
     await setThreadLocked(permissions, locked, toUpdate);
 
-    // @ts-expect-error StrictNullChecks
     await setThreadArchived(permissions, archived, toUpdate);
 
     await setThreadStage(
-      // @ts-expect-error StrictNullChecks
       permissions,
       stage,
-      community,
+      community!,
       allAnalyticsOptions,
       toUpdate,
     );
 
     await setThreadTopic(
-      // @ts-expect-error StrictNullChecks
       permissions,
-      community,
-      topicId,
+      community!,
+      topicId!,
       this.models,
+      isContestThread,
       toUpdate,
     );
 
@@ -241,7 +256,7 @@ export async function __updateThread(
       { transaction },
     );
 
-    if (versionHistory) {
+    if (versionHistory && body) {
       // The update above doesn't work because it can't detect array changes so doesn't write it to db
       await this.models.Thread.update(
         {
@@ -252,27 +267,36 @@ export async function __updateThread(
           transaction,
         },
       );
+
+      await this.models.ThreadVersionHistory.create(
+        {
+          thread_id: threadId!,
+          address: address.address,
+          body,
+          timestamp: new Date(),
+        },
+        {
+          transaction,
+        },
+      );
     }
 
     await updateThreadCollaborators(
-      // @ts-expect-error StrictNullChecks
       permissions,
       thread,
       collaborators,
+      isContestThread,
       this.models,
       transaction,
     );
 
     await emitMentions(this.models, transaction, {
-      // @ts-expect-error StrictNullChecks
-      authorAddressId: address.id,
-      // @ts-expect-error StrictNullChecks
-      authorUserId: user.id,
+      authorAddressId: address.id!,
+      authorUserId: user.id!,
       authorAddress: address.address,
-      // @ts-expect-error StrictNullChecks
-      authorProfileId: address.profile_id,
-      mentions: mentionedAddresses,
+      mentions: mentions,
       thread,
+      community_id: thread.community_id,
     });
 
     await transaction.commit();
@@ -304,15 +328,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -324,15 +340,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -350,15 +358,7 @@ export async function __updateThread(
                 model: this.models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: this.models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
+                attributes: ['id', 'profile'],
               },
             ],
           },
@@ -385,13 +385,8 @@ export async function __updateThread(
             attributes: ['address'],
             include: [
               {
-                model: this.models.Profile,
-                attributes: [
-                  ['id', 'profile_id'],
-                  'profile_name',
-                  ['avatar_url', 'profile_avatar_url'],
-                  'user_id',
-                ],
+                model: this.models.User,
+                attributes: ['profile'],
               },
             ],
           },
@@ -425,10 +420,6 @@ export async function __updateThread(
     excludeAddresses: [address.address],
   });
 
-  allNotificationOptions.push(
-    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
-  );
-
   const updatedThreadWithComments = {
     // @ts-expect-error StrictNullChecks
     ...finalThread.toJSON(),
@@ -441,7 +432,6 @@ export async function __updateThread(
   ).map((c) => {
     const temp = {
       ...c,
-      ...(c?.Address?.Profile || {}),
       address: c?.Address?.address || '',
     };
 
@@ -509,6 +499,7 @@ async function setThreadAttributes(
   permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
   { title, body, url, canvasSignedData, canvasHash }: UpdatableThreadAttributes,
+  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (
@@ -516,6 +507,9 @@ async function setThreadAttributes(
     typeof body !== 'undefined' ||
     typeof url !== 'undefined'
   ) {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
@@ -713,9 +707,13 @@ async function setThreadTopic(
   community: CommunityInstance,
   topicId: number,
   models: DB,
+  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof topicId !== 'undefined') {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
@@ -748,11 +746,16 @@ async function updateThreadCollaborators(
         toRemove?: number[];
       }
     | undefined,
+  isContestThread: boolean,
   models: DB,
   transaction: Transaction,
 ) {
   const { toAdd, toRemove } = collaborators || {};
   if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
+
     validatePermissions(permissions, {
       isThreadOwner: true,
       isSuperAdmin: true,
@@ -784,7 +787,6 @@ async function updateThreadCollaborators(
       await Promise.all(
         collaboratorAddresses.map(async (address) => {
           return models.Collaboration.findOrCreate({
-            // @ts-expect-error StrictNullChecks
             where: {
               thread_id: thread.id,
               address_id: address.id,
@@ -798,7 +800,6 @@ async function updateThreadCollaborators(
     // remove collaborators
     if (toRemoveUnique.length > 0) {
       await models.Collaboration.destroy({
-        // @ts-expect-error StrictNullChecks
         where: {
           thread_id: thread.id,
           address_id: {

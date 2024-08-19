@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
@@ -7,6 +7,7 @@ import {
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -23,12 +24,13 @@ export const Errors = {
   ThreadArchived: 'Thread is archived',
   FailedCreateReaction: 'Failed to create reaction',
   CommunityNotFound: 'Community not found',
+  MustHaveStake: 'Must have stake to upvote',
 };
 
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  reaction: string;
+  reaction: 'like';
   threadId: number;
   canvasSignedData?: string;
   canvasHash?: string;
@@ -114,19 +116,24 @@ export async function __createThreadReaction(
       const node = await this.models.ChainNode.findByPk(
         community.chain_node_id,
       );
+
+      if (!node || !node.eth_chain_id) {
+        throw new ServerError(`Invalid chain node ${node ? node.id : ''}`);
+      }
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          // @ts-expect-error StrictNullChecks
-          community.namespace_address,
+          community.namespace_address!,
           stake.stake_id,
-          // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
-          // @ts-expect-error StrictNullChecks
-          node.url,
         );
+      const stakeBalance = stakeBalances[address.address];
+      if (BigNumber.from(stakeBalance).lte(0)) {
+        // stake is enabled but user has no stake
+        throw new AppError(Errors.MustHaveStake);
+      }
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalances[address.address],
+        stakeBalance,
         voteWeight,
       );
     }
@@ -136,13 +143,10 @@ export async function __createThreadReaction(
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: thread.community_id,
-    // @ts-expect-error StrictNullChecks
     thread_id: thread.id,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
     canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
@@ -166,7 +170,7 @@ export async function __createThreadReaction(
         root_type: 'discussion',
         community_id: thread.community_id,
         author_address: address.address,
-        author_community_id: address.community_id,
+        author_community_id: address.community_id!,
       },
     },
     excludeAddresses: [address.address],

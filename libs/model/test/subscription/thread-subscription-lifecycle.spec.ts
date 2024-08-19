@@ -28,7 +28,7 @@ describe('Thread subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node!.id!,
       Addresses: [
         {
           role: 'member',
@@ -39,7 +39,7 @@ describe('Thread subscription lifecycle', () => {
     });
 
     [threadOne] = await seed('Thread', {
-      address_id: community!.Addresses![0].id,
+      address_id: community!.Addresses![0].id!,
       community_id: community?.id,
       topic_id: community!.topics![0].id,
       pinned: false,
@@ -47,7 +47,7 @@ describe('Thread subscription lifecycle', () => {
       version_history: [],
     });
     [threadTwo] = await seed('Thread', {
-      address_id: community!.Addresses![0].id,
+      address_id: community!.Addresses![0].id!,
       community_id: community?.id,
       topic_id: community!.topics![0].id,
       pinned: false,
@@ -70,6 +70,7 @@ describe('Thread subscription lifecycle', () => {
 
   test('should create a new thread subscription', async () => {
     const payload = {
+      id: 0,
       thread_id: threadOne!.id!,
     };
     const res = await command(CreateThreadSubscription(), {
@@ -125,6 +126,7 @@ describe('Thread subscription lifecycle', () => {
     ]);
 
     const payload = {
+      id: actor.user.id!,
       thread_ids: [threadOne!.id!, threadTwo!.id!],
     };
 

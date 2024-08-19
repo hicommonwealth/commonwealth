@@ -1,11 +1,8 @@
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
 
-import {
-  chainEntityTypeToProposalName,
-  chainEntityTypeToProposalSlug,
-  getProposalUrlPath,
-} from 'identifiers';
+import { ProposalType } from '@hicommonwealth/shared';
+import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -25,8 +22,8 @@ type ThreadLinkProps = {
 };
 
 const getThreadLink = ({ threadChain, identifier }: ThreadLinkProps) => {
-  const slug = chainEntityTypeToProposalSlug();
-
+  // XXX 7/3/2024: proposal links only supported for cosmos
+  const slug = ProposalType.CosmosProposal;
   const threadLink = `${
     app.isCustomDomain() ? '' : `/${threadChain}`
   }${getProposalUrlPath(slug, identifier, true)}`;
@@ -68,22 +65,24 @@ export const LinkedProposalsCard = ({
           }`,
         );
       } else {
-        loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-          for (const { space: _space, proposals } of data) {
-            const matchingSnapshot = proposals.find(
-              (sn) => sn.id === proposal.identifier,
-            );
-            if (matchingSnapshot) {
-              setSnapshotTitle(matchingSnapshot.title);
-              setSnapshotUrl(
-                `${
-                  app.isCustomDomain() ? '' : `/${thread.communityId}`
-                }/snapshot/${_space.id}/${matchingSnapshot.id}`,
+        loadMultipleSpacesData(app.chain.meta?.snapshot || [])
+          .then((data) => {
+            for (const { space: _space, proposals } of data) {
+              const matchingSnapshot = proposals.find(
+                (sn) => sn.id === proposal.identifier,
               );
-              break;
+              if (matchingSnapshot) {
+                setSnapshotTitle(matchingSnapshot.title);
+                setSnapshotUrl(
+                  `${
+                    app.isCustomDomain() ? '' : `/${thread.communityId}`
+                  }/snapshot/${_space.id}/${matchingSnapshot.id}`,
+                );
+                break;
+              }
             }
-          }
-        });
+          })
+          .catch(console.error);
       }
       setSnapshotProposalsLoaded(true);
     }
@@ -116,11 +115,7 @@ export const LinkedProposalsCard = ({
                               identifier: l.identifier,
                             })}
                           >
-                            {`${
-                              l.title ??
-                              chainEntityTypeToProposalName() ??
-                              'Proposal'
-                            } #${l.identifier}`}
+                            {`${l.title ?? 'Proposal'} #${l.identifier}`}
                           </ReactRouterLink>
                         );
                       })}
@@ -164,6 +159,8 @@ export const LinkedProposalsCard = ({
           <UpdateProposalStatusModal
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
+            snapshotProposalConnected={showSnapshot}
+            initialSnapshotLinks={initialSnapshotLinks}
           />
         }
         onClose={() => setIsModalOpen(false)}

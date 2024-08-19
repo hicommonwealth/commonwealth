@@ -102,7 +102,7 @@ export const modelFromServer = (
   if (Thread) {
     try {
       // The `Thread` var here uses /server/models/thread.ts as its type
-      // and we are modeling it to /client/scripts/models/Thread.ts so
+      // and we are modeling it to /models/Thread.ts so
       // using any here to avoid lint error.
       modeledThread = new ThreadT(Thread as any);
     } catch (e) {
@@ -124,15 +124,14 @@ export const modelFromServer = (
     id,
     category_id,
     is_active,
-    created_at,
+    created_at!,
     immediate_email,
-    // @ts-expect-error StrictNullChecks
-    community_id,
+    community_id!,
     // @ts-expect-error StrictNullChecks
     modeledComment,
     // @ts-expect-error StrictNullChecks
     modeledThread,
-    snapshot_id,
+    snapshot_id!,
   );
 };
 

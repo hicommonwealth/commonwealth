@@ -18,9 +18,9 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
+import * as api from './server/api';
 import { config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
@@ -29,8 +29,9 @@ import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const parseJson = json({ limit: '1mb' });
 
 /**
  * Bootstraps express app
@@ -42,17 +43,15 @@ export async function main(
     port,
     noGlobalActivityCache = true,
     withLoggingMiddleware = false,
-    withStatsMiddleware = false,
     withPrerender = false,
   }: {
     port: number;
     noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
-    withStatsMiddleware?: boolean;
     withPrerender?: boolean;
   },
 ) {
-  const log = logger(__filename);
+  const log = logger(import.meta);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
@@ -132,9 +131,12 @@ export async function main(
           },
         }),
       );
-    withStatsMiddleware && app.use(expressStatsInit());
 
-    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use((req, res, next) => {
+      if (req.path.startsWith(`${api.internal.PATH}/chainevent/`)) next();
+      else parseJson(req, res, next);
+    });
+
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
@@ -174,13 +176,27 @@ export async function main(
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
+
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
 
   app.use(
     '/assets',
     express.static(path.join(__dirname, 'assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
+
+  app.use(
+    '/brand_assets',
+    express.static(path.join(__dirname, 'brand_assets'), {
       setHeaders: (res) => {
         res.setHeader('Cache-Control', 'public');
       },

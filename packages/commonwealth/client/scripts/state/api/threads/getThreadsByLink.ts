@@ -1,8 +1,8 @@
 import type { Link } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 const THREAD_STALE_TIME = 5000; // 5 seconds
 
@@ -15,9 +15,9 @@ interface GetThreadsByLinkProps {
 const getThreadsByLink = async ({
   link,
 }: GetThreadsByLinkProps): Promise<{ id: number; title: string }[]> => {
-  const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
+  const response = await axios.post(`${SERVER_URL}/linking/getLinks`, {
     link,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return response.data.result.threads;

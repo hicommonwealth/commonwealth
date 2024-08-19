@@ -5,6 +5,7 @@ import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
 import type { CommunityAlertAttributes } from './community_alerts';
+import type { CommunityTagsAttributes } from './community_tags';
 import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
@@ -15,6 +16,7 @@ import type { UserAttributes } from './user';
 export type CommunityAttributes = z.infer<typeof Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
+  CommunityTags?: CommunityTagsAttributes[];
   StarredCommunities?: StarredCommunityAttributes[];
   Threads?: ThreadAttributes[] | ThreadAttributes['id'][];
   Comments?: CommentAttributes[] | CommentAttributes['id'][];
@@ -22,7 +24,8 @@ export type CommunityAttributes = z.infer<typeof Community> & {
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
   thread_count?: number;
-  address_count?: number;
+  profile_count?: number;
+  count_updated?: boolean;
   communityAlerts?: CommunityAlertAttributes[];
 };
 
@@ -91,7 +94,6 @@ export default (
         defaultValue: false,
       },
       type: { type: Sequelize.STRING, allowNull: false, defaultValue: 'chain' },
-      substrate_spec: { type: Sequelize.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
@@ -108,7 +110,6 @@ export default (
       terms: { type: Sequelize.STRING, allowNull: true },
       bech32_prefix: { type: Sequelize.STRING, allowNull: true },
       admin_only_polling: { type: Sequelize.BOOLEAN, allowNull: true },
-      category: { type: Sequelize.JSONB, allowNull: true },
       discord_bot_webhooks_enabled: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
@@ -128,7 +129,7 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
-      address_count: {
+      profile_count: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,

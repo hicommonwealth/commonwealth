@@ -1,4 +1,3 @@
-import { AccessLevel, RoleObject } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -21,20 +20,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .replace(/(\s|-)+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
-};
-
-export const getThreadUrlWithoutObject = (
-  proposalCommunity,
-  proposalId,
-  comment?,
-) => {
-  const aId = proposalCommunity;
-  const tId = proposalId;
-  const cId = comment ? `?comment=${comment.id}` : '';
-
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
 };
 
 // WARN: Using process.env to avoid webpack failures
@@ -226,34 +211,6 @@ export const addressSwapper = (options: {
     return options.address;
   }
 };
-
-export function aggregatePermissions(
-  roles: RoleObject[],
-  chain_permissions: { allow: number; deny: number },
-) {
-  const ORDER: AccessLevel[] = [
-    AccessLevel.Member,
-    AccessLevel.Moderator,
-    AccessLevel.Admin,
-  ];
-
-  function compare(o1: RoleObject, o2: RoleObject) {
-    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
-  }
-
-  roles = roles.sort(compare);
-
-  const permissionsAllowDeny: Array<{
-    allow: number;
-    deny: number;
-  }> = roles.map(({ allow, deny }) => ({ allow, deny }));
-
-  // add chain default permissions to beginning of permissions array
-  permissionsAllowDeny.unshift(chain_permissions);
-
-  // compute permissions
-  return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
-}
 
 /**
  * Convert Cosmos-style minimal denom amount to readable full-denom amount

@@ -2,7 +2,9 @@
 import axios from 'axios';
 import moment from 'moment';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
+import { userStore } from 'state/ui/user';
 import PollStore from 'stores/PollStore';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
@@ -48,7 +50,7 @@ class PollsController {
   public async fetchPolls(communityId: string, threadId: number) {
     try {
       const response = await axios.get(
-        `${app.serverUrl()}/threads/${threadId}/polls`,
+        `${SERVER_URL}/threads/${threadId}/polls`,
         {
           params: {
             chain: communityId,
@@ -92,12 +94,12 @@ class PollsController {
     } = args;
 
     const response = await axios.post(
-      `${app.serverUrl()}/threads/${threadId}/polls`,
+      `${SERVER_URL}/threads/${threadId}/polls`,
       {
         community_id: app.activeChainId(),
         author_chain: authorCommunity,
         address,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         prompt,
         options,
         custom_duration: customDuration?.split(' ')[0],
@@ -122,12 +124,12 @@ class PollsController {
     const { authorCommunity, address, threadId, pollId } = args;
 
     try {
-      await axios.delete(`${app.serverUrl()}/polls/${pollId}`, {
+      await axios.delete(`${SERVER_URL}/polls/${pollId}`, {
         data: {
           community_id: app.activeChainId(),
           author_chain: authorCommunity,
           address,
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
           poll_id: pollId,
         },
       });

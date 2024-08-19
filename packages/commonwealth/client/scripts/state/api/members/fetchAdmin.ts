@@ -1,8 +1,7 @@
-import { AccessLevel } from '@hicommonwealth/shared';
+import { AddressRole } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 
 const ADMINS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -10,24 +9,23 @@ interface FetchAdminProps {
   communityId: string;
 }
 
+// admins/mods are Address objects
 const fetchAdmin = async ({ communityId }: FetchAdminProps) => {
-  const memberAdmins = [];
-  const memberMods = [];
+  const memberAdmins: AddressRole[] = [];
+  const memberMods: AddressRole[] = [];
 
-  const res = await axios.get(`${app.serverUrl()}/roles`, {
+  const res = await axios.get(`${SERVER_URL}${ApiEndpoints.FETCH_ADMIN}`, {
     params: {
       chain_id: communityId,
       permissions: ['moderator', 'admin'],
     },
   });
-  const roles = res.data.result || [];
-  roles.forEach((role) => {
-    if (role.permission === AccessLevel.Admin) {
-      // @ts-expect-error StrictNullChecks
-      memberAdmins.push(role);
-    } else if (role.permission === AccessLevel.Moderator) {
-      // @ts-expect-error StrictNullChecks
-      memberMods.push(role);
+  const addresses = res.data.result || [];
+  addresses.forEach((a) => {
+    if (a.role === 'admin') {
+      memberAdmins.push(a);
+    } else if (a.role === 'moderator') {
+      memberMods.push(a);
     }
   });
   return { admins: memberAdmins, mods: memberMods };

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ChainInfo from 'models/ChainInfo';
+import ghostImg from 'assets/img/ghost.svg';
 import { CWAvatar } from 'views/components/component_kit/cw_avatar';
 import {
   CWAvatarGroup,
@@ -113,10 +113,10 @@ const AvatarsShowcase = () => {
     <>
       <CWText type="h5">Avatar</CWText>
       <div className="flex-row">
-        <CWAvatar avatarUrl="assets/img/ghost.svg" size={16} />
-        <CWAvatar avatarUrl="assets/img/ghost.svg" size={20} />
-        <CWAvatar avatarUrl="assets/img/ghost.svg" size={24} />
-        <CWAvatar avatarUrl="assets/img/ghost.svg" size={32} />
+        <CWAvatar avatarUrl={ghostImg} size={16} />
+        <CWAvatar avatarUrl={ghostImg} size={20} />
+        <CWAvatar avatarUrl={ghostImg} size={24} />
+        <CWAvatar avatarUrl={ghostImg} size={32} />
       </div>
 
       <CWText type="h5">Avatar Group</CWText>
@@ -129,19 +129,10 @@ const AvatarsShowcase = () => {
 
       <CWText type="h5">Community Avatar</CWText>
       <div className="flex-row">
-        <CWCommunityAvatar
-          size="small"
-          community={communityAvatar as ChainInfo}
-        />
-        <CWCommunityAvatar
-          size="medium"
-          community={communityAvatar as ChainInfo}
-        />
-        <CWCommunityAvatar size="xl" community={communityAvatar as ChainInfo} />
-        <CWCommunityAvatar
-          size="xxl"
-          community={communityAvatar as ChainInfo}
-        />
+        <CWCommunityAvatar size="small" community={communityAvatar} />
+        <CWCommunityAvatar size="medium" community={communityAvatar} />
+        <CWCommunityAvatar size="xl" community={communityAvatar} />
+        <CWCommunityAvatar size="xxl" community={communityAvatar} />
       </div>
     </>
   );
