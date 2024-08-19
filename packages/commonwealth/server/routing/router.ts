@@ -111,7 +111,6 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
-import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
 import farcasterRouter from '../farcaster/router';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
@@ -331,13 +330,6 @@ function setupRouter(
     '/nodes',
     passport.authenticate('jwt', { session: false }),
     createChainNodeHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/nodes/:id',
-    passport.authenticate('jwt', { session: false }),
-    updateChainNodeHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
