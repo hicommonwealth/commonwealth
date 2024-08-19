@@ -1254,7 +1254,7 @@ describe('ServerThreadsController', () => {
           transaction: async (callback) => {
             return callback();
           },
-          query: async () => ({}),
+          query: async () => [],
         },
         Group: {
           findAll: async () => [],
