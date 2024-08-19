@@ -39,7 +39,6 @@ const useTransactionHistory = ({
           // @ts-expect-error StrictNullChecks
           t.community?.chain_node_id,
         ),
-        chain: '',
       }));
 
   // filter by community name and symbol

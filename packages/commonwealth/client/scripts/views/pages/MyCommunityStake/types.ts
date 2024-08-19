@@ -6,11 +6,12 @@ export type FilterOptions = {
 export type TransactionsProps = {
   transactions: {
     community: {
-      id?: string;
-      default_symbol?: string;
-      icon_url?: string;
-      name?: string;
-      chain_node_id?: number;
+      id: string;
+      default_symbol?: string | null;
+      icon_url?: string | null;
+      name: string;
+      chain_node_id?: number | null;
+      chain_node_name?: string | null;
     };
     address: string;
     price: string;
@@ -21,6 +22,5 @@ export type TransactionsProps = {
     totalPrice: string;
     avgPrice: string;
     etherscanLink: string;
-    chain: string;
   }[];
 };

@@ -73,8 +73,6 @@ async function createMagicAddressInstances(
         last_active: new Date(),
         role: 'member',
         is_user_default: false,
-        is_councillor: false,
-        is_validator: false,
         ghost_address: false,
       },
       transaction: t,

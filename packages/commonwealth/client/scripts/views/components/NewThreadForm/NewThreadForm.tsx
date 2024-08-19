@@ -175,8 +175,8 @@ export const NewThreadForm = () => {
       const thread = await createThread({
         address: user.activeAccount?.address || '',
         kind: threadKind,
-        stage: app.chain.meta.customStages
-          ? parseCustomStages(app.chain.meta.customStages)[0]
+        stage: app.chain.meta?.customStages
+          ? parseCustomStages(app.chain.meta?.customStages)[0]
           : ThreadStage.Discussion,
         communityId: app.activeChainId(),
         title: threadTitle,

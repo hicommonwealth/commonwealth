@@ -21,8 +21,10 @@ import { CosmosExtension } from '@magic-ext/cosmos';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { Magic } from 'magic-sdk';
 
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import app from 'state';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import {
@@ -33,10 +35,11 @@ import {
 import { authModal } from 'state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
+import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
-import type ChainInfo from '../../models/ChainInfo';
+import ChainInfo from '../../models/ChainInfo';
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
@@ -112,14 +115,13 @@ export async function completeClientLogin(account: Account) {
   }
 }
 
-export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
+export async function updateActiveAddresses(chainId: string) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   userStore.getState().setData({
     accounts: userStore
       .getState()
-      .addresses // @ts-expect-error StrictNullChecks
-      .filter((a) => a.community.id === chain.id)
+      .addresses.filter((a) => a.community.id === chainId)
       .map((addr) => {
         const tempAddr = app.chain?.accounts.get(addr.address, false);
         tempAddr.profile = addr.profile;
@@ -131,8 +133,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
 
   // select the address that the new chain should be initialized with
   const memberAddresses = userStore.getState().accounts.filter((account) => {
-    // @ts-expect-error StrictNullChecks
-    return account.community.id === chain.id;
+    return account.community.id === chainId;
   });
 
   if (memberAddresses.length === 1) {
@@ -145,7 +146,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
     const communityAddressesSortedByLastUsed = [
       ...(userStore
         .getState()
-        .addresses.filter((a) => a.community.id === chain?.id) || []),
+        .addresses.filter((a) => a.community.id === chainId) || []),
     ].sort((a, b) => {
       if (b.lastActive && a.lastActive) return b.lastActive.diff(a.lastActive);
       if (!b.lastActive && !a.lastActive) return 0; // no change
@@ -285,7 +286,15 @@ export async function createUserWithAddress(
   });
 
   const id = response.data.result.id;
-  const chainInfo = app.config.chains.getById(chain);
+
+  const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+    chain || '',
+    true,
+  );
+  const chainInfo = ChainInfo.fromTRPCResponse(
+    communityInfo as z.infer<typeof ExtendedCommunity>,
+  );
+
   const account = new Account({
     addressId: id,
     address,
@@ -359,7 +368,7 @@ export async function startLoginWithMagicLink({
       redirectTo ? encodeURIComponent(redirectTo) : ''
     }&chain=${chain || ''}&sso=${provider}`;
     await magic.oauth.loginWithRedirect({
-      provider: provider as any,
+      provider,
       redirectURI: new URL(
         '/finishsociallogin' + params,
         window.location.origin,
@@ -418,8 +427,16 @@ export async function handleSocialLoginCallback({
 }): Promise<{ address: string; isAddressNew: boolean }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
-  // @ts-expect-error StrictNullChecks
-  const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
+  let desiredChain = app.chain?.meta;
+  if (!desiredChain && chain) {
+    const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+      chain || '',
+      true,
+    );
+    desiredChain = ChainInfo.fromTRPCResponse(
+      communityInfo as z.infer<typeof ExtendedCommunity>,
+    );
+  }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
   const isEmail = walletSsoSource === WalletSsoSource.Email;
@@ -554,10 +571,19 @@ export async function handleSocialLoginCallback({
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:
     if (app.chain) {
-      const c =
-        userStore.getState().activeCommunity ||
-        app.config.chains.getById(app.activeChainId());
-      await updateActiveAddresses({ chain: c });
+      let chainInfo = userStore.getState().activeCommunity;
+
+      if (!chainInfo && chain) {
+        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+          chain || '',
+          true,
+        );
+        chainInfo = ChainInfo.fromTRPCResponse(
+          communityInfo as z.infer<typeof ExtendedCommunity>,
+        );
+      }
+
+      chainInfo && (await updateActiveAddresses(chainInfo.id));
     }
 
     const { Profiles: profiles, email: ssoEmail } = response.data.result;
