@@ -5,6 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../../hooks/useAppStatus';
@@ -24,6 +25,8 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
     communityId: app.activeChainId(),
@@ -63,7 +66,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   });
 
   if (
-    !app.isLoggedIn() ||
+    !user.isLoggedIn ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {
     return <PageNotFound />;

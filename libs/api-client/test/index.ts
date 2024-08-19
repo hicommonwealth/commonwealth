@@ -1,14 +1,14 @@
 // Quick and dirty api-client test
-import { Configuration, QueryApi } from '@hicommonwealth/api-client';
+import { CommunityApi, Configuration } from '@hicommonwealth/api-client';
 
 async function main() {
   const config = new Configuration({
     accessToken: '',
-    basePath: 'http://localhost:8080/api/v1/rest',
+    basePath: 'http://localhost:8080/api/v1',
   });
 
-  const client = new QueryApi(config);
-  const members = await client.communityGetMembers(
+  const client = new CommunityApi(config);
+  const members = await client.getMembers(
     'sushi',
     undefined,
     10,

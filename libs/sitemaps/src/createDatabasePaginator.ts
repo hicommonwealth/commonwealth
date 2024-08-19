@@ -152,6 +152,7 @@ export function createDatabasePaginatorWithAdapter(
 
   let records: ReadonlyArray<Link> = [];
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async function hasNext() {
     return idx === 0 || records.length !== 0;
   }
@@ -205,10 +206,12 @@ export function createDatabasePaginatorMockForTable(
 
   let idx = 0;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async function hasNext() {
     return pageIdx <= maxPages;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async function next(): Promise<Page> {
     ++pageIdx;
     const links = [

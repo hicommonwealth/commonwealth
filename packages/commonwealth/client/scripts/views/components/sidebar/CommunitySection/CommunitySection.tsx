@@ -1,6 +1,5 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
@@ -30,11 +29,9 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
   const {
     selectedAddress,
-    selectedCommunity,
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
@@ -59,14 +56,15 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isMod = Permissions.isCommunityModerator();
-  const showAdmin = isAdmin || isMod;
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
 
   return (
     <>
       <div className="community-menu">
-        {app.isLoggedIn() && (
+        {user.isLoggedIn && (
           <>
             <AccountConnectionIndicator
               connected={!!user.activeAccount}
@@ -87,7 +85,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CreateCommunityButton />
 
-        {showAdmin && (
+        {isAdmin && (
           <>
             <CWDivider />
             <AdminSection />
@@ -108,7 +106,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <ExternalLinksModule />
         <div className="buttons-container">
-          {isLoggedIn && app.chain && (
+          {user.isLoggedIn && app.chain && (
             <div className="subscription-button">
               <SubscriptionButton />
             </div>
@@ -131,7 +129,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
-            {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
         // @ts-expect-error <StrictNullChecks/>

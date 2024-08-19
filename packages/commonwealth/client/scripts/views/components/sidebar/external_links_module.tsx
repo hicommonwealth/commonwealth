@@ -1,15 +1,30 @@
-import React from 'react';
-
 import 'components/sidebar/external_links_module.scss';
-
+import { categorizeSocialLinks } from 'helpers/link';
+import React from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
 
 export const ExternalLinksModule = () => {
-  if (!app.chain) return;
-  const meta = app.chain.meta;
-  const { remainingLinks, discords, elements, telegrams, githubs, twitters } =
-    meta.categorizeSocialLinks();
+  const { data: community, isLoading } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    enabled: !!app.activeChainId(),
+  });
+
+  if (!app.chain || !community) return;
+
+  if (isLoading) return <CWCircleMultiplySpinner />;
+
+  const {
+    discords,
+    elements,
+    githubs,
+    remainingLinks,
+    slacks,
+    telegrams,
+    twitters,
+  } = categorizeSocialLinks(community.social_links || []);
 
   return (
     <div className="ExternalLinksModule">
@@ -53,7 +68,7 @@ export const ExternalLinksModule = () => {
           onClick={() => window.open(link)}
         />
       ))}
-      {remainingLinks.map((link) => (
+      {[...remainingLinks, ...slacks].map((link) => (
         <CWIcon
           key={link}
           iconName="website"

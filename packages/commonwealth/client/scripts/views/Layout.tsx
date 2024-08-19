@@ -1,3 +1,4 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import 'Layout.scss';
 import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
@@ -6,9 +7,14 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
+import useErrorStore from 'state/ui/error';
+import useUserStore from 'state/ui/user';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
+import { z } from 'zod';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
+import ChainInfo from '../models/ChainInfo';
+import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
@@ -36,9 +42,11 @@ const LayoutComponent = ({
   const navigate = useCommonNavigate();
   const routerParams = useParams();
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
-  const selectedScope = scoped ? pathScope : null;
+  const providedCommunityScope = scoped ? pathScope : null;
+  const user = useUserStore();
+  const appError = useErrorStore();
 
-  const [scopeToLoad, setScopeToLoad] = useState<string>();
+  const [communityToLoad, setCommunityToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const { mutateAsync: updateActiveCommunity } =
@@ -49,38 +57,49 @@ const LayoutComponent = ({
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     // @ts-expect-error <StrictNullChecks/>
-    const redirectTo = configurationData?.redirects?.[selectedScope];
+    const redirectTo = configurationData?.redirects?.[providedCommunityScope];
     // @ts-expect-error <StrictNullChecks/>
-    if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
+    if (redirectTo && redirectTo !== providedCommunityScope.toLowerCase()) {
       // @ts-expect-error <StrictNullChecks/>
-      const path = window.location.href.split(selectedScope);
+      const path = window.location.href.split(providedCommunityScope);
       navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
       return;
     }
-  }, [selectedScope]);
+  }, [providedCommunityScope]);
 
-  // @ts-expect-error <StrictNullChecks/>
-  const scopeMatchesCommunity = app.config.chains.getById(selectedScope);
+  const { data: community, isLoading: isVerifyingCommunityExistance } =
+    useGetCommunityByIdQuery({
+      id: providedCommunityScope || '',
+      includeNodeInfo: true,
+      enabled: !!providedCommunityScope,
+    });
 
   // If the navigated-to community scope differs from the active chain id at render time,
   // and we have not begun loading the new navigated-to community data, shouldSelectChain is
   // set to true, and the navigated-to scope is loaded.
   const shouldSelectChain =
-    selectedScope &&
-    selectedScope !== app.activeChainId() &&
-    selectedScope !== scopeToLoad &&
-    scopeMatchesCommunity;
+    providedCommunityScope &&
+    providedCommunityScope !== app.activeChainId() &&
+    providedCommunityScope !== communityToLoad &&
+    community &&
+    !isVerifyingCommunityExistance;
 
   useNecessaryEffect(() => {
     (async () => {
       if (shouldSelectChain) {
         setIsLoading(true);
-        setScopeToLoad(selectedScope);
-        if (await loadCommunityChainInfo(scopeMatchesCommunity)) {
+        setCommunityToLoad(providedCommunityScope);
+        if (
+          await loadCommunityChainInfo(
+            ChainInfo.fromTRPCResponse(
+              community as z.infer<typeof ExtendedCommunity>,
+            ),
+          )
+        ) {
           // Update default community on server if logged in
-          if (app.isLoggedIn()) {
+          if (user.isLoggedIn) {
             await updateActiveCommunity({
-              communityId: scopeMatchesCommunity.id,
+              communityId: community?.id || '',
             });
           }
         }
@@ -92,37 +111,35 @@ const LayoutComponent = ({
   // If scope is not defined (and we are not on a custom domain), deinitialize the loaded chain
   // with deinitChainOrCommunity(), then set loadingScope to null and render a LoadingLayout.
   const shouldDeInitChain =
-    !selectedScope && !app.isCustomDomain() && app.chain && app.chain.network;
+    !providedCommunityScope &&
+    !app.isCustomDomain() &&
+    app.chain &&
+    app.chain.network;
 
   useNecessaryEffect(() => {
     (async () => {
       if (shouldDeInitChain) {
         setIsLoading(true);
         await deinitChainOrCommunity();
-        // @ts-expect-error <StrictNullChecks/>
-        setScopeToLoad(null);
+        setCommunityToLoad(undefined);
         setIsLoading(false);
       }
     })();
   }, [shouldDeInitChain]);
 
   // A loading state (i.e. spinner) is shown in the following cases:
-  // - user login status has not finished loaded
   // - a community is still being initialized or deinitialized
   const shouldShowLoadingState =
-    isLoading ||
-    !app.loginStatusLoaded() ||
-    shouldSelectChain ||
-    shouldDeInitChain;
+    isLoading || shouldSelectChain || shouldDeInitChain;
 
   const childToRender = () => {
-    if (app.loadingError) {
+    if (appError.loadingError) {
       return (
         <CWEmptyState
           iconName="cautionTriangle"
           content={
             <div className="loading-error">
-              <CWText>Application error: {app.loadingError}</CWText>
+              <CWText>Application error: {appError.loadingError}</CWText>
               <CWText>Please try again later</CWText>
             </div>
           }
@@ -139,7 +156,8 @@ const LayoutComponent = ({
     if (shouldShowLoadingState) return Bobber;
 
     // If attempting to navigate to a community not fetched by the /status query, return a 404
-    const pageNotFound = selectedScope && !scopeMatchesCommunity;
+    const pageNotFound =
+      providedCommunityScope && !community && !isVerifyingCommunityExistance;
     return (
       <Suspense fallback={Bobber}>
         {pageNotFound ? <PageNotFound /> : <Component {...routerParams} />}

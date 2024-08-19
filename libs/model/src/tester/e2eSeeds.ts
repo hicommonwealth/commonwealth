@@ -89,35 +89,47 @@ export const e2eTestEntities = async function (
     );
 
     testChains.push(
-      ...(await testDb.Community.bulkCreate([
-        {
-          id: 'cmntest',
-          chain_node_id: 9999,
-          name: 'cmntest',
-          network: ChainNetwork.Ethereum,
-          type: ChainType.Offchain,
-          base: ChainBase.Ethereum,
+      ...(await testDb.Community.bulkCreate(
+        [
+          {
+            id: 'cmntest',
+            chain_node_id: 9999,
+            name: 'cmntest',
+            network: ChainNetwork.Ethereum,
+            type: ChainType.Offchain,
+            base: ChainBase.Ethereum,
+            icon_url:
+              'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
+            active: true,
+            default_symbol: 'cmn',
+            custom_domain: 'customdomain.com',
+          },
+          {
+            id: 'cmntest2',
+            chain_node_id: 99999,
+            name: 'cmntest2',
+            network: ChainNetwork.Ethereum,
+            type: ChainType.Offchain,
+            base: ChainBase.Ethereum,
+            icon_url:
+              'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
+            active: true,
+            default_symbol: 'cmntest2',
+            custom_domain: 'customdomain.com',
+          },
+        ].map((x) => ({
+          ...x,
+          social_links: [],
           custom_stages: [],
-          icon_url:
-            'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
-          active: true,
-          default_symbol: 'cmn',
-          custom_domain: 'customdomain.com',
-        },
-        {
-          id: 'cmntest2',
-          chain_node_id: 99999,
-          name: 'cmntest2',
-          network: ChainNetwork.Ethereum,
-          type: ChainType.Offchain,
-          base: ChainBase.Ethereum,
-          icon_url:
-            'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
-          active: true,
-          default_symbol: 'cmntest2',
-          custom_domain: 'customdomain.com',
-        },
-      ])),
+          snapshot_spaces: [],
+          stages_enabled: true,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          has_homepage: 'false' as any,
+          collapsed_on_homepage: false,
+          has_chain_events_listener: false,
+          directory_page_enabled: false,
+        })),
+      )),
     );
 
     testTopics.push(
@@ -238,7 +250,6 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1,
-                  community_id: 'cmntest',
                   address_id: -1,
                   text: '',
                   thread_id: -1,
@@ -258,7 +269,6 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
-                  community_id: 'cmntest',
                   address_id: -2,
                   text: '',
                   thread_id: -2,
@@ -281,7 +291,6 @@ export const e2eTestEntities = async function (
                   reaction: 'like',
                   address_id: -1,
                   thread_id: -1,
-                  community_id: 'cmntest',
                 },
               })
             )[0],
@@ -300,7 +309,6 @@ export const e2eTestEntities = async function (
                   reaction: 'like',
                   address_id: -2,
                   comment_id: -2,
-                  community_id: 'cmntest',
                 },
               })
             )[0],
