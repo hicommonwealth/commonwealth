@@ -2,6 +2,7 @@ import { AppError } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   GroupAttributes,
+  models,
   UserInstance,
 } from '@hicommonwealth/model';
 import { ForumActionsEnum, GroupMetadata } from '@hicommonwealth/schemas';
@@ -116,20 +117,17 @@ export async function __createGroup(
       { transaction: t },
     );
     if (topicsToAssociate.length > 0) {
-      const createPermissionsPromises = topicsToAssociate.map((topic) => {
-        return this.models.GroupPermission.create(
-          {
-            group_id: group.id,
-            topic_id: topic.id,
-            allowed_actions: Object.values(ForumActionsEnum),
-          },
-          {
-            transaction: t,
-          },
-        );
-      });
+      const permissions = topicsToAssociate.map((topic) => ({
+        group_id: group.id,
+        topic_id: topic.id,
+        allowed_actions: this.models.sequelize.literal(
+          `ARRAY[${Object.values(ForumActionsEnum)
+            .map((value) => `'${value}'`)
+            .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
+        ),
+      }));
 
-      await Promise.all(createPermissionsPromises);
+      await models.GroupPermission.bulkCreate(permissions, { transaction: t });
     }
     return group.toJSON();
   };

@@ -56,20 +56,19 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
             { transaction },
           );
           if (topicsToAssociate.length > 0) {
-            const createPermissionsPromises = topicsToAssociate.map((topic) => {
-              return models.GroupPermission.create(
-                {
-                  group_id: group.id,
-                  topic_id: topic.id,
-                  allowed_actions: Object.values(ForumActionsEnum),
-                },
-                {
-                  transaction,
-                },
-              );
-            });
+            const permissions = topicsToAssociate.map((topic) => ({
+              group_id: group.id,
+              topic_id: topic.id,
+              allowed_actions: models.sequelize.literal(
+                `ARRAY[${Object.values(ForumActionsEnum)
+                  .map((value) => `'${value}'`)
+                  .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
+              ),
+            }));
 
-            await Promise.all(createPermissionsPromises);
+            await models.GroupPermission.bulkCreate(permissions, {
+              transaction,
+            });
           }
           return group.toJSON();
         },
