@@ -6,8 +6,8 @@ import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Poll from '../../../models/Poll';
+import { PollCard } from '../../components/Polls';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { getPollTimestamp } from './helpers';
 

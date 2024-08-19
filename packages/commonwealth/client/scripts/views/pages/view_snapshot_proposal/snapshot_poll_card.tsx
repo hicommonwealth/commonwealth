@@ -1,22 +1,21 @@
-import 'components/poll_card.scss';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useEffect } from 'react';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 
-import useAppStatus from '../../../hooks/useAppStatus';
-import type {
-  PollCardProps,
-  VoteInformation,
-} from '../../components/poll_card';
 import {
   CastVoteSection,
+  PollCardProps,
   PollOptions,
-  ResultsSection,
+  ResultsSections,
   VoteDisplay,
-  buildVoteDirectionString,
-} from '../../components/poll_card';
+  VoteInformation,
+} from 'views/components/Polls';
+import { buildVoteDirectionString } from 'views/components/Polls/utils';
+
+import 'views/components/Polls/PollCard/PollCard.scss';
 
 export type SnapshotPollCardProps = Omit<
   PollCardProps & {
@@ -128,7 +127,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
           />
         )}
       </div>
-      <ResultsSection
+      <ResultsSections
         resultString={resultString}
         // @ts-expect-error <StrictNullChecks/>
         onResultsClick={null}
