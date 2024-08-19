@@ -236,6 +236,7 @@ const CommunitiesPage = () => {
           <CWCircleMultiplySpinner />
         ) : (
           <Virtuoso
+            key={`${filters.withChainBase}-${filters.withNetwork}-${filters.withStakeEnabled}-${filters.withTagsIds}`}
             className="communities-list"
             style={{ height: '100%', width: '100%' }}
             data={isInitialCommunitiesLoading ? [] : communitiesList}
@@ -285,9 +286,9 @@ const CommunitiesPage = () => {
                 );
               });
             }}
-            endReached={() =>
-              hasNextPage && fetchMoreCommunities().catch(console.error)
-            }
+            endReached={() => {
+              hasNextPage && fetchMoreCommunities().catch(console.error);
+            }}
             overscan={50}
             components={{
               // eslint-disable-next-line react/no-multi-comp
