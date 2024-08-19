@@ -72,6 +72,7 @@ export const ThreadPollCard = ({
           label: 'Submit',
           buttonType: 'primary',
           buttonHeight: 'sm',
+          // @typescript-eslint/no-misused-promises
           onClick: async () => {
             const selectedOption = votedPoll.options.find((o) => o === option);
 
@@ -145,7 +146,10 @@ export const ThreadPollCard = ({
           }
         }}
         showDeleteButton={showDeleteButton}
-        onDeleteClick={() => handleDeletePoll().catch(console.error)}
+        onDeleteClick={() => {
+          //@typescript-eslint/no-misused-promises
+          handleDeletePoll().catch(console.error);
+        }}
       />
       <CWModal
         size="small"
