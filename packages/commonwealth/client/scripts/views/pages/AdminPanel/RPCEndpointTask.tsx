@@ -1,14 +1,11 @@
-import { BalanceType, ChainType } from '@hicommonwealth/shared';
+import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
 import React, { useEffect, useState } from 'react';
-import {
-  useGetCommunityByIdQuery,
-  useUpdateCommunityMutation,
-} from 'state/api/communities';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { getNodeByCosmosChainId, getNodeByUrl } from 'state/api/nodes/utils';
 import { useDebounce } from 'usehooks-ts';
 import useFetchNodesQuery from '../../../state/api/nodes/fetchNodes';
@@ -73,18 +70,10 @@ const RPCEndpointTask = () => {
     500,
   );
 
-  const { data: communityLookupData, isLoading: isLoadingCommunityLookupData } =
-    useGetCommunityByIdQuery({
-      id: debouncedCommunityLookupId || '',
-      enabled: !!debouncedCommunityLookupId,
-    });
-
-  const communityNotFound =
-    !isLoadingCommunityLookupData &&
-    (!communityLookupData ||
-      Object.keys(communityLookupData || {})?.length === 0);
-
-  const communityNotChain = communityLookupData?.type !== ChainType.Chain;
+  const { data: communityLookupData } = useGetCommunityByIdQuery({
+    id: debouncedCommunityLookupId || '',
+    enabled: !!debouncedCommunityLookupId,
+  });
 
   const buttonEnabled =
     (communityChainNodeValidated &&
@@ -94,16 +83,6 @@ const RPCEndpointTask = () => {
     (rpcName !== '' &&
       (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
       rpcEndpoint !== '');
-
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
-    communityId: rpcEndpointCommunityId,
-  });
-
-  const setCommunityIdInput = (e) => {
-    setRpcEndpointCommunityId(e?.target?.value?.trim() || '');
-    if (e?.target?.value?.trim()?.length === 0)
-      setCommunityInfoValueValidated(false);
-  };
 
   const RPCEndpointValidationFn = (
     value: string,
@@ -164,7 +143,6 @@ const RPCEndpointTask = () => {
   const update = async () => {
     if (!communityLookupData?.id) return;
     try {
-      let nodeId = null;
       if (chainNodeNotCreated) {
         // Create Chain Node if not yet created
         const res = await createChainNode({
@@ -175,7 +153,6 @@ const RPCEndpointTask = () => {
           eth_chain_id: ethChainId,
           cosmos_chain_id: cosmosChainId,
         });
-        nodeId = res.data.result.node_id;
       } else {
         await updateChainNode({
           id: communityChainNode.id,
@@ -185,15 +162,6 @@ const RPCEndpointTask = () => {
           balance_type: balanceType,
           eth_chain_id: ethChainId,
           cosmos_chain_id: cosmosChainId,
-        });
-        // @ts-expect-error <StrictNullChecks/>
-        nodeId = communityChainNode.id;
-      }
-
-      if (communityInfo) {
-        await communityInfo.updateChainData({
-          chain_node_id: nodeId ?? communityChainNode.id.toString(),
-          type: ChainType.Chain,
         });
       }
 
@@ -248,12 +216,6 @@ const RPCEndpointTask = () => {
 
     return chainIds;
   };
-
-  const communityIdInputError = (() => {
-    if (communityNotFound) return 'Community not found';
-    if (communityNotChain) return 'Community is not a chain';
-    return '';
-  })();
 
   return (
     <div className="TaskGroup">
