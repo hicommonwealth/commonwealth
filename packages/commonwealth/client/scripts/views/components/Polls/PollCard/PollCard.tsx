@@ -50,7 +50,7 @@ export const PollCard = ({
 
   const resultString = 'Results';
 
-  const castVote = async () => {
+  const castVote = () => {
     if (
       multiSelect ||
       selectedOptions[0] === votedFor ||
@@ -60,7 +60,7 @@ export const PollCard = ({
       return;
     }
 
-    await onVoteCast(selectedOptions[0], selectedOptions.length === 0);
+    onVoteCast(selectedOptions[0], selectedOptions.length === 0);
   };
 
   return (
@@ -73,7 +73,7 @@ export const PollCard = ({
           size="small"
           content={
             <DeletePollModal
-              onDelete={async () => {
+              onDelete={() => {
                 onDeleteClick?.();
                 setDeleteModalOpen(false);
               }}

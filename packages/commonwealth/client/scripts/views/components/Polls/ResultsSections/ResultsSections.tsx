@@ -11,7 +11,7 @@ const ENDED_PREVIEW_MAX = 1;
 
 export type ResultsSectionProps = {
   resultString?: string;
-  onResultsClick: (e: React.MouseEvent<HTMLDivElement>) => any;
+  onResultsClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   tokenSymbol?: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;

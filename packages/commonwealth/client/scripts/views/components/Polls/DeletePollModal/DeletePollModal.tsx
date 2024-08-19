@@ -10,7 +10,7 @@ import {
 import './DeletePollModal.scss';
 
 type DeletePollModalProps = {
-  onDelete: any;
+  onDelete: () => void;
   onClose: () => void;
 };
 
@@ -18,10 +18,9 @@ export const DeletePollModal: FC<DeletePollModalProps> = ({
   onDelete,
   onClose,
 }) => {
-  const handleDeleteClick = async (e) => {
+  const handleDeleteClick = (e) => {
     e.preventDefault();
-    await onDelete();
-    // Assuming you are using a library like 'react-modal', you can trigger the modal exit using that library's methods.
+    onDelete();
   };
 
   return (

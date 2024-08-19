@@ -55,7 +55,7 @@ export const ThreadPollCard = ({
     }
   };
 
-  const handlePollVote = async (
+  const handlePollVote = (
     votedPoll: Poll,
     option: string,
     isSelected: boolean,
@@ -72,7 +72,7 @@ export const ThreadPollCard = ({
           label: 'Submit',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          onClick: () => {
+          onClick: async () => {
             const selectedOption = votedPoll.options.find((o) => o === option);
 
             if (!selectedOption) {
@@ -81,7 +81,7 @@ export const ThreadPollCard = ({
             }
 
             try {
-              votePoll({
+              await votePoll({
                 pollId: votedPoll.id,
                 communityId: votedPoll.communityId,
                 authorCommunityId: user.activeAccount?.community?.id || '',
