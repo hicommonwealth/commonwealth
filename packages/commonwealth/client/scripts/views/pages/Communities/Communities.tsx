@@ -285,7 +285,9 @@ const CommunitiesPage = () => {
                 );
               });
             }}
-            endReached={() => hasNextPage && fetchMoreCommunities()}
+            endReached={() =>
+              hasNextPage && fetchMoreCommunities().catch(console.error)
+            }
             overscan={50}
             components={{
               // eslint-disable-next-line react/no-multi-comp
