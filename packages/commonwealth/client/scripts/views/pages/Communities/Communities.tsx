@@ -4,6 +4,7 @@ import { findDenominationString } from 'helpers/findDenomination';
 import React, { Fragment, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
+import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -67,33 +68,17 @@ const CommunitiesPage = () => {
     fetchNextPage: fetchMoreCommunities,
     hasNextPage,
     isInitialLoading: isInitialCommunitiesLoading,
-  } = trpc.community.getCommunities.useInfiniteQuery(
-    {
-      limit: 50,
-      include_node_info: true,
-      order_by: 'thread_count',
-      order_direction: 'DESC',
-      base: filters.withChainBase
-        ? ChainBase[filters.withChainBase]
-        : undefined,
-      network: filters.withNetwork,
-      stake_enabled: filters.withStakeEnabled,
-      ...(filters.withTagsIds &&
-        filters.withTagsIds?.length > 0 && {
-          tag_ids: filters.withTagsIds.join(','),
-        }),
-    },
-    {
-      staleTime: 60 * 3_000,
-      enabled: true,
-      initialCursor: 1,
-      getNextPageParam: (lastPage) => {
-        const nextPageNum = lastPage.page + 1;
-        if (nextPageNum <= lastPage.totalPages) return nextPageNum;
-        return undefined;
-      },
-    },
-  );
+  } = useFetchCommunitiesQuery({
+    limit: 50,
+    include_node_info: true,
+    order_by: 'thread_count',
+    order_direction: 'DESC',
+    base: filters.withChainBase ? ChainBase[filters.withChainBase] : undefined,
+    network: filters.withNetwork,
+    stake_enabled: filters.withStakeEnabled,
+    cursor: 1,
+    tag_ids: filters.withTagsIds,
+  });
 
   const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
     trpc.community.getStakeHistoricalPrice.useQuery({

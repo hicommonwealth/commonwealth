@@ -1,9 +1,9 @@
 import ChainInfo from 'models/ChainInfo';
 import React from 'react';
+import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { trpc } from 'utils/trpcClient';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -27,23 +27,24 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
       shouldFetchSelfProfile: true,
     });
 
-  const profileTagIds = (profile?.tags || []).map((t) => t.id);
-  const { data: suggestedCommunities, isLoading: isLoadingCommunities } =
-    trpc.community.getCommunities.useQuery(
-      {
-        limit: 4,
-        loose_filter: 'tag_ids',
-        include_node_info: true,
-        order_by: 'thread_count',
-        order_direction: 'DESC',
-        base: userAddress?.community?.base,
-        tag_ids: profileTagIds.length > 0 ? profileTagIds.join(',') : undefined,
-      },
-      {
-        staleTime: 60 * 3_000,
-        enabled: !isLoadingProfile,
-      },
-    );
+  const profileTagIds = (profile?.tags || [])
+    .map((t) => t.id || 0)
+    .filter((id) => id);
+
+  const { data: communitiesList, isLoading: isLoadingCommunities } =
+    useFetchCommunitiesQuery({
+      limit: 4,
+      loose_filter: 'tag_ids',
+      include_node_info: true,
+      order_by: 'thread_count',
+      order_direction: 'DESC',
+      base: userAddress?.community?.base,
+      cursor: 1,
+      tag_ids: profileTagIds.length > 0 ? profileTagIds : [],
+      enabled: !isLoadingProfile,
+    });
+
+  const suggestedCommunities = communitiesList?.pages?.[0].results || [];
 
   const handleCommunityJoin = (community: Pick<ChainInfo, 'id' | 'base'>) => {
     linkSpecificAddressToSpecificCommunity({
@@ -62,7 +63,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
         <CWCircleMultiplySpinner />
       ) : (
         <div className="communities-list">
-          {suggestedCommunities?.results?.map((community, index) => {
+          {suggestedCommunities?.map((community, index) => {
             const isMember = Permissions.isCommunityMember(community.id);
             return (
               <JoinCommunityCard
