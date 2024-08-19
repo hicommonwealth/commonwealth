@@ -28,6 +28,10 @@ export type VoteInformation = {
 };
 
 export function buildVoteDirectionString(voteOption: string) {
+  if (!voteOption) {
+    return '';
+  }
+
   return `You voted "${voteOption}"`;
 }
 
@@ -153,9 +157,16 @@ export const VoteDisplay = ({
   voteInformation,
   isSnapshot,
 }: VoteDisplayProps) => {
-  const topResponse = voteInformation.sort(
-    (option1, option2) => option2.voteCount - option1.voteCount,
-  )[0].label;
+  const atLeastOneVote =
+    voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
+
+  console.log('atLeastOneVote', atLeastOneVote);
+
+  const topResponse = atLeastOneVote
+    ? voteInformation.sort(
+        (option1, option2) => option2.voteCount - option1.voteCount,
+      )[0].label
+    : null;
 
   return (
     <div className="VoteDisplay">
@@ -178,7 +189,12 @@ export const VoteDisplay = ({
           <CWText type="caption">{`This ${
             isSnapshot ? 'Proposal' : 'Poll'
           } is Complete`}</CWText>
-          <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
+
+          {topResponse ? (
+            <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
+          ) : (
+            <CWText type="caption">There was no responses</CWText>
+          )}
           {voteDirectionString !== '' && (
             <CWText
               type="caption"
