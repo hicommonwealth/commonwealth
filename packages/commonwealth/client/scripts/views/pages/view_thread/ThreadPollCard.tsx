@@ -87,7 +87,7 @@ export const ThreadPollCard = ({
                 authorCommunityId: user.activeAccount?.community?.id || '',
                 address: user.activeAccount?.address || '',
                 selectedOption,
-              });
+              }).catch(console.error);
             } catch (err) {
               console.error(err);
               notifyError(
@@ -145,7 +145,7 @@ export const ThreadPollCard = ({
           }
         }}
         showDeleteButton={showDeleteButton}
-        onDeleteClick={handleDeletePoll}
+        onDeleteClick={() => handleDeletePoll().catch(console.error)}
       />
       <CWModal
         size="small"
