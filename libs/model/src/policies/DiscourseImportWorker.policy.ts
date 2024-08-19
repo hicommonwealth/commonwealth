@@ -35,7 +35,7 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
         if (!community) {
           throw new AppError(Errors.CommunityNotFound);
         }
-        const { base, dumpUrl } = payload;
+        const { base, dumpUrl, accountsClaimable } = payload;
 
         // cleanup functions are pushed to this array, then popped off
         // and invoked after everything is done
@@ -139,11 +139,10 @@ export function DiscourseImportWorker(): Policy<typeof inputs> {
         }
 
         try {
-          // TODO: use accountsClaimable flag
-
           // insert users
           const { users, admins, moderators } = await createAllUsersInCW(
             restrictedDiscourseConnection,
+            accountsClaimable,
             { transaction: null },
           );
           const numUsersCreated = users.filter((u) => u.created).length;

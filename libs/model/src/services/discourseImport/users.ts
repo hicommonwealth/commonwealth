@@ -1,6 +1,7 @@
 import { models, UserAttributes } from '@hicommonwealth/model';
 import { User } from '@hicommonwealth/schemas';
 import { Op, QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { uuidV4 } from 'web3-utils';
 import { z } from 'zod';
 
 export type CWUserWithDiscourseId = z.infer<typeof User> & {
@@ -119,6 +120,7 @@ class CWQueries {
 
 export const createAllUsersInCW = async (
   discourseConnection: Sequelize,
+  accountsClaimable: boolean,
   { transaction }: { transaction: Transaction | null },
 ): Promise<{
   users: Array<CWUserWithDiscourseId>;
@@ -129,6 +131,13 @@ export const createAllUsersInCW = async (
   const allDiscourseUsers = await DiscourseQueries.fetchUsers(
     discourseConnection,
   );
+
+  if (!accountsClaimable) {
+    // override discourse user emails with random non-usable email addresses
+    allDiscourseUsers.forEach((discourseUser) => {
+      discourseUser.email = `ghostuser@${uuidV4()}`;
+    });
+  }
 
   const allBios = await DiscourseQueries.fetchBios(discourseConnection);
 
