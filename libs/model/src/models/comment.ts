@@ -74,7 +74,7 @@ export default (
     {
       hooks: {
         afterCreate: async (comment, options) => {
-          const [, threads] = await (
+          await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
           ).update(
             {
@@ -83,7 +83,6 @@ export default (
             },
             {
               where: { id: comment.thread_id },
-              returning: true,
               transaction: options.transaction,
             },
           );
