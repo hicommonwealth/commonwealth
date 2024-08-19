@@ -54,20 +54,19 @@ module.exports = {
           },
         );
 
-        for (const t of topics) {
-          for (const g of t.group_ids) {
-            await queryInterface.sequelize.query(
-              `
-                INSERT INTO "GroupPermissions"(group_id, topic_id, created_at, updated_at, allowed_actions) VALUES 
-                (
-                 ${g}, ${t.id}, NOW(), NOW(),
-                 '{ CREATE_THREAD, CREATE_COMMENT, CREATE_THREAD_REACTION, CREATE_COMMENT_REACTION, UPDATE_POLL }'
-                );
-              `,
-              { transaction },
-            );
-          }
-        }
+        const permissionsData = topics.flatMap((topic) =>
+          topic.group_ids.map((groupId) => ({
+            group_id: groupId,
+            topic_id: topic.id,
+            created_at: new Date(),
+            updated_at: new Date(),
+            allowed_actions:
+              '{CREATE_THREAD,CREATE_COMMENT,CREATE_THREAD_REACTION,CREATE_COMMENT_REACTION,UPDATE_POLL}',
+          })),
+        );
+        await queryInterface.bulkInsert('GroupPermissions', permissionsData, {
+          transaction,
+        });
         await queryInterface.removeColumn('Topics', 'group_ids', {
           transaction,
         });

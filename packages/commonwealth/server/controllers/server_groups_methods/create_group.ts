@@ -2,6 +2,7 @@ import { AppError } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   GroupAttributes,
+  GroupPermissionAttributes,
   models,
   UserInstance,
 } from '@hicommonwealth/model';
@@ -127,7 +128,10 @@ export async function __createGroup(
         ),
       }));
 
-      await models.GroupPermission.bulkCreate(permissions, { transaction: t });
+      await models.GroupPermission.bulkCreate(
+        permissions as unknown as GroupPermissionAttributes[],
+        { transaction: t },
+      );
     }
     return group.toJSON();
   };

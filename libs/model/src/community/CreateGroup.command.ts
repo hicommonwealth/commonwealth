@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import { models } from '../database';
 import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
-import { GroupAttributes } from '../models';
+import { GroupAttributes, GroupPermissionAttributes } from '../models';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
 export const Errors = {
@@ -66,9 +66,12 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
               ),
             }));
 
-            await models.GroupPermission.bulkCreate(permissions, {
-              transaction,
-            });
+            await models.GroupPermission.bulkCreate(
+              permissions as unknown as GroupPermissionAttributes[],
+              {
+                transaction,
+              },
+            );
           }
           return group.toJSON();
         },
