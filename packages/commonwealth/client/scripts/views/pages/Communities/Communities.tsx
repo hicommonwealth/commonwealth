@@ -116,7 +116,7 @@ const CommunitiesPage = () => {
 
   return (
     // @ts-expect-error <StrictNullChecks/>
-    <CWPageLayout ref={containerRef}>
+    <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
       <div className="CommunitiesPage">
         <div className="header-section">
           <div className="description">
@@ -200,7 +200,6 @@ const CommunitiesPage = () => {
               );
             })}
             <CWDivider isVertical />
-            {/* TODO: 2617 not allowing to filter by multiple bases, do we really need that? */}
             {communityBases.map((base) => {
               return (
                 <CWButton
@@ -275,10 +274,7 @@ const CommunitiesPage = () => {
                 );
               });
             }}
-            endReached={() => {
-              // TODO: 2617 bug, called infinitely
-              hasNextPage && fetchMoreCommunities();
-            }}
+            endReached={() => hasNextPage && fetchMoreCommunities()}
             overscan={50}
             components={{
               // eslint-disable-next-line react/no-multi-comp
