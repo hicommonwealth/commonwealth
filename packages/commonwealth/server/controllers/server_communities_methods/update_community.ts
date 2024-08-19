@@ -123,7 +123,7 @@ export async function __updateCommunity(
     (s) => typeof s === 'string',
   );
   const invalidSocialLinks = nonEmptySocialLinks?.filter(
-    (s) => !urlHasValidHTTPPrefix(s),
+    (s) => !urlHasValidHTTPPrefix(s || ''),
   );
   if (nonEmptySocialLinks && invalidSocialLinks.length > 0) {
     throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
