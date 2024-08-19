@@ -1,4 +1,4 @@
-import { EventNames, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -8,7 +8,6 @@ import type {
   ReactionAttributes,
   ThreadInstance,
 } from '.';
-import { emitEvent } from '../utils';
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
@@ -87,19 +86,6 @@ export default (
               returning: true,
               transaction: options.transaction,
             },
-          );
-          await emitEvent(
-            sequelize.models.Outbox,
-            [
-              {
-                event_name: EventNames.CommentCreated,
-                event_payload: {
-                  ...comment.toJSON(),
-                  community_id: threads.at(0)!.community_id,
-                },
-              },
-            ],
-            options.transaction,
           );
           stats().increment('cw.hook.comment-count', {
             thread_id: String(comment.thread_id),
