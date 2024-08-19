@@ -119,7 +119,9 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  const nonEmptySocialLinks = social_links?.filter((s) => s && s !== '');
+  const nonEmptySocialLinks = (social_links || [])?.filter(
+    (s) => typeof s === 'string',
+  );
   const invalidSocialLinks = nonEmptySocialLinks?.filter(
     (s) => !urlHasValidHTTPPrefix(s),
   );

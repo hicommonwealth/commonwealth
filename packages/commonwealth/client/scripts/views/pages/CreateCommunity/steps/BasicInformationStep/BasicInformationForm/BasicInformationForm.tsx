@@ -161,7 +161,7 @@ const BasicInformationForm = ({
         altWalletUrl: selectedChainNode.altWalletUrl,
         userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
-          ethChainId: parseInt(values.chain.value || ''),
+          ethChainId: values.chain.value,
         }),
         ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
           cosmosChainId: values.chain.value,
