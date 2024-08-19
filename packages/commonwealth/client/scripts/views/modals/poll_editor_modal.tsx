@@ -49,14 +49,11 @@ const customDurationOptions = [
 type PollEditorModalProps = {
   onModalClose: () => void;
   thread: Thread;
-  onPollCreate: () => void;
 };
 
 export const PollEditorModal = ({
   onModalClose,
   thread,
-  // TODO remove
-  onPollCreate,
 }: PollEditorModalProps) => {
   const [customDuration, setCustomDuration] = useState(INFINITE_OPTION);
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
@@ -117,8 +114,6 @@ export const PollEditorModal = ({
       });
 
       notifySuccess('Poll creation succeeded');
-      // TODO remove
-      onPollCreate();
     } catch (err) {
       notifyError('Poll creation failed');
       console.error(err);

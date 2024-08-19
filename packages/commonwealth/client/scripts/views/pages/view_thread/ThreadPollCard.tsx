@@ -14,14 +14,12 @@ import { getPollTimestamp } from './helpers';
 type ThreadPollCardProps = {
   poll: Poll;
   showDeleteButton?: boolean;
-  onDelete?: () => void;
   isTopicMembershipRestricted?: boolean;
 };
 
 export const ThreadPollCard = ({
   poll,
   showDeleteButton,
-  onDelete,
   isTopicMembershipRestricted = false,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,7 +48,6 @@ export const ThreadPollCard = ({
         address: user.activeAccount?.address || '',
         authorCommunity: user.activeAccount?.community?.id || '',
       });
-      onDelete?.();
       notifySuccess('Poll deleted');
     } catch (e) {
       console.error(e);

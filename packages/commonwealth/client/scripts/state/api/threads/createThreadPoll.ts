@@ -22,18 +22,15 @@ const createThreadPoll = async ({
   authorCommunity,
   address,
 }: CreateThreadPollProps) => {
-  const response = await axios.post(
-    `${SERVER_URL}${ApiEndpoints.createThreadPoll(threadId)}`,
-    {
-      community_id: app.activeChainId(),
-      author_chain: authorCommunity,
-      address,
-      jwt: userStore.getState().jwt,
-      prompt,
-      options,
-      custom_duration: customDuration?.split(' ')[0],
-    },
-  );
+  const response = await axios.post(`${SERVER_URL}/threads/${threadId}/polls`, {
+    community_id: app.activeChainId(),
+    author_chain: authorCommunity,
+    address,
+    jwt: userStore.getState().jwt,
+    prompt,
+    options,
+    custom_duration: customDuration?.split(' ')[0],
+  });
 
   return response.data.result;
 };

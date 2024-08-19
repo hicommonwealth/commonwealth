@@ -81,9 +81,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
-
-  // TODO REMOVE
-  const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [commentSortType, setCommentSortType] =
@@ -91,9 +88,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isReplying, setIsReplying] = useState(false);
   // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-
-  // TODO REMOVE
-  const [arePollsFetched, setArePollsFetched] = useState(false);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
@@ -218,13 +212,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     },
   });
 
-  // TODO REMOVE
-  useEffect(() => {
-    if (!initializedPolls && thread?.id) {
-      setInitializedPolls(true);
-    }
-  }, [initializedPolls, thread?.id]);
-
   // TODO: unnecessary code - must be in a redirect hook
   useNecessaryEffect(() => {
     if (!thread) {
@@ -241,22 +228,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
   // ------------
-
-  // TODO REMOVE
-  useNecessaryEffect(() => {
-    if (!thread || (thread && arePollsFetched)) {
-      return;
-    }
-
-    app.polls
-      .fetchPolls(app.activeChainId(), thread?.id)
-      .then(() => {
-        setArePollsFetched(true);
-      })
-      .catch(() => {
-        notifyError('Failed to load polls');
-      });
-  }, [thread, arePollsFetched]);
 
   useManageDocumentTitle('View thread', thread?.title);
 
@@ -813,9 +784,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                   isRestrictedMembership
                                 }
                                 showDeleteButton={isAuthor || isAdmin}
-                                onDelete={() => {
-                                  setInitializedPolls(false);
-                                }}
                               />
                             );
                           })}
@@ -825,7 +793,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 // @ts-expect-error <StrictNullChecks/>
                                 thread={thread}
                                 threadAlreadyHasPolling={!pollsData?.length}
-                                onPollCreate={() => setInitializedPolls(false)}
                               />
                             )}
                         </div>
