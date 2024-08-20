@@ -34,12 +34,20 @@ describe('New Content lifecycle', () => {
     });
 
     actor1 = {
-      user: { id: user1!.id!, email: user1!.email!, isAdmin: user1?.isAdmin },
+      user: {
+        id: user1!.id!,
+        email: user1!.email!,
+        isAdmin: user1?.isAdmin || false,
+      },
       address_id: community!.Addresses!.at(0)!.address!,
     };
     address1 = community!.Addresses!.at(0)!;
     actor2 = {
-      user: { id: user2!.id!, email: user2!.email!, isAdmin: user2?.isAdmin },
+      user: {
+        id: user2!.id!,
+        email: user2!.email!,
+        isAdmin: user2?.isAdmin || false,
+      },
       address_id: community!.Addresses!.at(1)!.address!,
     };
   });
