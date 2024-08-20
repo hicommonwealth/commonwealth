@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
@@ -39,8 +38,6 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
-
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   return (
     <div className="DesktopHeader">
@@ -101,10 +98,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
 
             <HelpMenuPopover />
           </div>
-
-          {user.isLoggedIn && enableKnockInAppNotifications && (
-            <KnockNotifications />
-          )}
+          <KnockNotifications />
         </div>
 
         {user.isLoggedIn && (

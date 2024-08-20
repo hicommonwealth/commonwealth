@@ -1,6 +1,5 @@
 import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction } from 'react';
 import useUserStore from 'state/ui/user';
@@ -60,7 +59,6 @@ export const ThreadOptions = ({
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   const handleDownloadMarkdown = () => {
     downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');

@@ -104,10 +104,7 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
-const CommonDomainRoutes = ({
-  contestEnabled,
-  knockInAppNotifications,
-}: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({ contestEnabled }: RouteFeatureFlags) => [
   <Route
     key="/"
     path="/"
