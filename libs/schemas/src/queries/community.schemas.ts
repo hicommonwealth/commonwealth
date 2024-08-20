@@ -36,7 +36,6 @@ export const GetCommunities = {
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
     include_last_30_day_thread_count: z.boolean().optional(),
-    // TODO: add describe
     order_by: z
       .enum([
         'profile_count',
