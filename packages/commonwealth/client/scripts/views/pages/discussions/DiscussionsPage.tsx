@@ -1,6 +1,6 @@
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
@@ -18,7 +18,7 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { slugify } from '@hicommonwealth/shared';
+import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
@@ -127,16 +127,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
-  const splitURLPath = useMemo(() => location.pathname.split('/'), []);
-  const decodedString = useMemo(() => {
-    if (splitURLPath[2] === 'discussions') {
-      return decodeURIComponent(splitURLPath[3]);
-    }
-    splitURLPath[1] === 'discussions';
-    return decodeURIComponent(splitURLPath[2]);
-  }, [splitURLPath]);
+  const decodedString = splitAndDecodeURL(location.pathname);
 
-  //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
   useEffect(() => {
     if (!isLoadingTopics && decodedString) {
       const validTopics = topics?.some(
@@ -147,7 +139,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics, decodedString, splitURLPath, isLoadingTopics]);
+  }, [topics, decodedString, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
