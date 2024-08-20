@@ -548,6 +548,9 @@ describe('ServerThreadsController', () => {
         Group: {
           findAll: async () => [],
         },
+        Outbox: {
+          bulkCreate: async () => ({}),
+        },
       };
       const banCache = {
         checkBan: () => [true, null],
