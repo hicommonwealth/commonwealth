@@ -133,7 +133,7 @@ const LayoutComponent = ({
     isLoading ||
     shouldSelectChain ||
     shouldDeInitChain ||
-    isVerifyingCommunityExistance;
+    (providedCommunityScope ? isVerifyingCommunityExistance : false);
 
   const childToRender = () => {
     if (appError.loadingError) {
