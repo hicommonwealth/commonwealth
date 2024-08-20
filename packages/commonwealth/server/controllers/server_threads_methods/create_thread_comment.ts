@@ -213,27 +213,11 @@ export async function __createThreadComment(
         community_id: thread.community_id,
       });
 
-      await this.models.Subscription.bulkCreate(
-        [
-          {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewReaction,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id!,
-            is_active: true,
-          },
-          {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewComment,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id!,
-            is_active: true,
-          },
-        ],
+      await this.models.CommentSubscription.create(
+        {
+          user_id: user.id!,
+          comment_id: comment.id!,
+        },
         { transaction },
       );
     });
