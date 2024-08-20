@@ -127,20 +127,21 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
-  const decodedString = splitAndDecodeURL(location.pathname);
+  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
+  const topicNameFromURL = splitAndDecodeURL(location.pathname);
 
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
-    if (!isLoadingTopics && decodedString) {
+    if (!isLoadingTopics && topicNameFromURL) {
       const validTopics = topics?.some(
-        (topic) => topic?.name === decodedString,
+        (topic) => topic?.name === topicNameFromURL,
       );
       if (!validTopics) {
         navigate('/discussions');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics, decodedString, isLoadingTopics]);
+  }, [topics, topicNameFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 

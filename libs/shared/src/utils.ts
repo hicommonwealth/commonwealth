@@ -35,6 +35,8 @@ export const slugify = (str: string): string => {
 /* eslint-disable */
 
 export const splitAndDecodeURL = (locationPathname: string) => {
+  //checks if a url is custom or not and decodes the url after splitting it
+  //this is to check for malformed urls on a topics page in /discussions
   const splitURLPath = locationPathname.split('/');
   if (splitURLPath[2] === 'discussions') {
     return decodeURIComponent(splitURLPath[3]);
