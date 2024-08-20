@@ -1,6 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import z from 'zod';
-import { ContestManager } from '../entities';
+import { ContestManager, FarcasterWebhookEvent } from '../entities';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
@@ -75,12 +75,9 @@ export const PerformContestRollovers = {
   output: z.object({}),
 };
 
-export const FarcasterCastReplyWebhook = {
-  input: z.object({
-    id: z.string(),
-    root_hash: z.string(),
-    cast_hash: z.string(),
-    user_address: z.string(),
+export const FarcasterWebhook = {
+  input: FarcasterWebhookEvent.extend({
+    id: z.string(), // TODO: remove this since it's not relevant to webhooks
   }),
   output: z.object({}),
 };
