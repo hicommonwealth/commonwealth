@@ -22,7 +22,6 @@ type CommonProps = {
   addresses: AddressInfo[];
   activeCommunity: ChainInfo | null;
   communities: UserCommunities[]; // basic info of user-joined communities with user-associated metadata per community
-  joinedCommunitiesWithNewContent: string[]; // names of all communities which have new content since user last visited
   accounts: Account[]; // contains full accounts list of the user - when in a active chain/community scope, only
   // contains accounts specific to that community
   activeAccount: Account | null;
@@ -48,7 +47,6 @@ export const userStore = createStore<UserStoreProps>()(
     addresses: [],
     activeCommunity: null,
     communities: [],
-    joinedCommunitiesWithNewContent: [],
     accounts: [],
     activeAccount: null,
     jwt: null,
