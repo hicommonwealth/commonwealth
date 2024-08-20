@@ -61,10 +61,9 @@ export const processUserMentioned: EventHandler<
             safeTruncateBody(decodeURIComponent(payload.comment.text), 255),
       object_url:
         'thread' in payload
-          ? // @ts-expect-error StrictNullChecks
-            getThreadUrl(
-              payload.thread.community_id,
-              payload.thread.id,
+          ? getThreadUrl(
+              payload.thread!.community_id,
+              payload.thread!.id!,
               community.custom_domain,
             )
           : getCommentUrl(
