@@ -1,10 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/shared';
-import { notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
-import { Dispatch, SetStateAction } from 'react';
-import app from 'state';
-import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
-import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type Thread from '../../../models/Thread';
 import { ThreadFeaturedFilterTypes } from '../../../models/types';
 
@@ -23,86 +17,6 @@ export const isHot = (thread: Thread) => {
     moment.duration(moment().diff(getLastUpdated(thread))).asSeconds() <
     24 * 60 * 60
   );
-};
-
-export const handleToggleSubscription = async (
-  thread: Thread,
-  commentSubscription: NotificationSubscription,
-  reactionSubscription: NotificationSubscription,
-  isSubscribed: boolean,
-  setIsSubscribed?: Dispatch<SetStateAction<boolean>>,
-) => {
-  if (!commentSubscription || !reactionSubscription) {
-    await Promise.all([
-      app.user.notifications.subscribe({
-        categoryId: NotificationCategories.NewReaction,
-        options: {
-          threadId: thread.id,
-        },
-      }),
-      app.user.notifications.subscribe({
-        categoryId: NotificationCategories.NewComment,
-        options: {
-          threadId: thread.id,
-        },
-      }),
-    ]);
-    notifySuccess('Subscribed!');
-  } else if (isSubscribed) {
-    await app.user.notifications.disableSubscriptions([
-      commentSubscription,
-      reactionSubscription,
-    ]);
-    notifySuccess('Unsubscribed!');
-  } else {
-    await app.user.notifications.enableSubscriptions([
-      commentSubscription,
-      reactionSubscription,
-    ]);
-    notifySuccess('Subscribed!');
-  }
-  if (setIsSubscribed) setIsSubscribed(!isSubscribed);
-};
-
-export const getCommentSubscription = (thread: Thread) => {
-  return app.user.notifications.findNotificationSubscription({
-    categoryId: NotificationCategories.NewComment,
-    options: { threadId: thread.id },
-  });
-};
-
-export const getReactionSubscription = (thread: Thread) => {
-  return app.user.notifications.findNotificationSubscription({
-    categoryId: NotificationCategories.NewReaction,
-    options: { threadId: thread.id },
-  });
-};
-
-export const getThreadSubScriptionMenuItem = (
-  thread: Thread,
-  setIsSubscribed: Dispatch<SetStateAction<boolean>>,
-  archivedAt: moment.Moment | null,
-): PopoverMenuItem => {
-  const commentSubscription = getCommentSubscription(thread);
-  const reactionSubscription = getReactionSubscription(thread);
-
-  const isSubscribed =
-    commentSubscription?.isActive && reactionSubscription?.isActive;
-
-  return {
-    onClick: () => {
-      handleToggleSubscription(
-        thread,
-        getCommentSubscription(thread),
-        getReactionSubscription(thread),
-        isSubscribed,
-        setIsSubscribed,
-      );
-    },
-    label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
-    iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
-    disabled: archivedAt ? true : false,
-  };
 };
 
 /**

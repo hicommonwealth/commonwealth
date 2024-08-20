@@ -11,10 +11,4 @@ export class UserController {
   public get notifications(): NotificationsController {
     return this._notifications;
   }
-  private _setNotifications(notifications: NotificationsController): void {
-    this._notifications = notifications;
-  }
-  public setNotifications(notifications: NotificationsController): void {
-    this._setNotifications(notifications);
-  }
 }
