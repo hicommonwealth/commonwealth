@@ -62,7 +62,11 @@ export const processUserMentioned: EventHandler<
       object_url:
         'thread' in payload
           ? // @ts-expect-error StrictNullChecks
-            getThreadUrl(payload.thread.community_id, payload.thread.id)
+            getThreadUrl(
+              payload.thread.community_id,
+              payload.thread.id,
+              community.custom_domain,
+            )
           : getCommentUrl(
               // @ts-expect-error StrictNullChecks
               payload.comment.community_id,
@@ -70,6 +74,7 @@ export const processUserMentioned: EventHandler<
               payload.comment.thread_id,
               // @ts-expect-error StrictNullChecks
               payload.comment.id,
+              community.custom_domain,
             ),
     },
   });
