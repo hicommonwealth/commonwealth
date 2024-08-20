@@ -10,7 +10,6 @@ import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
-import { ToggleThreadSubscribeOld } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribeOld';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
@@ -118,21 +117,10 @@ export const ThreadOptions = ({
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
           {userStore.id > 0 && (
-            <>
-              {enableKnockInAppNotifications && (
-                <ToggleThreadSubscribe
-                  thread={thread}
-                  isCommunityMember={isCommunityMember}
-                />
-              )}
-
-              {!enableKnockInAppNotifications && (
-                <ToggleThreadSubscribeOld
-                  thread={thread}
-                  isCommunityMember={isCommunityMember}
-                />
-              )}
-            </>
+            <ToggleThreadSubscribe
+              thread={thread}
+              isCommunityMember={isCommunityMember}
+            />
           )}
 
           {thread && (

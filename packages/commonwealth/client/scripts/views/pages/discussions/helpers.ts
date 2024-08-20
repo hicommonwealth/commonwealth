@@ -25,28 +25,6 @@ export const isHot = (thread: Thread) => {
   );
 };
 
-export const isNewThread = (threadCreatedAt: moment.Moment) => {
-  const diffInMs = moment().diff(threadCreatedAt);
-  return moment.duration(diffInMs).asHours() < 48;
-};
-
-export const getLastUpdate = (thread: Thread): number => {
-  if (!thread) return 0;
-  const lastComment = thread.lastCommentedOn?.unix() || 0;
-  const createdAt = thread.createdAt?.unix() || 0;
-  const lastUpdate = Math.max(createdAt, lastComment);
-  return lastUpdate;
-};
-
-export const onFeaturedDiscussionPage = (p, topic) =>
-  decodeURI(p).endsWith(`/discussions/${topic}`);
-
-export const orderDiscussionsbyLastComment = (a, b) => {
-  const tsB = Math.max(+b.createdAt, +(b.lastCommentedOn || 0));
-  const tsA = Math.max(+a.createdAt, +(a.lastCommentedOn || 0));
-  return tsB - tsA;
-};
-
 export const handleToggleSubscription = async (
   thread: Thread,
   commentSubscription: NotificationSubscription,
