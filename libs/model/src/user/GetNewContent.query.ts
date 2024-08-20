@@ -23,7 +23,7 @@ export function GetNewContent(): Query<typeof schemas.GetNewContent> {
             AND t.created_at > a.last_active 
             AND t.deleted_at IS NULL
           LEFT JOIN "Comments" c 
-            ON c.community_id = a.community_id 
+            ON c.thread_id = t.id 
             AND c.created_at > a.last_active 
             AND c.deleted_at IS NULL
           WHERE 
