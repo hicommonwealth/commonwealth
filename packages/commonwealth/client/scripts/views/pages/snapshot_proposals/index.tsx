@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
-import { NotificationCategories } from '@hicommonwealth/shared';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
@@ -33,19 +32,6 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
   const proposalsToDisplay =
     activeTab === 1 ? proposals.active : proposals.ended;
 
-  const spaceSubscription = useMemo(
-    () =>
-      app.user.notifications.findNotificationSubscription({
-        categoryId: NotificationCategories.SnapshotProposal,
-        options: { snapshotId },
-      }),
-    [snapshotId],
-  );
-
-  const [hasSubscription, setHasSubscription] = useState<boolean>(
-    spaceSubscription !== undefined,
-  );
-
   useManageDocumentTitle('Snapshots');
 
   useNecessaryEffect(() => {
@@ -75,23 +61,6 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
     fetch();
   }, [snapshotId]);
-
-  const updateSubscription = () => {
-    if (hasSubscription) {
-      app.user.notifications.deleteSubscription(spaceSubscription).then(() => {
-        setHasSubscription(false);
-      });
-    } else {
-      app.user.notifications
-        .subscribe({
-          categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId },
-        })
-        .then(() => {
-          setHasSubscription(true);
-        });
-    }
-  };
 
   return (
     <CWPageLayout>
