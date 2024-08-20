@@ -81,7 +81,7 @@ const LayoutComponent = ({
     providedCommunityScope &&
     providedCommunityScope !== app.activeChainId() &&
     providedCommunityScope !== communityToLoad &&
-    community &&
+    !!community &&
     !isVerifyingCommunityExistance;
 
   useNecessaryEffect(() => {
@@ -130,7 +130,10 @@ const LayoutComponent = ({
   // A loading state (i.e. spinner) is shown in the following cases:
   // - a community is still being initialized or deinitialized
   const shouldShowLoadingState =
-    isLoading || shouldSelectChain || shouldDeInitChain;
+    isLoading ||
+    shouldSelectChain ||
+    shouldDeInitChain ||
+    isVerifyingCommunityExistance;
 
   const childToRender = () => {
     if (appError.loadingError) {
