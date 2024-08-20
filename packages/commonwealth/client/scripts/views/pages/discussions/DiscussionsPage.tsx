@@ -129,6 +129,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const decodedString = splitAndDecodeURL(location.pathname);
 
+  //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
     if (!isLoadingTopics && decodedString) {
       const validTopics = topics?.some(
