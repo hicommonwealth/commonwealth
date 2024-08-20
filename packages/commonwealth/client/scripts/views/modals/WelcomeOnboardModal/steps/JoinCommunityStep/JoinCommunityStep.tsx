@@ -36,7 +36,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
       limit: 4,
       relevance_by: 'tag_ids',
       include_node_info: true,
-      order_by: 'thread_count',
+      order_by: 'lifetime_thread_count',
       order_direction: 'DESC',
       base: userAddress?.community?.base,
       cursor: 1,

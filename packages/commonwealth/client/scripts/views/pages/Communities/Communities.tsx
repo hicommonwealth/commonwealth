@@ -71,7 +71,7 @@ const CommunitiesPage = () => {
   } = useFetchCommunitiesQuery({
     limit: 50,
     include_node_info: true,
-    order_by: 'thread_count',
+    order_by: 'lifetime_thread_count',
     order_direction: 'DESC',
     base: filters.withChainBase ? ChainBase[filters.withChainBase] : undefined,
     network: filters.withNetwork,

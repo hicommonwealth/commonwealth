@@ -6,7 +6,6 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import {
-  Community,
   CommunityMember,
   CommunityStake,
   ExtendedCommunity,
@@ -16,7 +15,10 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
-    relevance_by: z.enum(['tag_ids']).optional(),
+    relevance_by: z.enum(['tag_ids', 'membership']).optional().describe(`\n
+      - When 'tag_ids', results would be 'DESC' ordered based on the provided 'tag_ids' param, and wouldn't strictly include matching 'tag_ids'\n
+      - When 'memberships', results would be 'DESC' ordered, the communities with auth-user membership will come before non-membership communities\n
+    `),
     network: z.nativeEnum(ChainNetwork).optional(),
     base: z.nativeEnum(ChainBase).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
@@ -32,10 +34,17 @@ export const GetCommunities = {
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
-    order_by: z.enum(['profile_count', 'thread_count']).optional(),
+    // TODO: rename thread_count
+    order_by: z
+      .enum([
+        'profile_count',
+        'lifetime_thread_count',
+        'last_30_day_thread_count',
+      ])
+      .optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: Community.array(),
+    results: z.any().array(), // TODO: fix type
   }),
 };
 

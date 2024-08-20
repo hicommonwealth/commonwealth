@@ -18,7 +18,7 @@ const useFetchCommunitiesQuery = ({
   tag_ids,
   limit = 50,
   order_direction = 'DESC',
-  order_by = 'thread_count',
+  order_by = 'lifetime_thread_count',
   enabled = true,
 }: UseFetchCommunitiesProps) => {
   return trpc.community.getCommunities.useInfiniteQuery(
