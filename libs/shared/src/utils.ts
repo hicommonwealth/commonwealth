@@ -34,6 +34,15 @@ export const slugify = (str: string): string => {
 };
 /* eslint-disable */
 
+export const splitAndDecodeURL = (locationPathname: string) => {
+  const splitURLPath = locationPathname.split('/');
+  if (splitURLPath[2] === 'discussions') {
+    return decodeURIComponent(splitURLPath[3]);
+  }
+  splitURLPath[1] === 'discussions';
+  return decodeURIComponent(splitURLPath[2]);
+};
+
 export const getThreadUrl = (
   thread: {
     chain: string;
