@@ -1,12 +1,21 @@
 import { config } from '@hicommonwealth/model';
 
+function getBaseUrl(customDomain?: string | null): string {
+  if (!customDomain) return config.SERVER_URL;
+  else {
+    if (customDomain.endsWith('/')) return customDomain.slice(0, -1);
+    else return customDomain;
+  }
+}
+
 export const getCommentUrl = (
   communityId: string,
   threadId: number,
   commentId: number,
+  customDomain?: string | null,
 ): string => {
   return (
-    config.SERVER_URL +
+    getBaseUrl(customDomain) +
     `/${communityId}/discussion/${threadId}?comment=${commentId}`
   );
 };
@@ -14,17 +23,25 @@ export const getSnapshotUrl = (
   communityId: string,
   space: string,
   proposalId: string,
+  customDomain?: string | null,
 ): string => {
-  return config.SERVER_URL + `/${communityId}/snapshot/${space}/${proposalId}`;
+  return (
+    getBaseUrl(customDomain) + `/${communityId}/snapshot/${space}/${proposalId}`
+  );
 };
 
-export const getThreadUrl = (communityId: string, threadId: number): string => {
-  return config.SERVER_URL + `/${communityId}/discussion/${threadId}`;
+export const getThreadUrl = (
+  communityId: string,
+  threadId: number,
+  customDomain?: string | null,
+): string => {
+  return getBaseUrl(customDomain) + `/${communityId}/discussion/${threadId}`;
 };
 
 export const getChainProposalUrl = (
   communityId: string,
   proposalId: string,
+  customDomain?: string | null,
 ) => {
-  return config.SERVER_URL + `/${communityId}/proposal/${proposalId}`;
+  return getBaseUrl(customDomain) + `/${communityId}/proposal/${proposalId}`;
 };
