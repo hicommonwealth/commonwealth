@@ -68,7 +68,6 @@ export function UpdateSubscriptionPreferences(): Command<
               {
                 event_name: EventNames.SubscriptionPreferencesUpdated,
                 event_payload: {
-                  id: existingPreferences.id,
                   user_id: existingPreferences.user_id,
                   ...preferenceUpdates,
                 },

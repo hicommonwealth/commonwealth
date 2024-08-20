@@ -34,13 +34,3 @@ export const extractSnapshotProposals = (
 
   return snapshotProposals;
 };
-
-export const getNotificationTypeText = (category: string) => {
-  if (category === 'new-comment-creation') {
-    return 'Comments on';
-  } else if (category === 'new-reaction') {
-    return 'Reactions to';
-  } else {
-    return null;
-  }
-};

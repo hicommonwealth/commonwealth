@@ -18,8 +18,7 @@ export default (
   sequelize.define<SubscriptionPreferenceInstance>(
     'SubscriptionPreferences',
     {
-      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-      user_id: { type: Sequelize.INTEGER, allowNull: false },
+      user_id: { type: Sequelize.INTEGER, primaryKey: true },
       email_notifications_enabled: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
