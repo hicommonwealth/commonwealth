@@ -1,8 +1,8 @@
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import { useGetNewContent } from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
@@ -10,9 +10,9 @@ import './TrendingCommunitiesPreview.scss';
 
 export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
-  const { data } = useGetNewContent({ enabled: isLoggedIn });
+  const { data } = useGetNewContent({ enabled: user.isLoggedIn });
 
   const { data: activeCommunities } = useFetchActiveCommunitiesQuery();
 
