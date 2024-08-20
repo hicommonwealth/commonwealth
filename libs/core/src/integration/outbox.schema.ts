@@ -6,8 +6,8 @@ import * as events from './events.schemas';
 const BaseOutboxProperties = z.object({
   event_id: PG_INT.optional(),
   relayed: z.boolean().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const Outbox = z.union([

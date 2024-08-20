@@ -31,7 +31,8 @@ export function threadStageToLabel(stage: string) {
 export function isDefaultStage(stage: string, customStages?: string[]) {
   return (
     stage === ThreadStage.Discussion ||
-    stage === parseCustomStages(customStages || app.chain.meta.customStages)[0]
+    stage ===
+      parseCustomStages(customStages || app?.chain?.meta?.customStages)[0]
   );
 }
 

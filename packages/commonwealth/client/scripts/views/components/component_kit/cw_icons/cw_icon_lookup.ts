@@ -30,6 +30,7 @@ import {
   Compass,
   Copy,
   DotsThreeVertical,
+  Download,
   Export,
   Eye,
   Flag,
@@ -240,6 +241,7 @@ export const iconLookup = {
   website: Icons.CWWebsite,
   write: Icons.CWWrite,
   members: Icons.CWMembers,
+  download: withPhosphorIcon(Download),
 };
 
 export const customIconLookup = {

@@ -1,9 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import app from 'state';
 import { ReplyResult } from 'views/pages/search/helpers';
-import { ApiEndpoints } from '../config';
+import { ApiEndpoints, SERVER_URL } from '../config';
 
 const SEARCH_COMMENTS_STALE_TIME = 60 * 1_000; // 60 s
 
@@ -37,7 +36,7 @@ const searchComments = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchCommentsResponse }>(
-    `${app.serverUrl()}/comments`,
+    `${SERVER_URL}/comments`,
     {
       headers: {
         'Content-Type': 'application/json',
@@ -94,7 +93,7 @@ const useSearchCommentsQuery = ({
         return undefined;
       },
       staleTime: SEARCH_COMMENTS_STALE_TIME,
-      enabled: enabled && searchTerm.length >= 3,
+      enabled,
     },
   );
 };

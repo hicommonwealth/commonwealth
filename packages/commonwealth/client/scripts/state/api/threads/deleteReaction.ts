@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { signDeleteThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
@@ -27,18 +28,15 @@ const deleteReaction = async ({
     thread_id: threadId,
   });
 
-  const response = await axios.delete(
-    `${app.serverUrl()}/reactions/${reactionId}`,
-    {
-      data: {
-        author_community_id: communityId,
-        address: address,
-        community_id: app.chain.id,
-        jwt: userStore.getState().jwt,
-        ...toCanvasSignedDataApiArgs(canvasSignedData),
-      },
+  const response = await axios.delete(`${SERVER_URL}/reactions/${reactionId}`, {
+    data: {
+      author_community_id: communityId,
+      address: address,
+      community_id: app.chain.id,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
-  );
+  });
 
   return {
     ...response,

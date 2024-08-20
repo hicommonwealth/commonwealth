@@ -1,4 +1,4 @@
-import { EventNames, events, logger } from '@hicommonwealth/core';
+import { EventPairs, logger } from '@hicommonwealth/core';
 import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import {
@@ -9,7 +9,6 @@ import {
   Transaction,
 } from 'sequelize';
 import { isAddress } from 'web3-validator';
-import { z } from 'zod';
 import { config } from '../config';
 import { OutboxAttributes } from '../models';
 
@@ -26,56 +25,6 @@ export function hashAbi(abi: AbiType): string {
   return hashInstance.hash(abi);
 }
 
-type EmitEventValues =
-  | {
-      event_name: EventNames.CommentCreated;
-      event_payload: z.infer<typeof events.CommentCreated>;
-    }
-  | {
-      event_name: EventNames.ThreadCreated;
-      event_payload: z.infer<typeof events.ThreadCreated>;
-    }
-  | {
-      event_name: EventNames.ThreadUpvoted;
-      event_payload: z.infer<typeof events.ThreadUpvoted>;
-    }
-  | {
-      event_name: EventNames.ChainEventCreated;
-      event_payload: z.infer<typeof events.ChainEventCreated>;
-    }
-  | {
-      event_name: EventNames.SnapshotProposalCreated;
-      event_payload: z.infer<typeof events.SnapshotProposalCreated>;
-    }
-  | {
-      event_name: EventNames.UserMentioned;
-      event_payload: z.infer<typeof events.UserMentioned>;
-    }
-  | {
-      event_name: EventNames.RecurringContestManagerDeployed;
-      event_payload: z.infer<typeof events.RecurringContestManagerDeployed>;
-    }
-  | {
-      event_name: EventNames.OneOffContestManagerDeployed;
-      event_payload: z.infer<typeof events.OneOffContestManagerDeployed>;
-    }
-  | {
-      event_name: EventNames.ContestStarted;
-      event_payload: z.infer<typeof events.ContestStarted>;
-    }
-  | {
-      event_name: EventNames.ContestContentAdded;
-      event_payload: z.infer<typeof events.ContestContentAdded>;
-    }
-  | {
-      event_name: EventNames.ContestContentUpvoted;
-      event_payload: z.infer<typeof events.ContestContentUpvoted>;
-    }
-  | {
-      event_name: EventNames.SubscriptionPreferencesUpdated;
-      event_payload: z.infer<typeof events.SubscriptionPreferencesUpdated>;
-    };
-
 /**
  * This functions takes either a new domain record or a pre-formatted event and inserts it into the Outbox. For core
  * domain events (e.g. new thread, new comment, etc.), the event_payload should be the complete domain record. The point
@@ -85,10 +34,10 @@ type EmitEventValues =
  */
 export async function emitEvent(
   outbox: ModelStatic<Model<OutboxAttributes>>,
-  values: Array<EmitEventValues>,
+  values: Array<EventPairs>,
   transaction?: Transaction | null,
 ) {
-  const records: Array<EmitEventValues> = [];
+  const records: Array<EventPairs> = [];
   for (const event of values) {
     if (config.OUTBOX.ALLOWED_EVENTS.includes(event.event_name)) {
       records.push(event);
@@ -191,7 +140,7 @@ export async function getThreadContestManagers(
             WHERE ct.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
-            AND cm.ended = false
+            AND (cm.ended IS NULL OR cm.ended = false)
           `,
     {
       type: QueryTypes.SELECT,

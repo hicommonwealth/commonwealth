@@ -24,6 +24,7 @@ type CommonProps = {
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
   isWelcomeOnboardFlowComplete: boolean;
+  isLoggedIn: boolean;
 };
 
 type UserStoreProps = CommonProps & {
@@ -47,6 +48,7 @@ export const userStore = createStore<UserStoreProps>()(
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,
     isWelcomeOnboardFlowComplete: false,
+    isLoggedIn: false,
     // when logged-in, set the auth-user values
     setData: (data) => {
       if (Object.keys(data).length > 0) {

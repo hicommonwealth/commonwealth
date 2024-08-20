@@ -31,13 +31,19 @@ function isNullable(value: ZodUnknown) {
   return isNullable(value._def.innerType as ZodUnknown);
 }
 
-function isArray(value: ZodUnknown | ZodOptional<ZodUnknown>) {
-  if (value instanceof ZodOptional) return isArray(value._def.innerType);
+function isArray(
+  value: ZodUnknown | ZodOptional<ZodUnknown> | ZodNullable<ZodUnknown>,
+) {
+  if (value instanceof ZodOptional || value instanceof ZodNullable)
+    return isArray(value._def.innerType);
   return value instanceof ZodArray;
 }
 
-function isString(value: ZodUnknown | ZodOptional<ZodUnknown>) {
-  if (value instanceof ZodOptional) return isString(value._def.innerType);
+function isString(
+  value: ZodUnknown | ZodOptional<ZodUnknown> | ZodNullable<ZodUnknown>,
+) {
+  if (value instanceof ZodOptional || value instanceof ZodNullable)
+    return isString(value._def.innerType);
   return value instanceof ZodString;
 }
 

@@ -1,6 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {
   useFetchCommunityStakeQuery,
@@ -8,10 +6,16 @@ import {
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
-import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
 
 interface UseCommunityStakeProps {
-  community?: ChainInfo | CommunityData;
+  community?: {
+    id?: string;
+    namespace?: string;
+    ChainNode?: {
+      url: string;
+      ethChainId: number;
+    };
+  };
   stakeId?: number;
   walletAddress?: string;
 }
@@ -24,7 +28,6 @@ const chainIds = {
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
 
   const activeCommunityId = community?.id || app?.chain?.id;
@@ -53,7 +56,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&
-      isLoggedIn,
+      user.isLoggedIn,
   );
 
   const {

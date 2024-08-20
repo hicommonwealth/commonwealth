@@ -1,14 +1,15 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
+import { getUniqueUserAddresses } from 'helpers/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
 import {
@@ -47,7 +48,7 @@ const resetWalletConnectSession = async () => {
 
 export const handleLogout = async () => {
   try {
-    await axios.get(`${app.serverUrl()}/logout`);
+    await axios.get(`${SERVER_URL}/logout`);
     await initAppState();
     await resetWalletConnectSession();
     for (const signer of getSessionSigners()) {

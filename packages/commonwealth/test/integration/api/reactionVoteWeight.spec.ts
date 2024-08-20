@@ -122,7 +122,7 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       threadId: thread.id,
     });
-    const expectedWeight = 1 + 50 * 200;
+    const expectedWeight = 50 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
     const t = await server.models.Thread.findByPk(thread.id);
     // @ts-expect-error StrictNullChecks
@@ -142,7 +142,7 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       commentId: comment.id,
     });
-    const expectedWeight = 1 + 50 * 200;
+    const expectedWeight = 50 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
     const c = await server.models.Comment.findByPk(comment.id);
     // @ts-expect-error StrictNullChecks
@@ -152,7 +152,7 @@ describe('Reaction vote weight', () => {
   test('should set thread reaction vote weight to min 1', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
-      [address.address]: '0',
+      [address.address]: '17',
     });
     const thread = await createThread();
     const [reaction] = await threadsController.createThreadReaction({
@@ -161,14 +161,14 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       threadId: thread.id,
     });
-    const expectedWeight = 1;
+    const expectedWeight = 17 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
   });
 
   test('should set comment reaction vote weight to min 1', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
-      [address.address]: '0',
+      [address.address]: '7',
     });
     const thread = await createThread();
     const comment = await createComment(thread.id);
@@ -178,7 +178,7 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       commentId: comment.id,
     });
-    const expectedWeight = 1;
+    const expectedWeight = 7 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
   });
 });

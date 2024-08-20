@@ -1,5 +1,4 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/new_proposal/index.scss';
 import React, { useEffect, useState } from 'react';
@@ -15,7 +14,6 @@ import { CosmosProposalForm } from './cosmos_proposal_form';
 /// DEPRECATION OF OTHER GOVERNANCE FORMS, AND IS CONSIDERED LEGACY.
 
 const NewProposalPage = () => {
-  const forceRerender = useForceRerender();
   const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
   useInitChainIfNeeded(app);
 
@@ -24,14 +22,6 @@ const NewProposalPage = () => {
       setIsLoaded(app.chain.loaded);
     });
   }, []);
-
-  useEffect(() => {
-    app.loginStateEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.loginStateEmitter.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
 
   // wait for chain
   if (app.chain?.failed) {

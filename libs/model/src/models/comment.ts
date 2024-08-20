@@ -1,20 +1,17 @@
-import { EventNames, logger, stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import type {
+  CommentSubscriptionAttributes,
+  ModelInstance,
+  ReactionAttributes,
+  ThreadInstance,
+} from '.';
 import { emitEvent } from '../utils';
-import { CommentSubscriptionAttributes } from './comment_subscriptions';
-import type { CommunityAttributes } from './community';
-import type { ReactionAttributes } from './reaction';
-import type { ThreadAttributes } from './thread';
-import type { ModelInstance } from './types';
-
-const log = logger(import.meta);
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
-  Community?: CommunityAttributes;
-  Thread?: ThreadAttributes;
   reactions?: ReactionAttributes[];
   subscriptions?: CommentSubscriptionAttributes[];
 };
@@ -28,7 +25,6 @@ export default (
     'Comment',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: Sequelize.STRING, allowNull: false },
       thread_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -78,65 +74,53 @@ export default (
     },
     {
       hooks: {
-        afterCreate: async (comment: CommentInstance, options) => {
-          const { Thread, Outbox } = sequelize.models;
-          const thread_id = comment.thread_id;
-          try {
-            const thread = await Thread.findOne({
-              where: { id: thread_id },
-            });
-            if (thread) {
-              await thread.update(
-                {
-                  comment_count: Sequelize.literal('comment_count + 1'),
-                  activity_rank_date: comment.created_at,
-                },
-                { transaction: options.transaction },
-              );
-              stats().increment('cw.hook.comment-count', {
-                thread_id: String(thread_id),
-              });
-            }
-          } catch (error) {
-            log.error(
-              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`,
-            );
-          }
-
+        afterCreate: async (comment, options) => {
+          const [, threads] = await (
+            sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
+          ).update(
+            {
+              comment_count: Sequelize.literal('comment_count + 1'),
+              activity_rank_date: comment.created_at,
+            },
+            {
+              where: { id: comment.thread_id },
+              returning: true,
+              transaction: options.transaction,
+            },
+          );
           await emitEvent(
-            Outbox,
+            sequelize.models.Outbox,
             [
               {
                 event_name: EventNames.CommentCreated,
-                event_payload: comment.get({ plain: true }),
+                event_payload: {
+                  ...comment.toJSON(),
+                  community_id: threads.at(0)!.community_id,
+                },
               },
             ],
             options.transaction,
           );
+          stats().increment('cw.hook.comment-count', {
+            thread_id: String(comment.thread_id),
+          });
         },
-        afterDestroy: async (comment: CommentInstance, options) => {
-          const { Thread } = sequelize.models;
-          const thread_id = comment.thread_id;
-          try {
-            const thread = await Thread.findOne({
+
+        afterDestroy: async ({ thread_id }, options) => {
+          await (
+            sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
+          ).update(
+            {
+              comment_count: Sequelize.literal('comment_count - 1'),
+            },
+            {
               where: { id: thread_id },
-            });
-            if (thread) {
-              await thread.decrement('comment_count', {
-                transaction: options.transaction,
-              });
-              stats().decrement('cw.hook.comment-count', {
-                thread_id: String(thread_id),
-              });
-            }
-          } catch (error) {
-            log.error(
-              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
-            );
-            stats().increment('cw.hook.comment-count-error', {
-              thread_id: String(thread_id),
-            });
-          }
+              transaction: options.transaction,
+            },
+          );
+          stats().decrement('cw.hook.comment-count', {
+            thread_id: String(thread_id),
+          });
         },
       },
       timestamps: true,
@@ -149,8 +133,8 @@ export default (
       indexes: [
         { fields: ['id'] },
         { fields: ['address_id'] },
-        { fields: ['community_id', 'created_at'] },
-        { fields: ['community_id', 'updated_at'] },
+        { fields: ['created_at'] },
+        { fields: ['updated_at'] },
         { fields: ['thread_id'] },
       ],
     },

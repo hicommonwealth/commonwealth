@@ -1,29 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 
+import commonUrl from 'assets/img/branding/common.svg';
+import farcasterUrl from 'assets/img/farcaster.svg';
+import useAppStatus from 'hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
 import app from 'state';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
+import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
 
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
-import useAppStatus from 'hooks/useAppStatus';
-import {
-  BaseMixpanelPayload,
-  MixpanelContestEvents,
-} from 'shared/analytics/types';
 import ContestsList from '../ContestsList';
+import { ContestType, ContestView } from '../types';
 import useCommunityContests from '../useCommunityContests';
-import './AdminContestsPage.scss';
 import FeeManagerBanner from './FeeManagerBanner';
 
-const AdminContestsPage = () => {
-  const navigate = useCommonNavigate();
+import './AdminContestsPage.scss';
 
+const AdminContestsPage = () => {
+  const farcasterContestEnabled = useFlag('farcasterContest');
+  const [contestView, setContestView] = useState<ContestView>(ContestView.List);
+
+  const navigate = useCommonNavigate();
+  const user = useUserStore();
   const { isAddedToHomeScreen } = useAppStatus();
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -55,10 +65,13 @@ const AdminContestsPage = () => {
       event: MixpanelContestEvents.CREATE_CONTEST_BUTTON_PRESSED,
       isPWA: isAddedToHomeScreen,
     });
-    navigate('/manage/contests/launch');
+
+    return farcasterContestEnabled
+      ? setContestView(ContestView.TypeSelection)
+      : navigate('/manage/contests/launch');
   };
 
-  if (!app.isLoggedIn() || !isAdmin) {
+  if (!user.isLoggedIn || !isAdmin) {
     return <PageNotFound />;
   }
 
@@ -71,7 +84,7 @@ const AdminContestsPage = () => {
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {stakeEnabled && (
+          {stakeEnabled && contestView !== ContestView.TypeSelection && (
             <CWButton
               iconLeft="plusPhosphor"
               label="Create contest"
@@ -80,21 +93,55 @@ const AdminContestsPage = () => {
           )}
         </div>
 
-        {showBanner && (
-          <FeeManagerBanner
-            feeManagerBalance={feeManagerBalance}
-            isLoading={isFeeManagerBalanceLoading}
-          />
-        )}
+        {contestView === ContestView.List ? (
+          <>
+            {showBanner && (
+              <FeeManagerBanner
+                feeManagerBalance={feeManagerBalance}
+                isLoading={isFeeManagerBalanceLoading}
+              />
+            )}
 
-        <ContestsList
-          contests={contestsData}
-          isLoading={isContestDataLoading}
-          isAdmin={isAdmin}
-          isContestAvailable={isContestAvailable}
-          stakeEnabled={stakeEnabled}
-          feeManagerBalance={feeManagerBalance}
-        />
+            <ContestsList
+              contests={contestsData}
+              isLoading={isContestDataLoading}
+              isAdmin={isAdmin}
+              isContestAvailable={isContestAvailable}
+              stakeEnabled={stakeEnabled}
+              feeManagerBalance={feeManagerBalance}
+              onSetContestSelectionView={() =>
+                setContestView(ContestView.TypeSelection)
+              }
+            />
+          </>
+        ) : (
+          <div className="type-selection-list">
+            <EmptyCard
+              img={commonUrl}
+              title="Launch on Common"
+              subtitle="lorem ipsum dolor sit amet"
+              button={{
+                label: 'Launch Common contest',
+                handler: () =>
+                  navigate(
+                    `/manage/contests/launch?type=${ContestType.Common}`,
+                  ),
+              }}
+            />
+            <EmptyCard
+              img={farcasterUrl}
+              title="Launch on Farcaster"
+              subtitle="lorem ipsum dolor sit amet"
+              button={{
+                label: 'Launch Farcaster contest',
+                handler: () =>
+                  navigate(
+                    `/manage/contests/launch?type=${ContestType.Farcaster}`,
+                  ),
+              }}
+            />
+          </div>
+        )}
       </div>
     </CWPageLayout>
   );
