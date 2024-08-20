@@ -8,7 +8,6 @@ import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
-import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
@@ -52,9 +51,6 @@ export interface IApp {
   // Discord
   discord: DiscordController;
 
-  // User
-  user: UserController;
-
   // Web3
   snapshot: SnapshotController;
 
@@ -75,9 +71,6 @@ export interface IApp {
 
   setCustomDomain(d: string): void;
 }
-
-// INJECT DEPENDENCIES
-const user = new UserController();
 
 // INITIALIZE MAIN APP
 const app: IApp = {
@@ -104,9 +97,6 @@ const app: IApp = {
 
   // Web3
   snapshot: new SnapshotController(),
-
-  // User
-  user,
 
   // Global nav state
   sidebarRedraw: new EventEmitter(),
