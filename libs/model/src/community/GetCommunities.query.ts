@@ -15,6 +15,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         base,
         network,
         include_node_info,
+        include_last_30_day_thread_count,
         stake_enabled,
         has_groups,
         tag_ids,
@@ -36,8 +37,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
       if (relevance_by === 'membership')
         replacements.user_id = actor?.user?.id || 0;
 
-      // TODO: add last_30_day_thread_count optionally via a param
-      const thirtyDaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
+      const date30DaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
       const communityCTE = `
         WITH "community_CTE" AS (
           SELECT  "Community"."id",
@@ -79,7 +79,11 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."redirect",
                   "Community"."snapshot_spaces",
                   "Community"."include_in_digest_email",
-                  (SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${thirtyDaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count
+                  ${
+                    include_last_30_day_thread_count
+                      ? `(SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${date30DaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count`
+                      : ''
+                  }
           FROM    "Communities" AS "Community"
           WHERE  "Community"."active" = true
                         ${

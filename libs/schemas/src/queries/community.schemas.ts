@@ -35,6 +35,7 @@ export const GetCommunities = {
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
+    include_last_30_day_thread_count: z.boolean().optional(),
     // TODO: add describe
     order_by: z
       .enum([
@@ -43,7 +44,24 @@ export const GetCommunities = {
         'last_30_day_thread_count',
       ])
       .optional(),
-  }),
+  }).refine(
+    (data) => {
+      // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
+      if (
+        !data.include_last_30_day_thread_count &&
+        data.order_by === 'last_30_day_thread_count'
+      ) {
+        return false; // fail validation
+      }
+
+      // pass validation
+      return true;
+    },
+    {
+      message:
+        "'order_by' cannot be 'last_30_day_thread_count' when 'include_last_30_day_thread_count' is not specified",
+    },
+  ),
   output: PaginatedResultSchema.extend({
     results: Community.extend({
       last_30_day_thread_count: PG_INT.optional().nullish(),
