@@ -33,6 +33,7 @@
     "start-rmq": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh rmq",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "test-api": "pnpm -F commonwealth test-api",
+    "validate-external-api-version": "node ./scripts/validate-external-api-versioning.js",
     "merge-coverage": "chmod u+x scripts/mergeCoverageReports.sh && ./scripts/mergeCoverageReports.sh",
     "generate-load-tests": "chmod u+x scripts/generate-load-tests.sh && ./scripts/generate-load-tests.sh"
   },
@@ -118,6 +119,7 @@
     "ignore-styles": "^5.0.1",
     "mock-express-request": "^0.2.2",
     "nyc": "^15.1.0",
+    "openapi-diff": "^0.23.7",
     "playwright-json-summary-reporter": "^1.0.0",
     "playwright-test": "^8.2.0",
     "prettier": "2.7.1",

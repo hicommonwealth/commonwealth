@@ -31,7 +31,7 @@ importers:
         version: link:libs/eslint-plugin
       '@istanbuljs/nyc-config-typescript':
         specifier: ^0.1.3
-        version: 0.1.3(source-map-support@0.5.21)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))
+        version: 0.1.3(source-map-support@0.5.21)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))
       '@knocklabs/node':
         specifier: ^0.6.10
         version: 0.6.11
@@ -169,7 +169,7 @@ importers:
         version: 6.21.0(eslint@8.57.0)(typescript@5.4.5)
       '@vitejs/plugin-react-swc':
         specifier: ^3.7.0
-        version: 3.7.0(vite@5.2.12(@types/node@20.12.10)(sass@1.77.0)(terser@5.31.0))
+        version: 3.7.0(@swc/helpers@0.5.5)(vite@5.2.12(@types/node@20.12.10)(sass@1.77.0)(terser@5.31.0))
       '@vitest/coverage-istanbul':
         specifier: ^1.6.0
         version: 1.6.0(vitest@1.6.0(@types/node@20.12.10)(jsdom@24.0.0)(sass@1.77.0)(terser@5.31.0))
@@ -239,6 +239,9 @@ importers:
       nyc:
         specifier: ^15.1.0
         version: 15.1.0
+      openapi-diff:
+        specifier: ^0.23.7
+        version: 0.23.7(openapi-types@12.1.3)
       playwright-json-summary-reporter:
         specifier: ^1.0.0
         version: 1.0.1
@@ -511,7 +514,7 @@ importers:
     devDependencies:
       '@nomiclabs/hardhat-ethers':
         specifier: ^2.0.2
-        version: 2.2.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))
+        version: 2.2.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))
       '@typechain/ethers-v5':
         specifier: ^6.0.0
         version: 6.0.5(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@4.0.3(typescript@5.4.5))(typescript@5.4.5)
@@ -520,10 +523,10 @@ importers:
         version: 2.13.0
       hardhat:
         specifier: ^2.3.0
-        version: 2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10)
+        version: 2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10)
       hardhat-typechain:
         specifier: ^0.3.5
-        version: 0.3.5(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))(ts-generator@0.1.1)(typechain@4.0.3(typescript@5.4.5))
+        version: 0.3.5(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))(ts-generator@0.1.1)(typechain@4.0.3(typescript@5.4.5))
       ts-generator:
         specifier: ^0.1.1
         version: 0.1.1
@@ -1564,6 +1567,39 @@ packages:
     peerDependencies:
       '@faker-js/faker': ^7.0.0 || ^8.0.0
       zod: ^3.21.4
+
+  '@apidevtools/json-schema-ref-parser@9.0.9':
+    resolution:
+      {
+        integrity: sha512-GBD2Le9w2+lVFoc4vswGI/TjkNIZSVp7+9xPf+X3uidBfWnAeUWmquteSyt0+VCrhNMWj/FTABISQrD3Z/YA+w==,
+      }
+
+  '@apidevtools/json-schema-ref-parser@9.1.2':
+    resolution:
+      {
+        integrity: sha512-r1w81DpR+KyRWd3f+rk6TNqMgedmAxZP5v5KWlXQWlgMUUtyEJch0DKEci1SorPMiSeM8XPl7MZ3miJ60JIpQg==,
+      }
+
+  '@apidevtools/openapi-schemas@2.1.0':
+    resolution:
+      {
+        integrity: sha512-Zc1AlqrJlX3SlpupFGpiLi2EbteyP7fXmUOGup6/DnkRgjP9bgMM/ag+n91rsv0U1Gpz0H3VILA/o3bW7Ua6BQ==,
+      }
+    engines: { node: '>=10' }
+
+  '@apidevtools/swagger-methods@3.0.2':
+    resolution:
+      {
+        integrity: sha512-QAkD5kK2b1WfjDS/UQn/qQkbwF31uqRjPTrsCs5ZG9BQGAkjwvqGFjjPqAuzac/IYzpPtRzjCP1WrTuAIjMrXg==,
+      }
+
+  '@apidevtools/swagger-parser@10.0.3':
+    resolution:
+      {
+        integrity: sha512-sNiLY51vZOmSPFZA5TF35KZ2HbgYklQnTSDnkghamzLb3EkNtcQnrBQEj5AOCxHpTtXpqMCRM1CrmV2rG6nw4g==,
+      }
+    peerDependencies:
+      openapi-types: '>=7'
 
   '@apollo/client@3.10.2':
     resolution:
@@ -3582,6 +3618,12 @@ packages:
     resolution:
       {
         integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==,
+      }
+
+  '@jsdevtools/ono@7.1.3':
+    resolution:
+      {
+        integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==,
       }
 
   '@keplr-wallet/types@0.11.64':
@@ -9040,6 +9082,12 @@ packages:
       }
     engines: { node: '>= 0.4' }
 
+  call-me-maybe@1.0.2:
+    resolution:
+      {
+        integrity: sha512-HpX65o1Hnr9HH25ojC1YGs7HCQLq0GCOibSaWER0eNpgJ/Z1MZv2mTc7+xh6WOPxbRVcmgbv4hGU+uSQ/2xFZQ==,
+      }
+
   callsites@3.1.0:
     resolution:
       {
@@ -9662,6 +9710,13 @@ packages:
       {
         integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==,
       }
+
+  convict@6.2.4:
+    resolution:
+      {
+        integrity: sha512-qN60BAwdMVdofckX7AlohVJ2x9UvjTNoKVXCL2LxFk1l7757EJqf1nySdMkPQer0bt8kQ5lQiyZ9/2NvrFBuwQ==,
+      }
+    engines: { node: '>=6' }
 
   cookie-es@1.1.0:
     resolution:
@@ -13615,6 +13670,28 @@ packages:
         integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==,
       }
 
+  json-schema-diff@0.18.1:
+    resolution:
+      {
+        integrity: sha512-lLP/kbwXN85yKWwBGtraxVrJnK/v31D7UZIkSg68BrO+Qeai+aeW1u9b5H1h9uF/Uzzsa8PeaQPTYRaUcdAgWQ==,
+      }
+    engines: { node: '>=v10.24.1' }
+    hasBin: true
+
+  json-schema-ref-parser@9.0.9:
+    resolution:
+      {
+        integrity: sha512-qcP2lmGy+JUoQJ4DOQeLaZDqH9qSkeGCK3suKWxJXS82dg728Mn3j97azDMaOUmJAN4uCq91LdPx4K7E8F1a7Q==,
+      }
+    engines: { node: '>=10' }
+    deprecated: Please switch to @apidevtools/json-schema-ref-parser
+
+  json-schema-spec-types@0.1.2:
+    resolution:
+      {
+        integrity: sha512-MDl8fA8ONckmQOm2+eXKJaFJNvxk7eGin+XFofNjS3q3PRKSoEvgMVb0ehOpCAYkUiLoMiqdU7obV7AmzAmyLw==,
+      }
+
   json-schema-traverse@0.4.1:
     resolution:
       {
@@ -15206,10 +15283,24 @@ packages:
       }
     hasBin: true
 
+  openapi-diff@0.23.7:
+    resolution:
+      {
+        integrity: sha512-ABXJ7gTYyawmEC4Z3MiLu7CoD2fLSVfid+ttP9yiuDpytC2PDsc26OTNhYUV9y/z2/ama4CKbszkq3LMd80R6Q==,
+      }
+    engines: { node: '>=6.11.4' }
+    hasBin: true
+
   openapi-types@12.1.3:
     resolution:
       {
         integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==,
+      }
+
+  openapi3-ts@2.0.2:
+    resolution:
+      {
+        integrity: sha512-TxhYBMoqx9frXyOgnRHufjQfPXomTIHYKhSKJ6jHfj13kS8OEIhvmE8CTuQyKtjjWttAjX5DPxM1vmalEpo8Qw==,
       }
 
   optimism@0.18.0:
@@ -18243,6 +18334,13 @@ packages:
         integrity: sha512-ovssysQTa+luh7A5Weu3Rta6FJlFBBbInjOh722LIt6klpU2/HtdUbszju/G4devcvk8PGt7FCLv5wftu3THUA==,
       }
 
+  swagger-parser@10.0.3:
+    resolution:
+      {
+        integrity: sha512-nF7oMeL4KypldrQhac8RyHerJeGPD1p2xDh900GPvc+Nk7nWP6jX2FcC7WmkinMoAmoO774+AFXcWsW8gMWEIg==,
+      }
+    engines: { node: '>=10' }
+
   swagger-ui-dist@5.17.6:
     resolution:
       {
@@ -19479,6 +19577,13 @@ packages:
       }
     engines: { '0': node >=0.6.0 }
 
+  verror@1.10.1:
+    resolution:
+      {
+        integrity: sha512-veufcmxri4e3XSrT0xwfUR7kguIkaxBeosDg00yDWhk49wdwkSUrvvsm7nc75e1PUyvIeZj6nS8VQRYz2/S4Xg==,
+      }
+    engines: { node: '>=0.6.0' }
+
   viem@2.19.4:
     resolution:
       {
@@ -20445,6 +20550,34 @@ snapshots:
       '@faker-js/faker': 8.4.1
       randexp: 0.5.3
       zod: 3.23.6
+
+  '@apidevtools/json-schema-ref-parser@9.0.9':
+    dependencies:
+      '@jsdevtools/ono': 7.1.3
+      '@types/json-schema': 7.0.15
+      call-me-maybe: 1.0.2
+      js-yaml: 4.1.0
+
+  '@apidevtools/json-schema-ref-parser@9.1.2':
+    dependencies:
+      '@jsdevtools/ono': 7.1.3
+      '@types/json-schema': 7.0.15
+      call-me-maybe: 1.0.2
+      js-yaml: 4.1.0
+
+  '@apidevtools/openapi-schemas@2.1.0': {}
+
+  '@apidevtools/swagger-methods@3.0.2': {}
+
+  '@apidevtools/swagger-parser@10.0.3(openapi-types@12.1.3)':
+    dependencies:
+      '@apidevtools/json-schema-ref-parser': 9.1.2
+      '@apidevtools/openapi-schemas': 2.1.0
+      '@apidevtools/swagger-methods': 3.0.2
+      '@jsdevtools/ono': 7.1.3
+      call-me-maybe: 1.0.2
+      openapi-types: 12.1.3
+      z-schema: 5.0.5
 
   '@apollo/client@3.10.2(@types/react@18.3.1)(graphql@15.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -22348,10 +22481,10 @@ snapshots:
       js-yaml: 3.14.1
       resolve-from: 5.0.0
 
-  '@istanbuljs/nyc-config-typescript@0.1.3(source-map-support@0.5.21)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))':
+  '@istanbuljs/nyc-config-typescript@0.1.3(source-map-support@0.5.21)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))':
     dependencies:
       source-map-support: 0.5.21
-      ts-node: 10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5)
+      ts-node: 10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5)
 
   '@istanbuljs/schema@0.1.3': {}
 
@@ -22398,6 +22531,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
+
+  '@jsdevtools/ono@7.1.3': {}
 
   '@keplr-wallet/types@0.11.64':
     dependencies:
@@ -23188,10 +23323,10 @@ snapshots:
       '@nomicfoundation/solidity-analyzer-win32-ia32-msvc': 0.1.1
       '@nomicfoundation/solidity-analyzer-win32-x64-msvc': 0.1.1
 
-  '@nomiclabs/hardhat-ethers@2.2.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))':
+  '@nomiclabs/hardhat-ethers@2.2.3(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))':
     dependencies:
       ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      hardhat: 2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10)
+      hardhat: 2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10)
 
   '@nuxtjs/opencollective@0.3.2':
     dependencies:
@@ -24979,7 +25114,7 @@ snapshots:
   '@swc/core-win32-x64-msvc@1.5.25':
     optional: true
 
-  '@swc/core@1.5.25':
+  '@swc/core@1.5.25(@swc/helpers@0.5.5)':
     dependencies:
       '@swc/counter': 0.1.3
       '@swc/types': 0.1.7
@@ -24994,6 +25129,7 @@ snapshots:
       '@swc/core-win32-arm64-msvc': 1.5.25
       '@swc/core-win32-ia32-msvc': 1.5.25
       '@swc/core-win32-x64-msvc': 1.5.25
+      '@swc/helpers': 0.5.5
 
   '@swc/counter@0.1.3': {}
 
@@ -25675,9 +25811,9 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@vitejs/plugin-react-swc@3.7.0(vite@5.2.12(@types/node@20.12.10)(sass@1.77.0)(terser@5.31.0))':
+  '@vitejs/plugin-react-swc@3.7.0(@swc/helpers@0.5.5)(vite@5.2.12(@types/node@20.12.10)(sass@1.77.0)(terser@5.31.0))':
     dependencies:
-      '@swc/core': 1.5.25
+      '@swc/core': 1.5.25(@swc/helpers@0.5.5)
       vite: 5.2.12(@types/node@20.12.10)(sass@1.77.0)(terser@5.31.0)
     transitivePeerDependencies:
       - '@swc/helpers'
@@ -26784,6 +26920,8 @@ snapshots:
       get-intrinsic: 1.2.4
       set-function-length: 1.2.2
 
+  call-me-maybe@1.0.2: {}
+
   callsites@3.1.0: {}
 
   camel-case@4.1.2:
@@ -27165,6 +27303,11 @@ snapshots:
   convert-source-map@1.9.0: {}
 
   convert-source-map@2.0.0: {}
+
+  convict@6.2.4:
+    dependencies:
+      lodash.clonedeep: 4.5.0
+      yargs-parser: 20.2.9
 
   cookie-es@1.1.0: {}
 
@@ -29083,13 +29226,13 @@ snapshots:
 
   hard-rejection@2.1.0: {}
 
-  hardhat-typechain@0.3.5(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))(ts-generator@0.1.1)(typechain@4.0.3(typescript@5.4.5)):
+  hardhat-typechain@0.3.5(hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10))(ts-generator@0.1.1)(typechain@4.0.3(typescript@5.4.5)):
     dependencies:
-      hardhat: 2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10)
+      hardhat: 2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10)
       ts-generator: 0.1.1
       typechain: 4.0.3(typescript@5.4.5)
 
-  hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10):
+  hardhat@2.22.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5))(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@metamask/eth-sig-util': 4.0.1
@@ -29135,7 +29278,7 @@ snapshots:
       uuid: 8.3.2
       ws: 7.5.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
-      ts-node: 10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5)
+      ts-node: 10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5)
       typescript: 5.4.5
     transitivePeerDependencies:
       - bufferutil
@@ -29941,6 +30084,22 @@ snapshots:
   json-parse-better-errors@1.0.2: {}
 
   json-parse-even-better-errors@2.3.1: {}
+
+  json-schema-diff@0.18.1:
+    dependencies:
+      ajv: 8.13.0
+      commander: 10.0.1
+      convict: 6.2.4
+      json-schema-ref-parser: 9.0.9
+      json-schema-spec-types: 0.1.2
+      lodash: 4.17.21
+      verror: 1.10.1
+
+  json-schema-ref-parser@9.0.9:
+    dependencies:
+      '@apidevtools/json-schema-ref-parser': 9.0.9
+
+  json-schema-spec-types@0.1.2: {}
 
   json-schema-traverse@0.4.1: {}
 
@@ -30939,7 +31098,26 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
+  openapi-diff@0.23.7(openapi-types@12.1.3):
+    dependencies:
+      axios: 1.6.8
+      commander: 8.3.0
+      js-yaml: 4.1.0
+      json-schema-diff: 0.18.1
+      jsonpointer: 5.0.1
+      lodash: 4.17.21
+      openapi3-ts: 2.0.2
+      swagger-parser: 10.0.3(openapi-types@12.1.3)
+      verror: 1.10.0
+    transitivePeerDependencies:
+      - debug
+      - openapi-types
+
   openapi-types@12.1.3: {}
+
+  openapi3-ts@2.0.2:
+    dependencies:
+      yaml: 1.10.2
 
   optimism@0.18.0:
     dependencies:
@@ -33018,6 +33196,12 @@ snapshots:
 
   svg-tags@1.0.0: {}
 
+  swagger-parser@10.0.3(openapi-types@12.1.3):
+    dependencies:
+      '@apidevtools/swagger-parser': 10.0.3(openapi-types@12.1.3)
+    transitivePeerDependencies:
+      - openapi-types
+
   swagger-ui-dist@5.17.6: {}
 
   swagger-ui-express@5.0.0(express@4.19.2):
@@ -33293,7 +33477,7 @@ snapshots:
 
   ts-mixer@6.0.4: {}
 
-  ts-node@10.9.2(@swc/core@1.5.25)(@types/node@20.12.10)(typescript@5.4.5):
+  ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.5))(@types/node@20.12.10)(typescript@5.4.5):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
@@ -33311,7 +33495,7 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     optionalDependencies:
-      '@swc/core': 1.5.25
+      '@swc/core': 1.5.25(@swc/helpers@0.5.5)
 
   tsc-alias@1.8.8:
     dependencies:
@@ -33753,6 +33937,12 @@ snapshots:
   vary@1.1.2: {}
 
   verror@1.10.0:
+    dependencies:
+      assert-plus: 1.0.0
+      core-util-is: 1.0.2
+      extsprintf: 1.3.0
+
+  verror@1.10.1:
     dependencies:
       assert-plus: 1.0.0
       core-util-is: 1.0.2
