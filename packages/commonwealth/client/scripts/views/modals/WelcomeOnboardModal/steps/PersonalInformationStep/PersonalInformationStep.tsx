@@ -7,6 +7,7 @@ import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,
 } from 'state/api/profiles';
+import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscription/useUpdateSubscriptionPreferencesMutation';
 import {
   useUpdateUserEmailMutation,
   useUpdateUserEmailSettingsMutation,
@@ -23,7 +24,6 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
@@ -78,7 +78,8 @@ const PersonalInformationStep = ({
     }
   }, []);
 
-  const { toggleAllInAppNotifications } = useNotificationSettings();
+  const updateSubscriptionPreferencesMutation =
+    useUpdateSubscriptionPreferencesMutation();
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
@@ -134,8 +135,14 @@ const PersonalInformationStep = ({
       await updateEmail({ email: values.email });
     }
 
-    // enable/disable all in-app notifications for user
-    await toggleAllInAppNotifications(values.enableAccountNotifications);
+    if (values.enableAccountNotifications) {
+      await updateSubscriptionPreferencesMutation.mutateAsync({
+        id: user.id,
+        email_notifications_enabled: true,
+        recap_email_enabled: true,
+        digest_email_enabled: true,
+      });
+    }
     // enable/disable promotional emails flag for user
     await updateEmailSettings({
       promotionalEmailsEnabled: values.enableProductUpdates,
