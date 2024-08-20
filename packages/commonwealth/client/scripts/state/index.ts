@@ -144,8 +144,6 @@ export async function initAppState(
     const nodesData = await fetchNodesQuery();
 
     app.config.chains.clear();
-    app.user.notifications.clear();
-    app.user.notifications.clearSubscriptions();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
       enforceSessionKeys: statusRes.result.enforceSessionKeys,
@@ -181,10 +179,6 @@ export async function initAppState(
 
     // update the login status
     updateActiveUser(userResponse);
-
-    if (userResponse) {
-      await app.user.notifications.refresh();
-    }
 
     userStore.getState().setData({
       starredCommunities: (userResponse?.starredCommunities || []).map(
