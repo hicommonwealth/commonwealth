@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 
 import { NotificationCategories } from '@hicommonwealth/shared';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
 import app from 'state';
@@ -11,7 +10,6 @@ import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
   CWTab,
   CWTabsRow,
@@ -31,8 +29,6 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     active: Array<SnapshotProposal>;
     ended: Array<SnapshotProposal>;
   }>({ active: [], ended: [] });
-
-  const knockInAppNotifications = useFlag('knockInAppNotifications');
 
   const proposalsToDisplay =
     activeTab === 1 ? proposals.active : proposals.ended;
@@ -114,20 +110,6 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
               />
             ))}
           </CWTabsRow>
-          {!knockInAppNotifications && (
-            <div>
-              <CWButton
-                label={
-                  hasSubscription
-                    ? 'Remove Subscription'
-                    : 'Subscribe to Notifications'
-                }
-                iconLeft={hasSubscription ? 'mute' : 'bell'}
-                onClick={updateSubscription}
-                buttonHeight="sm"
-              />
-            </div>
-          )}
         </div>
         {!isSnapshotProposalsLoading ? (
           proposalsToDisplay.length > 0 ? (
