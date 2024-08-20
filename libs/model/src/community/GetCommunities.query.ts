@@ -78,10 +78,10 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."updated_at",
                   "Community"."redirect",
                   "Community"."snapshot_spaces",
-                  "Community"."include_in_digest_email",
+                  "Community"."include_in_digest_email"
                   ${
                     include_last_30_day_thread_count
-                      ? `(SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${date30DaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count`
+                      ? `,(SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${date30DaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count`
                       : ''
                   }
           FROM    "Communities" AS "Community"
