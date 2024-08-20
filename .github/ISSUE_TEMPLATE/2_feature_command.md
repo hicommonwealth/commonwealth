@@ -1,7 +1,8 @@
 ---
-name: "Platform: Command Handler Feature Request"
-about: Use this template for requesting a command handler feature within a user story.
+name: Command Feature Request
+about: Use this template for requesting a command feature within a user story.
 labels: command, enhancement, needs estimate
+title: 🟦 <Command Name>
 ---
 
 # Description
@@ -21,11 +22,10 @@ labels: command, enhancement, needs estimate
 
 1. **Authorization**
    - Who's authorized to execute this command? Roles, Groups?
-2. **Message Schemas** - Use [zod](http://zod.dev)
-   - Command schema
+2. **Schemas** - Use [zod](http://zod.dev)
+   - Input/Output schemas
 3. **Routing**
    - Define REST path, verb - params, query string
-   - Include validation schemas (params, query)
 4. **Loading Aggregate**
    - Define repository interface used to load (hydrate) model
    - New interface might be required (get by id variants)
@@ -41,7 +41,7 @@ labels: command, enhancement, needs estimate
    - Consider integration tradeoffs - inline, retries, circuit breakers, fire-and-forget, pubsub topics, etc
    - Define Event Schemas - Use [zod](http://zod.dev)
 9. **Response**
-   - Define success, including response schema (zod)
+   - Define success
    - Define errors (HTTP codes)
 
 ## Unit Testing
