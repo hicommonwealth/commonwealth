@@ -1,5 +1,4 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
 import {
   afterAll,
@@ -9,7 +8,6 @@ import {
   describe,
   test,
 } from 'vitest';
-import z from 'zod';
 import { models } from '../../src/database';
 import {
   GetSubscriptionPreferences,
@@ -19,7 +17,6 @@ import { seed } from '../../src/tester';
 
 describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
-  let subPreferences: z.infer<typeof SubscriptionPreference> | undefined;
   beforeAll(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
@@ -36,7 +33,7 @@ describe('Subscription preferences lifecycle', () => {
   });
 
   beforeEach(async () => {
-    [subPreferences] = await seed('SubscriptionPreference', {
+    await seed('SubscriptionPreference', {
       user_id: actor.user.id,
       email_notifications_enabled: false,
       digest_email_enabled: false,
@@ -128,7 +125,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should emit a SubscriptionPreferencesUpdated event if emails are enabled', async () => {
     const payload = {
-      id: actor.user.id!!,
+      id: actor.user.id!,
       email_notifications_enabled: true,
     };
 
@@ -157,7 +154,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should emit a SubscriptionPreferencesUpdated event if recap emails are enabled', async () => {
     const payload = {
-      id: actor.user.id!!,
+      id: actor.user.id!,
       email_notifications_enabled: true,
       recap_email_enabled: true,
     };
@@ -197,7 +194,7 @@ describe('Subscription preferences lifecycle', () => {
     );
 
     const payload = {
-      id: actor.user.id!!,
+      id: actor.user.id!,
       email_notifications_enabled: false,
     };
 
@@ -235,7 +232,7 @@ describe('Subscription preferences lifecycle', () => {
     );
 
     const payload = {
-      id: actor.user.id!!,
+      id: actor.user.id!,
       recap_email_enabled: false,
     };
 
@@ -275,7 +272,7 @@ describe('Subscription preferences lifecycle', () => {
     );
 
     const payload = {
-      id: actor.user.id!!,
+      id: actor.user.id!,
       email_notifications_enabled: true,
       recap_email_enabled: false,
       digest_email_enabled: false,

@@ -7,6 +7,7 @@ import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,
 } from 'state/api/profiles';
+// eslint-disable-next-line max-len
 import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscription/useUpdateSubscriptionPreferencesMutation';
 import {
   useUpdateUserEmailMutation,
