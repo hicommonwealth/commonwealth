@@ -97,10 +97,10 @@ const LayoutComponent = ({
           if (user.isLoggedIn) {
             await updateActiveCommunity({
               communityId: community?.id || '',
-            }).then(() => {
-              user.setData({
-                activeCommunity: communityFromTRPCResponse,
-              });
+            });
+
+            user.setData({
+              activeCommunity: communityFromTRPCResponse,
             });
           }
         }

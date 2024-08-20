@@ -2,7 +2,7 @@ import { GetCommunities } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 
-const COMMUNITIY_STALE_TIME = 60 * 3_000; // 3 mins
+const FETCH_COMMUNITIES_STALE_TIME = 60 * 3_000; // 3 mins
 
 type UseFetchCommunitiesProps = z.infer<typeof GetCommunities.input> & {
   enabled?: boolean;
@@ -39,7 +39,7 @@ const useFetchCommunitiesQuery = ({
         }),
     },
     {
-      staleTime: COMMUNITIY_STALE_TIME,
+      staleTime: FETCH_COMMUNITIES_STALE_TIME,
       enabled,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
