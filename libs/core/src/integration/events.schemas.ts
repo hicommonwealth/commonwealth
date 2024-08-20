@@ -234,4 +234,4 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
 
-export const FarcasterCastCreated = FarcasterWebhookEvent;
+export const FarcasterCastCreated = EventMetadata.merge(FarcasterWebhookEvent);

@@ -10,6 +10,7 @@ const log = logger(import.meta);
 const inputs = {
   ThreadCreated: events.ThreadCreated,
   ThreadUpvoted: events.ThreadUpvoted,
+  FarcasterCastCreated: events.FarcasterCastCreated,
 };
 
 export function ContestWorker(): Policy<typeof inputs> {
@@ -208,6 +209,9 @@ export function ContestWorker(): Policy<typeof inputs> {
             `voteContent failed ${errors.length} times: ${errors.join(', ')}"`,
           );
         }
+      },
+      FarcasterCastCreated: async ({ payload }) => {
+        // map farcaster event to ThreadCreated
       },
     },
   };
