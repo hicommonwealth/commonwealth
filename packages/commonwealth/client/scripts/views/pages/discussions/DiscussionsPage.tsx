@@ -1,6 +1,6 @@
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
@@ -58,7 +58,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
   });
   const contestAddress = searchParams.get('contest');
@@ -126,6 +126,28 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     return t;
   });
+
+  const splitURLPath = useMemo(() => location.pathname.split('/'), []);
+  const decodedString = useMemo(() => {
+    if (splitURLPath[2] === 'discussions') {
+      return decodeURIComponent(splitURLPath[3]);
+    }
+    splitURLPath[1] === 'discussions';
+    return decodeURIComponent(splitURLPath[2]);
+  }, [splitURLPath]);
+
+  //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
+  useEffect(() => {
+    if (!isLoadingTopics && decodedString) {
+      const validTopics = topics?.some(
+        (topic) => topic?.name === decodedString,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics, decodedString, splitURLPath, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
