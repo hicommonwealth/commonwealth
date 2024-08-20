@@ -11,8 +11,12 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sidebar/helpers';
 // import { SubscriptionButton } from 'views/components/subscription_button';
+import { CommunityAlert } from '@hicommonwealth/schemas';
+import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
+import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
@@ -55,6 +59,14 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
+
+  let communityAlerts:
+    | ReadonlyArray<z.infer<typeof CommunityAlert>>
+    | undefined;
+  if (user.isLoggedIn && app.chain) {
+    communityAlerts = useCommunityAlertsQuery()
+      .data as unknown as ReadonlyArray<z.infer<typeof CommunityAlert>>;
+  }
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
@@ -106,11 +118,11 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <ExternalLinksModule />
         <div className="buttons-container">
-          {/*{user.isLoggedIn && app.chain && (*/}
-          {/*  <div className="subscription-button">*/}
-          {/*    <SubscriptionButton />*/}
-          {/*  </div>*/}
-          {/*)}*/}
+          {user.isLoggedIn && app.chain && (
+            <div className="subscription-button">
+              <SubscriptionButton communityAlerts={communityAlerts} />
+            </div>
+          )}
           {app.isCustomDomain() && (
             <div
               className="powered-by"
