@@ -80,7 +80,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
                   iconUrl: community.icon_url || '',
                   name: community.name || '',
                   profileCount: community.profile_count || 0,
-                  threadCount: community.thread_count || 0,
+                  lifetimeThreadCount: community.lifetime_thread_count || 0,
                 }}
                 onJoinClick={() =>
                   handleCommunityJoin({

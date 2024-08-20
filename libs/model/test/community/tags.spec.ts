@@ -16,13 +16,13 @@ describe('Tags', () => {
     await seed('Community', {
       chain_node_id: node!.id!,
       active: true,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 0,
     });
     const [community1Tag1Only] = await seed('Community', {
       chain_node_id: node!.id!,
       active: true,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 0,
     });
     await seed('CommunityTags', {
@@ -32,7 +32,7 @@ describe('Tags', () => {
     const [community2Tag1And2] = await seed('Community', {
       chain_node_id: node!.id!,
       active: true,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 0,
     });
     await seed('CommunityTags', {

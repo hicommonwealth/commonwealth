@@ -41,7 +41,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     [user] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
       chain_node_id: null,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 0,
       Addresses: [
         {

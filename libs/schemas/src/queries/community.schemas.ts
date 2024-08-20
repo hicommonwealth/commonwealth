@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import {
+  Community,
   CommunityMember,
   CommunityStake,
   ExtendedCommunity,
@@ -34,7 +35,7 @@ export const GetCommunities = {
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
-    // TODO: rename thread_count
+    // TODO: add describe
     order_by: z
       .enum([
         'profile_count',
@@ -44,7 +45,9 @@ export const GetCommunities = {
       .optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: z.any().array(), // TODO: fix type
+    results: Community.extend({
+      last_30_day_thread_count: PG_INT.optional().nullish(),
+    }).array(),
   }),
 };
 

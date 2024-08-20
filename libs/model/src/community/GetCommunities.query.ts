@@ -70,7 +70,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."discord_bot_webhooks_enabled",
                   "Community"."directory_page_enabled",
                   "Community"."directory_page_chain_node_id",
-                  "Community"."thread_count" as "lifetime_thread_count",
+                  "Community"."lifetime_thread_count",
                   "Community"."profile_count",
                   "Community"."namespace",
                   "Community"."namespace_address",
@@ -263,17 +263,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             END DESC,`
               : ''
           }
-          ${
-            // TODO: move into a func
-            (() => {
-              if (order_col == 'lifetime_thread_count')
-                return `"community_CTE"."thread_count" ${direction}`;
-              if (order_col == 'profile_count')
-                return `"community_CTE"."profile_count" ${direction}`;
-              if (order_col == 'last_30_day_thread_count')
-                return `"community_CTE"."last_30_day_thread_count" ${direction}`;
-            })()
-          }
+          "community_CTE"."${order_col}" ${direction}
           LIMIT ${limit} 
           OFFSET ${offset};
           `;

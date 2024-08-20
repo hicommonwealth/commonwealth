@@ -249,7 +249,7 @@ const CommunitiesPage = () => {
                     <CWRelatedCommunityCard
                       community={community}
                       memberCount={community.profile_count || 0}
-                      threadCount={community.thread_count || 0}
+                      threadCount={community.lifetime_thread_count || 0}
                       canBuyStake={canBuyStake}
                       onStakeBtnClick={() =>
                         setSelectedCommunityId(community?.id || '')
