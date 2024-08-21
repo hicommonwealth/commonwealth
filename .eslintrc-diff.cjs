@@ -19,7 +19,6 @@ const ENABLE_ESLINT_DIFF_PLUGIN =
 
 module.exports = {
   settings: {
-    suppressDeprecatedPropertyWarnings: true,
     react: {
       version: 'detect',
     },
@@ -28,7 +27,6 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: `./tsconfig.json`,
-    suppressDeprecatedPropertyWarnings: true,
   },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
