@@ -186,12 +186,8 @@ describe('CommentCreated Event Handler', () => {
         comment_parent_name: 'thread',
         community_name: community?.name,
         comment_body: rootComment?.text.substring(0, 255),
-        comment_url: getCommentUrl(
-          community!.id!,
-          thread!.id!,
-          rootComment!.id!,
-          customDomain,
-        ),
+        comment_url: `https://${customDomain}/${community!
+          .id!}/discussion/${thread!.id!}?comment=${rootComment!.id!}`,
         comment_created_event: { ...rootComment, community_id: community!.id },
       },
       // @ts-expect-error StrictNullChecks
