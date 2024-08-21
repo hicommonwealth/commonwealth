@@ -25,8 +25,10 @@ module.exports = {
   },
   plugins: ['@tanstack/query'],
   parser: '@typescript-eslint/parser',
+  suppressDeprecatedPropertyWarnings: true,
   parserOptions: {
     project: `./tsconfig.json`,
+    suppressDeprecatedPropertyWarnings: true,
   },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
