@@ -49,12 +49,14 @@ export const processCommentCreated: EventHandler<
   }
 
   let users: { user_id: number }[] = [];
+  const excludeUsers: number[] = [author.user_id];
+  if (payload.users_mentioned) excludeUsers.push(...payload.users_mentioned);
 
   if (payload.parent_id) {
     users = (await models.CommentSubscription.findAll({
       where: {
         comment_id: Number(payload.parent_id),
-        user_id: { [Op.not]: author.user_id },
+        user_id: { [Op.notIn]: excludeUsers },
       },
       attributes: ['user_id'],
       raw: true,
@@ -63,7 +65,7 @@ export const processCommentCreated: EventHandler<
     users = (await models.ThreadSubscription.findAll({
       where: {
         thread_id: payload.thread_id,
-        user_id: { [Op.not]: author.user_id },
+        user_id: { [Op.notIn]: excludeUsers },
       },
       attributes: ['user_id'],
       raw: true,
