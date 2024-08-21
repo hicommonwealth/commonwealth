@@ -116,7 +116,10 @@ const CommunityProfileForm = () => {
       preferenceTags?.length > 0 && updatePreferenceTags();
     },
     shouldRun:
-      !isCommunityLoading && !!community && preferenceTags && !isLoadingTags,
+      !isCommunityLoading &&
+      !!community &&
+      preferenceTags?.length > 0 &&
+      !isLoadingTags,
   });
 
   const communityIdForUrl = slugifyPreserveDashes(
