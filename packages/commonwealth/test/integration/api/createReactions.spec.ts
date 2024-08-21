@@ -58,7 +58,7 @@ describe('createReaction Integration Tests', () => {
     userAddress = res.address;
     userDid = res.did;
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
-      () => ({ [userAddress.split(':')[2]]: 300 }),
+      () => ({ [userAddress]: 300 }),
     );
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },
