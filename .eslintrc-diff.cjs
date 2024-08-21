@@ -19,6 +19,7 @@ const ENABLE_ESLINT_DIFF_PLUGIN =
 
 module.exports = {
   settings: {
+    suppressDeprecatedPropertyWarnings: true,
     react: {
       version: 'detect',
     },
