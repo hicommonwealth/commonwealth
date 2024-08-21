@@ -27,7 +27,7 @@ const useToggleCommunityStarMutation = () => {
 
   return useMutation({
     mutationFn: toggleCommunityStar,
-    onSuccess: async ({ community }) => {
+    onSuccess: ({ community }) => {
       // Update existing object state
       user.setData({
         communities: user.communities.map((c) => ({
