@@ -67,7 +67,6 @@ export const NewSnapshotProposalModal = ({
           </>
         ) : (
           <NewSnapshotProposalForm
-            // @ts-expect-error <StrictNullChecks/>
             snapshotId={selectedSnapshotId}
             thread={thread}
             onSave={onSave}

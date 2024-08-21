@@ -53,7 +53,6 @@ export const SelectList = <
       isOptionDisabled={(option) => (option as any)?.disabled}
       components={{
         Option: (optionProps) => (
-          // @ts-expect-error <StrictNullChecks/>
           <CustomOption
             {...optionProps}
             children={optionProps.children}

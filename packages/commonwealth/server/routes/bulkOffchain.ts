@@ -42,7 +42,6 @@ const bulkOffchain = async (
       // admins
       models.Address.findAll({
         where: {
-          // @ts-expect-error StrictNullChecks
           community_id: community.id,
           [Op.or]: [{ role: 'admin' }, { role: 'moderator' }],
         },
@@ -50,21 +49,18 @@ const bulkOffchain = async (
       }),
       models.Thread.count({
         where: {
-          // @ts-expect-error StrictNullChecks
           community_id: community.id,
           stage: 'voting',
         },
       }),
       models.Thread.count({
         where: {
-          // @ts-expect-error StrictNullChecks
           community_id: community.id,
           marked_as_spam_at: null,
         },
       }),
       models.CommunityBanner.findOne({
         where: {
-          // @ts-expect-error StrictNullChecks
           community_id: community.id,
         },
       }),

@@ -12,12 +12,10 @@ export const CustomQuillFooter = ({
   const imgFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImgUploadClick = () => {
-    // @ts-expect-error <StrictNullChecks/>
     imgFileInputRef.current.click();
   };
 
   const handleImgUpload = () => {
-    // @ts-expect-error <StrictNullChecks/>
     handleImageUploader(imgFileInputRef.current.files[0]);
   };
 

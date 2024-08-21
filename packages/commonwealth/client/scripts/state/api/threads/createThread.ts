@@ -58,7 +58,7 @@ const createThread = async ({
       address,
       author: JSON.stringify(authorProfile),
       title: encodeURIComponent(title),
-      // @ts-expect-error StrictNullChecks
+
       body: encodeURIComponent(body),
       kind,
       stage,
@@ -92,7 +92,6 @@ const useCreateThreadMutation = ({
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
-      // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
 
       // Update community level thread counters variables

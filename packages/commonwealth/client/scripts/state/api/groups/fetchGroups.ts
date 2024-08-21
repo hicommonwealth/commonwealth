@@ -21,7 +21,7 @@ const fetchGroups = async ({
   // ideal solution would be to make the `enabled` prop of `useQuery`
   // work, but for some reason, it messes up on the /members page.
   // This early return however doesn't seem to messup cache on current page.
-  // @ts-expect-error StrictNullChecks
+
   if (!communityId) return;
 
   const response = await axios.get(

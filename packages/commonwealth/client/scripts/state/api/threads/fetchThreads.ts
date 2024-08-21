@@ -73,9 +73,8 @@ const useDateCursor = ({
   useEffect(() => {
     const updater = () => {
       const { toDate, fromDate } =
-        // @ts-expect-error StrictNullChecks
         getToAndFromDatesRangesForThreadsTimelines(dateRange);
-      // @ts-expect-error StrictNullChecks
+
       setDateCursor({ toDate, fromDate });
     };
 

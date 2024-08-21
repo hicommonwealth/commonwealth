@@ -52,7 +52,7 @@ const FundContestDrawer = ({
   } = useFundContestForm({
     contestAddress,
     chainRpc,
-    // @ts-expect-error <StrictNullChecks/>
+
     ethChainId,
     userAddress: selectedAddress.value,
   });
@@ -68,7 +68,7 @@ const FundContestDrawer = ({
 
     fundContest({
       contestAddress,
-      // @ts-expect-error <StrictNullChecks/>
+
       ethChainId,
       chainRpc,
       amount: Number(amountEth),
@@ -99,13 +99,11 @@ const FundContestDrawer = ({
             onClose={handleClose}
             handleTransferFunds={handleTransferFunds}
             amountEth={amountEth}
-            // @ts-expect-error <StrictNullChecks/>
             amountError={amountError}
             handleChangeEthAmount={handleChangeEthAmount}
             selectedAddress={selectedAddress}
             onSetSelectedAddress={setSelectedAddress}
             addressOptions={addressOptions}
-            // @ts-expect-error <StrictNullChecks/>
             userEthBalance={userEthBalance}
             contestEthBalance={contestEthBalance}
             amountEthInUsd={amountEthInUsd}

@@ -188,7 +188,6 @@ export async function __updateCommunity(
       : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
 
     if (directory_page_enabled) {
-      // @ts-expect-error StrictNullChecks
       communitySelected = await this.models.Community.findOne({
         where: { chain_node_id: directory_page_chain_node_id! },
       });
@@ -245,12 +244,11 @@ export async function __updateCommunity(
   };
 
   const analyticsOptions = {
-    // @ts-expect-error StrictNullChecks
     event: mixpanelEvent,
     community: community.id,
     userId: user.id,
     isCustomDomain: null,
-    // @ts-expect-error StrictNullChecks
+
     ...(communitySelected && { communitySelected: communitySelected.id }),
   };
 

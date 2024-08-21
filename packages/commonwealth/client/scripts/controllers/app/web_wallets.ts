@@ -81,7 +81,6 @@ export default class WebWalletController {
       throw new Error('account on wrong chain base');
     }
     if (account.walletId) {
-      // @ts-expect-error StrictNullChecks
       return this.getByName(account.walletId);
     }
     const availableWallets = this.availableWallets(chain);

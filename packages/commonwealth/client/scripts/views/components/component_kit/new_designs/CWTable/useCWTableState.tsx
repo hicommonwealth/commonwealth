@@ -49,7 +49,7 @@ export function useCWTableState({
 
   return {
     columns,
-    // @ts-expect-error <StrictNullChecks/>
+
     orderBy,
     orderDirection,
     sorting,

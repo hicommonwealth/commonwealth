@@ -72,7 +72,7 @@ export async function __getGroups(
       ...group,
       topics: topics
         .map((t) => t.toJSON())
-        // @ts-expect-error StrictNullChecks
+
         .filter((t) => t.group_ids.includes(group.id)),
     }));
   }

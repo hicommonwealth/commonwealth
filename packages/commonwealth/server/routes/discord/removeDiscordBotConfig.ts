@@ -33,7 +33,6 @@ const removeDiscordBotConfig = async (
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
           id: req.community.id,
         },
         transaction,
@@ -46,11 +45,9 @@ const removeDiscordBotConfig = async (
       transaction,
     });
     await models.Topic.update(
-      // @ts-expect-error StrictNullChecks
       { channel_id: null },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
           community_id: req.community.id,
         },
         transaction,

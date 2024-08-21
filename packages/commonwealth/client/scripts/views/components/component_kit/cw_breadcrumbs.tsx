@@ -53,7 +53,6 @@ export const CWBreadcrumbs = ({
               <CWText
                 type="caption"
                 className={isCurrent ? 'current-text' : 'parent-text'}
-                // @ts-expect-error <StrictNullChecks/>
                 onClick={isCurrent ? undefined : () => navigate(path)}
               >
                 {truncateText(label)}

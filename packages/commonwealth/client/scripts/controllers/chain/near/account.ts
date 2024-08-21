@@ -43,7 +43,6 @@ export class NearAccounts implements IAccountsModule<NearAccount> {
   }
 
   public get(address: string): NearAccount {
-    // @ts-expect-error StrictNullChecks
     if (!this._Chain) return null; // We can't construct accounts if the NEAR chain isn't loaded
     return this.fromAddress(address);
   }

@@ -24,18 +24,18 @@ export const TopicSelector = ({
   onChange,
 }: TopicSelectorProps) => {
   const enabledOptions = enabledTopics
-    // @ts-expect-error <StrictNullChecks/>
+
     .sort((a, b) => a.order - b.order)
     .map((t) => topicToOption(t, false));
   const disabledOptions = disabledTopics
-    // @ts-expect-error <StrictNullChecks/>
+
     .sort((a, b) => a.order - b.order)
     .map((t) => topicToOption(t, true));
   const allOptions = enabledOptions.concat(disabledOptions);
 
   const handleOnChange = ({ value: newValue }) => {
     const selectedTopic = enabledTopics.find(({ id }) => id === newValue);
-    // @ts-expect-error <StrictNullChecks/>
+
     onChange(selectedTopic);
   };
 

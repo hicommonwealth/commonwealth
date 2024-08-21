@@ -58,7 +58,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateAccount> {
       decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
       console.error(`Decoded invalid address: ${address}`);
-      // @ts-expect-error StrictNullChecks
+
       return;
     }
     try {

@@ -30,7 +30,6 @@ export function rateLimiterMiddleware({
         await cache().setKeyTTL(CacheNamespaces.Rate_Limiter, cacheKey, 60);
       }
 
-      // @ts-expect-error StrictNullChecks
       if (requestCount > requestsPerMinute) {
         const ttl = await cache().getKeyTTL(
           CacheNamespaces.Rate_Limiter,

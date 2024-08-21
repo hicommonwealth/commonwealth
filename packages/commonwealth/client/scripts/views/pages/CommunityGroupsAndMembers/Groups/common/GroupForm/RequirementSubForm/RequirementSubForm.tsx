@@ -79,16 +79,13 @@ const RequirementSubForm = ({
               value: requirement.value,
             }))}
           onChange={(newValue) => {
-            // @ts-expect-error <StrictNullChecks/>
             setRequirementType(newValue.value);
 
             onChange({
-              // @ts-expect-error <StrictNullChecks/>
               requirementType: newValue.value,
             });
           }}
           className="w-350"
-          // @ts-expect-error <StrictNullChecks/>
           customError={errors.requirementType}
         />
         {isRemoveable && (
@@ -140,11 +137,9 @@ const RequirementSubForm = ({
               }))}
             onChange={(newValue) => {
               onChange({
-                // @ts-expect-error <StrictNullChecks/>
                 requirementChain: newValue.value,
               });
             }}
-            // @ts-expect-error <StrictNullChecks/>
             customError={errors.requirementChain}
           />
           {!isTokenRequirement && (
@@ -164,7 +159,6 @@ const RequirementSubForm = ({
                   requirementContractAddress: (e.target as any).value,
                 });
               }}
-              // @ts-expect-error <StrictNullChecks/>
               customError={errors.requirementContractAddress}
             />
           )}
@@ -182,11 +176,9 @@ const RequirementSubForm = ({
             }))}
             onChange={(newValue) => {
               onChange({
-                // @ts-expect-error <StrictNullChecks/>
                 requirementCondition: newValue.value,
               });
             }}
-            // @ts-expect-error <StrictNullChecks/>
             customError={errors.requirementCondition}
             // ---
             // ATM the API only supports the "More" option, we make this field disabled with "More" as the
@@ -209,7 +201,6 @@ const RequirementSubForm = ({
                 requirementAmount: (e.target as any).value,
               });
             }}
-            // @ts-expect-error <StrictNullChecks/>
             customError={errors.requirementAmount}
             fullWidth
           />
@@ -227,7 +218,6 @@ const RequirementSubForm = ({
                   requirementTokenId: (e.target as any).value,
                 });
               }}
-              // @ts-expect-error <StrictNullChecks/>
               customError={errors.requirementTokenId}
               fullWidth
             />

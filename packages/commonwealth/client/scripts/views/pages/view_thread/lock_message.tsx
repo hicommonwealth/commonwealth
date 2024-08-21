@@ -32,7 +32,6 @@ export const LockMessage = ({
   updatedAt,
   fromDiscordBot,
 }: LockMessageProps) => {
-  // @ts-expect-error <StrictNullChecks>
   const message = buildLockMessage(fromDiscordBot, lockedAt, updatedAt);
   return (
     <div className="callout-text">

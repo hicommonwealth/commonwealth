@@ -28,7 +28,6 @@ const App = () => {
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
-            {/*@ts-expect-error StrictNullChecks*/}
             <OpenFeatureProvider client={undefined}>
               {isLoading ? (
                 <Splash />

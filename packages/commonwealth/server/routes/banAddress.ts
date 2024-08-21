@@ -25,9 +25,9 @@ const banAddress = async (
 
   const isAdmin = await validateOwner({
     models: models,
-    // @ts-expect-error StrictNullChecks
+
     user: req.user,
-    // @ts-expect-error StrictNullChecks
+
     communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
@@ -43,12 +43,10 @@ const banAddress = async (
   // find or create Ban
   const [ban, created] = await models.Ban.findOrCreate({
     where: {
-      // @ts-expect-error StrictNullChecks
       community_id: community.id,
       address,
     },
     defaults: {
-      // @ts-expect-error StrictNullChecks
       community_id: community.id,
       address,
     },

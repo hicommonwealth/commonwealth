@@ -222,7 +222,6 @@ const Webhooks = () => {
           <WebhookSettingsModal
             onModalClose={() => setWebhookToConfigure(null)}
             updateWebhook={handleUpdateWebhook}
-            // @ts-expect-error <StrictNullChecks/>
             webhook={webhookToConfigure}
           />
         }

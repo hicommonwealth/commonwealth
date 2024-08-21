@@ -30,7 +30,6 @@ const ThreadContestTag = ({
         label={moment.localeData().ordinal(prize)}
         type="contest"
         classNames={`prize-${prize}`}
-        // @ts-expect-error <StrictNullChecks/>
         onMouseEnter={popoverProps.handleInteraction}
         onMouseLeave={popoverProps.handleInteraction}
       />

@@ -26,7 +26,7 @@ type ProposalExtensionsProps = {
 export const ProposalExtensions = (props: ProposalExtensionsProps) => {
   const { setCosmosDepositAmount, setDemocracyVoteAmount, proposal } = props;
   const { data: stakingDenom } = useStakingParamsQuery();
-  // @ts-expect-error <StrictNullChecks/>
+
   const { data: cosmosDepositParams } = useDepositParamsQuery(stakingDenom);
 
   useEffect(() => {
@@ -45,7 +45,6 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
     const cosmos = app.chain as Cosmos;
     const meta = cosmos.meta;
     const minDeposit = parseFloat(
-      // @ts-expect-error <StrictNullChecks/>
       minimalToNaturalDenom(+cosmosDepositParams?.minDeposit, meta?.decimals),
     );
 

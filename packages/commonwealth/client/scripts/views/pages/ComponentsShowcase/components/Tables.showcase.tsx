@@ -23,7 +23,6 @@ const iconNames = ['cloud', 'mail', 'sun', 'cow'];
 const range = (len: number) => {
   const arr = [];
   for (let i = 0; i < len; i++) {
-    // @ts-expect-error <StrictNullChecks/>
     arr.push(i);
   }
   return arr;

@@ -42,7 +42,6 @@ export async function __getStats(
   // community is optional
   let community: CommunityAttributes | undefined = undefined;
   if (communityId) {
-    // @ts-expect-error StrictNullChecks
     community = await this.models.Community.findByPk(communityId);
     if (!community) {
       throw new AppError(Errors.CommunityNotFound);

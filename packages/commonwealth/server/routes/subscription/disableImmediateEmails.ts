@@ -30,7 +30,6 @@ export default async (
     where: { id: idOptions },
   });
 
-  // @ts-expect-error StrictNullChecks
   if (subscriptions.find((s) => s.subscriber_id !== req.user.id)) {
     return next(new AppError(Errors.NotUsersSubscription));
   }

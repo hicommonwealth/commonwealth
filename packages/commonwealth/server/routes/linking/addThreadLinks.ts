@@ -52,18 +52,17 @@ const addThreadLink = async (
 
   const isAuth = await isAuthorOrAdmin(
     models,
-    // @ts-expect-error StrictNullChecks
+
     await req.user.getAddresses(),
     thread.address_id,
     thread.community_id,
   );
-  // @ts-expect-error StrictNullChecks
+
   if (!isAuth && !req.user.isAdmin)
     return next(new AppError(Errors.NotAdminOrOwner));
 
   if (thread.links) {
     const filteredLinks = links.filter((link) => {
-      // @ts-expect-error StrictNullChecks
       return !thread.links.some(
         (newLinks) =>
           newLinks.source === link.source &&
@@ -104,7 +103,7 @@ const addThreadLink = async (
   serverAnalyticsController.track(
     {
       event: event,
-      // @ts-expect-error StrictNullChecks
+
       userId: req.user.id,
       community: thread.community_id,
       proposalType: source,
@@ -112,7 +111,6 @@ const addThreadLink = async (
     req,
   );
 
-  // @ts-expect-error StrictNullChecks
   return success(res, finalThread.toJSON());
 };
 

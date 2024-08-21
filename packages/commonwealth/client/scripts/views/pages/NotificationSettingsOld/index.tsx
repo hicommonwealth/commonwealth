@@ -491,7 +491,6 @@ const NotificationSettingsPage = () => {
           </div>
         </div>
         {snapshotsInfo &&
-          // @ts-expect-error <StrictNullChecks/>
           snapshotsInfo.map((snapshot: SnapshotInfo) => {
             //destructuring snapshotInfo for readability
             const { snapshotId, space, subs } = snapshot;

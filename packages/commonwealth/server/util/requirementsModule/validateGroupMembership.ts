@@ -65,7 +65,7 @@ export default function validateGroupMembership(
       numRequirementsMet++;
     } else {
       response.isValid = false;
-      // @ts-expect-error StrictNullChecks
+
       response.messages.push({
         requirement,
         message: checkResult.message,
@@ -122,7 +122,7 @@ function _thresholdCheck(
         balanceSourceType = BalanceSourceType.ERC1155;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.evm_chain_id.toString();
-        // @ts-expect-error StrictNullChecks
+
         tokenId = thresholdData.source.token_id.toString();
         break;
       }

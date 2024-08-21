@@ -44,7 +44,6 @@ export const MessageRow: FC<MessageRowProps> = ({
         <CWText
           type="caption"
           className={getClasses<{ status: ValidationStatus }>(
-            // @ts-expect-error <StrictNullChecks/>
             { status: validationStatus },
             'feedback-message-text',
           )}

@@ -16,7 +16,6 @@ export default class CosmosAccount extends Account {
   //   We should either deprecate this query and replace it with TokenBalanceCache, or create a
   //   workaround specific for Terra.
   public get balance() {
-    // @ts-expect-error StrictNullChecks
     return this.updateBalance().then(() => this._balance);
   }
 

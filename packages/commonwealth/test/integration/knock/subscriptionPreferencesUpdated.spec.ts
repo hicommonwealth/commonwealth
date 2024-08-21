@@ -42,7 +42,6 @@ describe('subscriptionPreferencesUpdated', () => {
 
   beforeEach(async () => {
     [subPreferences] = await tester.seed('SubscriptionPreference', {
-      // @ts-expect-error StrictNullChecks
       user_id: user.id,
       email_notifications_enabled: false,
       digest_email_enabled: false,
@@ -87,9 +86,8 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
         id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
+
         user_id: user.id!,
         email_notifications_enabled: false,
         recap_email_enabled: true,
@@ -102,7 +100,6 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
       user_id: String(user.id!),
     });
     expect((provider.deleteSchedules as sinon.SinonStub).calledOnce).to.be.true;
@@ -120,7 +117,6 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
           id: subPreferences.id!,
         },
       },
@@ -137,9 +133,8 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
         id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
+
         user_id: user.id!,
         recap_email_enabled: true,
       },
@@ -151,7 +146,6 @@ describe('subscriptionPreferencesUpdated', () => {
     // console.log((provider.createSchedules as sinon.SinonStub).getCall(0).args[0]);
     expect(
       (provider.createSchedules as sinon.SinonStub).getCall(0).args[0].user_ids,
-      // @ts-expect-error StrictNullChecks
     ).to.deep.equal([String(user.id!)]);
     expect(
       (provider.createSchedules as sinon.SinonStub).getCall(0).args[0]
@@ -182,7 +176,6 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
           id: subPreferences.id!,
         },
       },
@@ -203,9 +196,8 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
         id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
+
         user_id: user.id!,
         recap_email_enabled: true,
       },
@@ -217,7 +209,6 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
       user_id: String(user.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
@@ -230,7 +221,6 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
           id: subPreferences.id!,
         },
       },
@@ -254,9 +244,8 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
         id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
+
         user_id: user.id!,
         recap_email_enabled: false,
       },
@@ -268,7 +257,6 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
       user_id: String(user.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
@@ -286,7 +274,6 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
           id: subPreferences.id!,
         },
       },
@@ -306,9 +293,8 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
         id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
+
         user_id: user.id!,
         recap_email_enabled: false,
       },
@@ -320,7 +306,6 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
       user_id: String(user.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });

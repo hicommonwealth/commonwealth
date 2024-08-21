@@ -109,7 +109,6 @@ const SearchPage = () => {
   };
 
   const [orderBy, orderDirection] =
-    // @ts-expect-error <StrictNullChecks/>
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
@@ -333,9 +332,8 @@ const SearchPage = () => {
                             label=""
                             onSelect={handleSortChange}
                             initialValue={{
-                              // @ts-expect-error <StrictNullChecks/>
                               label: queryParams.sort,
-                              // @ts-expect-error <StrictNullChecks/>
+
                               value: queryParams.sort,
                             }}
                             options={Object.keys(SearchSort).map((k) => ({
@@ -348,7 +346,7 @@ const SearchPage = () => {
                     <div className="search-results-list">
                       {renderSearchResults(
                         results,
-                        // @ts-expect-error <StrictNullChecks/>
+
                         queryParams.q,
                         activeTab,
                         commonNavigate,

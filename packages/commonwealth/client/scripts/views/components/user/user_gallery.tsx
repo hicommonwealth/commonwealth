@@ -37,7 +37,6 @@ export const UserGallery = ({
           return (
             <User
               userAddress={user.address}
-              // @ts-expect-error <StrictNullChecks/>
               userCommunityId={user.community?.id || user.profile?.chain}
               shouldShowAvatarOnly
               shouldShowAsDeleted

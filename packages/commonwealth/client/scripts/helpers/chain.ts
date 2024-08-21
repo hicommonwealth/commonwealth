@@ -16,7 +16,7 @@ export const deinitChainOrCommunity = async () => {
     app.chain.deinitServer();
     await app.chain.deinit();
     console.log('Finished deinitializing chain');
-    // @ts-expect-error StrictNullChecks
+
     app.chain = null;
   }
 
@@ -58,7 +58,6 @@ export const loadCommunityChainInfo = async (
 
   // Check for valid chain selection, and that we need to switch
   if (app.chain && tempChain === app.chain.meta) {
-    // @ts-expect-error StrictNullChecks
     return;
   }
 
@@ -111,7 +110,7 @@ export const loadCommunityChainInfo = async (
   if (!finalizeInitialization) {
     console.log('Chain loading aborted');
     app.chainPreloading = false;
-    // @ts-expect-error StrictNullChecks
+
     app.chain = null;
     return false;
   } else {

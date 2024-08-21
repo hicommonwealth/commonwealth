@@ -86,7 +86,7 @@ export const DiscussionSection = ({
   const topics = (topicsData || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
-    // @ts-expect-error <StrictNullChecks/>
+
     .sort((a, b) => a.order - b.order);
 
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())

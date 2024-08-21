@@ -18,14 +18,13 @@ const createWebhook = async (
   const adminRoles = await findAllRoles(
     models,
     {
-      // @ts-expect-error StrictNullChecks
       where: {
         address_id: addresses
           .filter((addr) => !!addr.verified)
           .map((addr) => addr.id),
       },
     },
-    // @ts-expect-error StrictNullChecks
+
     community.id,
     ['admin'],
   );
@@ -35,7 +34,6 @@ const createWebhook = async (
   if (!req.body.webhookUrl) return next(new AppError(Errors.MissingWebhook));
   const existingWebhook = await models.Webhook.findOne({
     where: {
-      // @ts-expect-error StrictNullChecks
       community_id: community.id,
       url: req.body.webhookUrl,
     },
@@ -43,7 +41,6 @@ const createWebhook = async (
   if (existingWebhook) return next(new AppError(Errors.NoDuplicates));
   // create webhook
   const webhook = await models.Webhook.create({
-    // @ts-expect-error StrictNullChecks
     community_id: community.id,
     url: req.body.webhookUrl,
   });

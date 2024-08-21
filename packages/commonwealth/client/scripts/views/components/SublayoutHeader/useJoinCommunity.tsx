@@ -65,9 +65,7 @@ const useJoinCommunity = () => {
   const uniqueAddresses = [];
   const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
     (addressInfo) => {
-      // @ts-expect-error <StrictNullChecks/>
       if (!uniqueAddresses.includes(addressInfo.address)) {
-        // @ts-expect-error <StrictNullChecks/>
         uniqueAddresses.push(addressInfo.address);
         return true;
       }

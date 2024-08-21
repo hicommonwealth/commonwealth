@@ -15,7 +15,6 @@ import {
 } from './threads/get_threads_handler';
 
 function toDate(t: ThreadAttributes): Date {
-  // @ts-expect-error StrictNullChecks
   return t.last_edited ?? t.created_at;
 }
 
@@ -87,27 +86,27 @@ export const getFeedHandler = async (
 
     const bulkThreads = await controllers.threads.getBulkThreads({
       communityId: community_id,
-      // @ts-expect-error StrictNullChecks
+
       stage,
-      // @ts-expect-error StrictNullChecks
+
       topicId: topic_id,
-      // @ts-expect-error StrictNullChecks
+
       includePinnedThreads,
-      // @ts-expect-error StrictNullChecks
+
       page,
-      // @ts-expect-error StrictNullChecks
+
       limit,
-      // @ts-expect-error StrictNullChecks
+
       orderBy,
-      // @ts-expect-error StrictNullChecks
+
       fromDate: from_date,
-      // @ts-expect-error StrictNullChecks
+
       toDate: to_date,
-      // @ts-expect-error StrictNullChecks
+
       archived: archived,
-      // @ts-expect-error StrictNullChecks
+
       contestAddress,
-      // @ts-expect-error StrictNullChecks
+
       status,
     });
 
@@ -120,13 +119,12 @@ export const getFeedHandler = async (
     // const self = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
     const feed = new Feed({
-      // @ts-expect-error StrictNullChecks
       title: community.name,
-      // @ts-expect-error StrictNullChecks
+
       description: community.description,
       id: `https://common.xyz/${community_id}/discussions`,
       link: `https://common.xyz/${community_id}/discussions`,
-      // @ts-expect-error StrictNullChecks
+
       image: community.icon_url,
       copyright: 'All rights Reserved 2024, common.xyz',
       updated,
@@ -141,17 +139,16 @@ export const getFeedHandler = async (
       const slug = slugify(title);
       feed.addItem({
         title: title,
-        // @ts-expect-error StrictNullChecks
+
         id: thread.url,
         link: `https://common.xyz/${community_id}/discussions/${thread.id}-${slug}`,
         date: toDate(thread),
-        // @ts-expect-error StrictNullChecks
+
         content: thread.body,
-        // @ts-expect-error StrictNullChecks
+
         description: thread.plaintext,
         author: [
           {
-            // @ts-expect-error StrictNullChecks
             name: thread.profile_name,
           },
         ],

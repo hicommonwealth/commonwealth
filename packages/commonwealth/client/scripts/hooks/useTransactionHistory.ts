@@ -36,7 +36,7 @@ const useTransactionHistory = ({
         ).toFixed(5)} ETH`,
         etherscanLink: buildEtherscanLink(
           t.transaction_hash,
-          // @ts-expect-error StrictNullChecks
+
           t.community?.chain_node_id,
         ),
       }));
@@ -46,7 +46,7 @@ const useTransactionHistory = ({
     filteredData = filteredData.filter((tx) =>
       (tx.community.default_symbol + tx.community.name)
         .toLowerCase()
-        // @ts-expect-error StrictNullChecks
+
         .includes(filterOptions.searchText.toLowerCase()),
     );
   }

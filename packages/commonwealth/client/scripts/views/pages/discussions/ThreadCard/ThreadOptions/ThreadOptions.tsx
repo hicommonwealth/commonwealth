@@ -75,7 +75,7 @@ export const ThreadOptions = ({
             <ViewUpvotesDrawerTrigger
               onClick={(e) => {
                 e.preventDefault();
-                // @ts-expect-error <StrictNullChecks/>
+
                 setIsUpvoteDrawerOpen(true);
               }}
             />
@@ -95,10 +95,8 @@ export const ThreadOptions = ({
             />
           )}
 
-          {/* @ts-expect-error StrictNullChecks*/}
           {commentBtnVisible && totalComments >= 0 && (
             <CWThreadAction
-              // @ts-expect-error <StrictNullChecks/>
               label={pluralize(totalComments, 'Comment')}
               action="comment"
               disabled={!canComment}
@@ -114,7 +112,6 @@ export const ThreadOptions = ({
             />
           )}
 
-          {/* @ts-expect-error StrictNullChecks*/}
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
           {userStore.id > 0 && (
@@ -159,7 +156,7 @@ export const ThreadOptions = ({
           <ViewUpvotesDrawerTrigger
             onClick={(e) => {
               e.preventDefault();
-              // @ts-expect-error <StrictNullChecks/>
+
               setIsUpvoteDrawerOpen(true);
             }}
           />

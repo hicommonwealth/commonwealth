@@ -125,13 +125,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       {!isWindowSmallInclusive && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
-          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
         />
       )}
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
-        // @ts-expect-error StrictNullChecks
         isInsideCommunity={isInsideCommunity}
         onAuthModalOpen={(modalType) =>
           setAuthModalType(modalType || AuthModalType.SignIn)
@@ -144,7 +142,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       />
       <div className="sidebar-and-body-container">
         <Sidebar
-          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
           onMobile={isWindowExtraSmall}
         />

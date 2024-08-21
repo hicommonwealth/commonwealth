@@ -15,7 +15,6 @@ import {
 
 const log = logger(import.meta);
 
-// @ts-expect-error StrictNullChecks
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300;
 
 export async function cosmosHandler(
@@ -38,7 +37,6 @@ export async function cosmosHandler(
   await updateSlip44IfNeeded(community.ChainNode as ChainNodeInstance);
 
   const nodeTimeoutEnd = new Date(
-    // @ts-expect-error StrictNullChecks
     community.ChainNode.updated_at.getTime() + FALLBACK_NODE_DURATION,
   );
 
@@ -61,7 +59,6 @@ export async function cosmosHandler(
         community.ChainNode!.url?.trim();
     }
 
-    // @ts-expect-error StrictNullChecks
     if (!url) {
       log.error('No URL found for chain node', undefined, {
         cosmos_chain_id: community.ChainNode!.cosmos_chain_id,
@@ -105,7 +102,7 @@ export async function cosmosHandler(
     } catch (err) {
       log.error('Failed to query internal Cosmos chain node', err, {
         requestType,
-        // @ts-expect-error StrictNullChecks
+
         cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
       });
       await updateNodeHealthIfNeeded(
@@ -117,11 +114,9 @@ export async function cosmosHandler(
       );
 
       if (
-        // @ts-expect-error StrictNullChecks
         IGNORE_COSMOS_CHAIN_IDS.includes(community.ChainNode.cosmos_chain_id)
       ) {
         log.warn('Ignoring external proxy request for dev Cosmos chain', {
-          // @ts-expect-error StrictNullChecks
           cosmos_chain_id: community.ChainNode.cosmos_chain_id,
         });
         return res.status(err?.response?.status || 500).json({
@@ -146,7 +141,6 @@ export async function cosmosHandler(
     return res.status(response.status || 200).send(response?.data);
   } catch (err) {
     log.error('Failed to query external Cosmos proxy', err, {
-      // @ts-expect-error StrictNullChecks
       chainNode: community?.ChainNode.cosmos_chain_id,
     });
     return res.status(err?.response?.status || 500).json({

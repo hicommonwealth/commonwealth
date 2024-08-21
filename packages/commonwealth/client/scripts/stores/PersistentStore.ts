@@ -38,7 +38,6 @@ export function clearLocalStorage(
     const key = localStorage.key(i);
     if (key && key.startsWith(prefix)) {
       const storageItem: IStorageItem<any> = JSON.parse(
-        // @ts-expect-error StrictNullChecks
         localStorage.getItem(key),
       );
       if (now - storageItem.timestamp > maxAge) {
@@ -129,7 +128,6 @@ class PersistentStore<
       this.add(revivedItem);
       return revivedItem;
     } else {
-      // @ts-expect-error StrictNullChecks
       return null;
     }
   }

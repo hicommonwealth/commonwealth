@@ -16,7 +16,7 @@ type UpdateGroupResponse = GroupAttributes;
 
 export const updateGroupHandler = async (
   controllers: ServerControllers,
-  // @ts-expect-error StrictNullChecks
+
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
   res: TypedResponse<UpdateGroupResponse>,
 ) => {
@@ -48,15 +48,13 @@ export const updateGroupHandler = async (
     body: { metadata, requirements, topics, allowList },
   } = validationResult.data;
 
-  // @ts-expect-error StrictNullChecks
   const { metadata: oldGroupMetadata } = await models.Group.findByPk(groupId, {
     attributes: ['metadata'],
   });
 
   const [group, analyticsOptions] = await controllers.groups.updateGroup({
-    // @ts-expect-error StrictNullChecks
     user,
-    // @ts-expect-error StrictNullChecks
+
     address,
     groupId,
     metadata: metadata as Required<typeof metadata>,

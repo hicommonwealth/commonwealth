@@ -124,7 +124,6 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                 <Feed
                   dashboardView={DashboardViews.ForYou}
                   noFeedMessage="Join some communities to see Activity!"
-                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
@@ -132,7 +131,6 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                 <Feed
                   dashboardView={DashboardViews.Global}
                   noFeedMessage="No Activity"
-                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}

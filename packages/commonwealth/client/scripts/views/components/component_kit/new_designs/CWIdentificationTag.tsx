@@ -33,7 +33,6 @@ export const CWIdentificationTag = ({
         />
       )}
       <CWText className="label" type="b2" fontWeight="regular">
-        {/* @ts-expect-error StrictNullChecks*/}
         {username || formatAddressShort(address, 6)}
       </CWText>
       {iconRight && (

@@ -42,6 +42,5 @@ const unleashConfig = {
 };
 
 export const openFeatureProvider = process.env.UNLEASH_FRONTEND_API_TOKEN
-  ? // @ts-expect-error StrictNullChecks
-    new UnleashProvider(new UnleashClient(unleashConfig))
+  ? new UnleashProvider(new UnleashClient(unleashConfig))
   : new InMemoryProvider(featureFlags);

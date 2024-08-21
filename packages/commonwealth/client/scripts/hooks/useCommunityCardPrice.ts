@@ -51,14 +51,12 @@ export const useCommunityCardPrice = ({
     };
   }
 
-  // @ts-expect-error StrictNullChecks
   const stakeValue = convertEthToUsd(buyPriceData?.price, ethUsdRate);
   const historicalPriceEth = fromWei(historicalPrice);
 
   let stakeChange = 0;
   if (historicalPriceEth) {
     stakeChange =
-      // @ts-expect-error StrictNullChecks
       ((parseFloat(buyPriceData?.price) - historicalPriceEth) /
         historicalPriceEth) *
       100;

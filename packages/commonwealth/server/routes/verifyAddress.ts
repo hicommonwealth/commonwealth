@@ -91,13 +91,11 @@ const processAddress = async (
         profile: {},
       });
       await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
         is_active: true,
       });
       await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,
@@ -154,7 +152,7 @@ const processAddress = async (
           chain: community.name,
         },
       };
-      // @ts-expect-error StrictNullChecks
+
       await sgMail.send(msg);
       log.info(
         `Sent address move email: ${address} transferred to a new account`,
@@ -189,7 +187,7 @@ const verifyAddress = async (
     community.base === ChainBase.Substrate
       ? addressSwapper({
           address: req.body.address,
-          // @ts-expect-error StrictNullChecks
+
           currentPrefix: community.ss58_prefix,
         })
       : req.body.address;
@@ -201,7 +199,7 @@ const verifyAddress = async (
     community,
     address,
     req.body.wallet_id,
-    // @ts-expect-error <StrictNullChecks>
+
     req.user,
     decodedSession,
   );
@@ -221,7 +219,6 @@ const verifyAddress = async (
       where: { community_id: req.body.community_id, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
-      // @ts-expect-error StrictNullChecks
       where: { id: newAddress.user_id },
     });
     req.login(user, (err) => {

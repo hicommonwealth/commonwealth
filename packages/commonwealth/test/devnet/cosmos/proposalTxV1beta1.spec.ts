@@ -75,7 +75,6 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
     expect(resp.rawLog).to.not.be.undefined;
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 
-    // @ts-expect-error StrictNullChecks
     const rawLog = JSON.parse(resp.rawLog);
 
     const submitProposalEvent = rawLog[0]?.events?.find(
@@ -102,7 +101,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
 
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
-    // @ts-expect-error StrictNullChecks
+
     const voteValue = parseVoteValue(resp.rawLog);
     expect(voteValue.option).to.eql(voteOption);
   };

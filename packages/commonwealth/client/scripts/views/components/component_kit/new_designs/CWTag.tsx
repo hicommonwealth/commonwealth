@@ -64,7 +64,6 @@ export const CWTag = ({
     return label.slice(0, trimAt) + '...';
   };
 
-  // @ts-expect-error <StrictNullChecks/>
   const handleClick = () => onClick();
 
   return (

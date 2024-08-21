@@ -46,7 +46,7 @@ export const CreateTopicSection = () => {
     try {
       await createTopic({
         name: values.topicName,
-        // @ts-expect-error <StrictNullChecks/>
+
         description: values.topicDescription,
         featuredInSidebar,
         featuredInNewPost: false,
@@ -78,7 +78,6 @@ export const CreateTopicSection = () => {
   }, [descriptionDelta]);
 
   const handleInputValidation = (text: string): [ValidationStatus, string] => {
-    // @ts-expect-error <StrictNullChecks/>
     const currentCommunityTopicNames = topics.map((t) => t.name.toLowerCase());
 
     if (currentCommunityTopicNames.includes(text.toLowerCase())) {
@@ -117,7 +116,6 @@ export const CreateTopicSection = () => {
               setName(e.target.value);
               handleInputValidation(e.target.value.trim());
             }}
-            // @ts-expect-error <StrictNullChecks/>
             customError={nameErrorMsg}
             autoFocus
           />
@@ -156,7 +154,6 @@ export const CreateTopicSection = () => {
         </div>
         <div className="actions">
           <MessageRow
-            // @ts-expect-error <StrictNullChecks/>
             statusMessage={descErrorMsg}
             hasFeedback={!!descErrorMsg}
             validationStatus={descErrorMsg ? 'failure' : undefined}

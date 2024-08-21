@@ -39,7 +39,6 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
 
   try {
     if (isThread) {
-      // @ts-expect-error <StrictNullChecks/>
       decodedTitle = decodeURIComponent(title);
     } else {
       decodedTitle = decodeURIComponent(comment.thread?.title);
@@ -49,7 +48,6 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
     // (Maybe it has % Sign in the title)
     try {
       if (isThread) {
-        // @ts-expect-error <StrictNullChecks/>
         decodedTitle = decodeURIComponent(encodeURIComponent(title));
       } else {
         decodedTitle = decodeURIComponent(
@@ -58,10 +56,9 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
       }
     } catch (e) {
       console.error(
-        // @ts-expect-error <StrictNullChecks/>
         `Could not decode title: "${title ? title : comment.thread?.title}"`,
       );
-      // @ts-expect-error <StrictNullChecks/>
+
       decodedTitle = title;
     }
   }
@@ -116,7 +113,6 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 });
               }}
             >
-              {/* @ts-expect-error StrictNullChecks*/}
               {title}
             </a>
           ) : (
@@ -138,7 +134,6 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
       </div>
       <div className="content">
         <CWText type="b2" className="gray-text">
-          {/* @ts-expect-error StrictNullChecks*/}
           <QuillRenderer doc={isThread ? body : comment.text} />
         </CWText>
         <div className="actions">

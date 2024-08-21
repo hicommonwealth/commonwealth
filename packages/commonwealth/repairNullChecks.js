@@ -18,7 +18,7 @@ TODO:
 
  */
 
-const DISABLE_COMMENT = '// @ts-expect-error <StrictNullChecks>';
+const DISABLE_COMMENT = '';
 
 function getWhitespacePrefix(line) {
   const match = line.match(/^\s*/);

@@ -42,7 +42,6 @@ export const VotingResults = (props: VotingResultsProps) => {
     return (
       <SimpleYesApprovalVotingResult
         approvedCount={proposal.depositorsAsVotes.length}
-        // @ts-expect-error <StrictNullChecks/>
         proposal={proposal}
         votes={proposal.depositorsAsVotes}
       />

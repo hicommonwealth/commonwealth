@@ -54,7 +54,7 @@ export default class SolanaChain
 
     // slots are approx equal to block heights
     this.app.chain.block.height = await this._connection.getSlot();
-    // @ts-expect-error StrictNullChecks
+
     this.app.chain.block.duration = await this._connection.getBlockTime(
       this.app.chain.block.height,
     );
@@ -65,7 +65,7 @@ export default class SolanaChain
   public async deinit() {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
     // no need to unsubscribe as it's HTTP RPC
-    // @ts-expect-error StrictNullChecks
+
     this._connection = null;
   }
 

@@ -50,7 +50,6 @@ const GroupsSection = ({
               key={index}
               groupName={group.name}
               groupDescription={group.description}
-              // @ts-expect-error <StrictNullChecks/>
               requirements={group.requirements
                 .filter((r) => r?.data?.source) // filter erc groups
                 .map((r) => ({

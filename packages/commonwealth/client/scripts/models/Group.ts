@@ -61,7 +61,7 @@ class Group {
     this.requirements = requirements;
     this.topics = topics;
     this.members = memberships;
-    // @ts-expect-error StrictNullChecks
+
     this.requirementsToFulfill = metadata.required_requirements;
   }
 }

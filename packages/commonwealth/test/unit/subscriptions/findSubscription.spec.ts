@@ -57,7 +57,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     null,
     null,
@@ -69,7 +69,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     null,
     null,
@@ -81,7 +81,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     <Comment<any>>{
       id: 2,
@@ -94,7 +94,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     <Comment<any>>{
       id: commentId,
@@ -107,7 +107,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     null,
     <Thread>{
@@ -120,7 +120,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     null,
     <Thread>{
@@ -133,7 +133,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     <Comment<any>>{
       id: 2,
@@ -146,7 +146,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     <Comment<any>>{
       id: commentId,
@@ -159,7 +159,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     null,
     <Thread>{
@@ -172,7 +172,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    // @ts-expect-error StrictNullChecks
+
     null,
     null,
     <Thread>{

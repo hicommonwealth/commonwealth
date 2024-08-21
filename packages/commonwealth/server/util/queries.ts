@@ -49,7 +49,7 @@ export const buildPaginationSql = (
   const bind: PaginationSqlBind = {};
   if (typeof limit === 'number') {
     sql += `ORDER BY ${orderBy} `;
-    // @ts-expect-error StrictNullChecks
+
     if (validateOrderDirection(orderDirection)) {
       sql += `${orderDirection} `;
       if (nullsLast) {
@@ -62,7 +62,7 @@ export const buildPaginationSql = (
   // TODO: check if nullsLast works with secondary order
   if (orderBy && orderBySecondary) {
     sql += `, ${orderBySecondary} `;
-    // @ts-expect-error StrictNullChecks
+
     if (validateOrderDirection(orderDirectionSecondary)) {
       sql += `${orderDirectionSecondary} `;
     } else {

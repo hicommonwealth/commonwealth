@@ -67,7 +67,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
   };
   const banCache: any = {};
   const controller = new ServerTopicsController(db, banCache);
-  // @ts-expect-error StrictNullChecks
+
   const user = {
     getAddresses: async () => [],
     isAdmin,

@@ -189,7 +189,6 @@ async function setupNotification(
     );
   }
 
-  // @ts-expect-error StrictNullChecks
   if (!existingNotifications) {
     existingNotifications = await getExistingNotifications(
       transaction,
@@ -337,7 +336,6 @@ async function main() {
         );
         await dispose()('ERROR', true);
       } else {
-        // @ts-expect-error StrictNullChecks
         userId = address.user_id;
       }
     }

@@ -44,7 +44,7 @@ const ProposalsPage = () => {
 
   // lazy load Cosmos chain params
   const { data: stakingDenom } = useStakingParamsQuery();
-  // @ts-expect-error <StrictNullChecks/>
+
   useDepositParamsQuery(stakingDenom);
   usePoolParamsQuery();
 
@@ -89,7 +89,6 @@ const ProposalsPage = () => {
     ]
   ) : (
     (activeCosmosProposals || []).map((proposal) => (
-      // @ts-expect-error <StrictNullChecks/>
       <ProposalCard key={proposal.identifier} proposal={proposal} />
     ))
   );
@@ -99,8 +98,7 @@ const ProposalsPage = () => {
 
   const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWCircleMultiplySpinner />
-  ) : // @ts-expect-error <StrictNullChecks/>
-  !inactiveCosmosProposals?.length ? (
+  ) : !inactiveCosmosProposals?.length ? (
     [
       <div key="no-inactive" className="no-proposals">
         No past proposals
@@ -108,9 +106,7 @@ const ProposalsPage = () => {
     ]
   ) : (
     [].concat(
-      // @ts-expect-error <StrictNullChecks/>
       (inactiveCosmosProposals || []).map((proposal) => (
-        // @ts-expect-error <StrictNullChecks/>
         <ProposalCard key={proposal.identifier} proposal={proposal} />
       )),
     )

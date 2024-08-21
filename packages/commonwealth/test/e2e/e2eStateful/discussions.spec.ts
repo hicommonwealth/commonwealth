@@ -28,20 +28,19 @@ test.describe('test discussion page', () => {
     const reactionCountElement = await reactionButton[0].$('.reactions-count');
 
     // Get the initial reaction count
-    // @ts-expect-error StrictNullChecks
+
     const initialReactionCount = await reactionCountElement.textContent();
 
     // Click the reaction button
     await reactionButton[0].click();
 
     // Get the updated reaction count
-    // @ts-expect-error StrictNullChecks
+
     const updatedReactionCount = await reactionCountElement.textContent();
 
     // Assert that the reaction count has incremented by one
-    // @ts-expect-error StrictNullChecks
+
     expect(parseInt(updatedReactionCount)).toBe(
-      // @ts-expect-error StrictNullChecks
       parseInt(initialReactionCount) + 1,
     );
   });

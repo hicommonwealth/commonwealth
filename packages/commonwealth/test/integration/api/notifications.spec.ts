@@ -51,21 +51,18 @@ describe('Notification Routes Tests', () => {
       community_id,
     });
 
-    // @ts-expect-error StrictNullChecks
     notification = await server.models.Notification.create({
       category_id: NotificationCategories.NewThread,
       community_id,
       notification_data: '',
     });
 
-    // @ts-expect-error StrictNullChecks
     notificationTwo = await server.models.Notification.create({
       category_id: NotificationCategories.NewThread,
       community_id,
       notification_data: '',
     });
 
-    // @ts-expect-error StrictNullChecks
     notificationThree = await server.models.Notification.create({
       category_id: NotificationCategories.ChainEvent,
       community_id,
@@ -187,17 +184,16 @@ describe('Notification Routes Tests', () => {
       const nrOne = await server.models.NotificationsRead.findOne({
         where: { notification_id: notification.id, user_id: userId },
       });
-      // @ts-expect-error StrictNullChecks
+
       expect(nrOne.is_read).to.be.true;
       const nrTwo = await server.models.NotificationsRead.findOne({
         where: { notification_id: notificationThree.id, user_id: userId },
       });
-      // @ts-expect-error StrictNullChecks
+
       expect(nrTwo.is_read).to.be.true;
     });
 
     test('should pass when notification id is a string instead of an array', async () => {
-      // @ts-expect-error StrictNullChecks
       const notif = await server.models.Notification.create({
         category_id: NotificationCategories.NewThread,
         community_id: community_id,
@@ -224,7 +220,7 @@ describe('Notification Routes Tests', () => {
       const nr = await server.models.NotificationsRead.findOne({
         where: { notification_id: notif.id, user_id: userId },
       });
-      // @ts-expect-error StrictNullChecks
+
       expect(nr.is_read).to.be.true;
     });
 

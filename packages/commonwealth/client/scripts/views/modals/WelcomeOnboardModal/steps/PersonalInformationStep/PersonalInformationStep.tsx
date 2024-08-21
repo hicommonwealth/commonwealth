@@ -98,11 +98,11 @@ const PersonalInformationStep = ({
 
   const handleGenerateUsername = () => {
     const randomUsername = generateUsername('', 2);
-    // @ts-expect-error <StrictNullChecks/>
+
     formMethodsRef.current.setValue('username', randomUsername, {
       shouldDirty: true,
     });
-    // @ts-expect-error <StrictNullChecks/>
+
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
   };
@@ -149,7 +149,6 @@ const PersonalInformationStep = ({
 
   return (
     <CWForm
-      // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
       className="PersonalInformationStep"
       validationSchema={personalInformationFormValidation}

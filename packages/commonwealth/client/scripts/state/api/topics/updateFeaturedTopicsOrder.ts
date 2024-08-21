@@ -13,7 +13,7 @@ const updateFeaturedTopicsOrder = async ({
   featuredTopics,
 }: UpdateFeaturedTopicsOrderProps) => {
   const orderedIds = featuredTopics
-    // @ts-expect-error StrictNullChecks
+
     .sort((a, b) => a.order - b.order)
     .map((t) => t.id);
 

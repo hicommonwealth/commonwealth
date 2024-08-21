@@ -99,7 +99,6 @@ export async function __deleteThread(
 
   // use callbacks so route returns and this completes in the background
   if (this.globalActivityCache) {
-    // @ts-expect-error StrictNullChecks
     this.globalActivityCache.deleteActivityFromCache(thread.id);
   }
 }

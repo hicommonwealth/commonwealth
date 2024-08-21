@@ -36,7 +36,7 @@ export async function getTestChainNode(version?: 'v1' | 'v2') {
       url: rpc,
       balance_type: BalanceType.Ethereum,
     },
-    // @ts-expect-error StrictNullChecks
+
     defaults: {
       name,
     },
@@ -64,7 +64,7 @@ export async function getTestChain(version?: 'v1' | 'v2') {
       id: chainId,
       chain_node_id: chainNode.id,
     },
-    // @ts-expect-error StrictNullChecks
+
     defaults: {
       name,
       network: ChainNetwork.Compound,
@@ -107,7 +107,6 @@ export async function getTestAbi(version?: 'v1' | 'v2') {
 
   if (existingAbi) return existingAbi;
 
-  // @ts-expect-error StrictNullChecks
   return await models.ContractAbi.create({
     abi: !version || version === 'v1' ? rawCompoundAbi : rawDydxAbi,
     nickname: nickname,
@@ -172,7 +171,7 @@ export async function getTestSubscription(version?: 'v1' | 'v2') {
       category_id: 'chain-event',
       community_id: chain.id,
     },
-    // @ts-expect-error StrictNullChecks
+
     defaults: {
       is_active: true,
       immediate_email: false,

@@ -173,10 +173,8 @@ export const VotingActions = ({
     hasVotedAbstain,
     hasVotedVeto,
     hasVotedForAnyChoice,
-    // @ts-expect-error <StrictNullChecks/>
   } = getVotingResults(proposal, user);
 
-  // @ts-expect-error <StrictNullChecks/>
   const canVote = getCanVote(proposal, hasVotedForAnyChoice);
 
   const yesButton = (
@@ -230,7 +228,6 @@ export const VotingActions = ({
       <>
         <div className="button-row">{multiDepositApproveButton}</div>
         <ProposalExtensions
-          // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           setCosmosDepositAmount={setAmount}
         />
@@ -245,7 +242,7 @@ export const VotingActions = ({
           {abstainButton}
           {noWithVetoButton}
         </div>
-        {/* @ts-expect-error StrictNullChecks*/}
+
         <ProposalExtensions proposal={proposal} />
       </>
     );

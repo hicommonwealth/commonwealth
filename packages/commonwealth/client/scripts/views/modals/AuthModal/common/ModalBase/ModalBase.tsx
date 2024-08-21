@@ -282,7 +282,6 @@ const ModalBase = ({
         return;
       }
 
-      // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
 
@@ -343,11 +342,9 @@ const ModalBase = ({
         <CWModalBody className={clsx('content', bodyClassName)}>
           {customBody}
 
-          {/* @ts-expect-error StrictNullChecks*/}
           {showAuthOptionTypesFor?.length > 0 && (
             <>
               {shouldShowSSOOptions &&
-                // @ts-expect-error StrictNullChecks*
                 showAuthOptionTypesFor?.length > 1 &&
                 !showAuthOptionFor && (
                   <CWTabsRow className="tabs">

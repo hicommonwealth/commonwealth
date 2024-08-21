@@ -8,7 +8,6 @@ import { config } from '../config';
 
 const log = logger(import.meta);
 
-// @ts-expect-error StrictNullChecks
 sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 export const Errors = {
@@ -41,7 +40,7 @@ const updateEmail = async (
   const existingUser = await models.User.findOne({
     where: {
       email,
-      // @ts-expect-error StrictNullChecks
+
       id: { [Sequelize.Op.ne]: req.user.id },
     },
   });
@@ -49,14 +48,13 @@ const updateEmail = async (
 
   const user = await models.User.scope('withPrivateData').findOne({
     where: {
-      // @ts-expect-error StrictNullChecks
       id: req.user.id,
     },
   });
   if (!user) return next(new AppError(Errors.NoUser));
 
   // create and email the token
-  // @ts-expect-error StrictNullChecks
+
   const tokenObj = await models.EmailUpdateToken.createForEmail(email);
   const loginLink = `${config.SERVER_URL}/api/finishUpdateEmail?token=${
     tokenObj.token

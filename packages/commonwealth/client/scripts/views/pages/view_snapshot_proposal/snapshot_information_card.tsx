@@ -103,15 +103,11 @@ export const SnapshotInformationCard = ({
               value={moment(+proposal.end * 1000).format('lll')}
             />
             <SnapshotInfoLinkRow
-              // @ts-expect-error <StrictNullChecks/>
               label={proposal.strategies.length > 1 ? 'Strategies' : 'Strategy'}
               value={
-                // @ts-expect-error <StrictNullChecks/>
                 proposal.strategies.length > 1
-                  ? // @ts-expect-error <StrictNullChecks/>
-                    `${proposal.strategies.length} Strategies`
-                  : // @ts-expect-error <StrictNullChecks/>
-                    proposal.strategies[0].name
+                  ? `${proposal.strategies.length} Strategies`
+                  : proposal.strategies[0].name
               }
               url={`https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`}
             />
@@ -121,14 +117,14 @@ export const SnapshotInformationCard = ({
               url={`https://etherscan.io/block/${proposal.snapshot}`}
             />
           </div>
-          {/* @ts-expect-error StrictNullChecks*/}
+
           {threads.length > 0 && (
             <>
               <div className="linked-discussions">
                 <CWText type="h5" fontWeight="semiBold">
                   Linked Discussions
                 </CWText>
-                {/* @ts-expect-error StrictNullChecks*/}
+
                 {threads.map((thread) => (
                   <SnapshotThreadLink thread={thread} key={thread.id} />
                 ))}

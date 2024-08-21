@@ -72,9 +72,8 @@ const useCreateCommentMutation = ({
 }: Partial<CreateCommentProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    // @ts-expect-error StrictNullChecks
     communityId,
-    // @ts-expect-error StrictNullChecks
+
     threadId,
   });
 
@@ -94,12 +93,11 @@ const useCreateCommentMutation = ({
       queryClient.setQueryData(key, () => {
         return [...comments, newComment];
       });
-      // @ts-expect-error StrictNullChecks
+
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
       updateThreadInAllCaches(
-        // @ts-expect-error StrictNullChecks
         communityId,
         threadId,
         { recentComments: [newComment] },

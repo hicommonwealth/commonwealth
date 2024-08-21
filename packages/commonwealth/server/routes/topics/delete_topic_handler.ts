@@ -21,7 +21,7 @@ export const deleteTopicHandler = async (
   res: TypedResponse<DeleteTopicResponse>,
 ) => {
   const { user } = req;
-  // @ts-expect-error StrictNullChecks
+
   const { topicId } = req.params;
 
   const validationSchema = z.coerce.number();
@@ -33,7 +33,6 @@ export const deleteTopicHandler = async (
   }
 
   await controllers.topics.deleteTopic({
-    // @ts-expect-error StrictNullChecks
     user,
     topicId: validationResult.data,
   });

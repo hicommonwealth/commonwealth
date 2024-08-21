@@ -157,7 +157,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async fetchPoolParams(): Promise<CosmosToken> {
     const {
-      // @ts-expect-error StrictNullChecks
       pool: { bondedTokens },
     } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
@@ -166,7 +165,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async fetchStakingParams(): Promise<string> {
     const {
-      // @ts-expect-error StrictNullChecks
       params: { bondDenom },
     } = await this._api.staking.params();
     this._denom = bondDenom;

@@ -103,7 +103,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       }
 
       // If ethChainNode already has the apiKey, early return
-      // @ts-expect-error StrictNullChecks
+
       if (ethChainNodeExists[0][0]['url'].includes(apiKey)) {
         return;
       }
@@ -198,7 +198,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       ) RETURNING id
     `);
 
-      // @ts-expect-error StrictNullChecks
       await createAddress('ethereum', userId[0][0]['id']);
     },
 
@@ -209,7 +208,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       );
 
       // address already exists
-      // @ts-expect-error StrictNullChecks
+
       if (addresses.length && addresses.some((u) => u['chain'] === chain))
         return;
 

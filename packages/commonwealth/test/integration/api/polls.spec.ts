@@ -43,7 +43,7 @@ describe('Polls', () => {
         group_ids: [],
       },
     });
-    // @ts-expect-error StrictNullChecks
+
     topicId = topic.id;
 
     const userRes = await server.seeder.createAndVerifyAddress(
@@ -89,13 +89,12 @@ describe('Polls', () => {
 
     const res = await chai.request
       .agent(server.app)
-      // @ts-expect-error StrictNullChecks
+
       .post(`/api/threads/${thread.id}/polls`)
       .set('Accept', 'application/json')
       .send({
-        // @ts-expect-error StrictNullChecks
         author_chain: thread.community_id,
-        // @ts-expect-error StrictNullChecks
+
         chain: thread.community_id,
         address: userAddress,
         jwt: userJWT,
@@ -108,7 +107,6 @@ describe('Polls', () => {
       options: JSON.stringify(data.options),
     });
 
-    // @ts-expect-error StrictNullChecks
     threadId = thread.id;
     pollId = res.body.result.id;
   });

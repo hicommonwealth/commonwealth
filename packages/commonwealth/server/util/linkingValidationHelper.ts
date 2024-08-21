@@ -24,7 +24,7 @@ export const isAuthorOrAdmin = async (
     // is not author
     const roles = await findAllRoles(
       models,
-      // @ts-expect-error StrictNullChecks
+
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
       communityId,
       ['admin', 'moderator'],

@@ -11,7 +11,6 @@ const useCommunityContests = () => {
   const { data: contestsData, isLoading: isContestDataLoading } =
     useGetContestsQuery({ community_id: app.activeChainId(), enabled });
 
-  // @ts-expect-error StrictNullChecks
   const isContestAvailable = !isContestDataLoading && contestsData?.length > 0;
 
   const getContestByAddress = (contestAddress: string) => {

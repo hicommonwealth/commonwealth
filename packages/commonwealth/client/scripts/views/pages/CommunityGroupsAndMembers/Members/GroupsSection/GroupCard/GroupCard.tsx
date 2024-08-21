@@ -85,7 +85,7 @@ const GroupCard = ({
           ? 'All requirements must be satisfied'
           : `At least ${requirementsToFulfill} # of all requirements`}
       </CWText>
-      {/* @ts-expect-error StrictNullChecks*/}
+
       {requirements.map((r, index) => (
         <RequirementCard key={index} {...r} />
       ))}
@@ -114,19 +114,15 @@ const GroupCard = ({
                   <tr key={index}>
                     <div className="table-spacing">
                       <Link
-                        // @ts-expect-error <StrictNullChecks/>
                         to={`/profile/id/${profiles.get(address)?.userId}`}
                         className="user-info"
                       >
                         <Avatar
-                          // @ts-expect-error <StrictNullChecks/>
                           url={profiles.get(address)?.avatarUrl}
                           size={24}
-                          // @ts-expect-error <StrictNullChecks/>
                           address={profiles.get(address)?.userId}
                         />
                         <CWText type="b2">
-                          {/* @ts-expect-error StrictNullChecks*/}
                           {profiles.get(address)?.name ?? 'undefined'}
                         </CWText>
                       </Link>
@@ -134,8 +130,7 @@ const GroupCard = ({
                     <td>
                       <CWText type="b2">
                         {(!isWindowSmallInclusive
-                          ? // @ts-expect-error <StrictNullChecks/>
-                            profiles.get(address)?.address
+                          ? profiles.get(address)?.address
                           : formatAddressShort(address, 5, 6)) ?? 'error'}
                       </CWText>
                     </td>
@@ -143,11 +138,9 @@ const GroupCard = ({
                 ))}
               </tbody>
               <div className="pagination-buttons">
-                {/* @ts-expect-error StrictNullChecks*/}
                 {allowLists.length > ALLOWLIST_MEMBERS_PER_PAGE && (
                   <CWPagination
                     totalCount={Math.ceil(
-                      // @ts-expect-error <StrictNullChecks/>
                       allowLists.length / ALLOWLIST_MEMBERS_PER_PAGE,
                     )}
                     onChange={(_, n) => setCurrentAllowlistPage(n)}

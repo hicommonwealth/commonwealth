@@ -11,7 +11,7 @@ import { ComponentType } from '../types';
 export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
   setDarkMode(on);
   localStorage.setItem('user-dark-mode-state', on ? 'on' : 'off');
-  // @ts-expect-error <StrictNullChecks/>
+
   stateFn(on);
 };
 
@@ -68,7 +68,6 @@ export const CWToggle = (props: ToggleProps) => {
       )}
     >
       <input
-        // @ts-expect-error <StrictNullChecks/>
         type="checkbox"
         {...params}
         {...(hookToForm &&

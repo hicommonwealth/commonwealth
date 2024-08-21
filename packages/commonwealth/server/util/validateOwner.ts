@@ -52,7 +52,7 @@ export const validateOwner = async ({
   }
   const roles = await findAllRoles(
     models,
-    // @ts-expect-error StrictNullChecks
+
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
     communityId,
     requiredRoles,

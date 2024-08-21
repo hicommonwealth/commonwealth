@@ -25,7 +25,6 @@ const exportMembersList = async (
   res: TypedResponse<exportMembersListResp>,
   next: NextFunction,
 ) => {
-  // @ts-expect-error StrictNullChecks
   if (!req.user.isAdmin) {
     return next(new AppError(Errors.NotAdmin));
   }

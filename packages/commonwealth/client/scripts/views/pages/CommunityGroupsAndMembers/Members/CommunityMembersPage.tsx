@@ -155,7 +155,7 @@ const CommunityMembersPage = () => {
       order_by: (tableState.orderBy === 'lastActive'
         ? 'last_active'
         : tableState.orderBy) as MemberResultsOrderBy,
-      // @ts-expect-error <StrictNullChecks/>
+
       order_direction: tableState.orderDirection,
       ...(debouncedSearchTerm && {
         search: debouncedSearchTerm,
@@ -230,7 +230,7 @@ const CommunityMembersPage = () => {
               (groups || []).find((group) => group.id === groupId)?.name,
           )
           .filter(Boolean)
-          // @ts-expect-error <StrictNullChecks/>
+
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
@@ -447,10 +447,8 @@ const CommunityMembersPage = () => {
           />
         ) : (
           <MembersSection
-            // @ts-expect-error <StrictNullChecks/>
             filteredMembers={formattedMembers}
             onLoadMoreMembers={() => {
-              // @ts-expect-error <StrictNullChecks/>
               if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
                 fetchNextPage?.().catch(console.error);
               }

@@ -90,7 +90,6 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           signerAddress: string,
           message: string,
         ) => {
-          // @ts-expect-error <StrictNullChecks>
           const signature = await window.keplr.signEthereum(
             chainId,
             signerAddress,

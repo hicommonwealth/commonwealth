@@ -19,7 +19,6 @@ export async function __getCommunityStake(
     where['stake_id'] = stake_id;
   }
 
-  // @ts-expect-error StrictNullChecks
   return await this.models.CommunityStake.findOne({
     where,
     include: [

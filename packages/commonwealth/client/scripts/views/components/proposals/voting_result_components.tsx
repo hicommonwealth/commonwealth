@@ -148,7 +148,6 @@ export const YesNoAbstainVetoVotingResult = (
           {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
         </CWText>
         <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           votes={votes.filter((v) => v.choice === 'Yes')}
         />
@@ -158,7 +157,6 @@ export const YesNoAbstainVetoVotingResult = (
           {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
         </CWText>
         <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           votes={votes.filter((v) => v.choice === 'No')}
         />
@@ -170,7 +168,6 @@ export const YesNoAbstainVetoVotingResult = (
           })`}
         </CWText>
         <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           votes={votes.filter((v) => v.choice === 'Abstain')}
         />
@@ -182,7 +179,6 @@ export const YesNoAbstainVetoVotingResult = (
           })`}
         </CWText>
         <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           votes={votes.filter((v) => v.choice === 'NoWithVeto')}
         />

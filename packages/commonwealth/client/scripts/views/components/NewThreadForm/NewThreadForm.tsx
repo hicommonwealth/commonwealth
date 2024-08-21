@@ -213,7 +213,6 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      // @ts-expect-error <StrictNullChecks/>
       topicsForSelector?.find((t) => t?.name?.includes('General')) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
@@ -306,7 +305,6 @@ export const NewThreadForm = () => {
                   onChange={(topic) => {
                     setCanShowGatingBanner(true);
                     setThreadTopic(
-                      // @ts-expect-error <StrictNullChecks/>
                       topicsForSelector.find((t) => `${t.id}` === topic.value),
                     );
                   }}

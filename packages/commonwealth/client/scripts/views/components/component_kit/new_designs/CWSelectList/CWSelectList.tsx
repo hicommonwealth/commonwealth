@@ -38,14 +38,11 @@ export const CWSelectList = <
   } = props;
   const formContext = useFormContext();
   const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
+    ? formContext.register(name)
     : ({} as any);
   const formFieldErrorMessage =
-    // @ts-expect-error <StrictNullChecks/>
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
   const [defaultFormContextValue, setDefaultFormContextValue] = useState(
-    // @ts-expect-error <StrictNullChecks/>
     hookToForm ? formContext?.getValues?.(props?.name) : null,
   );
 
@@ -98,12 +95,10 @@ export const CWSelectList = <
         onChange={(newValue: any, actionMeta) => {
           props?.onChange?.(newValue, actionMeta);
           if (hookToForm) {
-            // @ts-expect-error <StrictNullChecks/>
             formContext.setValue(name, newValue);
             (newValue?.length ||
               (typeof newValue === 'object' &&
                 Object.keys(newValue).length > 0)) &&
-              // @ts-expect-error <StrictNullChecks/>
               formContext.setError(name, null);
           }
         }}

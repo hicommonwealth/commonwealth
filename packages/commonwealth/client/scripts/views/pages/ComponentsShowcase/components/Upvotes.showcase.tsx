@@ -19,7 +19,6 @@ const UpvotesShowcase = () => {
           voteCount={87}
           disabled={false}
           selected={false}
-          // @ts-expect-error <StrictNullChecks/>
           onClick={undefined}
           popoverContent={<div>Upvoters List</div>}
         />
@@ -27,7 +26,6 @@ const UpvotesShowcase = () => {
           voteCount={8887}
           disabled={false}
           selected={true}
-          // @ts-expect-error <StrictNullChecks/>
           onClick={undefined}
           popoverContent={<div>Upvoters List</div>}
         />
@@ -35,7 +33,6 @@ const UpvotesShowcase = () => {
           voteCount={99999}
           disabled={true}
           selected={false}
-          // @ts-expect-error <StrictNullChecks/>
           onClick={undefined}
           popoverContent={<div>Upvoters List</div>}
         />

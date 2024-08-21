@@ -47,7 +47,7 @@ export default async (
       // this check avoids a 500 error -> 'WHERE parameter "id" has invalid "undefined" value'
       if (!req.body.community_id)
         return next(new AppError(Errors.InvalidCommunity));
-      // @ts-expect-error StrictNullChecks
+
       community = await models.Community.findOne({
         where: {
           id: req.body.community_id,
@@ -78,7 +78,6 @@ export default async (
       }
 
       if (req.body.thread_id) {
-        // @ts-expect-error StrictNullChecks
         thread = await models.Thread.findOne({
           where: { id: req.body.thread_id },
         });
@@ -88,7 +87,6 @@ export default async (
           community_id: thread.community_id,
         };
       } else if (req.body.comment_id) {
-        // @ts-expect-error StrictNullChecks
         comment = await models.Comment.findOne({
           where: { id: req.body.comment_id },
           include: [{ model: models.Thread, attributes: ['community_id'] }],
@@ -109,7 +107,7 @@ export default async (
     case NotificationCategories.ChainEvent: {
       if (!req.body.community_id)
         return next(new AppError(Errors.InvalidCommunity));
-      // @ts-expect-error StrictNullChecks
+
       community = await models.Community.findOne({
         where: {
           id: req.body.community_id,
@@ -126,18 +124,17 @@ export default async (
       subscriber_id: req.user.id,
       category_id: req.body.category,
       is_active: !!req.body.is_active,
-      // @ts-expect-error StrictNullChecks
+
       ...obj,
     },
   });
 
   const subJson = subscription.toJSON();
 
-  // @ts-expect-error StrictNullChecks
   if (thread) {
     subJson.Thread = thread.toJSON();
   }
-  // @ts-expect-error StrictNullChecks
+
   if (comment) {
     subJson.Comment = comment.toJSON();
   }

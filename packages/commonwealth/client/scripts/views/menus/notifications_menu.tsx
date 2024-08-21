@@ -88,7 +88,6 @@ export const NotificationsMenuPopover = () => {
   const popoverProps = usePopover();
 
   return (
-    // @ts-expect-error <StrictNullChecks/>
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
       <div>
         <CWTooltip

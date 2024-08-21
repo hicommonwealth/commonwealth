@@ -99,7 +99,6 @@ export const status = async (
         expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
       });
 
-      // @ts-expect-error StrictNullChecks
       const knockJwtToken = await computeKnockJwtToken(user.id);
 
       user.jwt = jwtToken as string;
@@ -107,7 +106,7 @@ export const status = async (
 
       return success(res, {
         loggedIn: true,
-        // @ts-expect-error StrictNullChecks
+
         user,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,

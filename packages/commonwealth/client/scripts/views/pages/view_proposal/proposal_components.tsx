@@ -22,7 +22,6 @@ type ProposalSubheaderProps = {
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { proposal } = props;
   const [linkedThreads, setLinkedThreads] =
-    // @ts-expect-error <StrictNullChecks/>
     useState<{ id: number; title: string }[]>(null);
 
   useNecessaryEffect(() => {

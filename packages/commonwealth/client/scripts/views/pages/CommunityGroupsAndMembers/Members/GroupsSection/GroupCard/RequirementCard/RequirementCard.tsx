@@ -56,7 +56,6 @@ const RequirementCard = ({
           <InfoBlock label="Condition" value={requirementCondition} />
           <InfoBlock label="Amount" value={requirementAmount} />
           {is1155Requirement && (
-            // @ts-expect-error <StrictNullChecks/>
             <InfoBlock label="Id" value={requirementTokenId} />
           )}
         </div>

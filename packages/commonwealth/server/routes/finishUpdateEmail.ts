@@ -13,7 +13,7 @@ const finishUpdateEmail = async (
   res: TypedResponse<void>,
 ) => {
   // fetch token and confirm validity
-  // @ts-expect-error StrictNullChecks
+
   const { token, email } = req.query;
   if (!token || !email) {
     throw new AppError('Invalid arguments');

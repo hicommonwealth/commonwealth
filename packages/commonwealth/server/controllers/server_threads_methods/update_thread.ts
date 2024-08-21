@@ -151,7 +151,7 @@ export async function __updateThread(
     .map((addr) => addr.id);
   const roles = await findAllRoles(
     this.models,
-    // @ts-expect-error StrictNullChecks
+
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
     thread.community_id,
     ['moderator', 'admin'],
@@ -187,7 +187,6 @@ export async function __updateThread(
   };
 
   const { latestVersion, versionHistory } = addVersionHistory(
-    // @ts-expect-error StrictNullChecks
     thread.version_history,
     body,
     address,
@@ -404,16 +403,16 @@ export async function __updateThread(
       categoryId: NotificationCategories.ThreadEdit,
       data: {
         created_at: now,
-        // @ts-expect-error StrictNullChecks
+
         thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
+
         root_title: finalThread.title,
-        // @ts-expect-error StrictNullChecks
+
         community_id: finalThread.community_id,
-        // @ts-expect-error StrictNullChecks
+
         author_address: finalThread.Address.address,
-        // @ts-expect-error StrictNullChecks
+
         author_community_id: finalThread.Address.community_id,
       },
     },
@@ -421,7 +420,6 @@ export async function __updateThread(
   });
 
   const updatedThreadWithComments = {
-    // @ts-expect-error StrictNullChecks
     ...finalThread.toJSON(),
   } as ThreadAttributes & {
     Comments?: CommentAttributes[];
@@ -662,22 +660,20 @@ async function setThreadStage(
     try {
       const communityStages = community.custom_stages;
       if (Array.isArray(communityStages)) {
-        // @ts-expect-error StrictNullChecks
         customStages = Array.from(communityStages)
           .map((s) => s.toString())
           .filter((s) => s);
       }
       if (customStages.length === 0) {
         customStages = [
-          // @ts-expect-error StrictNullChecks
           'discussion',
-          // @ts-expect-error StrictNullChecks
+
           'proposal_in_review',
-          // @ts-expect-error StrictNullChecks
+
           'voting',
-          // @ts-expect-error StrictNullChecks
+
           'passed',
-          // @ts-expect-error StrictNullChecks
+
           'failed',
         ];
       }
@@ -686,7 +682,7 @@ async function setThreadStage(
     }
 
     // validate stage
-    // @ts-expect-error StrictNullChecks
+
     if (!customStages.includes(stage)) {
       throw new AppError(Errors.InvalidStage);
     }

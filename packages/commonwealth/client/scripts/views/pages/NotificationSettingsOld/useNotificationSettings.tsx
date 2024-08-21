@@ -51,7 +51,6 @@ const useNotificationSettings = () => {
           subs: bundledSnapshotSubs[snapshotId],
         }));
 
-        // @ts-expect-error StrictNullChecks
         setSnapshotsInfo(snapshotsInfoArr);
       } catch (err) {
         console.error(err);
@@ -118,17 +117,14 @@ const useNotificationSettings = () => {
     // get all subscription ids
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Object.entries(chainEventSubs).map(([_, subs]) =>
-      // @ts-expect-error StrictNullChecks
       subIds.push(...(subs || [])),
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Object.entries(bundledSubs).map(([_, subs]) =>
-      // @ts-expect-error StrictNullChecks
       subIds.push(...(subs || [])),
     );
-    // @ts-expect-error StrictNullChecks
+
     snapshotsInfo?.map(({ snapshotId, subs }: SnapshotInfo) => {
-      // @ts-expect-error StrictNullChecks
       if (snapshotId) subIds.push(...(subs || []));
     });
 

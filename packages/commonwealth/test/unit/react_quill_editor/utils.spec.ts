@@ -29,7 +29,7 @@ describe('react quill editor unit tests', () => {
         ops: [{ insert: '' }],
         ___isMarkdown: false,
       } as any as SerializableDeltaStatic;
-      // @ts-expect-error StrictNullChecks
+
       const result = createDeltaFromText(text);
       assert.deepEqual(result, expectedDelta);
     });
@@ -119,7 +119,7 @@ describe('react quill editor unit tests', () => {
         ops: [{ insert: '' }],
         ___isMarkdown: true,
       } as SerializableDeltaStatic;
-      // @ts-expect-error StrictNullChecks
+
       const result = deserializeDelta(original);
       assert.deepEqual(result, expectedOutput);
     });

@@ -21,13 +21,13 @@ describe('Thread queries', () => {
 
   test('query_thread_through_collaborations', async () => {
     const chain = await models.Community.findOne();
-    // @ts-expect-error StrictNullChecks
+
     expect(chain.id).to.not.be.null;
     const address = (
       await models.Address.findOrCreate({
         where: {
           address: 'JhgYcbJOdWHLVFHJKLPhC12',
-          // @ts-expect-error StrictNullChecks
+
           community_id: chain.id,
           verification_token: 'fgdfgd',
         },
@@ -38,7 +38,6 @@ describe('Thread queries', () => {
     const thread = (
       await models.Thread.findOrCreate({
         where: {
-          // @ts-expect-error StrictNullChecks
           community_id: chain.id,
           address_id: address.id,
           title: 'title',
@@ -77,11 +76,11 @@ describe('Thread queries', () => {
     });
     expect(threads).to.not.be.null;
     expect(threads[0].id).to.equal(thread.id);
-    // @ts-expect-error StrictNullChecks
+
     expect(threads[0].Address.id).to.not.be.null;
     expect(threads).length.above(0);
     expect(threads[0].collaborators).length.above(0);
-    // @ts-expect-error StrictNullChecks
+
     threads[0].collaborators.map(({ id }) => {
       expect(id).to.equal(address.id);
     });

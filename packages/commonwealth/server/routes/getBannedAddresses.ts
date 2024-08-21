@@ -19,9 +19,9 @@ const getBannedAddresses = async (
 
   const isAdmin = await validateOwner({
     models: models,
-    // @ts-expect-error StrictNullChecks
+
     user: req.user,
-    // @ts-expect-error StrictNullChecks
+
     communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
@@ -31,7 +31,6 @@ const getBannedAddresses = async (
   }
 
   const bans = await models.Ban.findAll({
-    // @ts-expect-error StrictNullChecks
     where: { community_id: community.id },
   });
   return success(

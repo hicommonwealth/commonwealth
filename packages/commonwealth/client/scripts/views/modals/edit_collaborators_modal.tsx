@@ -101,7 +101,7 @@ export const EditCollaboratorsModal = ({
                       id: c.id,
                       address: c.address,
                       community_id: c.community_id,
-                      // @ts-expect-error <StrictNullChecks/>
+
                       User: null,
                     })
                   }
@@ -165,7 +165,6 @@ export const EditCollaboratorsModal = ({
           onClick={async () => {
             const newCollaborators = collaborators.filter(
               (c1) =>
-                // @ts-expect-error <StrictNullChecks/>
                 !thread.collaborators.some((c2) => c1.address === c2.address),
             );
             const removedCollaborators = (thread.collaborators as any).filter(
@@ -192,7 +191,6 @@ export const EditCollaboratorsModal = ({
                 });
                 notifySuccess('Collaborators updated');
                 onCollaboratorsUpdated &&
-                  // @ts-expect-error <StrictNullChecks/>
                   onCollaboratorsUpdated(updatedThread.collaborators);
               } catch (err) {
                 const error =

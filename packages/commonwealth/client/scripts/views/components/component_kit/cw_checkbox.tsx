@@ -51,7 +51,7 @@ export const CWCheckbox = ({
   };
 
   const formContext = useFormContext();
-  // @ts-expect-error <StrictNullChecks/>
+
   const formFieldContext = hookToForm ? formContext.register(name) : undefined;
 
   // TODO: this message is not needed now, but when its needed it should be coming from the radio group

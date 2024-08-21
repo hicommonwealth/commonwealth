@@ -38,7 +38,7 @@ class SnapshotController {
         this._initializing = false;
         this._initialized = true;
         this.snapshotEmitter.emit('initialized');
-        // @ts-expect-error StrictNullChecks
+
         return null;
       }
     } catch (e) {
@@ -52,7 +52,7 @@ class SnapshotController {
 
   public async deinit() {
     this._initialized = false;
-    // @ts-expect-error StrictNullChecks
+
     this._space = null;
     this._proposals = [];
 

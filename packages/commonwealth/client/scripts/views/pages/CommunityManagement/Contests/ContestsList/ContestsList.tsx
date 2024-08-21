@@ -91,20 +91,15 @@ const ContestsList = ({
               <ContestCard
                 key={contest.contest_address}
                 isAdmin={isAdmin}
-                // @ts-expect-error <StrictNullChecks/>
                 address={contest.contest_address}
-                // @ts-expect-error <StrictNullChecks/>
                 name={contest.name}
                 imageUrl={contest.image_url}
-                // @ts-expect-error <StrictNullChecks/>
                 topics={contest.topics}
-                // @ts-expect-error <StrictNullChecks/>
                 score={score}
                 decimals={contest.decimals}
                 ticker={contest.ticker}
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
                 isCancelled={contest.cancelled}
-                // @ts-expect-error <StrictNullChecks/>
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
                 feeManagerBalance={feeManagerBalance}
                 isRecurring={!contest.funding_token_address}

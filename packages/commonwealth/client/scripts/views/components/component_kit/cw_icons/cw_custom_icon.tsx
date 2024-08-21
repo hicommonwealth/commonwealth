@@ -12,7 +12,6 @@ export const CWCustomIcon = ({
   iconSize = 'medium',
   ...otherProps
 }: CustomIconProps) => {
-  // @ts-expect-error <StrictNullChecks/>
   const CustomIcon = customIconLookup[iconName] as React.FC<CustomIconProps>;
 
   return (

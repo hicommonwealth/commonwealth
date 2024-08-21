@@ -60,7 +60,6 @@ const isCommunityModerator = (selectedCommunity?: SelectedCommunity) => {
 
 const isThreadCollaborator = (thread: Thread) => {
   return (
-    // @ts-expect-error StrictNullChecks
     thread?.collaborators?.filter((c) => {
       return (
         c?.address === userStore.getState().activeAccount?.address &&

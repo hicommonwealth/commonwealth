@@ -193,7 +193,7 @@ describe('validateOwner', () => {
         models,
         user,
         communityId: chainId,
-        // @ts-expect-error StrictNullChecks
+
         entity,
         allowMod,
         allowAdmin,
@@ -228,7 +228,7 @@ describe('validateOwner', () => {
         models,
         user,
         communityId: chainId,
-        // @ts-expect-error StrictNullChecks
+
         entity,
         allowMod,
         allowAdmin,
@@ -264,7 +264,7 @@ describe('validateOwner', () => {
       models,
       user,
       communityId: chainId,
-      // @ts-expect-error StrictNullChecks
+
       entity,
       allowMod,
       allowAdmin,
@@ -299,7 +299,7 @@ describe('validateOwner', () => {
       models,
       user,
       communityId: chainId,
-      // @ts-expect-error StrictNullChecks
+
       entity,
       allowMod,
       allowAdmin,

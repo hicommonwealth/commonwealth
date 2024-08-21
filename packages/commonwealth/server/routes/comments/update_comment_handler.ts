@@ -18,16 +18,15 @@ export const updateCommentHandler = async (
   res: TypedResponse<UpdateCommentResponse>,
 ) => {
   const { user, address } = req;
-  // @ts-expect-error StrictNullChecks
+
   const { id: commentId } = req.params;
-  // @ts-expect-error StrictNullChecks
+
   const { body: commentBody, discord_meta: discordMeta } = req.body;
 
   const [updatedComment, notificationOptions] =
     await controllers.comments.updateComment({
-      // @ts-expect-error StrictNullChecks
       user,
-      // @ts-expect-error StrictNullChecks
+
       address,
       commentId,
       commentBody,

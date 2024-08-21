@@ -123,7 +123,6 @@ describe('CommentCreated Event Handler', () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       payload: {
-        // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
         community_id: '2f92ekf2fjpe9svk23',
       } as z.infer<typeof CommentCreated>,
@@ -138,13 +137,12 @@ describe('CommentCreated Event Handler', () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       payload: {
-        // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
-        // @ts-expect-error StrictNullChecks
+
         community_id: community.id,
-        // @ts-expect-error StrictNullChecks
+
         id: rootComment.id,
-        // @ts-expect-error StrictNullChecks
+
         thread_id: rootComment.thread_id,
       } as z.infer<typeof CommentCreated>,
     });
@@ -157,14 +155,13 @@ describe('CommentCreated Event Handler', () => {
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
     await tester.seed('ThreadSubscription', {
-      // @ts-expect-error StrictNullChecks
       user_id: subscriber.id,
-      // @ts-expect-error StrictNullChecks
+
       thread_id: rootComment.thread_id,
     });
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
-      // @ts-expect-error StrictNullChecks
+
       payload: { ...rootComment, community_id: community.id },
     });
     expect(
@@ -179,7 +176,7 @@ describe('CommentCreated Event Handler', () => {
       (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
       key: WorkflowKeys.CommentCreation,
-      // @ts-expect-error StrictNullChecks
+
       users: [{ id: String(subscriber.id) }],
       data: {
         author: author?.profile.name,
@@ -190,7 +187,7 @@ describe('CommentCreated Event Handler', () => {
           .id!}/discussion/${thread!.id!}?comment=${rootComment!.id!}`,
         comment_created_event: { ...rootComment, community_id: community!.id },
       },
-      // @ts-expect-error StrictNullChecks
+
       actor: { id: String(author.id) },
     });
   });
@@ -200,14 +197,13 @@ describe('CommentCreated Event Handler', () => {
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
     await tester.seed('CommentSubscription', {
-      // @ts-expect-error StrictNullChecks
       user_id: subscriber.id,
-      // @ts-expect-error StrictNullChecks
+
       comment_id: rootComment.id,
     });
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
-      // @ts-expect-error StrictNullChecks
+
       payload: { ...replyComment, community_id: community.id },
     });
     expect(
@@ -222,7 +218,7 @@ describe('CommentCreated Event Handler', () => {
       (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
       key: WorkflowKeys.CommentCreation,
-      // @ts-expect-error StrictNullChecks
+
       users: [{ id: String(subscriber.id) }],
       data: {
         author: author?.profile.name,
@@ -237,7 +233,7 @@ describe('CommentCreated Event Handler', () => {
         ),
         comment_created_event: { ...replyComment, community_id: community!.id },
       },
-      // @ts-expect-error StrictNullChecks
+
       actor: { id: String(author.id) },
     });
   });
@@ -247,16 +243,15 @@ describe('CommentCreated Event Handler', () => {
     notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
     await tester.seed('ThreadSubscription', {
-      // @ts-expect-error StrictNullChecks
       user_id: subscriber.id,
-      // @ts-expect-error StrictNullChecks
+
       thread_id: rootComment.thread_id,
     });
 
     await expect(
       processCommentCreated({
         name: EventNames.CommentCreated,
-        // @ts-expect-error StrictNullChecks
+
         payload: { ...rootComment, community_id: community.id },
       }),
     ).to.eventually.be.rejectedWith(ProviderError);

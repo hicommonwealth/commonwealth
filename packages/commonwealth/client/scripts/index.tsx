@@ -11,7 +11,7 @@ import App from './App';
 import { getBrowserInfo } from './helpers/browser';
 
 const container = document.getElementById('root');
-// @ts-expect-error <StrictNullChecks/>
+
 const root = createRoot(container);
 
 root.render(<App />);

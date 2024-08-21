@@ -13,7 +13,6 @@ const CustomTopicOption = ({
   topic,
 }: CustomTopicOptionProps) => {
   return (
-    // @ts-expect-error <StrictNullChecks/>
     <components.Option {...originalProps}>
       {(topic?.activeContestManagers?.length || 0) > 0 && (
         <CWIcon iconName="trophy" iconSize="small" />

@@ -86,7 +86,7 @@ export async function __createThreadReaction(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      // @ts-expect-error StrictNullChecks
+
       thread.topic_id,
       thread.community_id,
       address,
@@ -154,7 +154,7 @@ export async function __createThreadReaction(
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({
     where: reactionWhere,
-    // @ts-expect-error StrictNullChecks
+
     defaults: reactionData,
   });
 
@@ -164,7 +164,7 @@ export async function __createThreadReaction(
       categoryId: NotificationCategories.NewReaction,
       data: {
         created_at: new Date(),
-        // @ts-expect-error StrictNullChecks
+
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',

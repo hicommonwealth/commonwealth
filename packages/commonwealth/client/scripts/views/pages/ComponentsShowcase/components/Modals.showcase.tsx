@@ -16,7 +16,6 @@ const ModalsShowcase = () => {
   const [modalSize, setModalSize] = useState<ModalSize>('small');
 
   const setModal = (size?: ModalSize) => {
-    // @ts-expect-error <StrictNullChecks/>
     setModalSize(size);
     setIsModalOpen(true);
   };

@@ -57,9 +57,9 @@ export async function refreshMembershipsForAddress(
     if (!membership) {
       membershipsToCreate.push({
         group_id: group.id,
-        // @ts-expect-error StrictNullChecks
+
         address_id: address.id,
-        // @ts-expect-error StrictNullChecks
+
         last_checked: null,
       });
       continue;
@@ -105,7 +105,6 @@ export async function refreshMembershipsForAddress(
   const toBulkCreate = [...membershipsToUpdate, ...membershipsToCreate].map(
     (m) =>
       computeMembership(
-        // @ts-expect-error StrictNullChecks
         groups.find((g) => g.id === m.group_id),
         address,
         balances,
@@ -142,7 +141,7 @@ function computeMembership(
   );
   return {
     group_id: group.id,
-    // @ts-expect-error StrictNullChecks
+
     address_id: address.id,
     reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,

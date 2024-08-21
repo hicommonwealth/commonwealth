@@ -97,7 +97,7 @@ describe('emitNotifications tests', () => {
     expect(isAdmin).to.not.be.null;
 
     // create a thread manually to bypass emitNotifications in-route
-    // @ts-expect-error StrictNullChecks
+
     thread = await server.models.Thread.create({
       community_id: chain,
       address_id: userAddressId2,
@@ -106,7 +106,6 @@ describe('emitNotifications tests', () => {
       kind,
     });
 
-    // @ts-expect-error StrictNullChecks
     comment = await server.models.Comment.create({
       thread_id: thread.id,
       address_id: userAddressId2,
@@ -157,9 +156,9 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
-      // @ts-expect-error StrictNullChecks
+
       expect(notif.thread_id).to.equal(thread.id);
-      // @ts-expect-error StrictNullChecks
+
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notification_data),
       );
@@ -167,7 +166,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
+
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -181,7 +180,7 @@ describe('emitNotifications tests', () => {
           id: thread.id,
         },
       });
-      // @ts-expect-error StrictNullChecks
+
       expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
@@ -216,9 +215,9 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
-      // @ts-expect-error StrictNullChecks
+
       expect(notif.thread_id).to.equal(thread.id);
-      // @ts-expect-error StrictNullChecks
+
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notifData),
       );
@@ -226,7 +225,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
+
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -240,7 +239,7 @@ describe('emitNotifications tests', () => {
           id: thread.id,
         },
       });
-      // @ts-expect-error StrictNullChecks
+
       expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
@@ -250,7 +249,7 @@ describe('emitNotifications tests', () => {
           id: thread.id,
         },
       });
-      // @ts-expect-error StrictNullChecks
+
       const before_thread_max_notif_id = updatedThread.max_notif_id;
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
@@ -281,9 +280,9 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
-      // @ts-expect-error StrictNullChecks
+
       expect(notif.thread_id).to.equal(thread.id);
-      // @ts-expect-error StrictNullChecks
+
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notification_data),
       );
@@ -291,7 +290,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
+
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -306,7 +305,7 @@ describe('emitNotifications tests', () => {
           id: thread.id,
         },
       });
-      // @ts-expect-error StrictNullChecks
+
       expect(updatedThread.max_notif_id).to.equal(before_thread_max_notif_id);
     });
 
@@ -338,13 +337,13 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
-      // @ts-expect-error StrictNullChecks
+
       expect(JSON.parse(notif.notification_data).thread_id).to.equal(thread.id);
 
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
+
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -381,13 +380,13 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
-      // @ts-expect-error StrictNullChecks
+
       expect(JSON.parse(notif.notification_data).thread_id).to.equal(thread.id);
 
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
+
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -438,7 +437,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
+
           notification_id: notif.id,
           user_id: userId,
         },
@@ -485,7 +484,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
+
           notification_id: notif.id,
           user_id: userId,
         },

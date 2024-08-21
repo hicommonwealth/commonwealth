@@ -131,7 +131,6 @@ export const ThreadCard = ({
   return (
     <>
       <Link
-        // @ts-expect-error <StrictNullChecks/>
         to={threadHref}
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
@@ -172,7 +171,6 @@ export const ThreadCard = ({
                 ).toISOString(),
               })}
               discord_meta={thread.discord_meta}
-              // @ts-expect-error <StrictNullChecks/>
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
               layoutType={layoutType}
@@ -227,11 +225,10 @@ export const ThreadCard = ({
                   trimAt={20}
                   type="stage"
                   onClick={async (e) => {
-                    // @ts-expect-error <StrictNullChecks/>
                     e.preventDefault();
-                    // @ts-expect-error <StrictNullChecks/>
+
                     e.stopPropagation();
-                    // @ts-expect-error <StrictNullChecks/>
+
                     await onStageTagClick(thread.stage);
                   }}
                 />
@@ -293,7 +290,6 @@ export const ThreadCard = ({
       </Link>
       {!hideRecentComments &&
       maxRecentCommentsToDisplay &&
-      // @ts-expect-error <StrictNullChecks/>
       thread?.recentComments?.length > 0 ? (
         <div className={clsx('RecentComments', { hideReactionButton })}>
           {[...(thread?.recentComments || [])]

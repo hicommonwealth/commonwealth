@@ -63,9 +63,8 @@ export const usePopover = (): UsePopoverProps => {
   const id = open ? `popover-${uuidv4()}` : undefined;
 
   return {
-    // @ts-expect-error <StrictNullChecks/>
     anchorEl,
-    // @ts-expect-error <StrictNullChecks/>
+
     id,
     open,
     setAnchorEl,

@@ -95,7 +95,7 @@ export const setActiveAccountOnTransactionSuccess = async (
       .accounts.find(
         (account) => account.address === userAddressUsedInTransaction,
       );
-    // @ts-expect-error StrictNullChecks
+
     return await setActiveAccount(accountToSet);
   }
 };

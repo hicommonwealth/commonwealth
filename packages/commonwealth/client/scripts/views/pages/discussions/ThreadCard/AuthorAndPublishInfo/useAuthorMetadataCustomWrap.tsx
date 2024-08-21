@@ -32,7 +32,7 @@ const applyLeftMarginToItems = (
     } else {
       // Apply 'unset' left margin for elements that used to be first, but
       // eg after screen resize, they are not first element in line anymore.
-      // @ts-expect-error <StrictNullChecks/>
+
       (child as HTMLDivElement).style.marginLeft = index > 0 && 'unset';
     }
   });

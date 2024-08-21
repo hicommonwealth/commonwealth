@@ -39,9 +39,9 @@ export const useMemberData = ({
 
   const { data: members, isLoading: isLoadingMembers } = useGetMembersQuery({
     limit: membersPerPage,
-    // @ts-expect-error StrictNullChecks
+
     order_by: tableState.orderBy,
-    // @ts-expect-error StrictNullChecks
+
     order_direction: tableState.orderDirection as 'ASC' | 'DESC',
     search: debouncedSearchTerm,
     community_id: app.activeChainId(),

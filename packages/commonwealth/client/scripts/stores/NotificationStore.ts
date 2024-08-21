@@ -23,7 +23,6 @@ class NotificationStore extends IdStore<Notification> {
   }
 
   public getBySubscription(subscription: NotificationSubscription) {
-    // @ts-expect-error StrictNullChecks
     return this._storeSubscription[subscription.id];
   }
 }

@@ -49,24 +49,21 @@ export const CWTextArea = (props: TextAreaProps) => {
 
   useEffect(() => {
     if (resizeWithText) {
-      // @ts-expect-error <StrictNullChecks/>
       textareaRef.current.style.height = 'auto';
-      // @ts-expect-error <StrictNullChecks/>
+
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      // @ts-expect-error <StrictNullChecks/>
+
       textareaRef.current.style.minHeight = '152px';
-      // @ts-expect-error <StrictNullChecks/>
+
       textareaRef.current.style.maxHeight = '512px';
     }
   }, [value, resizeWithText]);
 
   const formContext = useFormContext();
   const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
+    ? formContext.register(name)
     : ({} as any);
   const formFieldErrorMessage =
-    // @ts-expect-error <StrictNullChecks/>
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
@@ -147,7 +144,6 @@ export const CWTextArea = (props: TextAreaProps) => {
       {label && (
         <NewMessageRow
           hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}
-          // @ts-expect-error <StrictNullChecks/>
           statusMessage={validationProps.statusMessage || formFieldErrorMessage}
           validationStatus={
             validationProps.validationStatus ||

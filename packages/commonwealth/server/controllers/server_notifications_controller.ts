@@ -7,7 +7,7 @@ import {
   EmitOptions,
   EmitResult,
 } from './server_notifications_methods/emit';
-// @ts-expect-error StrictNullChecks
+
 sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 /**

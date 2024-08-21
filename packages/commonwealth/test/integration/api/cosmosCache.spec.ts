@@ -36,9 +36,9 @@ describe('Cosmos Cache', () => {
     expect(res).to.have.header('X-Cache', 'HIT');
     const valFromRedis = await server.cacheDecorator.checkCache(key);
     expect(valFromRedis).to.not.be.null;
-    // @ts-expect-error StrictNullChecks
+
     expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
-    // @ts-expect-error StrictNullChecks
+
     expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
   }
 

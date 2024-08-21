@@ -40,8 +40,7 @@ const getLinks = async (
     });
     if (!thread) return next(new AppError(Errors.NoThread));
     links = linkType
-      ? // @ts-expect-error StrictNullChecks
-        thread.links.filter((items) => {
+      ? thread.links.filter((items) => {
           return linkType.includes(items.source);
         })
       : thread.links;
@@ -54,7 +53,7 @@ const getLinks = async (
         },
       },
     });
-    // @ts-expect-error StrictNullChecks
+
     threads =
       matchThreads.length > 0
         ? matchThreads.map((thr) => {
@@ -63,7 +62,6 @@ const getLinks = async (
         : [];
   }
 
-  // @ts-expect-error StrictNullChecks
   return success(res, { links, threads });
 };
 

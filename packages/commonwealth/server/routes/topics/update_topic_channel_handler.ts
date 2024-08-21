@@ -37,7 +37,6 @@ export const updateTopicChannelHandler = async (
   }
 
   await controllers.topics.updateTopicChannel({
-    // @ts-expect-error StrictNullChecks
     user,
     topicId: parseInt(topicId, 10),
     channelId,

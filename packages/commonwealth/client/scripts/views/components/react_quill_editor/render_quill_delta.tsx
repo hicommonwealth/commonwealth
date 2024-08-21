@@ -47,20 +47,17 @@ const consolidateOrderedLists = (_groups) => {
 
   for (let i = 0; i < _groups.length; i++) {
     if (_groups[i].listtype) {
-      // @ts-expect-error <StrictNullChecks/>
       run.push(_groups[i]);
     } else {
       if (run.length > 0) {
-        // @ts-expect-error <StrictNullChecks/>
         result.push(run);
         run = [];
       }
-      // @ts-expect-error <StrictNullChecks/>
+
       result.push(_groups[i]);
     }
   }
   if (run.length > 0) {
-    // @ts-expect-error <StrictNullChecks/>
     result.push(run);
   }
 
@@ -89,23 +86,17 @@ export const renderQuillDelta = (
     // concatenate the current parent's children onto the last instead
     if (
       groups.length !== 0 &&
-      // @ts-expect-error <StrictNullChecks/>
       groups[groups.length - 1].parents[0].attributes &&
-      // @ts-expect-error <StrictNullChecks/>
       parent.attributes?.list &&
-      // @ts-expect-error <StrictNullChecks/>
       groups[groups.length - 1].parents[0].attributes.list
     ) {
       // && parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list
       // && parent.attributes.indent === groups[groups.length - 1].parents[0].attributes.indent) {
-      // @ts-expect-error <StrictNullChecks/>
+
       groups[groups.length - 1].parents.push(parent);
-      // @ts-expect-error <StrictNullChecks/>
     } else if (parent.attributes && parent.attributes.list) {
-      // @ts-expect-error <StrictNullChecks/>
       groups.push({ listtype: parent.attributes.list, parents: [parent] });
     } else {
-      // @ts-expect-error <StrictNullChecks/>
       groups.push({ parents: [parent] });
     }
   });
@@ -124,7 +115,6 @@ export const renderQuillDelta = (
         };
 
         return wrapGroupForHiddenFormatting(
-          // @ts-expect-error <StrictNullChecks/>
           group.parents.map((parent, ii) => {
             const [ParentTag, parentTagClass] = getParentTag(parent, collapse);
             const className = `hidden-formatting-inner ${parentTagClass || ''}`;
@@ -406,7 +396,6 @@ export const renderQuillDelta = (
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   <GroupTag key={`outdent-${iiii}`} className={groupTagClass}>
-                    {/* @ts-expect-error StrictNullChecks*/}
                     {temp.pop().map((data, index) => {
                       return (
                         <data.tag key={index} className={data.tagClass}>
@@ -434,7 +423,6 @@ export const renderQuillDelta = (
             const outdentBuffer = temp[temp.length - 2];
             outdentBuffer[outdentBuffer.length - 1].content.push(
               <GroupTag key={`extra-${iii}`} className={groupTagClass}>
-                {/* @ts-expect-error StrictNullChecks*/}
                 {temp.pop().map((data, index) => {
                   return (
                     <data.tag key={index} className={data.tagClass}>
@@ -460,9 +448,7 @@ export const renderQuillDelta = (
           );
         };
 
-        // @ts-expect-error <StrictNullChecks/>
         if (group.length) return group.map(renderListGroup);
-        // @ts-expect-error <StrictNullChecks/>
         else return group.parents.map(renderParent);
       });
 };

@@ -19,7 +19,7 @@ const baseRequest: CommunityAttributes = {
   name: 'ethereum',
   chain_node_id: 1,
   default_symbol: 'EDG',
-  // @ts-expect-error StrictNullChecks
+
   network: null,
   base: ChainBase.Substrate,
   icon_url: 'assets/img/protocols/edg.png',
@@ -40,7 +40,6 @@ describe('UpdateChain Tests', () => {
   });
 
   test('Correctly updates chain', async () => {
-    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -73,7 +72,6 @@ describe('UpdateChain Tests', () => {
   });
 
   test('Fails if namespace present but no transaction hash', async () => {
-    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -93,7 +91,6 @@ describe('UpdateChain Tests', () => {
   });
 
   test('Fails if chain node of community does not match supported chain', async () => {
-    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -126,7 +123,6 @@ describe('UpdateChain Tests', () => {
       '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1',
     });
 
-    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,

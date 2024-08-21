@@ -26,7 +26,6 @@ const StakeIntegration = () => {
   };
 
   const contractInfo =
-    // @ts-expect-error <StrictNullChecks/>
     commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.ethChainId];
 
   if (!contractInfo) {
@@ -64,7 +63,6 @@ const StakeIntegration = () => {
             goToSuccessStep={handleStepChange}
             createdCommunityName={community?.name}
             createdCommunityId={community?.id}
-            // @ts-expect-error <StrictNullChecks/>
             selectedAddress={selectedAddress}
             chainId={communityChainId}
           />

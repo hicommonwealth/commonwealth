@@ -90,7 +90,6 @@ export async function __updateComment(
   }
 
   const { latestVersion, versionHistory } = addVersionHistory(
-    // @ts-expect-error StrictNullChecks
     comment.version_history,
     commentBody,
     address,
@@ -167,19 +166,19 @@ export async function __updateComment(
         thread_id: comment.thread_id,
         root_title,
         root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
+
         comment_id: +finalComment.id,
-        // @ts-expect-error StrictNullChecks
+
         comment_text: finalComment.text,
-        // @ts-expect-error StrictNullChecks
+
         community_id: finalComment.community_id,
-        // @ts-expect-error StrictNullChecks
+
         author_address: finalComment.Address.address,
-        // @ts-expect-error StrictNullChecks
+
         author_community_id: finalComment.Address.community_id,
       },
     },
-    // @ts-expect-error StrictNullChecks
+
     excludeAddresses: [finalComment.Address.address],
   });
 
@@ -187,6 +186,5 @@ export async function __updateComment(
   address.last_active = new Date();
   address.save();
 
-  // @ts-expect-error StrictNullChecks
   return [finalComment.toJSON(), allNotificationOptions];
 }

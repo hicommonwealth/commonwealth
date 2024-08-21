@@ -104,7 +104,6 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
-          // @ts-expect-error <StrictNullChecks/>
           { isSelected: app.activeChainId() === item.id },
           'SidebarMenuItem community',
         )}
@@ -116,7 +115,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           navigateToCommunity({
             navigate,
             path: '/',
-            // @ts-expect-error <StrictNullChecks/>
+
             chain: item.id,
           });
         }}
@@ -166,7 +165,6 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
   return (
     <div
       className={getClasses<{ className: string }>(
-        // @ts-expect-error <StrictNullChecks/>
         { className },
         ComponentType.SidebarMenu,
       )}

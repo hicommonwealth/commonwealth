@@ -166,10 +166,8 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
 
   return (
     <TooltipWrapper
-      // @ts-expect-error <StrictNullChecks/>
       disabled={disabled}
       {...(!hideToolTip && {
-        // @ts-expect-error <StrictNullChecks/>
         text: tooltipText || getTooltipCopy(action, isThreadArchived),
       })}
     >
@@ -184,7 +182,6 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           ComponentType.ThreadAction,
         )}
       >
-        {/* @ts-expect-error StrictNullChecks*/}
         {renderPhosphorIcon(action, disabled, selected)}
         {action !== 'overflow' && action && label && (
           <CWText

@@ -151,9 +151,7 @@ export const CommentCard = ({
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            // @ts-expect-error <StrictNullChecks/>
             authorAddress={app.chain ? author?.address : comment?.author}
-            // @ts-expect-error <StrictNullChecks/>
             authorCommunityId={author?.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
@@ -181,7 +179,6 @@ export const CommentCard = ({
                 const hasContentChanged =
                   JSON.stringify(commentBody) !== JSON.stringify(commentDelta);
 
-                // @ts-expect-error <StrictNullChecks/>
                 onEditCancel(hasContentChanged);
               }}
             />
@@ -192,7 +189,7 @@ export const CommentCard = ({
               onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // @ts-expect-error <StrictNullChecks/>
+
                 await onEditConfirm(commentDelta);
               }}
             />
@@ -253,7 +250,7 @@ export const CommentCard = ({
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    // @ts-expect-error <StrictNullChecks/>
+
                     await onReply();
                   }}
                 />
@@ -272,7 +269,6 @@ export const CommentCard = ({
                   renderTrigger={(onClick) => (
                     <CWThreadAction action="overflow" onClick={onClick} />
                   )}
-                  // @ts-expect-error <StrictNullChecks/>
                   menuItems={[
                     canEdit && {
                       label: 'Edit',

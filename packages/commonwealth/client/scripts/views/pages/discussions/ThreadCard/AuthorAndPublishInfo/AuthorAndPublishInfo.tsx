@@ -84,7 +84,7 @@ export const AuthorAndPublishInfo = ({
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
-  // @ts-expect-error <StrictNullChecks>
+
   useAuthorMetadataCustomWrap(containerRef);
 
   const dotIndicator = showSplitDotIndicator && (
@@ -102,7 +102,7 @@ export const AuthorAndPublishInfo = ({
     value: v.body,
     label: formatVersionText(
       v.timestamp,
-      // @ts-expect-error <StrictNullChecks>
+
       v.author?.address,
       profile,
       collaboratorLookupInfo,
@@ -150,7 +150,6 @@ export const AuthorAndPublishInfo = ({
             : showUserAddressWithInfo
         }
         popoverPlacement={popoverPlacement}
-        // @ts-expect-error <StrictNullChecks>
         profile={profile}
       />
 
@@ -181,7 +180,6 @@ export const AuthorAndPublishInfo = ({
           >
             {/*@ts-expect-error <StrictNullChecks>*/}
             {`${collaboratorsInfo.length} other${
-              // @ts-expect-error <StrictNullChecks>
               collaboratorsInfo.length > 1 ? 's' : ''
             }`}
             <CWPopover
@@ -219,9 +217,7 @@ export const AuthorAndPublishInfo = ({
                   ?.utc?.()
                   ?.local?.()
                   ?.format('DD/MM/YYYY')}`}
-                // @ts-expect-error <StrictNullChecks>
                 onChange={({ value }) => {
-                  // @ts-expect-error <StrictNullChecks>
                   changeContentText(value);
                 }}
                 formatOptionLabel={(option) => {
@@ -283,7 +279,6 @@ export const AuthorAndPublishInfo = ({
               },
               'proposal-stage-text',
             )}
-            // @ts-expect-error <StrictNullChecks>
             onClick={async () => await onThreadStageLabelClick(threadStage)}
           >
             {threadStageToLabel(threadStage)}

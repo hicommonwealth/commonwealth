@@ -39,9 +39,9 @@ export const getCommunitiesHandler = async (
   if (options.search) {
     const results = await controllers.communities.searchCommunities({
       search: options.search,
-      // @ts-expect-error StrictNullChecks
+
       limit: parseInt(options.limit, 10) || 0,
-      // @ts-expect-error StrictNullChecks
+
       page: parseInt(options.page, 10) || 0,
       orderBy: options.order_by,
       orderDirection: options.order_direction as any,

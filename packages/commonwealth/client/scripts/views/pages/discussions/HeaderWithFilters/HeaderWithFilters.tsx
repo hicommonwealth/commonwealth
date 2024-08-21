@@ -62,7 +62,7 @@ export const HeaderWithFilters = ({
   const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
   const location = useLocation();
-  // @ts-expect-error <StrictNullChecks/>
+
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const filterRowRef = useRef<HTMLDivElement>();
@@ -118,7 +118,7 @@ export const HeaderWithFilters = ({
   const featuredTopics = (topics || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
-    // @ts-expect-error <StrictNullChecks/>
+
     .sort((a, b) => a.order - b.order);
 
   const otherTopics = (topics || [])
@@ -260,7 +260,6 @@ export const HeaderWithFilters = ({
       )}
 
       {app.chain?.meta && (
-        // @ts-expect-error <StrictNullChecks/>
         <div className="filter-row" ref={filterRowRef}>
           <div className="filter-section">
             <p className="filter-label">Sort</p>
@@ -360,7 +359,6 @@ export const HeaderWithFilters = ({
                   canEditOption={Permissions.isCommunityAdmin()}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
-                      // @ts-expect-error <StrictNullChecks/>
                       [...featuredTopics, ...otherTopics].find(
                         (x) => x.id === item.id,
                       ),
@@ -468,7 +466,6 @@ export const HeaderWithFilters = ({
           checked={isIncludingSpamThreads}
           label="Include posts flagged as spam"
           onChange={(e) => {
-            // @ts-expect-error <StrictNullChecks/>
             onIncludeSpamThreads(e.target.checked);
           }}
         />
@@ -478,7 +475,6 @@ export const HeaderWithFilters = ({
             checked={isIncludingArchivedThreads}
             label="Include archived posts"
             onChange={(e) => {
-              // @ts-expect-error <StrictNullChecks/>
               onIncludeArchivedThreads(e.target.checked);
             }}
           />
@@ -486,22 +482,16 @@ export const HeaderWithFilters = ({
       </div>
 
       {(activeContests || []).map((contest) => {
-        const { end_time, score } =
-          // @ts-expect-error <StrictNullChecks/>
-          contest?.contests[0] || {};
+        const { end_time, score } = contest?.contests[0] || {};
 
         return (
           <ContestCard
             key={contest.contest_address}
             isAdmin={false}
-            // @ts-expect-error <StrictNullChecks/>
             address={contest.contest_address}
-            // @ts-expect-error <StrictNullChecks/>
             name={contest.name}
             imageUrl={contest.image_url}
-            // @ts-expect-error <StrictNullChecks/>
             topics={contest.topics}
-            // @ts-expect-error <StrictNullChecks/>
             score={score}
             decimals={contest.decimals}
             ticker={contest.ticker}
@@ -520,11 +510,9 @@ export const HeaderWithFilters = ({
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}
-            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setTopicSelectedToEdit(null)}
           />
         }
-        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
       />

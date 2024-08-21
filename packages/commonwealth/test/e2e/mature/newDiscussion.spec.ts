@@ -13,7 +13,7 @@ test.describe('New Discussion Page Tests', () => {
     await page.goto(
       `${config.SERVER_URL}/${seeder.testChains[0].id}/discussions`,
     );
-    // @ts-expect-error StrictNullChecks
+
     await seeder.addAddressIfNone(seeder.testChains[0].id);
     await login(page);
     await page.goto(
@@ -33,7 +33,7 @@ test.describe('New Discussion Page Tests', () => {
 
     // delete thread for cleanup
     const match = page.url().match(/\/(\d+)-/);
-    // @ts-expect-error StrictNullChecks
+
     const threadId = match[1];
     await seeder.testDb.sequelize.query(
       `DELETE from "Threads" where id = ${threadId}`,

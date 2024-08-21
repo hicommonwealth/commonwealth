@@ -33,7 +33,6 @@ const setupServer = (app: Express, port: number) => {
     if (typeof addr === 'string') {
       log.info(`Listening on ${addr}`);
     } else {
-      // @ts-expect-error StrictNullChecks
       log.info(`Listening on port ${addr.port}`);
     }
   };

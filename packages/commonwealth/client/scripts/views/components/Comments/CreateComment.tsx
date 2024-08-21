@@ -150,7 +150,6 @@ export const CreateComment = ({
       parentType={parentType}
       canComment={canComment}
       handleSubmitComment={handleSubmitComment}
-      // @ts-expect-error <StrictNullChecks/>
       errorMsg={errorMsg}
       contentDelta={contentDelta}
       setContentDelta={setContentDelta}

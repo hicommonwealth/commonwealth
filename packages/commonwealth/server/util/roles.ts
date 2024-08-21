@@ -49,11 +49,9 @@ class RoleInstanceWithPermission {
 }
 
 function convertToAddressQuery(findOptions: FindOptions) {
-  // @ts-expect-error StrictNullChecks
   if (findOptions.where['address_id']) {
-    // @ts-expect-error StrictNullChecks
     findOptions.where['id'] = findOptions.where['address_id'];
-    // @ts-expect-error StrictNullChecks
+
     delete findOptions.where['address_id'];
   }
 
@@ -117,9 +115,8 @@ export async function findAllCommunityRolesWithRoleAssignments(
   return addresses.map((a) => {
     const roleAssignments: RoleAssignmentAttributes[] = [
       {
-        // @ts-expect-error StrictNullChecks
         community_role_id: a.id,
-        // @ts-expect-error StrictNullChecks
+
         address_id: a.id,
         is_user_default: a.is_user_default,
         Address: a,

@@ -46,7 +46,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     ThreadKind.Discussion,
   );
   const [threadUrl, setThreadUrl] = useState('');
-  // @ts-expect-error StrictNullChecks
+
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(

@@ -34,12 +34,11 @@ export async function __createTopic(
     throw new AppError(Errors.NotLoggedIn);
   }
 
-  // @ts-expect-error StrictNullChecks
   const name = body.name.trim();
   if (!name) {
     throw new AppError(Errors.TopicRequired);
   }
-  // @ts-expect-error StrictNullChecks
+
   if (body.name.match(/["<>%{}|\\/^`]/g)) {
     throw new AppError(Errors.InvalidTopicName);
   }
@@ -59,7 +58,7 @@ export async function __createTopic(
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    // @ts-expect-error StrictNullChecks
+
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
@@ -84,7 +83,7 @@ export async function __createTopic(
       name,
       community_id: community.id,
     },
-    // @ts-expect-error StrictNullChecks
+
     defaults: options,
   });
 

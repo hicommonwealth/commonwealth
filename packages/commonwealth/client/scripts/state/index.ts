@@ -81,7 +81,6 @@ const user = new UserController();
 
 // INITIALIZE MAIN APP
 const app: IApp = {
-  // @ts-expect-error StrictNullChecks
   chain: null,
   activeChainId: () => app.chain?.id,
 
@@ -115,10 +114,8 @@ const app: IApp = {
     chains: new ChainStore(),
   },
 
-  // @ts-expect-error StrictNullChecks
   loadingError: null,
 
-  // @ts-expect-error StrictNullChecks
   _customDomainId: null,
   isCustomDomain: () => app._customDomainId !== null,
   customDomainId: () => {

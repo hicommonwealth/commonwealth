@@ -23,7 +23,6 @@ const linkExistingAddressToCommunity = async (
   req: Request,
   res: Response,
 ) => {
-  // @ts-expect-error StrictNullChecks
   const userId = req.user.id;
   const { community_id } = req.body;
 
@@ -67,7 +66,6 @@ const linkExistingAddressToCommunity = async (
 
   if (!isOriginalTokenValid) {
     const communities = await models.Community.findAll({
-      // @ts-expect-error StrictNullChecks
       where: { base: community.base },
     });
 
@@ -82,7 +80,6 @@ const linkExistingAddressToCommunity = async (
         verification_token_expires: verificationTokenExpires,
       },
       {
-        // @ts-expect-error StrictNullChecks
         where: {
           user_id: originalAddress.user_id,
           address: req.body.address,
@@ -93,24 +90,22 @@ const linkExistingAddressToCommunity = async (
   }
 
   const encodedAddress =
-    // @ts-expect-error StrictNullChecks
     community.base === ChainBase.Substrate
       ? addressSwapper({
           address: req.body.address,
-          // @ts-expect-error StrictNullChecks
+
           currentPrefix: community.ss58_prefix,
         })
       : req.body.address;
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      // @ts-expect-error StrictNullChecks
       where: { community_id: community.id, address: encodedAddress },
     },
   );
 
   let hex;
-  // @ts-expect-error StrictNullChecks
+
   if (community.base === ChainBase.CosmosSDK) {
     hex = await bech32ToHex(req.body.address);
   }
@@ -142,7 +137,7 @@ const linkExistingAddressToCommunity = async (
         },
         { where: { id: existingAddress.id }, transaction },
       );
-      // @ts-expect-error StrictNullChecks
+
       addressId = updatedObj.id;
     });
   } else {
@@ -174,7 +169,6 @@ const linkExistingAddressToCommunity = async (
       );
     });
 
-    // @ts-expect-error StrictNullChecks
     addressId = newObj.id;
   }
 

@@ -93,7 +93,7 @@ export async function __createCommentReaction(
     try {
       const { isValid } = await validateTopicGroupsMembership(
         this.models,
-        // @ts-expect-error StrictNullChecks
+
         thread.topic_id,
         thread.community_id,
         address,
@@ -131,7 +131,7 @@ export async function __createCommentReaction(
         await commonProtocolService.contractHelpers.getNamespaceBalance(
           community.namespace_address!,
           stake.stake_id,
-          // @ts-expect-error StrictNullChecks
+
           node.eth_chain_id,
           [address.address],
         );
@@ -162,7 +162,7 @@ export async function __createCommentReaction(
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({
     where: reactionWhere,
-    // @ts-expect-error StrictNullChecks
+
     defaults: reactionData,
   });
   // build notification options
@@ -173,13 +173,13 @@ export async function __createCommentReaction(
       categoryId: NotificationCategories.NewReaction,
       data: {
         created_at: new Date(),
-        // @ts-expect-error StrictNullChecks
+
         thread_id: thread.id,
-        // @ts-expect-error StrictNullChecks
+
         comment_id: comment.id,
         comment_text: comment.text,
         root_title: thread.title,
-        // @ts-expect-error StrictNullChecks
+
         root_type: null, // What is this for?
         community_id: thread.community_id,
         author_address: address.address,

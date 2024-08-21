@@ -22,7 +22,6 @@ export const deleteThreadHandler = async (
     throw new AppError(Errors.InvalidThreadID);
   }
 
-  // @ts-expect-error StrictNullChecks
   await controllers.threads.deleteThread({ user, address, threadId });
 
   return success(res, undefined);

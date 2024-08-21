@@ -18,7 +18,6 @@ export const checkNewThreadErrors = (
     return notifyError(NewThreadErrors.NoTopic);
   }
 
-  // @ts-expect-error StrictNullChecks
   if (threadKind === ThreadKind.Discussion && !bodyText.length) {
     return notifyError(NewThreadErrors.NoBody);
   } else if (threadKind === ThreadKind.Link && !threadUrl) {

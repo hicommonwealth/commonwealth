@@ -31,7 +31,6 @@ export const ChangeThreadTopicModal = ({
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
-      // @ts-expect-error <StrictNullChecks/>
       acc.enabledTopics.push(t);
       return acc;
     },
@@ -68,9 +67,7 @@ export const ChangeThreadTopicModal = ({
       <CWModalHeader label="Change topic" onModalClose={onModalClose} />
       <CWModalBody>
         <TopicSelector
-          // @ts-expect-error <StrictNullChecks/>
           enabledTopics={topicsForSelector.enabledTopics}
-          // @ts-expect-error <StrictNullChecks/>
           disabledTopics={topicsForSelector.disabledTopics}
           value={activeTopic}
           onChange={setActiveTopic}

@@ -23,7 +23,6 @@ const UserMenuItem = ({
   return (
     <div className={clsx('UserMenuItem', { isSignedIn })}>
       <CWText type="b2" className="identification">
-        {/* @ts-expect-error StrictNullChecks*/}
         {username || formatAddressShort(address, 6)}
       </CWText>
       {isSignedIn && hasJoinedCommunity && (

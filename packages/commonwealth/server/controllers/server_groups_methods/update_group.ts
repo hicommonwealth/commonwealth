@@ -129,7 +129,6 @@ export async function __updateGroup(
           ),
         },
         {
-          // @ts-expect-error StrictNullChecks
           where: {
             id: {
               [Op.in]: topicsToAssociate.map(({ id }) => id),
@@ -154,7 +153,6 @@ export async function __updateGroup(
           ),
         },
         {
-          // @ts-expect-error StrictNullChecks
           where: {
             id: {
               [Op.notIn]: topicsToAssociate.map(({ id }) => id),

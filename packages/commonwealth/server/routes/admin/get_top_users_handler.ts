@@ -10,7 +10,6 @@ export const getTopUsersHandler = async (
   res: TypedResponse<GetTopUsersResponse>,
 ) => {
   const result = await controllers.admin.getTopUsers({
-    // @ts-expect-error StrictNullChecks
     user: req.user,
   });
   return success(res, result);

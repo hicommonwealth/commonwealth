@@ -6,7 +6,6 @@ type CountdownStatus = 'normal' | 'warning' | 'critical';
 export const calculateTimeLeft = (
   endTime: string,
   isActive: boolean,
-  // @ts-expect-error StrictNullChecks
 ): { label: string; status: CountdownStatus } => {
   const currentTime = moment();
   const endMoment = moment(endTime);

@@ -32,7 +32,7 @@ const createDiscordBotConfig = async (
 
   const isAdmin = await validateOwner({
     models: models,
-    // @ts-expect-error StrictNullChecks
+
     user: req.user,
     communityId: community_id,
     allowAdmin: true,
@@ -76,7 +76,6 @@ const createDiscordBotConfig = async (
         message: 'updated an existing discord bot config',
       });
     } else {
-      // @ts-expect-error StrictNullChecks
       await models.DiscordBotConfig.create({
         community_id,
         verification_token,

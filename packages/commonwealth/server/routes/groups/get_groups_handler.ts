@@ -32,7 +32,6 @@ export const getGroupsHandler = async (
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
-    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     includeMembers: include_members,
     includeTopics: include_topics,

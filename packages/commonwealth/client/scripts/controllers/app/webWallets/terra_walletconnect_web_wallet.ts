@@ -80,7 +80,6 @@ class TerraWalletConnectWebWalletController
             throw new Error('SignBytes unsuccessful');
           }
           return {
-            // @ts-expect-error <StrictNullChecks>
             public_key: result.result.public_key.toAmino().value as string,
             signature: Buffer.from(result.result.signature).toString('base64'),
           };

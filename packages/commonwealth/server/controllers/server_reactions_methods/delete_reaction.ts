@@ -30,7 +30,6 @@ export async function __deleteReaction(
     .map((addr) => addr.id);
 
   const reaction = await this.models.Reaction.findOne({
-    // @ts-expect-error StrictNullChecks
     where: {
       id: reactionId,
       address_id: { [Op.in]: userOwnedAddressIds },

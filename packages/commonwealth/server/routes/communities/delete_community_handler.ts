@@ -14,7 +14,6 @@ export const deleteCommunityHandler = async (
   res: TypedResponse<DeleteCommunityResponse>,
 ) => {
   const community = await controllers.communities.deleteCommunity({
-    // @ts-expect-error StrictNullChecks
     user: req.user,
     communityId: req.params.communityId,
   });

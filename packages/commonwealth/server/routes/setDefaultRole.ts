@@ -24,11 +24,10 @@ const setDefaultRole = async (
     where: { id: req.body.author_community_id },
   });
   const encodedAddress =
-    // @ts-expect-error StrictNullChecks
     authorCommunity.base === ChainBase.Substrate
       ? addressSwapper({
           address: req.body.address,
-          // @ts-expect-error StrictNullChecks
+
           currentPrefix: authorCommunity.ss58_prefix,
         })
       : req.body.address;

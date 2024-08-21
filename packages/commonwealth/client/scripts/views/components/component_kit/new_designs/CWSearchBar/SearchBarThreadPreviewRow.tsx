@@ -50,7 +50,6 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
 
       <div className="content-row">
         <CWText type="b2" fontWeight="bold">
-          {/* @ts-expect-error StrictNullChecks*/}
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <CWText type="caption" className="excerpt-text" fontWeight="medium">

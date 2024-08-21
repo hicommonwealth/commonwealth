@@ -22,7 +22,6 @@ const updateSiteAdmin = async (
 ) => {
   const { address, siteAdmin } = req.body;
 
-  // @ts-expect-error StrictNullChecks
   if (!req.user.isAdmin) {
     throw new AppError(PromoteUserErrors.NotAdmin);
   }

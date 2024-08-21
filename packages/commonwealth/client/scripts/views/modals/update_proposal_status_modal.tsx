@@ -74,11 +74,9 @@ export const UpdateProposalStatusModal = ({
   );
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
-    // @ts-expect-error <StrictNullChecks/>
   >(getInitialSnapshots(thread));
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
-    // @ts-expect-error <StrictNullChecks/>
   >(getInitialCosmosProposals(thread));
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -114,7 +112,7 @@ export const UpdateProposalStatusModal = ({
       address: user.activeAccount?.address || '',
       communityId: app.activeChainId(),
       threadId: thread.id,
-      // @ts-expect-error <StrictNullChecks/>
+
       stage: tempStage,
     })
       .then(() => {
@@ -262,7 +260,6 @@ export const UpdateProposalStatusModal = ({
           isPWA: isAddedToHomeScreen,
         });
 
-        // @ts-expect-error <StrictNullChecks/>
         onChangeHandler?.(tempStage, links);
         onModalClose();
       })
@@ -353,7 +350,6 @@ export const UpdateProposalStatusModal = ({
                 label: threadStageToLabel(stage),
               }))}
               className="StageSelector"
-              // @ts-expect-error <StrictNullChecks/>
               onChange={(option) => setTempStage(option.value)}
             />
             <SnapshotProposalSelector

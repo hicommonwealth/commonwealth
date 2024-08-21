@@ -20,7 +20,6 @@ const fetchCosmosDeposits = async (
   ) {
     return proposal.fetchDeposits();
   } else {
-    // @ts-expect-error StrictNullChecks
     return null;
   }
 };

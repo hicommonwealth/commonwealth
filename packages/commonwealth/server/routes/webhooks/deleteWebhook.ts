@@ -28,7 +28,7 @@ const deleteWebhook = async (
 
   const isAdmin = await validateOwner({
     models: models,
-    // @ts-expect-error StrictNullChecks
+
     user,
     communityId: webhook.community_id,
     allowAdmin: true,

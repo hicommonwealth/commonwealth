@@ -52,23 +52,20 @@ const Profile = ({ userId }: ProfileProps) => {
       setProfile(
         new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
       );
-      // @ts-expect-error <StrictNullChecks/>
+
       setThreads(data.threads.map((t) => new Thread(t)));
 
-      // @ts-expect-error <StrictNullChecks/>
       const responseComments = data.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = data.commentThreads.find(
-          // @ts-expect-error <StrictNullChecks/>
           (t) => t.id === parseInt(c.threadId, 10),
         );
         return { ...c, thread };
       });
-      // @ts-expect-error <StrictNullChecks/>
+
       setComments(commentsWithAssociatedThread);
 
       setAddresses(
-        // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
@@ -163,12 +160,10 @@ const Profile = ({ userId }: ProfileProps) => {
                 : 'ProfilePageContainer smaller-margins'
             }
           >
-            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
-              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>
@@ -180,12 +175,10 @@ const Profile = ({ userId }: ProfileProps) => {
       <CWPageLayout>
         <div className="Profile">
           <div className="ProfilePageContainer">
-            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
-              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>

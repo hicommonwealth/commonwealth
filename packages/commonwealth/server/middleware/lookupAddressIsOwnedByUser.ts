@@ -52,7 +52,7 @@ export const filterAddressOwnedByUser = async (
   // for each address owned by user, remove it from the unownedAddresses
   addressesOwnedByUser.forEach((author) => {
     unownedAddressesSet.delete(author.address);
-    // @ts-expect-error StrictNullChecks
+
     unownedAddressIdsSet.delete(author.id);
   });
 

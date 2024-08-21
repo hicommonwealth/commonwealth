@@ -91,7 +91,6 @@ export function hasKey<O, K extends string | number | symbol>(
   obj: O,
   key: K,
 ): obj is O & { [k in K]: unknown } {
-  // @ts-expect-error StrictNullChecks
   if (typeof obj === 'object') return key in obj;
   else return false;
 }

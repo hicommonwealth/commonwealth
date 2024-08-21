@@ -133,11 +133,9 @@ const SignTransactionsStep = ({
 
       isContestRecurring
         ? (contestAddress = await deployRecurringContestOnchainMutation(
-            // @ts-expect-error <StrictNullChecks/>
             recurring,
           ))
-        : // @ts-expect-error <StrictNullChecks/>
-          (contestAddress = await deploySingleContestOnchainMutation(single));
+        : (contestAddress = await deploySingleContestOnchainMutation(single));
 
       await createContestMutation({
         contest_address: contestAddress,

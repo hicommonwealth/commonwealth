@@ -63,7 +63,7 @@ export async function __createThreadPoll(
   const community = await this.models.Community.findByPk(thread.community_id);
 
   // check if admin_only flag is set
-  // @ts-expect-error StrictNullChecks
+
   if (community.admin_only_polling) {
     const isAdmin = await validateOwner({
       models: this.models,
@@ -81,12 +81,11 @@ export async function __createThreadPoll(
     await thread.save({ transaction });
     return this.models.Poll.create(
       {
-        // @ts-expect-error StrictNullChecks
         thread_id: thread.id,
         community_id: thread.community_id,
         prompt,
         options: JSON.stringify(options),
-        // @ts-expect-error StrictNullChecks
+
         ends_at,
       },
       { transaction },

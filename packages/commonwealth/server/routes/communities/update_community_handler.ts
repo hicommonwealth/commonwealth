@@ -23,7 +23,6 @@ export const updateCommunityHandler = async (
   } = req.body;
   const { analyticsOptions, ...community } =
     await controllers.communities.updateCommunity({
-      // @ts-expect-error StrictNullChecks
       user: req.user,
       featuredTopics,
       snapshot,

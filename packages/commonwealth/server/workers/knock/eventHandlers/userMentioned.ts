@@ -55,10 +55,8 @@ export const processUserMentioned: EventHandler<
       author: user.profile.name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
-          ? // @ts-expect-error StrictNullChecks
-            safeTruncateBody(decodeURIComponent(payload.thread.body), 255)
-          : // @ts-expect-error StrictNullChecks
-            safeTruncateBody(decodeURIComponent(payload.comment.text), 255),
+          ? safeTruncateBody(decodeURIComponent(payload.thread.body), 255)
+          : safeTruncateBody(decodeURIComponent(payload.comment.text), 255),
       object_url:
         'thread' in payload
           ? getThreadUrl(
@@ -67,11 +65,10 @@ export const processUserMentioned: EventHandler<
               community.custom_domain,
             )
           : getCommentUrl(
-              // @ts-expect-error StrictNullChecks
               payload.comment.community_id,
-              // @ts-expect-error StrictNullChecks
+
               payload.comment.thread_id,
-              // @ts-expect-error StrictNullChecks
+
               payload.comment.id,
               community.custom_domain,
             ),

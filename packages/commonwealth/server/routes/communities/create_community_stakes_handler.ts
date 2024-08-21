@@ -40,7 +40,7 @@ export const createCommunityStakeHandler = async (
   const user = req.user;
   const isAdmin = await validateOwner({
     models,
-    // @ts-expect-error StrictNullChecks
+
     user,
     communityId: community_id,
     allowMod: false,
@@ -76,7 +76,6 @@ export const createCommunityStakeHandler = async (
   }
 
   const results = await controllers.communities.createCommunityStake({
-    // @ts-expect-error StrictNullChecks
     user,
     communityStake: {
       ...paramsValidationResult.data,
@@ -88,7 +87,6 @@ export const createCommunityStakeHandler = async (
   // so this request doesn't fail
   await command(Community.GenerateStakeholderGroups(), {
     actor: {
-      // @ts-expect-error StrictNullChecks
       user: undefined,
     },
     payload: { id: community.id! },

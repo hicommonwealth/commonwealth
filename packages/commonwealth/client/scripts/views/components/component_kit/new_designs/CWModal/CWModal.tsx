@@ -50,7 +50,6 @@ const CWModal: FC<CWModalProps> = ({
     slots={{ backdrop: Backdrop }}
     disableEnforceFocus
     className={rootClassName}
-    // @ts-expect-error <StrictNullChecks/>
     style={{ zIndex: zIndex || null }}
   >
     <div

@@ -25,9 +25,9 @@ export class BinaryVote<C extends Coin> implements IVote<C> {
   ) {
     this.account = account;
     this.choice = choice;
-    // @ts-expect-error StrictNullChecks
+
     this.amount = amount;
-    // @ts-expect-error StrictNullChecks
+
     this.weight = weight;
   }
 }

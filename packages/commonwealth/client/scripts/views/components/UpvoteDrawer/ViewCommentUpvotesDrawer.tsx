@@ -33,14 +33,10 @@ export const ViewCommentUpvotesDrawer = ({
     <ViewUpvotesDrawer
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      // @ts-expect-error <StrictNullChecks/>
       contentBody={comment.text}
       header="Comment upvotes"
-      // @ts-expect-error <StrictNullChecks/>
       reactorData={reactorData}
-      // @ts-expect-error <StrictNullChecks/>
       author={comment?.author ? app.chain.accounts.get(comment?.author) : null}
-      // @ts-expect-error <StrictNullChecks/>
       publishDate={comment.createdAt}
     />
   );

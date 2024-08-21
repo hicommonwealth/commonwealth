@@ -36,9 +36,8 @@ export const createTopicHandler = async (
   }
 
   const [topic, analyticsOptions] = await controllers.topics.createTopic({
-    // @ts-expect-error StrictNullChecks
     user,
-    // @ts-expect-error StrictNullChecks
+
     community,
     body: validationResult.data,
   });

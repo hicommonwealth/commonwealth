@@ -30,7 +30,6 @@ export const ManageTopicsSection = () => {
           return [...acc, { ...curr, order: index + 1 }];
         }, []);
     } else {
-      // @ts-expect-error <StrictNullChecks/>
       return [...topics].sort((a, b) => a.order - b.order);
     }
   };
@@ -49,7 +48,6 @@ export const ManageTopicsSection = () => {
           return [...acc, { ...curr, order: index + 1 }];
         }, []);
     } else {
-      // @ts-expect-error <StrictNullChecks/>
       return [...topics].sort((a, b) => a.order - b.order);
     }
   };
@@ -64,19 +62,15 @@ export const ManageTopicsSection = () => {
     useUpdateFeaturedTopicsOrderMutation();
 
   const [featuredTopics, setFeaturedTopics] = useState<Topic[]>(() =>
-    // @ts-expect-error <StrictNullChecks/>
     getFeaturedTopics(rawTopics),
   );
 
   const [regularTopics, setRegularTopics] = useState<Topic[]>(() =>
-    // @ts-expect-error <StrictNullChecks/>
     getRegularTopics(rawTopics),
   );
 
-  // @ts-expect-error <StrictNullChecks/>
   const initialFeaturedTopics = getFeaturedTopics(rawTopics);
 
-  // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const handleSave = async () => {
@@ -93,9 +87,8 @@ export const ManageTopicsSection = () => {
   };
 
   useEffect(() => {
-    // @ts-expect-error <StrictNullChecks/>
     setFeaturedTopics(getFeaturedTopics(rawTopics));
-    // @ts-expect-error <StrictNullChecks/>
+
     setRegularTopics(getRegularTopics(rawTopics));
   }, [rawTopics]);
 
@@ -178,13 +171,11 @@ export const ManageTopicsSection = () => {
           <EditTopicModal
             topic={topicSelectedToEdit}
             onModalClose={() => {
-              // @ts-expect-error <StrictNullChecks/>
               setTopicSelectedToEdit(null);
             }}
             noRedirect={true}
           />
         }
-        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
       />

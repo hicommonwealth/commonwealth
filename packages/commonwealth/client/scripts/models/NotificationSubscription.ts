@@ -70,11 +70,11 @@ class NotificationSubscription {
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.communityId = communityId;
-    // @ts-expect-error StrictNullChecks
+
     this.Comment = comment;
-    // @ts-expect-error StrictNullChecks
+
     this.Thread = thread;
-    // @ts-expect-error StrictNullChecks
+
     this.snapshotId = snapshotId;
   }
 }
@@ -127,9 +127,9 @@ export const modelFromServer = (
     created_at!,
     immediate_email,
     community_id!,
-    // @ts-expect-error StrictNullChecks
+
     modeledComment,
-    // @ts-expect-error StrictNullChecks
+
     modeledThread,
     snapshot_id!,
   );

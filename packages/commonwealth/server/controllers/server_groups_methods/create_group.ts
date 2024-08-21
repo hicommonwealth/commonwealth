@@ -57,7 +57,7 @@ export async function __createGroup(
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    // @ts-expect-error StrictNullChecks
+
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
@@ -99,7 +99,7 @@ export async function __createGroup(
       community_id: community.id,
     },
   });
-  // @ts-expect-error StrictNullChecks
+
   if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
     // did not find all specified topics
     throw new AppError(Errors.InvalidTopics);
@@ -108,7 +108,6 @@ export async function __createGroup(
   const createGroupWithTransaction = async (t: Transaction) => {
     const group = await this.models.Group.create(
       {
-        // @ts-expect-error StrictNullChecks
         community_id: community.id,
         metadata,
         requirements,
@@ -127,7 +126,6 @@ export async function __createGroup(
           ),
         },
         {
-          // @ts-expect-error StrictNullChecks
           where: {
             id: {
               [Op.in]: topicsToAssociate.map(({ id }) => id),

@@ -63,7 +63,6 @@ export const AvatarUpload = ({
       }
 
       setFiles(
-        // @ts-expect-error StrictNullChecks
         acceptedFiles.map((file) =>
           Object.assign(file, {
             preview: URL.createObjectURL(file),
@@ -133,16 +132,13 @@ export const AvatarUpload = ({
 
         {files.length === 1 ? (
           <img
-            // @ts-expect-error StrictNullChecks
             src={files[0].preview}
             onLoad={() => {
-              // @ts-expect-error StrictNullChecks
               URL.revokeObjectURL(files[0].preview);
             }}
           />
         ) : (
           showAvatar && (
-            // @ts-expect-error StrictNullChecks
             <Avatar address={address} url={avatarUrl} size={avatarSize} />
           )
         )}

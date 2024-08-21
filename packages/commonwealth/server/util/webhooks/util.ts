@@ -105,7 +105,6 @@ export async function getPreviewImageUrl(
     notification.categoryId !== NotificationCategories.ThreadEdit &&
     notification.categoryId !== NotificationCategories.CommentEdit
   ) {
-    // @ts-expect-error StrictNullChecks
     const bodytext = decodeURIComponent(notification.data.comment_text);
     const matches = bodytext.match(REGEX_IMAGE);
     if (matches) {

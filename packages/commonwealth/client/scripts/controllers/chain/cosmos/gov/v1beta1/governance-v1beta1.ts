@@ -16,7 +16,6 @@ import { encodeMsgSubmitProposal, msgToIProposal } from './utils-v1beta1';
 class CosmosGovernance extends ProposalModule<
   CosmosApiType,
   ICosmosProposal,
-  // @ts-expect-error StrictNullChecks
   CosmosProposal
 > {
   private _minDeposit: CosmosToken;
@@ -46,17 +45,15 @@ class CosmosGovernance extends ProposalModule<
     return this._initProposal(proposalId);
   }
 
-  // @ts-expect-error StrictNullChecks
   private async _initProposal(proposalId: number): Promise<CosmosProposal> {
     try {
-      // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
       const { proposal } = await this._Chain.api.gov.proposal(proposalId);
       const cosmosProposal = new CosmosProposal(
         this._Chain,
         this._Accounts,
         this,
-        // @ts-expect-error StrictNullChecks
+
         msgToIProposal(proposal),
       );
       cosmosProposal.init();
@@ -94,11 +91,11 @@ class CosmosGovernance extends ProposalModule<
     console.log(events);
     const submitEvent = events.find((e) => e.type === 'submit_proposal');
     const cosm = await import('@cosmjs/encoding');
-    // @ts-expect-error StrictNullChecks
+
     const idAttribute = submitEvent.attributes.find(
       ({ key }) => cosm.fromAscii(key) === 'proposal_id',
     );
-    // @ts-expect-error StrictNullChecks
+
     const id = +cosm.fromAscii(idAttribute.value);
     await this._initProposal(id);
     return id;

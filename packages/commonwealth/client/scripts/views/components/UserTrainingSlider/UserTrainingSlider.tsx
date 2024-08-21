@@ -70,7 +70,6 @@ export const UserTrainingSlider = () => {
     if (cardToDismiss === 'all') {
       hideAllCards();
     } else {
-      // @ts-expect-error <StrictNullChecks/>
       markTrainingActionAsPermanentlyHidden(cardToDismiss, userId);
     }
     setCardToDismiss(undefined);

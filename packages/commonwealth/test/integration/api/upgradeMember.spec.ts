@@ -103,7 +103,6 @@ describe('upgradeMember Integration Tests', () => {
       where: { id: server.e2eTestEntities.testAddresses[1].id },
     });
 
-    // @ts-expect-error StrictNullChecks
     chai.assert.equal(address.role, 'admin');
   });
 });

@@ -36,7 +36,6 @@ export const ViewThreadUpvotesDrawer = ({
       contentBody={thread.body}
       header="Thread upvotes"
       reactorData={reactorData}
-      // @ts-expect-error <StrictNullChecks/>
       author={
         thread?.author && app?.chain?.accounts
           ? app.chain.accounts.get(thread?.author)

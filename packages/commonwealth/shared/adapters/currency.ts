@@ -49,7 +49,7 @@ export class Coin extends BN {
     denomination: string,
     n: number | BN,
     inDollars = false,
-    // @ts-expect-error StrictNullChecks
+
     dollar: BN = null,
   ) {
     // dollars are not set by default

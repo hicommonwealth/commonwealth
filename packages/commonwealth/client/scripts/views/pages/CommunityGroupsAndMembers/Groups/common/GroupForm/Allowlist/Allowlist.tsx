@@ -140,7 +140,7 @@ const Allowlist = ({
               (groups || []).find((group) => group.id === groupId)?.name,
           )
           .filter(Boolean)
-          // @ts-expect-error StrictNullChecks
+
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         address: p.addresses[0].address,

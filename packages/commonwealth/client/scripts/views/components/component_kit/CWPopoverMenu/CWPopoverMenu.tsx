@@ -45,7 +45,6 @@ export const PopoverMenu = ({
   }, [onOpenChange, open]);
 
   return (
-    // @ts-expect-error <StrictNullChecks/>
     <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
       {/* needs to be div instead of fragment so listener can work */}
       <div className="popover-container">

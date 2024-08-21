@@ -130,7 +130,6 @@ export const FullUser = ({
     >
       {showAvatar && (
         <Link
-          // @ts-expect-error <StrictNullChecks/>
           to={
             profile && shouldLinkProfile
               ? `/profile/id/${profile?.userId}`
@@ -188,7 +187,6 @@ export const FullUser = ({
             {app.chain && app.chain.base === ChainBase.Substrate && (
               <Link
                 className="user-display-name substrate@"
-                // @ts-expect-error <StrictNullChecks/>
                 to={profile?.id ? `/profile/id/${profile?.userId}` : undefined}
               >
                 {!profile || !profile?.userId ? (

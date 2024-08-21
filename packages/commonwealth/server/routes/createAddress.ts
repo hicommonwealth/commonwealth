@@ -43,7 +43,6 @@ const createAddress = async (
   req: TypedRequestBody<CreateAddressReq>,
   res: TypedResponse<CreateAddressResp>,
 ) => {
-  // @ts-expect-error StrictNullChecks
   const user = req.body.user;
 
   // start the process of creating a new address. this may be called
@@ -86,14 +85,14 @@ const createAddress = async (
     if (community.base === ChainBase.Substrate) {
       encodedAddress = addressSwapper({
         address: req.body.address,
-        // @ts-expect-error StrictNullChecks
+
         currentPrefix: community.ss58_prefix,
       });
     } else if (community.bech32_prefix) {
       // cosmos or injective
       const { words } = bech32.decode(req.body.address, 50);
       encodedAddress = bech32.encode(community.bech32_prefix, words);
-      // @ts-expect-error StrictNullChecks
+
       addressHex = await bech32ToHex(req.body.address);
 
       // check all addresses for matching hex
@@ -133,7 +132,6 @@ const createAddress = async (
   );
 
   const addressExistsOnOtherCommunity =
-    // @ts-expect-error StrictNullChecks
     !!existingAddressWithHex ||
     (await models.Address.scope('withPrivateData').findOne({
       where: {
@@ -170,7 +168,6 @@ const createAddress = async (
     existingAddress.last_active = new Date();
     existingAddress.block_info = req.body.block_info;
 
-    // @ts-expect-error StrictNullChecks
     existingAddress.hex = addressHex;
 
     // we update addresses with the wallet used to sign in
@@ -194,7 +191,6 @@ const createAddress = async (
     const last_active = new Date();
     let user_id = user ? user.id : null;
 
-    // @ts-expect-error StrictNullChecks
     if (existingAddressWithHex) {
       user_id = existingAddressWithHex.user_id;
     }

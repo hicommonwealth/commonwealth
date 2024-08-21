@@ -18,7 +18,6 @@ export const createChainNodeHandler = async (
   res: TypedResponse<CreateChainNodeResponse>,
 ) => {
   const results = await controllers.communities.createChainNode({
-    // @ts-expect-error StrictNullChecks
     user: req.user,
     url: req.body.url,
     name: req.body.name,

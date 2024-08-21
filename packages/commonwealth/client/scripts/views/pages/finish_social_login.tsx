@@ -23,9 +23,8 @@ const validate = async (
     const isAttemptingToConnectAddressToCommunity =
       isLoggedIn && app.activeChainId();
     const { isAddressNew } = await handleSocialLoginCallback({
-      // @ts-expect-error <StrictNullChecks/>
       chain,
-      // @ts-expect-error <StrictNullChecks/>
+
       walletSsoSource,
       returnEarlyIfNewAddress:
         authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,

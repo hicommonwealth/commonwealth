@@ -95,7 +95,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         <CWDivider />
         <DiscussionSection
           isContestAvailable={stakeEnabled && isContestAvailable}
-          // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
@@ -126,12 +125,10 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         content={
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
-            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
           />
         }
-        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setModeOfManageCommunityStakeModal(null)}
         open={!!modeOfManageCommunityStakeModal}
       />

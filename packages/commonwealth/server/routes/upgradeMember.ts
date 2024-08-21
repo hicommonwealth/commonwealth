@@ -39,9 +39,9 @@ const upgradeMember = async (
 
   const isAdmin = await validateOwner({
     models,
-    // @ts-expect-error StrictNullChecks
+
     user,
-    // @ts-expect-error StrictNullChecks
+
     communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
@@ -79,7 +79,6 @@ const upgradeMember = async (
       },
     });
 
-    // @ts-expect-error StrictNullChecks
     if (!otherExistingAdmin && !req.user.isAdmin) {
       return next(new AppError(Errors.MustHaveAdmin));
     }

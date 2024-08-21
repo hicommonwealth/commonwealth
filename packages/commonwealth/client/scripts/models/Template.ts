@@ -44,7 +44,7 @@ class Template {
     this.createdForCommunity = createdForCommunity;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    // @ts-expect-error StrictNullChecks
+
     this.inUse = inUse;
   }
 

@@ -64,7 +64,6 @@ export function makeGetBalancesOptions(
                 castedOpt.sourceOptions.contractAddress ===
                   castedSource.contract_address &&
                 castedOpt.sourceOptions.tokenId ===
-                  // @ts-expect-error StrictNullChecks
                   parseInt(castedSource.token_id, 10)
               );
             });
@@ -75,7 +74,7 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   evmChainId: castedSource.evm_chain_id,
                   contractAddress: castedSource.contract_address,
-                  // @ts-expect-error StrictNullChecks
+
                   tokenId: parseInt(castedSource.token_id, 10),
                 },
                 addresses,

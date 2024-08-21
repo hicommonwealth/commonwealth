@@ -56,11 +56,9 @@ const LayoutComponent = ({
   // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
-    // @ts-expect-error <StrictNullChecks/>
     const redirectTo = configurationData?.redirects?.[providedCommunityScope];
-    // @ts-expect-error <StrictNullChecks/>
+
     if (redirectTo && redirectTo !== providedCommunityScope.toLowerCase()) {
-      // @ts-expect-error <StrictNullChecks/>
       const path = window.location.href.split(providedCommunityScope);
       navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
       return;

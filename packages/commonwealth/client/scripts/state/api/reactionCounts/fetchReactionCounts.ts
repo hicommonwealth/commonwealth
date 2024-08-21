@@ -16,11 +16,10 @@ const fetchReactionCounts = async ({
   commentIds,
 }: FetchReactionCountsProps) => {
   const response = await axios.post(`${SERVER_URL}/reactionsCounts`, {
-    // @ts-expect-error StrictNullChecks
     ...(threadIds?.length > 0 && { thread_ids: threadIds }),
-    // @ts-expect-error StrictNullChecks
+
     ...(proposalIds?.length > 0 && { proposal_ids: proposalIds }),
-    // @ts-expect-error StrictNullChecks
+
     ...(commentIds?.length > 0 && { comment_ids: commentIds }),
     active_address: address,
   });

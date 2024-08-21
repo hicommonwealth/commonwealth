@@ -25,7 +25,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Canceled',
         label: `Proposal ${data.id} was cancelled.`,
-        // @ts-expect-error StrictNullChecks
+
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
@@ -35,7 +35,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Created',
         label: `Proposal ${data.id} was created.`,
-        // @ts-expect-error StrictNullChecks
+
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
@@ -45,7 +45,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Executed',
         label: `Proposal ${data.id} was executed.`,
-        // @ts-expect-error StrictNullChecks
+
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
@@ -57,7 +57,7 @@ export const Label: LabelerFilter = (
         label: `Proposal ${data.id} queued up. Execution time: ${moment
           .unix(data.executionTime)
           .format()}.`,
-        // @ts-expect-error StrictNullChecks
+
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
@@ -69,7 +69,7 @@ export const Label: LabelerFilter = (
         label: `Voter (${data.voter}) voted with weight ${data.votingPower} ${
           data.support ? 'against' : 'for'
         } proposal ${data.id}.`,
-        // @ts-expect-error StrictNullChecks
+
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
@@ -82,7 +82,7 @@ export const Label: LabelerFilter = (
         label: `User ${fmtAddr(data.delegator)} delegated to ${fmtAddr(
           data.delegatee,
         )}.`,
-        // @ts-expect-error StrictNullChecks
+
         linkUrl: chainId ? `/${chainId}/account/${data.delegator}` : null,
         icon: 'delegate',
       };
@@ -91,7 +91,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Delegated Power Changed',
         label: `User ${fmtAddr(data.who)} updated their delegation power.`,
-        // @ts-expect-error StrictNullChecks
+
         linkUrl: chainId ? `/${chainId}/account/${data.who}` : null,
         icon: 'delegate',
       };

@@ -56,7 +56,7 @@ export function setupPassport(models: DB) {
 
   passport.deserializeUser((userId, done) => {
     models.User.scope('withPrivateData')
-      // @ts-expect-error StrictNullChecks
+
       .findOne({ where: { id: userId } })
       .then((user) => {
         done(null, user);

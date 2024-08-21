@@ -17,9 +17,8 @@ export const deleteBotCommentHandler = async (
   const { message_id } = req.params;
 
   await controllers.comments.deleteComment({
-    // @ts-expect-error StrictNullChecks
     user,
-    // @ts-expect-error StrictNullChecks
+
     address,
     messageId: message_id, // Discord bot only
   });

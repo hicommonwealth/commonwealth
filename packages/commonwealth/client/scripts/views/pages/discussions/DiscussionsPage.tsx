@@ -47,7 +47,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
-  // @ts-expect-error <StrictNullChecks/>
+
   const stageName: string = searchParams.get('stage');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
@@ -103,12 +103,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         orderBy: featuredFilter,
       }),
       toDate: dateCursor.toDate,
-      // @ts-expect-error <StrictNullChecks/>
+
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
-      // @ts-expect-error <StrictNullChecks/>
+
       contestAddress,
-      // @ts-expect-error <StrictNullChecks/>
+
       contestStatus,
     });
 
@@ -154,7 +154,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   return (
-    // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
       <DiscussionsFeedDiscovery
         orderBy={featuredFilter}
@@ -243,7 +242,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               <AdminOnboardingSlider />
 
               <HeaderWithFilters
-                // @ts-expect-error <StrictNullChecks/>
                 topic={topicName}
                 stage={stageName}
                 featuredFilter={featuredFilter}

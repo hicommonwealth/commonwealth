@@ -12,7 +12,6 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
     super.add(proposal, {
       eqFn: (x) => x.identifier === proposal.identifier,
       ...(options &&
-        // @ts-expect-error StrictNullChecks
         options.pushToIndex >= 0 && { pushToIndex: options.pushToIndex }),
     });
     this._storeId[proposal.identifier] = proposal;

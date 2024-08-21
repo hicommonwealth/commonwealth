@@ -48,9 +48,8 @@ const useCreateCommentReactionMutation = ({
 }: Partial<CreateReactionProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    // @ts-expect-error StrictNullChecks
     communityId,
-    // @ts-expect-error StrictNullChecks
+
     threadId,
   });
   const user = useUserStore();

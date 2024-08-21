@@ -21,7 +21,6 @@ export async function __searchCommunities(
   { search, limit, page, orderBy, orderDirection }: SearchCommunitiesOptions,
 ): Promise<SearchCommunitiesResult> {
   let sortOptions: PaginationSqlOptions = {
-    // @ts-expect-error StrictNullChecks
     limit: Math.min(limit, 100) || 10,
     page: page || 1,
     orderDirection,

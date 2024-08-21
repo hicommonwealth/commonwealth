@@ -25,7 +25,6 @@ const DropdownsShowcase = () => {
         isSearchable={false}
         options={optionList}
         onChange={(newValue) => {
-          // @ts-expect-error <StrictNullChecks/>
           console.log('selected value is: ', newValue.label);
         }}
       />

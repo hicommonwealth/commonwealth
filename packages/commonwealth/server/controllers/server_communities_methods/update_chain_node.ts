@@ -63,7 +63,6 @@ export async function __updateChainNode(
 
   const chainNode = await this.models.ChainNode.findOne({ where });
 
-  // @ts-expect-error StrictNullChecks
   const updatedChainNode = await chainNode.update({
     url,
     name,
@@ -71,9 +70,7 @@ export async function __updateChainNode(
     slip44,
   });
 
-  // @ts-expect-error StrictNullChecks
   await chainNode.save();
 
-  // @ts-expect-error StrictNullChecks
   return { updated_node_id: updatedChainNode.id };
 }

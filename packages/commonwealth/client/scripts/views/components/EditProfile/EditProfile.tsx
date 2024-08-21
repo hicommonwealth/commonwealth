@@ -109,7 +109,7 @@ const EditProfile = () => {
           isOwner: data.userId === user.id,
         }),
       );
-      // @ts-expect-error <StrictNullChecks/>
+
       setAvatarUrl(data.profile.avatar_url);
       setPreferenceTags((tags) =>
         [...(tags || [])].map((t) => ({
@@ -125,7 +125,6 @@ const EditProfile = () => {
         })),
       );
       setAddresses(
-        // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
           try {
             return new AddressInfo({
@@ -151,7 +150,7 @@ const EditProfile = () => {
     // need to create an account to pass to AvatarUpload to see last upload
     // not the best solution because address is not always available
     // should refactor AvatarUpload to make it work with new profiles
-    // @ts-expect-error <StrictNullChecks/>
+
     if (addresses?.length > 0) {
       const address = addresses![0];
       const oldProfile = new MinimumProfile(
@@ -177,7 +176,6 @@ const EditProfile = () => {
         }),
       );
     } else {
-      // @ts-expect-error <StrictNullChecks/>
       setAccount(null);
     }
   }, [addresses, avatarUrl, profile]);
@@ -389,7 +387,6 @@ const EditProfile = () => {
               description="Manage your addresses."
             >
               <LinkedAddresses
-                // @ts-expect-error <StrictNullChecks/>
                 addresses={addresses}
                 profile={profile}
                 refreshProfiles={(addressInfo) => {

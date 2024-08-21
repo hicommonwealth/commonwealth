@@ -49,7 +49,7 @@ export function parseCustomStages(customStages?: string[]): string[] {
 
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
-  // @ts-expect-error <StrictNullChecks/>
+
   return re.exec(url)[1];
 }
 
@@ -320,7 +320,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.Solana:
       return ChainNetwork.Solana;
     default:
-      // @ts-expect-error <StrictNullChecks/>
       return null;
   }
 }

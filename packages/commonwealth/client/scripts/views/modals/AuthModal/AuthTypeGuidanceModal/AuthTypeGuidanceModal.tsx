@@ -22,12 +22,10 @@ const AuthTypeGuidanceModal = ({
         <>
           <Option
             type={AuthModalType.CreateAccount}
-            // @ts-expect-error StrictNullChecks
             onClick={() => onChangeModalType(AuthModalType.CreateAccount)}
           />
           <Option
             type={AuthModalType.SignIn}
-            // @ts-expect-error StrictNullChecks
             onClick={() => onChangeModalType(AuthModalType.SignIn)}
           />
         </>

@@ -200,7 +200,7 @@ async function getApolloClient() {
     }/graphql`,
   });
   // Create the apollo client
-  // @ts-expect-error StrictNullChecks
+
   apolloClient = new ApolloClient({
     link: httpLink,
     cache: new InMemoryCache(),
@@ -278,7 +278,7 @@ export async function getVersion(): Promise<string> {
 
 export async function getSpace(space: string): Promise<SnapshotSpace> {
   await getApolloClient();
-  // @ts-expect-error StrictNullChecks
+
   const spaceObj = await apolloClient.query({
     query: await GqlLazyLoader.SPACE_QUERY(),
     variables: {
@@ -290,7 +290,7 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
 
 export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
   await getApolloClient();
-  // @ts-expect-error StrictNullChecks
+
   const spaceObj = await apolloClient.query({
     query: await GqlLazyLoader.SPACE_QUERY(),
     variables: {
@@ -305,7 +305,7 @@ export async function getMultipleSpacesById(
   id_in: Array<string>,
 ): Promise<Array<SnapshotSpace>> {
   await getApolloClient();
-  // @ts-expect-error StrictNullChecks
+
   const spaceObj = await apolloClient.query({
     query: await GqlLazyLoader.MULTIPLE_SPACE_QUERY(),
     variables: {
@@ -320,7 +320,7 @@ export async function getProposal(
   id: string,
 ): Promise<{ title: string; space: string }> {
   await getApolloClient();
-  // @ts-expect-error StrictNullChecks
+
   const proposalObj = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSAL_QUERY(),
     variables: {
@@ -332,7 +332,7 @@ export async function getProposal(
 
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
   await getApolloClient();
-  // @ts-expect-error StrictNullChecks
+
   const proposalsObj = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSALS_QUERY(),
     variables: {
@@ -350,7 +350,7 @@ export async function getVotes(
   proposalHash: string,
 ): Promise<SnapshotProposalVote[]> {
   await getApolloClient();
-  // @ts-expect-error StrictNullChecks
+
   const response = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSAL_VOTES_QUERY(),
     variables: {

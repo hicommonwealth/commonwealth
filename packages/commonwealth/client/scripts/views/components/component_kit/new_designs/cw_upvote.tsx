@@ -36,7 +36,6 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
   return (
     <button
       className={getClasses({ ...getParameters() }, ComponentType.Upvote)}
-      // @ts-expect-error <StrictNullChecks/>
       onClick={disabled ? null : onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

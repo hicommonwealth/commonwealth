@@ -179,9 +179,9 @@ test.describe('Community proposals page', () => {
       const chainNode = await models.ChainNode.findOne({
         where: { cosmos_chain_id: chain },
       });
-      // @ts-expect-error StrictNullChecks
+
       originalRPCEndpoint = chainNode.url;
-      // @ts-expect-error StrictNullChecks
+
       originalRESTEndpoint = chainNode.alt_wallet_url;
     });
     test.describe('Using provided URL', () => {
@@ -323,11 +323,10 @@ test.describe('Community proposals page', () => {
         include: [models.ChainNode],
       });
 
-      // @ts-expect-error StrictNullChecks
       chaiExpect(communityBeforeUpgrade.ChainNode.cosmos_gov_version).to.equal(
         null,
       );
-      // @ts-expect-error StrictNullChecks
+
       chaiExpect(communityBeforeUpgrade.ChainNode.alt_wallet_url).to.equal(
         null,
       );
@@ -340,7 +339,7 @@ test.describe('Community proposals page', () => {
         where: { id: chain },
         include: [models.ChainNode],
       });
-      // @ts-expect-error StrictNullChecks
+
       chaiExpect(communityAfterFailure.ChainNode.cosmos_gov_version).to.equal(
         'v1beta1-attempt-failed',
       );
@@ -356,7 +355,6 @@ test.describe('Community proposals page', () => {
         include: [models.ChainNode],
       });
 
-      // @ts-expect-error StrictNullChecks
       chaiExpect(communityAfterRefresh.ChainNode.cosmos_gov_version).to.equal(
         'v1',
       );

@@ -38,7 +38,7 @@ const setDiscordBotConfig = async (
 
   const isAdmin = await validateOwner({
     models: models,
-    // @ts-expect-error StrictNullChecks
+
     user: req.user,
     communityId: community_id,
     allowAdmin: true,
@@ -59,10 +59,10 @@ const setDiscordBotConfig = async (
         community_id,
       },
     });
-    // @ts-expect-error StrictNullChecks
+
     configEntry.snapshot_channel_id =
       snapshot_channel_id !== 'disabled' ? snapshot_channel_id : null;
-    // @ts-expect-error StrictNullChecks
+
     await configEntry.save();
     return success(res, {
       message: 'Updated channel id',
@@ -98,9 +98,9 @@ const setDiscordBotConfig = async (
   ) {
     await models.sequelize.transaction(async (transaction) => {
       // Handle discord already linked to another CW community
-      // @ts-expect-error StrictNullChecks
+
       communityInstance.discord_config_id = null;
-      // @ts-expect-error StrictNullChecks
+
       await communityInstance.save({ transaction });
 
       await models.DiscordBotConfig.destroy({
@@ -128,7 +128,7 @@ const setDiscordBotConfig = async (
         address: DISCORD_BOT_ADDRESS,
         community_id,
       },
-      // @ts-expect-error StrictNullChecks
+
       defaults: {
         role: 'admin',
         verification_token: '123456',
@@ -144,13 +144,11 @@ const setDiscordBotConfig = async (
       await address.save({ transaction });
     }
 
-    // @ts-expect-error StrictNullChecks
     communityInstance.discord_config_id = configEntry.id;
-    // @ts-expect-error StrictNullChecks
+
     await communityInstance.save({ transaction });
 
     await configEntry.update(
-      // @ts-expect-error StrictNullChecks
       {
         community_id,
         guild_id,
@@ -169,7 +167,7 @@ const setDiscordBotConfig = async (
 
   return success(res, {
     message: 'created a new discord bot config',
-    // @ts-expect-error StrictNullChecks
+
     discordConfigId: communityInstance.discord_config_id,
   });
 };

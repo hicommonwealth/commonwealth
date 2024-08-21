@@ -131,13 +131,11 @@ export const CWContentPage = ({
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
     membership.topicIds.includes(thread?.topic?.id),
   );
 
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
       membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
   );
 
@@ -191,9 +189,7 @@ export const CWContentPage = ({
         {...(thread?.lastEdited && {
           lastUpdated: (thread?.lastEdited || thread.createdAt).toISOString(),
         })}
-        // @ts-expect-error <StrictNullChecks/>
         authorAddress={author?.address}
-        // @ts-expect-error <StrictNullChecks/>
         authorCommunityId={authorCommunityId}
         collaboratorsInfo={collaborators}
         publishDate={moment(createdOrEditedDate, 'X')}
@@ -204,9 +200,7 @@ export const CWContentPage = ({
         showEditedLabelWithDate={!!lastEdited}
         isSpamThread={isSpamThread}
         threadStage={stageLabel}
-        // @ts-expect-error <StrictNullChecks/>
         archivedAt={thread?.archivedAt}
-        // @ts-expect-error <StrictNullChecks/>
         isHot={isHot(thread)}
         profile={thread?.profile}
         versionHistory={thread?.versionHistory}
@@ -245,7 +239,6 @@ export const CWContentPage = ({
             upvoteBtnVisible={!thread?.readOnly}
             upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
-            // @ts-expect-error <StrictNullChecks/>
             thread={thread}
             totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}
@@ -282,7 +275,6 @@ export const CWContentPage = ({
           {showSidebar && (
             <div className="sidebar">
               {sidebarComponents?.map((c) => (
-                // @ts-expect-error <StrictNullChecks/>
                 <React.Fragment key={c.label}>{c.item}</React.Fragment>
               ))}
             </div>
@@ -301,9 +293,7 @@ export const CWContentPage = ({
               />
               {sidebarComponents?.map((item, i) => (
                 <CWTab
-                  // @ts-expect-error <StrictNullChecks/>
                   key={item.label}
-                  // @ts-expect-error <StrictNullChecks/>
                   label={item.label}
                   onClick={() => {
                     setTabSelected(i + 1);
@@ -314,20 +304,17 @@ export const CWContentPage = ({
             </CWTabsRow>
           </div>
           {tabSelected === 0 && mainBody}
-          {/* @ts-expect-error StrictNullChecks*/}
+
           {sidebarComponents?.length >= 1 &&
             tabSelected === 1 &&
-            // @ts-expect-error <StrictNullChecks/>
             sidebarComponents[0].item}
-          {/* @ts-expect-error StrictNullChecks*/}
+
           {sidebarComponents?.length >= 2 &&
             tabSelected === 2 &&
-            // @ts-expect-error <StrictNullChecks/>
             sidebarComponents[1].item}
-          {/* @ts-expect-error StrictNullChecks*/}
+
           {sidebarComponents?.length >= 3 &&
             tabSelected === 3 &&
-            // @ts-expect-error <StrictNullChecks/>
             sidebarComponents[2].item}
         </div>
       )}

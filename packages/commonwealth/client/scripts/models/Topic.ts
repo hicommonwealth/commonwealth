@@ -55,7 +55,7 @@ class Topic {
     this.id = id;
     this.description = description;
     this.telegram = telegram;
-    // @ts-expect-error StrictNullChecks
+
     this.communityId = community_id;
     this.featuredInSidebar = featured_in_sidebar;
     this.featuredInNewPost = featured_in_new_post;

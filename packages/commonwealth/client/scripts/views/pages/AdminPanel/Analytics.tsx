@@ -147,7 +147,6 @@ const Analytics = () => {
                   {'Total Communities with > 2 addresses'}
                 </CWText>
                 <CWText className="StatValue">
-                  {/* @ts-expect-error StrictNullChecks*/}
                   {Math.round(globalStats?.populatedCommunities)}
                 </CWText>
               </div>

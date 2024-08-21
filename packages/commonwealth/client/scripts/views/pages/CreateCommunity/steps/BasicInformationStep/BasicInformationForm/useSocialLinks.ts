@@ -28,7 +28,6 @@ const useSocialLinks = () => {
     const updatedSocialLinks = [...socialLinks];
     socialLinks.map((link, index) => {
       try {
-        // @ts-expect-error StrictNullChecks
         if (link.value.trim() !== '') {
           linkValidationSchema.required.parse(link.value);
         }
@@ -58,7 +57,6 @@ const useSocialLinks = () => {
       value,
     };
     try {
-      // @ts-expect-error StrictNullChecks
       if (updatedSocialLinks[index].value.trim() !== '') {
         linkValidationSchema.required.parse(updatedSocialLinks[index].value);
       }

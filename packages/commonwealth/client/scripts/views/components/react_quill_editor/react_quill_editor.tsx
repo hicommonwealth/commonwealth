@@ -111,14 +111,12 @@ const ReactQuillEditor = ({
   // is changed, since rerenders bug out the editor
   const lastSelectionRef = useRef<RangeStatic | null>(null);
   const { mention } = useMention({
-    // @ts-expect-error <StrictNullChecks/>
     editorRef,
     lastSelectionRef,
   });
 
   // handle image upload for drag and drop
   const { handleImageDropAndPaste } = useImageDropAndPaste({
-    // @ts-expect-error <StrictNullChecks/>
     editorRef,
     setContentDeltaToUse,
     setIsUploading,
@@ -129,14 +127,13 @@ const ReactQuillEditor = ({
   const handleTextPaste = useQuillPasteText(
     setContentDeltaToUse,
     contentDeltaToUse,
-    // @ts-expect-error <StrictNullChecks/>
+
     editorRef,
     isFocused || isHovering,
   );
 
   // handle image upload for image toolbar button
   const { handleImageUploader } = useImageUploader({
-    // @ts-expect-error <StrictNullChecks/>
     editorRef,
     setContentDeltaToUse,
     setIsUploading,
@@ -144,14 +141,12 @@ const ReactQuillEditor = ({
 
   // handle custom toolbar behavior for markdown
   const markdownToolbarHandlers = useMarkdownToolbarHandlers({
-    // @ts-expect-error <StrictNullChecks/>
     editorRef,
     setContentDeltaToUse,
   });
 
   // handle keyboard shortcuts for markdown
   const markdownKeyboardShortcuts = useMarkdownShortcuts({
-    // @ts-expect-error <StrictNullChecks/>
     editorRef,
     setContentDeltaToUse,
   });
@@ -207,7 +202,6 @@ const ReactQuillEditor = ({
               buttonType: 'secondary',
               buttonHeight: 'sm',
               onClick: () => {
-                // @ts-expect-error <StrictNullChecks/>
                 cancelEditing();
               },
             },
@@ -301,7 +295,6 @@ const ReactQuillEditor = ({
                     >
                       <div data-text-editor="name">
                         <ReactQuill
-                          // @ts-expect-error <StrictNullChecks/>
                           ref={editorRef}
                           className={`QuillEditor markdownEnabled ${className}`}
                           scrollingContainer="ql-container"
@@ -347,10 +340,7 @@ const ReactQuillEditor = ({
                   )}
                 </Droppable>
               </DragDropContext>
-              <CustomQuillFooter
-                // @ts-expect-error <StrictNullChecks/>
-                handleImageUploader={handleImageUploader}
-              />
+              <CustomQuillFooter handleImageUploader={handleImageUploader} />
             </div>
           </div>
         ) : (

@@ -396,16 +396,15 @@ describe('EVM Chain Events Log Processing Tests', () => {
       );
       expect(propCreatedEvent).to.exist;
       expect(
-        // @ts-expect-error StrictNullChecks
         web3.utils.toChecksumAddress(propCreatedEvent.rawLog.address),
       ).to.equal(sdk.contractAddrs.compound.governance);
-      // @ts-expect-error StrictNullChecks
+
       expect(propCreatedEvent.eventSource.kind).to.equal('proposal-created');
-      // @ts-expect-error StrictNullChecks
+
       expect(propCreatedEvent.rawLog.blockNumber).to.equal(
         propCreatedLog.blockNumber,
       );
-      // @ts-expect-error StrictNullChecks
+
       expect(propCreatedEvent.parsedArgs).to.exist;
 
       const propQueuedEvent = events.find(
@@ -413,16 +412,15 @@ describe('EVM Chain Events Log Processing Tests', () => {
       );
       expect(propQueuedEvent).to.exist;
       expect(
-        // @ts-expect-error StrictNullChecks
         web3.utils.toChecksumAddress(propQueuedEvent.rawLog.address),
       ).to.equal(sdk.contractAddrs.compound.governance);
-      // @ts-expect-error StrictNullChecks
+
       expect(propQueuedEvent.eventSource.kind).to.equal('proposal-queued');
-      // @ts-expect-error StrictNullChecks
+
       expect(propQueuedEvent.rawLog.blockNumber).to.equal(
         propQueuedLog.blockNumber,
       );
-      // @ts-expect-error StrictNullChecks
+
       expect(propQueuedEvent.parsedArgs).to.exist;
     });
   });

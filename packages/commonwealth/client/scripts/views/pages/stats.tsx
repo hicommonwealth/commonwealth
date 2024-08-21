@@ -202,11 +202,11 @@ const StatsPage = () => {
         </div>
         <div className="stat-row dark bottom">
           <CWText fontWeight="medium">Total &#40;all time&#41;</CWText>
-          {/* @ts-expect-error StrictNullChecks*/}
+
           <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
-          {/* @ts-expect-error StrictNullChecks*/}
+
           <CWText fontWeight="medium">{totalData.totalComments}</CWText>
-          {/* @ts-expect-error StrictNullChecks*/}
+
           <CWText fontWeight="medium">{totalData.totalThreads}</CWText>
         </div>
       </div>

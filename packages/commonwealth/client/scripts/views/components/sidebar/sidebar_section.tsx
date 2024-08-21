@@ -143,7 +143,6 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
       </div>
       {containsChildren && toggled && (
         <div className="subsections">
-          {/* @ts-expect-error StrictNullChecks*/}
           {displayData.map((subsection, i) => (
             <SubSection key={i} {...subsection} />
           ))}
@@ -209,7 +208,6 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
     >
       <div
         className="section-group-title-container"
-        // @ts-expect-error <StrictNullChecks/>
         onClick={(e) => clickHandler(e, title)}
       >
         {carat}
@@ -217,7 +215,6 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
       </div>
       {toggled && (
         <div className="sections-container">
-          {/* @ts-expect-error StrictNullChecks*/}
           {displayData.map((sectionGroup, i) => (
             <SubSectionGroup {...sectionGroup} key={i} />
           ))}

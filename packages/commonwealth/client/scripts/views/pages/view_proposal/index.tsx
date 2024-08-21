@@ -38,7 +38,6 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
-  // @ts-expect-error <StrictNullChecks/>
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [title, setTitle] = useState<string>(proposal?.title);
@@ -52,16 +51,15 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
   const { data: poolData } = usePoolParamsQuery();
-  // @ts-expect-error <StrictNullChecks/>
+
   useCosmosProposalVotesQuery(proposal, +poolData);
   useCosmosProposalTallyQuery(proposal);
-  // @ts-expect-error <StrictNullChecks/>
+
   useCosmosProposalDepositsQuery(proposal, +poolData);
 
   useEffect(() => {
-    // @ts-expect-error <StrictNullChecks/>
     setProposal(cosmosProposal);
-    // @ts-expect-error <StrictNullChecks/>
+
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
   }, [cosmosProposal]);
@@ -125,7 +123,6 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
         title={proposalTitle}
         author={proposal?.author}
         createdAt={proposal?.createdAt}
-        // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
         subHeader={<ProposalSubheader proposal={proposal} />}
         body={() =>

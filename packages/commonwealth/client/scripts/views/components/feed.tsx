@@ -57,7 +57,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: thread.communityId,
-    // @ts-expect-error <StrictNullChecks/>
+
     address: account?.address,
     apiEnabled: !!account?.address,
   });

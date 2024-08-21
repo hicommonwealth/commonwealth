@@ -10,7 +10,6 @@ const useNamespaceFactory = (ethChainId: number) => {
 
   const chainRpc = nodes?.find((node) => node.ethChainId === ethChainId)?.url;
 
-  // @ts-expect-error StrictNullChecks
   const namespaceFactory = new NamespaceFactory(chainFactoryAddress, chainRpc);
 
   return { namespaceFactory };

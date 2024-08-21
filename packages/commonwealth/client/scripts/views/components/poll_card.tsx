@@ -71,13 +71,10 @@ export const PollOptions = ({
             <CWRadioButton
               key={option.value}
               checked={
-                // @ts-expect-error <StrictNullChecks/>
                 selectedOptions.length > 0 &&
-                // @ts-expect-error <StrictNullChecks/>
                 option.value === selectedOptions[0]
               }
               groupName="votes"
-              // @ts-expect-error <StrictNullChecks/>
               onChange={() => setSelectedOptions([option.value])}
               label={option.label}
               value={option.value}
@@ -246,11 +243,9 @@ export const ResultsSection = ({
           <CWText
             type="caption"
             className={getClasses<{ clickable?: boolean }>({
-              // @ts-expect-error <StrictNullChecks/>
               clickable: onResultsClick && hasVotes,
             })}
             onClick={
-              // @ts-expect-error <StrictNullChecks/>
               onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
             }
           >

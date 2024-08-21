@@ -5,7 +5,7 @@ chai.use(chaiHttp);
 
 export async function get(
   path: string,
-  // @ts-expect-error StrictNullChecks
+
   val: Record<string, unknown> = null,
   expectError = false,
   passedApp,

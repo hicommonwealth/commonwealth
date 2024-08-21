@@ -66,10 +66,8 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
         // filter active and ended proposals
         app.snapshot.proposals.filter((proposal: SnapshotProposal) =>
           moment(+proposal.end * 1000) >= moment()
-            ? // @ts-expect-error <StrictNullChecks/>
-              tempProposals.active.push(proposal)
-            : // @ts-expect-error <StrictNullChecks/>
-              tempProposals.ended.push(proposal),
+            ? tempProposals.active.push(proposal)
+            : tempProposals.ended.push(proposal),
         );
 
         setProposals(tempProposals);
