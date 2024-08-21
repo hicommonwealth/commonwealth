@@ -1,11 +1,14 @@
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, ChainType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
 import React, { useEffect, useState } from 'react';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
+import {
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
+} from 'state/api/communities';
 import { getNodeByCosmosChainId, getNodeByUrl } from 'state/api/nodes/utils';
 import { useDebounce } from 'usehooks-ts';
 import useFetchNodesQuery from '../../../state/api/nodes/fetchNodes';
@@ -24,7 +27,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { CWTypeaheadSelectList } from '../../components/component_kit/new_designs/CWTypeaheadSelectList';
 import { openConfirmation } from '../../modals/confirmation_modal';
-import { updateChainNode } from './utils';
+import { createChainNode } from './utils';
 
 const RPCEndpointTask = () => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
@@ -83,6 +86,10 @@ const RPCEndpointTask = () => {
     (rpcName !== '' &&
       (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
       rpcEndpoint !== '');
+
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: rpcEndpointCommunityId,
+  });
 
   const RPCEndpointValidationFn = (
     value: string,
@@ -143,8 +150,9 @@ const RPCEndpointTask = () => {
   const update = async () => {
     if (!communityLookupData?.id) return;
     try {
-      await updateChainNode({
-        id: communityChainNode.id,
+      let nodeId = null;
+      // Create Chain Node if not yet created
+      const res = await createChainNode({
         url: rpcEndpoint,
         name: rpcName,
         bech32,
@@ -152,6 +160,15 @@ const RPCEndpointTask = () => {
         eth_chain_id: ethChainId,
         cosmos_chain_id: cosmosChainId,
       });
+      nodeId = res.data.result.node_id;
+
+      if (Object.keys(communityLookupData || {}).length > 0) {
+        await updateCommunity({
+          communityId: communityLookupData?.id,
+          chainNodeId: nodeId ?? communityChainNode?.id?.toString(),
+          type: ChainType.Chain,
+        });
+      }
 
       setRpcEndpointCommunityId('');
       setRpcEndpoint('');
@@ -209,8 +226,7 @@ const RPCEndpointTask = () => {
     <div className="TaskGroup">
       <CWText type="h4">Switch/Add RPC Endpoint</CWText>
       <CWText type="caption">
-        Changes the RPC endpoint for a specific chain community, or adds a Chain
-        Node if it doesn&apos;t yet exist.
+        Adds a Chain Node for a specific chain community
       </CWText>
       <CWText type="caption">
         Chain name, ETH chain id, and RPC enpoint can be found here:
@@ -228,7 +244,7 @@ const RPCEndpointTask = () => {
       <div className="MultiRow">
         {balanceType === BalanceType.Ethereum && (
           <div className="TaskRow">
-            <CWTextInput
+            <CWTextInputOld
               value={rpcEndpoint}
               onInput={(e) => {
                 setRpcEndpoint(e.target.value);
@@ -272,7 +288,7 @@ const RPCEndpointTask = () => {
           </div>
           {balanceType === BalanceType.Ethereum ? (
             <div className="TaskRow">
-              <CWTextInputOld
+              <CWTextInput
                 value={ethChainId}
                 onInput={(e) => {
                   setEthChainId(parseInt(e.target.value));
