@@ -9,7 +9,7 @@ export function useCommunityAlertsQuery({
     {},
     {
       enabled,
-      staleTime: 120_000,
+      staleTime: Infinity,
     },
   );
 }
