@@ -16,6 +16,8 @@ const {
   ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
   ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
   ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+  SITEMAP_THREAD_PRIORITY,
+  SITEMAP_PROFILE_PRIORITY,
 } = process.env;
 
 const NAME =
@@ -66,6 +68,14 @@ export const config = configure(
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY:
         ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+    },
+    SITEMAP: {
+      THREAD_PRIORITY: SITEMAP_THREAD_PRIORITY
+        ? parseInt(SITEMAP_THREAD_PRIORITY)
+        : 0.8,
+      PROFILE_PRIORITY: SITEMAP_PROFILE_PRIORITY
+        ? parseInt(SITEMAP_PROFILE_PRIORITY)
+        : -1,
     },
   },
   z.object({
@@ -129,5 +139,9 @@ export const config = configure(
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY: z.string().optional(),
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: z.string().optional(),
     }), // TODO: make these mandatory in production before chain-event v3 (Alchemy Webhooks) goes live
+    SITEMAP: z.object({
+      THREAD_PRIORITY: z.coerce.number(),
+      PROFILE_PRIORITY: z.coerce.number(),
+    }),
   }),
 );

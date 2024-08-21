@@ -89,6 +89,7 @@ export const processCommentCreated: EventHandler<
           payload.thread_id,
           // @ts-expect-error StrictNullChecks
           payload.id,
+          community.custom_domain,
         ),
         comment_created_event: payload,
       },
