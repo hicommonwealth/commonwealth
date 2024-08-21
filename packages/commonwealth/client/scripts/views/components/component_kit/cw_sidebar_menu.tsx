@@ -178,7 +178,9 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
 
           return (
             <CWSidebarMenuItem
-              key={i}
+              key={`${i}-${
+                item?.type === 'community' ? item?.community?.isStarred : false
+              }`}
               type={item.type || 'default'}
               {...itemProps}
             />

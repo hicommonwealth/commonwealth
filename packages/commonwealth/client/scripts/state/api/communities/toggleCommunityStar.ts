@@ -27,17 +27,12 @@ const useToggleCommunityStarMutation = () => {
 
   return useMutation({
     mutationFn: toggleCommunityStar,
-    onSuccess: async ({ response, community }) => {
+    onSuccess: async ({ community }) => {
       // Update existing object state
-      const responseCommunity = response.data.result;
-
       user.setData({
         communities: user.communities.map((c) => ({
           ...c,
-          isStarred:
-            !responseCommunity && community === c.id
-              ? !c.isStarred
-              : c.isStarred,
+          isStarred: community === c.id ? !c.isStarred : c.isStarred,
         })),
       });
     },
