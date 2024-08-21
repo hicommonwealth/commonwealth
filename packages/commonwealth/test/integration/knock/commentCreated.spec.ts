@@ -38,6 +38,8 @@ describe('CommentCreated Event Handler', () => {
     replyComment: z.infer<typeof schemas.Comment> | undefined,
     sandbox: sinon.SinonSandbox;
 
+  const customDomain = 'random_custom_domain.com';
+
   beforeAll(async () => {
     const [chainNode] = await tester.seed(
       'ChainNode',
@@ -54,6 +56,7 @@ describe('CommentCreated Event Handler', () => {
     [subscriber] = await tester.seed('User', {});
 
     [community] = await tester.seed('Community', {
+      custom_domain: customDomain,
       chain_node_id: chainNode?.id,
       Addresses: [
         {
@@ -183,11 +186,8 @@ describe('CommentCreated Event Handler', () => {
         comment_parent_name: 'thread',
         community_name: community?.name,
         comment_body: rootComment?.text.substring(0, 255),
-        comment_url: getCommentUrl(
-          community!.id!,
-          thread!.id!,
-          rootComment!.id!,
-        ),
+        comment_url: `https://${customDomain}/${community!
+          .id!}/discussion/${thread!.id!}?comment=${rootComment!.id!}`,
         comment_created_event: { ...rootComment, community_id: community!.id },
       },
       // @ts-expect-error StrictNullChecks
@@ -233,6 +233,7 @@ describe('CommentCreated Event Handler', () => {
           community!.id!,
           thread!.id!,
           replyComment!.id!,
+          customDomain,
         ),
         comment_created_event: { ...replyComment, community_id: community!.id },
       },
