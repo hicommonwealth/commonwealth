@@ -6,7 +6,7 @@ pnpm lint-branch &
 lint_pid=$!
 
 pnpm -r run lint-diff &
-lint_diff_pid=$!
+lint_diff_status=$!
 
 pnpm --silent -r build
 
