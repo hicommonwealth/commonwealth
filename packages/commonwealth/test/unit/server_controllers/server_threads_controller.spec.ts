@@ -549,6 +549,7 @@ describe('ServerThreadsController', () => {
           findAll: async () => [],
         },
         Outbox: {
+          // eslint-disable-next-line @typescript-eslint/require-await
           bulkCreate: async () => ({}),
         },
       };
