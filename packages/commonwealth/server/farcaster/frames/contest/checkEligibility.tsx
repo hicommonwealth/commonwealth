@@ -1,26 +1,13 @@
 import { Button } from 'frames.js/express';
 import React from 'react';
 import { frames } from '../../config';
-import { circleCheckIcon, circleXIcon } from '../../utils';
-
-// TODO remove when will be hooked up to real data
-async function fakeApiCall() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() > 0.5) {
-        return resolve('eligible');
-      } else {
-        return reject('not eligible');
-      }
-    }, 1000);
-  });
-}
+import { circleCheckIcon, circleXIcon, fakeApiCall } from '../../utils';
 
 export const checkEligibility = frames(async () => {
   let eligible: boolean;
 
   try {
-    await fakeApiCall();
+    await fakeApiCall({});
     eligible = true;
   } catch {
     eligible = false;

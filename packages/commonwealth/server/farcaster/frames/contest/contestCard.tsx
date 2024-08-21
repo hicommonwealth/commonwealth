@@ -73,7 +73,11 @@ export const contestCard = frames(async () => {
       </div>
     ),
     buttons: [
-      <Button key="leaderboard" action="post" target="/viewLeaderboard">
+      <Button
+        key="leaderboard"
+        action="post"
+        target="/viewLeaderboard?fromMain=true"
+      >
         View Leaderboard
       </Button>,
       <Button key="eligibility" action="post" target="/checkEligibility">
