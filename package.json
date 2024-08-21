@@ -12,6 +12,7 @@
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F commonwealth db-all",
+    "check-all": "chmod u+x scripts/check-all.sh && ./scripts/check-all.sh",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
     "dump-db": "pnpm -F commonwealth dump-db",
     "format": "prettier --write .",
