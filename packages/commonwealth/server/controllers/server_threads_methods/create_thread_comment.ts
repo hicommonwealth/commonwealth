@@ -235,8 +235,7 @@ export async function __createThreadComment(
             // @ts-expect-error StrictNullChecks
             subscriber_id: user.id,
             category_id: NotificationCategories.NewReaction,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
+            community_id: thread.community_id,
             comment_id: comment.id!,
             is_active: true,
           },
@@ -244,8 +243,7 @@ export async function __createThreadComment(
             // @ts-expect-error StrictNullChecks
             subscriber_id: user.id,
             category_id: NotificationCategories.NewComment,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
+            community_id: thread.community_id,
             comment_id: comment.id!,
             is_active: true,
           },
@@ -282,8 +280,7 @@ export async function __createThreadComment(
         comment_id: +comment.id,
         // @ts-expect-error StrictNullChecks
         comment_text: comment.text,
-        // @ts-expect-error StrictNullChecks
-        community_id: comment.community_id,
+        community_id: thread.community_id,
         author_address: address.address,
         author_community_id: address.community_id!,
       },
@@ -307,8 +304,7 @@ export async function __createThreadComment(
           comment_text: comment.text,
           parent_comment_id: +parentId,
           parent_comment_text: parentComment.text,
-          // @ts-expect-error StrictNullChecks
-          community_id: comment.community_id,
+          community_id: thread.community_id,
           author_address: address.address,
           author_community_id: address.community_id!,
         },
