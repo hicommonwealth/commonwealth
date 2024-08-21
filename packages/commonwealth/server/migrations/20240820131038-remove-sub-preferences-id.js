@@ -4,6 +4,9 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.removeColumn('SubscriptionPreferences', 'id', {
+        transaction,
+      });
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "SubscriptionPreferences"
@@ -11,9 +14,6 @@ module.exports = {
       `,
         { transaction },
       );
-      await queryInterface.removeColumn('SubscriptionPreferences', 'id', {
-        transaction,
-      });
     });
   },
 

@@ -54,11 +54,5 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
-      indexes: [
-        {
-          fields: ['user_id'],
-          unique: true,
-        },
-      ],
     },
   );
