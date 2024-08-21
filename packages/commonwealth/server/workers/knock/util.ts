@@ -1,11 +1,16 @@
 import { config } from '@hicommonwealth/model';
 
+function parseCustomDomain(customDomain: string) {
+  let parsedDomain = customDomain;
+  if (customDomain.endsWith('/')) parsedDomain = parsedDomain.slice(0, -1);
+  if (!customDomain.startsWith('https://'))
+    parsedDomain = 'https://' + parsedDomain;
+  return parsedDomain;
+}
+
 function getBaseUrl(customDomain?: string | null): string {
   if (!customDomain) return config.SERVER_URL;
-  else {
-    if (customDomain.endsWith('/')) return customDomain.slice(0, -1);
-    else return customDomain;
-  }
+  else return parseCustomDomain(customDomain);
 }
 
 export const getCommentUrl = (
