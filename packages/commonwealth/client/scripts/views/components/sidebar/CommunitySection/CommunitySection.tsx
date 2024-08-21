@@ -59,9 +59,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
   const communityAlerts:
     | ReadonlyArray<z.infer<typeof CommunityAlert>>
-    | undefined = useCommunityAlertsQuery().data as unknown as ReadonlyArray<
-    z.infer<typeof CommunityAlert>
-  >;
+    | undefined = useCommunityAlertsQuery({
+    enabled: user.isLoggedIn && !!app.chain,
+  }).data as unknown as ReadonlyArray<z.infer<typeof CommunityAlert>>;
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;

@@ -1,4 +1,5 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
+import { notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import app from 'state';
 import { useCreateCommunityAlertMutation } from 'state/api/trpc/subscription/useCreateCommunityAlertMutation';
@@ -36,6 +37,7 @@ export const SubscriptionButton = ({
             })
             .then(() => {
               setNotificationsOn(false);
+              notifySuccess('Unsubscribed!');
             })
             .catch((err) => {
               console.error(err);
@@ -48,6 +50,7 @@ export const SubscriptionButton = ({
             })
             .then(() => {
               setNotificationsOn(true);
+              notifySuccess('Subscribed!');
             })
             .catch((err) => {
               console.error(err);
