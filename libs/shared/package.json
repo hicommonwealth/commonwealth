@@ -22,14 +22,14 @@
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "@canvas-js/core": "0.10.6",
-    "@canvas-js/chain-cosmos": "0.10.6",
-    "@canvas-js/chain-ethereum": "0.10.6",
-    "@canvas-js/chain-solana": "0.10.6",
-    "@canvas-js/chain-substrate": "0.10.6",
-    "@canvas-js/gossiplog": "0.10.6",
-    "@canvas-js/interfaces": "0.10.6",
-    "@canvas-js/signatures": "0.10.6",
+    "@canvas-js/core": "^0.10.8",
+    "@canvas-js/chain-cosmos": "^0.10.8",
+    "@canvas-js/chain-ethereum": "^0.10.8",
+    "@canvas-js/chain-solana": "^0.10.8",
+    "@canvas-js/chain-substrate": "^0.10.8",
+    "@canvas-js/gossiplog": "^0.10.8",
+    "@canvas-js/interfaces": "^0.10.8",
+    "@canvas-js/signatures": "^0.10.8",
     "@ipld/dag-json": "^10.2.0",
     "moment": "^2.23.0",
     "safe-stable-stringify": "^2.4.2"
