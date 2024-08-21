@@ -11,7 +11,11 @@ function getDifferences(
 ): Partial<z.infer<typeof SubscriptionPreference>> {
   const differences: Record<string, any> = {};
   for (const key in subsetObject) {
-    if (key in subsetObject && subsetObject[key] !== fullObject[key]) {
+    if (
+      key !== 'id' &&
+      key in subsetObject &&
+      subsetObject[key] !== fullObject[key]
+    ) {
       differences[key] = subsetObject[key];
     }
   }

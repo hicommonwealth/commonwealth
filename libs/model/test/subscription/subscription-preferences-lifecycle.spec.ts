@@ -62,8 +62,8 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
       user_id: actor.user.id,
+      email_notifications_enabled: true,
       digest_email_enabled: false,
       recap_email_enabled: false,
       mobile_push_notifications_enabled: false,
@@ -85,7 +85,8 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
+      email_notifications_enabled: true,
+      digest_email_enabled: true,
       user_id: actor.user.id,
       recap_email_enabled: false,
       mobile_push_notifications_enabled: false,
