@@ -71,7 +71,7 @@
     "ts-exec": "tsx ",
     "vite": "wait-on http://localhost:3000/api/health && vite -c ./client/vite.config.ts --host",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
-    "strip-ts-expect-error": "find . -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\) -exec sed -i '' 's/ts-expect-error .*//g' '{}' ';'"
+    "strip-ts-expect-error": "find . -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\) -exec sed -i '' 's/@ts-expect-error .*//g' '{}' ';'"
   },
   "dependencies": {
     "@apollo/client": "^3.3.18",
