@@ -7,10 +7,8 @@ import type {
   StarredCommunityAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
-import { QueryTypes } from 'sequelize';
 import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
@@ -29,7 +27,6 @@ type StatusResp = {
     isAdmin: boolean;
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
-    unseenPosts: { [communityId: string]: number };
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
@@ -56,156 +53,9 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ]);
 
   // get starred communities for user
-  const starredCommunitiesPromise = models.StarredCommunity.findAll({
+  const starredCommunities = await models.StarredCommunity.findAll({
     where: { user_id: user.id },
   });
-
-  // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
-  /**
-   * Purpose of this section is to count the number of threads that have new updates grouped by community
-   */
-  const communityActivity = await getCommunityActivity(addresses);
-  const unseenPosts = {};
-  let query = ``;
-  let replacements: string[] = [];
-
-  // this loops through the communities for which we want to see if there are any new updates
-  // for each community a UNION SELECT query is appended to the query so that that communities updated threads are
-  // included in the final result. This method allows us to submit a single query for all the communities rather
-  // than a new query for each community
-  for (let i = 0; i < communityActivity.length; i++) {
-    const name = communityActivity[i][0];
-    const date = communityActivity[i][1];
-
-    if (!date) {
-      unseenPosts[name] = {};
-      continue;
-    }
-
-    // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-    if (query !== '') query += ' UNION ';
-    // add the community and timestamp to replacements so that we can safely populate the query with dynamic parameters
-    replacements.push(name, date);
-    // append the SELECT query
-    query += `SELECT id, community_id
-              FROM "Threads"
-              WHERE community_id = ?
-                AND created_at > ?
-                AND deleted_at IS NULL`;
-    if (i === communityActivity.length - 1) query += ';';
-  }
-
-  // populate the query replacements and execute the query
-  const threadNumPromise = sequelize.query<
-    Pick<ThreadAttributes, 'id' | 'community_id'>
-  >(query, {
-    raw: true,
-    type: QueryTypes.SELECT,
-    replacements,
-  });
-
-  // wait for all the promises to resolve
-  const [starredCommunities, threadNum] = await Promise.all([
-    starredCommunitiesPromise,
-    threadNumPromise,
-  ]);
-
-  // this section iterates through the retrieved threads
-  // counting the number of threads and keeping a set of activePosts
-  // the set of activePosts is used to compare with the comments
-  // under threads so that there are no duplicate active threads counted
-  for (const thread of threadNum) {
-    if (!unseenPosts[thread.community_id])
-      unseenPosts[thread.community_id] = {};
-    unseenPosts[thread.community_id].activePosts
-      ? unseenPosts[thread.community_id].activePosts.add(thread.id)
-      : (unseenPosts[thread.community_id].activePosts = new Set([thread.id]));
-    unseenPosts[thread.community_id].threads
-      ? unseenPosts[thread.community_id].threads++
-      : (unseenPosts[thread.community_id].threads = 1);
-  }
-
-  // reset var
-  query = ``;
-  replacements = [];
-
-  // same principal as the loop above but for comments instead of threads
-  for (let i = 0; i < communityActivity.length; i++) {
-    const name = communityActivity[i][0];
-    const date = communityActivity[i][1];
-
-    if (!date) {
-      unseenPosts[name] = {};
-      continue;
-    }
-
-    // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-    if (query !== '') query += ' UNION ';
-    // add the community and timestamp to replacements so that we can safely populate the query with dynamic parameters
-    replacements.push(name, date);
-    // append the SELECT query
-    query += `SELECT C.thread_id, T.community_id
-              FROM "Comments" C JOIN "Threads" T ON C.thread_id = T.id
-              WHERE T.community_id = ?
-                AND C.created_at > ?`;
-    if (i === communityActivity.length - 1) query += ';';
-  }
-
-  // populate query and execute
-  const commentNum: { thread_id: string; community_id: string }[] = <any>(
-    await sequelize.query(query, {
-      raw: true,
-      type: QueryTypes.SELECT,
-      replacements,
-    })
-  );
-
-  // iterates through the retrieved comments and adds each thread id to the activePosts set
-  for (const comment of commentNum) {
-    if (!unseenPosts[comment.community_id])
-      unseenPosts[comment.community_id] = {};
-    const id = comment.thread_id;
-    unseenPosts[comment.community_id].activePosts
-      ? unseenPosts[comment.community_id].activePosts.add(id)
-      : (unseenPosts[comment.community_id].activePosts = new Set([id]));
-    unseenPosts[comment.community_id].comments
-      ? unseenPosts[comment.community_id].comments++
-      : (unseenPosts[comment.community_id].comments = 1);
-  }
-
-  // set the activePosts to num in set
-  for (const community of communityActivity) {
-    const [name, date] = community;
-    if (!date) {
-      unseenPosts[name] = {};
-      continue;
-    }
-    // if the time is valid but the community is not defined in the unseenPosts object
-    // then initialize the object with zeros
-    if (!unseenPosts[name]) {
-      unseenPosts[name] = {
-        activePosts: 0,
-        threads: 0,
-        comments: 0,
-      };
-    } else {
-      // if the community does have activePosts convert the set of ids to simply the length of the set
-      unseenPosts[name].activePosts = unseenPosts[name].activePosts?.size || 0;
-    }
-  }
-  /**
-   * Example Result:
-   * {
-   *     ethereum: {
-   *         activePosts: 10,
-   *         threads: 8,
-   *         comments: 2
-   *     },
-   *     aave: {
-   *         ...
-   *     }
-   * }
-   */
 
   return {
     user: {
@@ -222,7 +72,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       isAdmin,
       disableRichText,
       starredCommunities,
-      unseenPosts,
     },
     id: user.id,
     email: user.email,
@@ -280,18 +129,4 @@ async function computeKnockJwtToken(userId: number) {
       expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
     });
   }
-}
-
-type CommunityActivity = [communityId: string, timestamp: string | null][];
-
-function getCommunityActivity(
-  addresses: AddressInstance[],
-): Promise<CommunityActivity> {
-  // @ts-expect-error StrictNullChecks
-  return Promise.all(
-    addresses.map(async (address) => {
-      const { community_id, last_active } = address;
-      return [community_id, last_active?.toISOString()];
-    }),
-  );
 }
