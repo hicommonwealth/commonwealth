@@ -4,19 +4,20 @@ import {
   CommentAttributes,
   CommentInstance,
   UserInstance,
-  sanitizeQuillText,
-} from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import moment from 'moment';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import { getCommentDepth } from '../../util/getCommentDepth';
-import {
   emitMentions,
   parseUserMentions,
+  sanitizeQuillText,
   uniqueMentions,
-} from '../../util/parseUserMentions';
+} from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
+import {
+  NotificationCategories,
+  ProposalType,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
+import moment from 'moment';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { getCommentDepth } from '../../util/getCommentDepth';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';

@@ -1,7 +1,6 @@
-import React, { ReactElement } from 'react';
-
+import { preprocessQuillDeltaForRendering } from '@hicommonwealth/shared';
 import { loadScript } from 'helpers';
-import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
+import React, { ReactElement } from 'react';
 
 type TempList = Array<
   Array<{

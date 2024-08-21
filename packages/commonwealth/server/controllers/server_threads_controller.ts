@@ -7,11 +7,6 @@ import {
   __countThreads,
 } from './server_threads_methods/count_threads';
 import {
-  CreateThreadOptions,
-  CreateThreadResult,
-  __createThread,
-} from './server_threads_methods/create_thread';
-import {
   CreateThreadCommentOptions,
   CreateThreadCommentResult,
   __createThreadComment,
@@ -95,13 +90,6 @@ export class ServerThreadsController {
     options: UpdateThreadOptions,
   ): Promise<UpdateThreadResult> {
     return __updateThread.call(this, options);
-  }
-
-  async createThread(
-    this: ServerThreadsController,
-    options: CreateThreadOptions,
-  ): Promise<CreateThreadResult> {
-    return __createThread.call(this, options);
   }
 
   async getThreadsByIds(

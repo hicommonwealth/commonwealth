@@ -63,3 +63,23 @@ if (config.NODE_ENV !== 'production') {
 }
 
 export { PATH, router, trpcRouter };
+
+// registerRoute(
+//   router,
+//   'post',
+//   '/threads',
+//   passport.authenticate('jwt', { session: false }),
+//   databaseValidationService.validateAuthor,
+//   databaseValidationService.validateCommunityWithTopics,
+//   createThreadHandler.bind(this, serverControllers),
+// );
+
+// registerRoute(
+//   router,
+//   'post',
+//   '/bot/threads',
+//   databaseValidationService.validateBotUser,
+//   databaseValidationService.validateAuthor,
+//   databaseValidationService.validateCommunityWithTopics,
+//   createThreadHandler.bind(this, serverControllers),
+// );

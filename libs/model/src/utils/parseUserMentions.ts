@@ -50,14 +50,14 @@ export const parseUserMentions = (text: string): UserMention[] => {
   try {
     const parsedText = JSON.parse(text);
     return (parsedText.ops || [])
-      .filter((op) => {
+      .filter((op: any) => {
         return (
           op.attributes?.link?.length > 0 &&
           typeof op.insert === 'string' &&
           op.insert?.slice(0, 1) === '@'
         );
       })
-      .map((op) => {
+      .map((op: any) => {
         const chunks = op.attributes.link.split('/');
         const refIdx = chunks.indexOf('account');
         return {

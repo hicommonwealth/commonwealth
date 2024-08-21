@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { discordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
 import { Address } from './user.schemas';
 
 export const Thread = z.object({
@@ -34,7 +34,7 @@ export const Thread = z.object({
   marked_as_spam_at: z.coerce.date().nullish(),
   archived_at: z.coerce.date().nullish(),
   locked_at: z.coerce.date().nullish(),
-  discord_meta: z.object(discordMetaSchema).nullish(),
+  discord_meta: DiscordMetaSchema.nullish(),
 
   //counts
   reaction_count: PG_INT,

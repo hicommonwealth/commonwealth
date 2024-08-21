@@ -1,8 +1,8 @@
 import { logger } from '@hicommonwealth/core';
-import type {
-  AddressAttributes,
-  DB,
-  UserAttributes,
+import {
+  type AddressAttributes,
+  type DB,
+  type UserAttributes,
 } from '@hicommonwealth/model';
 import {
   DynamicTemplate,
@@ -11,17 +11,14 @@ import {
   ISnapshotNotificationData,
   NotificationCategories,
   getThreadUrl,
+  renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import _ from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
-import {
-  formatAddressShort,
-  renderQuillDeltaToText,
-  smartTrim,
-} from '../../shared/utils';
+import { formatAddressShort, smartTrim } from '../../shared/utils';
 import { config } from '../config';
 
 const log = logger(import.meta);

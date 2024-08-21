@@ -141,7 +141,6 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
-import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
@@ -394,26 +393,6 @@ function setupRouter(
   );
 
   // threads
-  registerRoute(
-    router,
-    'post',
-    '/threads',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunityWithTopics,
-    createThreadHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/bot/threads',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunityWithTopics,
-    createThreadHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'patch',
