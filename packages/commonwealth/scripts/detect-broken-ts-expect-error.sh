@@ -19,6 +19,6 @@ find . -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's/\/\/ @ts-expe
 find . -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's/{\/\* @ts-expect-error .*//g' '{}' ';'
 
 # now turn off StrictNullChecks
-sed -i '' 's/"strictNullChecks": true/"strictNullChecks": false/g' tsconfig.json
+sed -i 's/"strictNullChecks": true/"strictNullChecks": false/g' tsconfig.json
 
 pnpm run build
