@@ -518,7 +518,7 @@ export async function handleSocialLoginCallback({
 
       const sessionSigner = new SIWESigner({
         signer,
-        chainId: app.chain?.meta.node?.ethChainId || 1,
+        chainId: app.chain?.meta?.node?.ethChainId || 1,
       });
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {
