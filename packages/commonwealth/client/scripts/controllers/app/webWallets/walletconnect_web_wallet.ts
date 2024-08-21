@@ -50,7 +50,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return this._chainInfo.node?.ethChainId?.toString() || '1';
+    return this._chainInfo?.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -115,7 +115,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._chainInfo = chainInfo;
     }
 
-    const chainId = this._chainInfo.node?.ethChainId || 1;
+    const chainId = this._chainInfo?.node?.ethChainId || 1;
     const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
       .default;
     this._provider = await EthereumProvider.init({

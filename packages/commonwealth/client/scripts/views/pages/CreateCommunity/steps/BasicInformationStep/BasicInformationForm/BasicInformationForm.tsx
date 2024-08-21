@@ -162,17 +162,16 @@ const BasicInformationForm = ({
         // @ts-expect-error StrictNullChecks
         socialLinks: values.links,
         // @ts-expect-error StrictNullChecks
-        nodeUrl: selectedChainNode.nodeUrl,
+        nodeUrl: selectedChainNode?.nodeUrl,
         // @ts-expect-error StrictNullChecks
-        altWalletUrl: selectedChainNode.altWalletUrl,
+        altWalletUrl: selectedChainNode?.altWalletUrl,
         userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
           ethChainId: values.chain.value,
         }),
         ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
           cosmosChainId: values.chain.value,
-          // @ts-expect-error StrictNullChecks
-          bech32Prefix: selectedChainNode.bech32Prefix,
+          bech32Prefix: selectedChainNode?.bech32Prefix,
         }),
         isPWA: isAddedToHomeScreen,
       });
