@@ -3,12 +3,18 @@
 echo "Running check-all"
 
 pnpm lint-branch &
-lint_status=$?
+lint_pid=$!
 
 pnpm -r run lint-diff &
-lint_diff_status=$?
+lint_diff_pid=$!
 
 pnpm --silent -r build
+
+wait $lint_pid
+lint_status=$?
+
+wait $lint_diff_pid
+lint_diff_status=$?
 
 pnpm -r check-types
 check_types_status=$?
