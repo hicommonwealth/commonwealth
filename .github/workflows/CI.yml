@@ -285,7 +285,7 @@ jobs:
       - name: build
         run: pnpm -r build
 
-      - name: check-types
+      - name: run detect-broken-ts-expect-error.sh
         run: cd packages/commonwealth && ./scripts/detect-broken-ts-expect-error.sh
 
   # These tests run quickly, so run them in a separate job
