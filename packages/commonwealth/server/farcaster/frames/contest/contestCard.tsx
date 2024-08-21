@@ -44,7 +44,7 @@ export const contestCard = frames(async () => {
         style={{
           backgroundColor: '#2A2432',
           color: 'white',
-          padding: '20px',
+          padding: '40px',
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
@@ -68,7 +68,7 @@ export const contestCard = frames(async () => {
             <PrizeRow key={index} index={index} prize={prize} />
           ))
         ) : (
-          <p style={{ fontSize: '32px' }}>This is contest description</p>
+          <p style={{ fontSize: '32px' }}>Contest has no prizes yet.</p>
         )}
       </div>
     ),
