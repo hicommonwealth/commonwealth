@@ -326,6 +326,7 @@ describe('CommentCreated Event Handler', () => {
           community!.id!,
           thread!.id!,
           mentionedComment!.id!,
+          customDomain,
         ),
         comment_created_event: {
           ...mentionedComment,
