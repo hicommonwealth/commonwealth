@@ -3,7 +3,7 @@ services:
   cw_postgres:
     container_name: cw_postgres
     build:
-      context: ./docker/
+      context: ./packages/commonwealth/docker/
       dockerfile: Dockerfile-pg-partman
     restart: always
     environment:
