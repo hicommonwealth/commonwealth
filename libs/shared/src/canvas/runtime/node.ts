@@ -7,18 +7,34 @@ import { contract, contractTopic } from './contract';
 export const CANVAS_TOPIC = contractTopic;
 
 export const startCanvasNode = async () => {
-  console.log('canvas: starting', process.env.POSTGRES_FEDERATION_DB_URL);
-
   const path =
-    process.env.POSTGRES_FEDERATION_DB_URL ??
+    process.env.FEDERATION_POSTGRES_DB_URL ??
     'postgresql://commonwealth:edgeware@localhost/federation';
+  const announce =
+    process.env.FEDERATION_ANNOUNCE_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
+  const listen =
+    process.env.FEDERATION_LISTEN_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
+
+  console.log('canvas: starting federation node on', path);
+
   const app = await Canvas.initialize({
     topic: contractTopic,
     path,
     contract,
     signers: getSessionSigners(),
-    bootstrapList: [], // TODO: app.libp2p.start()
+    bootstrapList: [],
+    announce: [announce],
+    listen: [listen],
   });
+
+  if (process.env.START_LIBP2P) {
+    await app.libp2p.start();
+    console.log(
+      'canvas: started libp2p with multiaddrs',
+      app.libp2p.getMultiaddrs().map((m) => m.toString()),
+    );
+  }
+
   return app;
 };
 
