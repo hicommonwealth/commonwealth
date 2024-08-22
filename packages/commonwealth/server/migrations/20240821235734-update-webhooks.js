@@ -52,6 +52,15 @@ module.exports = {
             `,
         { transaction },
       );
+      await queryInterface.changeColumn(
+        'Webhooks',
+        'destination',
+        {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        { transaction },
+      );
     });
   },
 
