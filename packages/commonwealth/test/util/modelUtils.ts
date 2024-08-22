@@ -106,7 +106,9 @@ export interface CommentArgs {
   jwt: any;
   text: any;
   parentCommentId?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   threadId?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   threadMsgId?: any;
   session: Session;
   sign: (message: Message<Action | Session>) => Awaitable<Signature>;
