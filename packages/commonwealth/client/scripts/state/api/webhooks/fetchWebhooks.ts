@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import Webhook from 'models/Webhook';
 import app from 'state';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { userStore } from '../../ui/user';
 
 const WEBHOOKS_STALE_TIME = 30 * 1_000; // 30 s
@@ -31,15 +31,21 @@ const fetchWebhooks = async ({
   );
 };
 
-const useFetchWebhooksQuery = ({
-  communityId,
-  apiEnabled = true,
-}: FetchWebhooksProps) => {
-  return useQuery({
-    queryKey: [ApiEndpoints.FETCH_WEBHOOKS, communityId],
-    queryFn: () => fetchWebhooks({ communityId }),
-    staleTime: WEBHOOKS_STALE_TIME,
-    enabled: apiEnabled,
+// const useFetchWebhooksQuery = ({
+//   communityId,
+//   apiEnabled = true,
+// }: FetchWebhooksProps) => {
+//   return useQuery({
+//     queryKey: [ApiEndpoints.FETCH_WEBHOOKS, communityId],
+//     queryFn: () => fetchWebhooks({ communityId }),
+//     staleTime: WEBHOOKS_STALE_TIME,
+//     enabled: apiEnabled,
+//   });
+// };
+
+const useFetchWebhooksQuery = ({ communityId }: { communityId: string }) => {
+  return trpc.webhook.getWebhooks.useQuery({
+    community_id: communityId,
   });
 };
 

@@ -2,12 +2,14 @@ import {
   CommandContext,
   InvalidActor,
   InvalidInput,
+  QueryHandler,
   type CommandHandler,
   type CommandInput,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
+import { ZodObject, ZodString } from 'zod';
 import { AddressAttributes, models } from '..';
 
 /**
@@ -54,6 +56,18 @@ const authorizeAddress = async (
 type CommunityMiddleware = CommandHandler<CommandInput, any>;
 type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
 type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
+
+type CommunityQueryMiddleware = QueryHandler<
+  ZodObject<{
+    community_id: ZodString;
+  }>,
+  any
+>;
+
+export const isCommunityAdminQuery: CommunityQueryMiddleware = async (ctx) => {
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin']);
+};
 
 /**
  * Community middleware

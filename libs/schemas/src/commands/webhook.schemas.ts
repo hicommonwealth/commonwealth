@@ -8,3 +8,10 @@ export const CreateWebhook = {
   }),
   output: Webhook,
 };
+
+export const GetWebhooks = {
+  input: z.object({
+    community_id: z.string().describe('The community_id to fetch webhooks for'),
+  }),
+  output: z.array(Webhook),
+};
