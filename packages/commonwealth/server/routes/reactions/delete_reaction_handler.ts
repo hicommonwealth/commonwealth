@@ -3,8 +3,9 @@ import {
   applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
+  verifyDeleteReaction,
 } from '@hicommonwealth/shared';
-import { canvas, verifyDeleteReaction } from 'server/federation';
+import { canvas } from 'server/federation';
 import { ServerControllers } from 'server/routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
