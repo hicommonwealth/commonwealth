@@ -15,3 +15,13 @@ export const GetWebhooks = {
   }),
   output: z.array(Webhook),
 };
+
+export const DeleteWebhook = {
+  input: z.object({
+    id: z.number().describe('The id of the webhook to delete'),
+    community_id: z.string(),
+  }),
+  output: z.object({
+    webhook_deleted: z.boolean(),
+  }),
+};

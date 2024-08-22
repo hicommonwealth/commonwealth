@@ -117,7 +117,7 @@ const Webhooks = () => {
         webhooks[index].canConfigure
       ) {
         await deleteWebhook({
-          communityId: communityId,
+          community_id: communityId,
           webhookUrl: webhooks[index].value,
         });
         notifySuccess('Webhook deleted!');
