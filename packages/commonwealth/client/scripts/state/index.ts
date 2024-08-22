@@ -7,7 +7,6 @@ import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import DiscordController from 'controllers/server/discord';
-import PollsController from 'controllers/server/polls';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
@@ -16,6 +15,7 @@ import StarredCommunity from 'models/StarredCommunity';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
+import { errorStore } from 'state/ui/error';
 import { ChainStore } from 'stores';
 import { userStore } from './ui/user';
 
@@ -44,9 +44,6 @@ export interface IApp {
   runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
-
-  // Polls
-  polls: PollsController;
 
   // Discord
   discord: DiscordController;
@@ -94,9 +91,6 @@ const app: IApp = {
   // need many max listeners because every account will wait on this
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
-
-  // Polls
-  polls: new PollsController(),
 
   // Discord
   discord: new DiscordController(),
@@ -208,8 +202,11 @@ export async function initAppState(
       }
     }
   } catch (err) {
-    app.loadingError =
-      err.response?.data?.error || 'Error loading application state';
+    errorStore
+      .getState()
+      .setLoadingError(
+        err.response?.data?.error || 'Error loading application state',
+      );
     throw err;
   }
 }

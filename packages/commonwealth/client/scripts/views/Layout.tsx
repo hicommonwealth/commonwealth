@@ -7,6 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
+import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
@@ -43,6 +44,7 @@ const LayoutComponent = ({
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
   const providedCommunityScope = scoped ? pathScope : null;
   const user = useUserStore();
+  const appError = useErrorStore();
 
   const [communityToLoad, setCommunityToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -79,7 +81,7 @@ const LayoutComponent = ({
     providedCommunityScope &&
     providedCommunityScope !== app.activeChainId() &&
     providedCommunityScope !== communityToLoad &&
-    community &&
+    !!community &&
     !isVerifyingCommunityExistance;
 
   useNecessaryEffect(() => {
@@ -128,16 +130,19 @@ const LayoutComponent = ({
   // A loading state (i.e. spinner) is shown in the following cases:
   // - a community is still being initialized or deinitialized
   const shouldShowLoadingState =
-    isLoading || shouldSelectChain || shouldDeInitChain;
+    isLoading ||
+    shouldSelectChain ||
+    shouldDeInitChain ||
+    (providedCommunityScope ? isVerifyingCommunityExistance : false);
 
   const childToRender = () => {
-    if (app.loadingError) {
+    if (appError.loadingError) {
       return (
         <CWEmptyState
           iconName="cautionTriangle"
           content={
             <div className="loading-error">
-              <CWText>Application error: {app.loadingError}</CWText>
+              <CWText>Application error: {appError.loadingError}</CWText>
               <CWText>Please try again later</CWText>
             </div>
           }

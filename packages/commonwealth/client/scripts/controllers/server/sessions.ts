@@ -85,7 +85,7 @@ function getCaip2Address(address: string) {
   const idOrPrefix =
     app.chain.base === ChainBase.CosmosSDK
       ? app.chain?.meta.bech32Prefix || 'cosmos'
-      : app.chain?.meta.node?.ethChainId || 1;
+      : app.chain?.meta?.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(app.chain.base, idOrPrefix);
 
   return `${caip2Prefix}:${canvasChainId}:${address}`;

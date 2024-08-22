@@ -47,15 +47,8 @@
     margin-top: auto;
     padding-top: 12px;
     display: flex;
-    gap: 4px;
-    align-items: flex-start;
+    gap: 8px;
+    align-items: center;
     color: $neutral-500;
-
-    .new-activity-tag.Text {
-      background-color: $purple-400;
-      border-radius: $border-radius-rounded-corners;
-      color: $white;
-      padding: 2px 8px;
-    }
   }
 }

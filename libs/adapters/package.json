@@ -43,6 +43,7 @@
     "redis": "4.2.0",
     "rollbar": "^2.6.1",
     "sequelize": "^6.32.1",
+    "swagger-ui-express": "^5.0.0",
     "trpc-swagger": "^1.2.6",
     "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
@@ -53,6 +54,7 @@
     "@types/qs": "^6.9.14",
     "@types/sinon": "^17.0.3",
     "@types/superagent": "4.1.13",
+    "@types/swagger-ui-express": "^4.1.6",
     "sinon": "^17.0.2",
     "superagent": "^5.2.2",
     "tsx": "^4.7.2"
