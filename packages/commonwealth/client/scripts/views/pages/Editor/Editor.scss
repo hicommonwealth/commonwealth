@@ -3,3 +3,17 @@
   border-radius: inherit;
   background-color: inherit;
 }
+
+.mdxeditor {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mdxeditor-diff-source-wrapper {
+  flex-grow: 1;
+}
+
+.mdxeditor-block-type-select button {
+  width: 65px;
+}

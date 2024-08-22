@@ -23,6 +23,8 @@ import React from 'react';
 
 import './Editor.scss';
 
+import 'commonwealth-mdxeditor/style.css';
+
 export const Editor = () => {
   return (
     <MDXEditor
