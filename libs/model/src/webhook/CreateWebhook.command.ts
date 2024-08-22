@@ -6,7 +6,7 @@ import { isCommunityAdmin } from '../middleware';
 const Errors = {
   InvalidWebhookUrl:
     'Invalid Webhook url. Must be one of: https://api.telegram.org/*, ' +
-    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://api.telegram.org/*',
+    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://discord.com/api/webhooks/*',
   WebhookExists: 'The provided webhook already exists for this community',
 };
 
@@ -17,7 +17,10 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
     secure: true,
     body: async ({ payload }) => {
       let destination = 'unknown';
-      if (payload.webhookUrl.startsWith('https://discord.com/api/webhooks/'))
+      if (
+        payload.webhookUrl.startsWith('https://discord.com/api/webhooks/') ||
+        payload.webhookUrl.startsWith('https://discordapp.com/api/webhooks/')
+      )
         destination = 'discord';
       else if (
         payload.webhookUrl.startsWith('https://hooks.slack.com/services/')
