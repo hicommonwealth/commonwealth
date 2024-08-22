@@ -34,3 +34,28 @@
 .ReactQueryDevtools * {
   display: none;
 }
+
+.mdxeditor-root-contenteditable p {
+  line-height: 2rem;
+}
+
+.mdxeditor-root-contenteditable blockquote {
+  margin-left: 20px;
+  border-left: #c6c6c6 solid 3px;
+  padding-left: 5px;
+}
+
+.mdxeditor-root-contenteditable {
+  ol,
+  ul {
+    margin-left: 20px;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  ul {
+    list-style: square;
+  }
+}
