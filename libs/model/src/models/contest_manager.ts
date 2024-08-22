@@ -41,6 +41,10 @@ export default (
       cancelled: { type: Sequelize.BOOLEAN },
       ended: { type: Sequelize.BOOLEAN },
       farcaster_frame_url: { type: Sequelize.STRING, allowNull: true },
+      farcaster_frame_hashes: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
     },
     {
       tableName: 'ContestManagers',

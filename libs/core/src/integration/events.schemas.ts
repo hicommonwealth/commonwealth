@@ -1,6 +1,5 @@
 import {
   Comment,
-  FarcasterWebhookEvent,
   Reaction,
   SubscriptionPreference,
   Thread,
@@ -236,5 +235,3 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   created_at: true,
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
-
-export const FarcasterCastCreated = EventMetadata.merge(FarcasterWebhookEvent);

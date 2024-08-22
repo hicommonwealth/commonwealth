@@ -1,5 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { ChainEvents } from '@hicommonwealth/model';
+import { ChainEvents, Contest } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router, raw } from 'express';
 import { config } from '../config';
@@ -51,6 +51,51 @@ router.post(
     next();
   },
   express.command(ChainEvents.ChainEventCreated()),
+);
+
+router.post(
+  '/farcaster/CastCreated',
+  raw({ type: '*/*', limit: '10mb', inflate: true }),
+  (req, _, next) => {
+    // TODO: verify frame signature message
+    return next();
+  },
+  // parse body as JSON (native express.json middleware doesn't work here)
+  (req, _, next) => {
+    req.body = JSON.parse(req.body);
+    next();
+  },
+  express.command(Contest.FarcasterCastCreatedWebhook()),
+);
+
+router.post(
+  '/farcaster/ReplyCastCreated',
+  raw({ type: '*/*', limit: '10mb', inflate: true }),
+  (req, _, next) => {
+    // TODO: verify frame signature message
+    return next();
+  },
+  // parse body as JSON (native express.json middleware doesn't work here)
+  (req, _, next) => {
+    req.body = JSON.parse(req.body);
+    next();
+  },
+  express.command(Contest.FarcasterReplyCastCreatedWebhook()),
+);
+
+router.post(
+  '/farcaster/action',
+  raw({ type: '*/*', limit: '10mb', inflate: true }),
+  (req, _, next) => {
+    // TODO: verify frame signature message
+    return next();
+  },
+  // parse body as JSON (native express.json middleware doesn't work here)
+  (req, _, next) => {
+    req.body = JSON.parse(req.body);
+    next();
+  },
+  express.command(Contest.FarcasterActionWebhook()),
 );
 
 if (config.NODE_ENV !== 'production') {

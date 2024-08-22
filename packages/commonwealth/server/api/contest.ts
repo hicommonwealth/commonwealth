@@ -16,5 +16,8 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getContestLog: trpc.query(Contest.GetContestLog, trpc.Tag.Community),
-  farcasterWebhook: trpc.command(Contest.FarcasterWebhook, trpc.Tag.Community), // TODO: Use different tag?
+  farcasterWebhook: trpc.command(
+    Contest.FarcasterCastCreatedWebhook,
+    trpc.Tag.Community,
+  ), // TODO: Use different tag?
 });

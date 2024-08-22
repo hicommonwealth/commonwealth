@@ -72,3 +72,10 @@ export const GetThreadContestManagers = {
     }),
   ),
 };
+
+export const FarcasterAction = {
+  input: z.object({
+    contest_address: z.string(),
+  }),
+  output: z.array(ContestLogEntry),
+};

@@ -1,6 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import z from 'zod';
-import { ContestManager, FarcasterWebhookEvent } from '../entities';
+import { ContestManager } from '../entities';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
@@ -75,9 +75,60 @@ export const PerformContestRollovers = {
   output: z.object({}),
 };
 
-export const FarcasterWebhook = {
-  input: FarcasterWebhookEvent.extend({
-    id: z.string(), // TODO: remove this since it's not relevant to webhooks
+export const FarcasterCastCreatedWebhook = {
+  input: z.object({
+    id: z.string(), // TODO: remove this
+    address: z.string(),
+    frame_url: z.string(),
+    button_index: z.number(),
+    cast_id: z.object({
+      fid: z.number(),
+      hash: z.string(),
+    }),
+  }),
+  output: z.object({}),
+};
+
+export const FarcasterActionWebhook = {
+  input: z.object({
+    id: z.string(), // TODO: remove this
+    created_at: z.number(),
+    type: z.literal('cast.created'),
+    data: z.object({
+      object: z.string(),
+      hash: z.string(),
+      thread_hash: z.string(),
+      parent_hash: z.string().nullable(),
+      parent_url: z.string(),
+      root_parent_url: z.string(),
+      parent_author: z.object({
+        fid: z.number().nullable(),
+      }),
+      author: z.object({
+        object: z.string(),
+        fid: z.number(),
+        custody_address: z.string(),
+        username: z.string(),
+        display_name: z.string(),
+        pfp_url: z.string(),
+        profile: z.any().nullish(), // TODO: Adjust this based on the actual structure of the "profile" object
+        follower_count: z.number(),
+        following_count: z.number(),
+        verifications: z.array(z.string()),
+        active_status: z.string(),
+      }),
+      text: z.string(),
+      timestamp: z.string(),
+      embeds: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "embeds" array
+      reactions: z.object({
+        likes: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "likes" array
+        recasts: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "recasts" array
+      }),
+      replies: z.object({
+        count: z.number(),
+      }),
+      mentioned_profiles: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "mentioned_profiles" array
+    }),
   }),
   output: z.object({}),
 };
