@@ -23,7 +23,7 @@ const api = {
   contest: contest.trpcRouter,
   subscription: subscription.trpcRouter,
   loadTest: loadTest.trpcRouter,
-  api: wallet.trpcRouter,
+  wallet: wallet.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
