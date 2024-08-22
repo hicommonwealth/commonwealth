@@ -33,7 +33,7 @@ const addressOneMnemonic =
   'jewel disease neglect feel mother dry hire yellow minute main tray famous';
 
 async function generateCosmosAddresses(numberOfAddresses: number) {
-  const addresses = [];
+  const addresses: string[] = [];
   for (let i = 0; i < numberOfAddresses; i++) {
     // Generate a new wallet with a random mnemonic
     const wallet = await Secp256k1HdWallet.generate(12, { prefix: 'cosmos' });
