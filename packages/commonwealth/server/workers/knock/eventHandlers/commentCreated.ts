@@ -4,11 +4,12 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, Webhook } from '@hicommonwealth/model';
 import { safeTruncateBody } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
-import { getCommentUrl } from '../util';
+import { config } from '../../../config';
+import { getCommentUrl, getProfileUrl } from '../util';
 
 const log = logger(import.meta);
 
@@ -72,6 +73,18 @@ export const processCommentCreated: EventHandler<
     })) as { user_id: number }[];
   }
 
+  const commentSummary = safeTruncateBody(
+    decodeURIComponent(payload.text),
+    255,
+  );
+  const commentUrl = getCommentUrl(
+    payload.community_id,
+    payload.thread_id,
+    // @ts-expect-error StrictNullChecks
+    payload.id,
+    community.custom_domain,
+  );
+
   if (users.length > 0) {
     const provider = notificationsProvider();
 
@@ -83,17 +96,54 @@ export const processCommentCreated: EventHandler<
         author: author.User.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
-        comment_body: safeTruncateBody(decodeURIComponent(payload.text), 255),
-        comment_url: getCommentUrl(
-          payload.community_id,
-          payload.thread_id,
-          // @ts-expect-error StrictNullChecks
-          payload.id,
-          community.custom_domain,
-        ),
+        comment_body: commentSummary,
+        comment_url: commentUrl,
         comment_created_event: payload,
       },
       actor: { id: String(author.user_id) },
+    });
+  }
+
+  const webhooks = await models.Webhook.findAll({
+    where: {
+      community_id: community.id!,
+      events: { [Op.contains]: ['CommentCreated'] },
+    },
+  });
+
+  if (webhooks.length > 0) {
+    const thread = await models.Thread.findByPk(payload.thread_id, {
+      attributes: ['title'],
+    });
+    const previewImg = Webhook.getPreviewImageUrl(
+      community,
+      decodeURIComponent(payload.text),
+    );
+
+    const provider = notificationsProvider();
+
+    return await provider.triggerWorkflow({
+      key: WorkflowKeys.Webhooks,
+      users: webhooks.map((w) => ({
+        id: `webhook-${w.id}`,
+        webhook_url: w.url,
+        destination: w.destination,
+      })),
+      data: {
+        sender_username: 'Common',
+        sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
+        community_id: community.id!,
+        title_prefix: 'Comment on: ',
+        preview_image_url: previewImg.previewImageUrl,
+        preview_image_alt_text: previewImg.previewImageAltText,
+        profile_name:
+          author.User!.profile.name || author.address.substring(0, 8),
+        profile_url: getProfileUrl(author.user_id, community.custom_domain),
+        profile_avatar_url: author.User!.profile.avatar_url ?? '',
+        object_title: Webhook.getRenderedTitle(thread!.title),
+        object_url: commentUrl,
+        object_summary: commentSummary,
+      },
     });
   }
 
