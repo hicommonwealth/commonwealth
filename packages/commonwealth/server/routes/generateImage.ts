@@ -18,7 +18,8 @@ const log = logger(import.meta);
 if (process.env.OPENAI_API_KEY) {
   try {
     openai = new OpenAI({
-      organization: 'org-D0ty00TJDApqHYlrn1gge2Ql',
+      organization:
+        process.env.OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
       apiKey: process.env.OPENAI_API_KEY,
     });
   } catch (e) {
@@ -26,7 +27,7 @@ if (process.env.OPENAI_API_KEY) {
   }
 } else {
   log.warn(
-    'OpenAI key not configured. You will be unable to generate an image on the create community page',
+    'OpenAI key not configured. You will be unable to generate images on client.',
   );
 }
 
