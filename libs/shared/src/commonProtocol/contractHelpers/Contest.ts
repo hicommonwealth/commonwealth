@@ -26,7 +26,7 @@ export const getContestBalanceShared = async (
   }
   if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
-      web3.eth.getBalance(contest).then((v) => {
+      web3.eth.getBalance(contest).then((v: number | BigInt | string) => {
         return Number(v);
       }),
     );
@@ -40,7 +40,7 @@ export const getContestBalanceShared = async (
           to: String(results[0]),
           data: calldata,
         })
-        .then((v) => {
+        .then((v: string) => {
           return Number(web3.eth.abi.decodeParameter('uint256', v));
         }),
     );
