@@ -49,10 +49,7 @@ const authorizeAddress = async (
   return addr;
 };
 
-type CommunityMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Community
->;
+type CommunityMiddleware = CommandHandler<CommandInput, any>;
 type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
 type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
 
