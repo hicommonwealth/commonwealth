@@ -10,10 +10,27 @@
   flex-direction: column;
 }
 
-.mdxeditor-diff-source-wrapper {
+.mdxeditor-diff-source-wrapper,
+.mdxeditor-root-contenteditable,
+.mdxeditor-rich-text-editor {
+  display: flex !important;
   flex-grow: 1;
 }
 
+.mdxeditor-block-type-select,
 .mdxeditor-block-type-select button {
-  width: 65px;
+  width: 45px;
+}
+
+#root {
+  // this is needed for mobile layout
+  display: flex;
+}
+
+#mava {
+  display: none;
+}
+
+.ReactQueryDevtools * {
+  display: none;
 }
