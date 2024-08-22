@@ -1,7 +1,3 @@
-import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
@@ -12,11 +8,9 @@ import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import useUserStore from 'state/ui/user';
-import Permissions, { canPerformAction } from 'utils/Permissions';
+import { canPerformAction } from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import {
@@ -30,8 +24,14 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
+import { getThreadActionTooltipText } from 'helpers/threads';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
