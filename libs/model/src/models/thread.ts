@@ -144,7 +144,7 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          const { Community, Outbox } = sequelize.models;
+          const { Community, Outbox, Address } = sequelize.models;
 
           await Community.increment('thread_count', {
             by: 1,
@@ -159,6 +159,10 @@ export default (
             ? []
             : await getThreadContestManagers(sequelize, topic_id, community_id);
 
+          const address = (await Address.findByPk(
+            thread.address_id,
+          )) as AddressAttributes | null;
+
           await emitEvent(
             Outbox,
             [
@@ -166,6 +170,7 @@ export default (
                 event_name: EventNames.ThreadCreated,
                 event_payload: {
                   ...thread.get({ plain: true }),
+                  address: address!.address,
                   contestManagers,
                 },
               },

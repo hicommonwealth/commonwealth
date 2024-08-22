@@ -72,7 +72,7 @@ export default (
                     event_payload: {
                       ...reaction.toJSON(),
                       reaction: 'like',
-                      community_id: thread.community_id,
+                      communityId: thread.community_id,
                       contestManagers,
                     },
                   },

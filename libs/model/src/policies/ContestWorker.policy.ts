@@ -1,7 +1,6 @@
 import { Actor, events, logger, Policy } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { config, Contest } from '..';
-import { models } from '../database';
+import { config, Contest, models } from '..';
 import { contestHelper } from '../services/commonProtocol';
 import { buildThreadContentUrl } from '../utils';
 
@@ -10,7 +9,6 @@ const log = logger(import.meta);
 const inputs = {
   ThreadCreated: events.ThreadCreated,
   ThreadUpvoted: events.ThreadUpvoted,
-  FarcasterCastCreated: events.FarcasterCastCreated,
 };
 
 export function ContestWorker(): Policy<typeof inputs> {
@@ -19,13 +17,10 @@ export function ContestWorker(): Policy<typeof inputs> {
     body: {
       ThreadCreated: async ({ payload }) => {
         if (!payload.topic_id) {
-          log.warn('ThreadCreated: payload does not contain topic_id');
+          log.warn('ThreadCreated: payload does not contain topic ID');
           return;
         }
-
-        const { address: userAddress } = (await models.Address.findByPk(
-          payload!.address_id,
-        ))!;
+        const { address: userAddress } = payload;
 
         const contentUrl = buildThreadContentUrl(
           payload.community_id!,
@@ -99,20 +94,11 @@ export function ContestWorker(): Policy<typeof inputs> {
         }
       },
       ThreadUpvoted: async ({ payload }) => {
-        const { community_id, topic_id } = (await models.Thread.findByPk(
-          payload.thread_id!,
-          {
-            attributes: ['community_id', 'topic_id'],
-          },
-        ))!;
-        if (!topic_id) {
-          log.warn('ThreadUpvoted: thread does not contain topic_id');
+        const { communityId, topicId, address: userAddress } = payload;
+        if (!topicId) {
+          log.warn('ThreadUpvoted: thread does not contain topic ID');
           return;
         }
-
-        const { address: userAddress } = (await models.Address.findByPk(
-          payload!.address_id,
-        ))!;
 
         const activeContestManagersWithoutVote = await models.sequelize.query<{
           url: string;
@@ -165,8 +151,8 @@ export function ContestWorker(): Policy<typeof inputs> {
             replacements: {
               thread_id: payload.thread_id!,
               actor_address: userAddress,
-              topic_id: topic_id,
-              community_id,
+              topic_id: topicId,
+              community_id: communityId,
             },
           },
         );
@@ -209,9 +195,6 @@ export function ContestWorker(): Policy<typeof inputs> {
             `voteContent failed ${errors.length} times: ${errors.join(', ')}"`,
           );
         }
-      },
-      FarcasterCastCreated: async ({ payload }) => {
-        // map farcaster event to ThreadCreated
       },
     },
   };

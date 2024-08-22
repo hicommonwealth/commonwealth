@@ -20,10 +20,13 @@ import {
 import { EventMetadata } from './util.schemas';
 
 export const ThreadCreated = Thread.extend({
+  address: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.extend({
-  community_id: z.string(),
+  communityId: z.string(),
+  topicId: z.number().optional(),
+  address: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const CommentCreated = Comment.extend({
