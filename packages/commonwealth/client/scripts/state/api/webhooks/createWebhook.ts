@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Webhook from 'models/Webhook';
-import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { userStore } from '../../ui/user';
 
 interface CreateWebhookProps {
@@ -29,13 +29,21 @@ const createWebhook = async ({
   );
 };
 
+// const useCreateWebhookMutation = () => {
+//   return useMutation({
+//     mutationFn: createWebhook,
+//     onSuccess: async (data) => {
+//       await queryClient.invalidateQueries({
+//         queryKey: [ApiEndpoints.FETCH_WEBHOOKS, data.community_id],
+//       });
+//     },
+//   });
+// };
+
 const useCreateWebhookMutation = () => {
-  return useMutation({
-    mutationFn: createWebhook,
-    onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.FETCH_WEBHOOKS, data.community_id],
-      });
+  return trpc.webhook.createWebhook.useMutation({
+    onSuccess: async () => {
+      // TODO: invalidate webhook fetching
     },
   });
 };

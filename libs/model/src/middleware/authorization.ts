@@ -1,7 +1,7 @@
 import {
+  CommandContext,
   InvalidActor,
   InvalidInput,
-  type CommandContext,
   type CommandHandler,
   type CommandInput,
 } from '@hicommonwealth/core';
@@ -29,7 +29,9 @@ const authorizeAddress = async (
   { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<AddressAttributes> => {
-  if (!payload.id) throw new InvalidActor(actor, 'Must provide a community id');
+  const communityId = payload.community_id || payload.id;
+  if (!communityId)
+    throw new InvalidActor(actor, 'Must provide a community id');
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   // TODO: cache
@@ -38,7 +40,7 @@ const authorizeAddress = async (
       where: {
         user_id: actor.user.id,
         address: actor.address_id,
-        community_id: payload.id,
+        community_id: communityId,
         role: { [Op.in]: roles },
       },
       order: [['role', 'DESC']],

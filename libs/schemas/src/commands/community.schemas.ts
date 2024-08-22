@@ -6,7 +6,7 @@ import {
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, Group, StakeTransaction, Webhook } from '../entities';
+import { Community, Group, StakeTransaction } from '../entities';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -97,12 +97,4 @@ export const GenerateStakeholderGroups = {
     groups: z.array(Group),
     created: z.boolean(),
   }),
-};
-
-export const CreateWebhook = {
-  input: z.object({
-    id: z.string().describe('The community_id the webhook is associated to'),
-    webhookUrl: z.string(),
-  }),
-  output: Webhook,
 };

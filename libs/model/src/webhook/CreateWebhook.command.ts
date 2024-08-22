@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 
-export const Errors = {
+const Errors = {
   InvalidWebhookUrl:
     'Invalid Webhook url. Must be one of: https://api.telegram.org/*, ' +
     'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://api.telegram.org/*',
