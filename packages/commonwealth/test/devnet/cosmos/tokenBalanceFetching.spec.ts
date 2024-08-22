@@ -11,7 +11,7 @@ import {
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { tester, tokenBalanceCache, type DB } from '@hicommonwealth/model';
+import { tester, tokenBalanceCache, type DB, CommunityAttributes } from '@hicommonwealth/model';
 import {
   BalanceSourceType,
   BalanceType,
@@ -100,7 +100,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
         has_chain_events_listener: true,
         chain_node_id: stargazeNode.id,
         bech32_prefix: 'stars',
-      });
+      } as unknown as CommunityAttributes);
     }
 
     if (junoChainNode) {
@@ -230,7 +230,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
               cosmos_chain_id: cosmosChainId,
             },
           });
-          const rpcEndpoint = chainNode.url!;
+          const rpcEndpoint = chainNode!.url!;
           const tmClient = await Tendermint34Client.connect(rpcEndpoint);
           const api = QueryClient.withExtensions(
             tmClient,
