@@ -10,12 +10,17 @@ This just tests all the major markdown features we want to support.
 
 https://www.youtube.com/watch?v=eRBOgtp0Hac
 
+# Paragraphs
 
-~~Strikethrough~~ 
+This is the first paragraph.
 
-<s>Strikethrough (when enable html tag decode.)</s>
+This is the second.
 
 # Formatting
+
+~~Strikethrough~~
+
+<s>Strikethrough (when enable html tag decode.)</s>
 
 *Italic*      _Italic_
 
@@ -25,7 +30,7 @@ https://www.youtube.com/watch?v=eRBOgtp0Hac
 
 Subscript: X<sub>2</sub>，Superscript: O<sup>2</sup>
 
-
+# Code Blocks
 
 ```js
 function main() {
@@ -35,8 +40,12 @@ function main() {
 
 # Bullets
 
+Regular bullet points: 
+
 - first point 
 - second point
+
+Numbered bullet points: 
 
 1. first
 2. second

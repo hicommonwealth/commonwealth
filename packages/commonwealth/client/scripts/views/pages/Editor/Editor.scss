@@ -1,3 +1,21 @@
+html,
+body,
+#root {
+  max-width: 100vh;
+}
+
+#root {
+  // this is needed for mobile layout
+  display: flex;
+}
+
+// disable misc buttons on mobile for now.
+#mava,
+.ReactQueryDevtools * {
+  display: none;
+}
+
+// changes needed for the toolbar
 .mdxeditor .mdxeditor-toolbar {
   border-top: solid #c6c6c6 1px;
   border-radius: inherit;
@@ -22,21 +40,21 @@
   width: 45px;
 }
 
-#root {
-  // this is needed for mobile layout
-  display: flex;
-}
+.mdxeditor-root-contenteditable {
+  overflow: auto;
 
-#mava {
-  display: none;
-}
+  p {
+    line-height: 2.2em;
+  }
 
-.ReactQueryDevtools * {
-  display: none;
-}
-
-.mdxeditor-root-contenteditable p {
-  line-height: 2rem;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 2.2em;
+  }
 }
 
 .mdxeditor-root-contenteditable blockquote {
