@@ -18,6 +18,7 @@ export const getLinkType = (link: string): LinkType => {
   if (link.includes('telegram.com')) return 'telegram';
   if (link.includes('t.me')) return 'telegram';
   if (link.includes('twitter.com')) return 'x (twitter)';
+  if (link.includes('x.com')) return 'x (twitter)';
   if (link.includes('github.com')) return 'github';
   if (link.includes('matrix.to')) return 'matrix';
   return '';
