@@ -51,6 +51,20 @@ http://localhost:3000/api/health. It should respond with
 
 The client is served from http://localhost:8080/.
 
+### Side Notes
+
+Some features of the application require additional API keys.
+While the app will still function without them, certain functionalities may be limited.
+
+Required for openAI image generation:
+- OPENAI_ORGANIZATION
+- OPENAI_API_KEY
+
+Required for chain features on EVM chains (groups, stake, contests):
+- ETH_ALCHEMY_API_KEY
+
+Ensure these keys are set up in your environment variables to fully utilize all features of the application.
+
 # Scripts
 - `pnpm start-all`
   - Starts ALL the microservices in different processes. Requires a RabbitMQ instance/connection to function properly.
