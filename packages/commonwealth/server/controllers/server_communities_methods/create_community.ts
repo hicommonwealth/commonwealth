@@ -360,7 +360,6 @@ export async function __createCommunity(
     base,
     bech32_prefix,
     active: true,
-    // @ts-expect-error StrictNullChecks
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',

@@ -125,7 +125,7 @@ export async function __createCommentReaction(
         throw new AppError(Errors.CommunityNotFound);
       }
       const node = await this.models.ChainNode.findByPk(
-        community.chain_node_id,
+        community.chain_node_id!,
       );
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(

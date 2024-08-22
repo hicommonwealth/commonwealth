@@ -39,7 +39,6 @@ async function generateCosmosAddresses(numberOfAddresses: number) {
     const wallet = await Secp256k1HdWallet.generate(12, { prefix: 'cosmos' });
     // Get the first account from the wallet
     const [firstAccount] = await wallet.getAccounts();
-    // @ts-expect-error StrictNullChecks
     addresses.push(firstAccount.address);
   }
 
@@ -99,7 +98,6 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: true,
-        // @ts-expect-error StrictNullChecks
         chain_node_id: stargazeNode.id,
         bech32_prefix: 'stars',
       });

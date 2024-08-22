@@ -114,7 +114,7 @@ export async function __createThreadReaction(
         throw new AppError(Errors.CommunityNotFound);
       }
       const node = await this.models.ChainNode.findByPk(
-        community.chain_node_id,
+        community.chain_node_id!,
       );
 
       if (!node || !node.eth_chain_id) {
