@@ -7,7 +7,7 @@ export const checkEligibility = frames(async () => {
   let eligible: boolean;
 
   try {
-    await fakeApiCall({});
+    await fakeApiCall({ error: 'error' });
     eligible = true;
   } catch {
     eligible = false;

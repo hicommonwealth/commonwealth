@@ -1,14 +1,11 @@
 import { error } from 'frames.js/core';
 import { Button } from 'frames.js/express';
-
 import React from 'react';
 import { frames } from '../../config';
-import { getLeaderboard } from '../../utils';
+import { getInvertedColor, getLeaderboard, getRandomColor } from '../../utils';
 
-const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-const invertedColor = (parseInt(randomColor, 16) ^ 16777215).toString(16);
-
-// TODO check if this is first page + add "pagination" using searchParams
+const randomColor = getRandomColor();
+const invertedColor = getInvertedColor(randomColor);
 
 export const viewLeaderboard = frames(async (ctx) => {
   const fromMain = ctx.searchParams.fromMain;
