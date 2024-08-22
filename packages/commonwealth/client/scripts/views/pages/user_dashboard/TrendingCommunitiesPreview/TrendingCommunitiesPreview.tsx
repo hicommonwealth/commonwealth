@@ -63,9 +63,9 @@ export const TrendingCommunitiesPreview = () => {
         Trending Communities
       </CWText>
       <div className="community-preview-cards-collection">
-        {trendingCommunities.map((sortedCommunity, index) => (
+        {trendingCommunities.map((sortedCommunity) => (
           <CommunityPreviewCard
-            key={index}
+            key={sortedCommunity.community.id}
             community={{
               name: sortedCommunity.community.name || '',
               icon_url: sortedCommunity.community.icon_url || '',
