@@ -18,7 +18,7 @@ export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional
   id: z.string().optional(),
   name: z.string(),
-  chain_node_id: PG_INT,
+  chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
   base: z.nativeEnum(ChainBase),
@@ -62,7 +62,7 @@ export const Community = z.object({
   Addresses: z.array(Address).optional(),
   CommunityStakes: z.array(CommunityStake).nullish(),
   CommunityTags: z.array(CommunityTags).nullish(),
-  ChainNode: ChainNode.optional(),
+  ChainNode: ChainNode.nullish(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),

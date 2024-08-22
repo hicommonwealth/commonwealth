@@ -14,12 +14,15 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
       const include: Includeable[] = [
         {
           model: models.CommunityStake,
+          required: false,
         },
         {
           model: models.CommunityTags,
+          required: false,
           include: [
             {
               model: models.Tags,
+              required: false,
             },
           ],
         },
@@ -28,7 +31,7 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
       if (payload.include_node_info) {
         include.push({
           model: models.ChainNode,
-          required: true,
+          required: false,
         });
       }
 
