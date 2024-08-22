@@ -124,14 +124,21 @@ export async function __createCommentReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
+
+      if (!community.chain_node_id) {
+        throw new ServerError(`Invalid chain node`);
+      }
       const node = await this.models.ChainNode.findByPk(
         community.chain_node_id,
       );
+
+      if (!node || !node.eth_chain_id) {
+        throw new ServerError(`Invalid chain node ${node ? node.id : ''}`);
+      }
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
           community.namespace_address!,
           stake.stake_id,
-          // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
         );

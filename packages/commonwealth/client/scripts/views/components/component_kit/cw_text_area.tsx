@@ -107,7 +107,8 @@ export const CWTextArea = (props: TextAreaProps) => {
           } else {
             e.stopPropagation();
             validationProps.setIsTyping(true);
-            clearTimeout(validationProps.inputTimeout);
+            validationProps.inputTimeout &&
+              clearTimeout(validationProps.inputTimeout);
             const timeout = e.currentTarget.value?.length > 3 ? 250 : 1000;
             validationProps.setInputTimeout(
               setTimeout(() => {

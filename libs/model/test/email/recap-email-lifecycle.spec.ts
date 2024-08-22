@@ -52,6 +52,8 @@ describe('Recap email lifecycle', () => {
     });
     [community] = await seed('Community', {
       chain_node_id: node?.id,
+      thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',

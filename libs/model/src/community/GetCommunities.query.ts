@@ -11,7 +11,12 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
     secure: false,
     body: async ({ payload }) => {
       const {
+        // Indicates that a filter key, ex: `tag_ids`, shouldn't be strictly checked for when querying.
+        // Results should include matching `tag_ids` first, then items with non-matching `tag_ids`, then
+        // items with no `tag_ids`.
+        relevance_by,
         base,
+        network,
         include_node_info,
         stake_enabled,
         has_groups,
@@ -80,7 +85,13 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                           AND "Community"."base" = '${base}'
                         `
                             : ''
-                        }
+                        }${
+          network
+            ? `
+                          AND "Community"."network" = '${network}'
+                        `
+            : ''
+        }
                         ${
                           has_groups
                             ? `
@@ -109,7 +120,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             : ''
                         }
                         ${
-                          filtering_tags
+                          filtering_tags && relevance_by !== 'tag_ids'
                             ? `
                           AND (
                             SELECT COUNT  ( DISTINCT "CommunityTags"."tag_id" )
@@ -221,8 +232,25 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             ? 'LEFT OUTER JOIN "ChainNodes" AS "ChainNode" ON "community_CTE"."chain_node_id" = "ChainNode"."id"'
             : ''
         }
-        ORDER BY "community_CTE"."${order_col}" ${direction} LIMIT ${limit} OFFSET ${offset};
-      `;
+        ORDER BY 
+          ${
+            filtering_tags && relevance_by === 'tag_ids'
+              ? `CASE 
+              WHEN jsonb_array_length("CommunityTags_CTE"."CommunityTags"::jsonb) = 0 IS NULL THEN 2
+				      WHEN EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements("CommunityTags_CTE"."CommunityTags"::jsonb) AS tag_element
+                WHERE (tag_element->>'tag_id')::int = ANY(ARRAY[:tag_ids])
+			        ) THEN 0
+              ELSE 1
+            END,
+            "CommunityTags_CTE"."CommunityTags"::jsonb,`
+              : ''
+          }
+          "community_CTE"."${order_col}" ${direction} 
+          LIMIT ${limit} 
+          OFFSET ${offset};
+          `;
 
       const communities = await models.sequelize.query<
         z.infer<typeof schemas.Community> & { total?: number }
