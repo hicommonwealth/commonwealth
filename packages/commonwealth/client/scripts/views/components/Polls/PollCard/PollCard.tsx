@@ -32,7 +32,6 @@ export const PollCard = ({
   isPreview = false,
   showDeleteButton = false,
   onDeleteClick,
-  multiSelect,
   onResultsClick,
   onVoteCast,
   pollEnded,
@@ -51,15 +50,6 @@ export const PollCard = ({
   const resultString = 'Results';
 
   const castVote = () => {
-    if (
-      multiSelect ||
-      selectedOptions[0] === votedFor ||
-      selectedOptions.length === 0
-    ) {
-      // TODO: Build this out when multiple vote options are introduced.
-      return;
-    }
-
     onVoteCast(selectedOptions[0], selectedOptions.length === 0);
   };
 
@@ -99,7 +89,6 @@ export const PollCard = ({
         {!hasVoted && !pollEnded && !isPreview && (
           <>
             <PollOptions
-              multiSelect={multiSelect}
               voteInformation={voteInformation}
               selectedOptions={selectedOptions}
               setSelectedOptions={setSelectedOptions}

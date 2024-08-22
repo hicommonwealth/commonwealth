@@ -21,7 +21,7 @@ export type SnapshotPollCardProps = Omit<
   PollCardProps & {
     onSnapshotVoteCast: (option: string) => void;
   },
-  'multiSelect' | 'onResultsClick'
+  'onResultsClick'
 >;
 
 export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
@@ -101,7 +101,6 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
         {!internalHasVoted && !pollEnded && !isPreview && (
           <>
             <PollOptions
-              multiSelect={false}
               voteInformation={internalVoteInformation}
               selectedOptions={selectedOptions}
               disableVoteOptions={disableVoteButton}

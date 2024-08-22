@@ -11,7 +11,7 @@ const ENDED_PREVIEW_MAX = 1;
 
 export type ResultsSectionProps = {
   resultString?: string;
-  onResultsClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onResultsClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   tokenSymbol?: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;
@@ -61,11 +61,9 @@ export const ResultsSections = ({
           <CWText
             type="caption"
             className={getClasses<{ clickable?: boolean }>({
-              // @ts-expect-error <StrictNullChecks/>
               clickable: onResultsClick && hasVotes,
             })}
             onClick={
-              // @ts-expect-error <StrictNullChecks/>
               onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
             }
           >

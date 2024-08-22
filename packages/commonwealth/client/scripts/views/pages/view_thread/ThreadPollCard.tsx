@@ -88,11 +88,11 @@ export const ThreadPollCard = ({
                 authorCommunityId: user.activeAccount?.community?.id || '',
                 address: user.activeAccount?.address || '',
                 selectedOption,
-              }).catch(console.error);
+              });
             } catch (err) {
               console.error(err);
               notifyError(
-                'Error submitting vote. Maybe the poll has already ended?',
+                'Error submitting vote. Check if poll is still active.',
               );
             }
           },
@@ -114,7 +114,6 @@ export const ThreadPollCard = ({
   return (
     <>
       <PollCard
-        multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
         disableVoteButton={!user.activeAccount || isTopicMembershipRestricted}
