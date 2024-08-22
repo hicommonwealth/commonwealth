@@ -414,6 +414,10 @@ describe('ServerThreadsController', () => {
         Group: {
           findAll: async () => [],
         },
+        Outbox: {
+          // eslint-disable-next-line @typescript-eslint/require-await
+          bulkCreate: async () => ({}),
+        },
       };
       const banCache = {
         checkBan: () => [true, null],

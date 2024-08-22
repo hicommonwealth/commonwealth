@@ -204,7 +204,6 @@ export function updateActiveUser(data) {
       knockJWT: '',
       addresses: [],
       starredCommunities: [],
-      joinedCommunitiesWithNewContent: [],
       accounts: [],
       activeAccount: null,
       jwt: null,
@@ -229,28 +228,12 @@ export function updateActiveUser(data) {
         }),
     );
 
-    const joinedCommunitiesWithNewContent = (() => {
-      if (!data.unseenPosts) return [];
-
-      const communityIds: string[] = [];
-
-      // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8391
-      Object.keys(data.unseenPosts).map(
-        (c) =>
-          (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
-          communityIds.push(c),
-      );
-
-      return communityIds;
-    })();
-
     user.setData({
       id: data.id || 0,
       email: data.email || '',
       emailNotificationInterval: data.emailInterval || '',
       knockJWT: data.knockJwtToken || '',
       addresses,
-      joinedCommunitiesWithNewContent,
       jwt: data.jwt || null,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
@@ -527,7 +510,7 @@ export async function handleSocialLoginCallback({
 
       const sessionSigner = new SIWESigner({
         signer,
-        chainId: app.chain?.meta.node?.ethChainId || 1,
+        chainId: app.chain?.meta?.node?.ethChainId || 1,
       });
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {

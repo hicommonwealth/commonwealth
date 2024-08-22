@@ -1,8 +1,8 @@
 ---
-name: Projection Feature Request
-about: Use this template for requesting a projection within a user story.
-labels: projection, enhancement, needs estimate
-title: 🟩 <Projection Name>
+name: Query Feature Request
+about: Use this template for requesting a query within a user story.
+labels: query, enhancement, needs estimate
+title: 🟩 <Query Name>
 ---
 
 # Description
@@ -20,18 +20,18 @@ title: 🟩 <Projection Name>
 ## Engineering Requirements
 <!-- List of engineering items required as part of the feature. -->
 
-1. **Events**
-   - References to projected events
-2. **Schemas**
-   - Projection schema (model)
-3. **Business Rules**
-   - Transformations
-   - Aumentation
-   - Aggregation
-4. **Persistence**
-   - Define repository interfaces used to persist projections, including data schemas
+1. **Authorization**
+   - Who's authorized to execute this query? Roles, Groups?
+2. **Schemas** - Use [zod](http://zod.dev)
+   - Input/Output schemas
+3. **Routing**
+   - Define REST query paths (GET) - params, query string
+   - Include pagination requirements
+4. **Query**
+   - Define repository interface used to query this projection
+   - New interface might be required
 5. **Response**
-   - Define success, including response schema (zod)
+   - Define success
    - Define errors (HTTP codes)
 
 ## Unit Testing

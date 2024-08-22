@@ -5,7 +5,7 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
@@ -25,14 +25,17 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
-import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
-import { UserTrainingSlider } from '../../components/UserTrainingSlider';
-import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
-import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
+
+import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import 'pages/discussions/index.scss';
+import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
+import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
+import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -57,7 +60,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
   });
   const contestAddress = searchParams.get('contest');
@@ -124,6 +127,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     return t;
   });
+
+  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
+  const topicNameFromURL = splitAndDecodeURL(location.pathname);
+
+  //checks for malformed url in topics and redirects if the topic does not exist
+  useEffect(() => {
+    if (!isLoadingTopics && topicNameFromURL) {
+      const validTopics = topics?.some(
+        (topic) => topic?.name === topicNameFromURL,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics, topicNameFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
