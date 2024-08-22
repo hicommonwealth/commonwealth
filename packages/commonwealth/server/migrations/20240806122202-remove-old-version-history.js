@@ -16,6 +16,14 @@ module.exports = {
       await queryInterface.removeColumn('Comments', 'version_history_updated', {
         transaction,
       });
+      await queryInterface.addIndex('ThreadVersionHistories', [
+        'thread_id',
+        'timestamp',
+      ]);
+      await queryInterface.addIndex('CommentVersionHistories', [
+        'comment_id',
+        'timestamp',
+      ]);
     });
   },
 
