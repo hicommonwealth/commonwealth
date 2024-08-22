@@ -1,7 +1,6 @@
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
-  CodeBlockEditorDescriptor,
   codeBlockPlugin,
   codeMirrorPlugin,
   CreateLink,
@@ -21,7 +20,6 @@ import {
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
-  useCodeBlockEditorContext,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 
@@ -29,36 +27,12 @@ import './Editor.scss';
 
 import 'commonwealth-mdxeditor/style.css';
 
-import markdown from './markdown.md?raw';
-
-const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
-  match: () => true,
-  priority: 0,
-  Editor: (props) => {
-    const cb = useCodeBlockEditorContext();
-    return (
-      <div
-        onKeyDown={(e) => {
-          e.nativeEvent.stopImmediatePropagation();
-        }}
-      >
-        <textarea
-          rows={3}
-          cols={20}
-          defaultValue={props.code}
-          onChange={(e) => {
-            cb.setCode(e.target.value);
-          }}
-        />
-      </div>
-    );
-  },
-};
+import supported from './supported.md?raw';
 
 export const Editor = () => {
   return (
     <MDXEditor
-      markdown={markdown}
+      markdown={supported}
       translation={(key, defaultValue, interpolations) => {
         console.log(`${key}=${defaultValue}`);
         switch (key) {
