@@ -230,7 +230,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
               cosmos_chain_id: cosmosChainId,
             },
           });
-          const rpcEndpoint = chainNode.url;
+          const rpcEndpoint = chainNode.url!;
           const tmClient = await Tendermint34Client.connect(rpcEndpoint);
           const api = QueryClient.withExtensions(
             tmClient,
@@ -239,7 +239,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           );
           const { params } = await api.staking.params();
           const denom = params?.bondDenom;
-          const { amount } = await api.bank.balance(addressOne, denom);
+          const { amount } = await api.bank.balance(addressOne, denom!);
           const originalAddressOneBalance = amount;
 
           const balance = await tokenBalanceCache.getBalances(
@@ -264,9 +264,9 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
             rpcEndpoint,
             wallet,
           );
-          const transferAmount = coins(76, denom);
+          const transferAmount = coins(76, denom!);
           await client.sendTokens(addressOne, addressTwo, transferAmount, {
-            amount: coins(500, denom),
+            amount: coins(500, denom!),
             gas: '200000',
           });
 
@@ -408,7 +408,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
             },
           });
           const tmClient = await tokenBalanceCache.getTendermintClient({
-            chainNode,
+            chainNode: chainNode!,
           });
           const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
 
@@ -568,7 +568,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
             },
           });
           const tmClient = await tokenBalanceCache.getTendermintClient({
-            chainNode,
+            chainNode: chainNode!,
           });
           const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
 
