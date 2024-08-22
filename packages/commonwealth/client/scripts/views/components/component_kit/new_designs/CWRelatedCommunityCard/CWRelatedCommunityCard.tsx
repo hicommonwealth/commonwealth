@@ -90,8 +90,10 @@ export const CWRelatedCommunityCard = ({
     if (community.id && community.namespace && community.ChainNode) {
       setSelectedCommunity({
         id: community.id,
+        name: community.name,
         base: community.base,
         namespace: community.namespace,
+        iconUrl: community.icon_url || '',
         ChainNode: {
           url: community.ChainNode.url || '',
           ethChainId: community.ChainNode.eth_chain_id || 0,

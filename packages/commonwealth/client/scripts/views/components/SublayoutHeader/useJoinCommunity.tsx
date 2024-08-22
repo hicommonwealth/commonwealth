@@ -89,28 +89,42 @@ const useJoinCommunity = () => {
   // Handles linking the specified address to the specified community
   const linkSpecificAddressToSpecificCommunity = async ({
     address,
-    communityId,
-    communityChainBase,
+    community,
     activeChainId,
   }: {
     address: string;
-    communityId: string;
-    communityChainBase: string;
+    community: {
+      id: string;
+      name: string;
+      iconUrl: string;
+      base: string;
+    };
     activeChainId?: string;
   }) => {
     try {
       const res = await linkExistingAddressToChainOrCommunity(
         address,
-        communityId,
-        communityChainBase,
+        community.id,
+        community.base,
       );
 
       if (res && res.data.result) {
         const { verification_token, addresses, encodedAddress } =
           res.data.result;
 
-        // update addresses
+        // update addresses and user communities
         user.setData({
+          ...(!user.communities.find((c) => c.id === community.id) && {
+            communities: [
+              ...user.communities,
+              {
+                id: community.id,
+                iconUrl: activeChainInfo.iconUrl || '',
+                name: activeChainInfo.name || '',
+                isStarred: false,
+              },
+            ],
+          }),
           addresses: addresses.map((a) => {
             return new AddressInfo({
               userId: user.id,
@@ -167,8 +181,12 @@ const useJoinCommunity = () => {
 
         await linkSpecificAddressToSpecificCommunity({
           address,
-          communityId: targetCommunity,
-          communityChainBase: originAddressInfo.community.id,
+          community: {
+            id: targetCommunity,
+            name: activeChainInfo.name,
+            base: activeChainInfo.base,
+            iconUrl: activeChainInfo.iconUrl || '',
+          },
           activeChainId: activeCommunityId,
         });
 

@@ -46,11 +46,19 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
 
   const suggestedCommunities = communitiesList?.pages?.[0].results || [];
 
-  const handleCommunityJoin = (community: Pick<ChainInfo, 'id' | 'base'>) => {
+  const handleCommunityJoin = (
+    community: Pick<ChainInfo, 'id' | 'base' | 'iconUrl' | 'name'>,
+  ) => {
+    if (!community) return;
+
     linkSpecificAddressToSpecificCommunity({
       address: userAddress?.address,
-      communityId: community?.id,
-      communityChainBase: community?.base,
+      community: {
+        id: community.id,
+        base: community.base,
+        iconUrl: community.iconUrl,
+        name: community.name,
+      },
     }).catch(console.error);
   };
 
@@ -78,6 +86,8 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
                   handleCommunityJoin({
                     id: community.id || '',
                     base: community.base || '',
+                    iconUrl: community.icon_url || '',
+                    name: community.name || '',
                   })
                 }
                 isJoined={isMember}

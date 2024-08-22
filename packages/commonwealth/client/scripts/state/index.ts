@@ -168,14 +168,6 @@ export async function initAppState(
       await app.user.notifications.refresh();
     }
 
-    userStore.getState().setData({
-      communities: (userResponse?.communities || []).map((c) => ({
-        id: c.id || '',
-        iconUrl: c.icon_url || '',
-        name: c.name || '',
-        isStarred: c.is_starred || false,
-      })),
-    });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
     if (updateSelectedCommunity && userResponse?.selectedCommunity) {

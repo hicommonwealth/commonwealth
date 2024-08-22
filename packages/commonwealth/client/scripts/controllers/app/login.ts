@@ -244,6 +244,12 @@ export function updateActiveUser(data) {
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+      communities: (data?.communities || []).map((c) => ({
+        id: c.id || '',
+        iconUrl: c.icon_url || '',
+        name: c.name || '',
+        isStarred: c.is_starred || false,
+      })),
       isLoggedIn: true,
     });
   }

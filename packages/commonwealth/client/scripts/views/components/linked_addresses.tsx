@@ -91,7 +91,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
             <DeleteAddressModal
               profile={profile}
               addresses={addresses}
-              address={currentAddress?.address}
+              address={currentAddress}
               chain={currentAddress?.community?.id}
               closeModal={() => {
                 setIsRemoveModalOpen(false);
