@@ -8,17 +8,19 @@ import { ed25519 } from '@canvas-js/signatures';
 
 import assert from 'assert';
 
-import { contractTopic } from './runtime/contract';
-import { getSessionSignerForDid } from './signers';
-import { CanvasSignedData } from './types';
-import { assertMatches } from './utils';
+import {
+  CANVAS_TOPIC,
+  CanvasSignedData,
+  assertMatches,
+  getSessionSignerForDid,
+} from '@hicommonwealth/shared';
 
 export const verifySession = async (session: Session) => {
   const signer = getSessionSignerForDid(session.did);
   if (!signer) {
     throw new Error(`No signer for session ${session.did}`);
   }
-  await signer.verifySession(contractTopic, session);
+  await signer.verifySession(CANVAS_TOPIC, session);
 };
 
 export const verify = async ({

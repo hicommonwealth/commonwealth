@@ -5,10 +5,9 @@ import {
   applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
-  verifyReaction,
 } from '@hicommonwealth/shared';
 import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
-import { canvas } from 'server/federation';
+import { canvas, verifyReaction } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

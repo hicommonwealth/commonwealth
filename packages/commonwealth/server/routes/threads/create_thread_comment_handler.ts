@@ -1,15 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
-
 import {
   addressSwapper,
   applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
-  verifyComment,
 } from '@hicommonwealth/shared';
 import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
-import { canvas } from 'server/federation';
+import { canvas, verifyComment } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

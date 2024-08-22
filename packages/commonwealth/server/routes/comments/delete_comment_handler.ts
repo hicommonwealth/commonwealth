@@ -3,10 +3,9 @@ import {
   applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
-  verifyDeleteComment,
 } from '@hicommonwealth/shared';
 import { DeleteCommentOptions } from 'server/controllers/server_comments_methods/delete_comment';
-import { canvas } from 'server/federation';
+import { canvas, verifyDeleteComment } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
