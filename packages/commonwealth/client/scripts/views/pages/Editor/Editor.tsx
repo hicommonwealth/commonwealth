@@ -1,7 +1,9 @@
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
+  CodeBlockEditorDescriptor,
   codeBlockPlugin,
+  codeMirrorPlugin,
   CreateLink,
   diffSourcePlugin,
   frontmatterPlugin,
@@ -19,6 +21,7 @@ import {
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
+  useCodeBlockEditorContext,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 
@@ -27,6 +30,30 @@ import './Editor.scss';
 import 'commonwealth-mdxeditor/style.css';
 
 import markdown from './markdown.md?raw';
+
+const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
+  match: () => true,
+  priority: 0,
+  Editor: (props) => {
+    const cb = useCodeBlockEditorContext();
+    return (
+      <div
+        onKeyDown={(e) => {
+          e.nativeEvent.stopImmediatePropagation();
+        }}
+      >
+        <textarea
+          rows={3}
+          cols={20}
+          defaultValue={props.code}
+          onChange={(e) => {
+            cb.setCode(e.target.value);
+          }}
+        />
+      </div>
+    );
+  },
+};
 
 export const Editor = () => {
   return (
@@ -39,13 +66,10 @@ export const Editor = () => {
             // show the default placeholder that's active here..
             return 'H1';
           case 'toolbar.blockTypes.heading':
-            console.log('FIXME: ', { key, defaultValue, interpolations });
-
             if (interpolations?.level) {
               // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
               return 'H' + interpolations.level;
             }
-
             return 'H1';
           case 'toolbar.blockTypes.quote':
             return 'Q';
@@ -86,11 +110,14 @@ export const Editor = () => {
         headingsPlugin(),
         linkPlugin(),
         linkDialogPlugin(),
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+        codeMirrorPlugin({
+          codeBlockLanguages: { js: 'JavaScript', css: 'CSS' },
+        }),
         imagePlugin(),
         tablePlugin(),
         thematicBreakPlugin(),
         frontmatterPlugin(),
-        codeBlockPlugin(),
         // codeMirrorPlugin(),
         // codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
         // sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
