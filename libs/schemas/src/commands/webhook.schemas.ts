@@ -1,4 +1,4 @@
-import { Webhook } from '@hicommonwealth/schemas';
+import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
 export const CreateWebhook = {
@@ -24,4 +24,13 @@ export const DeleteWebhook = {
   output: z.object({
     webhook_deleted: z.boolean(),
   }),
+};
+
+export const UpdateWebhook = {
+  input: z.object({
+    id: z.number().describe('The id of the webhook to update'),
+    community_id: z.string(),
+    events: z.array(WebhookSupportedEvents),
+  }),
+  output: Webhook,
 };

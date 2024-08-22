@@ -1,5 +1,4 @@
-import { Webhook } from '@hicommonwealth/schemas';
-import { WebhookCategory } from '@hicommonwealth/shared';
+import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { linkValidationSchema } from 'helpers/formValidations/common';
@@ -14,7 +13,7 @@ import {
   useFetchWebhooksQuery,
 } from 'state/api/webhooks';
 import _ from 'underscore';
-import { LinksArray, useLinksArray } from 'views/components/LinksArray';
+import { Link, LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -30,7 +29,7 @@ const Webhooks = () => {
     typeof Webhook
   > | null>(null);
   const {
-    links: webhooks,
+    links,
     setLinks,
     onLinkAdd,
     onLinkRemovedAtIndex,
@@ -40,6 +39,8 @@ const Webhooks = () => {
     initialLinks: [],
     linkValidation: linkValidationSchema.required,
   });
+
+  const webhooks = links as (Link & { metadata: z.infer<typeof Webhook> })[];
 
   const { mutateAsync: createWebhook, isLoading: isCreatingWebhook } =
     useCreateWebhookMutation();
@@ -117,8 +118,8 @@ const Webhooks = () => {
         webhooks[index].canConfigure
       ) {
         await deleteWebhook({
+          id: webhooks[index].metadata.id,
           community_id: communityId,
-          webhookUrl: webhooks[index].value,
         });
         notifySuccess('Webhook deleted!');
       }
@@ -131,15 +132,15 @@ const Webhooks = () => {
 
   const handleUpdateWebhook = async (
     webhook: z.infer<typeof Webhook>,
-    categories: WebhookCategory[],
+    events: Array<z.infer<typeof WebhookSupportedEvents>>,
   ) => {
     if (isEditingWebhook) return;
 
     try {
       await editWebhook({
-        communityId: communityId,
-        webhookId: webhook.id,
-        webhookCategories: categories,
+        id: webhook.id!,
+        community_id: communityId,
+        events: events,
       });
       notifySuccess('Updated webhook config!');
     } catch {
@@ -189,7 +190,7 @@ const Webhooks = () => {
             onLinkRemovedAtIndex={handleLinkRemoval}
             addLinkButtonCTA="+ Add Webhook"
             onLinkConfiguredAtIndex={(index) =>
-              setWebhookToConfigure(webhooks[index].metadata as Webhook)
+              setWebhookToConfigure(webhooks[index].metadata)
             }
             canConfigureLinks
           />
@@ -223,8 +224,7 @@ const Webhooks = () => {
           <WebhookSettingsModal
             onModalClose={() => setWebhookToConfigure(null)}
             updateWebhook={handleUpdateWebhook}
-            // @ts-expect-error <StrictNullChecks/>
-            webhook={webhookToConfigure}
+            webhook={webhookToConfigure!}
           />
         }
         onClose={() => setWebhookToConfigure(null)}
