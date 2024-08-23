@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import app, { initAppState } from 'state';
+import { initAppState } from 'state';
 import { fetchCustomDomainQuery } from 'state/api/configuration';
 import useGroupMutationBannerStore from '../state/ui/group';
 
@@ -13,12 +13,6 @@ const useInitApp = () => {
     readFromStorageAndSetGatingGroupBannerForCommunities();
 
     Promise.all([fetchCustomDomainQuery(), initAppState()])
-      .then(([domainResp]) => {
-        if (domainResp.customDomainId) {
-          app.setCustomDomain(domainResp.customDomainId);
-        }
-        return Promise.resolve(domainResp.customDomainId);
-      })
       .catch((err) => console.log('Failed fetching custom domain', err))
       .finally(() => setIsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps

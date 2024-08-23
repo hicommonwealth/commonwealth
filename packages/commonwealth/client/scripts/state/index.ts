@@ -53,14 +53,6 @@ export interface IApp {
   snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
-
-  loadingError: string;
-
-  _customDomainId: string;
-
-  customDomainId(): string;
-
-  setCustomDomain(d: string): void;
 }
 
 // INJECT DEPENDENCIES
@@ -94,18 +86,6 @@ const app: IApp = {
 
   // Global nav state
   sidebarRedraw: new EventEmitter(),
-
-  // @ts-expect-error StrictNullChecks
-  loadingError: null,
-
-  // @ts-expect-error StrictNullChecks
-  _customDomainId: null,
-  customDomainId: () => {
-    return app._customDomainId;
-  },
-  setCustomDomain: (d) => {
-    app._customDomainId = d;
-  },
 };
 //allows for FS.identify to be used
 declare const window: any;
