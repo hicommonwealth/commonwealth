@@ -158,15 +158,16 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
 
   if (domain?.isCustomDomain) {
     if (
-      path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !== 0 &&
-      path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0
+      path.indexOf(`https://commonwealth.im/${domain?.customDomainId}/`) !==
+        0 &&
+      path.indexOf(`http://localhost:8080/${domain?.customDomainId}/`) !== 0
     ) {
       return;
     }
 
     path = path
-      .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
-      .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+      .replace(`https://commonwealth.im/${domain?.customDomainId}/`, '/')
+      .replace(`http://localhost:8080/${domain?.customDomainId}/`, '/');
   } else {
     path = path
       .replace(`https://commonwealth.im/`, '/')
