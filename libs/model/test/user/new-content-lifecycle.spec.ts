@@ -17,6 +17,8 @@ describe('New Content lifecycle', () => {
     const [user2] = await seed('User');
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
+      thread_count: 0,
+      profile_count: 2,
       Addresses: [
         {
           role: 'member',
