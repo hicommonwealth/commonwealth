@@ -56,6 +56,7 @@ type EditorMode = 'desktop' | 'mobile';
 
 type EditorProps = {
   readonly mode?: EditorMode;
+  readonly placeholder?: string;
 };
 
 export const Editor = (props: EditorProps) => {
@@ -64,9 +65,12 @@ export const Editor = (props: EditorProps) => {
 
   const mode = props.mode ?? 'desktop';
 
+  const placeholder = props.placeholder ?? 'Share your thoughts...';
+
   return (
     <MDXEditor
       markdown={supported}
+      placeholder={placeholder}
       translation={(key, defaultValue, interpolations) => {
         switch (key) {
           case 'toolbar.blockTypeSelect.placeholder':

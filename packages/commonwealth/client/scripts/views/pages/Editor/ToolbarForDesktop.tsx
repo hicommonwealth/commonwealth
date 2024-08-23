@@ -2,9 +2,12 @@ import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
   CreateLink,
+  InsertCodeBlock,
   InsertImage,
+  InsertTable,
   ListsToggle,
   Separator,
+  StrikeThroughSupSubToggles,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 
@@ -20,6 +23,9 @@ export const ToolbarForDesktop = () => {
       <ListsToggle />
       <Separator />
       <InsertImage />
+      <StrikeThroughSupSubToggles />
+      <InsertCodeBlock />
+      <InsertTable />
     </>
   );
 };
