@@ -20,6 +20,8 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import './Communities.scss';
@@ -145,33 +147,6 @@ const CommunitiesPage = () => {
               iconLeft="coins"
             />
             <CWDivider isVertical />
-            {(tags || [])
-              .filter((t) => ['dao', 'defi'].includes(t.name.toLowerCase()))
-              .map((tag) => {
-                return (
-                  <CWButton
-                    key={tag.name}
-                    label={tag.name}
-                    buttonHeight="sm"
-                    buttonType={
-                      filters.withTagsIds?.includes(tag.id)
-                        ? 'primary'
-                        : 'secondary'
-                    }
-                    onClick={() => {
-                      setFilters((f) => ({
-                        ...f,
-                        withTagsIds: (f.withTagsIds || [])?.includes(tag.id)
-                          ? [...(f.withTagsIds || [])].filter(
-                              (id) => id !== tag.id,
-                            )
-                          : [...(f.withTagsIds || []), tag.id],
-                      }));
-                    }}
-                  />
-                );
-              })}
-            <CWDivider isVertical />
             {communityNetworks.map((network) => {
               return (
                 <CWButton
@@ -215,6 +190,51 @@ const CommunitiesPage = () => {
                 />
               );
             })}
+            <CWDivider isVertical />
+            <CWSelectList
+              key={filters.withTagsIds?.length}
+              className="tag-filter"
+              placeholder="Community Tags"
+              value={{
+                // Default value asking as a placeholder
+                label: 'Community Tags',
+                value: 0,
+              }}
+              options={(tags || []).map((t) => ({
+                label: t.name,
+                value: t.id,
+              }))}
+              onChange={(selected) => {
+                selected &&
+                  setFilters((f) => ({
+                    ...f,
+                    withTagsIds: [...(f.withTagsIds || []), selected.value],
+                  }));
+              }}
+            />
+            {(filters.withTagsIds || [])?.length > 0 && (
+              <>
+                <CWDivider isVertical />
+                {tags
+                  ?.filter((t) => filters.withTagsIds?.includes(t.id))
+                  .map((t) => (
+                    <CWTag
+                      key={t.name}
+                      type="filter"
+                      label={t.name}
+                      classNames="filter-tag"
+                      onClick={() => {
+                        setFilters((f) => ({
+                          ...f,
+                          withTagsIds: [...(f.withTagsIds || [])].filter(
+                            (id) => id !== t.id,
+                          ),
+                        }));
+                      }}
+                    />
+                  ))}
+              </>
+            )}
           </div>
         </div>
         {isLoading && communitiesList.length === 0 ? (
