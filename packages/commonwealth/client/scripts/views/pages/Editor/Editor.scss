@@ -25,12 +25,17 @@ body,
 
   position: initial;
   top: initial;
+  height: 65px;
 }
 
 .mdxeditor {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+}
+
+.mdxeditor-diff-source-wrapper {
+  overflow: auto;
 }
 
 .mdxeditor-diff-source-wrapper,
