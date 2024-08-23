@@ -111,8 +111,9 @@ export const processCommentCreated: EventHandler<
     },
     logging: console.log,
   });
-
-  console.log('\n>>>>>>>>>>>>>>>>>>>>>>> WEBHOOKS:\n', webhooks);
+  log.info('\n>>>>>>>>>>>>>>>>>>>>>>> WEBHOOKS:\n', {
+    webhooks,
+  });
   if (webhooks.length > 0) {
     const thread = await models.Thread.findByPk(payload.thread_id, {
       attributes: ['title'],
@@ -124,7 +125,7 @@ export const processCommentCreated: EventHandler<
 
     const provider = notificationsProvider();
 
-    console.log('>>>>>>>>>>>>>>>>>> SENDING WEBHOOK TRIGGER');
+    log.info('>>>>>>>>>>>>>>>>>> SENDING WEBHOOK TRIGGER');
     return await provider.triggerWorkflow({
       key: WorkflowKeys.Webhooks,
       users: webhooks.map((w) => ({
