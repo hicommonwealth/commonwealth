@@ -5,7 +5,6 @@ import useGroupMutationBannerStore from '../state/ui/group';
 
 const useInitApp = () => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [customDomain, setCustomDomain] = React.useState('');
   const { readFromStorageAndSetGatingGroupBannerForCommunities } =
     useGroupMutationBannerStore();
 
@@ -15,19 +14,17 @@ const useInitApp = () => {
 
     Promise.all([fetchCustomDomainQuery(), initAppState()])
       .then(([domainResp]) => {
-        const serverCustomDomain = domainResp;
-        if (serverCustomDomain) {
-          app.setCustomDomain(serverCustomDomain);
+        if (domainResp.customDomainId) {
+          app.setCustomDomain(domainResp.customDomainId);
         }
-        setCustomDomain(serverCustomDomain);
-        return Promise.resolve(serverCustomDomain);
+        return Promise.resolve(domainResp.customDomainId);
       })
       .catch((err) => console.log('Failed fetching custom domain', err))
       .finally(() => setIsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { isLoading, customDomain };
+  return { isLoading };
 };
 
 export default useInitApp;

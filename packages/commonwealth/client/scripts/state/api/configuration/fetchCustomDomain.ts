@@ -5,12 +5,26 @@ import { ApiEndpoints, queryClient, SERVER_URL } from 'state/api/config';
 const DOMAIN_CACHE_TIME = Infinity;
 const DOMAIN_STALE_TIME = Infinity;
 
-const fetchCustomDomain = async (): Promise<string> => {
+type CustomDomainResponse = {
+  isCustomDomain: boolean;
+  customDomainId?: string;
+};
+
+const fetchCustomDomain = async (): Promise<CustomDomainResponse> => {
   const response = await axios.get(
     `${SERVER_URL}/${ApiEndpoints.FETCH_DOMAIN}`,
   );
 
-  return response.data.customDomain || '';
+  const customDomain = response.data.customDomain;
+
+  return { isCustomDomain: !!customDomain, customDomainId: customDomain };
+};
+
+// this is specifically used where you want to get custom domain synchronously (only directly from cache)
+export const fetchCachedCustomDomain = () => {
+  return queryClient.getQueryData<CustomDomainResponse>([
+    ApiEndpoints.FETCH_DOMAIN,
+  ]);
 };
 
 // this is needed for useInitApp because it lives outside the RQ provider
