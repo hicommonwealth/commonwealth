@@ -95,8 +95,6 @@ const useUserMenuItems = ({
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  const user = userData.addresses?.[0];
-
   const uniqueChainAddresses = getUniqueUserAddresses({
     forChain: app?.chain?.base,
   });
@@ -262,7 +260,7 @@ const useUserMenuItems = ({
       {
         type: 'default',
         label: 'View profile',
-        onClick: () => navigate(`/profile/id/${user.userId}`, {}, null),
+        onClick: () => navigate(`/profile/id/${userData.id}`, {}, null),
       },
       {
         type: 'default',
