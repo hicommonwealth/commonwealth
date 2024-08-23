@@ -74,9 +74,16 @@
   }
 
   &.poll,
-  &.active {
+  &.active,
+  &.filter {
     padding: 4px 12px;
     border-radius: $border-radius-tags;
+  }
+
+  &.filter {
+    .close-container {
+      margin-left: 8px;
+    }
   }
 
   &.passed {
@@ -293,6 +300,16 @@
     &:hover {
       cursor: pointer;
       color: $neutral-600;
+    }
+  }
+
+  &.filter {
+    background-color: $black;
+
+    .Text,
+    .Icon,
+    svg {
+      color: $white !important;
     }
   }
 }
