@@ -88,7 +88,7 @@ export const processCommentCreated: EventHandler<
   if (users.length > 0) {
     const provider = notificationsProvider();
 
-    return await provider.triggerWorkflow({
+    await provider.triggerWorkflow({
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
@@ -126,7 +126,7 @@ export const processCommentCreated: EventHandler<
     const provider = notificationsProvider();
 
     log.info('>>>>>>>>>>>>>>>>>> SENDING WEBHOOK TRIGGER');
-    return await provider.triggerWorkflow({
+    await provider.triggerWorkflow({
       key: WorkflowKeys.Webhooks,
       users: webhooks.map((w) => ({
         id: `webhook-${w.id}`,
