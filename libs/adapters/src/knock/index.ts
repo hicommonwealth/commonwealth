@@ -71,6 +71,9 @@ export function KnockProvider(): NotificationsProvider {
     async triggerWorkflow(
       options: NotificationsProviderTriggerOptions,
     ): Promise<boolean> {
+      // disable webhook workflow in all environments except production
+      // if (options.key === 'webhooks' && config.APP_ENV !== 'production') return true;
+
       const runId = await knock.workflows.trigger(options.key, {
         recipients: options.users,
         data: options.data,

@@ -109,8 +109,10 @@ export const processCommentCreated: EventHandler<
       community_id: community.id!,
       events: { [Op.contains]: ['CommentCreated'] },
     },
+    logging: console.log,
   });
 
+  console.log('\n>>>>>>>>>>>>>>>>>>>>>>> WEBHOOKS:\n', webhooks);
   if (webhooks.length > 0) {
     const thread = await models.Thread.findByPk(payload.thread_id, {
       attributes: ['title'],
@@ -122,6 +124,7 @@ export const processCommentCreated: EventHandler<
 
     const provider = notificationsProvider();
 
+    console.log('>>>>>>>>>>>>>>>>>> SENDING WEBHOOK TRIGGER');
     return await provider.triggerWorkflow({
       key: WorkflowKeys.Webhooks,
       users: webhooks.map((w) => ({
