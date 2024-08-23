@@ -25,6 +25,7 @@ import 'commonwealth-mdxeditor/style.css';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
+import { fileToText } from 'views/pages/Editor/fileToText';
 import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
 import supported from './supported.md?raw';
@@ -71,8 +72,44 @@ export const Editor = (props: EditorProps) => {
 
   const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
 
+  // TODO: handle other file formats too including txt and html but I'm not sure
+  // about the correct way to handle html
+  const handleDrop = useCallback((event: React.DragEvent) => {
+    async function doAsync() {
+      console.log(event.dataTransfer.files.length);
+
+      const nrFiles = event.dataTransfer.files.length;
+
+      if (nrFiles === 1) {
+        const type = event.dataTransfer.files[0].type;
+
+        if (type === 'text/markdown') {
+          const text = await fileToText(event.dataTransfer.files[0]);
+          mdxEditorRef.current?.setMarkdown(text);
+        } else {
+          // TODO: use a snackbar
+          console.log('File not markdown');
+        }
+      }
+
+      if (nrFiles <= 0) {
+        // TODO: use a snackbar
+        console.log('No files given');
+        return;
+      }
+
+      if (nrFiles > 1) {
+        // TODO: use a snackbar
+        console.log('Too many files given');
+        return;
+      }
+    }
+
+    doAsync().catch(console.error);
+  }, []);
+
   return (
-    <div className="mdxeditor-container">
+    <div className="mdxeditor-container" onDrop={handleDrop}>
       <MDXEditor
         ref={mdxEditorRef}
         markdown={supported}
