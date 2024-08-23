@@ -21,20 +21,43 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
 } from 'commonwealth-mdxeditor';
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import './Editor.scss';
 
 import 'commonwealth-mdxeditor/style.css';
 
+import { SERVER_URL } from 'state/api/config';
+import useUserStore from 'state/ui/user';
+import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
 import supported from './supported.md?raw';
 
+type ImageURL = string;
+
+function useImageUploadHandler() {
+  const user = useUserStore();
+
+  return useCallback(async (file: File): Promise<ImageURL> => {
+    console.log('FIXME uploading image!!!');
+
+    const uploadedFileUrl = await uploadFileToS3(
+      file,
+      SERVER_URL,
+      user.jwt || '',
+    );
+    console.log('FIXME uploading image!!!  ... done');
+
+    return uploadedFileUrl;
+  }, []);
+}
+
 export const Editor = () => {
+  const imageUploadHandler = useImageUploadHandler();
+
   return (
     <MDXEditor
       markdown={supported}
       translation={(key, defaultValue, interpolations) => {
-        console.log(`${key}=${defaultValue}`);
         switch (key) {
           case 'toolbar.blockTypeSelect.placeholder':
             // show the default placeholder that's active here..
@@ -88,7 +111,7 @@ export const Editor = () => {
         codeMirrorPlugin({
           codeBlockLanguages: { js: 'JavaScript', css: 'CSS' },
         }),
-        imagePlugin(),
+        imagePlugin({ imageUploadHandler }),
         tablePlugin(),
         thematicBreakPlugin(),
         frontmatterPlugin(),

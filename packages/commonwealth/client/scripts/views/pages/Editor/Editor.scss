@@ -1,7 +1,8 @@
 html,
 body,
 #root {
-  max-width: 100vh;
+  max-height: 100vh;
+  overflow: auto;
 }
 
 #root {
@@ -20,6 +21,10 @@ body,
   border-top: solid #c6c6c6 1px;
   border-radius: inherit;
   background-color: inherit;
+  overflow: hidden;
+
+  position: initial;
+  top: initial;
 }
 
 .mdxeditor {
@@ -41,8 +46,6 @@ body,
 }
 
 .mdxeditor-root-contenteditable {
-  overflow: auto;
-
   p {
     line-height: 2.2em;
   }
