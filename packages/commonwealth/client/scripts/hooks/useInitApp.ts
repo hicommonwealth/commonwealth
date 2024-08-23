@@ -1,7 +1,6 @@
-import axios from 'axios';
 import React, { useEffect } from 'react';
 import app, { initAppState } from 'state';
-import { SERVER_URL } from 'state/api/config';
+import { fetchCustomDomainQuery } from 'state/api/configuration';
 import useGroupMutationBannerStore from '../state/ui/group';
 
 const useInitApp = () => {
@@ -14,9 +13,9 @@ const useInitApp = () => {
     // read localstorage and set informational banner for gated communities on the members page group section
     readFromStorageAndSetGatingGroupBannerForCommunities();
 
-    Promise.all([axios.get(`${SERVER_URL}/domain`), initAppState()])
+    Promise.all([fetchCustomDomainQuery(), initAppState()])
       .then(([domainResp]) => {
-        const serverCustomDomain = domainResp.data.customDomain;
+        const serverCustomDomain = domainResp;
         if (serverCustomDomain) {
           app.setCustomDomain(serverCustomDomain);
         }
