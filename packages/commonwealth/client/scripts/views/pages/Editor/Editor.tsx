@@ -10,6 +10,7 @@ import {
   listsPlugin,
   markdownShortcutPlugin,
   MDXEditor,
+  MDXEditorMethods,
   quotePlugin,
   tablePlugin,
   thematicBreakPlugin,
@@ -64,54 +65,60 @@ export const Editor = (props: EditorProps) => {
   // const imageUploadHandler = useImageUploadHandlerS3();
 
   const mode = props.mode ?? 'desktop';
+  // const mode = props.mode ?? 'mobile';
 
   const placeholder = props.placeholder ?? 'Share your thoughts...';
 
+  const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
+
   return (
-    <MDXEditor
-      markdown={supported}
-      placeholder={placeholder}
-      translation={(key, defaultValue, interpolations) => {
-        switch (key) {
-          case 'toolbar.blockTypeSelect.placeholder':
-            // show the default placeholder that's active here..
-            return 'H1';
-          case 'toolbar.blockTypes.heading':
-            if (interpolations?.level) {
-              // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-              return 'H' + interpolations.level;
-            }
-            return 'H1';
-          case 'toolbar.blockTypes.quote':
-            return 'Q';
-          case 'toolbar.blockTypes.paragraph':
-            return 'P';
-          default:
-            return defaultValue;
-        }
-      }}
-      plugins={[
-        toolbarPlugin({
-          location: mode === 'mobile' ? 'bottom' : 'top',
-          toolbarContents: () =>
-            mode === 'mobile' ? <ToolbarForMobile /> : <ToolbarForDesktop />,
-        }),
-        listsPlugin(),
-        quotePlugin(),
-        headingsPlugin(),
-        linkPlugin(),
-        linkDialogPlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-        codeMirrorPlugin({
-          codeBlockLanguages: { js: 'JavaScript', css: 'CSS' },
-        }),
-        imagePlugin({ imageUploadHandler }),
-        tablePlugin(),
-        thematicBreakPlugin(),
-        frontmatterPlugin(),
-        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
-        markdownShortcutPlugin(),
-      ]}
-    />
+    <div className="mdxeditor-container">
+      <MDXEditor
+        ref={mdxEditorRef}
+        markdown={supported}
+        placeholder={placeholder}
+        translation={(key, defaultValue, interpolations) => {
+          switch (key) {
+            case 'toolbar.blockTypeSelect.placeholder':
+              // show the default placeholder that's active here..
+              return 'H1';
+            case 'toolbar.blockTypes.heading':
+              if (interpolations?.level) {
+                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                return 'H' + interpolations.level;
+              }
+              return 'H1';
+            case 'toolbar.blockTypes.quote':
+              return 'Q';
+            case 'toolbar.blockTypes.paragraph':
+              return 'P';
+            default:
+              return defaultValue;
+          }
+        }}
+        plugins={[
+          toolbarPlugin({
+            location: mode === 'mobile' ? 'bottom' : 'top',
+            toolbarContents: () =>
+              mode === 'mobile' ? <ToolbarForMobile /> : <ToolbarForDesktop />,
+          }),
+          listsPlugin(),
+          quotePlugin(),
+          headingsPlugin(),
+          linkPlugin(),
+          linkDialogPlugin(),
+          codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+          codeMirrorPlugin({
+            codeBlockLanguages: { js: 'JavaScript', css: 'CSS' },
+          }),
+          imagePlugin({ imageUploadHandler }),
+          tablePlugin(),
+          thematicBreakPlugin(),
+          frontmatterPlugin(),
+          diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+          markdownShortcutPlugin(),
+        ]}
+      />
+    </div>
   );
 };

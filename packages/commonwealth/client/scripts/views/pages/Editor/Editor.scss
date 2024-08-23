@@ -49,6 +49,11 @@ body,
   width: 45px;
 }
 
+.mdxeditor-container {
+  display: flex;
+  flex-grow: 1;
+}
+
 .mdxeditor-root-contenteditable {
   p {
     line-height: 1.8em;
