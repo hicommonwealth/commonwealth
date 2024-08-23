@@ -19,11 +19,13 @@ export const ToolbarForDesktop = () => {
       </div>
       {/*<UndoRedo />*/}
       <BoldItalicUnderlineToggles />
-      <CreateLink />
+      <Separator />
+      <StrikeThroughSupSubToggles />
+      <Separator />
       <ListsToggle />
       <Separator />
+      <CreateLink />
       <InsertImage />
-      <StrikeThroughSupSubToggles />
       <InsertCodeBlock />
       <InsertTable />
     </>
