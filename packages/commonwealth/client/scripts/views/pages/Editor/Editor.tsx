@@ -119,6 +119,8 @@ export const Editor = (props: EditorProps) => {
           markdownShortcutPlugin(),
         ]}
       />
+
+      <div className="mdxeditor-footer">here it is</div>
     </div>
   );
 };
