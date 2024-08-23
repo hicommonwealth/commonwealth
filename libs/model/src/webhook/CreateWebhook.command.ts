@@ -43,18 +43,21 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
 
       if (existingWebhook) throw new InvalidState(Errors.WebhookExists);
 
-      let res: fetch.Response;
-      try {
-        res = await fetch(payload.webhookUrl, { method: 'GET' });
-      } catch (e) {
-        log.error('Failed to check webhook status');
-        throw new InvalidState('Failed to check Webhook status');
-      }
+      // Telegram webhook urls are a workaround (all we need is the chat/group id)
+      if (destination !== 'telegram') {
+        let res: fetch.Response;
+        try {
+          res = await fetch(payload.webhookUrl, { method: 'GET' });
+        } catch (e) {
+          log.error('Failed to check webhook status');
+          throw new InvalidState('Failed to check Webhook status');
+        }
 
-      if (res.status === 404) {
-        throw new InvalidInput(Errors.WebhookNotFound);
-      } else if (res.status === 401) {
-        throw new InvalidInput(Errors.UnauthorizedWebhooks);
+        if (res.status === 404) {
+          throw new InvalidInput(Errors.WebhookNotFound);
+        } else if (res.status === 401) {
+          throw new InvalidInput(Errors.UnauthorizedWebhooks);
+        }
       }
 
       const webhook = await models.Webhook.create({
