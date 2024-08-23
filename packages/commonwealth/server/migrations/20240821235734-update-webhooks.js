@@ -44,8 +44,9 @@ module.exports = {
                 UPDATE "Webhooks"
                 SET destination = CASE
                                       WHEN url LIKE 'https://discord.com/api/webhooks/%' THEN 'discord'
-                                      WHEN url LIKE 'https://hooks.slack.com/services/%' THEN 'slack'
-                                      WHEN url LIKE 'https://hooks.zapier.com/hooks/%' THEN 'zapier'
+                                      WHEN url LIKE 'https://discordapp.com/api/webhooks/%' THEN 'discord'
+                                      WHEN url LIKE 'https://hooks.slack.com/%' THEN 'slack'
+                                      WHEN url LIKE 'https://hooks.zapier.com/%' THEN 'zapier'
                                       WHEN url LIKE 'https://api.telegram.org/%' THEN 'telegram'
                                       ELSE 'unknown'
                     END;
@@ -58,6 +59,13 @@ module.exports = {
         {
           type: Sequelize.STRING,
           allowNull: false,
+        },
+        { transaction },
+      );
+      await queryInterface.bulkDelete(
+        'Webhooks',
+        {
+          destination: 'unknown',
         },
         { transaction },
       );

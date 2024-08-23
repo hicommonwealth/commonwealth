@@ -1,8 +1,8 @@
 import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
+import { getWebhookDestination } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import { getLinkType, isLinkValid } from 'helpers/link';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { useState } from 'react';
 import app from 'state';
@@ -175,9 +175,11 @@ const Webhooks = () => {
               canDelete: !isDeletingWebhook,
               canConfigure: webhook.canConfigure ? !isEditingWebhook : false,
               customElementAfterLink:
-                webhook.canConfigure && isLinkValid(webhook.value) ? (
+                webhook.canConfigure &&
+                webhook?.metadata?.destination &&
+                getWebhookDestination(webhook.metadata?.url) !== 'unknown' ? (
                   <CWTag
-                    label={getLinkType(webhook.value)}
+                    label={webhook.metadata.destination}
                     type="group"
                     classNames="link-type"
                   />
