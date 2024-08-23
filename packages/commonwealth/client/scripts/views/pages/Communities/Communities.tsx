@@ -196,7 +196,7 @@ const CommunitiesPage = () => {
               className="tag-filter"
               placeholder="Community Tags"
               value={{
-                // Default value asking as a placeholder
+                // Default value acting as a placeholder
                 label: 'Community Tags',
                 value: 0,
               }}
