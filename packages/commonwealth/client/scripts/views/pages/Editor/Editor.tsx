@@ -34,25 +34,31 @@ import supported from './supported.md?raw';
 
 type ImageURL = string;
 
-function useImageUploadHandler() {
+function useImageUploadHandlerS3() {
   const user = useUserStore();
 
   return useCallback(async (file: File): Promise<ImageURL> => {
-    console.log('FIXME uploading image!!!');
-
     const uploadedFileUrl = await uploadFileToS3(
       file,
       SERVER_URL,
       user.jwt || '',
     );
-    console.log('FIXME uploading image!!!  ... done');
-
     return uploadedFileUrl;
   }, []);
 }
 
+/**
+ * Just a basic local image handler that uses a file URL.
+ */
+function useImageUploadHandlerLocal() {
+  return useCallback(async (file: File) => {
+    return URL.createObjectURL(file);
+  }, []);
+}
+
 export const Editor = () => {
-  const imageUploadHandler = useImageUploadHandler();
+  const imageUploadHandler = useImageUploadHandlerLocal();
+  // const imageUploadHandler = useImageUploadHandlerS3();
 
   return (
     <MDXEditor
