@@ -24,6 +24,7 @@ import 'commonwealth-mdxeditor/style.css';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
+import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
 import supported from './supported.md?raw';
 
@@ -51,9 +52,17 @@ function useImageUploadHandlerLocal() {
   }, []);
 }
 
-export const Editor = () => {
+type EditorMode = 'desktop' | 'mobile';
+
+type EditorProps = {
+  readonly mode?: EditorMode;
+};
+
+export const Editor = (props: EditorProps) => {
   const imageUploadHandler = useImageUploadHandlerLocal();
   // const imageUploadHandler = useImageUploadHandlerS3();
+
+  const mode = props.mode ?? 'desktop';
 
   return (
     <MDXEditor
@@ -79,8 +88,9 @@ export const Editor = () => {
       }}
       plugins={[
         toolbarPlugin({
-          location: 'bottom',
-          toolbarContents: () => <ToolbarForMobile />,
+          location: mode === 'mobile' ? 'bottom' : 'top',
+          toolbarContents: () =>
+            mode === 'mobile' ? <ToolbarForMobile /> : <ToolbarForDesktop />,
         }),
         listsPlugin(),
         quotePlugin(),
@@ -95,11 +105,6 @@ export const Editor = () => {
         tablePlugin(),
         thematicBreakPlugin(),
         frontmatterPlugin(),
-        // codeMirrorPlugin(),
-        // codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-        // sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
-        // codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
-        // directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
         diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
         markdownShortcutPlugin(),
       ]}
