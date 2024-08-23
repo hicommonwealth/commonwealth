@@ -1,22 +1,16 @@
 import {
-  BlockTypeSelect,
-  BoldItalicUnderlineToggles,
   codeBlockPlugin,
   codeMirrorPlugin,
-  CreateLink,
   diffSourcePlugin,
   frontmatterPlugin,
   headingsPlugin,
   imagePlugin,
-  InsertImage,
   linkDialogPlugin,
   linkPlugin,
   listsPlugin,
-  ListsToggle,
   markdownShortcutPlugin,
   MDXEditor,
   quotePlugin,
-  Separator,
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
@@ -30,6 +24,7 @@ import 'commonwealth-mdxeditor/style.css';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
+import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
 import supported from './supported.md?raw';
 
 type ImageURL = string;
@@ -85,28 +80,7 @@ export const Editor = () => {
       plugins={[
         toolbarPlugin({
           location: 'bottom',
-          toolbarContents: () => (
-            <>
-              <div className="mdxeditor-block-type-select">
-                <BlockTypeSelect />
-              </div>
-              {/*<UndoRedo />*/}
-              <BoldItalicUnderlineToggles />
-              <CreateLink />
-              <ListsToggle />
-              <Separator />
-              <InsertImage />
-              <div
-                style={{
-                  justifyContent: 'flex-end',
-                  flexGrow: 1,
-                  display: 'flex',
-                }}
-              >
-                <button>➤</button>
-              </div>
-            </>
-          ),
+          toolbarContents: () => <ToolbarForMobile />,
         }),
         listsPlugin(),
         quotePlugin(),
