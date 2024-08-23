@@ -8,9 +8,7 @@ import {
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
-import { config } from '../config';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
-import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
 const log = logger(import.meta);
 
@@ -171,15 +169,6 @@ export default async function emitNotifications(
       replacements,
       type: QueryTypes.INSERT,
     });
-  }
-
-  if (config.SEND_WEBHOOKS_EMAILS) {
-    // webhooks
-    try {
-      await dispatchWebhooks(notification_data_and_category);
-    } catch (e) {
-      log.error('Failed to dispatch webhooks', e);
-    }
   }
 
   return notification;
