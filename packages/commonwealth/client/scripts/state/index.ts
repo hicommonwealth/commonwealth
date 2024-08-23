@@ -58,8 +58,6 @@ export interface IApp {
 
   _customDomainId: string;
 
-  isCustomDomain(): boolean;
-
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
@@ -102,7 +100,6 @@ const app: IApp = {
 
   // @ts-expect-error StrictNullChecks
   _customDomainId: null,
-  isCustomDomain: () => app._customDomainId !== null,
   customDomainId: () => {
     return app._customDomainId;
   },
