@@ -51,7 +51,7 @@ body,
 
 .mdxeditor-root-contenteditable {
   p {
-    line-height: 2.2em;
+    line-height: 1.8em;
   }
 
   h1,
@@ -81,4 +81,9 @@ body,
   ul {
     list-style: square;
   }
+
+  //* {
+  //  margin-top: 10px;
+  //  margin-bottom: 10px;
+  //}
 }
