@@ -1,15 +1,10 @@
 import { logger } from '@hicommonwealth/core';
-import {
-  CommunityInstance,
-  WebhookInstance,
-  models,
-} from '@hicommonwealth/model';
+import { CommunityInstance, models } from '@hicommonwealth/model';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
   slugify,
 } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
 import { config } from '../../config';
 import { WebhookDestinations } from './types';
 
@@ -19,25 +14,6 @@ export const REGEX_IMAGE =
   /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
 export const REGEX_EMOJI =
   /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g;
-
-/**
- * Fetch all webhooks that are subscribed to the notification category and chain of the notification object.
- */
-export async function fetchWebhooks(
-  notifDataCategory: Exclude<
-    NotificationDataAndCategory,
-    { categoryId: NotificationCategories.SnapshotProposal }
-  >,
-): Promise<WebhookInstance[]> {
-  return await models.Webhook.findAll({
-    where: {
-      community_id: notifDataCategory.data.community_id,
-      categories: {
-        [Op.contains]: [notifDataCategory.categoryId],
-      },
-    },
-  });
-}
 
 /**
  * Get the profile of the user associated with the notification objects author address. For example,
