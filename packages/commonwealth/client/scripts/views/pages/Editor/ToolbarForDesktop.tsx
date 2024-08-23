@@ -20,15 +20,6 @@ export const ToolbarForDesktop = () => {
       <ListsToggle />
       <Separator />
       <InsertImage />
-      <div
-        style={{
-          justifyContent: 'flex-end',
-          flexGrow: 1,
-          display: 'flex',
-        }}
-      >
-        <button>➤</button>
-      </div>
     </>
   );
 };
