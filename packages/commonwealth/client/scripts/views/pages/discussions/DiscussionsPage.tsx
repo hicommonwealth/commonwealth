@@ -132,7 +132,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
-    if (!isLoadingTopics && topicNameFromURL) {
+    if (
+      !isLoadingTopics &&
+      topicNameFromURL &&
+      topicNameFromURL !== 'archived'
+    ) {
       const validTopics = topics?.some(
         (topic) => topic?.name === topicNameFromURL,
       );
