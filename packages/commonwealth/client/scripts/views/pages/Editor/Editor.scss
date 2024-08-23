@@ -16,22 +16,21 @@ body,
   display: none;
 }
 
-// changes needed for the toolbar
-.mdxeditor .mdxeditor-toolbar {
-  border-top: solid #c6c6c6 1px;
-  border-radius: inherit;
-  background-color: inherit;
-  overflow: hidden;
-
-  position: initial;
-  top: initial;
-  height: 65px;
-}
-
 .mdxeditor {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+
+  .mdxeditor-toolbar {
+    border-top: solid #c6c6c6 1px;
+    border-radius: inherit;
+    background-color: inherit;
+    overflow: hidden;
+
+    position: initial;
+    top: initial;
+    height: 65px;
+  }
 }
 
 .mdxeditor-diff-source-wrapper {
@@ -63,15 +62,13 @@ body,
   h6 {
     line-height: 2.2em;
   }
-}
 
-.mdxeditor-root-contenteditable blockquote {
-  margin-left: 20px;
-  border-left: #c6c6c6 solid 3px;
-  padding-left: 5px;
-}
+  blockquote {
+    margin-left: 20px;
+    border-left: #c6c6c6 solid 3px;
+    padding-left: 5px;
+  }
 
-.mdxeditor-root-contenteditable {
   ol,
   ul {
     margin-left: 20px;
