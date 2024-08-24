@@ -14,7 +14,6 @@ import { User } from 'views/components/user/user';
 import type { IEventLabel } from '../../../../../shared/chain/labelers/util';
 import { Label as ChainEventLabel } from '../../../../../shared/chain/labelers/util';
 import type { CWEvent } from '../../../../../shared/chain/types/types';
-import AddressInfo from '../../../models/AddressInfo';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getClasses } from '../../components/component_kit/helpers';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -186,15 +185,10 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
         />
       ) : (
         <UserGallery
-          users={authorInfo.map(
-            (auth) =>
-              new AddressInfo({
-                userId: 0, // TODO: is this OK?
-                id: 0, // TODO: is this OK?
-                address: auth[1],
-                communityId: auth[0],
-              }),
-          )}
+          users={authorInfo.map((auth) => ({
+            communityId: auth?.[0] || '',
+            address: auth?.[1] || '',
+          }))}
           avatarSize={26}
         />
       )}

@@ -1,17 +1,21 @@
 import { ServerError } from '@hicommonwealth/core';
-import type {
-  AddressInstance,
-  CommunityInstance,
-  DB,
-  EmailNotificationInterval,
-  StarredCommunityAttributes,
-  UserInstance,
+import {
+  sequelize,
+  type AddressInstance,
+  type CommunityInstance,
+  type DB,
+  type EmailNotificationInterval,
+  type StarredCommunityAttributes,
+  type UserInstance,
 } from '@hicommonwealth/model';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
+import { QueryTypes } from 'sequelize';
 import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
+
+type CommunityWithRedirects = { id: string; redirect: string };
 
 type StatusResp = {
   loggedIn?: boolean;
@@ -28,6 +32,7 @@ type StatusResp = {
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
   };
+  communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
 };
@@ -38,7 +43,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     attributes: ['id'],
   });
 
-  const unfilteredAddresses = await user.getAddresses();
+  const unfilteredAddresses = await user.getAddresses({
+    include: [
+      {
+        model: models.Community,
+        attributes: ['id', 'base', 'ss58_prefix'],
+      },
+    ],
+  });
   // TODO: fetch all this data with a single query
   const [addresses, selectedCommunity, isAdmin, disableRichText] =
     await Promise.all([
@@ -53,9 +65,43 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ]);
 
   // get starred communities for user
-  const starredCommunities = await models.StarredCommunity.findAll({
-    where: { user_id: user.id },
-  });
+  const userCommunities = await sequelize.query(
+    `
+      SELECT 
+        id, 
+        icon_url, 
+        name,
+        CASE 
+          WHEN sc.community_id IS NOT NULL THEN TRUE
+          ELSE FALSE
+        END AS is_starred
+      FROM 
+        "Communities" c
+      LEFT JOIN 
+        "StarredCommunities" sc 
+      ON 
+        c.id = sc.community_id 
+        AND sc.user_id = :user_id
+      WHERE 
+        id IN (
+          SELECT 
+            a.community_id
+          FROM 
+            "Addresses" a
+          WHERE 
+            a.verified IS NOT NULL 
+            AND a.last_active IS NOT NULL 
+            AND a.user_id = :user_id
+          GROUP BY 
+            a.community_id
+        );
+    `,
+    {
+      replacements: {
+        user_id: user.id,
+      },
+    },
+  );
 
   return {
     user: {
@@ -71,7 +117,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       selectedCommunity,
       isAdmin,
       disableRichText,
-      starredCommunities,
+      communities: userCommunities?.[0] || [],
     },
     id: user.id,
     email: user.email,
@@ -105,10 +151,20 @@ export const status = async (
       user.jwt = jwtToken as string;
       user.knockJwtToken = knockJwtToken!;
 
+      // get communities with redirects (this should be a very small list and should'n cause performance issues)
+      const communityWithRedirects =
+        await models.sequelize.query<CommunityWithRedirects>(
+          `SELECT id, redirect FROM "Communities" WHERE redirect IS NOT NULL;`,
+          {
+            type: QueryTypes.SELECT,
+          },
+        );
+
       return success(res, {
         loggedIn: true,
         // @ts-expect-error StrictNullChecks
         user,
+        communityWithRedirects: communityWithRedirects || [],
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });

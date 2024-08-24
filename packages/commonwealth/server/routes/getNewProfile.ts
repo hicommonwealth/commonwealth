@@ -1,10 +1,15 @@
 import { AppError } from '@hicommonwealth/core';
-import type { DB, TagsAttributes } from '@hicommonwealth/model';
+import type {
+  AddressInstance,
+  DB,
+  TagsAttributes,
+} from '@hicommonwealth/model';
 import {
   GetNewProfileReq,
   GetNewProfileResp,
   ProfileTags,
 } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import z from 'zod';
@@ -17,6 +22,14 @@ export const Errors = {
 };
 
 type ProfileWithTags = z.infer<typeof ProfileTags> & { Tag: TagsAttributes };
+
+export type ExtendedAddessInstance = AddressInstance & {
+  Community: {
+    id: string;
+    base: ChainBase;
+    ss58_prefix?: number;
+  };
+};
 
 const getNewProfile = async (
   models: DB,
@@ -40,7 +53,7 @@ const getNewProfile = async (
         model: models.Community,
         required: true,
         where: { active: true },
-        attributes: ['id'],
+        attributes: ['id', 'base', 'ss58_prefix'],
       },
     ],
   });
@@ -99,7 +112,7 @@ const getNewProfile = async (
     userId: user_id!,
     profile: user.profile,
     totalUpvotes,
-    addresses: addresses.map((a) => a.toJSON()),
+    addresses: addresses.map((a) => a.toJSON() as ExtendedAddessInstance),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),

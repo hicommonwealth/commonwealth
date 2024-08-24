@@ -14,6 +14,7 @@ export const TrendingCommunitiesPreview = () => {
 
   const { data } = useGetNewContent({ enabled: user.isLoggedIn });
 
+  // TODO: https://github.com/hicommonwealth/commonwealth/issues/8760
   const { data: activeCommunities } = useFetchActiveCommunitiesQuery();
 
   const sortedCommunities = (activeCommunities?.communities || [])
