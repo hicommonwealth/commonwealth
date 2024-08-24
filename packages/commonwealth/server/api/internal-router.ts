@@ -1,7 +1,6 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { ChainEvents } from '@hicommonwealth/model';
 import cors from 'cors';
-import { Router, raw } from 'express';
+import { Router } from 'express';
 import { config } from '../config';
 import * as community from './community';
 import * as contest from './contest';
@@ -35,24 +34,6 @@ export type API = typeof trpcRouter;
 
 router.use('/trpc', express.statsMiddleware, trpc.toExpress(trpcRouter));
 
-/**
- * Special integration endpoints
- */
-router.post(
-  '/chainevent/ChainEventCreated/:id',
-  raw({ type: '*/*', limit: '10mb', inflate: true }),
-  (req, _, next) => {
-    ChainEvents.verifyAlchemySignature(req);
-    return next();
-  },
-  // parse body as JSON (native express.json middleware doesn't work here)
-  (req, _, next) => {
-    req.body = JSON.parse(req.body);
-    next();
-  },
-  express.command(ChainEvents.ChainEventCreated()),
-);
-
 if (config.NODE_ENV !== 'production') {
   router.use(cors());
   trpc.useOAS(router, trpcRouter, {
@@ -63,23 +44,3 @@ if (config.NODE_ENV !== 'production') {
 }
 
 export { PATH, router, trpcRouter };
-
-// registerRoute(
-//   router,
-//   'post',
-//   '/threads',
-//   passport.authenticate('jwt', { session: false }),
-//   databaseValidationService.validateAuthor,
-//   databaseValidationService.validateCommunityWithTopics,
-//   createThreadHandler.bind(this, serverControllers),
-// );
-
-// registerRoute(
-//   router,
-//   'post',
-//   '/bot/threads',
-//   databaseValidationService.validateBotUser,
-//   databaseValidationService.validateAuthor,
-//   databaseValidationService.validateCommunityWithTopics,
-//   createThreadHandler.bind(this, serverControllers),
-// );

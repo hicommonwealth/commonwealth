@@ -8,6 +8,7 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
+import { ZodSchema } from 'zod';
 import { AddressAttributes, models } from '..';
 
 /**
@@ -38,7 +39,7 @@ const authorizeAddress = async (
       where: {
         user_id: actor.user.id,
         address: actor.address_id,
-        community_id: payload.id,
+        community_id: payload.community_id ?? payload.id,
         role: { [Op.in]: roles },
       },
       order: [['role', 'DESC']],
@@ -49,10 +50,7 @@ const authorizeAddress = async (
   return addr;
 };
 
-type CommunityMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Community
->;
+type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
 type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
 type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
 
@@ -75,6 +73,36 @@ export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin', 'moderator']);
+};
+
+export const isCommunityAdminOrTopicMember: CommunityMiddleware = async (
+  ctx,
+) => {
+  // super admin is always allowed
+  if (ctx.actor.user.isAdmin) return;
+  try {
+    await authorizeAddress(ctx, ['admin', 'moderator']);
+  } catch {
+    // TODO: check topic group membership
+    //     const { isValid, message } = await validateTopicGroupsMembership(
+    //       this.models,
+    //       topicId,
+    //       community.id,
+    //       address,
+    //       PermissionEnum.CREATE_THREAD,
+    //     );
+    //     if (!isValid) {
+    //       throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
+    //     }
+    // TODO: check if banned
+    // const [canInteract, banError] = await this.banCache.checkBan({
+    //   communityId: community.id,
+    //   address: address.address,
+    // });
+    // if (!canInteract) {
+    //   throw new AppError(`Ban error: ${banError}`);
+    // }
+  }
 };
 
 /**

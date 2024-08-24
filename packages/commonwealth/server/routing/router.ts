@@ -1,5 +1,5 @@
 import type { Express } from 'express';
-import express from 'express';
+import express, { raw } from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 import * as api from '../api';
@@ -73,7 +73,12 @@ import getWebhooks from '../routes/webhooks/getWebhooks';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
-import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
+import {
+  ChainEvents,
+  Thread,
+  type DB,
+  type GlobalActivityCache,
+} from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
@@ -106,7 +111,10 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
-import { CacheDecorator } from '@hicommonwealth/adapters';
+import {
+  CacheDecorator,
+  express as ExpressAdapter,
+} from '@hicommonwealth/adapters';
 import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
@@ -211,6 +219,34 @@ function setupRouter(
   // API routes
   app.use(api.internal.PATH, api.internal.router);
   app.use(api.external.PATH, api.external.router);
+
+  /**
+   * Special integration endpoints
+   */
+  router.post(
+    '/chainevent/ChainEventCreated/:id',
+    raw({ type: '*/*', limit: '10mb', inflate: true }),
+    (req, _, next) => {
+      ChainEvents.verifyAlchemySignature(req);
+      return next();
+    },
+    // parse body as JSON (native express.json middleware doesn't work here)
+    (req, _, next) => {
+      req.body = JSON.parse(req.body);
+      next();
+    },
+    ExpressAdapter.command(ChainEvents.ChainEventCreated()),
+  );
+  // TODO: do we need more middleware here? (analytics, notifications, canvas, etc)
+  router.post(
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    (req, _, next) => {
+      req.body = JSON.parse(req.body);
+      next();
+    },
+    ExpressAdapter.command(Thread.CreateThread()),
+  );
 
   registerRoute(
     router,

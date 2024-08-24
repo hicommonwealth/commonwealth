@@ -2,14 +2,16 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import cors from 'cors';
 import { Router } from 'express';
 import * as community from './community';
+import * as thread from './threads';
 
 const { getCommunities, getCommunity, getMembers } = community.trpcRouter;
-//const { getBulkThreads } = thread.trpcRouter;
+const { createThread } = thread.trpcRouter;
 
 const api = {
   getCommunities,
   getCommunity,
   getMembers,
+  createThread,
   //getBulkThreads,
 };
 

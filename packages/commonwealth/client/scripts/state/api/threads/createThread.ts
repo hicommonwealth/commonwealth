@@ -42,6 +42,7 @@ const createThread = async ({
   authorProfile,
   isPWA,
 }: CreateThreadProps): Promise<Thread> => {
+  // TODO: move this to client proxy
   const canvasSignedData = await signThread(address, {
     community: communityId,
     title,
@@ -50,6 +51,7 @@ const createThread = async ({
     topic: topic.id,
   });
 
+  // TODO: replace with tRPC mutation
   const response = await axios.post(
     `${SERVER_URL}/threads`,
     {

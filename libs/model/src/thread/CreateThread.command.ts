@@ -14,6 +14,8 @@ import { BigNumber } from 'ethers';
 import moment from 'moment';
 import { z } from 'zod';
 import { Contest, config, models, tokenBalanceCache } from '..';
+import { isCommunityAdminOrTopicMember } from '../middleware';
+import { mustExist } from '../middleware/guards';
 import {
   emitMentions,
   parseUserMentions,
@@ -33,126 +35,90 @@ const Errors = {
   PostLimitReached: 'Post limit reached',
 };
 
-/**
- * Gets sanitized quill body and plaintext for the search indexer
- */
-function parseBody({
-  body,
-  kind,
-  url,
-}: z.infer<typeof schemas.CreateThread.input>) {
-  // TODO: Refactor to simplify - there is some redundant logic in the way quill gets sanitized and plaintext extracted
-  const sanitized = sanitizeQuillText(body);
-  if (kind === 'discussion') {
-    try {
-      const quillDoc = JSON.parse(decodeURIComponent(body));
-      if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '')
-        throw new InvalidInput(Errors.NoBody);
-      const plaintext = (() => {
-        try {
-          return renderQuillDeltaToText(quillDoc);
-        } catch (e) {
-          return decodeURIComponent(body);
-        }
-      })();
-      return { body: sanitized, plaintext };
-    } catch (e) {
-      // check always passes if the body isn't a Quill document
-    }
-  } else if (kind === 'link' && !url?.trim())
-    throw new InvalidInput(Errors.LinkMissingTitleOrUrl);
+const getActiveContestManagersQuery = Contest.GetActiveContestManagers();
 
-  return { body: sanitized, plaintext: decodeURIComponent(body) };
+function toPlainString(decodedBody: string) {
+  try {
+    const quillDoc = JSON.parse(decodedBody);
+    if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '')
+      throw new InvalidInput(Errors.NoBody);
+    return renderQuillDeltaToText(quillDoc);
+  } catch {
+    // check always passes if the body isn't a Quill document
+  }
+  return decodedBody;
 }
 
-async function checkContestLimits(
-  community_id: string,
-  topic_id: number,
+/**
+ * Ensure that user has non-dust ETH value
+ */
+async function checkAddressBalance(
+  activeContestManagers: z.infer<typeof getActiveContestManagersQuery.output>,
   address: string,
 ) {
-  const activeContestManagers = await Contest.GetActiveContestManagers().body({
-    actor: {} as Actor,
-    payload: {
-      community_id,
-      topic_id,
+  const balances = await tokenBalanceCache.getBalances({
+    balanceSourceType: BalanceSourceType.ETHNative,
+    addresses: [address],
+    sourceOptions: {
+      evmChainId: activeContestManagers[0]!.eth_chain_id,
     },
+    cacheRefresh: true,
   });
-
-  if (activeContestManagers && activeContestManagers.length > 0) {
-    // ensure that user has non-dust ETH value
-    const balances = await tokenBalanceCache.getBalances({
-      balanceSourceType: BalanceSourceType.ETHNative,
-      addresses: [address],
-      sourceOptions: {
-        evmChainId: activeContestManagers[0]!.eth_chain_id,
-      },
-      cacheRefresh: true,
-    });
-    const minUserEthBigNumber = BigNumber.from(
-      (config.CONTESTS.MIN_USER_ETH * 1e18).toFixed(),
+  const minUserEthBigNumber = BigNumber.from(
+    (config.CONTESTS.MIN_USER_ETH * 1e18).toFixed(),
+  );
+  if (BigNumber.from(balances[address]).lt(minUserEthBigNumber))
+    throw new AppError(
+      `user ETH balance insufficient (${balances[address]} of ${minUserEthBigNumber})`,
     );
-    if (BigNumber.from(balances[address]).lt(minUserEthBigNumber))
-      throw new AppError(
-        `user ETH balance insufficient (${balances[address]} of ${minUserEthBigNumber})`,
-      );
+}
 
-    // ensure post limit not reached on all contests
-    const validActiveContests = activeContestManagers.filter((c) => {
-      const userPostsInContest = c.actions.filter(
-        (action) =>
-          action.actor_address === address && action.action === 'added',
-      );
-      const quotaReached =
-        userPostsInContest.length >= config.CONTESTS.MAX_USER_POSTS_PER_CONTEST;
-      return !quotaReached;
-    });
-    if (validActiveContests.length === 0)
-      throw new AppError(Errors.PostLimitReached);
-  }
+/**
+ * Ensure post limit not reached on active contests
+ */
+async function checkContestLimits(
+  activeContestManagers: z.infer<typeof getActiveContestManagersQuery.output>,
+  address: string,
+) {
+  const validActiveContests = activeContestManagers.filter((c) => {
+    const userPostsInContest = c.actions.filter(
+      (action) => action.actor_address === address && action.action === 'added',
+    );
+    const quotaReached =
+      userPostsInContest.length >= config.CONTESTS.MAX_USER_POSTS_PER_CONTEST;
+    return !quotaReached;
+  });
+  if (validActiveContests.length === 0)
+    throw new AppError(Errors.PostLimitReached);
 }
 
 export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
-    auth: [],
+    auth: [isCommunityAdminOrTopicMember],
     body: async ({ actor, payload }) => {
-      // TODO: this should be auth middleware
-      //   const isAdmin = await validateOwner({
-      //     models: this.models,
-      //     user,
-      //     communityId: community.id,
-      //     allowAdmin: true,
-      //     allowSuperAdmin: true,
-      //   });
-      //   if (!isAdmin) {
-      //     const { isValid, message } = await validateTopicGroupsMembership(
-      //       this.models,
-      //       topicId,
-      //       community.id,
-      //       address,
-      //       PermissionEnum.CREATE_THREAD,
-      //     );
-      //     if (!isValid) {
-      //       throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
-      //     }
-      //   }
+      const { community_id, topic_id, kind, url } = payload;
 
-      // TODO: address ban should we part of auth middleware
-      // check if banned
-      // const [canInteract, banError] = await this.banCache.checkBan({
-      //   communityId: community.id,
-      //   address: address.address,
-      // });
-      // if (!canInteract) {
-      //   throw new AppError(`Ban error: ${banError}`);
-      // }
+      if (kind === 'link' && !url?.trim())
+        throw new InvalidInput(Errors.LinkMissingTitleOrUrl);
 
-      const address = actor.address_id!;
-      const { community_id, topic_id } = payload;
-      const { body, plaintext } = parseBody(payload);
+      const decoded = decodeURIComponent(payload.body);
+      const body = sanitizeQuillText(decoded, true);
+      const plaintext = kind === 'discussion' ? toPlainString(body) : decoded;
       const mentions = uniqueMentions(parseUserMentions(body));
 
-      await checkContestLimits(community_id, topic_id, actor.address_id!);
+      // check contest invariants
+      const activeContestManagers = await getActiveContestManagersQuery.body({
+        actor: {} as Actor,
+        payload: {
+          community_id,
+          topic_id,
+        },
+      });
+      if (activeContestManagers && activeContestManagers.length > 0) {
+        await checkAddressBalance(activeContestManagers, actor.address_id!);
+        await checkContestLimits(activeContestManagers, actor.address_id!);
+      }
 
       // New threads get an empty version history initialized, which is passed
       // the thread's first version, formatted on the frontend with timestamps
@@ -164,14 +130,23 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         }),
       ];
 
+      // Load membership info (we can optimize this with middleware auth cache)
+      const address = await models.Address.findOne({
+        where: {
+          user_id: actor.user.id,
+          community_id,
+          address: actor.address_id!,
+        },
+      });
+      if (!mustExist('Community address', address)) return;
+
       // Thread aggregate mutation is a transaction boundary
       const new_thread_id = await models.sequelize.transaction(
         async (transaction) => {
           const thread = await models.Thread.create(
             {
               ...payload,
-              // TODO: address should be resolved by middleware
-              address_id: 0, // address.id!,
+              address_id: address.id!,
               body,
               plaintext,
               version_history,
@@ -194,7 +169,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
             {
               thread_id: thread.id!,
               body,
-              address,
+              address: address.address,
               timestamp: thread.created_at!,
             },
             {
@@ -202,21 +177,20 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
             },
           );
 
-          // TODO: address should be resolved by middleware
-          //address.last_active = new Date();
-          //await address.save({ transaction });
+          address.last_active = new Date();
+          await address.save({ transaction });
 
+          // TODO: this should be a notification policy
           await emitMentions(models, transaction, {
-            // TODO: address should be resolved by middleware
-            authorAddressId: 0, // address.id!,
+            authorAddressId: address.id!,
             authorUserId: actor.user.id!,
-            authorAddress: address,
+            authorAddress: address.address,
             mentions: mentions,
             thread,
             community_id: thread.community_id,
           });
 
-          // auto-subscribe thread creator to comments & reactions
+          // TODO: check with Tim-> auto-subscribe thread creator to comments & reactions
           await models.Subscription.bulkCreate(
             [
               {
@@ -249,102 +223,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         ],
       });
       return thread!.toJSON();
-
-      // TODO: move this to middleware
-      //   const allNotificationOptions: EmitOptions[] = [];
-      //   allNotificationOptions.push({
-      //     notification: {
-      //       categoryId: NotificationCategories.NewThread,
-      //       data: {
-      //         created_at: new Date(),
-      //         thread_id: finalThread.id,
-      //         root_type: ProposalType.Thread,
-      //         root_title: finalThread.title,
-      //         comment_text: finalThread.body,
-      //         community_id: finalThread.community_id,
-      //         author_address: finalThread.Address.address,
-      //         author_community_id: finalThread.Address.community_id,
-      //       },
-      //     },
-      //     excludeAddresses: [finalThread.Address.address],
-      //   });
-
-      //   const analyticsOptions = {
-      //     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
-      //     community: community.id,
-      //     userId: user.id,
-      //   };
     },
   };
 }
-
-// TODO: middleware stuff
-// export const createThreadHandler = async (
-//   controllers: ServerControllers,
-//   req: TypedRequestBody<CreateThreadRequestBody>,
-//   res: TypedResponse<CreateThreadResponse>,
-// ) => {
-//   const { user, address, community } = req;
-
-//   const {
-//     topic_id: topicId,
-//     title,
-//     body,
-//     kind,
-//     stage,
-//     url,
-//     readOnly,
-//     discord_meta,
-//   } = req.body;
-
-//   const threadFields: CreateThreadOptions = {
-//     user,
-//     address,
-//     community,
-//     title,
-//     body,
-//     kind,
-//     readOnly,
-//     topicId: parseInt(topicId, 10) || undefined,
-//     stage,
-//     url,
-//     discordMeta: discord_meta,
-//   };
-
-//   if (hasCanvasSignedDataApiArgs(req.body)) {
-//     threadFields.canvasSignedData = req.body.canvas_signed_data;
-//     threadFields.canvasHash = req.body.canvas_hash;
-
-//     if (config.ENFORCE_SESSION_KEYS) {
-//       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-
-//       await verifyThread(canvasSignedData, {
-//         title,
-//         body,
-//         address:
-//           canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-//           'polkadot'
-//             ? addressSwapper({
-//                 currentPrefix: 42,
-//                 // @ts-expect-error <StrictNullChecks>
-//                 address: address.address,
-//               })
-//             : // @ts-expect-error <StrictNullChecks>
-//               address.address,
-//         // @ts-expect-error <StrictNullChecks>
-//         community: community.id,
-//         topic: topicId ? parseInt(topicId, 10) : null,
-//       });
-//     }
-//   }
-//   const [thread, notificationOptions, analyticsOptions] =
-//     await controllers.threads.createThread(threadFields);
-
-//   for (const n of notificationOptions) {
-//     controllers.notifications.emit(n).catch(console.error);
-//   }
-
-//   controllers.analytics.track(analyticsOptions, req).catch(console.error);
-
-//   return success(res, thread);
-// };
