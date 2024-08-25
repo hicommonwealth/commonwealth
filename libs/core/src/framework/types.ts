@@ -54,14 +54,15 @@ export type User = {
  * - Authorization is typically granted based on group membership, role association, or ownership of the targeted entity.
  * - Unique identification is established through the `user.id`
  * - Extends users with additional (optional) attributes that may include:
- *   - `address_id` for the active web wallet address
+ *   - `address` for the active web wallet address
  *
  * Authorization for actors is facilitated through {@link CommandHandler} or {@link QueryHandler} middleware within the context of the invoked command or query.
  * - When executing a command, the `aggregate` may need loading before completing the authorization process.
  */
 export type Actor = {
   readonly user: Readonly<User>;
-  readonly address_id?: string;
+  readonly address?: string;
+  readonly addressId?: number;
 };
 
 /**

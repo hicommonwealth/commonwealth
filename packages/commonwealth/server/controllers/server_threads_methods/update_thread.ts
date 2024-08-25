@@ -1,6 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
+  BanCache,
   CommentAttributes,
   CommunityInstance,
   DB,
@@ -139,7 +140,9 @@ export async function __updateThread(
   const isContestThread = contestManagers.length > 0;
 
   // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
+  const [canInteract, banError] = await BanCache.getInstance(
+    this.models,
+  ).checkBan({
     communityId: thread.community_id,
     address: address.address,
   });

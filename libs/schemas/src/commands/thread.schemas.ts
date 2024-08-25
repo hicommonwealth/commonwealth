@@ -11,9 +11,11 @@ export const CreateThread = {
     body: z.string(),
     kind: z.enum(['discussion', 'link']),
     stage: z.string(),
-    url: z.string().url().optional(),
+    url: z.string().optional(),
     read_only: z.boolean(),
     discord_meta: DiscordMetaSchema.optional(),
+    canvas_signed_data: z.string(),
+    canvas_hash: z.string(),
   }),
   output: Thread,
 };

@@ -121,7 +121,7 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
         headers: [
           {
             in: 'header',
-            name: 'address_id',
+            name: 'address',
             required: true,
             schema: { type: 'string' },
           },
@@ -141,8 +141,7 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
           {
             actor: {
               user: ctx.req.user as User,
-              // TODO: get from JWT?
-              address_id: ctx.req.headers['address_id'] as string,
+              address: ctx.req.headers['address'] as string,
             },
             payload: input!,
           },
@@ -197,7 +196,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
         headers: [
           {
             in: 'header',
-            name: 'address_id',
+            name: 'address',
             required: false,
             schema: { type: 'string' },
           },
@@ -216,7 +215,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
           {
             actor: {
               user: ctx.req.user as User,
-              address_id: ctx.req.headers['address_id'] as string,
+              address: ctx.req.headers['address'] as string,
             },
             payload: input!,
           },

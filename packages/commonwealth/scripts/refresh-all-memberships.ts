@@ -3,16 +3,13 @@ import { cache, dispose, logger, query } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import { config } from '../server/config';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
-import BanCache from '../server/util/banCheckCache';
 
 const log = logger(import.meta);
 
 async function main() {
   config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
-  const banCache = new BanCache(models);
-
-  const groupsController = new ServerGroupsController(models, banCache);
+  const groupsController = new ServerGroupsController(models);
 
   // fetch all communities via pagination
   const limit = 50;

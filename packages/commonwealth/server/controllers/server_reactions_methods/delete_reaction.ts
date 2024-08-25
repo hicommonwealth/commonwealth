@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
+  BanCache,
   CommunityInstance,
   UserInstance,
 } from '@hicommonwealth/model';
@@ -43,7 +44,9 @@ export async function __deleteReaction(
   }
 
   // check if author is banned
-  const [canInteract, banError] = await this.banCache.checkBan({
+  const [canInteract, banError] = await BanCache.getInstance(
+    this.models,
+  ).checkBan({
     communityId: community.id,
     address: address.address,
   });

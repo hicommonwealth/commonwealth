@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
+  BanCache,
   CommentAttributes,
   UserInstance,
   emitMentions,
@@ -71,7 +72,9 @@ export async function __updateComment(
   }
 
   // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
+  const [canInteract, banError] = await BanCache.getInstance(
+    this.models,
+  ).checkBan({
     communityId: thread.community_id,
     address: address.address,
   });

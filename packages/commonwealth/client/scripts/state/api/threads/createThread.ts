@@ -1,17 +1,13 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { signThread } from 'controllers/server/sessions';
-import MinimumProfile from 'models/MinimumProfile';
-import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
-import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { trpc } from '../../../utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
-import useUserStore, { userStore } from '../../ui/user';
+import useUserStore from '../../ui/user';
 import { addThreadInAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
 
@@ -24,12 +20,9 @@ interface CreateThreadProps {
   topic: Topic;
   body?: string;
   url?: string;
-  readOnly?: boolean;
-  authorProfile: MinimumProfile;
-  isPWA?: boolean;
 }
 
-const createThread = async ({
+export const buildCreateThreadInput = async ({
   address,
   kind,
   stage,
@@ -38,11 +31,7 @@ const createThread = async ({
   topic,
   body,
   url,
-  readOnly,
-  authorProfile,
-  isPWA,
-}: CreateThreadProps): Promise<Thread> => {
-  // TODO: move this to client proxy
+}: CreateThreadProps) => {
   const canvasSignedData = await signThread(address, {
     community: communityId,
     title,
@@ -50,35 +39,18 @@ const createThread = async ({
     link: url,
     topic: topic.id,
   });
-
-  // TODO: replace with tRPC mutation
-  const response = await axios.post(
-    `${SERVER_URL}/threads`,
-    {
-      author_community_id: communityId,
-      community_id: communityId,
-      address,
-      author: JSON.stringify(authorProfile),
-      title: encodeURIComponent(title),
-      // @ts-expect-error StrictNullChecks
-      body: encodeURIComponent(body),
-      kind,
-      stage,
-      topic_name: topic.name,
-      topic_id: topic.id,
-      url,
-      readOnly,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
-    {
-      headers: {
-        isPWA: isPWA?.toString(),
-      },
-    },
-  );
-
-  return new Thread(response.data.result);
+  return {
+    id: 0,
+    community_id: communityId,
+    topic_id: topic.id,
+    title: encodeURIComponent(title),
+    body: encodeURIComponent(body ?? ''),
+    kind,
+    stage,
+    url,
+    read_only: false,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+  };
 };
 
 const useCreateThreadMutation = ({
@@ -91,8 +63,7 @@ const useCreateThreadMutation = ({
 
   const user = useUserStore();
 
-  return useMutation({
-    mutationFn: createThread,
+  return trpc.thread.createThread.useMutation({
     onSuccess: async (newThread) => {
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);

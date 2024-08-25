@@ -95,16 +95,15 @@ async function checkContestLimits(
 export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
-    auth: [isCommunityAdminOrTopicMember],
+    auth: [isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD)],
     body: async ({ actor, payload }) => {
-      const { community_id, topic_id, kind, url } = payload;
+      const { id, community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(Errors.LinkMissingTitleOrUrl);
 
-      const decoded = decodeURIComponent(payload.body);
-      const body = sanitizeQuillText(decoded, true);
-      const plaintext = kind === 'discussion' ? toPlainString(body) : decoded;
+      const body = sanitizeQuillText(payload.body);
+      const plaintext = kind === 'discussion' ? toPlainString(body) : body;
       const mentions = uniqueMentions(parseUserMentions(body));
 
       // check contest invariants
@@ -116,8 +115,8 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         },
       });
       if (activeContestManagers && activeContestManagers.length > 0) {
-        await checkAddressBalance(activeContestManagers, actor.address_id!);
-        await checkContestLimits(activeContestManagers, actor.address_id!);
+        await checkAddressBalance(activeContestManagers, actor.address!);
+        await checkContestLimits(activeContestManagers, actor.address!);
       }
 
       // New threads get an empty version history initialized, which is passed
@@ -125,7 +124,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       const version_history = [
         JSON.stringify({
           timestamp: moment(),
-          author: actor.address_id!,
+          author: actor.address,
           body,
         }),
       ];
@@ -135,7 +134,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         where: {
           user_id: actor.user.id,
           community_id,
-          address: actor.address_id!,
+          address: actor.address,
         },
       });
       if (!mustExist('Community address', address)) return;
@@ -145,15 +144,14 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         async (transaction) => {
           const thread = await models.Thread.create(
             {
-              ...payload,
+              ...rest,
+              community_id,
               address_id: address.id!,
+              topic_id,
+              kind,
               body,
               plaintext,
               version_history,
-              // TODO: build this... canvas stuff must come from the middleware
-              //canvas_signed_data: canvasSignedData,
-              //canvas_hash: canvasHash,
-              //discord_meta: discordMeta,
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,

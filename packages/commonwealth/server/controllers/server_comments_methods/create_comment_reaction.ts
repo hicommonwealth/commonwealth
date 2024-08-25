@@ -1,6 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
+  BanCache,
   ReactionAttributes,
   UserInstance,
   commonProtocol as commonProtocolService,
@@ -71,7 +72,9 @@ export async function __createCommentReaction(
   }
 
   // check address ban
-  const [canInteract, banError] = await this.banCache.checkBan({
+  const [canInteract, banError] = await BanCache.getInstance(
+    this.models,
+  ).checkBan({
     communityId: thread.community_id,
     address: address.address,
   });

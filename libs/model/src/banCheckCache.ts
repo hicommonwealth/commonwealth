@@ -1,6 +1,4 @@
-// Helper function to look up a scope, i.e. a chain XOR community.
-import { JobRunner } from '@hicommonwealth/adapters';
-// If a community is found, also check that the user is allowed to see it.
+import { JobRunner } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 
 export const BanErrors = {
@@ -10,7 +8,21 @@ export const BanErrors = {
 
 type CacheT = { [communityAddressKey: string]: number };
 
-export default class BanCache extends JobRunner<CacheT> {
+// Helper function to look up a scope, i.e. a chain XOR community.
+// If a community is found, also check that the user is allowed to see it.
+export class BanCache extends JobRunner<CacheT> {
+  private static _instance: BanCache;
+
+  static getInstance(
+    models: DB,
+    ttlS?: number,
+    prunningJobsTimeS?: number,
+  ): BanCache {
+    if (!BanCache._instance)
+      BanCache._instance = new BanCache(models, ttlS, prunningJobsTimeS);
+    return BanCache._instance;
+  }
+
   constructor(
     private _models: DB,
     private _ttlS: number = 60 * 15, // 10 minutes

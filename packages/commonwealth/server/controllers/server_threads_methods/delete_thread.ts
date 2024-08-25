@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { AddressInstance, UserInstance } from '@hicommonwealth/model';
+import { AddressInstance, BanCache, UserInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import deleteThreadFromDb from '../../util/deleteThread';
 import { validateOwner } from '../../util/validateOwner';
@@ -51,7 +51,9 @@ export async function __deleteThread(
 
   if (address) {
     // check ban
-    const [canInteract, banError] = await this.banCache.checkBan({
+    const [canInteract, banError] = await BanCache.getInstance(
+      this.models,
+    ).checkBan({
       communityId: thread.community_id,
       address: address.address,
     });
