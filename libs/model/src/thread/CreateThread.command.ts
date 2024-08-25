@@ -15,6 +15,7 @@ import moment from 'moment';
 import { z } from 'zod';
 import { Contest, config, models, tokenBalanceCache } from '..';
 import { isCommunityAdminOrTopicMember } from '../middleware';
+import { verifyThreadSignature } from '../middleware/canvas';
 import { mustExist } from '../middleware/guards';
 import {
   emitMentions,
@@ -95,8 +96,12 @@ async function checkContestLimits(
 export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
-    auth: [isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD)],
+    auth: [
+      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD),
+      verifyThreadSignature,
+    ],
     body: async ({ actor, payload }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
@@ -124,7 +129,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       const version_history = [
         JSON.stringify({
           timestamp: moment(),
-          author: actor.address,
+          author: { id: actor.addressId, address: actor.address },
           body,
         }),
       ];

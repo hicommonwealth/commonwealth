@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const Thread = z.object({
   id: PG_INT.optional(),
-  Address: Address.nullish(),
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
@@ -48,6 +48,10 @@ export const Thread = z.object({
 
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
+
+  // associations
+  Address: Address.nullish(),
+  topic: Topic.nullish(),
 });
 
 export const ThreadVersionHistory = z.object({

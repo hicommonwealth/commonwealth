@@ -81,7 +81,7 @@ function processVersionHistory(versionHistory: any[]) {
             : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
-        console.log(e);
+        console.log(e, versionHistory);
       }
       return history;
     });

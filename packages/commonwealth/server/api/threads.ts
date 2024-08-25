@@ -6,34 +6,6 @@ export const trpcRouter = trpc.router({
   getBulkThreads: trpc.query(Thread.GetBulkThreads, trpc.Tag.Thread),
 });
 
-// TODO: canvas middleware -> should this be part of the framework? look for usage
-//   if (hasCanvasSignedDataApiArgs(req.body)) {
-//     threadFields.canvasSignedData = req.body.canvas_signed_data;
-//     threadFields.canvasHash = req.body.canvas_hash;
-
-//     if (config.ENFORCE_SESSION_KEYS) {
-//       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-
-//       await verifyThread(canvasSignedData, {
-//         title,
-//         body,
-//         address:
-//           canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-//           'polkadot'
-//             ? addressSwapper({
-//                 currentPrefix: 42,
-//                 // @ts-expect-error <StrictNullChecks>
-//                 address: address.address,
-//               })
-//             : // @ts-expect-error <StrictNullChecks>
-//               address.address,
-//         // @ts-expect-error <StrictNullChecks>
-//         community: community.id,
-//         topic: topicId ? parseInt(topicId, 10) : null,
-//       });
-//     }
-//   }
-
 // TODO: post notifications middleware -> check with Tim
 //   const allNotificationOptions: EmitOptions[] = [];
 //   allNotificationOptions.push({

@@ -121,9 +121,15 @@ async function isTopicMember(
     throw new InvalidActor(actor, rejects.join('\n'));
 }
 
-type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
-type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
-type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
+export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
+export type ThreadMiddleware = CommandHandler<
+  CommandInput,
+  typeof schemas.Thread
+>;
+export type CommentMiddleware = CommandHandler<
+  CommandInput,
+  typeof schemas.Comment
+>;
 
 /**
  * Community middleware
