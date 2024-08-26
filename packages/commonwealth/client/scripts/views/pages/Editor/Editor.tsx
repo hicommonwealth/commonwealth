@@ -22,6 +22,7 @@ import './Editor.scss';
 
 import 'commonwealth-mdxeditor/style.css';
 
+import clsx from 'clsx';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
@@ -72,8 +73,8 @@ export const Editor = (props: EditorProps) => {
 
   const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
 
-  // TODO: handle other file formats too including txt and html but I'm not sure
-  // about the correct way to handle html
+  // TODO: handle html but I'm not sure about the correct way to handle it
+  // because I have to convert to markdown
   const handleDrop = useCallback((event: React.DragEvent) => {
     async function doAsync() {
       console.log(event.dataTransfer.files.length);
@@ -83,7 +84,7 @@ export const Editor = (props: EditorProps) => {
       if (nrFiles === 1) {
         const type = event.dataTransfer.files[0].type;
 
-        if (type === 'text/markdown') {
+        if (['text/markdown', 'text/plain'].includes(type)) {
           const text = await fileToText(event.dataTransfer.files[0]);
           mdxEditorRef.current?.setMarkdown(text);
         } else {
@@ -109,7 +110,13 @@ export const Editor = (props: EditorProps) => {
   }, []);
 
   return (
-    <div className="mdxeditor-container" onDrop={handleDrop}>
+    <div
+      className={clsx(
+        'mdxeditor-container',
+        'mdxeditor-container-mode-' + mode,
+      )}
+      onDrop={handleDrop}
+    >
       <MDXEditor
         ref={mdxEditorRef}
         markdown={supported}
@@ -157,7 +164,7 @@ export const Editor = (props: EditorProps) => {
         ]}
       />
 
-      <div className="mdxeditor-footer">here it is</div>
+      {mode === 'desktop' && <div className="mdxeditor-footer">here it is</div>}
     </div>
   );
 };
