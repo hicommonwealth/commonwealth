@@ -73,7 +73,7 @@ export const GetCommunity = {
     id: z.string(),
     include_node_info: z.boolean().optional(),
   }),
-  output: ExtendedCommunity,
+  output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
 export const GetCommunityStake = {
