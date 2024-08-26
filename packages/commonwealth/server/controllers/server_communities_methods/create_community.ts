@@ -354,17 +354,20 @@ export async function __createCommunity(
     description,
     network,
     type,
-    // @ts-expect-error StrictNullChecks
     social_links: uniqueLinksArray,
     base,
     bech32_prefix,
     active: true,
-    // @ts-expect-error StrictNullChecks
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
     default_page: DefaultPage.Discussions,
     has_homepage: 'true',
+    collapsed_on_homepage: false,
+    custom_stages: [],
+    directory_page_enabled: false,
+    snapshot_spaces: [],
+    stages_enabled: true,
   });
 
   const nodeJSON = node.toJSON();

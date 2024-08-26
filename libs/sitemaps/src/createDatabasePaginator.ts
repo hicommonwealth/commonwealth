@@ -1,4 +1,9 @@
-import { models, ThreadInstance, UserAttributes } from '@hicommonwealth/model';
+import {
+  config,
+  models,
+  ThreadInstance,
+  UserAttributes,
+} from '@hicommonwealth/model';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 
@@ -6,6 +11,7 @@ export interface Link {
   readonly id: number;
   readonly url: string;
   readonly updated_at: string;
+  readonly priority?: number;
 }
 
 /**
@@ -26,6 +32,11 @@ export interface Paginator {
   readonly next: () => Promise<Page>;
 }
 
+const NULL_PAGINATOR: Paginator = {
+  hasNext: async () => Promise.resolve(false),
+  next: async () => Promise.resolve(null!),
+};
+
 interface TableAdapter {
   /**
    * Covert the object to a record or undefined if we can't use it with the sitemaps.
@@ -39,10 +50,11 @@ export function createDatabasePaginatorDefault(limit: number = 50000) {
     createThreadsTableAdapter(),
     limit,
   );
-  const profiles = createDatabasePaginatorWithAdapter(
-    createProfilesTableAdapter(),
-    limit,
-  );
+
+  const profiles =
+    config.SITEMAP.PROFILE_PRIORITY !== -1
+      ? createDatabasePaginatorWithAdapter(createProfilesTableAdapter(), limit)
+      : NULL_PAGINATOR;
 
   return { threads, profiles };
 }
@@ -69,6 +81,7 @@ function createThreadsTableAdapter(): TableAdapter {
       id: thread.id,
       url,
       updated_at: thread.updated_at.toISOString(),
+      priority: config.SITEMAP.THREAD_PRIORITY,
     };
   }
 
@@ -104,6 +117,7 @@ function createProfilesTableAdapter(): TableAdapter {
       id: user.id,
       url,
       updated_at: user.updated_at.toISOString(),
+      priority: config.SITEMAP.PROFILE_PRIORITY,
     };
   }
 

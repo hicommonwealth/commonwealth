@@ -1,7 +1,5 @@
 import 'components/user/user_gallery.scss';
 import React from 'react';
-import Account from '../../../models/Account';
-import AddressInfo from '../../../models/AddressInfo';
 import { User } from './user';
 
 type UserGalleryProps = {
@@ -10,7 +8,7 @@ type UserGalleryProps = {
   class?: string;
   maxUsers?: number;
   popover?: boolean;
-  users: Array<Account> | Array<AddressInfo>;
+  users: { address: string; communityId: string }[];
 };
 
 // The UserGallery does not perform uniqueness checks.
@@ -31,22 +29,19 @@ export const UserGallery = ({
 
   return (
     <div className="UserGallery">
-      {users
-        .slice(0, Math.min(userCount, maxUsers))
-        .map((user: Account | AddressInfo, index) => {
-          return (
-            <User
-              userAddress={user.address}
-              // @ts-expect-error <StrictNullChecks/>
-              userCommunityId={user.community?.id || user.profile?.chain}
-              shouldShowAvatarOnly
-              shouldShowAsDeleted
-              shouldShowPopover={popover}
-              avatarSize={avatarSize}
-              key={index}
-            />
-          );
-        })}
+      {users.slice(0, Math.min(userCount, maxUsers)).map((user, index) => {
+        return (
+          <User
+            userAddress={user.address}
+            userCommunityId={user.communityId}
+            shouldShowAvatarOnly
+            shouldShowAsDeleted
+            shouldShowPopover={popover}
+            avatarSize={avatarSize}
+            key={index}
+          />
+        );
+      })}
       {overflowUsers > 0 && (
         <div
           className="overflow-users-wrap"
