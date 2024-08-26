@@ -96,13 +96,17 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      const serverCommentsController = new ServerCommentsController(db as any);
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
         await serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
+          // @ts-expect-error
+          reaction,
           commentId,
         });
 
@@ -189,13 +193,16 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverCommentsController = new ServerCommentsController(db as any);
-
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
+          // @ts-expect-error
+          reaction,
           commentId: 123,
         }),
       ).to.be.rejectedWith('Comment not found: 123');
@@ -251,13 +258,16 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverCommentsController = new ServerCommentsController(db as any);
-
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
+          // @ts-expect-error
+          reaction,
           commentId: 123,
         }),
       ).to.be.rejectedWith('Thread not found for comment');
@@ -375,13 +385,16 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      const serverCommentsController = new ServerCommentsController(db as any);
-
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
+          // @ts-expect-error
+          reaction,
           commentId,
         }),
       ).to.be.rejectedWith('Insufficient token balance');
@@ -403,8 +416,8 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      const serverCommentsController = new ServerCommentsController(db as any);
-
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
       const community = { id: 'ethereum' };
       const searchOptions: SearchCommentsOptions = {
         community: community as CommunityInstance,
@@ -476,7 +489,8 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      const serverCommentsController = new ServerCommentsController(db as any);
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -490,8 +504,10 @@ describe('ServerCommentsController', () => {
       const commentBody = 'Hello';
       const [updatedComment, allNotificationOptions] =
         await serverCommentsController.updateComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
           commentId,
           commentBody,
         });
@@ -554,7 +570,8 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      const serverCommentsController = new ServerCommentsController(db as any);
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -568,8 +585,10 @@ describe('ServerCommentsController', () => {
       const commentBody = 'Hello';
       expect(
         serverCommentsController.updateComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
           commentId,
           commentBody,
         }),
@@ -602,23 +621,27 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      const serverCommentsController = new ServerCommentsController(db as any);
-
+      // @ts-expect-error
+      const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
       const address = { id: 1 };
       const commentId = 1;
       await serverCommentsController.deleteComment({
-        user: user as any,
-        address: address as any,
+        // @ts-expect-error
+        user,
+        // @ts-expect-error
+        address,
         commentId,
       });
       expect(didDestroy).to.be.true;
 
       serverCommentsController.deleteComment({
-        user: user as any,
-        address: address as any,
+        // @ts-expect-error
+        user,
+        // @ts-expect-error
+        address,
         commentId,
       });
     });

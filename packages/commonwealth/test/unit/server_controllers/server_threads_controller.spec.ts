@@ -104,13 +104,17 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       const [newReaction, notificationOptions, analyticsOptions] =
         await serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user: user,
+          // @ts-expect-error
+          address: address,
+          // @ts-expect-error
+          reaction: reaction,
           threadId: threadId,
         });
 
@@ -183,13 +187,17 @@ describe('ServerThreadsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user: user,
+          // @ts-expect-error
+          address: address,
+          // @ts-expect-error
+          reaction: reaction,
           threadId: 123,
         }),
       ).to.be.rejectedWith('Thread not found: 123');
@@ -240,13 +248,17 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
+          // @ts-expect-error
+          reaction,
           threadId,
         }),
       ).to.be.rejectedWith('Thread is archived');
@@ -366,13 +378,17 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
+          // @ts-expect-error
+          reaction,
           threadId,
         }),
       ).to.be.rejectedWith(
@@ -454,12 +470,15 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       const [newComment, notificationOptions, analyticsOptions] =
         await serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
           // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
@@ -517,7 +536,8 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -531,8 +551,10 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
           // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
@@ -606,12 +628,15 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user,
+          // @ts-expect-error
+          address,
           // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
@@ -661,7 +686,8 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -675,8 +701,10 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user: user,
+          // @ts-expect-error
+          address: address,
           // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
@@ -731,7 +759,8 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -744,8 +773,10 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user: user,
+          // @ts-expect-error
+          address: address,
           parentId,
           threadId,
           text,
@@ -795,7 +826,8 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -809,8 +841,10 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error
+          user: user,
+          // @ts-expect-error
+          address: address,
           parentId,
           threadId,
           text,
@@ -858,15 +892,19 @@ describe('ServerThreadsController', () => {
       const address = {
         address: '0x123',
       };
-      const serverThreadsController = new ServerThreadsController(db as any);
+
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
       const threadId = 1;
       await serverThreadsController.deleteThread({
-        user: user as any,
+        // @ts-expect-error
+        user: user,
         threadId,
-        address: address as any,
+        // @ts-expect-error
+        address: address,
       });
     });
 
@@ -891,7 +929,8 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
@@ -901,9 +940,11 @@ describe('ServerThreadsController', () => {
       };
       expect(
         serverThreadsController.deleteThread({
-          user: user as any,
+          // @ts-expect-error
+          user: user,
           threadId,
-          address: address as any,
+          // @ts-expect-error
+          address: address,
         }),
       ).to.be.rejectedWith('Thread not found: 1');
     });
@@ -934,7 +975,8 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      const serverThreadsController = new ServerThreadsController(db as any);
+      // @ts-expect-error
+      const serverThreadsController = new ServerThreadsController(db);
       const user = {
         // address is different from thread author
         getAddresses: async () => [{ id: 2, address: '0x124', verified: true }],
@@ -945,9 +987,11 @@ describe('ServerThreadsController', () => {
       };
       expect(
         serverThreadsController.deleteThread({
-          user: user as any,
+          // @ts-expect-error
+          user: user,
           threadId,
-          address: address as any,
+          // @ts-expect-error
+          address: address,
         }),
       ).to.be.rejectedWith('Not owned by this user');
     });
