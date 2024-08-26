@@ -1,6 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { models } from '../database';
 import { isCommunityAdminQuery } from '../middleware';
 
 export function GetWebhooks(): Query<typeof schemas.GetWebhooks> {
