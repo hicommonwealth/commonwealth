@@ -30,6 +30,7 @@ import { fileToText } from 'views/pages/Editor/fileToText';
 import { iconComponentFor } from 'views/pages/Editor/iconComponentFor';
 import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
+import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
 import supported from './supported.md?raw';
 
 type ImageURL = string;
