@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { logger, stats } from '@hicommonwealth/core';
 import { type DB, type NotificationInstance } from '@hicommonwealth/model';
 import {
@@ -135,7 +134,8 @@ export default async function emitNotifications(
     }
   }
 
-  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id) VALUES `;
+  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id)
+               VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {
