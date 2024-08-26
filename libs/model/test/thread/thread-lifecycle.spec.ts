@@ -14,7 +14,7 @@ describe('Thread lifecycle', () => {
   const payload = {
     community_id: '',
     topic_id: 0,
-    kind: 'discussion' as 'discussion',
+    kind: 'discussion' as const,
     title,
     body,
     stage,
@@ -42,7 +42,7 @@ describe('Thread lifecycle', () => {
     });
 
     payload.community_id = community!.id!;
-    payload.topic_id = community?.topics?.at(0)?.id!;
+    payload.topic_id = community!.topics!.at(0)!.id!;
     actor = {
       user: { id: user!.id!, email: user!.email!, isAdmin: user!.isAdmin! },
       address: community!.Addresses!.at(0)!.address!,
