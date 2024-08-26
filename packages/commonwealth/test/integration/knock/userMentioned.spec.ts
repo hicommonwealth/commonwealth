@@ -44,7 +44,7 @@ describe('userMentioned Event Handler', () => {
     [author] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 2,
       Addresses: [
         {

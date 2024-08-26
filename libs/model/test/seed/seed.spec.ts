@@ -123,7 +123,7 @@ describe('Seed functions', () => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: node!.id,
-        thread_count: 1,
+        lifetime_thread_count: 1,
         profile_count: 1,
         Addresses: [
           {
@@ -150,7 +150,7 @@ describe('Seed functions', () => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: node!.id,
-        thread_count: 1,
+        lifetime_thread_count: 1,
         profile_count: 1,
         Addresses: [
           {
@@ -198,7 +198,7 @@ describe('Seed functions', () => {
         seed(
           'Community',
           {
-            thread_count: 0,
+            lifetime_thread_count: 0,
             profile_count: 1,
           },
           { mock: false },

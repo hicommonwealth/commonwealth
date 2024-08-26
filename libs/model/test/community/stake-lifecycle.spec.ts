@@ -41,7 +41,7 @@ describe('Stake lifecycle', () => {
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test1',
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {
@@ -62,7 +62,7 @@ describe('Stake lifecycle', () => {
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test2',
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {
@@ -74,7 +74,7 @@ describe('Stake lifecycle', () => {
     const [community_without_stake] = await seed('Community', {
       active: true,
       chain_node_id: node!.id!,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {
