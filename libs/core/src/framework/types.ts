@@ -22,22 +22,24 @@ export const ExternalServiceUserIds = {
 export type AuthStrategies =
   | {
       name: 'jwt' | 'authtoken';
-      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+      userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
     }
   | {
       name: 'custom';
-      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+      userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       customStrategyFn: (req: any) => void;
     };
 
 /**
  * Deep partial utility
  */
-export type DeepPartial<T> = T extends Array<infer I>
-  ? Array<DeepPartial<I>>
-  : T extends object
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : T;
+export type DeepPartial<T> =
+  T extends Array<infer I>
+    ? Array<DeepPartial<I>>
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T;
 
 /**
  * Represents a user in the system with attributes commonly provided by authentication infrastructure
@@ -82,7 +84,10 @@ export class InvalidInput extends Error {
  * Invalid actor error - usually unauthorized users
  */
 export class InvalidActor extends Error {
-  constructor(public actor: Actor, message: string) {
+  constructor(
+    public actor: Actor,
+    message: string,
+  ) {
     super(message);
     this.name = INVALID_ACTOR_ERROR;
   }
@@ -141,7 +146,7 @@ export type QueryContext<Input extends ZodSchema> = {
  */
 export type EventContext<Name extends Events> = {
   readonly name: Name;
-  readonly payload: z.infer<typeof events[Name]>;
+  readonly payload: z.infer<(typeof events)[Name]>;
 };
 
 /**
@@ -219,7 +224,7 @@ export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
  * Domain event schemas
  */
 export type EventSchemas = {
-  [Name in Events]?: typeof events[Name];
+  [Name in Events]?: (typeof events)[Name];
 };
 
 /**
@@ -256,22 +261,18 @@ export type QuerySchemas<Input extends ZodSchema, Output extends ZodSchema> = {
 /**
  * Command metadata
  */
-export type Command<Schema> = Schema extends CommandSchemas<
-  infer Input,
-  infer Output
->
-  ? CommandMetadata<Input, Output>
-  : never;
+export type Command<Schema> =
+  Schema extends CommandSchemas<infer Input, infer Output>
+    ? CommandMetadata<Input, Output>
+    : never;
 
 /**
  * Query metadata
  */
-export type Query<Schema> = Schema extends QuerySchemas<
-  infer Input,
-  infer Output
->
-  ? QueryMetadata<Input, Output>
-  : never;
+export type Query<Schema> =
+  Schema extends QuerySchemas<infer Input, infer Output>
+    ? QueryMetadata<Input, Output>
+    : never;
 
 /**
  * Policy metadata

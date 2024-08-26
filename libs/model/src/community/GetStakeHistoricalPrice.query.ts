@@ -13,6 +13,7 @@ export function GetStakeHistoricalPrice(): Query<
     body: async ({ payload }) => {
       const { past_date_epoch, community_id, stake_id } = payload;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const response: any = await models.sequelize.query(
         `
         SELECT s.community_id, (s.stake_price / s.stake_amount::REAL)::TEXT as old_price

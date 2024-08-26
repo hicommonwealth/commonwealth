@@ -170,6 +170,7 @@ const linkExistingAddressToCommunity = async (
           role: 'member',
           is_user_default: false,
           ghost_address: false,
+          is_banned: false,
         },
         { transaction },
       );
