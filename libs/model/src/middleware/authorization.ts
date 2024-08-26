@@ -1,13 +1,15 @@
 import {
+  CommandContext,
   InvalidActor,
   InvalidInput,
-  type CommandContext,
+  QueryHandler,
   type CommandHandler,
   type CommandInput,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
+import { ZodObject, ZodString } from 'zod';
 import { AddressAttributes, models } from '..';
 
 /**
@@ -29,7 +31,9 @@ const authorizeAddress = async (
   { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<AddressAttributes> => {
-  if (!payload.id) throw new InvalidActor(actor, 'Must provide a community id');
+  const communityId = payload.community_id || payload.id;
+  if (!communityId)
+    throw new InvalidActor(actor, 'Must provide a community id');
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   // TODO: cache
@@ -38,7 +42,7 @@ const authorizeAddress = async (
       where: {
         user_id: actor.user.id,
         address: actor.address_id,
-        community_id: payload.id,
+        community_id: communityId,
         role: { [Op.in]: roles },
       },
       order: [['role', 'DESC']],
@@ -49,12 +53,23 @@ const authorizeAddress = async (
   return addr;
 };
 
-type CommunityMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Community
->;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CommunityMiddleware = CommandHandler<CommandInput, any>;
 type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
 type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
+
+type CommunityQueryMiddleware = QueryHandler<
+  ZodObject<{
+    community_id: ZodString;
+  }>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any
+>;
+
+export const isCommunityAdminQuery: CommunityQueryMiddleware = async (ctx) => {
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin']);
+};
 
 /**
  * Community middleware

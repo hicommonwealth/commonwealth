@@ -27,7 +27,6 @@ export const ApiEndpoints = {
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',
   REFRESH_MEMBERSHIP: '/refresh-membership',
-  FETCH_WEBHOOKS: '/getWebhooks',
   FETCH_TAGS: '/tags',
   UPDATE_USER_EMAIL: '/updateEmail',
   UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',

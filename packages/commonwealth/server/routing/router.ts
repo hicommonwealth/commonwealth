@@ -67,10 +67,6 @@ import { getCanvasData, postCanvasData } from '../routes/canvas';
 import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
-import createWebhook from '../routes/webhooks/createWebhook';
-import deleteWebhook from '../routes/webhooks/deleteWebhook';
-import getWebhooks from '../routes/webhooks/getWebhooks';
-import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
 import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
@@ -719,39 +715,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     updateBanner.bind(this, models),
-  );
-
-  // third-party webhooks
-  registerRoute(
-    router,
-    'post',
-    '/createWebhook',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    createWebhook.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateWebhook',
-    passport.authenticate('jwt', { session: false }),
-    updateWebhook.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/deleteWebhook',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    deleteWebhook.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/getWebhooks',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    getWebhooks.bind(this, models),
   );
 
   // roles

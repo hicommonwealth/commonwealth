@@ -5,8 +5,6 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 
-export function foo() {}
-
 /**
  * Decamelizes a string
  * @param value camelized string
@@ -199,4 +197,26 @@ export function safeTruncateBody(body: string, length: number = 500): string {
   } else {
     return body.substring(0, result.startIndex);
   }
+}
+
+export function getWebhookDestination(webhookUrl = '') {
+  if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
+
+  let destination = 'unknown';
+  if (
+    webhookUrl.startsWith('https://discord.com/api/webhooks/') ||
+    webhookUrl.startsWith('https://discordapp.com/api/webhooks/')
+  )
+    destination = 'discord';
+  else if (webhookUrl.startsWith('https://hooks.slack.com/'))
+    destination = 'slack';
+  else if (webhookUrl.startsWith('https://hooks.zapier.com/'))
+    destination = 'zapier';
+  else if (webhookUrl.startsWith('https://api.telegram.org/@')) {
+    const [, channelId] = webhookUrl.split('/@');
+    if (!channelId) destination = 'unknown';
+    else destination = 'telegram';
+  }
+
+  return destination;
 }

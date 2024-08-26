@@ -87,3 +87,23 @@ export const ChainProposalsNotification = z.object({
     .string()
     .describe('The url to the snapshot proposal on Common'),
 });
+
+export const WebhookNotification = z.object({
+  sender_username: z.literal('Common'),
+  sender_avatar_url: z
+    .string()
+    .describe('The avatar url of the sender e.g. default commonwealth logo'),
+  community_id: z.string().max(255).describe('The community id'),
+  title_prefix: z
+    .string()
+    .max(255)
+    .describe('A title prefix such as "New Thread: "'),
+  preview_image_url: z.string().describe('The preview image of the content'),
+  preview_image_alt_text: z.string(),
+  profile_name: z.string().max(255).describe('The profile name of the author'),
+  profile_url: z.string(),
+  profile_avatar_url: z.string(),
+  object_title: z.string(),
+  object_url: z.string(),
+  object_summary: z.string(),
+});
