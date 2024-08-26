@@ -74,7 +74,7 @@ export const useCommonNavigate = () => {
 // This helper should be used as a wrapper to Class Components
 // to access react-router functionalities
 const withRouter = (Component) => {
-  // eslint-disable-next-line react/display-name
+  // eslint-disable-next-line react/function-component-definition, react/no-multi-comp, react/display-name
   return (props) => {
     const location = useLocation();
     const navigate = useNavigate();
