@@ -485,6 +485,7 @@ export async function __createCommunity(
       role: 'admin',
       last_active: new Date(),
       ghost_address: false,
+      is_banned: false,
     });
   }
 

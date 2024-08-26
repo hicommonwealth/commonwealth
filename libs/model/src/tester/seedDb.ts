@@ -447,6 +447,7 @@ export const seedDb = async () => {
         role: 'admin' as Role,
         is_user_default: false,
         ghost_address: false,
+        is_banned: false,
       })),
     );
 
