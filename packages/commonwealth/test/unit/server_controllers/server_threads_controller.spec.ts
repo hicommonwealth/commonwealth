@@ -453,8 +453,8 @@ describe('ServerThreadsController', () => {
         CommentVersionHistory: {
           create: () => null,
         },
-        Subscription: {
-          bulkCreate: async () => ({}),
+        CommentSubscription: {
+          create: () => null,
         },
         Topic: {
           findOne: async () => ({
