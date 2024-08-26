@@ -113,6 +113,10 @@ export async function __createThreadReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
+
+      if (!community.chain_node_id) {
+        throw new ServerError(`Invalid chain node`);
+      }
       const node = await this.models.ChainNode.findByPk(
         community.chain_node_id!,
       );

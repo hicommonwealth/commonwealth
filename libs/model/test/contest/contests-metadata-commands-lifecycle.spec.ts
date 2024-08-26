@@ -56,6 +56,8 @@ describe('Contests metadata commands lifecycle', () => {
         id: community_id,
         namespace,
         chain_node_id: chain!.id,
+        lifetime_thread_count: 0,
+        profile_count: 2,
         Addresses: [
           {
             community_id,

@@ -1,4 +1,5 @@
 import {
+  BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
@@ -26,7 +27,7 @@ export const Community = z.object({
   active: z.boolean(),
   type: z.nativeEnum(ChainType).default(ChainType.Chain),
   description: z.string().nullish(),
-  social_links: z.array(z.string()).default([]),
+  social_links: z.array(z.string().nullish()).default([]),
   ss58_prefix: PG_INT.nullish(),
   stages_enabled: z.boolean().default(true),
   custom_stages: z.array(z.string()).default([]),
@@ -53,6 +54,8 @@ export const Community = z.object({
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
+  profile_count: PG_INT.nullish(),
+  lifetime_thread_count: PG_INT.nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
@@ -62,7 +65,11 @@ export const Community = z.object({
   Addresses: z.array(Address).optional(),
   CommunityStakes: z.array(CommunityStake).nullish(),
   CommunityTags: z.array(CommunityTags).nullish(),
-  ChainNode: ChainNode.nullish(),
+  ChainNode: ChainNode.extend({
+    url: z.string().max(255).nullish(),
+    balance_type: z.nativeEnum(BalanceType).nullish(),
+    name: z.string().max(255).nullish(),
+  }).nullish(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),

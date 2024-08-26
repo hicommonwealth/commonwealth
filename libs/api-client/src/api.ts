@@ -3112,7 +3112,7 @@ export class CommunityApi extends BaseAPI {
  */
 export const GetCommunitiesOrderByEnum = {
   ProfileCount: 'profile_count',
-  ThreadCount: 'thread_count',
+  ThreadCount: 'lifetime_thread_count',
 } as const;
 export type GetCommunitiesOrderByEnum =
   typeof GetCommunitiesOrderByEnum[keyof typeof GetCommunitiesOrderByEnum];

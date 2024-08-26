@@ -1,5 +1,6 @@
 import {
   ChainBase,
+  ChainNetwork,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -15,6 +16,11 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
+    relevance_by: z.enum(['tag_ids', 'membership']).optional().describe(`\n
+      - When 'tag_ids', results would be 'DESC' ordered based on the provided 'tag_ids' param, and wouldn't strictly include matching 'tag_ids'\n
+      - When 'memberships', results would be 'DESC' ordered, the communities with auth-user membership will come before non-membership communities\n
+    `),
+    network: z.nativeEnum(ChainNetwork).optional(),
     base: z.nativeEnum(ChainBase).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
     //    Instead we support comma-separated strings of ids.
@@ -29,10 +35,36 @@ export const GetCommunities = {
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
-    order_by: z.enum(['profile_count', 'thread_count']).optional(),
-  }),
+    include_last_30_day_thread_count: z.boolean().optional(),
+    order_by: z
+      .enum([
+        'profile_count',
+        'lifetime_thread_count',
+        'last_30_day_thread_count',
+      ])
+      .optional(),
+  }).refine(
+    (data) => {
+      // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
+      if (
+        !data.include_last_30_day_thread_count &&
+        data.order_by === 'last_30_day_thread_count'
+      ) {
+        return false; // fail validation
+      }
+
+      // pass validation
+      return true;
+    },
+    {
+      message:
+        "'order_by' cannot be 'last_30_day_thread_count' when 'include_last_30_day_thread_count' is not specified",
+    },
+  ),
   output: PaginatedResultSchema.extend({
-    results: Community.array(),
+    results: Community.extend({
+      last_30_day_thread_count: PG_INT.optional().nullish(),
+    }).array(),
   }),
 };
 
@@ -41,7 +73,7 @@ export const GetCommunity = {
     id: z.string(),
     include_node_info: z.boolean().optional(),
   }),
-  output: ExtendedCommunity,
+  output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
 export const GetCommunityStake = {

@@ -53,20 +53,18 @@ const CommunityPreviewCard = ({
               {community?.name}
             </CWText>
           )}
-          {monthlyThreadCount && monthlyThreadCount > 0 && (
-            <div className="thread-counts">
-              <CWIcon iconName="notepad" weight="light" />
-              <CWText className="card-subtext" type="b2" fontWeight="medium">
-                {`${pluralize(
-                  monthlyThreadCount,
-                  'new thread',
-                )} created this month`}
-              </CWText>
-              {isCommunityMember && hasNewContent && (
-                <CWTag type="new" label="New" />
-              )}
-            </div>
-          )}
+          <div className="thread-counts">
+            <CWIcon iconName="notepad" weight="light" />
+            <CWText className="card-subtext" type="b2" fontWeight="medium">
+              {`${pluralize(
+                monthlyThreadCount || 0,
+                'new thread',
+              )} created this month`}
+            </CWText>
+            {isCommunityMember && hasNewContent && (
+              <CWTag type="new" label="New" />
+            )}
+          </div>
         </>
       )}
     </CWCard>
