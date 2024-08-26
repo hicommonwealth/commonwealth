@@ -12,7 +12,6 @@ const {
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
   SEND_EMAILS: _SEND_EMAILS,
-  SEND_WEBHOOKS_EMAILS,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
@@ -57,10 +56,6 @@ export const config = configure(
   {
     ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     SEND_EMAILS,
-    // Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
-    // Risks sending webhooks/emails to real users if incorrectly set to true
-    SEND_WEBHOOKS_EMAILS:
-      model_config.APP_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
@@ -140,9 +135,6 @@ export const config = configure(
   z.object({
     ENFORCE_SESSION_KEYS: z.boolean(),
     SEND_EMAILS: z.boolean(),
-    SEND_WEBHOOKS_EMAILS: z
-      .boolean()
-      .refine((data) => !(model_config.APP_ENV !== 'production' && data)),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
