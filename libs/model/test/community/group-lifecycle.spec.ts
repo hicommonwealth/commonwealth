@@ -51,7 +51,7 @@ describe('Group lifecycle', () => {
     payload.id = community!.id!;
     actor = {
       user: { id: user!.id!, email: user!.email!, isAdmin: user!.isAdmin! },
-      address_id: community!.Addresses!.at(0)!.address!,
+      address: community!.Addresses!.at(0)!.address!,
     };
   });
 

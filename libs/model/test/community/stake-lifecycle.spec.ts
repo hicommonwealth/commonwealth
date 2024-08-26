@@ -89,7 +89,7 @@ describe('Stake lifecycle', () => {
     id_without_stake = community_without_stake!.id!;
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: community_with_stake!.Addresses!.at(0)!.address!,
+      address: community_with_stake!.Addresses!.at(0)!.address!,
     };
 
     Sinon.stub(

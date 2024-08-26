@@ -59,7 +59,7 @@ describe('Comment subscription lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: undefined,
+      address: undefined,
     };
   });
 
