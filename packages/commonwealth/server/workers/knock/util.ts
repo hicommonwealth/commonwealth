@@ -55,5 +55,5 @@ export const getProfileUrl = (
   userId: number,
   customDomain?: string | null,
 ): string => {
-  return getBaseUrl(customDomain) + `/profile/${userId}`;
+  return getBaseUrl(customDomain) + `/profile/id/${userId}`;
 };
