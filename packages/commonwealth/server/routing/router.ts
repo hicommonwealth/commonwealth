@@ -202,7 +202,7 @@ function setupRouter(
     groups: new ServerGroupsController(models),
     topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
-    tags: new ServerTagsController(models), // TOOD: maybe remove banCache?
+    tags: new ServerTagsController(models),
   };
 
   // ---

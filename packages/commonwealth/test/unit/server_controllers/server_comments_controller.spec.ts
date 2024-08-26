@@ -1,11 +1,14 @@
-import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
+import {
+  BanErrors,
+  CommunityInstance,
+  commonProtocol,
+} from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
-import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 import { afterEach, beforeEach, describe, test } from 'vitest';
 
 chai.use(chaiAsPromised);
@@ -85,7 +88,6 @@ describe('ServerCommentsController', () => {
           }),
         },
       };
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -98,10 +100,7 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
         await serverCommentsController.createCommentReaction({
@@ -121,7 +120,7 @@ describe('ServerCommentsController', () => {
           reaction: reaction as any,
           commentId,
         }),
-      ).to.be.rejectedWith('Ban error: banned');
+      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
 
       expect(newReaction).to.be.ok;
 
@@ -199,9 +198,6 @@ describe('ServerCommentsController', () => {
           }),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -209,10 +205,7 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
 
       expect(
         serverCommentsController.createCommentReaction({
@@ -267,9 +260,6 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves(null),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -277,10 +267,7 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
 
       expect(
         serverCommentsController.createCommentReaction({
@@ -337,9 +324,6 @@ describe('ServerCommentsController', () => {
           update: sandbox.stub().resolves(null),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([false, 'big ban err']),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -348,10 +332,7 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
 
       expect(
         serverCommentsController.createCommentReaction({
@@ -360,7 +341,7 @@ describe('ServerCommentsController', () => {
           reaction: reaction as any,
           commentId,
         }),
-      ).to.be.rejectedWith('Ban error: big ban err');
+      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should throw error (token balance)', () => {
@@ -465,9 +446,6 @@ describe('ServerCommentsController', () => {
           bulkCreate: sandbox.stub().resolves([]),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -478,10 +456,7 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
 
       expect(
         serverCommentsController.createCommentReaction({
@@ -508,12 +483,8 @@ describe('ServerCommentsController', () => {
           },
         },
       };
-      const banCache = {};
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
 
       const community = { id: 'ethereum' };
       const searchOptions: SearchCommentsOptions = {
@@ -586,13 +557,8 @@ describe('ServerCommentsController', () => {
           query: () => Promise.resolve([]),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+
+      const serverCommentsController = new ServerCommentsController(db as any);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -675,11 +641,7 @@ describe('ServerCommentsController', () => {
           query: Promise.resolve([]),
         },
       };
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -698,7 +660,7 @@ describe('ServerCommentsController', () => {
           commentId,
           commentBody,
         }),
-      ).to.be.rejectedWith('Ban error: banned');
+      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should throw error (thread not found)', () => {
@@ -736,13 +698,8 @@ describe('ServerCommentsController', () => {
           query: Promise.resolve([]),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+
+      const serverCommentsController = new ServerCommentsController(db as any);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -789,14 +746,8 @@ describe('ServerCommentsController', () => {
           destroy: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: () => [true, null],
-      };
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      const serverCommentsController = new ServerCommentsController(db as any);
 
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],

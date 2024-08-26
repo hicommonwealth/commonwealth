@@ -1,5 +1,5 @@
 import { JobRunner } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { config, type DB } from '@hicommonwealth/model';
 
 export const BanErrors = {
   NoAddress: 'Address not found',
@@ -8,21 +8,38 @@ export const BanErrors = {
 
 type CacheT = { [communityAddressKey: string]: number };
 
-// Helper function to look up a scope, i.e. a chain XOR community.
-// If a community is found, also check that the user is allowed to see it.
-export class BanCache extends JobRunner<CacheT> {
-  private static _instance: BanCache;
+interface BanChecker {
+  checkBan(params: {
+    communityId?: string;
+    address: string;
+  }): Promise<[boolean, string?]>;
+}
 
+export class BanCache {
+  private static _instance: BanChecker;
   static getInstance(
     models: DB,
     ttlS?: number,
     prunningJobsTimeS?: number,
-  ): BanCache {
+  ): BanChecker {
+    if (config.NODE_ENV === 'test') return MockedChecker;
     if (!BanCache._instance)
-      BanCache._instance = new BanCache(models, ttlS, prunningJobsTimeS);
+      BanCache._instance = new DbChecker(models, ttlS, prunningJobsTimeS);
     return BanCache._instance;
   }
+}
 
+const MockedChecker: BanChecker = {
+  checkBan({ address }) {
+    if (address === '0xbanned')
+      return Promise.resolve([false, BanErrors.Banned]);
+    return Promise.resolve([true, undefined]);
+  },
+};
+
+// Helper function to look up a scope, i.e. a chain XOR community.
+// If a community is found, also check that the user is allowed to see it.
+class DbChecker extends JobRunner<CacheT> implements BanChecker {
   constructor(
     private _models: DB,
     private _ttlS: number = 60 * 15, // 10 minutes
@@ -32,11 +49,13 @@ export class BanCache extends JobRunner<CacheT> {
     this.start();
   }
 
-  public async checkBan(params: {
+  public async checkBan({
+    communityId,
+    address,
+  }: {
     communityId?: string;
     address: string;
   }): Promise<[boolean, string?]> {
-    const { address, communityId } = params;
     const cacheKey = `${communityId}-${address}`;
 
     // first, check cache for existing ban
@@ -68,7 +87,7 @@ export class BanCache extends JobRunner<CacheT> {
       });
       return [false, BanErrors.Banned];
     }
-    return [true];
+    return [true, undefined];
   }
 
   // prunes all expired cache entries based on initialized time-to-live

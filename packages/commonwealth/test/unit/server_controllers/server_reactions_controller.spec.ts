@@ -1,9 +1,8 @@
-import { commonProtocol } from '@hicommonwealth/model';
+import { BanErrors, commonProtocol } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerReactionsController } from 'server/controllers/server_reactions_controller';
 import Sinon from 'sinon';
-import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 import { afterEach, beforeEach, describe, test } from 'vitest';
 
 chai.use(chaiAsPromised);
@@ -37,7 +36,6 @@ describe('ServerReactionsController', () => {
           },
         },
       };
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -65,7 +63,7 @@ describe('ServerReactionsController', () => {
             address: '0xbanned',
           },
         }),
-      ).to.be.rejectedWith('Ban error: banned');
+      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should throw error (reaction not found)', () => {
@@ -74,9 +72,6 @@ describe('ServerReactionsController', () => {
         Reaction: {
           findOne: sandbox.stub().resolves(null),
         },
-      };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
       };
 
       const user = {
@@ -112,9 +107,6 @@ describe('ServerReactionsController', () => {
           }),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([false, 'big ban err']),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -132,7 +124,7 @@ describe('ServerReactionsController', () => {
           address: address as any,
           community: { id: 'ethereum' } as any,
         }),
-      ).to.be.rejectedWith('Ban error: big ban err');
+      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
   });
 });
