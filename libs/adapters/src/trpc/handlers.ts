@@ -16,7 +16,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import { Request } from 'express';
 import { type OpenApiMeta } from 'trpc-swagger';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { authenticate } from './auth';
+import { OutputMiddleware, authenticate } from './middleware';
 
 export interface Context {
   req: Request;
@@ -65,6 +65,7 @@ export enum Tag {
 export const command = <Input extends CommandInput, Output extends ZodSchema>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
+  outputMiddleware?: OutputMiddleware<z.infer<Output>>,
 ) => {
   const md = factory();
   return trpc.procedure
@@ -91,17 +92,17 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
       // if we provide any authorization method we force authentication as well
       if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
       try {
-        return await coreCommand(
-          md,
-          {
-            actor: {
-              user: ctx.req.user as User,
-              address: ctx.req.headers['address'] as string,
-            },
-            payload: input!,
+        const _ctx = {
+          actor: {
+            user: ctx.req.user as User,
+            address: ctx.req.headers['address'] as string,
           },
-          false,
-        );
+          payload: input!,
+        };
+        const result = await coreCommand(md, _ctx, false);
+        // TODO: relocate this?
+        outputMiddleware && (await outputMiddleware(_ctx, result!));
+        return result;
       } catch (error) {
         throw trpcerror(error);
       }

@@ -76,7 +76,7 @@ async function checkAddressBalance(
 /**
  * Ensure post limit not reached on active contests
  */
-async function checkContestLimits(
+function checkContestLimits(
   activeContestManagers: z.infer<typeof getActiveContestManagersQuery.output>,
   address: string,
 ) {
@@ -119,7 +119,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       });
       if (activeContestManagers && activeContestManagers.length > 0) {
         await checkAddressBalance(activeContestManagers, actor.address!);
-        await checkContestLimits(activeContestManagers, actor.address!);
+        checkContestLimits(activeContestManagers, actor.address!);
       }
 
       // New threads get an empty version history initialized, which is passed

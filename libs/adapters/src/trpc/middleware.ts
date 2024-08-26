@@ -1,8 +1,39 @@
-import { AuthStrategies, User } from '@hicommonwealth/core';
+import {
+  analytics,
+  logger,
+  type AuthStrategies,
+  type CommandContext,
+  type CommandInput,
+  type User,
+} from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { Request } from 'express';
 import passport from 'passport';
 import { config } from '../config';
+
+const log = logger(import.meta);
+
+export type OutputMiddleware<Output> = (
+  ctx: CommandContext<CommandInput>,
+  result: Partial<Output>,
+) => Promise<void>;
+
+export function track<Output>(
+  event: string,
+  mapper?: (result: Partial<Output>) => Record<string, unknown>,
+): OutputMiddleware<Output> {
+  return async ({ actor, payload }, result) => {
+    try {
+      analytics().track(event, {
+        userId: actor.user.id,
+        aggregateId: payload.id,
+        ...(mapper ? mapper(result) : {}),
+      });
+    } catch (err) {
+      err instanceof Error && log.error(err.message, err);
+    }
+  };
+}
 
 export const authenticate = async (
   req: Request,
