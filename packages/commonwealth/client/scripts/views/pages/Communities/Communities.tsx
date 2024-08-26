@@ -308,7 +308,8 @@ const CommunitiesPage = () => {
                       ? ` for the applied filters.`
                       : '.'}
                     <br />
-                    Create a new community <Link to="/communities">here</Link>.
+                    Create a new community{' '}
+                    <Link to="/createCommunity">here</Link>.
                   </CWText>
                 </section>
               ),
