@@ -54,7 +54,10 @@ export const ThreadSelector = ({
             userId: t.address_user_id,
             id: t.address_id,
             address: t.address,
-            communityId: t.address_community_id,
+            community: {
+              id: t.address_community_id,
+              // we don't get other community properties from api + they aren't needed here
+            },
           }),
         } as ConstructorParameters<typeof Thread>[0]),
     );

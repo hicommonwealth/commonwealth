@@ -2,32 +2,37 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import 'pages/view_thread/poll_cards.scss';
 import React, { useState } from 'react';
-import app from 'state';
+import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Poll from '../../../models/Poll';
+import { PollCard } from '../../components/Polls';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
-import { getPollTimestamp, handlePollVote } from './helpers';
+import { getPollTimestamp } from './helpers';
 
 type ThreadPollCardProps = {
   poll: Poll;
-  onVote: () => void;
   showDeleteButton?: boolean;
-  onDelete?: () => void;
   isTopicMembershipRestricted?: boolean;
 };
 
 export const ThreadPollCard = ({
   poll,
-  onVote,
   showDeleteButton,
-  onDelete,
   isTopicMembershipRestricted = false,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const user = useUserStore();
+
+  const { mutateAsync: deletePoll } = useDeletePollMutation({
+    threadId: poll.threadId,
+  });
+
+  const { mutateAsync: votePoll } = useVotePollMutation({
+    threadId: poll.threadId,
+  });
 
   const getTooltipErrorMessage = () => {
     if (!user.activeAccount)
@@ -36,31 +41,83 @@ export const ThreadPollCard = ({
     return '';
   };
 
+  const handleDeletePoll = async () => {
+    try {
+      await deletePoll({
+        pollId: poll.id,
+        address: user.activeAccount?.address || '',
+        authorCommunity: user.activeAccount?.community?.id || '',
+      });
+      notifySuccess('Poll deleted');
+    } catch (e) {
+      console.error(e);
+      notifyError('Failed to delete poll');
+    }
+  };
+
+  const handlePollVote = (
+    votedPoll: Poll,
+    option: string,
+    isSelected: boolean,
+  ) => {
+    if (!user.isLoggedIn || !user.activeAccount || isSelected) {
+      return;
+    }
+
+    openConfirmation({
+      title: 'Info',
+      description: `Submit a vote for '${option}'?`,
+      buttons: [
+        {
+          label: 'Submit',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onClick: async () => {
+            const selectedOption = votedPoll.options.find((o) => o === option);
+
+            if (!selectedOption) {
+              notifyError('Invalid voting option');
+              return;
+            }
+
+            try {
+              await votePoll({
+                pollId: votedPoll.id,
+                communityId: votedPoll.communityId,
+                authorCommunityId: user.activeAccount?.community?.id || '',
+                address: user.activeAccount?.address || '',
+                selectedOption,
+              });
+            } catch (err) {
+              console.error(err);
+              notifyError(
+                'Error submitting vote. Check if poll is still active.',
+              );
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
+  };
+
+  const userVote = poll.getUserVote(
+    user.activeAccount?.community?.id || '',
+    user.activeAccount?.address || '',
+  );
+
   return (
     <>
       <PollCard
-        multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
-        hasVoted={
-          !!(
-            user.activeAccount?.community?.id &&
-            user.activeAccount?.address &&
-            poll.getUserVote(
-              user.activeAccount?.community?.id,
-              user.activeAccount?.address,
-            )
-          )
-        }
+        hasVoted={!!userVote}
         disableVoteButton={!user.activeAccount || isTopicMembershipRestricted}
-        // @ts-expect-error <StrictNullChecks/>
-        votedFor={
-          user.activeAccount?.community?.id &&
-          user.activeAccount?.address &&
-          poll.getUserVote(
-            user.activeAccount?.community?.id,
-            user.activeAccount?.address,
-          )?.option
-        }
+        votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
@@ -79,7 +136,7 @@ export const ThreadPollCard = ({
         tooltipErrorMessage={getTooltipErrorMessage()}
         onVoteCast={(option, isSelected) => {
           // @ts-expect-error <StrictNullChecks/>
-          handlePollVote(poll, option, isSelected, onVote);
+          handlePollVote(poll, option, isSelected);
         }}
         onResultsClick={(e) => {
           e.preventDefault();
@@ -88,20 +145,9 @@ export const ThreadPollCard = ({
           }
         }}
         showDeleteButton={showDeleteButton}
-        onDeleteClick={async () => {
-          try {
-            await app.polls.deletePoll({
-              threadId: poll.threadId,
-              pollId: poll.id,
-              address: user.activeAccount?.address || '',
-              authorCommunity: user.activeAccount?.community.id || '',
-            });
-            if (onDelete) onDelete();
-            notifySuccess('Poll deleted');
-          } catch (e) {
-            console.error(e);
-            notifyError('Failed to delete poll');
-          }
+        onDeleteClick={() => {
+          //@typescript-eslint/no-misused-promises
+          handleDeletePoll().catch(console.error);
         }}
       />
       <CWModal
