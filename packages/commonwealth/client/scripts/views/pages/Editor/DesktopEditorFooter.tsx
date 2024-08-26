@@ -2,16 +2,22 @@ import React, { useCallback, useRef } from 'react';
 
 import './DesktopEditorFooter.scss';
 
-export const DesktopEditorFooter = () => {
+type DesktopEditorFooterProps = Readonly<{
+  onImportMarkdown?: (file: File) => void;
+}>;
+
+export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
+  const { onImportMarkdown } = props;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const fileHandler = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.files) {
         console.log('nr files: ' + event.target.files.length);
+        onImportMarkdown?.(event.target.files[0]);
       }
     },
-    [],
+    [onImportMarkdown],
   );
 
   const handleImportMarkdown = useCallback(() => {

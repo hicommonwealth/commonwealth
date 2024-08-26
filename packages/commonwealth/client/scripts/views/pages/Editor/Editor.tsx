@@ -76,41 +76,59 @@ export const Editor = (props: EditorProps) => {
 
   const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
 
+  const handleFile = useCallback(async (file: File) => {
+    const text = await fileToText(file);
+    mdxEditorRef.current?.setMarkdown(text);
+  }, []);
+
   // TODO: handle html but I'm not sure about the correct way to handle it
   // because I have to convert to markdown
-  const handleDrop = useCallback((event: React.DragEvent) => {
-    async function doAsync() {
-      console.log(event.dataTransfer.files.length);
+  const handleDrop = useCallback(
+    (event: React.DragEvent) => {
+      async function doAsync() {
+        console.log(event.dataTransfer.files.length);
 
-      const nrFiles = event.dataTransfer.files.length;
+        const nrFiles = event.dataTransfer.files.length;
 
-      if (nrFiles === 1) {
-        const type = event.dataTransfer.files[0].type;
+        if (nrFiles === 1) {
+          const type = event.dataTransfer.files[0].type;
 
-        if (['text/markdown', 'text/plain'].includes(type)) {
-          const text = await fileToText(event.dataTransfer.files[0]);
-          mdxEditorRef.current?.setMarkdown(text);
-        } else {
+          if (['text/markdown', 'text/plain'].includes(type)) {
+            await handleFile(event.dataTransfer.files[0]);
+          } else {
+            // TODO: use a snackbar
+            console.log('File not markdown');
+          }
+        }
+
+        if (nrFiles <= 0) {
           // TODO: use a snackbar
-          console.log('File not markdown');
+          console.log('No files given');
+          return;
+        }
+
+        if (nrFiles > 1) {
+          // TODO: use a snackbar
+          console.log('Too many files given');
+          return;
         }
       }
 
-      if (nrFiles <= 0) {
-        // TODO: use a snackbar
-        console.log('No files given');
-        return;
+      doAsync().catch(console.error);
+    },
+    [handleFile],
+  );
+
+  const handleImportMarkdown = useCallback(
+    (file: File) => {
+      async function doAsync() {
+        await handleFile(file);
       }
 
-      if (nrFiles > 1) {
-        // TODO: use a snackbar
-        console.log('Too many files given');
-        return;
-      }
-    }
-
-    doAsync().catch(console.error);
-  }, []);
+      doAsync().catch(console.error);
+    },
+    [handleFile],
+  );
 
   return (
     <div
@@ -169,7 +187,9 @@ export const Editor = (props: EditorProps) => {
         ]}
       />
 
-      {mode === 'desktop' && <DesktopEditorFooter />}
+      {mode === 'desktop' && (
+        <DesktopEditorFooter onImportMarkdown={handleImportMarkdown} />
+      )}
     </div>
   );
 };
