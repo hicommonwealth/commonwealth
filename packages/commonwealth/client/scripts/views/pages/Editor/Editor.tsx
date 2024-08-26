@@ -30,6 +30,8 @@ import {
   TextB,
   TextItalic,
   TextStrikethrough,
+  TextSubscript,
+  TextSuperscript,
   TextUnderline,
 } from '@phosphor-icons/react';
 import clsx from 'clsx';
@@ -153,6 +155,10 @@ export const Editor = (props: EditorProps) => {
               return <TextUnderline size={24} />;
             case 'strikeThrough':
               return <TextStrikethrough size={24} />;
+            case 'superscript':
+              return <TextSuperscript size={24} />;
+            case 'subscript':
+              return <TextSubscript size={24} />;
             case 'format_list_bulleted':
               return <ListDashes size={24} />;
             case 'format_list_numbered':
