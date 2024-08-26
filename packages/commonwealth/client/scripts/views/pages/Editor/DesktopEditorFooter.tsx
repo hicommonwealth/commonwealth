@@ -27,6 +27,7 @@ export const DesktopEditorFooter = () => {
         <input
           ref={fileInputRef}
           type="file"
+          accept=".md"
           className="FilePicker"
           onChange={fileHandler}
         />
