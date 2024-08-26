@@ -39,14 +39,17 @@ type ImageURL = string;
 function useImageUploadHandlerS3() {
   const user = useUserStore();
 
-  return useCallback(async (file: File): Promise<ImageURL> => {
-    const uploadedFileUrl = await uploadFileToS3(
-      file,
-      SERVER_URL,
-      user.jwt || '',
-    );
-    return uploadedFileUrl;
-  }, []);
+  return useCallback(
+    async (file: File): Promise<ImageURL> => {
+      const uploadedFileUrl = await uploadFileToS3(
+        file,
+        SERVER_URL,
+        user.jwt || '',
+      );
+      return uploadedFileUrl;
+    },
+    [user.jwt],
+  );
 }
 
 /**
