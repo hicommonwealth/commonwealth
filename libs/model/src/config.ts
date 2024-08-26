@@ -29,7 +29,7 @@ const DEFAULTS = {
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
   DEFAULT_COMMONWEALTH_LOGO:
-    'https://commonwealth.im/static/brand_assets/logo_stacked.png',
+    'https://s3.amazonaws.com/assets.commonwealth.im/common-white.png',
 };
 
 export const config = configure(

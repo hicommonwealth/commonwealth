@@ -109,7 +109,6 @@ export const processCommentCreated: EventHandler<
       community_id: community.id!,
       events: { [Op.contains]: ['CommentCreated'] },
     },
-    logging: console.log,
   });
   if (webhooks.length > 0) {
     const thread = await models.Thread.findByPk(payload.thread_id, {
