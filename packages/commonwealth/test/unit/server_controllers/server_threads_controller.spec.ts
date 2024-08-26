@@ -104,16 +104,16 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       const [newReaction, notificationOptions, analyticsOptions] =
         await serverThreadsController.createThreadReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user: user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address: address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction: reaction,
           threadId: threadId,
         });
@@ -136,7 +136,7 @@ describe('ServerThreadsController', () => {
 
       expect(notificationOptions).to.have.property('excludeAddresses');
       const { excludeAddresses } = notificationOptions;
-      // @ts-expect-error StrictNullChecks
+      // @ts-expect-error ignore type
       expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(analyticsOptions).to.include({
@@ -187,16 +187,16 @@ describe('ServerThreadsController', () => {
       const address = {};
       const reaction = {};
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user: user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address: address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction: reaction,
           threadId: 123,
         }),
@@ -248,16 +248,16 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction,
           threadId,
         }),
@@ -378,16 +378,16 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction,
           threadId,
         }),
@@ -470,16 +470,16 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       const [newComment, notificationOptions, analyticsOptions] =
         await serverThreadsController.createThreadComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -536,7 +536,7 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
@@ -551,11 +551,11 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -628,16 +628,16 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -686,7 +686,7 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
@@ -701,11 +701,11 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user: user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address: address,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -759,7 +759,7 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
@@ -773,9 +773,9 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user: user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address: address,
           parentId,
           threadId,
@@ -826,7 +826,7 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
@@ -841,9 +841,9 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user: user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address: address,
           parentId,
           threadId,
@@ -893,17 +893,17 @@ describe('ServerThreadsController', () => {
         address: '0x123',
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
       const threadId = 1;
       await serverThreadsController.deleteThread({
-        // @ts-expect-error
+        // @ts-expect-error ignore type
         user: user,
         threadId,
-        // @ts-expect-error
+        // @ts-expect-error ignore type
         address: address,
       });
     });
@@ -929,7 +929,7 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
@@ -940,10 +940,10 @@ describe('ServerThreadsController', () => {
       };
       expect(
         serverThreadsController.deleteThread({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user: user,
           threadId,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address: address,
         }),
       ).to.be.rejectedWith('Thread not found: 1');
@@ -975,7 +975,7 @@ describe('ServerThreadsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
       const user = {
         // address is different from thread author
@@ -987,10 +987,10 @@ describe('ServerThreadsController', () => {
       };
       expect(
         serverThreadsController.deleteThread({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user: user,
           threadId,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address: address,
         }),
       ).to.be.rejectedWith('Not owned by this user');

@@ -96,16 +96,16 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
         await serverCommentsController.createCommentReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction,
           commentId,
         });
@@ -133,7 +133,7 @@ describe('ServerCommentsController', () => {
 
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
-      // @ts-expect-error StrictNullChecks
+      // @ts-expect-error ignore type StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(allAnalyticsOptions[0]).to.include({
@@ -193,15 +193,15 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction,
           commentId: 123,
         }),
@@ -258,15 +258,15 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction,
           commentId: 123,
         }),
@@ -385,15 +385,15 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           reaction,
           commentId,
         }),
@@ -416,7 +416,7 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
       const community = { id: 'ethereum' };
       const searchOptions: SearchCommentsOptions = {
@@ -489,7 +489,7 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
@@ -504,9 +504,9 @@ describe('ServerCommentsController', () => {
       const commentBody = 'Hello';
       const [updatedComment, allNotificationOptions] =
         await serverCommentsController.updateComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
           commentId,
           commentBody,
@@ -530,7 +530,7 @@ describe('ServerCommentsController', () => {
       });
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
-      // @ts-expect-error StrictNullChecks
+      // @ts-expect-error ignore type StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
     });
 
@@ -570,7 +570,7 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
@@ -585,9 +585,9 @@ describe('ServerCommentsController', () => {
       const commentBody = 'Hello';
       expect(
         serverCommentsController.updateComment({
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           user,
-          // @ts-expect-error
+          // @ts-expect-error ignore type
           address,
           commentId,
           commentBody,
@@ -621,7 +621,7 @@ describe('ServerCommentsController', () => {
         },
       };
 
-      // @ts-expect-error
+      // @ts-expect-error ignore type
       const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
@@ -629,18 +629,18 @@ describe('ServerCommentsController', () => {
       const address = { id: 1 };
       const commentId = 1;
       await serverCommentsController.deleteComment({
-        // @ts-expect-error
+        // @ts-expect-error ignore type
         user,
-        // @ts-expect-error
+        // @ts-expect-error ignore type
         address,
         commentId,
       });
       expect(didDestroy).to.be.true;
 
       serverCommentsController.deleteComment({
-        // @ts-expect-error
+        // @ts-expect-error ignore type
         user,
-        // @ts-expect-error
+        // @ts-expect-error ignore type
         address,
         commentId,
       });
