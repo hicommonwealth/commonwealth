@@ -1,4 +1,3 @@
-import 'pages/notifications/index.scss';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
