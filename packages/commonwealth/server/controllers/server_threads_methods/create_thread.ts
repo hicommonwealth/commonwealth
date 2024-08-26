@@ -15,7 +15,6 @@ import {
 import {
   BalanceSourceType,
   NotificationCategories,
-  ProposalType,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -28,7 +27,6 @@ import {
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -59,11 +57,7 @@ export type CreateThreadOptions = {
   discordMeta?: any;
 };
 
-export type CreateThreadResult = [
-  ThreadAttributes,
-  EmitOptions[],
-  TrackOptions,
-];
+export type CreateThreadResult = [ThreadAttributes, TrackOptions];
 
 export async function __createThread(
   this: ServerThreadsController,
@@ -293,35 +287,11 @@ export async function __createThread(
     },
   ]);
 
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.NewThread,
-      data: {
-        created_at: new Date(),
-        // @ts-expect-error StrictNullChecks
-        thread_id: finalThread.id,
-        root_type: ProposalType.Thread,
-        root_title: finalThread.title,
-        // @ts-expect-error StrictNullChecks
-        comment_text: finalThread.body,
-        community_id: finalThread.community_id,
-        // @ts-expect-error StrictNullChecks
-        author_address: finalThread.Address.address,
-        // @ts-expect-error StrictNullChecks
-        author_community_id: finalThread.Address.community_id,
-      },
-    },
-    // @ts-expect-error StrictNullChecks
-    excludeAddresses: [finalThread.Address.address],
-  });
-
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
     community: community.id,
     userId: user.id,
   };
 
-  return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];
+  return [finalThread.toJSON(), analyticsOptions];
 }

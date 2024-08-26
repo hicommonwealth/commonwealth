@@ -80,11 +80,6 @@ export const createCommentReactionHandler = async (
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.comments.createCommentReaction(commentReactionFields);
 
-  // emit notifications
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
-
   // track analytics events
   for (const a of analyticsOptions) {
     controllers.analytics.track(a, req).catch(console.error);

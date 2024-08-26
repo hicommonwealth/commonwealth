@@ -84,12 +84,8 @@ export const createThreadHandler = async (
       });
     }
   }
-  const [thread, notificationOptions, analyticsOptions] =
+  const [thread, analyticsOptions] =
     await controllers.threads.createThread(threadFields);
-
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
