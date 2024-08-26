@@ -13,7 +13,7 @@ export const checkEligibility = frames(async () => {
     eligible = false;
   }
 
-  const base64Icon = eligible ? circleCheckIcon : circleXIcon;
+  const icon = eligible ? circleCheckIcon : circleXIcon;
   const title = eligible ? 'You are eligible to enter' : 'You are not eligible';
   const description = eligible
     ? 'Reply to this cast or quote this frame to be entered into the contest.'
@@ -35,11 +35,7 @@ export const checkEligibility = frames(async () => {
           textAlign: 'center',
         }}
       >
-        <img
-          style={{ width: '100px', height: '100px' }}
-          alt="icon"
-          src={base64Icon}
-        />
+        {icon}
 
         <p
           style={{
