@@ -40,8 +40,9 @@ describe('snapshotProposalCreated Event Handler', () => {
   beforeAll(async () => {
     [user] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
-      // @ts-expect-error StrictNullChecks
       chain_node_id: null,
+      lifetime_thread_count: 0,
+      profile_count: 0,
       Addresses: [
         {
           role: 'member',

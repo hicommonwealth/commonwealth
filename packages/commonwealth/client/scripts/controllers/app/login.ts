@@ -101,7 +101,7 @@ export async function completeClientLogin(account: Account) {
         userId: user.id,
         id: account.addressId,
         address: account.address,
-        communityId: account.community.id,
+        community: account.community,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
@@ -203,7 +203,7 @@ export function updateActiveUser(data) {
       emailNotificationInterval: '',
       knockJWT: '',
       addresses: [],
-      starredCommunities: [],
+      communities: [],
       accounts: [],
       activeAccount: null,
       jwt: null,
@@ -220,7 +220,11 @@ export function updateActiveUser(data) {
           userId: user.id,
           id: a.id,
           address: a.address,
-          communityId: a.community_id,
+          community: {
+            id: a.community_id,
+            base: a.Community.base,
+            ss58Prefix: a.Community.ss58_prefix,
+          },
           walletId: a.wallet_id,
           walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,
@@ -240,6 +244,12 @@ export function updateActiveUser(data) {
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+      communities: (data?.communities || []).map((c) => ({
+        id: c.id || '',
+        iconUrl: c.icon_url || '',
+        name: c.name || '',
+        isStarred: c.is_starred || false,
+      })),
       isLoggedIn: true,
     });
   }
@@ -281,7 +291,11 @@ export async function createUserWithAddress(
   const account = new Account({
     addressId: id,
     address,
-    community: chainInfo,
+    community: {
+      id: chainInfo.id,
+      base: chainInfo.base,
+      ss58Prefix: chainInfo.ss58Prefix,
+    },
     validationToken: response.data.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
@@ -510,7 +524,7 @@ export async function handleSocialLoginCallback({
 
       const sessionSigner = new SIWESigner({
         signer,
-        chainId: app.chain?.meta.node?.ethChainId || 1,
+        chainId: app.chain?.meta?.node?.ethChainId || 1,
       });
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {

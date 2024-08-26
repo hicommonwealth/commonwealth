@@ -151,7 +151,12 @@ export const CommentCard = ({
             // @ts-expect-error <StrictNullChecks/>
             authorAddress={app.chain ? author?.address : comment?.author}
             // @ts-expect-error <StrictNullChecks/>
-            authorCommunityId={author?.community?.id || author?.profile?.chain}
+            authorCommunityId={
+              author?.community?.id ||
+              author?.profile?.chain ||
+              comment?.communityId ||
+              comment?.authorChain
+            }
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"

@@ -6,6 +6,9 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint', 'n'],
   parser: '@typescript-eslint/parser',
+  parserOptions: {
+    suppressDeprecatedPropertyWarnings: true,
+  },
   // indicates this is the parent eslint so eslint will stop searching further up for eslint configs
   root: true,
   settings: {

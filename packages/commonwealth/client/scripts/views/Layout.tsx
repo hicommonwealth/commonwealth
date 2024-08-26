@@ -89,17 +89,18 @@ const LayoutComponent = ({
       if (shouldSelectChain) {
         setIsLoading(true);
         setCommunityToLoad(providedCommunityScope);
-        if (
-          await loadCommunityChainInfo(
-            ChainInfo.fromTRPCResponse(
-              community as z.infer<typeof ExtendedCommunity>,
-            ),
-          )
-        ) {
-          // Update default community on server if logged in
+        const communityFromTRPCResponse = ChainInfo.fromTRPCResponse(
+          community as z.infer<typeof ExtendedCommunity>,
+        );
+        if (await loadCommunityChainInfo(communityFromTRPCResponse)) {
+          // Update default community on server and app, if logged in
           if (user.isLoggedIn) {
             await updateActiveCommunity({
               communityId: community?.id || '',
+            });
+
+            user.setData({
+              activeCommunity: communityFromTRPCResponse,
             });
           }
         }
