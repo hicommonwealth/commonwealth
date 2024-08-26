@@ -12,7 +12,7 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
-import { Configuration } from 'state/api/configuration';
+import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
 import { userStore } from './ui/user';
@@ -100,6 +100,7 @@ export async function initAppState(
     ]);
 
     await fetchNodesQuery();
+    await fetchCustomDomainQuery();
 
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
