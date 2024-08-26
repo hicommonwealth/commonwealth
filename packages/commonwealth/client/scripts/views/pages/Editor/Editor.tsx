@@ -26,6 +26,7 @@ import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
 import { codeBlockLanguages } from 'views/pages/Editor/codeBlockLanguages';
+import { DesktopEditorFooter } from 'views/pages/Editor/DesktopEditorFooter';
 import { fileToText } from 'views/pages/Editor/fileToText';
 import { iconComponentFor } from 'views/pages/Editor/iconComponentFor';
 import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
@@ -168,7 +169,7 @@ export const Editor = (props: EditorProps) => {
         ]}
       />
 
-      {mode === 'desktop' && <div className="mdxeditor-footer">here it is</div>}
+      {mode === 'desktop' && <DesktopEditorFooter />}
     </div>
   );
 };

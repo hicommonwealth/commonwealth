@@ -11,7 +11,7 @@ import {
   TextSuperscript,
   TextUnderline,
 } from '@phosphor-icons/react';
-import { defaultSvgIcons, IconKey } from 'commonwealth-mdxeditor';
+import { IconKey, defaultSvgIcons } from 'commonwealth-mdxeditor';
 import React from 'react';
 
 const DEFAULT_ICON_SIZE = 22;
@@ -51,7 +51,6 @@ export const iconComponentFor = (name: IconKey) => {
       return <ListChecks size={DEFAULT_ICON_SIZE} />;
     case 'frame_source':
     case 'code':
-      console.log('FIXME: code');
       return <Code size={DEFAULT_ICON_SIZE} />;
     case 'table':
       return <Table size={DEFAULT_ICON_SIZE + 2} />;
