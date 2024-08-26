@@ -9,22 +9,16 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodObject, ZodOptional, ZodSchema, ZodString, z } from 'zod';
+import { ZodSchema, z } from 'zod';
 import { BanCache, models } from '..';
 
-type ConventionalCommandInput = CommandInput &
-  ZodObject<{ community_id: ZodString; topic_id: ZodOptional<ZodString> }>;
-
-export type CommunityMiddleware = CommandHandler<
-  ConventionalCommandInput,
-  ZodSchema
->;
+export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
 export type ThreadMiddleware = CommandHandler<
-  ConventionalCommandInput,
+  CommandInput,
   typeof schemas.Thread
 >;
 export type CommentMiddleware = CommandHandler<
-  ConventionalCommandInput,
+  CommandInput,
   typeof schemas.Comment
 >;
 
@@ -43,11 +37,12 @@ export type CommentMiddleware = CommandHandler<
  * @param roles roles filter
  */
 const authorizeAddress = async (
-  { actor, payload }: CommandContext<ConventionalCommandInput>,
+  { actor, payload }: CommandContext<CommandInput>,
   roles: Role[],
 ): Promise<z.infer<typeof Address>> => {
   // By convention, secure requests must provide community_id/id + address arguments
-  const community_id = payload.community_id ?? payload.id;
+  const community_id =
+    ('community_id' in payload && payload.community_id) || payload.id;
   if (!community_id)
     throw new InvalidActor(actor, 'Must provide a community id');
   if (!actor.address) throw new InvalidActor(actor, 'Must provide an address');
@@ -76,13 +71,14 @@ const authorizeAddress = async (
  * Checks if actor passes a set of requirements and grants access for all groups of the given topic
  */
 async function isTopicMember(
-  { actor, payload }: CommandContext<ConventionalCommandInput>,
+  { actor, payload }: CommandContext<CommandInput>,
   action: GroupPermissionAction,
 ): Promise<void> {
   // By convention, topic_id must by part of the body
-  if (!payload.topic_id) throw new InvalidInput('Must provide a topic id');
+  const topic_id = 'topic_id' in payload && payload.topic_id;
+  if (!topic_id) throw new InvalidInput('Must provide a topic id');
 
-  const topic = await models.Topic.findOne({ where: { id: payload.topic_id } });
+  const topic = await models.Topic.findOne({ where: { id: topic_id } });
   if (!topic) throw new InvalidInput('Topic not found');
   if (topic.group_ids?.length === 0) return;
 
