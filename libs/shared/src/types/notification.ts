@@ -1,5 +1,3 @@
-import { SupportedNetwork } from './protocol';
-
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',
   NewThread = 'new-thread-creation',
@@ -32,12 +30,4 @@ export interface IForumNotificationData {
   view_count?: number;
   like_count?: number;
   comment_count?: number;
-}
-
-export interface IChainEventNotificationData {
-  id?: number;
-  block_number?: number;
-  event_data: any;
-  network: SupportedNetwork;
-  community_id: string;
 }
