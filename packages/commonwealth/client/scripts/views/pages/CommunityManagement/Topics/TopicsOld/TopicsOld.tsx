@@ -7,17 +7,17 @@ import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
-import CreateTopicSection from './CreateTopicsSection';
-import ManageTopicsSection from './ManageTopicsSection';
+import CreateTopicSection from '../CreateTopicsSection';
+import ManageTopicsSection from '../ManageTopicsSection';
 
-import './Topics.scss';
+import './TopicsOld.scss';
 
 const TABS = [
   { value: 'create-topic', label: 'Create Topic' },
   { value: 'manage-topics', label: 'Manage Topics' },
 ];
 
-export const Topics = () => {
+export const TopicsOld = () => {
   const navigate = useCommonNavigate();
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
 
@@ -30,9 +30,9 @@ export const Topics = () => {
 
   return (
     <CWPageLayout>
-      <div className="Topics">
+      <div className="TopicsOld">
         <header>
-          <CWText type="h2">Topics New</CWText>
+          <CWText type="h2">Topics</CWText>
           <CWText type="b1" className="subheader">
             Create topics and sub-topics, and rearrange them in the sidebar
           </CWText>
@@ -76,4 +76,4 @@ export const Topics = () => {
   );
 };
 
-export default Topics;
+export default TopicsOld;
