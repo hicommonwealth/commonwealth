@@ -61,7 +61,6 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Notification)
     .withMany(db.Webhook)
     .withMany(db.Ban)
-    .withMany(db.CommunityBanner)
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })

@@ -51,7 +51,6 @@ export * from './comment';
 export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
-export * from './community_banner';
 export * from './community_contract';
 export * from './community_role';
 export * from './community_stake';

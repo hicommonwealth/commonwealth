@@ -56,6 +56,7 @@ export const Community = z.object({
   include_in_digest_email: z.boolean().nullish(),
   profile_count: PG_INT.nullish(),
   lifetime_thread_count: PG_INT.nullish(),
+  banner_text: z.string().nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
