@@ -32,7 +32,7 @@ describe('Stake transactions', () => {
     const [community] = await seed('Community', {
       namespace: 'qaa',
       chain_node_id: node?.id,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {

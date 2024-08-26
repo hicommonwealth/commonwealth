@@ -24,7 +24,7 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
 
     await tester.seed('Community', {
       chain_node_id: chainNode?.id,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 0,
       Addresses: [],
       CommunityStakes: [],

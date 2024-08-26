@@ -26,7 +26,7 @@ describe('Stake Historical Price', () => {
     });
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {
