@@ -7,8 +7,12 @@ module.exports = {
       await queryInterface.addColumn(
         'Addresses',
         'is_banned',
-        Sequelize.BOOLEAN,
-        { transaction, allowNull: false, defaultValue: false },
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        { transaction },
       );
       await queryInterface.sequelize.query(
         `
