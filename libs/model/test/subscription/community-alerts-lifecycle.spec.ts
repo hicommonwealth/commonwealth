@@ -31,12 +31,12 @@ describe('Community alerts lifecycle', () => {
     });
     [community] = await seed('Community', {
       chain_node_id: node?.id,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 0,
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: node?.id,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 0,
     });
     actor = {
