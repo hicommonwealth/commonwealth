@@ -73,8 +73,8 @@ export function KnockProvider(): NotificationsProvider {
     ): Promise<boolean> {
       // disable webhook workflow in all environments except production
       // this is to prevent sending webhooks to real endpoints in all other env
-      if (options.key === 'webhooks' && config.APP_ENV !== 'production') {
-        log.warn('Webhooks disabled in non-production environment');
+      if (options.key === 'webhooks' && !config.NOTIFICATIONS.WEBHOOKS.SEND) {
+        log.warn('Webhooks disabled');
         return true;
       }
 
