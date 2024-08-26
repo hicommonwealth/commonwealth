@@ -7,9 +7,11 @@ module.exports = {
       await queryInterface.addColumn(
         'Communities',
         'banner_text',
-        Sequelize.TEXT,
         {
-          allowNull: true,
+          type: Sequelize.TEXT,
+          allowNull: false,
+        },
+        {
           transaction,
         },
       );
