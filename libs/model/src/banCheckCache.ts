@@ -40,19 +40,14 @@ export class BanCache extends JobRunner<CacheT> {
     const cacheKey = `${communityId}-${address}`;
 
     // first, check cache for existing ban
-    const isCachedBan = await this.access(async (c: CacheT) => {
+    const isCachedBan = await this.access((c: CacheT) => {
       const bannedAt = c[cacheKey];
-      if (!bannedAt) {
-        return false;
-      }
+      if (!bannedAt) return Promise.resolve(false);
       const now = Date.now() / 1000;
       const oldestPermittedTime = now - this._ttlS;
-      if (bannedAt > oldestPermittedTime) {
-        return true;
-      } else {
-        delete c[cacheKey];
-        return false;
-      }
+      if (bannedAt > oldestPermittedTime) return Promise.resolve(true);
+      delete c[cacheKey];
+      return Promise.resolve(false);
     });
     if (isCachedBan) {
       return [false, BanErrors.Banned];
@@ -67,8 +62,9 @@ export class BanCache extends JobRunner<CacheT> {
 
     // insert into cache if ban found
     if (ban) {
-      await this.access(async (c) => {
+      await this.access((c) => {
         c[cacheKey] = Date.now() / 1000;
+        return Promise.resolve();
       });
       return [false, BanErrors.Banned];
     }
@@ -76,7 +72,7 @@ export class BanCache extends JobRunner<CacheT> {
   }
 
   // prunes all expired cache entries based on initialized time-to-live
-  protected async _job(c: CacheT): Promise<void> {
+  protected _job(c: CacheT): Promise<void> {
     const oldestPermittedTime = Date.now() / 1000 - this._ttlS;
     for (const key of Object.keys(c)) {
       const banCheckDate = c[key];
@@ -84,5 +80,6 @@ export class BanCache extends JobRunner<CacheT> {
         delete c[key];
       }
     }
+    return Promise.resolve();
   }
 }

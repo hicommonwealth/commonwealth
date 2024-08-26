@@ -7,7 +7,6 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
-  NotificationCategories,
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
@@ -184,6 +183,15 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           address.last_active = new Date();
           await address.save({ transaction });
 
+          // subscribe author (@timolegros this is the user aggregate leak we are discussing)
+          await models.ThreadSubscription.create(
+            {
+              user_id: actor.user.id!,
+              thread_id: thread.id!,
+            },
+            { transaction },
+          );
+
           // emit mention events = transactional outbox
           mentions.length &&
             (await emitMentions(models, transaction, {
@@ -194,27 +202,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               thread,
               community_id: thread.community_id,
             }));
-
-          // TODO: check with Tim-> auto-subscribe thread creator to comments & reactions
-          await models.Subscription.bulkCreate(
-            [
-              {
-                subscriber_id: actor.user.id!,
-                category_id: NotificationCategories.NewComment,
-                thread_id: thread.id,
-                community_id,
-                is_active: true,
-              },
-              {
-                subscriber_id: actor.user.id!,
-                category_id: NotificationCategories.NewReaction,
-                thread_id: thread.id,
-                community_id,
-                is_active: true,
-              },
-            ],
-            { transaction },
-          );
 
           return thread.id;
         },

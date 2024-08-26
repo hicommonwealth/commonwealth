@@ -9,8 +9,24 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodSchema, z } from 'zod';
+import { ZodObject, ZodOptional, ZodSchema, ZodString, z } from 'zod';
 import { BanCache, models } from '..';
+
+type ConventionalCommandInput = CommandInput &
+  ZodObject<{ community_id: ZodString; topic_id: ZodOptional<ZodString> }>;
+
+export type CommunityMiddleware = CommandHandler<
+  ConventionalCommandInput,
+  ZodSchema
+>;
+export type ThreadMiddleware = CommandHandler<
+  ConventionalCommandInput,
+  typeof schemas.Thread
+>;
+export type CommentMiddleware = CommandHandler<
+  ConventionalCommandInput,
+  typeof schemas.Comment
+>;
 
 /**
  * TODO: review rules
@@ -27,7 +43,7 @@ import { BanCache, models } from '..';
  * @param roles roles filter
  */
 const authorizeAddress = async (
-  { actor, payload }: CommandContext<any>,
+  { actor, payload }: CommandContext<ConventionalCommandInput>,
   roles: Role[],
 ): Promise<z.infer<typeof Address>> => {
   // By convention, secure requests must provide community_id/id + address arguments
@@ -60,7 +76,7 @@ const authorizeAddress = async (
  * Checks if actor passes a set of requirements and grants access for all groups of the given topic
  */
 async function isTopicMember(
-  { actor, payload }: CommandContext<any>,
+  { actor, payload }: CommandContext<ConventionalCommandInput>,
   action: GroupPermissionAction,
 ): Promise<void> {
   // By convention, topic_id must by part of the body
@@ -121,16 +137,6 @@ async function isTopicMember(
     throw new InvalidActor(actor, rejects.join('\n'));
 }
 
-export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
-export type ThreadMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Thread
->;
-export type CommentMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Comment
->;
-
 /**
  * Community middleware
  */
@@ -170,7 +176,7 @@ export function isCommunityAdminOrTopicMember(
       if (!canInteract)
         throw new InvalidActor(ctx.actor, `Ban error: ${banError}`);
       // check group membership
-      isTopicMember(ctx, action);
+      await isTopicMember(ctx, action);
     }
   };
 }
