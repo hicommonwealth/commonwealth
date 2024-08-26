@@ -65,7 +65,7 @@ type EditorProps = {
 
 export const Editor = (props: EditorProps) => {
   const imageUploadHandler = useImageUploadHandlerLocal();
-  // const imageUploadHandler = useImageUploadHandlerS3();
+  const errorHandler = useEditorErrorHandler();
 
   const mode = props.mode ?? 'desktop';
   // const mode = props.mode ?? 'mobile';
@@ -119,6 +119,7 @@ export const Editor = (props: EditorProps) => {
       onDrop={handleDrop}
     >
       <MDXEditor
+        onError={errorHandler}
         ref={mdxEditorRef}
         markdown={supported}
         placeholder={placeholder}
