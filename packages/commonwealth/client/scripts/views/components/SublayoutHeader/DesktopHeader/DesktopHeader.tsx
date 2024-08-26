@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
@@ -13,7 +12,6 @@ import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearch
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
@@ -40,8 +38,6 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
-
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   return (
     <div className="DesktopHeader">
@@ -101,15 +97,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             />
 
             <HelpMenuPopover />
-
-            {user.isLoggedIn && !enableKnockInAppNotifications && (
-              <NotificationsMenuPopover />
-            )}
           </div>
-
-          {user.isLoggedIn && enableKnockInAppNotifications && (
-            <KnockNotifications />
-          )}
+          <KnockNotifications />
         </div>
 
         {user.isLoggedIn && (

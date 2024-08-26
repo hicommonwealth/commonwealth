@@ -11,7 +11,11 @@ function getDifferences(
 ): Partial<z.infer<typeof SubscriptionPreference>> {
   const differences: Record<string, any> = {};
   for (const key in subsetObject) {
-    if (key in subsetObject && subsetObject[key] !== fullObject[key]) {
+    if (
+      key !== 'id' &&
+      key in subsetObject &&
+      subsetObject[key] !== fullObject[key]
+    ) {
       differences[key] = subsetObject[key];
     }
   }
@@ -68,7 +72,6 @@ export function UpdateSubscriptionPreferences(): Command<
               {
                 event_name: EventNames.SubscriptionPreferencesUpdated,
                 event_payload: {
-                  id: existingPreferences.id,
                   user_id: existingPreferences.user_id,
                   ...preferenceUpdates,
                 },

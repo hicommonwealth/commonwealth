@@ -1,7 +1,9 @@
+import { CommunityAlert } from '@hicommonwealth/schemas';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import React from 'react';
 import app from 'state';
+import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
   VoteWeightModule,
@@ -13,6 +15,7 @@ import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sideb
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
@@ -52,6 +55,12 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
   const topicIdsIncludedInContest =
     getUniqueTopicIdsIncludedInActiveContest(contestsData);
+
+  const communityAlerts:
+    | ReadonlyArray<z.infer<typeof CommunityAlert>>
+    | undefined = useCommunityAlertsQuery({
+    enabled: user.isLoggedIn && !!app.chain,
+  }).data as unknown as ReadonlyArray<z.infer<typeof CommunityAlert>>;
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
@@ -108,7 +117,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         <div className="buttons-container">
           {user.isLoggedIn && app.chain && (
             <div className="subscription-button">
-              <SubscriptionButton />
+              <SubscriptionButton communityAlerts={communityAlerts} />
             </div>
           )}
           {app.isCustomDomain() && (

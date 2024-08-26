@@ -327,13 +327,13 @@ export async function __createCommunity(
         base === ChainBase.CosmosSDK
           ? BalanceType.Cosmos
           : base === ChainBase.Substrate
-          ? BalanceType.Substrate
-          : base === ChainBase.Ethereum
-          ? BalanceType.Ethereum
-          : // beyond here should never really happen, but just to make sure...
-          base === ChainBase.Solana
-          ? BalanceType.Solana
-          : undefined,
+            ? BalanceType.Substrate
+            : base === ChainBase.Ethereum
+              ? BalanceType.Ethereum
+              : // beyond here should never really happen, but just to make sure...
+                base === ChainBase.Solana
+                ? BalanceType.Solana
+                : undefined,
       // use first chain name as node name
       name: community.name,
     },
