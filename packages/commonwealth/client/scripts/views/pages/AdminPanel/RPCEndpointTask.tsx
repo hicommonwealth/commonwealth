@@ -189,7 +189,7 @@ const RPCEndpointTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update RPC Endpoint',
-      description: `Are you sure you want to update the rpc endpoint on ${rpcEndpointCommunityId}?`,
+      description: `Are you sure you want to create this rpc endpoint for ${rpcEndpointCommunityId}?`,
       buttons: [
         {
           label: 'Update',
