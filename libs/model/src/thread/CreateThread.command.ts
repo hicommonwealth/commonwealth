@@ -24,7 +24,7 @@ import {
   uniqueMentions,
 } from '../utils';
 
-const Errors = {
+export const CreateThreadErrors = {
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
   ParseMentionsFailed: 'Failed to parse mentions',
@@ -42,7 +42,7 @@ function toPlainString(decodedBody: string) {
   try {
     const quillDoc = JSON.parse(decodedBody);
     if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '')
-      throw new InvalidInput(Errors.NoBody);
+      throw new InvalidInput(CreateThreadErrors.NoBody);
     return renderQuillDeltaToText(quillDoc);
   } catch {
     // check always passes if the body isn't a Quill document
@@ -90,7 +90,7 @@ async function checkContestLimits(
     return !quotaReached;
   });
   if (validActiveContests.length === 0)
-    throw new AppError(Errors.PostLimitReached);
+    throw new AppError(CreateThreadErrors.PostLimitReached);
 }
 
 export function CreateThread(): Command<typeof schemas.CreateThread> {
@@ -105,7 +105,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       const { id, community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
-        throw new InvalidInput(Errors.LinkMissingTitleOrUrl);
+        throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
 
       const body = sanitizeQuillText(payload.body);
       const plaintext = kind === 'discussion' ? toPlainString(body) : body;
