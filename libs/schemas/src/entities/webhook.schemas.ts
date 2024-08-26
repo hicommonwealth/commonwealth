@@ -1,5 +1,6 @@
-import { Community, PG_INT } from '@hicommonwealth/schemas';
 import { z } from 'zod';
+import { PG_INT } from '../utils';
+import { Community } from './community.schemas';
 
 export const WebhookSupportedEvents = z.union([
   z.literal('ThreadCreated'),
