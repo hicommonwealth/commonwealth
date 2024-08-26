@@ -1,5 +1,6 @@
 import {
   Comment,
+  PG_INT,
   Reaction,
   SubscriptionPreference,
   Thread,
@@ -30,6 +31,10 @@ export const ThreadUpvoted = Reaction.extend({
 });
 export const CommentCreated = Comment.extend({
   community_id: z.string(),
+  users_mentioned: z
+    .array(PG_INT)
+    .optional()
+    .describe('An array of user ids that are mentioned in the comment'),
 });
 export const GroupCreated = z.object({
   groupId: z.string(),

@@ -1,9 +1,10 @@
-import { AppError, ServerError } from '@hicommonwealth/core';
+import { AppError, EventNames, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   CommentInstance,
   UserInstance,
+  emitEvent,
   sanitizeQuillText,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
@@ -212,6 +213,21 @@ export async function __createThreadComment(
         comment,
         community_id: thread.community_id,
       });
+
+      await emitEvent(
+        this.models.Outbox,
+        [
+          {
+            event_name: EventNames.CommentCreated,
+            event_payload: {
+              ...comment.toJSON(),
+              community_id: thread.community_id,
+              users_mentioned: mentions.map((u) => parseInt(u.userId)),
+            },
+          },
+        ],
+        transaction,
+      );
 
       await this.models.Subscription.bulkCreate(
         [

@@ -146,7 +146,7 @@ export default (
         ) => {
           const { Community, Outbox, Address } = sequelize.models;
 
-          await Community.increment('thread_count', {
+          await Community.increment('lifetime_thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,
@@ -183,7 +183,7 @@ export default (
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           const { Community } = sequelize.models;
-          await Community.increment('thread_count', {
+          await Community.increment('lifetime_thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,

@@ -44,9 +44,9 @@ export default class SolanaChain
 
     const solw3 = await import('@solana/web3.js');
     try {
-      url = solw3.clusterApiUrl(chain.node.url as solw3.Cluster);
+      url = solw3.clusterApiUrl(chain?.node?.url as solw3.Cluster);
     } catch (e) {
-      url = chain.node.url;
+      url = chain?.node?.url;
       // TODO: test if custom url is valid
     }
     // TODO: validate config here -- maybe we want ws?

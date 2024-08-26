@@ -1,6 +1,6 @@
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
@@ -18,7 +18,7 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { slugify } from '@hicommonwealth/shared';
+import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
@@ -58,7 +58,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
   });
   const contestAddress = searchParams.get('contest');
@@ -126,6 +126,26 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     return t;
   });
+
+  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
+  const topicNameFromURL = splitAndDecodeURL(location.pathname);
+
+  //checks for malformed url in topics and redirects if the topic does not exist
+  useEffect(() => {
+    if (
+      !isLoadingTopics &&
+      topicNameFromURL &&
+      topicNameFromURL !== 'archived'
+    ) {
+      const validTopics = topics?.some(
+        (topic) => topic?.name === topicNameFromURL,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics, topicNameFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 

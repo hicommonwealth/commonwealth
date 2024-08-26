@@ -1,0 +1,117 @@
+@import '../../../../styles/shared';
+
+.CommunitiesPageLayout {
+  overflow: auto;
+  padding-top: 0;
+  height: 100%;
+
+  .layout-container {
+    height: 100%;
+  }
+}
+
+.CommunitiesPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  .header-section {
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: $white;
+
+    .description {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .communities-count {
+          color: $neutral-500;
+          height: fit-content;
+        }
+
+        .CreateCommunityButton {
+          padding: 0 0 0 16px;
+        }
+      }
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+
+      @include extraSmall {
+        gap: 12px;
+      }
+
+      .Divider {
+        height: 40px;
+      }
+    }
+  }
+
+  .communities-list {
+    width: 100%;
+    min-height: 500px;
+
+    > div {
+      div[data-testid='virtuoso-item-list'] {
+        > div {
+          display: grid !important;
+          grid-gap: 28px;
+          grid-template-columns: 1fr 1fr;
+          justify-content: center;
+          padding-top: 24px;
+
+          @include mediumSmall {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          @include extraSmall {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+    }
+  }
+
+  .empty-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    justify-content: center;
+    align-items: center;
+
+    .h2 {
+      display: inline;
+      text-align: center;
+
+      a {
+        color: $primary-500;
+        text-decoration: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+          color: $primary-500;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}

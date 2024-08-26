@@ -6,7 +6,9 @@ import { createStore } from 'zustand/vanilla';
 
 type SelectedCommunity = {
   id: string;
+  name: string;
   base: ChainBase;
+  iconUrl: string;
   namespace: string;
   ChainNode: {
     url: string;

@@ -18,6 +18,7 @@ export const Errors = {
   NoCommunityId: 'Must provide community ID',
   ReservedId: 'The id is reserved and cannot be used',
   CantChangeCustomDomain: 'Custom domain change not permitted',
+  CustomDomainIsTaken: 'Custom domain is taken by another community',
   CantChangeNetwork: 'Cannot change community network',
   NotAdmin: 'Not an admin',
   NoCommunityFound: 'Community not found',
@@ -118,9 +119,11 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  const nonEmptySocialLinks = social_links?.filter((s) => s && s !== '');
+  const nonEmptySocialLinks = (social_links || [])?.filter(
+    (s) => typeof s === 'string',
+  );
   const invalidSocialLinks = nonEmptySocialLinks?.filter(
-    (s) => !urlHasValidHTTPPrefix(s),
+    (s) => !urlHasValidHTTPPrefix(s || ''),
   );
   if (nonEmptySocialLinks && invalidSocialLinks.length > 0) {
     throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
@@ -231,6 +234,14 @@ export async function __updateCommunity(
   // external configuration (via heroku + whitelists).
   // Currently does not permit unsetting the custom domain; must be done manually.
   if (user.isAdmin && custom_domain) {
+    // verify if this custom domain is taken by another community
+    const foundCommunity = await this.models.Community.findOne({
+      where: { custom_domain: custom_domain! },
+    });
+    if (foundCommunity) {
+      throw new AppError(Errors.CustomDomainIsTaken);
+    }
+
     community.custom_domain = custom_domain;
   } else if (custom_domain && custom_domain !== community.custom_domain) {
     throw new AppError(Errors.CantChangeCustomDomain);
