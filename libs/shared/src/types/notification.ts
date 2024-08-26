@@ -41,15 +41,6 @@ export interface IForumNotificationData {
   comment_count?: number;
 }
 
-// export type IForumNotificationData =
-//   | INewCommentNotificationData
-//   | INewReactionNotificationData
-//   | INewThreadNotificationData
-//   | INewMentionNotificationData
-//   | INewCollaborationNotificationData
-//   | IThreadEditNotificationData
-//   | ICommentEditNotificationData;
-
 export interface IBaseForumNotificationData {
   created_at: Date;
   thread_id: number | string;
