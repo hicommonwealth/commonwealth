@@ -11,6 +11,7 @@ export function assert(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function assertMatches(a: any, b: any, obj: string, field: string) {
   assert(
     a === b,
