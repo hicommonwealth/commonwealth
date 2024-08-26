@@ -1,7 +1,6 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  BanCache,
   ReactionAttributes,
   UserInstance,
   commonProtocol as commonProtocolService,
@@ -64,17 +63,6 @@ export async function __createThreadReaction(
   // check if thread is archived
   if (thread.archived_at) {
     throw new AppError(Errors.ThreadArchived);
-  }
-
-  // check address ban
-  const [canInteract, banError] = await BanCache.getInstance(
-    this.models,
-  ).checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   // check balance (bypass for admin)

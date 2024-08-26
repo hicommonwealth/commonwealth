@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  BanCache,
   CommentAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
@@ -46,17 +45,6 @@ export async function __deleteComment(
 
   if (!comment || !community_id) {
     throw new AppError(Errors.CommentNotFound);
-  }
-
-  // check if author can delete post
-  const [canInteract, error] = await BanCache.getInstance(this.models).checkBan(
-    {
-      communityId: community_id,
-      address: address.address,
-    },
-  );
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${error}`);
   }
 
   const isAdminOrOwner = await validateOwner({

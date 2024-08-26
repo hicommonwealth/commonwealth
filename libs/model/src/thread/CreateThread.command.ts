@@ -12,10 +12,13 @@ import {
 import { BigNumber } from 'ethers';
 import moment from 'moment';
 import { z } from 'zod';
-import { Contest, config, models, tokenBalanceCache } from '..';
+import { config } from '../config';
+import { GetActiveContestManagers } from '../contest';
+import { models } from '../database';
 import { isCommunityAdminOrTopicMember } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
 import { mustExist } from '../middleware/guards';
+import { tokenBalanceCache } from '../services';
 import {
   emitMentions,
   parseUserMentions,
@@ -35,7 +38,7 @@ export const CreateThreadErrors = {
   PostLimitReached: 'Post limit reached',
 };
 
-const getActiveContestManagersQuery = Contest.GetActiveContestManagers();
+const getActiveContestManagersQuery = GetActiveContestManagers();
 
 function toPlainString(decodedBody: string) {
   try {

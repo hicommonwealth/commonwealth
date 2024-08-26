@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { AddressInstance, BanCache, UserInstance } from '@hicommonwealth/model';
+import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import deleteThreadFromDb from '../../util/deleteThread';
 import { validateOwner } from '../../util/validateOwner';
@@ -47,19 +47,6 @@ export async function __deleteThread(
   });
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
-  }
-
-  if (address) {
-    // check ban
-    const [canInteract, banError] = await BanCache.getInstance(
-      this.models,
-    ).checkBan({
-      communityId: thread.community_id,
-      address: address.address,
-    });
-    if (!canInteract) {
-      throw new AppError(`Ban error: ${banError}`);
-    }
   }
 
   // check ownership (bypass if admin)

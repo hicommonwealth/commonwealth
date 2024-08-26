@@ -1,8 +1,4 @@
-import {
-  BanErrors,
-  CommunityInstance,
-  commonProtocol,
-} from '@hicommonwealth/model';
+import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -109,18 +105,6 @@ describe('ServerCommentsController', () => {
           reaction: reaction as any,
           commentId,
         });
-
-      expect(
-        serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          reaction: reaction as any,
-          commentId,
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
 
       expect(newReaction).to.be.ok;
 
@@ -279,71 +263,6 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Thread not found for comment');
     });
 
-    test('should throw error (banned)', () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-          transaction: (callback) => Promise.resolve(callback()),
-        },
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            chain: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              chain: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Comment: {
-          findOne: sandbox.stub().resolves({
-            id: 3,
-            text: 'my comment body',
-            Thread: {
-              id: 4,
-              title: 'Big Thread!',
-              community_id: 'ethereum',
-            },
-          }),
-          update: sandbox.stub().resolves(null),
-        },
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {};
-      const reaction = {};
-      const commentId = 123;
-
-      const serverCommentsController = new ServerCommentsController(db as any);
-
-      expect(
-        serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
-          commentId,
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
-    });
-
     test('should throw error (token balance)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
@@ -496,9 +415,8 @@ describe('ServerCommentsController', () => {
         orderDirection: 'DESC',
         includeCount: true,
       };
-      const comments = await serverCommentsController.searchComments(
-        searchOptions,
-      );
+      const comments =
+        await serverCommentsController.searchComments(searchOptions);
       expect(comments.results).to.have.length(5);
       expect(comments.results[0].id).to.equal(1);
       expect(comments.results[1].id).to.equal(2);
@@ -598,69 +516,6 @@ describe('ServerCommentsController', () => {
       const { excludeAddresses } = allNotificationOptions[0];
       // @ts-expect-error StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
-    });
-
-    test('should throw error (banned)', () => {
-      const data = {
-        id: 123,
-        thread_id: 2,
-        address_id: 1,
-        text: 'Wasup',
-        version_history: ['{"body":""}'],
-        community_id: 'ethereum',
-        Address: {
-          id: 1,
-          address: '0xbanned',
-          community_id: 'ethereum',
-          save: async () => ({}),
-        },
-        Thread: {
-          id: 2,
-          address_id: 1,
-          address: '0xbanned',
-          community_id: 'ethereum',
-          title: 'Big Thread!',
-        },
-        save: async () => ({}),
-        toJSON: () => data,
-      };
-      const db = {
-        Comment: {
-          findOne: async () => data,
-          update: () => null,
-        },
-        sequelize: {
-          transaction: (callback?: () => Promise<void>) => {
-            if (callback) return callback();
-            else
-              return {
-                rollback: () => Promise.resolve({}),
-                commit: () => Promise.resolve({}),
-              };
-          },
-          query: Promise.resolve([]),
-        },
-      };
-      const serverCommentsController = new ServerCommentsController(db as any);
-      const user = {
-        getAddresses: async () => [{ id: 1, verified: true }],
-      };
-      const address = {
-        id: 1,
-        address: '0xbanned',
-        chain: 'ethereum',
-        save: async () => ({}),
-      };
-      const commentId = 123;
-      const commentBody = 'Hello';
-      expect(
-        serverCommentsController.updateComment({
-          user: user as any,
-          address: address as any,
-          commentId,
-          commentBody,
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should throw error (thread not found)', () => {

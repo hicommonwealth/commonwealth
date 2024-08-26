@@ -1,8 +1,9 @@
 import { EventNames, events } from '@hicommonwealth/core';
-import { DB, emitEvent } from '@hicommonwealth/model';
 import { Comment, Thread } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
+import { DB } from '../models';
+import { emitEvent } from './utils';
 
 export type UserMention = {
   userId: string;

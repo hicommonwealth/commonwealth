@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  BanCache,
   CommentAttributes,
   UserInstance,
   emitMentions,
@@ -69,17 +68,6 @@ export async function __updateComment(
   const { Thread: thread } = comment;
   if (!thread) {
     throw new AppError(Errors.ThreadNotFoundForComment);
-  }
-
-  // check if banned
-  const [canInteract, banError] = await BanCache.getInstance(
-    this.models,
-  ).checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   const isAuthor = await validateOwner({

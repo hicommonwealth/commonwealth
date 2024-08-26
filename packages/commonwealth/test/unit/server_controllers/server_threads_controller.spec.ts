@@ -1,4 +1,4 @@
-import { BanErrors, commonProtocol } from '@hicommonwealth/model';
+import { commonProtocol } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
@@ -113,18 +113,6 @@ describe('ServerThreadsController', () => {
           reaction: reaction as any,
           threadId: threadId,
         });
-
-      expect(
-        serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          reaction: reaction as any,
-          threadId: threadId,
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
 
       expect(newReaction).to.be.ok;
 
@@ -262,65 +250,6 @@ describe('ServerThreadsController', () => {
           threadId,
         }),
       ).to.be.rejectedWith('Thread is archived');
-    });
-
-    test('should throw error (banned)', () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            chain: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              chain: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Thread: {
-          findOne: sandbox.stub().resolves({
-            id: 4,
-            title: 'Big Thread!',
-            community_id: 'ethereum',
-          }),
-        },
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-        },
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {};
-      const reaction = {};
-      const threadId = 123;
-
-      const serverThreadsController = new ServerThreadsController(db as any);
-
-      expect(
-        serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
-          threadId,
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should throw error (token balance)', () => {
@@ -550,70 +479,6 @@ describe('ServerThreadsController', () => {
         event: 'Create New Comment',
         community: 'ethereum',
       });
-    });
-
-    test('should throw error (banned)', () => {
-      const db = {
-        Thread: {
-          findOne: async () => ({
-            save: async () => ({}),
-          }),
-        },
-        // for findAllRoles
-        CommunityRole: {
-          findAll: async () => [
-            {
-              toJSON: () => ({}),
-            },
-          ],
-        },
-        sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
-          query: () => Promise.resolve([]),
-        },
-        Comment: {
-          create: async () => ({}),
-          findOne: async () => ({
-            Address: {
-              id: 1,
-              address: '0x123',
-            },
-            destroy: async () => ({}),
-            toJSON: () => ({}),
-          }),
-        },
-        Subscription: {
-          create: async () => ({}),
-        },
-      };
-
-      const serverThreadsController = new ServerThreadsController(db as any);
-
-      const user = {};
-      const address = {
-        id: 1,
-        address: '0x123',
-        save: async () => ({}),
-      };
-      const parentId = null;
-      const threadId = 1;
-      const text = 'hello';
-
-      expect(
-        serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
-          // @ts-expect-error StrictNullChecks
-          parentId,
-          threadId,
-          text,
-          canvasHash: undefined,
-          canvasSignedData: undefined,
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should throw error (thread not found)', () => {
@@ -1003,17 +868,6 @@ describe('ServerThreadsController', () => {
         threadId,
         address: address as any,
       });
-
-      expect(
-        serverThreadsController.deleteThread({
-          user: user as any,
-          threadId,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should should throw error (thread not found)', () => {
@@ -1052,50 +906,6 @@ describe('ServerThreadsController', () => {
           address: address as any,
         }),
       ).to.be.rejectedWith('Thread not found: 1');
-    });
-
-    test('should throw error (banned)', () => {
-      const db = {
-        Thread: {
-          findOne: async () => ({
-            id: 1,
-            Address: {
-              id: 1,
-              address: '0x123',
-            },
-          }),
-          destroy: async () => ({}),
-        },
-        CommunityRole: {
-          findAll: async () => [
-            {
-              toJSON: () => ({}),
-            },
-          ],
-        },
-        Subscription: {
-          destroy: async () => ({}),
-        },
-        sequelize: {
-          query: () => Promise.resolve([]),
-        },
-      };
-
-      const serverThreadsController = new ServerThreadsController(db as any);
-      const user = {
-        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
-      };
-      const threadId = 1;
-      const address = {
-        address: '0x123',
-      };
-      expect(
-        serverThreadsController.deleteThread({
-          user: user as any,
-          threadId,
-          address: address as any,
-        }),
-      ).to.be.rejectedWith(`Ban error: ${BanErrors.Banned}`);
     });
 
     test('should throw error (not owned)', () => {

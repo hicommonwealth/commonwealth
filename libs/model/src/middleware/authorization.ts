@@ -10,7 +10,7 @@ import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
-import { BanCache, models } from '..';
+import { models } from '..';
 
 export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
 export type ThreadMiddleware = CommandHandler<
@@ -163,14 +163,8 @@ export function isCommunityAdminOrTopicMember(
     const addr = await authorizeAddress(ctx, ['admin', 'moderator', 'member']);
     if (addr.role === 'member') {
       // first, check if banned
-      const [canInteract, banError] = await BanCache.getInstance(
-        models,
-      ).checkBan({
-        communityId: addr.community_id,
-        address: addr.address,
-      });
-      if (!canInteract)
-        throw new InvalidActor(ctx.actor, `Ban error: ${banError}`);
+      // TODO: if(addr.is_banned)
+      //  throw new InvalidActor(ctx.actor, `Ban error: ${banError}`);
       // check group membership
       await isTopicMember(ctx, action);
     }

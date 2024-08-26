@@ -1,7 +1,6 @@
 import { AppError, EventNames, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  BanCache,
   CommentAttributes,
   CommentInstance,
   UserInstance,
@@ -80,17 +79,6 @@ export async function __createThreadComment(
   });
   if (!thread) {
     throw new AppError(Errors.ThreadNotFound);
-  }
-
-  // check if banned
-  const [canInteract, banError] = await BanCache.getInstance(
-    this.models,
-  ).checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   // check if thread is archived
