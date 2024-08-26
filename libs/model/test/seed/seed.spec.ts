@@ -21,9 +21,9 @@ chai.use(chaiAsPromised);
 // then attempts to find the entity and validate it
 async function testSeed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas[T]>>,
+  values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<z.infer<typeof schemas[T]>> {
+): Promise<z.infer<(typeof schemas)[T]>> {
   const [record, records] = await seed(name, values, options);
   expect(records.length, 'failed to create entity').to.be.gt(0);
 
@@ -123,6 +123,8 @@ describe('Seed functions', () => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: node!.id,
+        lifetime_thread_count: 1,
+        profile_count: 1,
         Addresses: [
           {
             user_id: user.id,
@@ -148,6 +150,8 @@ describe('Seed functions', () => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: node!.id,
+        lifetime_thread_count: 1,
+        profile_count: 1,
         Addresses: [
           {
             user_id: user.id,
@@ -191,7 +195,14 @@ describe('Seed functions', () => {
       expect(shouldExit).to.be.false;
       shouldExit = true;
       expect(
-        seed('Community', {}, { mock: false }),
+        seed(
+          'Community',
+          {
+            lifetime_thread_count: 0,
+            profile_count: 1,
+          },
+          { mock: false },
+        ),
       ).to.eventually.be.rejectedWith(ValidationError);
       shouldExit = false;
     });

@@ -7,7 +7,7 @@ import { RouteFeatureFlags } from './Router';
 const EditorPage = lazy(() => import('views/pages/Editor'));
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/communities'));
+const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));

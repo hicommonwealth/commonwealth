@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Community } from '../entities';
 import { Comment } from '../entities/comment.schemas';
 import { Tags } from '../entities/tag.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -12,7 +13,15 @@ export const GetNewProfileResp = z.object({
   userId: z.number(),
   profile: UserProfile,
   totalUpvotes: z.number().int(),
-  addresses: z.array(Address),
+  addresses: z.array(
+    Address.extend({
+      Community: Community.pick({
+        id: true,
+        base: true,
+        ss58_prefix: true,
+      }),
+    }),
+  ),
   threads: z.array(Thread),
   comments: z.array(Comment),
   commentThreads: z.array(Thread),

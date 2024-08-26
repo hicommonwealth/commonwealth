@@ -30,6 +30,8 @@ describe('Comment subscription lifecycle', () => {
     });
     const [community] = await seed('Community', {
       chain_node_id: node!.id!,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',

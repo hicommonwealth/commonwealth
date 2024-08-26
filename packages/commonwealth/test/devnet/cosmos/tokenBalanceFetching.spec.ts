@@ -99,9 +99,14 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: true,
-        // @ts-expect-error StrictNullChecks
         chain_node_id: stargazeNode.id,
         bech32_prefix: 'stars',
+        collapsed_on_homepage: false,
+        custom_stages: [],
+        directory_page_enabled: false,
+        snapshot_spaces: [],
+        stages_enabled: true,
+        social_links: [],
       });
     }
 
@@ -263,9 +268,8 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           expect(balance[addressOne]).to.equal(originalAddressOneBalance);
 
           // transfer tokens
-          const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
-            addressOneMnemonic,
-          );
+          const wallet =
+            await DirectSecp256k1HdWallet.fromMnemonic(addressOneMnemonic);
           const client = await SigningStargateClient.connectWithSigner(
             rpcEndpoint,
             wallet,

@@ -25,7 +25,7 @@ import '../../../styles/modals/delete_address_modal.scss';
 type DeleteAddressModalAttrs = {
   profile: NewProfile;
   addresses: AddressInfo[];
-  address: string;
+  address: AddressInfo;
   chain: string;
   closeModal: () => void;
 };
@@ -48,15 +48,27 @@ export const DeleteAddressModal = ({
 
     try {
       const response = await axios.post(`${SERVER_URL}/deleteAddress`, {
-        address,
+        address: address.address,
         chain,
         jwt: user.jwt,
       });
 
       if (response?.data.status === 'Success') {
+        const updatedAddresses = [...user.addresses].filter(
+          (a) =>
+            a.addressId !== address.addressId &&
+            a.community?.id !== address.community?.id,
+        );
+        const remainingJoinedCommunities = updatedAddresses.map(
+          (a) => a.community.id,
+        );
         user.setData({
+          addresses: updatedAddresses,
+          communities: [...user.communities].filter((c) =>
+            remainingJoinedCommunities.includes(c.id),
+          ),
           accounts: user.accounts.filter(
-            (a) => a.address !== address && a.community.id !== chain,
+            (a) => a.address !== address.address && a.community.id !== chain,
           ),
         });
 
@@ -105,7 +117,7 @@ export const DeleteAddressModal = ({
         </div>
         <div className="confirmation">
           <CWText>Are you sure you want to remove this address?</CWText>
-          <CWTruncatedAddress address={address} />
+          <CWTruncatedAddress address={address.address} />
         </div>
       </CWModalBody>
       <CWModalFooter>

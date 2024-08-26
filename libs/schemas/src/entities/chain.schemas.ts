@@ -8,7 +8,7 @@ import { PG_INT } from '../utils';
 import { Contract } from './contract.schemas';
 
 export const ChainNode = z.object({
-  id: PG_INT.optional(),
+  id: PG_INT.optional().nullish(),
   url: z.string().max(255),
   eth_chain_id: PG_INT.nullish(),
   alt_wallet_url: z.string().max(255).nullish(),
