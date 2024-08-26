@@ -16,6 +16,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
+    // eslint-disable-next-line max-len
     relevance_by: z.enum(['tag_ids', 'membership']).optional().describe(`\n
       - When 'tag_ids', results would be 'DESC' ordered based on the provided 'tag_ids' param, and wouldn't strictly include matching 'tag_ids'\n
       - When 'memberships', results would be 'DESC' ordered, the communities with auth-user membership will come before non-membership communities\n
