@@ -22,7 +22,7 @@ export function track<Output>(
   event: string,
   mapper?: (result: Partial<Output>) => Record<string, unknown>,
 ): OutputMiddleware<Output> {
-  return async ({ actor, payload }, result) => {
+  return ({ actor, payload }, result) => {
     try {
       analytics().track(event, {
         userId: actor.user.id,
@@ -32,6 +32,7 @@ export function track<Output>(
     } catch (err) {
       err instanceof Error && log.error(err.message, err);
     }
+    return Promise.resolve();
   };
 }
 
