@@ -6,7 +6,6 @@ import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   DynamicTemplate,
-  NotificationCategories,
   WalletId,
   addressSwapper,
   deserializeCanvas,
@@ -89,18 +88,6 @@ const processAddress = async (
       const newUser = await models.User.create({
         email: null,
         profile: {},
-      });
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      });
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
       });
       addressInstance.user_id = newUser.id;
     }
