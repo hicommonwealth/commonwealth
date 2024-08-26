@@ -22,6 +22,16 @@ import './Editor.scss';
 
 import 'commonwealth-mdxeditor/style.css';
 
+import {
+  Code,
+  ListChecks,
+  ListDashes,
+  ListNumbers,
+  TextB,
+  TextItalic,
+  TextStrikethrough,
+  TextUnderline,
+} from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
@@ -121,6 +131,44 @@ export const Editor = (props: EditorProps) => {
         ref={mdxEditorRef}
         markdown={supported}
         placeholder={placeholder}
+        // 'undo' | 'redo' | 'format_bold' | 'format_italic' |
+        // 'format_underlined' | 'code' | 'strikeThrough' | 'superscript' |
+        // 'subscript' | 'format_list_bulleted' | 'format_list_numbered' |
+        // 'format_list_checked' | 'link' | 'add_photo' | 'table' |
+        // 'horizontal_rule' | 'frontmatter' | 'frame_source' |
+        // 'arrow_drop_down' | 'admonition' | 'sandpack' | 'rich_text' |
+        // 'difference' | 'markdown' | 'open_in_new' | 'link_off' | 'edit' |
+        // 'content_copy' | 'more_horiz' | 'more_vert' | 'close' | 'settings' |
+        // 'delete_big' | 'delete_small' | 'format_align_center' |
+        // 'format_align_left' | 'format_align_right' | 'add_row' | 'add_column'
+        // | 'insert_col_left' | 'insert_row_above' | 'insert_row_below' |
+        // 'insert_col_right' | 'check';
+        iconComponentFor={(name) => {
+          switch (name) {
+            case 'format_bold':
+              return <TextB size={24} />;
+            case 'format_italic':
+              return <TextItalic size={24} />;
+            case 'format_underlined':
+              return <TextUnderline size={24} />;
+            case 'strikeThrough':
+              return <TextStrikethrough size={24} />;
+            case 'format_list_bulleted':
+              return <ListDashes size={24} />;
+            case 'format_list_numbered':
+              return <ListNumbers size={24} />;
+            case 'format_list_checked':
+              return <ListChecks size={24} />;
+            case 'code':
+              console.log('FIXME: code');
+              return <Code size={24} />;
+
+            default:
+              break;
+          }
+
+          return <div />;
+        }}
         translation={(key, defaultValue, interpolations) => {
           switch (key) {
             case 'toolbar.blockTypeSelect.placeholder':
