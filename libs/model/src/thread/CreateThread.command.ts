@@ -109,7 +109,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
 
       const body = sanitizeQuillText(payload.body);
       const plaintext = kind === 'discussion' ? toPlainString(body) : body;
-      const mentions = uniqueMentions(parseUserMentions(body));
 
       // check contest invariants
       const activeContestManagers = await getActiveContestManagersQuery.body({
@@ -144,7 +143,9 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       });
       if (!mustExist('Community address', address)) return;
 
-      // Thread aggregate mutation is a transaction boundary
+      const mentions = uniqueMentions(parseUserMentions(body));
+
+      // == mutation transaction boundary ==
       const new_thread_id = await models.sequelize.transaction(
         async (transaction) => {
           const thread = await models.Thread.create(
@@ -183,15 +184,16 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           address.last_active = new Date();
           await address.save({ transaction });
 
-          // TODO: this should be a notification policy
-          await emitMentions(models, transaction, {
-            authorAddressId: address.id!,
-            authorUserId: actor.user.id!,
-            authorAddress: address.address,
-            mentions: mentions,
-            thread,
-            community_id: thread.community_id,
-          });
+          // emit mention events = transactional outbox
+          mentions.length &&
+            (await emitMentions(models, transaction, {
+              authorAddressId: address.id!,
+              authorUserId: actor.user.id!,
+              authorAddress: address.address,
+              mentions: mentions,
+              thread,
+              community_id: thread.community_id,
+            }));
 
           // TODO: check with Tim-> auto-subscribe thread creator to comments & reactions
           await models.Subscription.bulkCreate(
@@ -217,6 +219,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           return thread.id;
         },
       );
+      // == end of transaction boundary ==
 
       const thread = await models.Thread.findOne({
         where: { id: new_thread_id },

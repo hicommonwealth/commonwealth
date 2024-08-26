@@ -47,7 +47,6 @@ describe('ServerReactionsController', () => {
       };
       const serverReactionsController = new ServerReactionsController(
         db as any,
-        banCache as any,
       );
       await serverReactionsController.deleteReaction({
         user: user as any,
@@ -88,7 +87,6 @@ describe('ServerReactionsController', () => {
       };
       const serverReactionsController = new ServerReactionsController(
         db as any,
-        banCache as any,
       );
       expect(
         serverReactionsController.deleteReaction({
@@ -126,7 +124,6 @@ describe('ServerReactionsController', () => {
       };
       const serverReactionsController = new ServerReactionsController(
         db as any,
-        banCache as any,
       );
       expect(
         serverReactionsController.deleteReaction({

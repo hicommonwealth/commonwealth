@@ -10,16 +10,12 @@ import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
-import BanCache from 'server/util/banCheckCache';
 import Sinon from 'sinon';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
 
-const mockBanCache = {
-  checkBan: async () => [true, null],
-} as any as BanCache;
 describe('Reaction vote weight', () => {
   let server: TestServer;
 
@@ -34,14 +30,8 @@ describe('Reaction vote weight', () => {
   beforeAll(async () => {
     server = await testServer();
 
-    threadsController = new ServerThreadsController(
-      server.models,
-      mockBanCache,
-    );
-    commentsController = new ServerCommentsController(
-      server.models,
-      mockBanCache,
-    );
+    threadsController = new ServerThreadsController(server.models);
+    commentsController = new ServerCommentsController(server.models);
 
     const userRes = await server.seeder.createAndVerifyAddress(
       { chain: 'ethereum' },
