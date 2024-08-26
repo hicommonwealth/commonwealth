@@ -7,6 +7,7 @@ export type ThreadSubscriptionAttributes = z.infer<
   typeof ThreadSubscription
 > & {
   // associations
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Thread?: any;
 };
 

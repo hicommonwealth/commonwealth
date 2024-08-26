@@ -17,10 +17,16 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
     // eslint-disable-next-line max-len
-    relevance_by: z.enum(['tag_ids', 'membership']).optional().describe(`\n
-      - When 'tag_ids', results would be 'DESC' ordered based on the provided 'tag_ids' param, and wouldn't strictly include matching 'tag_ids'\n
-      - When 'memberships', results would be 'DESC' ordered, the communities with auth-user membership will come before non-membership communities\n
-    `),
+    relevance_by: z
+      .enum(['tag_ids', 'membership'])
+      .optional()
+      .describe(
+        '\n' +
+          // eslint-disable-next-line max-len
+          " - When 'tag_ids', results would be 'DESC' ordered based on the provided 'tag_ids' param, and wouldn't strictly include matching 'tag_ids'\n" +
+          // eslint-disable-next-line max-len
+          " - When 'memberships', results would be 'DESC' ordered, the communities with auth-user membership will come before non-membership communities\n",
+      ),
     network: z.nativeEnum(ChainNetwork).optional(),
     base: z.nativeEnum(ChainBase).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
