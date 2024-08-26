@@ -1,7 +1,9 @@
+import { CommunityAlert } from '@hicommonwealth/schemas';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import React from 'react';
 import app from 'state';
+import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
   VoteWeightModule,
@@ -10,9 +12,6 @@ import {
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sidebar/helpers';
-// import { SubscriptionButton } from 'views/components/subscription_button';
-import { CommunityAlert } from '@hicommonwealth/schemas';
-import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';

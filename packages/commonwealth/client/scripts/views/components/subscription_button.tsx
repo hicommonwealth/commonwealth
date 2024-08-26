@@ -21,8 +21,10 @@ export const SubscriptionButton = ({
     existingAlert || false,
   );
 
-  const deleteCommunityAlert = useDeleteCommunityAlertMutation();
-  const createCommunityAlert = useCreateCommunityAlertMutation();
+  const { mutateAsync: deleteCommunityAlert } =
+    useDeleteCommunityAlertMutation();
+  const { mutateAsync: createCommunityAlert } =
+    useCreateCommunityAlertMutation();
 
   return (
     <CWButton
@@ -30,11 +32,10 @@ export const SubscriptionButton = ({
       onClick={(e) => {
         e.preventDefault();
         if (notificationsOn) {
-          deleteCommunityAlert
-            .mutateAsync({
-              id: user.id,
-              community_ids: [app.activeChainId()],
-            })
+          deleteCommunityAlert({
+            id: user.id,
+            community_ids: [app.activeChainId()],
+          })
             .then(() => {
               setNotificationsOn(false);
               notifySuccess('Unsubscribed!');
@@ -43,11 +44,10 @@ export const SubscriptionButton = ({
               console.error(err);
             });
         } else {
-          createCommunityAlert
-            .mutateAsync({
-              id: user.id,
-              community_id: app.activeChainId(),
-            })
+          createCommunityAlert({
+            id: user.id,
+            community_id: app.activeChainId(),
+          })
             .then(() => {
               setNotificationsOn(true);
               notifySuccess('Subscribed!');

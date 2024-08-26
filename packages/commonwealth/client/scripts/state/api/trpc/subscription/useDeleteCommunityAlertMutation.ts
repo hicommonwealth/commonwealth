@@ -1,12 +1,10 @@
-import { queryClient } from 'state/api/config';
 import { trpc } from 'utils/trpcClient';
 
 export function useDeleteCommunityAlertMutation() {
+  const utils = trpc.useUtils();
   return trpc.subscription.deleteCommunityAlert.useMutation({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: trpc.subscription.getCommunityAlerts.getQueryKey({}),
-      });
+      await utils.subscription.getCommunityAlerts.invalidate();
     },
   });
 }

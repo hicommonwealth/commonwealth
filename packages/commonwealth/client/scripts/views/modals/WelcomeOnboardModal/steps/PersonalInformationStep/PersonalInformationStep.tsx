@@ -79,7 +79,7 @@ const PersonalInformationStep = ({
     }
   }, []);
 
-  const updateSubscriptionPreferencesMutation =
+  const { mutateAsync: updateSubscriptionPreferences } =
     useUpdateSubscriptionPreferencesMutation();
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
@@ -137,7 +137,7 @@ const PersonalInformationStep = ({
     }
 
     if (values.enableAccountNotifications) {
-      await updateSubscriptionPreferencesMutation.mutateAsync({
+      await updateSubscriptionPreferences({
         id: user.id,
         email_notifications_enabled: true,
         recap_email_enabled: true,
