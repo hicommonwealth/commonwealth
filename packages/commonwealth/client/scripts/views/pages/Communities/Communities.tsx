@@ -73,7 +73,7 @@ const CommunitiesPage = () => {
   } = useFetchCommunitiesQuery({
     limit: 50,
     include_node_info: true,
-    order_by: 'thread_count',
+    order_by: 'lifetime_thread_count',
     order_direction: 'DESC',
     base: filters.withChainBase ? ChainBase[filters.withChainBase] : undefined,
     network: filters.withNetwork,
@@ -269,7 +269,7 @@ const CommunitiesPage = () => {
                     <CWRelatedCommunityCard
                       community={community}
                       memberCount={community.profile_count || 0}
-                      threadCount={community.thread_count || 0}
+                      threadCount={community.lifetime_thread_count || 0}
                       canBuyStake={canBuyStake}
                       onStakeBtnClick={() =>
                         setSelectedCommunityId(community?.id || '')

@@ -10,7 +10,7 @@ import './JoinCommunityCard.scss';
 type JoinCommunityCardProps = {
   community: Pick<
     ChainInfo,
-    'name' | 'iconUrl' | 'profileCount' | 'threadCount'
+    'name' | 'iconUrl' | 'profileCount' | 'lifetimeThreadCount'
   >;
   isJoined?: boolean;
   canJoin?: boolean;
@@ -50,9 +50,12 @@ const JoinCommunityCard = ({
 
           <CWText className="dot">•</CWText>
 
-          <CWText type="b2" title={`${community?.threadCount}`}>
-            {community?.threadCount}&nbsp;
-            {pluralizeWithoutNumberPrefix(community?.threadCount, 'Thread')}
+          <CWText type="b2" title={`${community?.lifetimeThreadCount}`}>
+            {community?.lifetimeThreadCount}&nbsp;
+            {pluralizeWithoutNumberPrefix(
+              community?.lifetimeThreadCount,
+              'Thread',
+            )}
           </CWText>
         </div>
       </div>

@@ -30,7 +30,7 @@ describe('Contest Worker Policy', () => {
     const [community] = await seed('Community', {
       id: communityId,
       chain_node_id: chainNode!.id,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {
