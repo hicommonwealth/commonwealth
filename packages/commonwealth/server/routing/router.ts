@@ -234,6 +234,7 @@ function setupRouter(
   // TODO: do we need more middleware here? (analytics, notifications, canvas, etc)
   router.post(
     '/bot/threads',
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     databaseValidationService.validateBotUser,
     (req, _, next) => {
       req.body = JSON.parse(req.body);

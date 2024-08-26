@@ -8,12 +8,12 @@ import { afterEach, beforeEach, describe, test } from 'vitest';
 chai.use(chaiAsPromised);
 
 describe('ServerThreadsController', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       '0x123': '0',
     });
   });
-  afterEach(async () => {
+  afterEach(() => {
     Sinon.restore();
   });
   describe('#createThreadReaction', () => {
