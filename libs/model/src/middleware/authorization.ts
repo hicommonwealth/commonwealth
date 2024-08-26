@@ -53,6 +53,7 @@ const authorizeAddress = async (
   return addr;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CommunityMiddleware = CommandHandler<CommandInput, any>;
 type ThreadMiddleware = CommandHandler<CommandInput, typeof schemas.Thread>;
 type CommentMiddleware = CommandHandler<CommandInput, typeof schemas.Comment>;
@@ -61,6 +62,7 @@ type CommunityQueryMiddleware = QueryHandler<
   ZodObject<{
     community_id: ZodString;
   }>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any
 >;
 
