@@ -256,9 +256,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       throw new Error(`invalid chain ${chain}`);
     }
 
-    const { payload: session, signer } = await sessionSigner.newSession(
-      CANVAS_TOPIC,
-    );
+    const { payload: session, signer } =
+      await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = session.address.split(':')[2];
 
     let res = await chai.request
@@ -585,10 +584,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   updateRole: async (args: AssignRoleArgs) => {
     await models.sequelize.query(
       `
-      UPDATE "Addresses"
-      SET role = '${args.role}'
-      WHERE id = ${args.address_id};
-    `,
+          UPDATE "Addresses"
+          SET role = '${args.role}'
+          WHERE id = ${args.address_id};
+      `,
     );
     return true;
   },

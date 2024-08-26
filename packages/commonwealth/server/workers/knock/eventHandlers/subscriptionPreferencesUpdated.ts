@@ -16,7 +16,7 @@ const output = z.boolean();
 function mapDateToDaysOfWeek(
   date: Date,
   // @ts-expect-error StrictNullChecks
-): typeof DaysOfWeek[keyof typeof DaysOfWeek] {
+): (typeof DaysOfWeek)[keyof typeof DaysOfWeek] {
   switch (date.getDay()) {
     case 0:
       return DaysOfWeek.Sun;
