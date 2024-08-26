@@ -1,5 +1,5 @@
-import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import { z } from 'zod';
+import { Webhook, WebhookSupportedEvents } from '../entities/webhook.schemas';
 
 export const CreateWebhook = {
   input: z.object({
