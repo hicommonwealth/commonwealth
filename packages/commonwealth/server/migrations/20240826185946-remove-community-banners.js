@@ -9,7 +9,7 @@ module.exports = {
         'banner_text',
         {
           type: Sequelize.TEXT,
-          allowNull: false,
+          allowNull: true,
         },
         {
           transaction,
