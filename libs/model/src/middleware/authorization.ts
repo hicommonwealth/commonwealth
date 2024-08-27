@@ -47,7 +47,11 @@ export class BannedActor extends InvalidActor {
  * @param roles roles filter
  */
 const authorizeAddress = async (
-  { actor, payload }: CommandContext<CommandInput>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // `CommandContext<CommandInput>` prevents use of this function in Query middleware
+  // due to `id` being required in the core command framework.
+  // This issue can be resolved with https://github.com/hicommonwealth/commonwealth/issues/9009
+  { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<z.infer<typeof Address>> => {
   // By convention, secure requests must provide community_id/id + address arguments
