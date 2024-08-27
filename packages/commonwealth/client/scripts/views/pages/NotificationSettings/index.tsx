@@ -1,5 +1,4 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
-import { getUniqueCommunities } from 'helpers/addresses';
 import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
@@ -26,7 +25,7 @@ type NotificationSection = 'community-alerts' | 'threads' | 'comments';
 const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
   const threadSubscriptions = useThreadSubscriptions();
-  const communityAlerts = useCommunityAlertsQuery();
+  const communityAlerts = useCommunityAlertsQuery({});
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const user = useUserStore();
 
@@ -104,7 +103,7 @@ const NotificationSettings = () => {
               communities.
             </CWText>
 
-            {getUniqueCommunities().map((community) => {
+            {user.communities.map((community) => {
               return (
                 <CommunityEntry
                   key={community.id}

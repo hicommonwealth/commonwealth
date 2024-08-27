@@ -8,14 +8,12 @@ import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
-import type { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
-  topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
   reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
@@ -134,7 +132,7 @@ export default (
         ) => {
           const { Community, Outbox } = sequelize.models;
 
-          await Community.increment('thread_count', {
+          await Community.increment('lifetime_thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,
@@ -166,7 +164,7 @@ export default (
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           const { Community } = sequelize.models;
-          await Community.increment('thread_count', {
+          await Community.increment('lifetime_thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,

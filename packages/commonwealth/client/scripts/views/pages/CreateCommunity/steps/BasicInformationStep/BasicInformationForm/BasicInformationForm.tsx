@@ -32,7 +32,6 @@ import {
   ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
-  existingCommunityIds,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import { BasicInformationFormProps, FormSubmitValues } from './types';
@@ -76,12 +75,7 @@ const BasicInformationForm = ({
   } = useCreateCommunityMutation();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  let isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
-  if (!isCommunityNameTaken) {
-    isCommunityNameTaken = !!existingCommunityIds.find(
-      (id) => id === communityId,
-    );
-  }
+  const isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
 
   const getChainOptions = () => {
     const mappedChainValue = (chainType) => ({
@@ -162,23 +156,29 @@ const BasicInformationForm = ({
         // @ts-expect-error StrictNullChecks
         socialLinks: values.links,
         // @ts-expect-error StrictNullChecks
-        nodeUrl: selectedChainNode.nodeUrl,
+        nodeUrl: selectedChainNode?.nodeUrl,
         // @ts-expect-error StrictNullChecks
-        altWalletUrl: selectedChainNode.altWalletUrl,
+        altWalletUrl: selectedChainNode?.altWalletUrl,
         userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
           ethChainId: values.chain.value,
         }),
         ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
           cosmosChainId: values.chain.value,
-          // @ts-expect-error StrictNullChecks
-          bech32Prefix: selectedChainNode.bech32Prefix,
+          bech32Prefix: selectedChainNode?.bech32Prefix,
         }),
         isPWA: isAddedToHomeScreen,
       });
       onSubmit(communityId, values.communityName);
     } catch (err) {
-      notifyError(err.response?.data?.error);
+      if (
+        err.response?.data?.error ===
+        'The id for this community already exists, please choose another id'
+      ) {
+        notifyError(`Community name is taken, please choose a different name!`);
+      } else {
+        notifyError(err.response?.data?.error);
+      }
     }
   };
 
@@ -258,6 +258,7 @@ const BasicInformationForm = ({
         hookToForm
         label="Community Description"
         placeholder="Enter a description of your community or project"
+        charCount={250}
       />
 
       <CWCoverImageUploader

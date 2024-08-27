@@ -104,10 +104,6 @@ export const CreateComment = ({
           // Wait for dom to be updated before scrolling to comment
           jumpHighlightComment(newComment?.id as number);
         }, 100);
-
-        // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
-        // once we are receiving notifications from the websocket
-        await app.user.notifications.refresh();
       } catch (err) {
         if (err instanceof SessionKeyError) {
           return;

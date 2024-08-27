@@ -29,7 +29,6 @@ import {
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
-import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
@@ -222,9 +221,8 @@ export type ModelSeeder = {
     jwt: string;
   }) => Promise<any>;
   updateRole: (args: AssignRoleArgs) => Promise<any>;
-  createSubscription: (
-    args: SubscriptionArgs,
-  ) => Promise<NotificationSubscription>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  createSubscription: (args: SubscriptionArgs) => Promise<any>;
   createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
@@ -587,10 +585,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   updateRole: async (args: AssignRoleArgs) => {
     await models.sequelize.query(
       `
-      UPDATE "Addresses"
-      SET role = '${args.role}'
-      WHERE id = ${args.address_id};
-    `,
+          UPDATE "Addresses"
+          SET role = '${args.role}'
+          WHERE id = ${args.address_id};
+      `,
     );
     return true;
   },

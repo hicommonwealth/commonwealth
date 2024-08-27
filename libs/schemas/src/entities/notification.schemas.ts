@@ -30,7 +30,6 @@ export const Subscription = z.object({
 });
 
 export const SubscriptionPreference = z.object({
-  id: PG_INT,
   user_id: PG_INT,
   email_notifications_enabled: z.boolean().default(false),
   digest_email_enabled: z.boolean().default(false),
@@ -96,20 +95,22 @@ export const CommentSubscription = z.object({
           comment_count: true,
           created_at: true,
           url: true,
-        }).merge(
-          z.object({
-            Community: Community.pick({
-              id: true,
-              name: true,
-              icon_url: true,
+        })
+          .merge(
+            z.object({
+              Community: Community.pick({
+                id: true,
+                name: true,
+                icon_url: true,
+              }),
+              Address: Address.pick({
+                id: true,
+                user_id: true,
+                address: true,
+              }),
             }),
-            Address: Address.pick({
-              id: true,
-              user_id: true,
-              address: true,
-            }),
-          }),
-        ),
+          )
+          .optional(),
       }),
     )
     .optional(),

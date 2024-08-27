@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import app from 'state';
 
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
@@ -13,10 +11,10 @@ import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearch
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
@@ -32,6 +30,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
   const user = useUserStore();
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -41,8 +40,6 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     }, 200);
   };
 
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
-
   return (
     <div className="DesktopHeader">
       <div className="header-left">
@@ -51,7 +48,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
           iconButtonTheme="black"
           iconSize="header"
           onClick={() => {
-            if (app.isCustomDomain()) {
+            if (domain?.isCustomDomain) {
               navigate('/', {}, null);
             } else {
               if (user.isLoggedIn) {
@@ -101,15 +98,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             />
 
             <HelpMenuPopover />
-
-            {user.isLoggedIn && !enableKnockInAppNotifications && (
-              <NotificationsMenuPopover />
-            )}
           </div>
-
-          {user.isLoggedIn && enableKnockInAppNotifications && (
-            <KnockNotifications />
-          )}
+          <KnockNotifications />
         </div>
 
         {user.isLoggedIn && (

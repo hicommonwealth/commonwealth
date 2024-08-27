@@ -6,7 +6,11 @@ import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
+import {
+  useFetchConfigurationQuery,
+  useFetchCustomDomainQuery,
+} from 'state/api/configuration';
+import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
@@ -40,9 +44,13 @@ const LayoutComponent = ({
 }: LayoutAttrs) => {
   const navigate = useCommonNavigate();
   const routerParams = useParams();
-  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
+
+  const { data: domain } = useFetchCustomDomainQuery();
+
+  const pathScope = routerParams?.scope?.toString() || domain?.customDomainId;
   const providedCommunityScope = scoped ? pathScope : null;
   const user = useUserStore();
+  const appError = useErrorStore();
 
   const [communityToLoad, setCommunityToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -79,7 +87,7 @@ const LayoutComponent = ({
     providedCommunityScope &&
     providedCommunityScope !== app.activeChainId() &&
     providedCommunityScope !== communityToLoad &&
-    community &&
+    !!community &&
     !isVerifyingCommunityExistance;
 
   useNecessaryEffect(() => {
@@ -87,17 +95,18 @@ const LayoutComponent = ({
       if (shouldSelectChain) {
         setIsLoading(true);
         setCommunityToLoad(providedCommunityScope);
-        if (
-          await loadCommunityChainInfo(
-            ChainInfo.fromTRPCResponse(
-              community as z.infer<typeof ExtendedCommunity>,
-            ),
-          )
-        ) {
-          // Update default community on server if logged in
+        const communityFromTRPCResponse = ChainInfo.fromTRPCResponse(
+          community as z.infer<typeof ExtendedCommunity>,
+        );
+        if (await loadCommunityChainInfo(communityFromTRPCResponse)) {
+          // Update default community on server and app, if logged in
           if (user.isLoggedIn) {
             await updateActiveCommunity({
               communityId: community?.id || '',
+            });
+
+            user.setData({
+              activeCommunity: communityFromTRPCResponse,
             });
           }
         }
@@ -110,7 +119,7 @@ const LayoutComponent = ({
   // with deinitChainOrCommunity(), then set loadingScope to null and render a LoadingLayout.
   const shouldDeInitChain =
     !providedCommunityScope &&
-    !app.isCustomDomain() &&
+    !domain?.isCustomDomain &&
     app.chain &&
     app.chain.network;
 
@@ -128,16 +137,19 @@ const LayoutComponent = ({
   // A loading state (i.e. spinner) is shown in the following cases:
   // - a community is still being initialized or deinitialized
   const shouldShowLoadingState =
-    isLoading || shouldSelectChain || shouldDeInitChain;
+    isLoading ||
+    shouldSelectChain ||
+    shouldDeInitChain ||
+    (providedCommunityScope ? isVerifyingCommunityExistance : false);
 
   const childToRender = () => {
-    if (app.loadingError) {
+    if (appError.loadingError) {
       return (
         <CWEmptyState
           iconName="cautionTriangle"
           content={
             <div className="loading-error">
-              <CWText>Application error: {app.loadingError}</CWText>
+              <CWText>Application error: {appError.loadingError}</CWText>
               <CWText>Please try again later</CWText>
             </div>
           }

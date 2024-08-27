@@ -2,6 +2,7 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
+  ENFORCE_SESSION_KEYS,
   TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
@@ -16,6 +17,8 @@ const {
   ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
   ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
   ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+  SITEMAP_THREAD_PRIORITY,
+  SITEMAP_PROFILE_PRIORITY,
 } = process.env;
 
 const NAME =
@@ -30,6 +33,7 @@ const DEFAULTS = {
 export const config = configure(
   target,
   {
+    ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
@@ -67,8 +71,17 @@ export const config = configure(
         ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
     },
+    SITEMAP: {
+      THREAD_PRIORITY: SITEMAP_THREAD_PRIORITY
+        ? parseInt(SITEMAP_THREAD_PRIORITY)
+        : 0.8,
+      PROFILE_PRIORITY: SITEMAP_PROFILE_PRIORITY
+        ? parseInt(SITEMAP_PROFILE_PRIORITY)
+        : -1,
+    },
   },
   z.object({
+    ENFORCE_SESSION_KEYS: z.boolean(),
     DB: z.object({
       URI: z
         .string()
@@ -129,5 +142,9 @@ export const config = configure(
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY: z.string().optional(),
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: z.string().optional(),
     }), // TODO: make these mandatory in production before chain-event v3 (Alchemy Webhooks) goes live
+    SITEMAP: z.object({
+      THREAD_PRIORITY: z.coerce.number(),
+      PROFILE_PRIORITY: z.coerce.number(),
+    }),
   }),
 );

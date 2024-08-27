@@ -2,7 +2,7 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
-import apiRouter from '../api';
+import * as api from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 
@@ -75,7 +75,6 @@ import type ViewCountCache from '../util/viewCountCache';
 
 import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
-import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import type BanCache from '../util/banCheckCache';
 
@@ -113,6 +112,7 @@ import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
+import farcasterRouter from '../farcaster/router';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -206,11 +206,11 @@ function setupRouter(
   // ---
 
   const router = express.Router();
-
   router.use(useragent.express());
 
-  // Routes API
-  app.use('/api', apiRouter);
+  // API routes
+  app.use(api.internal.PATH, api.internal.router);
+  app.use(api.external.PATH, api.external.router);
 
   registerRoute(
     router,
@@ -931,14 +931,6 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     banAddress.bind(this, models),
   );
-  registerRoute(
-    router,
-    'get',
-    '/getBannedAddresses',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    getBannedAddresses.bind(this, models),
-  );
 
   // Custom domain update route
   registerRoute(
@@ -1123,6 +1115,9 @@ function setupRouter(
   app.use(endpoint, router);
 
   app.use(methodNotAllowedMiddleware());
+
+  app.use('/api/farcaster', farcasterRouter);
+
   app.use('/api/*', function (_req, res) {
     res.status(404);
     return failure(res, 'Not Found');

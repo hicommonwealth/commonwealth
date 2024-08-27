@@ -3,16 +3,14 @@ import {
   AddressInstance,
   CommentAttributes,
   UserInstance,
+  emitMentions,
+  findMentionDiff,
+  parseUserMentions,
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import {
-  emitMentions,
-  findMentionDiff,
-  parseUserMentions,
-} from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 

@@ -1,12 +1,13 @@
 import React from 'react';
-import type { To, NavigateOptions } from 'react-router-dom';
+import type { NavigateOptions, To } from 'react-router-dom';
 import {
-  useParams,
-  useNavigate,
-  useLocation,
   Navigate as ReactNavigate,
+  useLocation,
+  useNavigate,
+  useParams,
 } from 'react-router-dom';
 import app from 'state';
+import { fetchCachedCustomDomain } from 'state/api/configuration';
 
 const PROD_URL = 'https://commonwealth.im';
 
@@ -23,7 +24,9 @@ export const Navigate = ({ to }: NavigateWithParamsProps) => {
 
 export const getScopePrefix = (prefix?: null | string) => {
   const activeChainIdPrefix = app.activeChainId() || '';
-  const scope = app.isCustomDomain() ? '' : activeChainIdPrefix;
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
+
+  const scope = isCustomDomain ? '' : activeChainIdPrefix;
 
   if (prefix === null) {
     return '';
@@ -71,6 +74,7 @@ export const useCommonNavigate = () => {
 // This helper should be used as a wrapper to Class Components
 // to access react-router functionalities
 const withRouter = (Component) => {
+  // eslint-disable-next-line react/function-component-definition, react/no-multi-comp, react/display-name
   return (props) => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -84,7 +88,7 @@ interface NavigateToCommunityProps {
   navigate: (
     url: To,
     options?: NavigateOptions,
-    prefix?: null | string
+    prefix?: null | string,
   ) => void;
   path: string;
   chain: string;
@@ -101,12 +105,14 @@ export const navigateToCommunity = ({
   path,
   chain,
 }: NavigateToCommunityProps) => {
-  const isExternalLink = chain !== app.customDomainId();
+  const { isCustomDomain, customDomainId } = fetchCachedCustomDomain() || {};
+
+  const isExternalLink = chain !== customDomainId;
 
   // When we navigate to another chain, remove all listeners initialized from old chain.
   app.chainModuleReady.removeAllListeners();
 
-  if (!app.isCustomDomain()) {
+  if (!isCustomDomain) {
     navigate(path, {}, chain);
   } else {
     if (isExternalLink) {

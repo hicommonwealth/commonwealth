@@ -1,9 +1,11 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
+import { z } from 'zod';
 
 interface CommunityDirectoryCardProps {
   communityId: string;
@@ -37,18 +39,7 @@ const CommunityDirectoryCard = ({
   return (
     <CWRelatedCommunityCard
       key={communityId}
-      community={{
-        id: community.id || '',
-        name: community.name,
-        base: community.base,
-        description: community.description || '',
-        iconUrl: community.icon_url || '',
-        namespace: community.namespace || '',
-        ChainNode: {
-          url: community.ChainNode?.url || '',
-          ethChainId: community.ChainNode?.eth_chain_id || 0,
-        },
-      }}
+      community={community as z.infer<typeof ExtendedCommunity>}
       canBuyStake={canBuyStake}
       memberCount={membersCount}
       threadCount={threadsCount}

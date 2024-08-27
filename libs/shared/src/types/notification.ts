@@ -103,6 +103,7 @@ export interface ICommentEditNotificationData
 type ChainEventAttributes = {
   id: number;
   block_number: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   event_data: any;
   queued: number;
   entity_id?: number;
@@ -126,6 +127,7 @@ export type ChainEventNotification = {
 export interface IChainEventNotificationData {
   id?: number;
   block_number?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   event_data: any;
   network: SupportedNetwork;
   community_id: string;

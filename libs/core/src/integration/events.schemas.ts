@@ -1,5 +1,6 @@
 import {
   Comment,
+  PG_INT,
   Reaction,
   SubscriptionPreference,
   Thread,
@@ -27,6 +28,10 @@ export const ThreadUpvoted = Reaction.extend({
 });
 export const CommentCreated = Comment.extend({
   community_id: z.string(),
+  users_mentioned: z
+    .array(PG_INT)
+    .optional()
+    .describe('An array of user ids that are mentioned in the comment'),
 });
 export const GroupCreated = z.object({
   groupId: z.string(),
@@ -231,4 +236,4 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   mobile_push_admin_alerts_enabled: true,
   created_at: true,
   updated_at: true,
-}).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
+}).merge(SubscriptionPreference.pick({ user_id: true }));

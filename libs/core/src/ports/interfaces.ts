@@ -139,6 +139,7 @@ export interface Cache extends Disposable {
   ): Promise<boolean>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnalyticsOptions = Record<string, any>;
 
 /**
@@ -232,7 +233,9 @@ export interface Broker extends Disposable {
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
@@ -340,6 +343,7 @@ export type NotificationsProviderGetMessagesReturn = Array<{
     version_id: string;
     key: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   __cursor?: string;
 }>;
