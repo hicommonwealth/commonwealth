@@ -5,7 +5,10 @@ import {
   CommentInstance,
   UserInstance,
   emitEvent,
+  emitMentions,
+  parseUserMentions,
   sanitizeQuillText,
+  uniqueMentions,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import {
@@ -16,11 +19,6 @@ import {
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { getCommentDepth } from '../../util/getCommentDepth';
-import {
-  emitMentions,
-  parseUserMentions,
-  uniqueMentions,
-} from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';

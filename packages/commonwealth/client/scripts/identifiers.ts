@@ -1,4 +1,5 @@
 import { ProposalType, slugify } from '@hicommonwealth/shared';
+import { fetchCachedCustomDomain } from 'state/api/configuration';
 import type NotificationSubscription from './models/NotificationSubscription';
 import app from './state';
 
@@ -16,7 +17,10 @@ export const getProposalUrlPath = (
   } else {
     basePath = `/proposal/${id}`;
   }
-  if (omitActiveId || (app.isCustomDomain() && !chainId)) {
+
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
+
+  if (omitActiveId || (isCustomDomain && !chainId)) {
     return basePath;
   } else {
     return `/${chainId || app.activeChainId()}${basePath}`;

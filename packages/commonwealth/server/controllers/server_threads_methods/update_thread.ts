@@ -7,6 +7,9 @@ import {
   ThreadAttributes,
   ThreadInstance,
   UserInstance,
+  emitMentions,
+  findMentionDiff,
+  parseUserMentions,
 } from '@hicommonwealth/model';
 import {
   NotificationCategories,
@@ -23,11 +26,6 @@ import {
 } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validURL } from '../../../shared/utils';
-import {
-  emitMentions,
-  findMentionDiff,
-  parseUserMentions,
-} from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { addVersionHistory } from '../../util/versioning';
 import { TrackOptions } from '../server_analytics_controller';

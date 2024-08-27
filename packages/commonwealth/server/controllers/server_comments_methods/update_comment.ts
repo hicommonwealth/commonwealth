@@ -3,6 +3,9 @@ import {
   AddressInstance,
   CommentAttributes,
   UserInstance,
+  emitMentions,
+  findMentionDiff,
+  parseUserMentions,
 } from '@hicommonwealth/model';
 import {
   NotificationCategories,
@@ -11,11 +14,6 @@ import {
 } from '@hicommonwealth/shared';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
-import {
-  emitMentions,
-  findMentionDiff,
-  parseUserMentions,
-} from '../../util/parseUserMentions';
 import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
