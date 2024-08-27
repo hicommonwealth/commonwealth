@@ -105,12 +105,11 @@ const useNotificationSettings = () => {
     app?.user.notifications.chainEventSubscribedChainIds;
 
   // communities the user has addresses for but does not have existing subscriptions for
-  const relevantSubscribedCommunities = user.addresses
-    ?.map?.((x) => x?.community)
-    ?.filter?.(
-      (x) =>
-        subscribedCommunityIds?.includes?.(x?.id) && !chainEventSubs?.[x?.id],
-    );
+  const relevantSubscribedCommunities = user.communities?.filter?.(
+    (community) =>
+      subscribedCommunityIds?.includes?.(community.id) &&
+      !chainEventSubs?.[community.id],
+  );
 
   const toggleAllInAppNotifications = async (enableAll: boolean) => {
     const subIds = [];
@@ -136,16 +135,14 @@ const useNotificationSettings = () => {
     await handleSubscriptions(!enableAll, subIds);
     await handleEmailSubscriptions(!enableAll, subIds);
     if (enableAll) {
-      relevantSubscribedCommunities
-        .sort((x, y) => x.name.localeCompare(y.name))
-        .map((community) => {
-          app.user.notifications
-            .subscribe({
-              categoryId: NotificationCategories.ChainEvent,
-              options: { communityId: community.id },
-            })
-            .catch(console.error);
-        });
+      relevantSubscribedCommunities.map((community) => {
+        app.user.notifications
+          .subscribe({
+            categoryId: NotificationCategories.ChainEvent,
+            options: { communityId: community.id },
+          })
+          .catch(console.error);
+      });
     }
   };
 

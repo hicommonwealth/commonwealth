@@ -13,7 +13,6 @@ import {
   ChainBase,
   ChainType,
   DefaultPage,
-  NotificationCategories,
 } from '@hicommonwealth/shared';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
@@ -327,13 +326,13 @@ export async function __createCommunity(
         base === ChainBase.CosmosSDK
           ? BalanceType.Cosmos
           : base === ChainBase.Substrate
-          ? BalanceType.Substrate
-          : base === ChainBase.Ethereum
-          ? BalanceType.Ethereum
-          : // beyond here should never really happen, but just to make sure...
-          base === ChainBase.Solana
-          ? BalanceType.Solana
-          : undefined,
+            ? BalanceType.Substrate
+            : base === ChainBase.Ethereum
+              ? BalanceType.Ethereum
+              : // beyond here should never really happen, but just to make sure...
+                base === ChainBase.Solana
+                ? BalanceType.Solana
+                : undefined,
       // use first chain name as node name
       name: community.name,
     },
@@ -355,17 +354,20 @@ export async function __createCommunity(
     description,
     network,
     type,
-    // @ts-expect-error StrictNullChecks
     social_links: uniqueLinksArray,
     base,
     bech32_prefix,
     active: true,
-    // @ts-expect-error StrictNullChecks
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
     default_page: DefaultPage.Discussions,
     has_homepage: 'true',
+    collapsed_on_homepage: false,
+    custom_stages: [],
+    directory_page_enabled: false,
+    snapshot_spaces: [],
+    stages_enabled: true,
   });
 
   const nodeJSON = node.toJSON();
@@ -483,15 +485,7 @@ export async function __createCommunity(
       role: 'admin',
       last_active: new Date(),
       ghost_address: false,
-    });
-
-    await this.models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewThread,
-        community_id: createdCommunity.id,
-        is_active: true,
-      },
+      is_banned: false,
     });
   }
 

@@ -5,6 +5,7 @@ import 'pages/search/index.scss';
 
 import { CommunityMember } from '@hicommonwealth/schemas';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { z } from 'zod';
 import CommunityInfo from '../../../models/ChainInfo';
@@ -38,6 +39,8 @@ const ThreadResultRow = ({
   searchTerm,
   setRoute,
 }: ThreadResultRowProps) => {
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const title = useMemo(() => {
     try {
       return decodeURIComponent(thread.title);
@@ -50,7 +53,10 @@ const ThreadResultRow = ({
     setRoute(`/discussion/${thread.id}`, {}, thread.community_id);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== thread.community_id) {
+  if (
+    domain?.isCustomDomain &&
+    domain?.customDomainId !== thread.community_id
+  ) {
     return <></>;
   }
 
@@ -115,6 +121,8 @@ const ReplyResultRow = ({
   const proposalId = comment.proposalid;
   const communityId = comment.community_id;
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const title = useMemo(() => {
     try {
       return decodeURIComponent(comment.title);
@@ -131,7 +139,7 @@ const ReplyResultRow = ({
     );
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== communityId) {
+  if (domain?.isCustomDomain && domain?.customDomainId !== communityId) {
     return <></>;
   }
 
@@ -229,11 +237,13 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   });
   const profile: MinimumProfile = users?.[0];
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const handleClick = () => {
     setRoute(`/profile/id/${profile?.userId}`, {}, null);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== community_id) {
+  if (domain?.isCustomDomain && domain?.customDomainId !== community_id) {
     return null;
   }
 

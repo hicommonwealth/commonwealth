@@ -26,6 +26,8 @@ describe('Stake Historical Price', () => {
     });
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'admin',
@@ -44,7 +46,7 @@ describe('Stake Historical Price', () => {
 
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: community!.Addresses![0].address,
+      address: community!.Addresses![0].address,
     };
 
     community_id = community!.id!;

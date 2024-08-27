@@ -77,6 +77,7 @@ export class ChainTesting extends SdkBase {
   public async createProposal(
     accountIndex: number,
     govType = 'compound',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const gov: IGovernor =
       govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
@@ -92,6 +93,7 @@ export class ChainTesting extends SdkBase {
   public async cancelProposal(
     proposalId: string,
     govType = 'compound',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const gov: IGovernor =
       govType === 'compound' ? new compoundGovernor() : new aaveGovernor();

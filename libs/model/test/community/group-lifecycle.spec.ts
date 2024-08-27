@@ -38,6 +38,8 @@ describe('Group lifecycle', () => {
     const [community] = await seed('Community', {
       chain_node_id: node!.id!,
       active: true,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'admin',
@@ -49,7 +51,7 @@ describe('Group lifecycle', () => {
     payload.id = community!.id!;
     actor = {
       user: { id: user!.id!, email: user!.email!, isAdmin: user!.isAdmin! },
-      address_id: community!.Addresses!.at(0)!.address!,
+      address: community!.Addresses!.at(0)!.address!,
     };
   });
 

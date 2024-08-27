@@ -44,7 +44,6 @@ export const buildDb = (sequelize: Sequelize): DB => {
 
 // TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
-export * from './ban';
 export * from './chain_node';
 export * from './collaboration';
 export * from './comment';

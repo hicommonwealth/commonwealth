@@ -17,6 +17,8 @@ describe('New Content lifecycle', () => {
     const [user2] = await seed('User');
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
+      lifetime_thread_count: 0,
+      profile_count: 2,
       Addresses: [
         {
           role: 'member',
@@ -39,7 +41,7 @@ describe('New Content lifecycle', () => {
         email: user1!.email!,
         isAdmin: user1?.isAdmin || false,
       },
-      address_id: community!.Addresses!.at(0)!.address!,
+      address: community!.Addresses!.at(0)!.address!,
     };
     address1 = community!.Addresses!.at(0)!;
     actor2 = {
@@ -48,7 +50,7 @@ describe('New Content lifecycle', () => {
         email: user2!.email!,
         isAdmin: user2?.isAdmin || false,
       },
-      address_id: community!.Addresses!.at(1)!.address!,
+      address: community!.Addresses!.at(1)!.address!,
     };
   });
 
