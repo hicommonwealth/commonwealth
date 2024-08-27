@@ -41,18 +41,12 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         return;
       }
 
-      const [
-        adminsAndMods,
-        numVotingThreads,
-        numTotalThreads,
-        communityBanner,
-      ] = await (<
+      const [adminsAndMods, numVotingThreads, numTotalThreads] = await (<
         Promise<
           [
             Array<{ address: string; role: 'admin' | 'moderator' }>,
             number,
             number,
-            { banner_text: string } | undefined,
           ]
         >
       >Promise.all([
@@ -75,11 +69,6 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
             marked_as_spam_at: null,
           },
         }),
-        models.CommunityBanner.findOne({
-          where: {
-            community_id: payload.id,
-          },
-        }),
       ]));
 
       return {
@@ -87,7 +76,7 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         adminsAndMods,
         numVotingThreads,
         numTotalThreads,
-        communityBanner: communityBanner?.banner_text,
+        communityBanner: result.banner_text,
       } as CommunityAttributes & {
         numVotingThreads: number;
         numTotalThreads: number;
