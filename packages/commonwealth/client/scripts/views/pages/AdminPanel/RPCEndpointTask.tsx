@@ -1,16 +1,11 @@
-import { BalanceType, ChainType } from '@hicommonwealth/shared';
+import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
 import React, { useEffect, useState } from 'react';
-import {
-  useGetCommunityByIdQuery,
-  useUpdateCommunityMutation,
-} from 'state/api/communities';
 import { getNodeByCosmosChainId, getNodeByUrl } from 'state/api/nodes/utils';
-import { useDebounce } from 'usehooks-ts';
 import useFetchNodesQuery from '../../../state/api/nodes/fetchNodes';
 import {
   CWDropdown,
@@ -34,6 +29,8 @@ const RPCEndpointTask = () => {
   const [rpcEndpointCommunityId, setRpcEndpointCommunityId] =
     useState<string>('');
   const [rpcEndpoint, setRpcEndpoint] = useState<string>('');
+  const [communityInfoValueValidated, setCommunityInfoValueValidated] =
+    useState<boolean>(false);
   // @ts-expect-error <StrictNullChecks/>
   const [communityChainNode, setCommunityChainNode] = useState<NodeInfo>(null);
   const [communityChainNodeValidated, setCommunityChainNodeValidated] =
@@ -53,8 +50,7 @@ const RPCEndpointTask = () => {
       value: '',
     },
   ]);
-  // @ts-expect-error <StrictNullChecks/>
-  const [cosmosChainId, setCosmosChainId] = useState<string>(null);
+
   const [ethChainIdValueValidated, setEthChainIdValueValidated] =
     useState<boolean>(false);
 
@@ -68,28 +64,42 @@ const RPCEndpointTask = () => {
     }
   }, [balanceType]);
 
-  const debouncedCommunityLookupId = useDebounce<string | undefined>(
-    rpcEndpointCommunityId,
-    500,
-  );
+  // const debouncedCommunityLookupId = useDebounce<string | undefined>(
+  //   rpcEndpointCommunityId,
+  //   500,
+  // );
 
-  const { data: communityLookupData } = useGetCommunityByIdQuery({
-    id: debouncedCommunityLookupId || '',
-    enabled: !!debouncedCommunityLookupId,
-  });
+  // const { data: communityLookupData } = useGetCommunityByIdQuery({
+  //   id: debouncedCommunityLookupId || '',
+  //   enabled: !!debouncedCommunityLookupId,
+  // });
+
+  // const communityNotFound =
+  //   !isLoadingCommunityLookupData &&
+  //   (!communityLookupData ||
+  //     Object.keys(communityLookupData || {})?.length === 0);
+
+  // const communityNotChain = communityLookupData?.type !== ChainType.Chain;
 
   const buttonEnabled =
     (communityChainNodeValidated &&
       communityChainNode &&
+      communityInfoValueValidated &&
       balanceType !== BalanceType.Ethereum &&
       !ethChainIdValueValidated) ||
     (rpcName !== '' &&
       (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
       rpcEndpoint !== '');
 
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
-    communityId: rpcEndpointCommunityId,
-  });
+  // const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+  //   communityId: rpcEndpointCommunityId,
+  // });
+
+  const setCommunityIdInput = (e) => {
+    setRpcEndpointCommunityId(e?.target?.value?.trim() || '');
+    if (e?.target?.value?.trim()?.length === 0)
+      setCommunityInfoValueValidated(false);
+  };
 
   const RPCEndpointValidationFn = (
     value: string,
@@ -148,28 +158,29 @@ const RPCEndpointTask = () => {
   };
 
   const update = async () => {
-    if (!communityLookupData?.id) return;
+    // if (!communityLookupData?.id) return;
     try {
-      let nodeId = null;
+      // let nodeId = null;
       // Create Chain Node if not yet created
-      const res = await createChainNode({
+      await createChainNode({
         url: rpcEndpoint,
         name: rpcName,
-        bech32,
         balance_type: balanceType,
         eth_chain_id: ethChainId,
-        cosmos_chain_id: cosmosChainId,
       });
-      nodeId = res.data.result.node_id;
+      // nodeId = res.data.result.node_id;
 
-      if (Object.keys(communityLookupData || {}).length > 0) {
-        await updateCommunity({
-          communityId: communityLookupData?.id,
-          chainNodeId: nodeId ?? communityChainNode?.id?.toString(),
-          type: ChainType.Chain,
-        });
-      }
-
+      // if (
+      //   Object.keys(communityLookupData || {}).length > 0 &&
+      //   communityInfoValueValidated
+      // ) {
+      //   console.log('inside if statement)');
+      //   await updateCommunity({
+      //     communityId: communityLookupData?.id,
+      //     chainNodeId: nodeId ?? communityChainNode?.id?.toString(),
+      //     type: ChainType.Chain,
+      //   });
+      // }
       setRpcEndpointCommunityId('');
       setRpcEndpoint('');
       // @ts-expect-error <StrictNullChecks/>
@@ -179,6 +190,7 @@ const RPCEndpointTask = () => {
       setRpcName('');
       setErrorMsg(null);
       notifySuccess('RPC Endpoint Updated');
+      console.log('from the bottom');
     } catch (e) {
       notifyError('Error updating RPC Endpoint');
       console.error(e);
@@ -189,7 +201,7 @@ const RPCEndpointTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update RPC Endpoint',
-      description: `Are you sure you want to create this rpc endpoint for ${rpcEndpointCommunityId}?`,
+      description: `Are you sure you want to create this rpc endpoint?`,
       buttons: [
         {
           label: 'Update',
@@ -244,6 +256,11 @@ const RPCEndpointTask = () => {
       <div className="MultiRow">
         {balanceType === BalanceType.Ethereum && (
           <div className="TaskRow">
+            <CWTextInput
+              value={rpcEndpointCommunityId}
+              onInput={setCommunityIdInput}
+              placeholder="Enter a community id (Optional)"
+            />
             <CWTextInputOld
               value={rpcEndpoint}
               onInput={(e) => {
@@ -253,7 +270,7 @@ const RPCEndpointTask = () => {
               placeholder="Enter an RPC endpoint (Required)"
             />
             <CWButton
-              label={chainNodeNotCreated ? 'Create' : 'Update'}
+              label="Create"
               className="TaskButton"
               disabled={!buttonEnabled}
               onClick={openConfirmationModal}
@@ -317,7 +334,6 @@ const RPCEndpointTask = () => {
                   }}
                   onChange={(selectedOption) => {
                     checkIfCosmosChainNodeExists(selectedOption.value);
-                    setCosmosChainId(selectedOption.value);
                   }}
                 />
               </div>
