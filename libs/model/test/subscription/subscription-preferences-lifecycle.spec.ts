@@ -1,5 +1,4 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
 import {
   afterAll,
@@ -9,7 +8,6 @@ import {
   describe,
   test,
 } from 'vitest';
-import z from 'zod';
 import { models } from '../../src/database';
 import {
   GetSubscriptionPreferences,
@@ -19,7 +17,6 @@ import { seed } from '../../src/tester';
 
 describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
-  let subPreferences: z.infer<typeof SubscriptionPreference> | undefined;
   beforeAll(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
@@ -36,7 +33,7 @@ describe('Subscription preferences lifecycle', () => {
   });
 
   beforeEach(async () => {
-    [subPreferences] = await seed('SubscriptionPreference', {
+    await seed('SubscriptionPreference', {
       user_id: actor.user.id,
       email_notifications_enabled: false,
       digest_email_enabled: false,
@@ -54,7 +51,8 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should update a single property in subscription preferences', async () => {
     const payload = {
-      id: subPreferences!.id!,
+      id: actor.user.id!,
+      user_id: actor.user.id,
       email_notifications_enabled: true,
     };
 
@@ -64,9 +62,8 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
-      id: subPreferences!.id,
       user_id: actor.user.id,
+      email_notifications_enabled: true,
       digest_email_enabled: false,
       recap_email_enabled: false,
       mobile_push_notifications_enabled: false,
@@ -77,7 +74,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should update multiple properties in subscription preferences', async () => {
     const payload = {
-      id: subPreferences!.id!,
+      id: actor.user.id!,
       email_notifications_enabled: true,
       digest_email_enabled: true,
     };
@@ -88,8 +85,8 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
-      id: subPreferences!.id,
+      email_notifications_enabled: true,
+      digest_email_enabled: true,
       user_id: actor.user.id,
       recap_email_enabled: false,
       mobile_push_notifications_enabled: false,
@@ -105,7 +102,6 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      id: subPreferences!.id,
       user_id: actor.user.id,
       email_notifications_enabled: false,
       digest_email_enabled: false,
@@ -130,7 +126,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should emit a SubscriptionPreferencesUpdated event if emails are enabled', async () => {
     const payload = {
-      id: subPreferences!.id!,
+      id: actor.user.id!,
       email_notifications_enabled: true,
     };
 
@@ -140,8 +136,7 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
-      id: subPreferences!.id,
+      email_notifications_enabled: true,
       user_id: actor.user.id,
       digest_email_enabled: false,
       recap_email_enabled: false,
@@ -153,7 +148,6 @@ describe('Subscription preferences lifecycle', () => {
     const event = await models.Outbox.findAll();
     expect(event[0]).to.exist;
     expect(event[0]!.event_payload).to.deep.equal({
-      id: subPreferences!.id,
       user_id: actor.user.id,
       email_notifications_enabled: true,
     });
@@ -161,7 +155,7 @@ describe('Subscription preferences lifecycle', () => {
 
   test('should emit a SubscriptionPreferencesUpdated event if recap emails are enabled', async () => {
     const payload = {
-      id: subPreferences!.id!,
+      id: actor.user.id!,
       email_notifications_enabled: true,
       recap_email_enabled: true,
     };
@@ -172,8 +166,8 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
-      id: subPreferences!.id,
+      email_notifications_enabled: true,
+      recap_email_enabled: true,
       user_id: actor.user.id,
       digest_email_enabled: false,
       mobile_push_notifications_enabled: false,
@@ -184,7 +178,6 @@ describe('Subscription preferences lifecycle', () => {
     const event = await models.Outbox.findAll();
     expect(event[0]).to.exist;
     expect(event[0]!.event_payload).to.deep.equal({
-      id: subPreferences!.id,
       user_id: actor.user.id,
       email_notifications_enabled: true,
       recap_email_enabled: true,
@@ -196,13 +189,13 @@ describe('Subscription preferences lifecycle', () => {
       { email_notifications_enabled: true },
       {
         where: {
-          id: subPreferences!.id,
+          user_id: actor.user.id!,
         },
       },
     );
 
     const payload = {
-      id: subPreferences!.id!,
+      id: actor.user.id!,
       email_notifications_enabled: false,
     };
 
@@ -212,8 +205,7 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
-      id: subPreferences!.id,
+      email_notifications_enabled: false,
       user_id: actor.user.id,
       digest_email_enabled: false,
       recap_email_enabled: false,
@@ -225,7 +217,6 @@ describe('Subscription preferences lifecycle', () => {
     const event = await models.Outbox.findAll();
     expect(event[0]).to.exist;
     expect(event[0]!.event_payload).to.deep.equal({
-      id: subPreferences!.id,
       user_id: actor.user.id,
       email_notifications_enabled: false,
     });
@@ -236,13 +227,13 @@ describe('Subscription preferences lifecycle', () => {
       { recap_email_enabled: true },
       {
         where: {
-          id: subPreferences!.id,
+          user_id: actor.user.id!,
         },
       },
     );
 
     const payload = {
-      id: subPreferences!.id!,
+      id: actor.user.id!,
       recap_email_enabled: false,
     };
 
@@ -252,8 +243,7 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      ...payload,
-      id: subPreferences!.id,
+      recap_email_enabled: false,
       user_id: actor.user.id,
       digest_email_enabled: false,
       mobile_push_notifications_enabled: false,
@@ -264,7 +254,6 @@ describe('Subscription preferences lifecycle', () => {
     const event = await models.Outbox.findAll();
     expect(event[0]).to.exist;
     expect(event[0]!.event_payload).to.deep.equal({
-      id: subPreferences!.id,
       user_id: actor.user.id,
       recap_email_enabled: false,
     });
@@ -278,13 +267,13 @@ describe('Subscription preferences lifecycle', () => {
       },
       {
         where: {
-          id: subPreferences!.id,
+          user_id: actor.user.id!,
         },
       },
     );
 
     const payload = {
-      id: subPreferences!.id!,
+      id: actor.user.id!,
       email_notifications_enabled: true,
       recap_email_enabled: false,
       digest_email_enabled: false,
@@ -295,8 +284,9 @@ describe('Subscription preferences lifecycle', () => {
       actor,
     });
     expect(res).to.deep.contains({
-      ...payload,
-      id: subPreferences!.id,
+      email_notifications_enabled: true,
+      recap_email_enabled: false,
+      digest_email_enabled: false,
       user_id: actor.user.id,
       mobile_push_notifications_enabled: false,
       mobile_push_discussion_activity_enabled: false,
@@ -306,7 +296,6 @@ describe('Subscription preferences lifecycle', () => {
     const event = await models.Outbox.findAll();
     expect(event[0]).to.exist;
     expect(event[0]!.event_payload).to.deep.equal({
-      id: subPreferences!.id,
       user_id: actor.user.id,
       email_notifications_enabled: true,
       recap_email_enabled: false,
