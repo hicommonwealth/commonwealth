@@ -71,8 +71,7 @@ const authorizeAddress = async (
   if (!addr)
     throw new InvalidActor(actor, `User is not ${roles} in the community`);
 
-  // @ts-expect-error readonly property
-  actor.addressId = addr.id;
+  (actor as { addressId: number }).addressId = addr.id!;
   return addr;
 };
 
