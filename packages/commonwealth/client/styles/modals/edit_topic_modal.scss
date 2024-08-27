@@ -1,6 +1,13 @@
 @import '../shared';
 
 .EditTopicModal {
+  .topic-image {
+    max-height: 200px;
+    height: auto;
+    width: auto;
+    max-width: 100%;
+  }
+
   .EditTopicModalFooter {
     display: flex;
     flex-direction: column;

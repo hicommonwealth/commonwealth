@@ -1,5 +1,5 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Topic, { TopicAttributes } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -51,8 +51,17 @@ export const EditTopicModal = ({
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
+  const [image, setImage] = useState<string | null>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const markdownImageRegex = useMemo(() => /!\[image\]\((.*?)\)/, []);
+
+  //checks if there is an image in the description to show/delete separately in the modal
+  useMemo(() => {
+    const match = description.match(markdownImageRegex);
+    setImage(match ? match[1] : null);
+  }, [description, markdownImageRegex]);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -119,6 +128,15 @@ export const EditTopicModal = ({
     });
   };
 
+  function removeImageMarkdown(desc: string): string {
+    return desc.replace(markdownImageRegex, '').trim();
+  }
+
+  function onDeleteImageClick() {
+    setDescription(removeImageMarkdown(description));
+    setImage(null);
+  }
+
   return (
     <div className="EditTopicModal">
       <CWModalHeader label="Edit topic" onModalClose={onModalClose} />
@@ -159,6 +177,9 @@ export const EditTopicModal = ({
             setDescription(e.target.value);
           }}
         />
+        {image && (
+          <img src={image} className="topic-image" alt="Image-description" />
+        )}
         <CWCheckbox
           label="Featured in Sidebar"
           checked={featuredInSidebar}
@@ -179,6 +200,16 @@ export const EditTopicModal = ({
               label="Delete topic"
             />
           </div>
+          {image && (
+            <div>
+              <CWButton
+                buttonType="destructive"
+                buttonHeight="sm"
+                label="Remove image"
+                onClick={() => onDeleteImageClick()}
+              />
+            </div>
+          )}
           <CWButton
             label="Cancel"
             buttonType="secondary"
