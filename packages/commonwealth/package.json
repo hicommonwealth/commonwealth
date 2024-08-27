@@ -70,9 +70,7 @@
     "test-select:watch": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false",
     "ts-exec": "tsx ",
     "vite": "wait-on http://localhost:3000/api/health && vite -c ./client/vite.config.ts --host",
-    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
-    "strip-ts-expect-error-ts": "find . -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\) -exec sed -i '' 's/\\/\\/ @ts-expect-error .*//g' '{}' ';'",
-    "strip-ts-expect-error-tsx": "find . -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\) -exec sed -i '' 's/\\{\\/\\* @ts-expect-error .*//g' '{}' ';'"
+    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {
     "@apollo/client": "^3.3.18",
