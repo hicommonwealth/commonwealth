@@ -13,7 +13,6 @@ const validate = async (
   isLoggedIn: boolean,
   isCustomDomain?: boolean,
 ) => {
-  console.log('isCustomDomain', isCustomDomain);
   const params = new URLSearchParams(window.location.search);
   const chain = params.get('chain');
   const walletSsoSource = params.get('sso');
@@ -62,8 +61,6 @@ const FinishSocialLogin = () => {
   const [validationError, setValidationError] = useState<string>('');
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
-
-  console.log('dziala?');
 
   useEffect(() => {
     validate(navigate, user.isLoggedIn, domain?.isCustomDomain).catch(
