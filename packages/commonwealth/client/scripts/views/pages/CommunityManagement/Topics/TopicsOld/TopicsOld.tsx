@@ -7,8 +7,8 @@ import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
-import CreateTopicSection from '../CreateTopicsSection';
-import ManageTopicsSection from '../ManageTopicsSection';
+import CreateTopicSectionOld from './CreateTopicsSectionOld';
+import ManageTopicsSectionOld from './ManageTopicsSectionOld';
 
 import './TopicsOld.scss';
 
@@ -50,9 +50,9 @@ export const TopicsOld = () => {
               ))}
             </CWTabsRow>
             {selectedTab === TABS[0].value ? (
-              <CreateTopicSection />
+              <CreateTopicSectionOld />
             ) : (
-              <ManageTopicsSection />
+              <ManageTopicsSectionOld />
             )}
           </main>
           <aside>

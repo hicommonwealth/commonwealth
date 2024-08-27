@@ -8,9 +8,9 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 
-import CreateTopicSection from '../CreateTopicsSection';
-import ManageTopicsSection from '../ManageTopicsSection';
 import { CreateTopicStep } from '../utils';
+import CreateTopicSection from './CreateTopicsSection';
+import ManageTopicsSection from './ManageTopicsSection';
 
 import './TopicDetails.scss';
 
