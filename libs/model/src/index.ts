@@ -10,6 +10,7 @@ export * as Reaction from './reaction';
 export * as Subscription from './subscription';
 export * as Thread from './thread';
 export * as User from './user';
+export * as Webhook from './webhook';
 
 // Core Services
 export * from './services';

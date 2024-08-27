@@ -13,6 +13,7 @@ import {
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
+  WebhookNotification,
 } from '../integration/notifications.schemas';
 import { ILogger } from '../logging/interfaces';
 
@@ -277,6 +278,7 @@ export enum WorkflowKeys {
   ChainProposals = 'chain-event-proposals',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
+  Webhooks = 'webhooks',
 }
 
 export enum KnockChannelIds {
@@ -293,33 +295,41 @@ export type NotificationsProviderRecipient =
     };
 
 type BaseNotifProviderOptions = {
-  users: { id: string; email?: string }[];
+  users: { id: string; email?: string; webhook_url?: string }[];
   actor?: { id: string; email?: string };
 };
 
-export type NotificationsProviderTriggerOptions = BaseNotifProviderOptions &
-  (
-    | {
-        data: z.infer<typeof CommentCreatedNotification>;
-        key: WorkflowKeys.CommentCreation;
-      }
-    | {
-        data: z.infer<typeof SnapshotProposalCreatedNotification>;
-        key: WorkflowKeys.SnapshotProposals;
-      }
-    | {
-        data: z.infer<typeof UserMentionedNotification>;
-        key: WorkflowKeys.UserMentioned;
-      }
-    | {
-        data: z.infer<typeof CommunityStakeNotification>;
-        key: WorkflowKeys.CommunityStake;
-      }
-    | {
-        data: z.infer<typeof ChainProposalsNotification>;
-        key: WorkflowKeys.ChainProposals;
-      }
-  );
+type WebhookProviderOptions = {
+  key: WorkflowKeys.Webhooks;
+  users: { id: string; webhook_url: string; destination: string }[];
+  data: z.infer<typeof WebhookNotification>;
+};
+
+export type NotificationsProviderTriggerOptions =
+  | (BaseNotifProviderOptions &
+      (
+        | {
+            data: z.infer<typeof CommentCreatedNotification>;
+            key: WorkflowKeys.CommentCreation;
+          }
+        | {
+            data: z.infer<typeof SnapshotProposalCreatedNotification>;
+            key: WorkflowKeys.SnapshotProposals;
+          }
+        | {
+            data: z.infer<typeof UserMentionedNotification>;
+            key: WorkflowKeys.UserMentioned;
+          }
+        | {
+            data: z.infer<typeof CommunityStakeNotification>;
+            key: WorkflowKeys.CommunityStake;
+          }
+        | {
+            data: z.infer<typeof ChainProposalsNotification>;
+            key: WorkflowKeys.ChainProposals;
+          }
+      ))
+  | WebhookProviderOptions;
 
 export type NotificationsProviderGetMessagesOptions = {
   user_id: string;

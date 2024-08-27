@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { logger, stats } from '@hicommonwealth/core';
 import { type DB, type NotificationInstance } from '@hicommonwealth/model';
 import {
@@ -8,9 +7,7 @@ import {
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
-import { config } from '../config';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
-import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
 const log = logger(import.meta);
 
@@ -137,7 +134,8 @@ export default async function emitNotifications(
     }
   }
 
-  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id) VALUES `;
+  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id)
+               VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {
@@ -171,15 +169,6 @@ export default async function emitNotifications(
       replacements,
       type: QueryTypes.INSERT,
     });
-  }
-
-  if (config.SEND_WEBHOOKS_EMAILS) {
-    // webhooks
-    try {
-      await dispatchWebhooks(notification_data_and_category);
-    } catch (e) {
-      log.error('Failed to dispatch webhooks', e);
-    }
   }
 
   return notification;
