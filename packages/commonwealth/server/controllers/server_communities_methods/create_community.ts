@@ -104,8 +104,7 @@ export async function __createCommunity(
 
   // TODO: refactor this to use existing nodes rather than always creating one
 
-  // @ts-expect-error StrictNullChecks
-  let eth_chain_id: number = null;
+  let eth_chain_id: number | null = null;
   let cosmos_chain_id: string | null = null;
   let url = community.node_url;
   let altWalletUrl = community.alt_wallet_url;
@@ -127,8 +126,7 @@ export async function __createCommunity(
     community.type !== ChainType.Offchain
   ) {
     // Warning: this looks like input validation
-    // @ts-expect-error StrictNullChecks
-    if (!Web3.utils.isAddress(community.address)) {
+    if (!community.address || !Web3.utils.isAddress(community.address)) {
       throw new AppError(Errors.InvalidAddress);
     }
 
@@ -159,7 +157,6 @@ export async function __createCommunity(
         : new Web3.providers.WebsocketProvider(node_url);
 
     const web3 = new Web3(provider);
-    // @ts-expect-error StrictNullChecks
     const code = await web3.eth.getCode(community.address);
     if (provider instanceof Web3.providers.WebsocketProvider)
       provider.disconnect(1000, 'finished');
