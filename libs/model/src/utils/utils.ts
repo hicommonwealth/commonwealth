@@ -152,3 +152,15 @@ export async function getThreadContestManagers(
   );
   return contestManagers;
 }
+
+export function removeUndefined(obj: object) {
+  const result = {};
+
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] !== undefined) {
+      result[key] = obj[key];
+    }
+  });
+
+  return result;
+}
