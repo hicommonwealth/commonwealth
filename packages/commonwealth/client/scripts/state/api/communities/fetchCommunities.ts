@@ -12,19 +12,21 @@ const useFetchCommunitiesQuery = ({
   base,
   has_groups,
   include_node_info,
+  include_last_30_day_thread_count,
   relevance_by,
   network,
   stake_enabled,
   tag_ids,
   limit = 50,
   order_direction = 'DESC',
-  order_by = 'thread_count',
+  order_by = 'lifetime_thread_count',
   enabled = true,
 }: UseFetchCommunitiesProps) => {
   return trpc.community.getCommunities.useInfiniteQuery(
     {
       limit: limit,
       include_node_info,
+      include_last_30_day_thread_count,
       order_by,
       order_direction,
       base,

@@ -26,6 +26,7 @@ import { AddressAttributes, models } from '..';
  * @returns authorized address or throws
  */
 const authorizeAddress = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<AddressAttributes> => {

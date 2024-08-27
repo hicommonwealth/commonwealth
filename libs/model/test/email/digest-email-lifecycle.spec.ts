@@ -22,7 +22,7 @@ describe('Digest email lifecycle', () => {
 
     [communityOne] = await seed('Community', {
       chain_node_id: undefined,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {
@@ -33,7 +33,7 @@ describe('Digest email lifecycle', () => {
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: undefined,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {
@@ -45,7 +45,7 @@ describe('Digest email lifecycle', () => {
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
       chain_node_id: undefined,
-      thread_count: 0,
+      lifetime_thread_count: 0,
       profile_count: 1,
       Addresses: [
         {

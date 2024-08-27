@@ -75,7 +75,6 @@ import type ViewCountCache from '../util/viewCountCache';
 
 import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
-import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import type BanCache from '../util/banCheckCache';
 
@@ -931,14 +930,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     banAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/getBannedAddresses',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    getBannedAddresses.bind(this, models),
   );
 
   // Custom domain update route
