@@ -162,7 +162,6 @@ export const status = async (
 
       return success(res, {
         loggedIn: true,
-        // @ts-expect-error StrictNullChecks
         user,
         communityWithRedirects: communityWithRedirects || [],
         evmTestEnv: config.EVM.ETH_RPC,

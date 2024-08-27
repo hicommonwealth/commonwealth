@@ -143,7 +143,7 @@ const linkExistingAddressToCommunity = async (
         },
         { where: { id: existingAddress.id }, transaction },
       );
-      // @ts-expect-error StrictNullChecks
+
       addressId = updatedObj.id;
     });
   } else {

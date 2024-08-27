@@ -44,9 +44,7 @@ export const createCommentReactionHandler = async (
   }
 
   const commentReactionFields: CreateCommentReactionOptions = {
-    // @ts-expect-error <StrictNullChecks>
     user,
-    // @ts-expect-error <StrictNullChecks>
     address,
     reaction,
     commentId,

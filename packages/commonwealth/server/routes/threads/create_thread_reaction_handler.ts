@@ -46,10 +46,8 @@ export const createThreadReactionHandler = async (
   }
 
   const reactionFields: CreateThreadReactionOptions = {
-    // @ts-expect-error <StrictNullChecks>
     user,
-    // @ts-expect-error <StrictNullChecks>
-    address,
+    address: address,
     reaction,
     threadId,
   };

@@ -43,7 +43,6 @@ const createAddress = async (
   req: TypedRequestBody<CreateAddressReq>,
   res: TypedResponse<CreateAddressResp>,
 ) => {
-  // @ts-expect-error StrictNullChecks
   const user = req.body.user;
 
   // start the process of creating a new address. this may be called
