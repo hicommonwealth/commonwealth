@@ -5,19 +5,20 @@ import {
   CommentInstance,
   UserInstance,
   emitEvent,
-  sanitizeQuillText,
-} from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import moment from 'moment';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import { getCommentDepth } from '../../util/getCommentDepth';
-import {
   emitMentions,
   parseUserMentions,
+  sanitizeQuillText,
   uniqueMentions,
-} from '../../util/parseUserMentions';
+} from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
+import {
+  NotificationCategories,
+  ProposalType,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
+import moment from 'moment';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { getCommentDepth } from '../../util/getCommentDepth';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -229,27 +230,11 @@ export async function __createThreadComment(
         transaction,
       );
 
-      await this.models.Subscription.bulkCreate(
-        [
-          {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewReaction,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id!,
-            is_active: true,
-          },
-          {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewComment,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id!,
-            is_active: true,
-          },
-        ],
+      await this.models.CommentSubscription.create(
+        {
+          user_id: user.id!,
+          comment_id: comment.id!,
+        },
         { transaction },
       );
     });

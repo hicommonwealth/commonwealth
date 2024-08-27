@@ -16,6 +16,7 @@ export function sanitizeDeletedComment(
       role: 'member',
       is_user_default: false,
       ghost_address: false,
+      is_banned: false,
     },
     address_id: 0,
     canvas_hash: null,
