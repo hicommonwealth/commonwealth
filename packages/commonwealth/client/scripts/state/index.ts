@@ -12,7 +12,7 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
-import { Configuration } from 'state/api/configuration';
+import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
 import { userStore } from './ui/user';
@@ -53,16 +53,6 @@ export interface IApp {
   snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
-
-  loadingError: string;
-
-  _customDomainId: string;
-
-  isCustomDomain(): boolean;
-
-  customDomainId(): string;
-
-  setCustomDomain(d: string): void;
 }
 
 // INJECT DEPENDENCIES
@@ -96,19 +86,6 @@ const app: IApp = {
 
   // Global nav state
   sidebarRedraw: new EventEmitter(),
-
-  // @ts-expect-error StrictNullChecks
-  loadingError: null,
-
-  // @ts-expect-error StrictNullChecks
-  _customDomainId: null,
-  isCustomDomain: () => app._customDomainId !== null,
-  customDomainId: () => {
-    return app._customDomainId;
-  },
-  setCustomDomain: (d) => {
-    app._customDomainId = d;
-  },
 };
 //allows for FS.identify to be used
 declare const window: any;
@@ -123,6 +100,7 @@ export async function initAppState(
     ]);
 
     await fetchNodesQuery();
+    await fetchCustomDomainQuery();
 
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
