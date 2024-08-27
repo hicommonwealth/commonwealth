@@ -87,3 +87,11 @@ export const ChainProposalsNotification = z.object({
     .string()
     .describe('The url to the snapshot proposal on Common'),
 });
+
+export const ThreadUpvoteNotification = z.object({});
+export const CommentUpvoteNotification = z.object({});
+
+export const UpvoteNotification = z.union([
+  ThreadUpvoteNotification,
+  CommentUpvoteNotification,
+]);

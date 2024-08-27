@@ -12,6 +12,7 @@ import {
   CommentCreatedNotification,
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
+  UpvoteNotification,
   UserMentionedNotification,
 } from '../integration/notifications.schemas';
 import { ILogger } from '../logging/interfaces';
@@ -257,7 +258,9 @@ export interface BlobStorage extends Disposable {
     content: BlobType;
     contentType?: string;
   }): Promise<{ url: string; location: string }>;
+
   exists(options: { key: string; bucket: BlobBucket }): Promise<boolean>;
+
   getSignedUrl(options: {
     key: string;
     bucket: BlobBucket;
@@ -275,6 +278,7 @@ export enum WorkflowKeys {
   UserMentioned = 'user-mentioned',
   CommunityStake = 'community-stake',
   ChainProposals = 'chain-event-proposals',
+  NewUpvotes = 'new-upvote',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
 }
@@ -318,6 +322,10 @@ export type NotificationsProviderTriggerOptions = BaseNotifProviderOptions &
     | {
         data: z.infer<typeof ChainProposalsNotification>;
         key: WorkflowKeys.ChainProposals;
+      }
+    | {
+        data: z.infer<typeof UpvoteNotification>;
+        key: WorkflowKeys.NewUpvotes;
       }
   );
 
