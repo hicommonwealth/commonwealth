@@ -5,7 +5,7 @@ import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/communities'));
+const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
@@ -29,9 +29,6 @@ const FinishSocialLoginPage = lazy(
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 
-const NotificationSettingsOld = lazy(
-  () => import('views/pages/NotificationSettingsOld'),
-);
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
@@ -107,10 +104,7 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
-const CommonDomainRoutes = ({
-  contestEnabled,
-  knockInAppNotifications,
-}: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({ contestEnabled }: RouteFeatureFlags) => [
   <Route
     key="/"
     path="/"
@@ -213,10 +207,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(
-      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
-      { type: 'common' },
-    )}
+    element={withLayout(NotificationSettings, { type: 'common' })}
   />,
   <Route
     key="/:scope/notification-settings"

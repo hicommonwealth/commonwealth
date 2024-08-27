@@ -102,21 +102,24 @@ const CommunityProfileForm = () => {
     callback: () => {
       setIsCustomStagesEnabled(community?.stages_enabled);
 
-      const linksFromCommunity = (community?.social_links || []).map(
-        (link) => ({
-          value: link,
+      const linksFromCommunity = (community?.social_links || [])
+        .filter((x) => x)
+        .map((link) => ({
+          value: link || '',
           canUpdate: true,
           canDelete: true,
           error: '',
-        }),
-      );
+        }));
       setLinks(linksFromCommunity);
       setInitialLinks(linksFromCommunity);
 
       preferenceTags?.length > 0 && updatePreferenceTags();
     },
     shouldRun:
-      !isCommunityLoading && !!community && preferenceTags && !isLoadingTags,
+      !isCommunityLoading &&
+      !!community &&
+      preferenceTags?.length > 0 &&
+      !isLoadingTags,
   });
 
   const communityIdForUrl = slugifyPreserveDashes(

@@ -2,13 +2,12 @@ import moment from 'moment';
 import React, { useRef, useState } from 'react';
 import _ from 'underscore';
 
-import {
-  notifyError,
-  notifySuccess,
-} from '../../controllers/app/notifications';
-import { pluralize } from '../../helpers';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
+import { useCreateThreadPollMutation } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
+
 import type Thread from '../../models/Thread';
-import app from '../../state';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { SelectList } from '../components/component_kit/cw_select_list';
@@ -21,7 +20,6 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import useUserStore from 'state/ui/user';
 import '../../../styles/modals/poll_editor_modal.scss';
 
 const getPollDurationCopy = (
@@ -51,13 +49,11 @@ const customDurationOptions = [
 type PollEditorModalProps = {
   onModalClose: () => void;
   thread: Thread;
-  onPollCreate: () => void;
 };
 
 export const PollEditorModal = ({
   onModalClose,
   thread,
-  onPollCreate,
 }: PollEditorModalProps) => {
   const [customDuration, setCustomDuration] = useState(INFINITE_OPTION);
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
@@ -65,6 +61,8 @@ export const PollEditorModal = ({
   const [prompt, setPrompt] = useState('');
   const modalContainerRef = useRef(null);
   const user = useUserStore();
+
+  const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
   const handleInputChange = (value: string, index: number) => {
     setOptions((prevState) => {
@@ -106,18 +104,18 @@ export const PollEditorModal = ({
     }
 
     try {
-      await app.polls.setPolling({
+      await createPoll({
         threadId: thread.id,
         prompt,
         options,
-        // @ts-expect-error <StrictNullChecks/>
-        customDuration: customDurationEnabled ? customDuration : null,
-        address: user.activeAccount?.address || '',
+        customDuration: customDurationEnabled ? customDuration : undefined,
         authorCommunity: user.activeAccount?.community?.id || '',
+        address: user.activeAccount?.address || '',
       });
+
       notifySuccess('Poll creation succeeded');
-      onPollCreate();
     } catch (err) {
+      notifyError('Poll creation failed');
       console.error(err);
     }
 

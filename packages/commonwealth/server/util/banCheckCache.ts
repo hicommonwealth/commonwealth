@@ -46,10 +46,12 @@ export default class BanCache extends JobRunner<CacheT> {
       return [false, BanErrors.Banned];
     }
 
-    const ban = await this._models.Ban.findOne({
+    const ban = await this._models.Address.findOne({
+      attributes: ['id'], // no data needed; only checking existence
       where: {
         community_id: communityId,
         address,
+        is_banned: true,
       },
     });
 

@@ -9,6 +9,7 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import { ExtendedAddessInstance } from './getNewProfile';
 
 const { Op } = Sequelize;
 
@@ -169,6 +170,7 @@ const linkExistingAddressToCommunity = async (
           role: 'member',
           is_user_default: false,
           ghost_address: false,
+          is_banned: false,
         },
         { transaction },
       );
@@ -183,6 +185,10 @@ const linkExistingAddressToCommunity = async (
 
   const ownedAddresses = await models.Address.findAll({
     where: { user_id: originalAddress.user_id },
+    include: {
+      model: models.Community,
+      attributes: ['id', 'base', 'ss58_prefix'],
+    },
   });
 
   const serverAnalyticsController = new ServerAnalyticsController();
@@ -200,7 +206,9 @@ const linkExistingAddressToCommunity = async (
     result: {
       verification_token: verificationToken,
       addressId,
-      addresses: ownedAddresses.map((a) => a.toJSON()),
+      addresses: ownedAddresses.map(
+        (a) => a.toJSON() as ExtendedAddessInstance,
+      ),
       encodedAddress,
     },
   });

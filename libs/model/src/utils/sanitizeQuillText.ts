@@ -32,6 +32,7 @@ const embedSanitizers: EmbedSanitizer[] = [
 
 // sanitizeQuillText returns a sanitized version of the input
 type QuillOps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ops: any[];
 };
 export function sanitizeQuillText(input: string, noEncode?: boolean): string {
