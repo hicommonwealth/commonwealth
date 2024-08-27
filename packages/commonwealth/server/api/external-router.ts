@@ -1,6 +1,7 @@
 import { express, trpc } from '@hicommonwealth/adapters';
 import cors from 'cors';
 import { Router } from 'express';
+import passport from 'passport';
 import * as community from './community';
 import * as thread from './threads';
 
@@ -17,7 +18,11 @@ const api = {
 
 const PATH = '/api/v1';
 const router = Router();
-router.use(cors(), express.statsMiddleware);
+router.use(
+  cors(),
+  passport.authenticate('jwt', { session: false }),
+  express.statsMiddleware,
+);
 
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {

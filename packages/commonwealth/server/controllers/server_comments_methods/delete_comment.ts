@@ -25,7 +25,7 @@ export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, address, commentId, messageId }: DeleteCommentOptions,
+  { user, commentId, messageId }: DeleteCommentOptions,
 ): Promise<DeleteCommentResult> {
   const commentWhere: WhereOptions<CommentAttributes> = {};
   if (commentId) {

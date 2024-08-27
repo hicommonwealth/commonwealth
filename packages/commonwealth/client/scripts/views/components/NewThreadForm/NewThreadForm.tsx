@@ -52,7 +52,7 @@ export const NewThreadForm = () => {
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
-  const { isAddedToHomeScreen } = useAppStatus();
+  useAppStatus();
 
   const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),

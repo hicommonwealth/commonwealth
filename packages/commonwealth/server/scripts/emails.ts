@@ -50,12 +50,12 @@ const getForumNotificationCopy = async (
     category_id === NotificationCategories.NewComment
       ? `Comment on: ${decodedTitle}`
       : category_id === NotificationCategories.NewMention
-      ? `You were mentioned in: ${decodedTitle}`
-      : category_id === NotificationCategories.NewCollaboration
-      ? `You were added as a collaborator on: ${decodedTitle}`
-      : category_id === NotificationCategories.NewThread
-      ? `New thread: ${decodedTitle}`
-      : 'New activity on Commonwealth';
+        ? `You were mentioned in: ${decodedTitle}`
+        : category_id === NotificationCategories.NewCollaboration
+          ? `You were added as a collaborator on: ${decodedTitle}`
+          : category_id === NotificationCategories.NewThread
+            ? `New thread: ${decodedTitle}`
+            : 'New activity on Commonwealth';
 
   // author
   // @ts-expect-error StrictNullChecks
@@ -96,15 +96,15 @@ const getForumNotificationCopy = async (
   ].includes(category_id)
     ? 'commented on'
     : category_id === NotificationCategories.NewMention
-    ? 'mentioned you in the thread'
-    : category_id === NotificationCategories.NewCollaboration
-    ? 'invited you to collaborate on'
-    : [
-        NotificationCategories.ThreadEdit,
-        NotificationCategories.NewThread,
-      ].includes(category_id)
-    ? 'created a new thread'
-    : null;
+      ? 'mentioned you in the thread'
+      : category_id === NotificationCategories.NewCollaboration
+        ? 'invited you to collaborate on'
+        : [
+              NotificationCategories.ThreadEdit,
+              NotificationCategories.NewThread,
+            ].includes(category_id)
+          ? 'created a new thread'
+          : null;
   const objectCopy = decodeURIComponent(root_title).trim();
   const communityObject = await models.Community.findOne({
     where: { id: community_id },

@@ -22,7 +22,7 @@ export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, address, threadId, messageId }: DeleteThreadOptions,
+  { user, threadId, messageId }: DeleteThreadOptions,
 ): Promise<DeleteThreadResult> {
   if (!threadId) {
     // Special handling for discobot threads

@@ -98,9 +98,6 @@ describe('ServerThreadsController', () => {
         address: '0x123',
         community_id: 'ethereum',
       };
-      const chain = {
-        id: 'ethereum',
-      };
       const reaction = {};
       const threadId = 123;
 

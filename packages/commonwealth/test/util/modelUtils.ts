@@ -258,9 +258,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       throw new Error(`invalid chain ${chain}`);
     }
 
-    const { payload: session, signer } = await sessionSigner.newSession(
-      CANVAS_TOPIC,
-    );
+    const { payload: session, signer } =
+      await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = session.address.split(':')[2];
 
     let res = await chai.request
@@ -313,9 +312,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     args: ThreadArgs,
   ): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
     const {
+      jwt,
       chainId,
       address,
-      jwt,
       title,
       body,
       topicId,
@@ -350,22 +349,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post('/api/v1/thread.createThread')
+      .post('/api/v1/CreateThread/0')
       .set('Accept', 'application/json')
-      .set('Bearer', jwt)
       .set('address', address.split(':')[2])
       .send({
+        jwt,
         community_id: chainId,
+        topic_id: topicId,
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
-        topic_id: topicId,
+        stage: '',
         url,
         read_only: readOnly || false,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
-    return res.body;
+    if (res.ok) return { result: res.body, status: 'Success' };
+    return { status: res.status.toString() };
   },
 
   createLink: async (args: createDeleteLinkArgs) => {

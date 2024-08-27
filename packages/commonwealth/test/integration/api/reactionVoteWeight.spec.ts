@@ -39,18 +39,22 @@ describe('Reaction vote weight', () => {
     );
 
     createThread = async () => {
-      const t = await threadsController.createThread({
-        user,
-        address,
-        community,
-        // @ts-expect-error StrictNullChecks
-        topicId: topic.id,
-        title: 'Hey',
+      const t = await server.models.Thread.create({
+        community_id: community!.id!,
+        address_id: address!.id!,
+        topic_id: topic!.id,
+        title: 'Nice',
         body: 'Cool',
+        plaintext: 'Cool',
         kind: 'discussion',
-        readOnly: false,
+        stage: '',
+        view_count: 0,
+        comment_count: 0,
+        reaction_count: 0,
+        reaction_weights_sum: 0,
+        max_notif_id: 0,
       });
-      return t[0];
+      return t;
     };
 
     createComment = async (threadId: number) => {

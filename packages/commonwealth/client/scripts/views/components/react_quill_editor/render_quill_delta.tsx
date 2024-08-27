@@ -324,35 +324,35 @@ export const renderQuillDelta = (
           const Tag = parent.attributes?.blockquote
             ? 'blockquote'
             : parent.attributes?.['code-block']
-            ? 'pre'
-            : parent.attributes?.header === 1
-            ? 'h1'
-            : parent.attributes?.header === 2
-            ? 'h2'
-            : parent.attributes?.header === 3
-            ? 'h3'
-            : parent.attributes?.header === 4
-            ? 'h4'
-            : parent.attributes?.header === 5
-            ? 'h5'
-            : parent.attributes?.header === 6
-            ? 'h6'
-            : parent.attributes?.list === 'bullet'
-            ? 'li'
-            : parent.attributes?.list === 'ordered'
-            ? 'li'
-            : parent.attributes?.list === 'checked'
-            ? 'li'
-            : parent.attributes?.list === 'unchecked'
-            ? 'li'
-            : 'div';
+              ? 'pre'
+              : parent.attributes?.header === 1
+                ? 'h1'
+                : parent.attributes?.header === 2
+                  ? 'h2'
+                  : parent.attributes?.header === 3
+                    ? 'h3'
+                    : parent.attributes?.header === 4
+                      ? 'h4'
+                      : parent.attributes?.header === 5
+                        ? 'h5'
+                        : parent.attributes?.header === 6
+                          ? 'h6'
+                          : parent.attributes?.list === 'bullet'
+                            ? 'li'
+                            : parent.attributes?.list === 'ordered'
+                              ? 'li'
+                              : parent.attributes?.list === 'checked'
+                                ? 'li'
+                                : parent.attributes?.list === 'unchecked'
+                                  ? 'li'
+                                  : 'div';
 
           const className =
             parent.attributes?.list === 'checked'
               ? 'checked'
               : parent.attributes?.list === 'unchecked'
-              ? 'unchecked'
-              : '';
+                ? 'unchecked'
+                : '';
 
           return (
             <Tag key={ii} className={className}>
