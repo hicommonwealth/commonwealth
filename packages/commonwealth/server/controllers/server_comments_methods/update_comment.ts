@@ -70,14 +70,7 @@ export async function __updateComment(
     throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   const isAuthor = await validateOwner({
     models: this.models,

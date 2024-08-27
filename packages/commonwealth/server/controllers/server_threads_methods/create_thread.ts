@@ -104,14 +104,7 @@ export async function __createThread(
     throw new AppError(Errors.UnsupportedKind);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: community.id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check contest limits
   const activeContestManagers = await Contest.GetActiveContestManagers().body({

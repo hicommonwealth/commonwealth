@@ -81,14 +81,7 @@ export async function __createThreadComment(
     throw new AppError(Errors.ThreadNotFound);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check if thread is archived
   if (thread.archived_at) {
