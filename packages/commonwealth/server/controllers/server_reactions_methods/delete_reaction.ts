@@ -23,7 +23,7 @@ export type DeleteReactionResult = void;
 
 export async function __deleteReaction(
   this: ServerReactionsController,
-  { user, reactionId }: DeleteReactionOptions,
+  { user, address, reactionId }: DeleteReactionOptions,
 ): Promise<DeleteReactionResult> {
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -41,6 +41,8 @@ export async function __deleteReaction(
   if (!reaction) {
     throw new AppError(`${Errors.ReactionNotFound}: ${reactionId}`);
   }
+
+  if (address.is_banned) throw new AppError('Banned User');
 
   await reaction.destroy();
 }

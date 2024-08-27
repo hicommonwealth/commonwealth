@@ -70,6 +70,8 @@ export async function __createCommentReaction(
     throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
+  if (address.is_banned) throw new AppError('Banned User');
+
   // check balance (bypass for admin)
   const addressAdminRoles = await findAllRoles(
     this.models,

@@ -138,6 +138,8 @@ export async function __updateThread(
   );
   const isContestThread = contestManagers.length > 0;
 
+  if (address.is_banned) throw new AppError('Banned User');
+
   // get various permissions
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)

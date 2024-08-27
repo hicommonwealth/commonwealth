@@ -51,7 +51,7 @@ export default class DatabaseValidationService {
 
   public validateBotUser = async (
     req: Request,
-    _: Response,
+    res: Response,
     next: NextFunction,
   ) => {
     if (req.body.auth !== config.CW_BOT_KEY) {

@@ -25,7 +25,7 @@ export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, commentId, messageId }: DeleteCommentOptions,
+  { user, address, commentId, messageId }: DeleteCommentOptions,
 ): Promise<DeleteCommentResult> {
   const commentWhere: WhereOptions<CommentAttributes> = {};
   if (commentId) {
@@ -46,6 +46,8 @@ export async function __deleteComment(
   if (!comment || !community_id) {
     throw new AppError(Errors.CommentNotFound);
   }
+
+  if (address.is_banned) throw new AppError('Banned User');
 
   const isAdminOrOwner = await validateOwner({
     models: this.models,

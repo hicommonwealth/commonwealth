@@ -65,6 +65,8 @@ export async function __createThreadReaction(
     throw new AppError(Errors.ThreadArchived);
   }
 
+  if (address.is_banned) throw new AppError('Banned User');
+
   // check balance (bypass for admin)
   const isAdmin = await validateOwner({
     models: this.models,

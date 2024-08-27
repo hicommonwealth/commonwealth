@@ -70,6 +70,8 @@ export async function __updateComment(
     throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
+  if (address.is_banned) throw new AppError('Banned User');
+
   const isAuthor = await validateOwner({
     models: this.models,
     user,

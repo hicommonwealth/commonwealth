@@ -22,7 +22,7 @@ export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, threadId, messageId }: DeleteThreadOptions,
+  { user, address, threadId, messageId }: DeleteThreadOptions,
 ): Promise<DeleteThreadResult> {
   if (!threadId) {
     // Special handling for discobot threads
@@ -48,6 +48,8 @@ export async function __deleteThread(
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
+
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check ownership (bypass if admin)
   const isOwnerOrAdmin = await validateOwner({

@@ -81,6 +81,8 @@ export async function __createThreadComment(
     throw new AppError(Errors.ThreadNotFound);
   }
 
+  if (address.is_banned) throw new AppError('Banned User');
+
   // check if thread is archived
   if (thread.archived_at) {
     throw new AppError(Errors.ThreadArchived);
