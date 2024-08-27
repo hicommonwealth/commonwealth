@@ -83,7 +83,7 @@ export const createThreadCommentHandler = async (
       thread_id: threadMsgId ?? null,
       text,
       address:
-        canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
+        canvasSignedData.actionMessage.payload.did.split(':')[2] == 'polkadot'
           ? addressSwapper({
               currentPrefix: 42,
               // @ts-expect-error <StrictNullChecks>

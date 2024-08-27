@@ -65,7 +65,7 @@ export const createThreadReactionHandler = async (
     const canvasThreadReaction = {
       thread_id: threadMsgId ?? null,
       address:
-        canvasSignedData.actionMessage.payload.did.split(':')[0] == 'polkadot'
+        canvasSignedData.actionMessage.payload.did.split(':')[2] == 'polkadot'
           ? addressSwapper({
               currentPrefix: 42,
               // @ts-expect-error <StrictNullChecks>
