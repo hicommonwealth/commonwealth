@@ -6,7 +6,6 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
-  ENFORCE_SESSION_KEYS,
   SENDGRID_API_KEY,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
@@ -54,7 +53,6 @@ const DEFAULTS = {
 export const config = configure(
   { ...model_config, ...adapters_config, ...evm_config },
   {
-    ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     SEND_EMAILS,
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
@@ -133,7 +131,6 @@ export const config = configure(
     },
   },
   z.object({
-    ENFORCE_SESSION_KEYS: z.boolean(),
     SEND_EMAILS: z.boolean(),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),

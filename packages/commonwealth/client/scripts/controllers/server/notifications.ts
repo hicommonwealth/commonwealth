@@ -12,6 +12,7 @@ import { Subscription } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { SERVER_URL } from 'state/api/config';
+import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { userStore } from 'state/ui/user';
 import { NotificationStore } from 'stores';
 import { z } from 'zod';
@@ -325,8 +326,10 @@ class NotificationsController {
       throw new Error('must be signed in to refresh notifications');
     }
 
+    const { isCustomDomain } = fetchCachedCustomDomain() || {};
+
     // @ts-expect-error StrictNullChecks
-    const options: NotifOptions = app.isCustomDomain()
+    const options: NotifOptions = isCustomDomain
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };
 
@@ -342,8 +345,11 @@ class NotificationsController {
     if (!userStore.getState().jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
+
+    const { isCustomDomain } = fetchCachedCustomDomain() || {};
+
     // @ts-expect-error StrictNullChecks
-    const options: NotifOptions = app.isCustomDomain()
+    const options: NotifOptions = isCustomDomain
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };
 

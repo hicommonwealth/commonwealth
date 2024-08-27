@@ -90,6 +90,7 @@ export function UpdateContestManagerMetadata(): Command<
           contest_managers: [
             {
               ...result.get({ plain: true }),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               topics: contestTopics.map((ct) => (ct as any).Topic),
             },
           ],

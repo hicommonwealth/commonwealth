@@ -16,10 +16,10 @@ import {
 type ParseType<T> = T extends 'address'
   ? z.infer<typeof EVM_ADDRESS>
   : T extends 'uint256'
-  ? z.infer<typeof ETHERS_BIG_NUMBER>
-  : T extends 'bool'
-  ? boolean
-  : never;
+    ? z.infer<typeof ETHERS_BIG_NUMBER>
+    : T extends 'bool'
+      ? boolean
+      : never;
 
 // RemoveIndexed removes "indexed" arg name
 type RemoveIndexed<T extends string> = T extends `indexed ${infer Suffix}`
@@ -31,8 +31,9 @@ type ParseSignature<S extends string> =
   S extends `${infer Type} ${infer Name}, ${infer Rest}`
     ? { [K in RemoveIndexed<Name>]: ParseType<Type> } & ParseSignature<Rest>
     : S extends `${infer Type} ${infer Name}`
-    ? { [K in RemoveIndexed<Name>]: ParseType<Type> }
-    : any;
+      ? { [K in RemoveIndexed<Name>]: ParseType<Type> }
+      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        any;
 
 // EvmMapper maps chain event args as input to a zod event schema type as output
 type EvmMapper<Input extends string, Output extends ZodSchema> = {
@@ -210,6 +211,7 @@ const EvmMappers = {
 const parseEthersResult = (
   signature: string,
   evmParsedArgs: ethers.utils.Result,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, any> => {
   const sigParts = signature.split(',').map((str: string) => str.trim());
   if (!evmParsedArgs || evmParsedArgs.length !== sigParts.length) {
@@ -219,6 +221,7 @@ const parseEthersResult = (
       )}) !== (${signature})`,
     );
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result: Record<string, any> = {};
   for (let i = 0; i < sigParts.length; i++) {
     const value = evmParsedArgs[i];
@@ -231,13 +234,15 @@ const parseEthersResult = (
 // ParserReturnType gets the inferred type for the `output` schema of
 // the event. If output is an array, returns a union of all schemas in the array.
 type ParserReturnType<Event extends keyof typeof ChainEventSigs> =
-  typeof EvmMappers[Event] extends EvmMapper<any, any>
-    ? z.infer<typeof EvmMappers[Event]['output']>
-    : typeof EvmMappers[Event] extends (infer U)[]
-    ? U extends EvmMapper<any, any>
-      ? z.infer<U['output']>
-      : never
-    : never;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (typeof EvmMappers)[Event] extends EvmMapper<any, any>
+    ? z.infer<(typeof EvmMappers)[Event]['output']>
+    : (typeof EvmMappers)[Event] extends (infer U)[]
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        U extends EvmMapper<any, any>
+        ? z.infer<U['output']>
+        : never
+      : never;
 
 // ContestOutboxEvent is the outbox shape
 type ContestOutboxEvent<Event extends keyof typeof ChainEventSigs> = {
@@ -257,6 +262,7 @@ export const parseEvmEventToContestEvent = <
   if (!m) {
     throw new Error(`failed to map EVM event to schema: ${chainEventName}`);
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mappers: EvmMapper<any, any>[] = Array.isArray(m) ? m : [m];
   for (const mapper of mappers) {
     const evmInput = parseEthersResult(mapper.signature, evmParsedArgs);

@@ -52,7 +52,7 @@ export const Address = z.object({
   address: z.string().max(255),
   community_id: z.string().max(255),
   user_id: PG_INT.nullish(),
-  verification_token: z.string().max(255),
+  verification_token: z.string().max(255).optional(),
   verification_token_expires: z.date().nullable().nullish(),
   verified: z.date().nullable().nullish(),
   last_active: z.date().nullable().nullish(),
@@ -62,6 +62,7 @@ export const Address = z.object({
   is_user_default: z.boolean().default(false),
   role: z.enum(Roles).default('member'),
   wallet_sso_source: z.nativeEnum(WalletSsoSource).nullish(),
+  is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
 
   User: User.optional(),

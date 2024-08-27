@@ -73,6 +73,7 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
       };
 
       // get response threads from query
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let responseThreads: any;
       try {
         responseThreads = await models.sequelize.query(
@@ -191,7 +192,8 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let threads = responseThreads.map((t: any) => {
         const collaborators = JSON.parse(t.collaborators[0]).address?.length
-          ? t.collaborators.map((c: any) => JSON.parse(c))
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            t.collaborators.map((c: any) => JSON.parse(c))
           : [];
 
         const last_edited = getLastEdited(t);
@@ -227,7 +229,8 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
             ? t.reaction_timestamps.split(',')
             : [],
           reactionWeights: t.reaction_weights
-            ? t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
             : [],
           reaction_weights_sum: t.reaction_weights_sum,
           addressesReacted: t.addresses_reacted

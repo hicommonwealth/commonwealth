@@ -140,6 +140,7 @@ export interface Cache extends Disposable {
   ): Promise<boolean>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnalyticsOptions = Record<string, any>;
 
 /**
@@ -233,7 +234,9 @@ export interface Broker extends Disposable {
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
@@ -243,7 +246,7 @@ export interface Broker extends Disposable {
 
 export type BlobType = string | Uint8Array | Buffer | Readable;
 export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
-export type BlobBucket = typeof BlobBuckets[number];
+export type BlobBucket = (typeof BlobBuckets)[number];
 
 /**
  * External Blob Storage Port
@@ -350,6 +353,7 @@ export type NotificationsProviderGetMessagesReturn = Array<{
     version_id: string;
     key: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   __cursor?: string;
 }>;
@@ -372,11 +376,11 @@ const DaysOfWeek = {
 } as const;
 
 export type NotificationsProviderScheduleRepeats = Array<{
-  frequency: typeof RepeatFrequency[keyof typeof RepeatFrequency];
+  frequency: (typeof RepeatFrequency)[keyof typeof RepeatFrequency];
   interval?: number;
   day_of_month?: number;
   days?:
-    | Array<typeof DaysOfWeek[keyof typeof DaysOfWeek]>
+    | Array<(typeof DaysOfWeek)[keyof typeof DaysOfWeek]>
     | 'weekdays'
     | 'weekends';
   hours?: number;

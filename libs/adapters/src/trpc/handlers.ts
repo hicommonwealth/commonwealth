@@ -1,5 +1,4 @@
 import {
-  AuthStrategies,
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
@@ -15,10 +14,9 @@ import {
 } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { Request } from 'express';
-import passport from 'passport';
 import { type OpenApiMeta } from 'trpc-swagger';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { config } from '../config';
+import { OutputMiddleware, authenticate } from './middleware';
 
 export interface Context {
   req: Request;
@@ -28,49 +26,6 @@ const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 
 const isSecure = (md: { secure?: boolean; auth: unknown[] }) =>
   md.secure !== false || md.auth.length > 0;
-
-const authenticate = async (
-  req: Request,
-  authStrategy: AuthStrategies = { name: 'jwt' },
-) => {
-  try {
-    if (authStrategy.name === 'authtoken') {
-      switch (req.headers['authorization']) {
-        case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
-          req.user = {
-            id: authStrategy.userId,
-            email: 'hello@knock.app',
-          };
-          break;
-        case config.LOAD_TESTING.AUTH_TOKEN:
-          req.user = {
-            id: authStrategy.userId,
-            email: 'info@grafana.com',
-          };
-          break;
-        default:
-          throw new Error('Not authenticated');
-      }
-    } else if (authStrategy.name === 'custom') {
-      authStrategy.customStrategyFn(req);
-      req.user = {
-        id: authStrategy.userId,
-      };
-    } else {
-      await passport.authenticate(authStrategy.name, { session: false });
-    }
-
-    if (!req.user) throw new Error('Not authenticated');
-    if (authStrategy.userId && (req.user as User).id !== authStrategy.userId) {
-      throw new Error('Not authenticated');
-    }
-  } catch (error) {
-    throw new TRPCError({
-      message: error instanceof Error ? error.message : (error as string),
-      code: 'UNAUTHORIZED',
-    });
-  }
-};
 
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
@@ -111,6 +66,7 @@ export enum Tag {
 export const command = <Input extends CommandInput, Output extends ZodSchema>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
+  outputMiddleware?: OutputMiddleware<z.infer<Output>>,
 ) => {
   const md = factory();
   return trpc.procedure
@@ -122,7 +78,7 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
         headers: [
           {
             in: 'header',
-            name: 'address_id',
+            name: 'address',
             required: true,
             schema: { type: 'string' },
           },
@@ -137,18 +93,16 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
       // if we provide any authorization method we force authentication as well
       if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
       try {
-        return await coreCommand(
-          md,
-          {
-            actor: {
-              user: ctx.req.user as User,
-              // TODO: get from JWT?
-              address_id: ctx.req.headers['address_id'] as string,
-            },
-            payload: input!,
+        const _ctx = {
+          actor: {
+            user: ctx.req.user as User,
+            address: ctx.req.headers['address'] as string,
           },
-          false,
-        );
+          payload: input!,
+        };
+        const result = await coreCommand(md, _ctx, false);
+        outputMiddleware && (await outputMiddleware(_ctx, result!));
+        return result;
       } catch (error) {
         throw trpcerror(error);
       }
@@ -198,7 +152,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
         headers: [
           {
             in: 'header',
-            name: 'address_id',
+            name: 'address',
             required: false,
             schema: { type: 'string' },
           },
@@ -217,7 +171,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
           {
             actor: {
               user: ctx.req.user as User,
-              address_id: ctx.req.headers['address_id'] as string,
+              address: ctx.req.headers['address'] as string,
             },
             payload: input!,
           },

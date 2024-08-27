@@ -21,6 +21,7 @@ export const ApiEndpoints = {
   FETCH_PROFILES_BY_ADDRESS: '/getAddressProfile',
   FETCH_PROFILES_BY_ID: '/profile/v2',
   FETCH_NODES: '/nodes',
+  FETCH_DOMAIN: '/domain',
   DISCORD_CHANNELS: '/getDiscordChannels',
   SET_DISCORD_CONFIG: '/setDiscordBotConfig',
   FETCH_PROPOSALS: '/proposals',
