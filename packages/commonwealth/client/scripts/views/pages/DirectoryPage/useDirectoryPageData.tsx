@@ -67,7 +67,7 @@ const useDirectoryPageData = ({
         namespace: c.namespace,
         description: c.description,
         members: c.profile_count,
-        threads: c.thread_count,
+        threads: c.lifetime_thread_count,
         iconUrl: c.icon_url,
         id: c.id,
       })),

@@ -8,7 +8,10 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './JoinCommunityCard.scss';
 
 type JoinCommunityCardProps = {
-  community: ChainInfo;
+  community: Pick<
+    ChainInfo,
+    'name' | 'iconUrl' | 'profileCount' | 'lifetimeThreadCount'
+  >;
   isJoined?: boolean;
   canJoin?: boolean;
   onJoinClick?: () => void;
@@ -47,9 +50,12 @@ const JoinCommunityCard = ({
 
           <CWText className="dot">•</CWText>
 
-          <CWText type="b2" title={`${community?.threadCount}`}>
-            {community?.threadCount}&nbsp;
-            {pluralizeWithoutNumberPrefix(community?.threadCount, 'Thread')}
+          <CWText type="b2" title={`${community?.lifetimeThreadCount}`}>
+            {community?.lifetimeThreadCount}&nbsp;
+            {pluralizeWithoutNumberPrefix(
+              community?.lifetimeThreadCount,
+              'Thread',
+            )}
           </CWText>
         </div>
       </div>
@@ -67,8 +73,7 @@ const JoinCommunityCard = ({
           iconLeftWeight: 'fill',
         })}
         disabled={!canJoin}
-        // @ts-expect-error <StrictNullChecks/>
-        onClick={canJoin ? onJoinClick : null}
+        onClick={canJoin ? onJoinClick : undefined}
       />
     </div>
   );

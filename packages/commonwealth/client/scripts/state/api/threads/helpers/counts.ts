@@ -24,8 +24,8 @@ export const updateCommunityThreadCount = (
   const foundCommunity = (existingCommunities?.communities || []).find(
     (x) => x.id === communityId,
   );
-  if (foundCommunity && foundCommunity?.thread_count >= 0) {
-    foundCommunity.thread_count += type === 'increment' ? 1 : -1;
+  if (foundCommunity && foundCommunity?.lifetime_thread_count >= 0) {
+    foundCommunity.lifetime_thread_count += type === 'increment' ? 1 : -1;
     queryClient.setQueryData(key, { ...existingCommunities });
   }
 };

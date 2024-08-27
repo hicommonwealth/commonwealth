@@ -1,0 +1,11 @@
+@import '../../../../../styles/shared';
+
+.CastVoteSection {
+  align-items: center;
+  display: flex;
+
+  .time-remaining-text.Text {
+    color: $neutral-500;
+    margin-left: 16px;
+  }
+}

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { SolanaSigner } from '@canvas-js/chain-solana';
 import type {
@@ -90,6 +89,7 @@ export const verify = async ({
 
 export const verifyComment = async (
   canvasSignedData: CanvasSignedData,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: any,
 ) => {
   const { thread_id, text, address, parent_comment_id } = fields;
@@ -123,6 +123,7 @@ export const verifyComment = async (
 
 export const verifyThread = async (
   canvasSignedData: CanvasSignedData,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: any,
 ) => {
   const { title, body, address, community, link, topic } = fields;
@@ -158,6 +159,7 @@ export const verifyThread = async (
 
 export const verifyReaction = async (
   canvasSignedData: CanvasSignedData,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: any,
 ) => {
   const { thread_id, comment_id, proposal_id, address, value } = fields;

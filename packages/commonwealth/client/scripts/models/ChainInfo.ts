@@ -14,7 +14,7 @@ class ChainInfo {
   public readonly CommunityStakes: StakeInfo[];
   public CommunityTags: Tag[];
   public readonly tokenName: string;
-  public threadCount: number;
+  public lifetimeThreadCount: number;
   public readonly profileCount: number;
   public readonly default_symbol: string;
   public name: string;
@@ -89,7 +89,7 @@ class ChainInfo {
     directoryPageChainNodeId,
     namespace,
     redirect,
-    thread_count,
+    lifetime_thread_count,
     profile_count,
     snapshot_spaces,
     communityBanner,
@@ -129,7 +129,7 @@ class ChainInfo {
     this.directoryPageChainNodeId = directoryPageChainNodeId;
     this.namespace = namespace;
     this.redirect = redirect;
-    this.threadCount = thread_count;
+    this.lifetimeThreadCount = lifetime_thread_count;
     this.profileCount = profile_count;
     this.snapshot = snapshot_spaces || [];
   }
@@ -166,7 +166,7 @@ class ChainInfo {
     directory_page_chain_node_id,
     namespace,
     redirect,
-    thread_count,
+    lifetime_thread_count,
     profile_count,
     CommunityStakes,
     CommunityTags,
@@ -226,7 +226,7 @@ class ChainInfo {
       directoryPageChainNodeId: directory_page_chain_node_id,
       namespace,
       redirect,
-      thread_count,
+      lifetime_thread_count,
       profile_count,
       snapshot_spaces,
       adminsAndMods: adminsAndMods || Addresses,
@@ -282,7 +282,7 @@ class ChainInfo {
       snapshot_spaces: community.snapshot_spaces,
       stages_enabled: community.stages_enabled,
       terms: community.terms,
-      thread_count: community.numTotalThreads,
+      lifetime_thread_count: community.numTotalThreads,
       social_links: community.social_links,
       ss58_prefix: community.ss58_prefix,
       type: community.type,

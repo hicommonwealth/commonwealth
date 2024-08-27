@@ -537,8 +537,8 @@ describe('ServerThreadsController', () => {
         CommentVersionHistory: {
           create: () => null,
         },
-        Subscription: {
-          bulkCreate: async () => ({}),
+        CommentSubscription: {
+          create: () => null,
         },
         Topic: {
           findOne: async () => ({
@@ -547,6 +547,10 @@ describe('ServerThreadsController', () => {
         },
         Group: {
           findAll: async () => [],
+        },
+        Outbox: {
+          // eslint-disable-next-line @typescript-eslint/require-await
+          bulkCreate: async () => ({}),
         },
       };
       const banCache = {
@@ -1288,8 +1292,8 @@ describe('ServerThreadsController', () => {
             return data;
           },
         },
-        Subscription: {
-          bulkCreate: async () => ({}),
+        ThreadSubscription: {
+          create: () => null,
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole

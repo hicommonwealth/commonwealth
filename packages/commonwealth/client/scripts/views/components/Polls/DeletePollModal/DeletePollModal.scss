@@ -1,0 +1,9 @@
+@import '../../../../../styles/shared';
+
+.DeletePollModal {
+  width: 100%;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+}

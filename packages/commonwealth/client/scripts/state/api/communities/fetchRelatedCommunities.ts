@@ -14,7 +14,7 @@ interface FetchRelatedCommunitiesResponse {
   description: string;
   icon_url: string;
   id: string;
-  thread_count: string;
+  lifetime_thread_count: string;
   namespace: string;
   chain_node_id: number;
 }
