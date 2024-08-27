@@ -36,6 +36,8 @@
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.6",
     "async-mutex": "^0.5.0",
+    "bip39": "^3.1.0",
+    "cosmos-lib": "^1.1.0",
     "ethers": "5.7.2",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",

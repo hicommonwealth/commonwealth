@@ -20,5 +20,9 @@ export const trpcRouter = trpc.router({
     Community.CreateStakeTransaction,
     trpc.Tag.Community,
   ),
+  submitDiscourseImport: trpc.command(
+    Community.SubmitDiscourseImport,
+    trpc.Tag.Community,
+  ),
   // TODO: integrate via async analytics policy: analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
 });

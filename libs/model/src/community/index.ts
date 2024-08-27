@@ -8,3 +8,4 @@ export * from './GetMembers.query';
 export * from './GetStakeHistoricalPrice.query';
 export * from './GetStakeTransaction.query';
 export * from './SetCommunityStake.command';
+export * from './SubmitDiscourseImport.command';

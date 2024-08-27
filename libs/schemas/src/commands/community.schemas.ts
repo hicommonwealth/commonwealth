@@ -98,3 +98,13 @@ export const GenerateStakeholderGroups = {
     created: z.boolean(),
   }),
 };
+
+export const SubmitDiscourseImport = {
+  input: z.object({
+    id: z.string(),
+    base: z.enum(['ETHEREUM', 'COSMOS', 'NEAR']),
+    accountsClaimable: z.boolean(),
+    dumpUrl: z.string().url(),
+  }),
+  output: z.void(),
+};

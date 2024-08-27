@@ -14,8 +14,12 @@ export const sequelize = new Sequelize(config.DB.URI, {
       ? { requestTimeout: 40000 }
       : config.DB.URI ===
         'postgresql://commonwealth:edgeware@localhost/commonwealth'
-      ? { requestTimeout: 40000, ssl: false }
-      : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
+      ? { multipleStatements: true, requestTimeout: 40000, ssl: false }
+      : {
+          multipleStatements: true,
+          requestTimeout: 40000,
+          ssl: { rejectUnauthorized: false },
+        },
   pool: {
     max: 10,
     min: 0,
@@ -25,3 +29,22 @@ export const sequelize = new Sequelize(config.DB.URI, {
 });
 
 export const models = buildDb(sequelize);
+
+export const createDiscourseDBConnection = (databaseUri: string) => {
+  return new Sequelize(databaseUri, {
+    logging: (msg) => {
+      log.trace(msg);
+    },
+    dialectOptions: {
+      multipleStatements: true,
+      requestTimeout: 40_000,
+      ssl: {
+        rejectUnauthorized: !config.DB.NO_SSL,
+      },
+    },
+    pool: {
+      max: 3,
+      min: 0,
+    },
+  });
+};

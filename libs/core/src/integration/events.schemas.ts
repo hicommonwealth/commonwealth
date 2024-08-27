@@ -237,3 +237,10 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   created_at: true,
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
+
+export const DiscourseImportSubmitted = EventMetadata.extend({
+  id: z.string(),
+  base: z.enum(['ETHEREUM', 'COSMOS', 'NEAR']),
+  accountsClaimable: z.boolean(),
+  dumpUrl: z.string().url(),
+});

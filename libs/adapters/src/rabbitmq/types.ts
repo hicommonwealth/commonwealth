@@ -17,6 +17,7 @@ export enum RascalSubscriptions {
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
   ContestProjection = BrokerSubscriptions.ContestProjection,
+  DiscourseImportWorkerPolicy = BrokerSubscriptions.DiscourseImportWorkerPolicy,
 }
 
 export enum RascalExchanges {
@@ -32,6 +33,7 @@ export enum RascalQueues {
   NotificationsProvider = 'NotificationsProviderQueue',
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
   ContestProjection = 'ContestProjection',
+  DiscourseImportWorkerPolicy = 'DiscourseImportWorkerPolicy',
 }
 
 export enum RascalBindings {
@@ -41,6 +43,7 @@ export enum RascalBindings {
   ChainEvent = 'ChainEventBinding',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
+  DiscourseImportWorkerPolicy = 'DiscourseImportWorkerPolicy',
 }
 
 export enum RascalRoutingKeys {
@@ -61,4 +64,6 @@ export enum RascalRoutingKeys {
   ContestProjectionContestStarted = EventNames.ContestStarted,
   ContestProjectionContestContentAdded = EventNames.ContestContentAdded,
   ContestProjectionContestContentUpvoted = EventNames.ContestContentUpvoted,
+
+  DiscourseImportSubmitted = EventNames.DiscourseImportSubmitted,
 }

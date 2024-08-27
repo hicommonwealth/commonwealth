@@ -26,6 +26,9 @@ export enum EventNames {
 
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
+
+  // Discourse Import
+  DiscourseImportSubmitted = 'DiscourseImportSubmitted',
 }
 
 export type EventPairs =
@@ -76,4 +79,8 @@ export type EventPairs =
   | {
       event_name: EventNames.SubscriptionPreferencesUpdated;
       event_payload: z.infer<typeof events.SubscriptionPreferencesUpdated>;
+    }
+  | {
+      event_name: EventNames.DiscourseImportSubmitted;
+      event_payload: z.infer<typeof events.DiscourseImportSubmitted>;
     };

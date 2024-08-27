@@ -72,7 +72,7 @@ export function getAllRascalConfigs(
     retry: {
       delay: 1000,
     },
-    prefetch: 10,
+    prefetch: 1,
   };
 
   const publicationConfig = {
@@ -132,6 +132,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.DiscourseImportWorkerPolicy]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
@@ -180,6 +186,12 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.ContestProjectionContestContentUpvoted,
       ],
     },
+    [RascalBindings.DiscourseImportWorkerPolicy]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.DiscourseImportWorkerPolicy,
+      destinationType: 'queue',
+      bindingKeys: [RascalRoutingKeys.DiscourseImportSubmitted],
+    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
@@ -213,6 +225,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.ContestProjection]: {
       queue: RascalQueues.ContestProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.DiscourseImportWorkerPolicy]: {
+      queue: RascalQueues.DiscourseImportWorkerPolicy,
       ...subscriptionConfig,
     },
   };
