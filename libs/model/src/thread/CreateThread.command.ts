@@ -135,7 +135,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         }),
       ];
 
-      // Load membership info (we can optimize this with middleware auth cache)
+      // Loading to update last_active
       const address = await models.Address.findOne({
         where: {
           user_id: actor.user.id,

@@ -31,6 +31,30 @@ export class BannedActor extends InvalidActor {
   }
 }
 
+export class NonMember extends InvalidActor {
+  constructor(
+    public actor: Actor,
+    public topic: string,
+    public action: GroupPermissionAction,
+  ) {
+    super(
+      actor,
+      `User does not have permission to perform action ${action} in topic ${topic}`,
+    );
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
+export class RejectedMember extends InvalidActor {
+  constructor(
+    public actor: Actor,
+    public reasons: string[],
+  ) {
+    super(actor, reasons.join(', '));
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
 /**
  * TODO: review rules
  * We have to consider these scenarios
@@ -117,11 +141,7 @@ async function isTopicMember(
   const allowed = groups.filter(
     (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
-  if (!allowed.length!)
-    throw new InvalidActor(
-      actor,
-      `User does not have permission to perform action ${action} in topic ${topic.name}`,
-    );
+  if (!allowed.length!) throw new NonMember(actor, topic.name, action);
 
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
@@ -136,9 +156,14 @@ async function isTopicMember(
       },
     ],
   });
+  if (!memberships.length) throw new NonMember(actor, topic.name, action);
+
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
-    throw new InvalidActor(actor, rejects.join('\n'));
+    throw new RejectedMember(
+      actor,
+      rejects.flatMap((r) => r.reject_reason!.map((r) => r.message)),
+    );
 }
 
 /**
