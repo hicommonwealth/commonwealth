@@ -258,6 +258,7 @@ const BasicInformationForm = ({
         hookToForm
         label="Community Description"
         placeholder="Enter a description of your community or project"
+        charCount
       />
 
       <CWCoverImageUploader
