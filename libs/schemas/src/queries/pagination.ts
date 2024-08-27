@@ -122,7 +122,7 @@ export function buildPaginatedResponse<T>(
 ): TypedPaginatedResult<T> {
   const limit = options.limit || 10;
   let page;
-  if (options.offset) {
+  if (options.offset !== undefined) {
     page = Math.floor(options.offset! / limit) + 1;
   } else {
     page = Math.floor(options.cursor! / limit) + 1;
