@@ -1,5 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
 export const trpcRouter = trpc.router({
   getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community),
@@ -14,11 +15,14 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
-  createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community),
+  createGroup: trpc.command(
+    Community.CreateGroup,
+    trpc.Tag.Community,
+    trpc.track(MixpanelCommunityInteractionEvent.CREATE_GROUP),
+  ),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
     trpc.Tag.Community,
   ),
-  // TODO: integrate via async analytics policy: analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
 });

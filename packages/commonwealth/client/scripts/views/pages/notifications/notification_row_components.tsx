@@ -10,6 +10,7 @@ import 'pages/notifications/notification_row.scss';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { User } from 'views/components/user/user';
 import type { IEventLabel } from '../../../../../shared/chain/labelers/util';
 import { Label as ChainEventLabel } from '../../../../../shared/chain/labelers/util';
@@ -27,6 +28,7 @@ export const ChainEventNotificationRow = ({
   onListPage,
 }: Omit<NotificationRowProps, 'allRead'>) => {
   const navigate = useCommonNavigate();
+  const { data: domain } = useFetchCustomDomainQuery();
 
   if (!notification.chainEvent) {
     throw new Error('chain event notification does not have expected data');
@@ -34,7 +36,7 @@ export const ChainEventNotificationRow = ({
 
   const communityId = notification.chainEvent.chain;
 
-  if (app.isCustomDomain() && communityId !== app.customDomainId()) {
+  if (domain?.isCustomDomain && communityId !== domain?.customDomainId) {
     return;
   }
 
@@ -135,6 +137,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const category = notification.categoryId;
 
   const navigate = useNavigate();
@@ -152,17 +156,18 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
     response;
   let { path } = response;
 
-  if (app.isCustomDomain()) {
+  if (domain?.isCustomDomain) {
     if (
-      path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !== 0 &&
-      path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0
+      path.indexOf(`https://commonwealth.im/${domain?.customDomainId}/`) !==
+        0 &&
+      path.indexOf(`http://localhost:8080/${domain?.customDomainId}/`) !== 0
     ) {
       return;
     }
 
     path = path
-      .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
-      .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+      .replace(`https://commonwealth.im/${domain?.customDomainId}/`, '/')
+      .replace(`http://localhost:8080/${domain?.customDomainId}/`, '/');
   } else {
     path = path
       .replace(`https://commonwealth.im/`, '/')
