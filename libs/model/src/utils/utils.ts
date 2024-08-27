@@ -153,12 +153,12 @@ export async function getThreadContestManagers(
   return contestManagers;
 }
 
-export function removeUndefined(obj: object) {
+export function removeUndefined<T extends Record<string, any>>(obj: T) {
   const result = {};
 
   Object.keys(obj).forEach((key) => {
     if (obj[key] !== undefined) {
-      result[key] = obj[key];
+      result[key as keyof T] = obj[key];
     }
   });
 
