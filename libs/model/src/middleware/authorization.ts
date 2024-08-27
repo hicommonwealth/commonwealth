@@ -51,6 +51,7 @@ const authorizeAddress = async (
   // `CommandContext<CommandInput>` prevents use of this function in Query middleware
   // due to `id` being required in the core command framework.
   // This issue can be resolved with https://github.com/hicommonwealth/commonwealth/issues/9009
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<z.infer<typeof Address>> => {
