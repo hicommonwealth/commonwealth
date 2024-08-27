@@ -151,6 +151,10 @@ export default (
         type: Sequelize.BOOLEAN,
         allowNull: true,
       },
+      banner_text: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
     },
     {
       tableName: 'Communities',

@@ -14,24 +14,17 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   contestEnabled: boolean;
-  knockInAppNotifications: boolean;
 };
 
 const Router = () => {
   const client = OpenFeature.getClient();
   const contestEnabled = client.getBooleanValue('contest', false);
 
-  const knockInAppNotifications = client.getBooleanValue(
-    'knockInAppNotifications',
-    false,
-  );
-
-  const { isCustomDomain } = fetchCachedCustomDomain() || {};
-
   const flags = {
     contestEnabled,
-    knockInAppNotifications,
   };
+
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
 
   return createBrowserRouter(
     createRoutesFromElements([

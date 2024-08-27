@@ -2,8 +2,6 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
-import { ApiEndpoints, queryClient } from '../config';
-import { FetchActiveCommunitiesResponse } from './fetchActiveCommunities';
 import { invalidateAllQueriesForCommunity } from './getCommuityById';
 
 interface EditCommunityTagsProps {
@@ -28,23 +26,8 @@ const editCommunityTags = async ({
 const useEditCommunityTagsMutation = () => {
   return useMutation({
     mutationFn: editCommunityTags,
-    onSuccess: async ({ CommunityTags = [], community_id }) => {
+    onSuccess: async ({ community_id }) => {
       await invalidateAllQueriesForCommunity(community_id);
-
-      // update active communities cache
-      const key = [ApiEndpoints.FETCH_ACTIVE_COMMUNITIES];
-      const existingActiveCommunities:
-        | FetchActiveCommunitiesResponse
-        | undefined = queryClient.getQueryData(key);
-      if (existingActiveCommunities) {
-        const foundCommunity = existingActiveCommunities.communities.find(
-          (c) => c.id === community_id,
-        );
-        if (foundCommunity) {
-          foundCommunity.CommunityTags = CommunityTags;
-          queryClient.setQueryData(key, () => existingActiveCommunities);
-        }
-      }
     },
   });
 };

@@ -131,11 +131,8 @@ describe('ServerThreadsController', () => {
           query: () => new Promise((resolve) => resolve([])),
         },
       };
-      const banCache: any = {
-        checkBan: () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(db, banCache);
+      const serverThreadsController = new ServerThreadsController(db);
       const [updatedThread, notificationOptions, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
 

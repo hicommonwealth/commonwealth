@@ -1,5 +1,4 @@
 import { CommunityStakeAttributes, DB } from '@hicommonwealth/model';
-import BanCache from '../util/banCheckCache';
 import {
   CreateChainNodeOptions,
   CreateChainNodeResult,
@@ -69,7 +68,7 @@ import {
  * Implements methods related to communities
  */
 export class ServerCommunitiesController {
-  constructor(public models: DB, public banCache: BanCache) {}
+  constructor(public models: DB) {}
 
   async searchCommunities(
     options: SearchCommunitiesOptions,
