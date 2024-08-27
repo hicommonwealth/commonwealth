@@ -1,4 +1,6 @@
 import {
+  Actor,
+  INVALID_ACTOR_ERROR,
   InvalidActor,
   InvalidInput,
   type CommandContext,
@@ -21,6 +23,13 @@ export type CommentMiddleware = CommandHandler<
   CommandInput,
   typeof schemas.Comment
 >;
+
+export class BannedActor extends InvalidActor {
+  constructor(public actor: Actor) {
+    super(actor, 'Banned User');
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}
 
 /**
  * TODO: review rules
@@ -62,8 +71,7 @@ const authorizeAddress = async (
   if (!addr)
     throw new InvalidActor(actor, `User is not ${roles} in the community`);
 
-  // @ts-expect-error readonly property
-  actor.addressId = addr.id;
+  (actor as { addressId: number }).addressId = addr.id!;
   return addr;
 };
 
@@ -162,10 +170,7 @@ export function isCommunityAdminOrTopicMember(
     if (ctx.actor.user.isAdmin) return;
     const addr = await authorizeAddress(ctx, ['admin', 'moderator', 'member']);
     if (addr.role === 'member') {
-      // first, check if banned
-      // TODO: if(addr.is_banned)
-      //  throw new InvalidActor(ctx.actor, `Ban error: ${banError}`);
-      // check group membership
+      if (addr.is_banned) throw new BannedActor(ctx.actor);
       await isTopicMember(ctx, action);
     }
   };

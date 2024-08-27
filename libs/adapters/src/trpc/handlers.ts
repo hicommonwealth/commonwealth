@@ -100,7 +100,6 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
           payload: input!,
         };
         const result = await coreCommand(md, _ctx, false);
-        // TODO: relocate this?
         outputMiddleware && (await outputMiddleware(_ctx, result!));
         return result;
       } catch (error) {
