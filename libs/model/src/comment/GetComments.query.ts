@@ -1,6 +1,8 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { FindAndCountOptions } from 'sequelize';
 import { models } from '../database';
+import { CommentAttributes } from '../models/index';
 import { removeUndefined } from '../utils/index';
 import { formatSequelizePagination } from '../utils/paginationUtils';
 
@@ -56,7 +58,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         include: includeArray,
         ...formatSequelizePagination(payload),
         paranoid: false,
-      });
+      } as unknown as FindAndCountOptions<CommentAttributes>);
 
       return schemas.buildPaginatedResponse(comments, count as number, payload);
     },
