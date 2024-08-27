@@ -211,7 +211,7 @@ importers:
         version: 17.10.2(eslint@8.57.0)
       eslint-plugin-prettier:
         specifier: ^5.2.1
-        version: 5.2.1(eslint-config-prettier@9.1.0(eslint@8.57.0))(eslint@8.57.0)(prettier@2.7.1)
+        version: 5.2.1(eslint-config-prettier@9.1.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3)
       eslint-plugin-promise:
         specifier: ^7.1.0
         version: 7.1.0(eslint@8.57.0)
@@ -246,11 +246,11 @@ importers:
         specifier: ^8.2.0
         version: 8.4.0
       prettier:
-        specifier: 2.7.1
-        version: 2.7.1
+        specifier: 3.3.3
+        version: 3.3.3
       prettier-plugin-organize-imports:
-        specifier: ^3.2.3
-        version: 3.2.4(prettier@2.7.1)(typescript@5.4.5)
+        specifier: ^4.0.0
+        version: 4.0.0(prettier@3.3.3)(typescript@5.4.5)
       process:
         specifier: ^0.11.10
         version: 0.11.10
@@ -273,7 +273,7 @@ importers:
         specifier: ^14.14.1
         version: 14.16.1
       stylelint-config-prettier:
-        specifier: ^9.0.4
+        specifier: ^9.0.5
         version: 9.0.5(stylelint@14.16.1)
       stylelint-config-standard:
         specifier: ^29.0.0
@@ -16122,20 +16122,20 @@ packages:
       }
     engines: { node: '>=6.0.0' }
 
-  prettier-plugin-organize-imports@3.2.4:
+  prettier-plugin-organize-imports@4.0.0:
     resolution:
       {
-        integrity: sha512-6m8WBhIp0dfwu0SkgfOxJqh+HpdyfqSSLfKKRZSFbDuEQXDDndb8fTpRWkUrX/uBenkex3MgnVk0J3b3Y5byog==,
+        integrity: sha512-vnKSdgv9aOlqKeEFGhf9SCBsTyzDSyScy1k7E0R1Uo4L0cTcOV7c1XQaT7jfXIOc/p08WLBfN2QUQA9zDSZMxA==,
       }
     peerDependencies:
-      '@volar/vue-language-plugin-pug': ^1.0.4
-      '@volar/vue-typescript': ^1.0.4
+      '@vue/language-plugin-pug': ^2.0.24
       prettier: '>=2.0'
       typescript: '>=2.9'
+      vue-tsc: ^2.0.24
     peerDependenciesMeta:
-      '@volar/vue-language-plugin-pug':
+      '@vue/language-plugin-pug':
         optional: true
-      '@volar/vue-typescript':
+      vue-tsc:
         optional: true
 
   prettier@2.7.1:
@@ -16144,6 +16144,14 @@ packages:
         integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==,
       }
     engines: { node: '>=10.13.0' }
+    hasBin: true
+
+  prettier@3.3.3:
+    resolution:
+      {
+        integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==,
+      }
+    engines: { node: '>=14' }
     hasBin: true
 
   pretty-format@29.7.0:
@@ -28109,10 +28117,10 @@ snapshots:
       minimatch: 9.0.5
       semver: 7.6.0
 
-  eslint-plugin-prettier@5.2.1(eslint-config-prettier@9.1.0(eslint@8.57.0))(eslint@8.57.0)(prettier@2.7.1):
+  eslint-plugin-prettier@5.2.1(eslint-config-prettier@9.1.0(eslint@8.57.0))(eslint@8.57.0)(prettier@3.3.3):
     dependencies:
       eslint: 8.57.0
-      prettier: 2.7.1
+      prettier: 3.3.3
       prettier-linter-helpers: 1.0.0
       synckit: 0.9.1
     optionalDependencies:
@@ -31543,12 +31551,14 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier-plugin-organize-imports@3.2.4(prettier@2.7.1)(typescript@5.4.5):
+  prettier-plugin-organize-imports@4.0.0(prettier@3.3.3)(typescript@5.4.5):
     dependencies:
-      prettier: 2.7.1
+      prettier: 3.3.3
       typescript: 5.4.5
 
   prettier@2.7.1: {}
+
+  prettier@3.3.3: {}
 
   pretty-format@29.7.0:
     dependencies:

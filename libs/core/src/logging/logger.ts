@@ -15,6 +15,7 @@ export function logger(
   ids: ImportMeta | LoggerIds,
   getLogger?: GetLogger,
 ): ILogger {
+  // eslint-disable-next-line no-param-reassign
   if (!Array.isArray(ids)) ids = [fileURLToPath(ids.url)];
 
   if (getLogger) {

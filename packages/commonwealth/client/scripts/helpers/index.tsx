@@ -56,10 +56,6 @@ export function extractDomain(url) {
 /*
  * comparators
  */
-export function byDescendingCreationDate(a, b) {
-  return +b.createdAt - +a.createdAt;
-}
-
 export function byAscendingCreationDate(a, b) {
   return +a.createdAt - +b.createdAt;
 }
