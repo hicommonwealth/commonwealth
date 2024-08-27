@@ -26,7 +26,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
-import BanCache from './server/util/banCheckCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -150,8 +149,6 @@ export async function main(
   setupMiddleware();
   setupPassport(db);
 
-  const banCache = new BanCache(db);
-
   // TODO: decouple as global singleton
   const globalActivityCache = GlobalActivityCache.getInstance(db);
   // initialize async to avoid blocking startup
@@ -167,7 +164,6 @@ export async function main(
     app,
     db,
     viewCountCache,
-    banCache,
     globalActivityCache,
     dbValidationService,
     cacheDecorator,

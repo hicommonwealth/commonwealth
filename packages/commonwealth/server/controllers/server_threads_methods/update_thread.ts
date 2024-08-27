@@ -138,14 +138,7 @@ export async function __updateThread(
   );
   const isContestThread = contestManagers.length > 0;
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // get various permissions
   const userOwnedAddressIds = (await user.getAddresses())

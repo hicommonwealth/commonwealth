@@ -76,7 +76,6 @@ import type ViewCountCache from '../util/viewCountCache';
 import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
-import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/discord/createDiscordBotConfig';
@@ -178,29 +177,24 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, banCache, globalActivityCache),
-    comments: new ServerCommentsController(
-      models,
-      banCache,
-      globalActivityCache,
-    ),
-    reactions: new ServerReactionsController(models, banCache),
+    threads: new ServerThreadsController(models, globalActivityCache),
+    comments: new ServerCommentsController(models, globalActivityCache),
+    reactions: new ServerReactionsController(models),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    communities: new ServerCommunitiesController(models, banCache),
+    communities: new ServerCommunitiesController(models),
     polls: new ServerPollsController(models),
-    groups: new ServerGroupsController(models, banCache),
-    topics: new ServerTopicsController(models, banCache),
+    groups: new ServerGroupsController(models),
+    topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
-    tags: new ServerTagsController(models, banCache), // TOOD: maybe remove banCache?
+    tags: new ServerTagsController(models),
   };
 
   // ---
