@@ -9,11 +9,11 @@ import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
+import { updateThreadCountsByStageChange } from '../communities/getCommuityById';
 import {
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
 } from './helpers/cache';
-import { updateThreadCountsByStageChange } from './helpers/counts';
 
 interface EditThreadProps {
   address: string;
@@ -103,8 +103,6 @@ const editThread = async ({
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 
-  console.log(response.data.result);
-
   return new Thread(response.data.result);
 };
 
@@ -128,7 +126,11 @@ const useEditThreadMutation = ({
     onSuccess: async (updatedThread) => {
       // Update community level thread counters variables
       if (currentStage !== updatedThread.stage) {
-        updateThreadCountsByStageChange(currentStage, updatedThread.stage);
+        updateThreadCountsByStageChange(
+          communityId,
+          currentStage,
+          updatedThread.stage,
+        );
       }
 
       // add/remove thread from different caches if the topic id was changed

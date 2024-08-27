@@ -5,10 +5,9 @@ import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
 import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
-import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { userStore } from '../../ui/user';
+import { updateCommunityThreadCount } from '../communities/getCommuityById';
 import { removeThreadFromAllCaches } from './helpers/cache';
-import { updateCommunityThreadCount } from './helpers/counts';
 
 interface DeleteThreadProps {
   communityId: string;
@@ -54,19 +53,14 @@ const useDeleteThreadMutation = ({
     onSuccess: async (response) => {
       removeThreadFromAllCaches(communityId, threadId);
 
-      // Update community level thread counters variables
-      EXCEPTION_CASE_threadCountersStore.setState(
-        ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
-          totalThreadsInCommunity: totalThreadsInCommunity - 1,
-          totalThreadsInCommunityForVoting:
-            currentStage === ThreadStage.Voting
-              ? totalThreadsInCommunityForVoting - 1
-              : totalThreadsInCommunityForVoting,
-        }),
-      );
-
       // decrement communities thread count
-      if (communityId) updateCommunityThreadCount(communityId, 'decrement');
+      if (communityId) {
+        updateCommunityThreadCount(
+          communityId,
+          'decrement',
+          currentStage === ThreadStage.Voting,
+        );
+      }
 
       return response.data;
     },

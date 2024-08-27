@@ -10,10 +10,9 @@ import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
-import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import useUserStore, { userStore } from '../../ui/user';
+import { updateCommunityThreadCount } from '../communities/getCommuityById';
 import { addThreadInAllCaches } from './helpers/cache';
-import { updateCommunityThreadCount } from './helpers/counts';
 
 interface CreateThreadProps {
   address: string;
@@ -95,19 +94,14 @@ const useCreateThreadMutation = ({
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
 
-      // Update community level thread counters variables
-      EXCEPTION_CASE_threadCountersStore.setState(
-        ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
-          totalThreadsInCommunity: totalThreadsInCommunity + 1,
-          totalThreadsInCommunityForVoting:
-            newThread.stage === ThreadStage.Voting
-              ? totalThreadsInCommunityForVoting + 1
-              : totalThreadsInCommunityForVoting,
-        }),
-      );
-
       // increment communities thread count
-      if (communityId) updateCommunityThreadCount(communityId, 'increment');
+      if (communityId) {
+        updateCommunityThreadCount(
+          communityId,
+          'increment',
+          newThread.stage === ThreadStage.Voting,
+        );
+      }
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

@@ -6,7 +6,6 @@ import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -23,6 +22,7 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -42,7 +42,6 @@ type DiscussionsPageProps = {
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
-  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
@@ -57,6 +56,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
     'dateRange',
   ) as ThreadTimelineFilterTypes;
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+    includeNodeInfo: true,
+  });
 
   const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
@@ -256,7 +261,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                    ? totalThreadsInCommunity
+                    ? community?.lifetime_thread_count || 0
                     : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}

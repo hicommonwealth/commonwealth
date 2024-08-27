@@ -1,5 +1,6 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
+import { ThreadStage } from 'models/types';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 import { queryClient } from '../config';
@@ -12,9 +13,8 @@ type UseGetCommunityByIdProps = {
   enabled?: boolean;
 };
 
-export const invalidateAllQueriesForCommunity = async (communityId: string) => {
-  // get all the query keys for this community
-  const queryKeys = [
+const getQueryKeysForCommunity = (communityId: string) => {
+  return [
     trpc.community.getCommunity.getQueryKey({
       id: communityId,
       include_node_info: true,
@@ -24,6 +24,60 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
       include_node_info: false,
     }),
   ];
+};
+
+export const updateThreadCountsByStageChange = (
+  communityId: string,
+  currentStage: ThreadStage,
+  updatedStage: ThreadStage,
+) => {
+  // get all the query keys for this community
+  const queryKeys = getQueryKeysForCommunity(communityId);
+
+  queryKeys.map((key) => {
+    const data =
+      queryClient.getQueryData<z.infer<typeof ExtendedCommunity>>(key);
+
+    if (data) {
+      queryClient.setQueryData(key, () => {
+        let incBy = 0;
+        if (currentStage === ThreadStage.Voting) incBy--;
+        if (updatedStage === ThreadStage.Voting) incBy++;
+        data.numVotingThreads = (data.numVotingThreads || 0) + incBy;
+        return { ...data };
+      });
+    }
+  });
+};
+
+export const updateCommunityThreadCount = (
+  communityId: string,
+  type: 'increment' | 'decrement',
+  isVotingThread: boolean,
+) => {
+  // get all the query keys for this community
+  const queryKeys = getQueryKeysForCommunity(communityId);
+
+  queryKeys.map((key) => {
+    const data =
+      queryClient.getQueryData<z.infer<typeof ExtendedCommunity>>(key);
+
+    if (data) {
+      queryClient.setQueryData(key, () => {
+        const count = type === 'increment' ? 1 : -1;
+        data.lifetime_thread_count = (data.lifetime_thread_count || 0) + count;
+        if (isVotingThread) {
+          data.numVotingThreads = (data.numVotingThreads || 0) + count;
+        }
+        return { ...data };
+      });
+    }
+  });
+};
+
+export const invalidateAllQueriesForCommunity = async (communityId: string) => {
+  // get all the query keys for this community
+  const queryKeys = getQueryKeysForCommunity(communityId);
 
   // invalidate all the query keys for this community
   if (queryKeys.length > 0) {
