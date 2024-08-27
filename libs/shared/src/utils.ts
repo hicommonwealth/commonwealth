@@ -199,7 +199,7 @@ export function safeTruncateBody(body: string, length: number = 500): string {
   }
 }
 
-export function getWebhookDestination(webhookUrl = '') {
+export function getWebhookDestination(webhookUrl = ''): string {
   if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
 
   let destination = 'unknown';
