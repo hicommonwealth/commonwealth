@@ -9,7 +9,6 @@ import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import useUserStore from '../../ui/user';
 import { addThreadInAllCaches } from './helpers/cache';
-import { updateCommunityThreadCount } from './helpers/counts';
 
 interface CreateThreadProps {
   address: string;
@@ -78,9 +77,6 @@ const useCreateThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
-
-      // increment communities thread count
-      if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&
