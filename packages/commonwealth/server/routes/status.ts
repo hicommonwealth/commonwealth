@@ -30,6 +30,7 @@ type StatusResp = {
     selectedCommunity: CommunityInstance;
     isAdmin: boolean;
     disableRichText: boolean;
+    communities: StarredCommunityAttributes[];
     starredCommunities: StarredCommunityAttributes[];
   };
   communityWithRedirects?: CommunityWithRedirects[];
@@ -117,6 +118,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       selectedCommunity,
       isAdmin,
       disableRichText,
+      communities: userCommunities?.[0] || [],
       starredCommunities: userCommunities?.[0] || [],
     },
     id: user.id,
