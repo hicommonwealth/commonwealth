@@ -260,8 +260,7 @@ export async function __createThreadComment(
         comment_id: +comment.id,
         // @ts-expect-error StrictNullChecks
         comment_text: comment.text,
-        // @ts-expect-error StrictNullChecks
-        community_id: comment.community_id,
+        community_id: thread.community_id,
         author_address: address.address,
         author_community_id: address.community_id!,
       },
