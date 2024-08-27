@@ -162,7 +162,9 @@ async function isTopicMember(
   if (rejects.length === memberships.length)
     throw new RejectedMember(
       actor,
-      rejects.flatMap((r) => r.reject_reason!.map((r) => r.message)),
+      rejects.flatMap((reject) =>
+        reject.reject_reason!.map((reason) => reason.message),
+      ),
     );
 }
 
