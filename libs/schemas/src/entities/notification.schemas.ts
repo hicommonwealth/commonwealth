@@ -30,7 +30,6 @@ export const Subscription = z.object({
 });
 
 export const SubscriptionPreference = z.object({
-  id: PG_INT,
   user_id: PG_INT,
   email_notifications_enabled: z.boolean().default(false),
   digest_email_enabled: z.boolean().default(false),
