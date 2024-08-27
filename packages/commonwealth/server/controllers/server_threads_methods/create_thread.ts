@@ -16,10 +16,10 @@ import {
   BalanceSourceType,
   NotificationCategories,
   ProposalType,
+  renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   emitMentions,
   parseUserMentions,

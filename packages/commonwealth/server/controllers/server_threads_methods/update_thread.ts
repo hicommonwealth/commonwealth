@@ -8,7 +8,11 @@ import {
   ThreadInstance,
   UserInstance,
 } from '@hicommonwealth/model';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import {
+  NotificationCategories,
+  ProposalType,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
 import _ from 'lodash';
 import {
   Op,
@@ -18,7 +22,7 @@ import {
   WhereOptions,
 } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
+import { validURL } from '../../../shared/utils';
 import {
   emitMentions,
   findMentionDiff,

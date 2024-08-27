@@ -4,10 +4,13 @@ import {
   CommentAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import {
+  NotificationCategories,
+  ProposalType,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
-import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   emitMentions,
   findMentionDiff,
