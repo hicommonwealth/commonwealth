@@ -16,7 +16,6 @@ export const ApiEndpoints = {
   FETCH_COMMUNITY_STAKES: '/communityStakes',
   FETCH_COMMENTS: '/viewComments',
   FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
-  FETCH_ACTIVE_COMMUNITIES: '/communities',
   FETCH_THREADS: '/threads',
   FETCH_PROFILES_BY_ADDRESS: '/getAddressProfile',
   FETCH_PROFILES_BY_ID: '/profile/v2',
