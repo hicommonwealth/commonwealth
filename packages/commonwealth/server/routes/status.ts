@@ -117,7 +117,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       selectedCommunity,
       isAdmin,
       disableRichText,
-      communities: userCommunities?.[0] || [],
+      starredCommunities: userCommunities?.[0] || [],
     },
     id: user.id,
     email: user.email,
