@@ -30,6 +30,7 @@
     "@knocklabs/node": "^0.6.10",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",
+    "async-rwlock": "^1.1.1",
     "express": "^4.18.2",
     "hot-shots": "^9",
     "mixpanel": "^0.14.0",

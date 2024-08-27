@@ -1,4 +1,4 @@
-import { JobRunner } from '@hicommonwealth/core';
+import { JobRunner } from '@hicommonwealth/adapters';
 
 type CacheT = { [viewerId: string]: { [objectId: string]: number } };
 
