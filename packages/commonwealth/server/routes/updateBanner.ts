@@ -14,7 +14,7 @@ type UpdateBannerReq = {
   banner_text: string;
 };
 
-// XXX: this route should be rolled into the updateCommunity route
+// TODO in #9012: this route should be rolled into the updateCommunity route
 const updateBanner = async (
   models: DB,
   req: TypedRequestBody<UpdateBannerReq>,
