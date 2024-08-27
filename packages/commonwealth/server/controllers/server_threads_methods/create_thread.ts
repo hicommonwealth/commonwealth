@@ -19,10 +19,10 @@ import {
   BalanceSourceType,
   NotificationCategories,
   ProposalType,
+  renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
