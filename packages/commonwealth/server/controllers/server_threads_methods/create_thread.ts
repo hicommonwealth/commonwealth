@@ -9,8 +9,11 @@ import {
   ThreadAttributes,
   UserInstance,
   config,
+  emitMentions,
+  parseUserMentions,
   sanitizeQuillText,
   tokenBalanceCache,
+  uniqueMentions,
 } from '@hicommonwealth/model';
 import {
   BalanceSourceType,
@@ -20,11 +23,6 @@ import {
 import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import {
-  emitMentions,
-  parseUserMentions,
-  uniqueMentions,
-} from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';

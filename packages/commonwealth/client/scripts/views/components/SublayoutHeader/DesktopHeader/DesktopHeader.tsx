@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import React from 'react';
-import app from 'state';
 
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -17,6 +16,7 @@ import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
@@ -32,6 +32,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
   const user = useUserStore();
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -51,7 +52,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
           iconButtonTheme="black"
           iconSize="header"
           onClick={() => {
-            if (app.isCustomDomain()) {
+            if (domain?.isCustomDomain) {
               navigate('/', {}, null);
             } else {
               if (user.isLoggedIn) {
