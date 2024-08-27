@@ -165,8 +165,7 @@ export async function __updateComment(
         comment_id: +finalComment.id,
         // @ts-expect-error StrictNullChecks
         comment_text: finalComment.text,
-        // @ts-expect-error StrictNullChecks
-        community_id: finalComment.community_id,
+        community_id: thread.community_id,
         // @ts-expect-error StrictNullChecks
         author_address: finalComment.Address.address,
         // @ts-expect-error StrictNullChecks
