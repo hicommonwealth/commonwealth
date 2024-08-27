@@ -111,7 +111,7 @@ export const verifyDeleteComment = async (
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'deleteComment', 'comment', 'call');
   assertMatches(
-    actionMessage.payload.args.commentId,
+    actionMessage.payload.args.comment_id,
     comment_id,
     'comment',
     'msgid',
