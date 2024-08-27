@@ -21,7 +21,7 @@ type TextAreaStyleProps = {
 type TextAreaFormValidationProps = {
   name?: string;
   hookToForm?: boolean;
-  charCount?: boolean;
+  charCount?: number;
 };
 
 type TextAreaProps = BaseTextInputProps &
@@ -164,7 +164,9 @@ export const CWTextArea = (props: TextAreaProps) => {
       )}
       {charCount && (
         <div className="character-count">
-          <CWText type="caption">Character count: {characterCount}/250</CWText>
+          <CWText type="caption">
+            Character count: {characterCount}/{charCount}
+          </CWText>
         </div>
       )}
     </div>
