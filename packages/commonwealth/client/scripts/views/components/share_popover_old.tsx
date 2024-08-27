@@ -2,6 +2,7 @@ import React from 'react';
 import app from '../../state';
 
 import { useLocation } from 'react-router-dom';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -22,6 +23,8 @@ export const SharePopoverOld = ({
 }: SharePopoverProps) => {
   const domain = document.location.origin;
   const { pathname: currentRoute } = useLocation();
+
+  const { data: domainData } = useFetchCustomDomainQuery();
 
   const defaultRenderTrigger = (
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
@@ -57,7 +60,7 @@ export const SharePopoverOld = ({
               const urlParts = currentRoute.split('/');
 
               // If we copy from a custom domain page, exclude the chain
-              if (app.isCustomDomain()) {
+              if (domainData?.isCustomDomain) {
                 urlToCopy = `${domain}${discussionLink}`;
               } else {
                 const communityId = urlParts[1];
