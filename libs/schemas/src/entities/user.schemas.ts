@@ -62,6 +62,7 @@ export const Address = z.object({
   is_user_default: z.boolean().default(false),
   role: z.enum(Roles).default('member'),
   wallet_sso_source: z.nativeEnum(WalletSsoSource).nullish(),
+  is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
 
   User: User.optional(),

@@ -244,6 +244,14 @@ export async function __createThread(
       address.last_active = new Date();
       await address.save({ transaction });
 
+      await this.models.ThreadSubscription.create(
+        {
+          user_id: user.id!,
+          thread_id: thread.id!,
+        },
+        { transaction },
+      );
+
       await emitMentions(this.models, transaction, {
         authorAddressId: address.id!,
         authorUserId: user.id!,
@@ -254,7 +262,6 @@ export async function __createThread(
       });
 
       return thread.id;
-      // end of transaction
     },
   );
 
@@ -270,28 +277,6 @@ export async function __createThread(
   if (!finalThread) {
     throw new AppError(Errors.FailedCreateThread);
   }
-
-  // -----
-
-  // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.bulkCreate([
-    {
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewComment,
-      thread_id: finalThread.id,
-      community_id: finalThread.community_id,
-      is_active: true,
-    },
-    {
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewReaction,
-      thread_id: finalThread.id,
-      community_id: finalThread.community_id,
-      is_active: true,
-    },
-  ]);
 
   const allNotificationOptions: EmitOptions[] = [];
 

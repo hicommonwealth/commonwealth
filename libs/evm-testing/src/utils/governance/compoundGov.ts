@@ -12,6 +12,7 @@ export class compoundGovernor implements IGovernor {
   public async createArbitraryProposal(
     accountIndex: number,
     advanceDays?: string | number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
@@ -65,6 +66,7 @@ export class compoundGovernor implements IGovernor {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async cancelProposal(proposalId: string | number): Promise<any> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
@@ -79,6 +81,7 @@ export class compoundGovernor implements IGovernor {
     proposalId: string | number,
     accountIndex: number,
     forAgainst: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
@@ -89,6 +92,7 @@ export class compoundGovernor implements IGovernor {
     return { block: Number(vote['blockNumber']) };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async getProposalDetails(proposalId: number | string): Promise<any> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
@@ -99,6 +103,7 @@ export class compoundGovernor implements IGovernor {
   public async queueProposal(
     proposalId: string | number,
     advanceTimeToo?: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     if (advanceTimeToo) {
       const secs = Number(3) * 86400;
@@ -117,6 +122,7 @@ export class compoundGovernor implements IGovernor {
   public async executeProposal(
     proposalId: string | number,
     advanceTimeToo?: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     if (advanceTimeToo) {
       const secs = Number(5) * 86400;
@@ -135,6 +141,7 @@ export class compoundGovernor implements IGovernor {
   public async getVotes(
     accountIndex: number,
     numberOfVotes: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const provider = getProvider();
     const compToken = erc20(this.compToken, provider);

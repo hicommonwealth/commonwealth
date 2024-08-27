@@ -13,7 +13,6 @@ import {
   ChainBase,
   ChainType,
   DefaultPage,
-  NotificationCategories,
 } from '@hicommonwealth/shared';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
@@ -327,13 +326,13 @@ export async function __createCommunity(
         base === ChainBase.CosmosSDK
           ? BalanceType.Cosmos
           : base === ChainBase.Substrate
-          ? BalanceType.Substrate
-          : base === ChainBase.Ethereum
-          ? BalanceType.Ethereum
-          : // beyond here should never really happen, but just to make sure...
-          base === ChainBase.Solana
-          ? BalanceType.Solana
-          : undefined,
+            ? BalanceType.Substrate
+            : base === ChainBase.Ethereum
+              ? BalanceType.Ethereum
+              : // beyond here should never really happen, but just to make sure...
+                base === ChainBase.Solana
+                ? BalanceType.Solana
+                : undefined,
       // use first chain name as node name
       name: community.name,
     },
@@ -486,15 +485,7 @@ export async function __createCommunity(
       role: 'admin',
       last_active: new Date(),
       ghost_address: false,
-    });
-
-    await this.models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewThread,
-        community_id: createdCommunity.id,
-        is_active: true,
-      },
+      is_banned: false,
     });
   }
 
