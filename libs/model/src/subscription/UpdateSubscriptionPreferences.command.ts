@@ -6,9 +6,12 @@ import { z } from 'zod';
 import { models } from '../database';
 
 function getDifferences(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fullObject: Record<string, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subsetObject: Record<string, any>,
 ): Partial<z.infer<typeof SubscriptionPreference>> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const differences: Record<string, any> = {};
   for (const key in subsetObject) {
     if (

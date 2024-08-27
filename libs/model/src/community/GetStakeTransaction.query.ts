@@ -48,6 +48,7 @@ export function GetStakeTransaction(): Query<
             addresses: addresses ?? null,
           },
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       )) as any;
     },
   };

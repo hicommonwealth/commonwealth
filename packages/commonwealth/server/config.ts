@@ -6,7 +6,6 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
-  ENFORCE_SESSION_KEYS,
   SENDGRID_API_KEY,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
@@ -58,7 +57,6 @@ const DEFAULTS = {
 export const config = configure(
   { ...model_config, ...adapters_config, ...evm_config },
   {
-    ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     SEND_EMAILS,
     // Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
     // Risks sending webhooks/emails to real users if incorrectly set to true
@@ -143,7 +141,6 @@ export const config = configure(
     },
   },
   z.object({
-    ENFORCE_SESSION_KEYS: z.boolean(),
     SEND_EMAILS: z.boolean(),
     SEND_WEBHOOKS_EMAILS: z
       .boolean()

@@ -6,6 +6,7 @@ import {
   createRoutesFromElements,
   Route,
 } from 'react-router-dom';
+import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { withLayout } from 'views/Layout';
 import { PageNotFound } from 'views/pages/404';
 import CommonDomainRoutes from './CommonDomainRoutes';
@@ -15,7 +16,7 @@ export type RouteFeatureFlags = {
   contestEnabled: boolean;
 };
 
-const Router = (customDomain: string) => {
+const Router = () => {
   const client = OpenFeature.getClient();
   const contestEnabled = client.getBooleanValue('contest', false);
 
@@ -23,10 +24,14 @@ const Router = (customDomain: string) => {
     contestEnabled,
   };
 
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
+
   return createBrowserRouter(
     createRoutesFromElements([
       ...GeneralRoutes(),
-      ...(customDomain ? CustomDomainRoutes(flags) : CommonDomainRoutes(flags)),
+      ...(isCustomDomain
+        ? CustomDomainRoutes(flags)
+        : CommonDomainRoutes(flags)),
       <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );

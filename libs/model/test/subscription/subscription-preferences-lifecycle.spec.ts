@@ -24,7 +24,7 @@ describe('Subscription preferences lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: '0x',
+      address: '0x',
     };
   });
 
