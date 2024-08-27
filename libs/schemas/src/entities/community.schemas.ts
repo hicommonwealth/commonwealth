@@ -70,7 +70,7 @@ export const Community = z.object({
     url: z.string().max(255).nullish(),
     balance_type: z.nativeEnum(BalanceType).nullish(),
     name: z.string().max(255).nullish(),
-  }).optional(),
+  }).nullish(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
