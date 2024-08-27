@@ -56,6 +56,8 @@ describe('Contests metadata commands lifecycle', () => {
         id: community_id,
         namespace,
         chain_node_id: chain!.id,
+        lifetime_thread_count: 0,
+        profile_count: 2,
         Addresses: [
           {
             community_id,
@@ -108,20 +110,20 @@ describe('Contests metadata commands lifecycle', () => {
         id: communityAdminUser!.id,
         email: communityAdminUser!.email!,
       },
-      address_id: community[0]!.Addresses![0].address,
+      address: community[0]!.Addresses![0].address,
     };
 
-    expect(communityAdminActor.address_id).to.not.be.empty;
+    expect(communityAdminActor.address).to.not.be.empty;
 
     communityMemberActor = {
       user: {
         id: memberUser!.id,
         email: memberUser!.email!,
       },
-      address_id: community[0]!.Addresses![1].address,
+      address: community[0]!.Addresses![1].address,
     };
 
-    expect(communityMemberActor.address_id).to.not.be.empty;
+    expect(communityMemberActor.address).to.not.be.empty;
   });
 
   afterAll(async () => {

@@ -9,10 +9,13 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
     ...schemas.GetCommunities,
     auth: [],
     secure: false,
-    body: async ({ payload }) => {
+    body: async ({ payload, actor }) => {
       const {
+        relevance_by,
         base,
+        network,
         include_node_info,
+        include_last_30_day_thread_count,
         stake_enabled,
         has_groups,
         tag_ids,
@@ -29,8 +32,12 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
 
       // note that tags are queried based on the INTERSECTION of provided tags
       const filtering_tags = tag_ids && tag_ids.length > 0;
-      const replacements = filtering_tags ? { tag_ids } : {};
+      const replacements: { tag_ids?: number[]; user_id?: number } = {};
+      if (filtering_tags) replacements.tag_ids = tag_ids;
+      if (relevance_by === 'membership')
+        replacements.user_id = actor?.user?.id || 0;
 
+      const date30DaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
       const communityCTE = `
         WITH "community_CTE" AS (
           SELECT  "Community"."id",
@@ -63,7 +70,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."discord_bot_webhooks_enabled",
                   "Community"."directory_page_enabled",
                   "Community"."directory_page_chain_node_id",
-                  "Community"."thread_count",
+                  "Community"."lifetime_thread_count",
                   "Community"."profile_count",
                   "Community"."namespace",
                   "Community"."namespace_address",
@@ -72,12 +79,24 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."redirect",
                   "Community"."snapshot_spaces",
                   "Community"."include_in_digest_email"
+                  ${
+                    include_last_30_day_thread_count
+                      ? // eslint-disable-next-line max-len
+                        `,(SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${date30DaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count`
+                      : ''
+                  }
           FROM    "Communities" AS "Community"
           WHERE  "Community"."active" = true
                         ${
                           base
                             ? `
                           AND "Community"."base" = '${base}'
+                        `
+                            : ''
+                        }${
+                          network
+                            ? `
+                          AND "Community"."network" = '${network}'
                         `
                             : ''
                         }
@@ -109,7 +128,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             : ''
                         }
                         ${
-                          filtering_tags
+                          filtering_tags && relevance_by !== 'tag_ids'
                             ? `
                           AND (
                             SELECT COUNT  ( DISTINCT "CommunityTags"."tag_id" )
@@ -212,6 +231,12 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         LEFT OUTER JOIN "CommunityTags_CTE" ON "community_CTE"."id" = "CommunityTags_CTE"."community_id"
         LEFT OUTER JOIN "CommunityStakes_CTE" ON "community_CTE"."id" = "CommunityStakes_CTE"."community_id"
         ${
+          relevance_by === 'membership' && replacements.user_id
+            ? // eslint-disable-next-line max-len
+              `LEFT OUTER JOIN "Addresses" authUserAddresses ON "community_CTE"."id" = authUserAddresses.community_id AND authUserAddresses.user_id = :user_id`
+            : ``
+        }
+        ${
           has_groups
             ? 'LEFT OUTER JOIN "Groups_CTE" ON "community_CTE"."id" = "Groups_CTE"."community_id"'
             : ''
@@ -221,8 +246,33 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             ? 'LEFT OUTER JOIN "ChainNodes" AS "ChainNode" ON "community_CTE"."chain_node_id" = "ChainNode"."id"'
             : ''
         }
-        ORDER BY "community_CTE"."${order_col}" ${direction} LIMIT ${limit} OFFSET ${offset};
-      `;
+        ORDER BY 
+          ${
+            filtering_tags && relevance_by === 'tag_ids'
+              ? `CASE 
+              WHEN jsonb_array_length("CommunityTags_CTE"."CommunityTags"::jsonb) = 0 IS NULL THEN 2
+				      WHEN EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements("CommunityTags_CTE"."CommunityTags"::jsonb) AS tag_element
+                WHERE (tag_element->>'tag_id')::int = ANY(ARRAY[:tag_ids])
+			        ) THEN 0
+              ELSE 1
+            END,
+            "CommunityTags_CTE"."CommunityTags"::jsonb,`
+              : ''
+          }
+          ${
+            relevance_by === 'membership' && replacements.user_id
+              ? `CASE
+                WHEN authUserAddresses.user_id IS NOT NULL THEN 1
+                ELSE 0
+            END DESC,`
+              : ''
+          }
+          "community_CTE"."${order_col}" ${direction}
+          LIMIT ${limit} 
+          OFFSET ${offset};
+          `;
 
       const communities = await models.sequelize.query<
         z.infer<typeof schemas.Community> & { total?: number }

@@ -78,11 +78,7 @@ export async function __updateCommunityId(
       // @ts-expect-error StrictNullChecks
       this.models.Address,
       // @ts-expect-error StrictNullChecks
-      this.models.Ban,
-      // @ts-expect-error StrictNullChecks
       this.models.Comment,
-      // @ts-expect-error StrictNullChecks
-      this.models.CommunityBanner,
       // @ts-expect-error StrictNullChecks
       this.models.Topic,
       // @ts-expect-error StrictNullChecks

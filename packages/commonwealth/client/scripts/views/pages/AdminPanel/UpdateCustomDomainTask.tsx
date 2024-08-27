@@ -1,6 +1,5 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
-import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -34,7 +33,9 @@ const UpdateCustomDomainTask = () => {
                 setCustomDomain('');
                 notifySuccess('Custom domain updated');
               } catch (e) {
-                notifyError('Error updating custom domain');
+                notifyError(
+                  e?.response?.data?.error || 'Error updating custom domain',
+                );
                 console.error(e);
               }
             })();
@@ -71,19 +72,6 @@ const UpdateCustomDomainTask = () => {
     // TODO: enhance this validation to ensure a tighter format (no dangling paths)
     if (!validCustomDomainUrl.test(customDomain)) {
       return 'Invalid URL (try removing the http prefix)';
-    }
-
-    // there's probably a better way to remove prefixes for duplicate finding purposes
-    const existingCustomDomain = app.config.chains
-      .getAll()
-      .find(
-        (c) =>
-          c.customDomain &&
-          c.customDomain.replace('https://', '').replace('http://', '') ===
-            customDomain,
-      );
-    if (existingCustomDomain) {
-      return `Custom domain in use by community '${existingCustomDomain.id}'`;
     }
   })();
 

@@ -55,7 +55,7 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return app.chain?.meta.node?.ethChainId?.toString() || '1';
+    return app.chain?.meta?.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -173,7 +173,7 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     } catch (error) {
       let errorMsg = `Failed to enable coinbase: ${error.message}`;
       if (error.code === 4902) {
-        errorMsg = `Failed to enable coinbase: Please add chain ID ${app.chain.meta.node.ethChainId}`;
+        errorMsg = `Failed to enable coinbase: Please add chain ID ${app?.chain?.meta?.node?.ethChainId}`;
       }
       console.error(errorMsg);
       this._enabling = false;
@@ -213,7 +213,9 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
           // Check if the string contains '${' and '}'
           const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           const url =
-            rpcUrl.length > 0 ? rpcUrl[0] : app.chain.meta.node.altWalletUrl;
+            rpcUrl.length > 0
+              ? rpcUrl[0]
+              : app?.chain?.meta?.node?.altWalletUrl;
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [

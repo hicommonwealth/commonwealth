@@ -3,10 +3,11 @@ import {
   DEFAULT_NAME,
   NotificationCategories,
   NotificationDataAndCategory,
+  renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
-import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
+import { smartTrim } from '../../../shared/utils';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import {
   getActorProfile,

@@ -88,6 +88,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
       query @@ "Comments"._search
   `;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const [results, [{ count }]]: [any[], any[]] = await Promise.all([
         models.sequelize.query(sqlBaseQuery, {
           bind,

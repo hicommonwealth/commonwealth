@@ -1,22 +1,24 @@
-import { AppError, ServerError } from '@hicommonwealth/core';
+import { AppError, EventNames, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   CommentInstance,
   UserInstance,
-  sanitizeQuillText,
-} from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import moment from 'moment';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import { getCommentDepth } from '../../util/getCommentDepth';
-import {
+  emitEvent,
   emitMentions,
   parseUserMentions,
+  sanitizeQuillText,
   uniqueMentions,
-} from '../../util/parseUserMentions';
+} from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
+import {
+  NotificationCategories,
+  ProposalType,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
+import moment from 'moment';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { getCommentDepth } from '../../util/getCommentDepth';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -79,14 +81,7 @@ export async function __createThreadComment(
     throw new AppError(Errors.ThreadNotFound);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check if thread is archived
   if (thread.archived_at) {
@@ -213,27 +208,26 @@ export async function __createThreadComment(
         community_id: thread.community_id,
       });
 
-      await this.models.Subscription.bulkCreate(
+      await emitEvent(
+        this.models.Outbox,
         [
           {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewReaction,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id!,
-            is_active: true,
-          },
-          {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewComment,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id!,
-            is_active: true,
+            event_name: EventNames.CommentCreated,
+            event_payload: {
+              ...comment.toJSON(),
+              community_id: thread.community_id,
+              users_mentioned: mentions.map((u) => parseInt(u.userId)),
+            },
           },
         ],
+        transaction,
+      );
+
+      await this.models.CommentSubscription.create(
+        {
+          user_id: user.id!,
+          comment_id: comment.id!,
+        },
         { transaction },
       );
     });
