@@ -1,7 +1,6 @@
 export { default as AccountsStore } from './AccountsStore';
 export { default as IdStore } from './IdStore';
 export { default as NewProfileStore } from './NewProfileStore';
-export { default as NotificationStore } from './NotificationStore';
 export { default as PersistentStore } from './PersistentStore';
 export { default as ProposalStore } from './ProposalStore';
 export { default as Store } from './Store';

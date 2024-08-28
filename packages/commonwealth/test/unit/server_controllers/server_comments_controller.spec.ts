@@ -5,7 +5,6 @@ import chaiAsPromised from 'chai-as-promised';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
-import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 import { afterEach, beforeEach, describe, test } from 'vitest';
 
 chai.use(chaiAsPromised);
@@ -85,7 +84,6 @@ describe('ServerCommentsController', () => {
           }),
         },
       };
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -98,30 +96,19 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
         await serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
+          reaction,
           commentId,
         });
-
-      expect(
-        serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          reaction: reaction as any,
-          commentId,
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
 
@@ -146,7 +133,7 @@ describe('ServerCommentsController', () => {
 
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
-      // @ts-expect-error StrictNullChecks
+      // @ts-expect-error ignore type StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(allAnalyticsOptions[0]).to.include({
@@ -199,9 +186,6 @@ describe('ServerCommentsController', () => {
           }),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -209,16 +193,16 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
-
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
+          reaction,
           commentId: 123,
         }),
       ).to.be.rejectedWith('Comment not found: 123');
@@ -267,9 +251,6 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves(null),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -277,90 +258,19 @@ describe('ServerCommentsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
-
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
+          reaction,
           commentId: 123,
         }),
       ).to.be.rejectedWith('Thread not found for comment');
-    });
-
-    test('should throw error (banned)', () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-          transaction: (callback) => Promise.resolve(callback()),
-        },
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            chain: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              chain: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Comment: {
-          findOne: sandbox.stub().resolves({
-            id: 3,
-            text: 'my comment body',
-            Thread: {
-              id: 4,
-              title: 'Big Thread!',
-              community_id: 'ethereum',
-            },
-          }),
-          update: sandbox.stub().resolves(null),
-        },
-      };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([false, 'big ban err']),
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {};
-      const reaction = {};
-      const commentId = 123;
-
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
-
-      expect(
-        serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
-          commentId,
-        }),
-      ).to.be.rejectedWith('Ban error: big ban err');
     });
 
     test('should throw error (token balance)', () => {
@@ -465,9 +375,6 @@ describe('ServerCommentsController', () => {
           bulkCreate: sandbox.stub().resolves([]),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -478,16 +385,16 @@ describe('ServerCommentsController', () => {
       const reaction = {};
       const commentId = 123;
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
-
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
       expect(
         serverCommentsController.createCommentReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
+          reaction,
           commentId,
         }),
       ).to.be.rejectedWith('Insufficient token balance');
@@ -508,13 +415,9 @@ describe('ServerCommentsController', () => {
           },
         },
       };
-      const banCache = {};
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
-
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
       const community = { id: 'ethereum' };
       const searchOptions: SearchCommentsOptions = {
         community: community as CommunityInstance,
@@ -525,9 +428,8 @@ describe('ServerCommentsController', () => {
         orderDirection: 'DESC',
         includeCount: true,
       };
-      const comments = await serverCommentsController.searchComments(
-        searchOptions,
-      );
+      const comments =
+        await serverCommentsController.searchComments(searchOptions);
       expect(comments.results).to.have.length(5);
       expect(comments.results[0].id).to.equal(1);
       expect(comments.results[1].id).to.equal(2);
@@ -586,13 +488,9 @@ describe('ServerCommentsController', () => {
           query: () => Promise.resolve([]),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -606,8 +504,10 @@ describe('ServerCommentsController', () => {
       const commentBody = 'Hello';
       const [updatedComment, allNotificationOptions] =
         await serverCommentsController.updateComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
           commentId,
           commentBody,
         });
@@ -630,75 +530,8 @@ describe('ServerCommentsController', () => {
       });
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
-      // @ts-expect-error StrictNullChecks
+      // @ts-expect-error ignore type StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
-    });
-
-    test('should throw error (banned)', () => {
-      const data = {
-        id: 123,
-        thread_id: 2,
-        address_id: 1,
-        text: 'Wasup',
-        version_history: ['{"body":""}'],
-        community_id: 'ethereum',
-        Address: {
-          id: 1,
-          address: '0xbanned',
-          community_id: 'ethereum',
-          save: async () => ({}),
-        },
-        Thread: {
-          id: 2,
-          address_id: 1,
-          address: '0xbanned',
-          community_id: 'ethereum',
-          title: 'Big Thread!',
-        },
-        save: async () => ({}),
-        toJSON: () => data,
-      };
-      const db = {
-        Comment: {
-          findOne: async () => data,
-          update: () => null,
-        },
-        sequelize: {
-          transaction: (callback?: () => Promise<void>) => {
-            if (callback) return callback();
-            else
-              return {
-                rollback: () => Promise.resolve({}),
-                commit: () => Promise.resolve({}),
-              };
-          },
-          query: Promise.resolve([]),
-        },
-      };
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
-      const user = {
-        getAddresses: async () => [{ id: 1, verified: true }],
-      };
-      const address = {
-        id: 1,
-        address: '0xbanned',
-        chain: 'ethereum',
-        save: async () => ({}),
-      };
-      const commentId = 123;
-      const commentBody = 'Hello';
-      expect(
-        serverCommentsController.updateComment({
-          user: user as any,
-          address: address as any,
-          commentId,
-          commentBody,
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
     });
 
     test('should throw error (thread not found)', () => {
@@ -736,13 +569,9 @@ describe('ServerCommentsController', () => {
           query: Promise.resolve([]),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
+
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -756,8 +585,10 @@ describe('ServerCommentsController', () => {
       const commentBody = 'Hello';
       expect(
         serverCommentsController.updateComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
           commentId,
           commentBody,
         }),
@@ -789,30 +620,28 @@ describe('ServerCommentsController', () => {
           destroy: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: () => [true, null],
-      };
 
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        banCache as any,
-      );
-
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
       const address = { id: 1 };
       const commentId = 1;
       await serverCommentsController.deleteComment({
-        user: user as any,
-        address: address as any,
+        // @ts-expect-error ignore type
+        user,
+        // @ts-expect-error ignore type
+        address,
         commentId,
       });
       expect(didDestroy).to.be.true;
 
       serverCommentsController.deleteComment({
-        user: user as any,
-        address: address as any,
+        // @ts-expect-error ignore type
+        user,
+        // @ts-expect-error ignore type
+        address,
         commentId,
       });
     });

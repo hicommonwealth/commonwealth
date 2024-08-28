@@ -36,6 +36,7 @@ export function buildRetryStrategy(
   return function (
     err: Error | InvalidInput | CustomRetryStrategyError,
     topic: BrokerSubscriptions,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: any,
     ackOrNackFn: AckOrNack,
     log: ILogger,
@@ -194,7 +195,9 @@ export class RabbitMQAdapter implements Broker {
     handler: EventsHandlerMetadata<EventSchemas>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       beforeHandleEvent: (topic: string, event: any, context: any) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       afterHandleEvent: (topic: string, event: any, context: any) => void;
     },
   ): Promise<boolean> {
@@ -222,6 +225,7 @@ export class RabbitMQAdapter implements Broker {
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
           const { beforeHandleEvent, afterHandleEvent } = hooks || {};
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const context: any = {};
           try {
             beforeHandleEvent?.(topic, content, context);

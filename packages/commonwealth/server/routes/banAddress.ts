@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import type { BanAttributes, BanInstance, DB } from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -8,13 +8,15 @@ enum BanAddressErrors {
   NoAddress = 'Must supply an address',
   NoPermission = 'You do not have permission to ban an address',
   AlreadyExists = 'Ban for this address already exists',
+  NotFound = 'Address not found',
 }
 
-type BanAddressReq = Omit<BanInstance, 'id'> & {
+type BanAddressReq = {
+  community_id: string;
   address: string;
 };
 
-type BanAddressResp = BanAttributes;
+type BanAddressResp = {};
 
 const banAddress = async (
   models: DB,
@@ -40,25 +42,22 @@ const banAddress = async (
     throw new AppError(BanAddressErrors.NoAddress);
   }
 
-  // find or create Ban
-  const [ban, created] = await models.Ban.findOrCreate({
+  const addressInstance = await models.Address.findOne({
     where: {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      address,
-    },
-    defaults: {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
+      community_id: community!.id,
       address,
     },
   });
-
-  if (!created) {
+  if (!addressInstance) {
+    throw new AppError(BanAddressErrors.NotFound);
+  }
+  if (addressInstance.is_banned) {
     throw new AppError(BanAddressErrors.AlreadyExists);
   }
+  addressInstance.is_banned = true;
+  await addressInstance.save();
 
-  return success(res, ban.toJSON());
+  return success(res, {});
 };
 
 export default banAddress;

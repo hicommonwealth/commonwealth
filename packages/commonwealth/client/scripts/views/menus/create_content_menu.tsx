@@ -5,6 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import app from 'state';
+import { fetchCachedCustomDomain } from 'state/api/configuration';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
@@ -35,6 +36,8 @@ const resetSidebarState = () => {
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     userStore.getState() && !!app.chain?.meta?.snapshot?.length;
+
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
 
   const showOnChainProposalItem =
     app.chain?.base === ChainBase.CosmosSDK &&
@@ -99,8 +102,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             try {
               const verification_token = uuidv4();
               await app.discord.createConfig(verification_token);
-
-              const isCustomDomain = app.isCustomDomain();
 
               window.open(
                 `https://discord.com/oauth2/authorize?client_id=${

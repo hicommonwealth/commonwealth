@@ -7,12 +7,11 @@ import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import DiscordController from 'controllers/server/discord';
-import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
-import { Configuration } from 'state/api/configuration';
+import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
 import { userStore } from './ui/user';
@@ -46,27 +45,11 @@ export interface IApp {
   // Discord
   discord: DiscordController;
 
-  // User
-  user: UserController;
-
   // Web3
   snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
-
-  loadingError: string;
-
-  _customDomainId: string;
-
-  isCustomDomain(): boolean;
-
-  customDomainId(): string;
-
-  setCustomDomain(d: string): void;
 }
-
-// INJECT DEPENDENCIES
-const user = new UserController();
 
 // INITIALIZE MAIN APP
 const app: IApp = {
@@ -91,24 +74,8 @@ const app: IApp = {
   // Web3
   snapshot: new SnapshotController(),
 
-  // User
-  user,
-
   // Global nav state
   sidebarRedraw: new EventEmitter(),
-
-  // @ts-expect-error StrictNullChecks
-  loadingError: null,
-
-  // @ts-expect-error StrictNullChecks
-  _customDomainId: null,
-  isCustomDomain: () => app._customDomainId !== null,
-  customDomainId: () => {
-    return app._customDomainId;
-  },
-  setCustomDomain: (d) => {
-    app._customDomainId = d;
-  },
 };
 //allows for FS.identify to be used
 declare const window: any;
@@ -123,9 +90,7 @@ export async function initAppState(
     ]);
 
     await fetchNodesQuery();
-
-    app.user.notifications.clear();
-    app.user.notifications.clearSubscriptions();
+    await fetchCustomDomainQuery();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
       enforceSessionKeys: statusRes.result.enforceSessionKeys,
@@ -156,10 +121,6 @@ export async function initAppState(
 
     // update the login status
     updateActiveUser(userResponse);
-
-    if (userResponse) {
-      await app.user.notifications.refresh();
-    }
 
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)

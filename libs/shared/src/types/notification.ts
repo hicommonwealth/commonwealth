@@ -20,7 +20,7 @@ export type WebhookCategory =
   | NotificationCategories.NewReaction;
 
 export type NotificationCategory =
-  typeof NotificationCategories[keyof typeof NotificationCategories];
+  (typeof NotificationCategories)[keyof typeof NotificationCategories];
 
 // TODO: @Timothee remove this type in favor of the one below once webhook and email functions are fixed + tested and
 //  their types are updated
@@ -103,6 +103,7 @@ export interface ICommentEditNotificationData
 type ChainEventAttributes = {
   id: number;
   block_number: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   event_data: any;
   queued: number;
   entity_id?: number;
@@ -126,6 +127,7 @@ export type ChainEventNotification = {
 export interface IChainEventNotificationData {
   id?: number;
   block_number?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   event_data: any;
   network: SupportedNetwork;
   community_id: string;
@@ -151,22 +153,22 @@ export type NotifCategoryToNotifDataMapping = {
   [K in NotificationCategory]: K extends typeof NotificationCategories.NewComment
     ? INewCommentNotificationData
     : K extends typeof NotificationCategories.NewThread
-    ? INewThreadNotificationData
-    : K extends typeof NotificationCategories.NewMention
-    ? INewMentionNotificationData
-    : K extends typeof NotificationCategories.NewReaction
-    ? INewReactionNotificationData
-    : K extends typeof NotificationCategories.NewCollaboration
-    ? INewCollaborationNotificationData
-    : K extends typeof NotificationCategories.ThreadEdit
-    ? IThreadEditNotificationData
-    : K extends typeof NotificationCategories.CommentEdit
-    ? ICommentEditNotificationData
-    : K extends typeof NotificationCategories.ChainEvent
-    ? IChainEventNotificationData
-    : K extends typeof NotificationCategories.SnapshotProposal
-    ? ISnapshotNotificationData
-    : never;
+      ? INewThreadNotificationData
+      : K extends typeof NotificationCategories.NewMention
+        ? INewMentionNotificationData
+        : K extends typeof NotificationCategories.NewReaction
+          ? INewReactionNotificationData
+          : K extends typeof NotificationCategories.NewCollaboration
+            ? INewCollaborationNotificationData
+            : K extends typeof NotificationCategories.ThreadEdit
+              ? IThreadEditNotificationData
+              : K extends typeof NotificationCategories.CommentEdit
+                ? ICommentEditNotificationData
+                : K extends typeof NotificationCategories.ChainEvent
+                  ? IChainEventNotificationData
+                  : K extends typeof NotificationCategories.SnapshotProposal
+                    ? ISnapshotNotificationData
+                    : never;
 };
 
 // This maps a NotificationCategory to a NotificationDataType - if the category and the

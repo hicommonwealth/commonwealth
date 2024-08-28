@@ -6,7 +6,6 @@ import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -23,6 +22,7 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -42,7 +42,6 @@ type DiscussionsPageProps = {
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
-  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
@@ -80,6 +79,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     apiEnabled: !!user.activeAccount?.address,
   });
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const { contestsData } = useCommunityContests();
 
   const { dateCursor } = useDateCursor({
@@ -88,7 +89,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isOnArchivePage =
     location.pathname ===
-    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
+    (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -256,7 +257,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                      ? totalThreadsInCommunity
+                      ? app?.chain?.meta?.lifetimeThreadCount
                       : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}

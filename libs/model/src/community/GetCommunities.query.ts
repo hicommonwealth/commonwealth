@@ -81,7 +81,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."include_in_digest_email"
                   ${
                     include_last_30_day_thread_count
-                      ? `,(SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${date30DaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count`
+                      ? // eslint-disable-next-line max-len
+                        `,(SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${date30DaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count`
                       : ''
                   }
           FROM    "Communities" AS "Community"
@@ -231,7 +232,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         LEFT OUTER JOIN "CommunityStakes_CTE" ON "community_CTE"."id" = "CommunityStakes_CTE"."community_id"
         ${
           relevance_by === 'membership' && replacements.user_id
-            ? `LEFT OUTER JOIN "Addresses" authUserAddresses ON "community_CTE"."id" = authUserAddresses.community_id AND authUserAddresses.user_id = :user_id`
+            ? // eslint-disable-next-line max-len
+              `LEFT OUTER JOIN "Addresses" authUserAddresses ON "community_CTE"."id" = authUserAddresses.community_id AND authUserAddresses.user_id = :user_id`
             : ``
         }
         ${

@@ -14,6 +14,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageLoading } from 'views/pages/loading';
 import {
@@ -65,6 +66,8 @@ const SearchPage = () => {
   useWindowResize({
     setMenu,
   });
+
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const queryParams = useMemo(() => {
     return Object.fromEntries(urlQueryParams.entries()) as SearchQueryParams;
@@ -313,7 +316,7 @@ const SearchPage = () => {
                       {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
                       {scopeText}
                       {community !== 'all_communities' &&
-                        !app.isCustomDomain() && (
+                        !domain?.isCustomDomain && (
                           <a
                             href="#"
                             className="search-all-communities"

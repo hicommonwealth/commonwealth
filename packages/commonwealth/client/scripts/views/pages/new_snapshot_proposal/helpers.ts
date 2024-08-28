@@ -2,15 +2,15 @@ import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 import type Account from 'models/Account';
 import app from 'state';
+import { getTextFromDelta } from '../../components/react_quill_editor';
 import type { ThreadForm } from './types';
 import { NewThreadErrors } from './types';
-import { getTextFromDelta } from '../../components/react_quill_editor';
 
 export const createNewProposal = async (
   form: ThreadForm,
   content: string,
   author: Account,
-  space: SnapshotSpace
+  space: SnapshotSpace,
 ) => {
   if (!form.name) {
     throw new Error(NewThreadErrors.NoTitle);
@@ -62,7 +62,6 @@ export const createNewProposal = async (
   };
 
   const resp = await createProposal(author.address, proposalPayload);
-  await app.user.notifications.refresh();
   await app.snapshot.refreshProposals();
   return resp;
 };

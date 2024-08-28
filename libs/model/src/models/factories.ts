@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
 import Address from './address';
-import Ban from './ban';
 import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
@@ -10,7 +9,6 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
-import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
@@ -50,7 +48,6 @@ import Webhook from './webhook';
 
 export const Factories = {
   Address,
-  Ban,
   ChainNode,
   Collaboration,
   Comment,
@@ -58,7 +55,6 @@ export const Factories = {
   CommentSubscription,
   Community,
   CommunityAlert,
-  CommunityBanner,
   CommunityContract,
   CommunityStake,
   CommunityTags,
@@ -98,8 +94,8 @@ export const Factories = {
 };
 
 export type DB = {
-  [K in keyof typeof Factories]: ReturnType<typeof Factories[K]> &
-    Associable<ReturnType<typeof Factories[K]>>;
+  [K in keyof typeof Factories]: ReturnType<(typeof Factories)[K]> &
+    Associable<ReturnType<(typeof Factories)[K]>>;
 } & {
   sequelize: Sequelize.Sequelize;
   Sequelize: typeof Sequelize.Sequelize;
