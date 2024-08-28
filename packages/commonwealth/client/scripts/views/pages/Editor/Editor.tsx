@@ -16,7 +16,7 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 
 import './Editor.scss';
 
@@ -69,10 +69,12 @@ type EditorProps = {
   readonly placeholder?: string;
 };
 
-export const Editor = memo((props: EditorProps) => {
+export const Editor = memo(function Editor(props: EditorProps) {
   const imageUploadHandler = useImageUploadHandlerLocal();
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
+
+  const dragCounterRef = useRef(0);
 
   const mode = props.mode ?? 'desktop';
   // const mode = props.mode ?? 'mobile';
@@ -86,32 +88,47 @@ export const Editor = memo((props: EditorProps) => {
     mdxEditorRef.current?.setMarkdown(text);
   }, []);
 
+  const handleImportMarkdown = useCallback(
+    (file: File) => {
+      async function doAsync() {
+        await handleFile(file);
+      }
+
+      doAsync().catch(console.error);
+    },
+    [handleFile],
+  );
+
   const handleDropAsync = useCallback(async (event: React.DragEvent) => {
     console.log(event.dataTransfer.files.length);
 
     const nrFiles = event.dataTransfer.files.length;
 
-    if (nrFiles === 1) {
-      const type = event.dataTransfer.files[0].type;
+    try {
+      if (nrFiles === 1) {
+        const type = event.dataTransfer.files[0].type;
 
-      if (['text/markdown', 'text/plain'].includes(type)) {
-        await handleFile(event.dataTransfer.files[0]);
-      } else {
-        // TODO: use a snackbar
-        console.log('File not markdown');
+        if (['text/markdown', 'text/plain'].includes(type)) {
+          await handleFile(event.dataTransfer.files[0]);
+        } else {
+          // TODO: use a snackbar
+          console.log('File not markdown');
+        }
       }
-    }
 
-    if (nrFiles <= 0) {
-      // TODO: use a snackbar
-      console.log('No files given');
-      return;
-    }
+      if (nrFiles <= 0) {
+        // TODO: use a snackbar
+        console.log('No files given');
+        return;
+      }
 
-    if (nrFiles > 1) {
-      // TODO: use a snackbar
-      console.log('Too many files given');
-      return;
+      if (nrFiles > 1) {
+        // TODO: use a snackbar
+        console.log('Too many files given');
+        return;
+      }
+    } finally {
+      setDragging(false);
     }
   }, []);
 
@@ -126,34 +143,32 @@ export const Editor = memo((props: EditorProps) => {
     [handleFile, handleDropAsync],
   );
 
-  const handleImportMarkdown = useCallback(
-    (file: File) => {
-      async function doAsync() {
-        await handleFile(file);
-      }
-
-      doAsync().catch(console.error);
-    },
-    [handleFile],
-  );
-
   const handleDragEnter = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-
     console.log('handleDragStart');
-    setDragging(true);
+    event.preventDefault();
+    dragCounterRef.current = dragCounterRef.current + 1;
+
+    if (dragCounterRef.current === 1) {
+      setDragging(true);
+    }
   }, []);
 
   const handleDragOver = useCallback((event: React.DragEvent) => {
+    console.log('handleDragOver');
+
     event.preventDefault();
     // This is necessary to allow a drop
     event.dataTransfer!.dropEffect = 'copy'; // Shows a copy cursor when dragging files
   }, []);
 
   const handleDragLeave = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
     console.log('handleDragLeave');
-    setDragging(false);
+    event.preventDefault();
+    dragCounterRef.current = dragCounterRef.current - 1;
+
+    if (dragCounterRef.current === 0) {
+      setDragging(false);
+    }
   }, []);
 
   return (
@@ -163,9 +178,9 @@ export const Editor = memo((props: EditorProps) => {
         'mdxeditor-container-mode-' + mode,
       )}
       onDrop={handleDrop}
-      // onDragEnter={handleDragEnter}
-      // onDragOver={handleDragOver}
-      // onDragLeave={handleDragLeave}
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
     >
       <MDXEditor
         onError={errorHandler}
