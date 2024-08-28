@@ -15,12 +15,19 @@ export const Topics = () => {
     CreateTopicStep.TopicDetails,
   );
 
+  const topicName = 'todo';
+
   const getCurrentStep = () => {
     switch (createCommunityStep) {
       case CreateTopicStep.TopicDetails:
         return <TopicDetails onStepChange={setCreateCommunityStep} />;
       case CreateTopicStep.WVConsent:
-        return <WVConsent onStepChange={setCreateCommunityStep} />;
+        return (
+          <WVConsent
+            onStepChange={setCreateCommunityStep}
+            topicName={topicName}
+          />
+        );
       case CreateTopicStep.WVDetails:
         return <WVDetails onStepChange={setCreateCommunityStep} />;
     }

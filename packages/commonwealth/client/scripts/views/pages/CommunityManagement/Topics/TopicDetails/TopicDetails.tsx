@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { useCommonNavigate } from 'navigation/helpers';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -24,15 +23,8 @@ interface TopicDetailsProps {
 }
 
 const TopicDetails = ({ onStepChange }: TopicDetailsProps) => {
-  const navigate = useCommonNavigate();
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
-
-  const updateActiveTab = (activeTab: string) => {
-    const params = new URLSearchParams();
-    params.set('tab', activeTab);
-    navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
-    setSelectedTab(activeTab);
-  };
+  const isCreateTopicTab = selectedTab === TABS[0].value;
 
   return (
     <div className="TopicDetails">
@@ -49,19 +41,19 @@ const TopicDetails = ({ onStepChange }: TopicDetailsProps) => {
               <CWTab
                 key={index}
                 label={tab.label}
-                onClick={() => updateActiveTab(tab.value)}
+                onClick={() => setSelectedTab(tab.value)}
                 isSelected={selectedTab === tab.value}
               />
             ))}
           </CWTabsRow>
-          {selectedTab === TABS[0].value ? (
+          {isCreateTopicTab ? (
             <CreateTopicSection onStepChange={onStepChange} />
           ) : (
             <ManageTopicsSection />
           )}
         </main>
         <aside>
-          {selectedTab === TABS[0].value ? (
+          {isCreateTopicTab ? (
             <FeatureHint
               title="Topics and Subtopics"
               hint="Top level topics can act as parents to subtopics. Subtopics can not have additional subtopics."
@@ -76,8 +68,6 @@ const TopicDetails = ({ onStepChange }: TopicDetailsProps) => {
           )}
         </aside>
       </div>
-      Topic Details
-      <p onClick={() => onStepChange(CreateTopicStep.WVConsent)}>next</p>
     </div>
   );
 };
