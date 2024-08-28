@@ -5,7 +5,9 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
+import { getThreadUrl } from '../util';
 
 const log = logger(import.meta);
 const output = z.boolean();
@@ -55,15 +57,30 @@ export const processThreadUpvoted: EventHandler<
     return true;
   }
 
+  const community = await models.Community.findByPk(payload.community_id, {
+    attributes: ['name', 'custom_domain'],
+  });
+  if (!community) {
+    log.error('Community not found!', undefined, payload);
+    return false;
+  }
+
   const provider = notificationsProvider();
   return await provider.triggerWorkflow({
     key: WorkflowKeys.NewUpvotes,
     users: [{ id: String(threadAuthorSubscription.user_id) }],
     data: {
       community_id: payload.community_id,
+      community_name: community.name,
       reaction: payload.reaction,
       thread_id: payload.thread_id!,
+      thread_title: safeTruncateBody(threadAndAuthor.title),
       created_at: payload.created_at!.toISOString(),
+      object_url: getThreadUrl(
+        payload.community_id,
+        payload.thread_id!,
+        community.custom_domain,
+      ),
     },
   });
 };

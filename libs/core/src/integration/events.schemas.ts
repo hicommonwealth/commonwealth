@@ -23,6 +23,7 @@ export const ThreadCreated = Thread.extend({
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.extend({
+  thread_id: PG_INT,
   community_id: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
@@ -32,6 +33,10 @@ export const CommentCreated = Comment.extend({
     .array(PG_INT)
     .optional()
     .describe('An array of user ids that are mentioned in the comment'),
+});
+export const CommentUpvoted = Reaction.extend({
+  comment_id: PG_INT,
+  community_id: z.string(),
 });
 export const GroupCreated = z.object({
   groupId: z.string(),
