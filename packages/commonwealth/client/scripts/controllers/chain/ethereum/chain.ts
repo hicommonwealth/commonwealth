@@ -54,7 +54,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   private _api: Web3;
   private _metadataInitialized = false;
 
-  public async _initApi(node: z.infer<typeof ChainNode>): Promise<Web3> {
+  public _initApi(node: z.infer<typeof ChainNode>): Web3 {
     try {
       const provider =
         node.url.slice(0, 4) == 'http'
@@ -72,7 +72,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   public async initApi(node?: z.infer<typeof ChainNode>): Promise<Web3> {
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
-    node && (await this._initApi(node));
+    node && this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = Number(await this._api.eth.getBlockNumber());
