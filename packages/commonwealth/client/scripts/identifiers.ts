@@ -1,6 +1,5 @@
-import { ProposalType, slugify } from '@hicommonwealth/shared';
+import { ProposalType } from '@hicommonwealth/shared';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
-import type NotificationSubscription from './models/NotificationSubscription';
 import app from './state';
 
 // returns a URL path to a proposal based on its type and id, taking into account
@@ -25,16 +24,4 @@ export const getProposalUrlPath = (
   } else {
     return `/${chainId || app.activeChainId()}${basePath}`;
   }
-};
-
-export const getNotificationUrlPath = (
-  subscription: NotificationSubscription,
-): string => {
-  const community = subscription.communityId;
-  const type = subscription.Thread.slug;
-  const id = `${subscription.Thread.identifier}-${slugify(
-    subscription.Thread.title,
-  )}`;
-
-  return `/${community}/${type}/${id}`;
 };

@@ -7,6 +7,7 @@ const {
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
+  DEFAULT_COMMONWEALTH_LOGO,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
@@ -28,6 +29,8 @@ const DEFAULTS = {
   JWT_SECRET: 'my secret',
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
+  DEFAULT_COMMONWEALTH_LOGO:
+    'https://s3.amazonaws.com/assets.commonwealth.im/common-white.png',
 };
 
 export const config = configure(
@@ -79,6 +82,8 @@ export const config = configure(
         ? parseInt(SITEMAP_PROFILE_PRIORITY)
         : -1,
     },
+    DEFAULT_COMMONWEALTH_LOGO:
+      DEFAULT_COMMONWEALTH_LOGO ?? DEFAULTS.DEFAULT_COMMONWEALTH_LOGO,
   },
   z.object({
     ENFORCE_SESSION_KEYS: z.boolean(),
@@ -146,5 +151,6 @@ export const config = configure(
       THREAD_PRIORITY: z.coerce.number(),
       PROFILE_PRIORITY: z.coerce.number(),
     }),
+    DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
   }),
 );

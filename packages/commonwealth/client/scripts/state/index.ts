@@ -7,7 +7,6 @@ import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import DiscordController from 'controllers/server/discord';
-import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
@@ -46,17 +45,11 @@ export interface IApp {
   // Discord
   discord: DiscordController;
 
-  // User
-  user: UserController;
-
   // Web3
   snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
 }
-
-// INJECT DEPENDENCIES
-const user = new UserController();
 
 // INITIALIZE MAIN APP
 const app: IApp = {
@@ -81,9 +74,6 @@ const app: IApp = {
   // Web3
   snapshot: new SnapshotController(),
 
-  // User
-  user,
-
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 };
@@ -101,9 +91,6 @@ export async function initAppState(
 
     await fetchNodesQuery();
     await fetchCustomDomainQuery();
-
-    app.user.notifications.clear();
-    app.user.notifications.clearSubscriptions();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
       enforceSessionKeys: statusRes.result.enforceSessionKeys,
@@ -134,10 +121,6 @@ export async function initAppState(
 
     // update the login status
     updateActiveUser(userResponse);
-
-    if (userResponse) {
-      await app.user.notifications.refresh();
-    }
 
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)

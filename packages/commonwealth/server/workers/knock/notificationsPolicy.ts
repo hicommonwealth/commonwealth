@@ -1,13 +1,12 @@
-import { Policy, events, logger } from '@hicommonwealth/core';
+import { Policy, events } from '@hicommonwealth/core';
 import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';
 import { processCommentUpvoted } from './eventHandlers/commentUpvoted';
 import { processSnapshotProposalCreated } from './eventHandlers/snapshotProposalCreated';
 import { processSubscriptionPreferencesUpdated } from './eventHandlers/subscriptionPreferencesUpdated';
+import { processThreadCreated } from './eventHandlers/threadCreated';
 import { processThreadUpvoted } from './eventHandlers/threadUpvoted';
 import { processUserMentioned } from './eventHandlers/userMentioned';
-
-const log = logger(import.meta);
 
 const notificationInputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,
@@ -33,8 +32,8 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
         await processChainEventCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
-      ThreadCreated: async () => {
-        log.info('Method not implemented');
+      ThreadCreated: async (event) => {
+        await processThreadCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
       CommentCreated: async (event) => {

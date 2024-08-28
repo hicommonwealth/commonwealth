@@ -25,7 +25,7 @@ type NotificationSection = 'community-alerts' | 'threads' | 'comments';
 const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
   const threadSubscriptions = useThreadSubscriptions();
-  const communityAlerts = useCommunityAlertsQuery();
+  const communityAlerts = useCommunityAlertsQuery({});
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const user = useUserStore();
 

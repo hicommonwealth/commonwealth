@@ -240,4 +240,4 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   mobile_push_admin_alerts_enabled: true,
   created_at: true,
   updated_at: true,
-}).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
+}).merge(SubscriptionPreference.pick({ user_id: true }));
