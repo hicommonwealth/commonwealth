@@ -1,13 +1,14 @@
+import { Clipboard, DownloadSimple } from '@phosphor-icons/react';
 import React, { useCallback, useRef } from 'react';
-
 import './DesktopEditorFooter.scss';
 
 type DesktopEditorFooterProps = Readonly<{
   onImportMarkdown?: (file: File) => void;
+  onSubmit?: () => void;
 }>;
 
 export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
-  const { onImportMarkdown } = props;
+  const { onImportMarkdown, onSubmit } = props;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const fileHandler = useCallback(
@@ -28,17 +29,28 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
 
   return (
     <div className="DesktopEditorFooter">
-      <div>Paste, drop or click to add files.</div>
-      <div>
+      <div className="Item">
+        <Clipboard size={24} />
+        &nbsp; Paste, drop or click to add files.
+      </div>
+      <div className="Item">
         <input
           ref={fileInputRef}
           type="file"
           accept=".md"
-          className="FilePicker"
+          className="FilePickerInput"
           onChange={fileHandler}
         />
+        <button onClick={handleImportMarkdown} className="FilePickerButton">
+          <DownloadSimple size={24} />
+          &nbsp; Import markdown
+        </button>
+      </div>
 
-        <button onClick={handleImportMarkdown}>Import markdown</button>
+      <div className="Item SubmitButtonItem">
+        <button onClick={() => onSubmit?.()} className="SubmitButton">
+          Submit
+        </button>
       </div>
     </div>
   );
