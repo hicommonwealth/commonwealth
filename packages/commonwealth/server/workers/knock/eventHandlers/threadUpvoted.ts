@@ -18,7 +18,7 @@ export const processThreadUpvoted: EventHandler<
 > = async ({ payload }) => {
   const threadAndAuthor = await models.Thread.findOne({
     where: {
-      id: payload.thread_id!,
+      id: payload.thread_id,
     },
     include: [
       {
@@ -49,7 +49,7 @@ export const processThreadUpvoted: EventHandler<
   const threadAuthorSubscription = await models.ThreadSubscription.findOne({
     where: {
       user_id: threadAndAuthor.Address.User!.id,
-      thread_id: payload.thread_id!,
+      thread_id: payload.thread_id,
     },
   });
   if (!threadAuthorSubscription) {
@@ -73,12 +73,12 @@ export const processThreadUpvoted: EventHandler<
       community_id: payload.community_id,
       community_name: community.name,
       reaction: payload.reaction,
-      thread_id: payload.thread_id!,
+      thread_id: payload.thread_id,
       thread_title: safeTruncateBody(threadAndAuthor.title),
       created_at: payload.created_at!.toISOString(),
       object_url: getThreadUrl(
         payload.community_id,
-        payload.thread_id!,
+        payload.thread_id,
         community.custom_domain,
       ),
     },
