@@ -46,10 +46,10 @@ export const processCommentUpvoted: EventHandler<
     return false;
   }
 
-  const commentAuthorSubscription = await models.ThreadSubscription.findOne({
+  const commentAuthorSubscription = await models.CommentSubscription.findOne({
     where: {
       user_id: commentAndAuthor.Address.User!.id,
-      thread_id: payload.comment_id,
+      comment_id: payload.comment_id,
     },
   });
   if (!commentAuthorSubscription) {
@@ -57,10 +57,24 @@ export const processCommentUpvoted: EventHandler<
     return true;
   }
 
-  const community = await models.Community.findByPk(payload.community_id, {
-    attributes: ['name', 'custom_domain'],
+  const thread = await models.Thread.findOne({
+    where: {
+      id: commentAndAuthor.thread_id,
+    },
+    include: [
+      {
+        model: models.Community,
+        required: true,
+      },
+    ],
   });
-  if (!community) {
+
+  if (!thread) {
+    log.error('Thread not found!', undefined, payload);
+    return false;
+  }
+
+  if (!thread.Community) {
     log.error('Community not found!', undefined, payload);
     return false;
   }
@@ -70,17 +84,17 @@ export const processCommentUpvoted: EventHandler<
     key: WorkflowKeys.NewUpvotes,
     users: [{ id: String(commentAuthorSubscription.user_id) }],
     data: {
-      community_id: payload.community_id,
-      community_name: community.name,
+      community_id: thread.Community.id!,
+      community_name: thread.Community.name,
       reaction: payload.reaction,
       comment_id: payload.comment_id,
       comment_body: safeTruncateBody(commentAndAuthor.text),
       created_at: payload.created_at!.toISOString(),
       object_url: getCommentUrl(
-        payload.community_id,
+        thread.Community.id!,
         commentAndAuthor.thread_id,
         payload.comment_id,
-        community.custom_domain,
+        thread.Community.custom_domain,
       ),
     },
   });

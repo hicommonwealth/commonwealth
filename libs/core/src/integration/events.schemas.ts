@@ -36,7 +36,6 @@ export const CommentCreated = Comment.extend({
 });
 export const CommentUpvoted = Reaction.omit({ thread_id: true }).extend({
   comment_id: PG_INT,
-  community_id: z.string(),
 });
 export const GroupCreated = z.object({
   groupId: z.string(),
