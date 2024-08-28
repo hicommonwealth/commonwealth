@@ -70,8 +70,8 @@ async function startKnockWorker() {
     // This is because we cannot guarantee whether a Knock workflow trigger
     // call was successful or not. It is better to 'miss' notifications then
     // to double send a notification
-    buildRetryStrategy((err, topic, content, ackOrNackFn, log) => {
-      log.error(err.message, err, {
+    buildRetryStrategy((err, topic, content, ackOrNackFn, log_) => {
+      log_.error(err.message, err, {
         topic,
         message: content,
       });
