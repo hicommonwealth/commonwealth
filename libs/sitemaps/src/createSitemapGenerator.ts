@@ -44,6 +44,8 @@ export function createSitemapGenerator(
           content: sitemap,
           contentType: 'text/xml; charset=utf-8',
         });
+        log.info("Resource URL returned from S3: " + res.location)
+
         const url = new URL(res.location);
         const location = 'https://' + url.hostname + '/' + sitemapPath;
         log.info(`Wrote sitemap: ${sitemapPath} to location ${location}`);
