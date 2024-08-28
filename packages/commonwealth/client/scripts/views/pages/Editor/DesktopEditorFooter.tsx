@@ -30,8 +30,12 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
   return (
     <div className="DesktopEditorFooter">
       <div className="Item">
-        <Clipboard size={24} />
-        &nbsp; Paste, drop or click to add files.
+        <div className="IconAndText">
+          <div>
+            <Clipboard size={24} />
+          </div>
+          <div>Paste, drop or click to add files</div>
+        </div>
       </div>
       <div className="Item">
         <input
@@ -42,8 +46,12 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
           onChange={fileHandler}
         />
         <button onClick={handleImportMarkdown} className="FilePickerButton">
-          <DownloadSimple size={24} />
-          &nbsp; Import markdown
+          <div className="IconAndText">
+            <div>
+              <DownloadSimple size={24} />
+            </div>
+            <div>Import markdown</div>
+          </div>
         </button>
       </div>
 
