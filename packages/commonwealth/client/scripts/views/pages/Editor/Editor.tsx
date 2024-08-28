@@ -20,6 +20,7 @@ import React, { memo, useCallback, useRef, useState } from 'react';
 
 import './Editor.scss';
 
+import { delay } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import 'commonwealth-mdxeditor/style.css';
 import { SERVER_URL } from 'state/api/config';
@@ -58,6 +59,7 @@ function useImageUploadHandlerS3() {
  */
 function useImageUploadHandlerLocal() {
   return useCallback(async (file: File) => {
+    await delay(1000);
     return URL.createObjectURL(file);
   }, []);
 }
@@ -70,9 +72,10 @@ type EditorProps = {
 };
 
 export const Editor = memo(function Editor(props: EditorProps) {
-  const imageUploadHandler = useImageUploadHandlerLocal();
+  const imageUploadHandlerDelegate = useImageUploadHandlerLocal();
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const dragCounterRef = useRef(0);
 
@@ -82,6 +85,18 @@ export const Editor = memo(function Editor(props: EditorProps) {
   const placeholder = props.placeholder ?? 'Share your thoughts...';
 
   const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
+
+  const imageUploadHandler = useCallback(
+    async (file: File) => {
+      try {
+        setUploading(true);
+        return await imageUploadHandlerDelegate(file);
+      } finally {
+        setUploading(false);
+      }
+    },
+    [imageUploadHandlerDelegate],
+  );
 
   const handleFile = useCallback(async (file: File) => {
     const text = await fileToText(file);
@@ -99,38 +114,41 @@ export const Editor = memo(function Editor(props: EditorProps) {
     [handleFile],
   );
 
-  const handleDropAsync = useCallback(async (event: React.DragEvent) => {
-    console.log(event.dataTransfer.files.length);
+  const handleDropAsync = useCallback(
+    async (event: React.DragEvent) => {
+      console.log(event.dataTransfer.files.length);
 
-    const nrFiles = event.dataTransfer.files.length;
+      const nrFiles = event.dataTransfer.files.length;
 
-    try {
-      if (nrFiles === 1) {
-        const type = event.dataTransfer.files[0].type;
+      try {
+        if (nrFiles === 1) {
+          const type = event.dataTransfer.files[0].type;
 
-        if (['text/markdown', 'text/plain'].includes(type)) {
-          await handleFile(event.dataTransfer.files[0]);
-        } else {
-          // TODO: use a snackbar
-          console.log('File not markdown');
+          if (['text/markdown', 'text/plain'].includes(type)) {
+            await handleFile(event.dataTransfer.files[0]);
+          } else {
+            // TODO: use a snackbar
+            console.log('File not markdown');
+          }
         }
-      }
 
-      if (nrFiles <= 0) {
-        // TODO: use a snackbar
-        console.log('No files given');
-        return;
-      }
+        if (nrFiles <= 0) {
+          // TODO: use a snackbar
+          console.log('No files given');
+          return;
+        }
 
-      if (nrFiles > 1) {
-        // TODO: use a snackbar
-        console.log('Too many files given');
-        return;
+        if (nrFiles > 1) {
+          // TODO: use a snackbar
+          console.log('Too many files given');
+          return;
+        }
+      } finally {
+        setDragging(false);
       }
-    } finally {
-      setDragging(false);
-    }
-  }, []);
+    },
+    [handleFile],
+  );
 
   // TODO: handle html files but I'm not sure about the correct way to handle it
   // because I have to convert to markdown.  This isn't really a typical use
@@ -236,6 +254,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
       )}
 
       {dragging && <DragIndicator />}
+      {uploading && <DragIndicator />}
     </div>
   );
 });
