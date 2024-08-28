@@ -42,6 +42,7 @@ describe('Thread lifecycle', () => {
       active: true,
       profile_count: 1,
       Addresses: roles.map((role) => ({
+        address: `0xaddressof${role}`,
         user_id: users[role].id,
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
