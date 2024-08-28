@@ -1,5 +1,5 @@
 import type { Express } from 'express';
-import express, { raw } from 'express';
+import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 import * as api from '../api';
@@ -73,12 +73,7 @@ import getWebhooks from '../routes/webhooks/getWebhooks';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
-import {
-  ChainEvents,
-  Thread,
-  type DB,
-  type GlobalActivityCache,
-} from '@hicommonwealth/model';
+import { type DB, type GlobalActivityCache } from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
@@ -109,10 +104,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
-import {
-  CacheDecorator,
-  express as ExpressAdapter,
-} from '@hicommonwealth/adapters';
+import { CacheDecorator } from '@hicommonwealth/adapters';
 import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
@@ -122,7 +114,6 @@ import { config } from '../config';
 import farcasterRouter from '../farcaster/router';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
@@ -149,7 +140,6 @@ import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
-import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
@@ -212,34 +202,9 @@ function setupRouter(
   // API routes
   app.use(api.internal.PATH, api.internal.router);
   app.use(api.external.PATH, api.external.router);
-
-  /**
-   * Special integration endpoints
-   */
-  router.post(
-    '/chainevent/ChainEventCreated/:id',
-    raw({ type: '*/*', limit: '10mb', inflate: true }),
-    (req, _, next) => {
-      ChainEvents.verifyAlchemySignature(req);
-      return next();
-    },
-    // parse body as JSON (native express.json middleware doesn't work here)
-    (req, _, next) => {
-      req.body = JSON.parse(req.body);
-      next();
-    },
-    ExpressAdapter.command(ChainEvents.ChainEventCreated()),
-  );
-  // TODO: do we need more middleware here? (analytics, notifications, canvas, etc)
-  router.post(
-    '/bot/threads',
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    databaseValidationService.validateBotUser,
-    (req, _, next) => {
-      req.body = JSON.parse(req.body);
-      next();
-    },
-    ExpressAdapter.command(Thread.CreateThread()),
+  app.use(
+    api.integration.PATH,
+    api.integration.build(serverControllers, databaseValidationService),
   );
 
   registerRoute(
@@ -422,24 +387,6 @@ function setupRouter(
     getTopUsersHandler.bind(this, serverControllers),
   );
 
-  // threads
-  registerRoute(
-    router,
-    'patch',
-    '/bot/threads',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    updateThreadHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'delete',
-    '/bot/threads/:message_id',
-    databaseValidationService.validateBotUser,
-    deleteBotThreadHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'patch',
@@ -536,33 +483,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     createThreadCommentHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/bot/threads/:id/comments',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    createThreadCommentHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'patch',
-    '/bot/threads/:id/comments',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    updateCommentHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'delete',
-    '/bot/comments/:message_id',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    deleteBotCommentHandler.bind(this, serverControllers),
   );
 
   registerRoute(
