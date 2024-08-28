@@ -1,3 +1,3 @@
-import CWTextInput from "./CWTextInput";
+import CWTextInput from './CWTextInput';
 
 export { CWTextInput };

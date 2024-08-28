@@ -2,7 +2,8 @@
   font-family: Silka;
   font-weight: 900;
   font-style: normal;
-  src: url('assets/fonts/silka-black-webfont.eot'),
+  src:
+    url('assets/fonts/silka-black-webfont.eot'),
     url('assets/fonts/silka-black-webfont.woff2') format('woff2'),
     url('assets/fonts/silka-black-webfont.woff') format('woff'),
     url('assets/fonts/silka-black-webfont.ttf') format('truetype');
@@ -12,7 +13,8 @@
   font-family: Silka;
   font-weight: 700;
   font-style: normal;
-  src: url('assets/fonts/silka-bold-webfont.eot'),
+  src:
+    url('assets/fonts/silka-bold-webfont.eot'),
     url('assets/fonts/silka-bold-webfont.woff2') format('woff2'),
     url('assets/fonts/silka-bold-webfont.woff') format('woff'),
     url('assets/fonts/silka-bold-webfont.ttf') format('truetype');
@@ -22,7 +24,8 @@
   font-family: Silka;
   font-weight: 600;
   font-style: normal;
-  src: url('assets/fonts/silka-semibold-webfont.eot'),
+  src:
+    url('assets/fonts/silka-semibold-webfont.eot'),
     url('assets/fonts/silka-semibold-webfont.woff2') format('woff2'),
     url('assets/fonts/silka-semibold-webfont.woff') format('woff'),
     url('assets/fonts/silka-semibold-webfont.ttf') format('truetype');
@@ -32,7 +35,8 @@
   font-family: Silka;
   font-weight: 500;
   font-style: normal;
-  src: url('assets/fonts/silka-medium-webfont.eot'),
+  src:
+    url('assets/fonts/silka-medium-webfont.eot'),
     url('assets/fonts/silka-medium-webfont.woff2') format('woff2'),
     url('assets/fonts/silka-medium-webfont.woff') format('woff'),
     url('assets/fonts/silka-medium-webfont.ttf') format('truetype');
@@ -42,7 +46,8 @@
   font-family: NeueHaasUnica;
   font-weight: 500;
   font-style: normal;
-  src: url('assets/fonts/NeueHaasUnica-Medium.eot'),
+  src:
+    url('assets/fonts/NeueHaasUnica-Medium.eot'),
     url('assets/fonts/NeueHaasUnica-Medium.woff2') format('woff2'),
     url('assets/fonts/NeueHaasUnica-Medium.woff') format('woff'),
     url('assets/fonts/NeueHaasUnica-Medium.ttf') format('truetype');
@@ -52,7 +57,8 @@
   font-family: NeueHaasUnica;
   font-weight: 400;
   font-style: normal;
-  src: url('assets/fonts/NeueHaasUnica-Regular.eot'),
+  src:
+    url('assets/fonts/NeueHaasUnica-Regular.eot'),
     url('assets/fonts/NeueHaasUnica-Regular.woff2') format('woff2'),
     url('assets/fonts/NeueHaasUnica-Regular.woff') format('woff'),
     url('assets/fonts/NeueHaasUnica-Regular.ttf') format('truetype');

@@ -23,7 +23,7 @@ const queryTypeToRQMap = {
 };
 
 interface CommonProps {
-  queryType: typeof QueryTypes[keyof typeof QueryTypes];
+  queryType: (typeof QueryTypes)[keyof typeof QueryTypes];
   communityId: string;
   apiEnabled?: boolean;
 }

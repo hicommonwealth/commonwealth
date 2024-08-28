@@ -34,8 +34,8 @@ export const sidebarStore = createStore<SidebarStore>()(
               state.userToggledVisibility === 'closed'
                 ? false
                 : state.userToggledVisibility === 'open'
-                ? true
-                : !isWindowSmallInclusive(window.innerWidth),
+                  ? true
+                  : !isWindowSmallInclusive(window.innerWidth),
           }));
         },
         recentlyUpdatedVisibility: false,

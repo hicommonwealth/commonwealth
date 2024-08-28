@@ -16,18 +16,18 @@ export function formatNumberShort(num: number) {
   return num > 1_000_000_000_000
     ? `${round(num / 1_000_000_000_000)}t`
     : num > 1_000_000_000
-    ? `${round(num / 1_000_000_000)}b`
-    : num > 1_000_000
-    ? `${round(num / 1_000_000)}m`
-    : num > 1_000
-    ? `${round(num / 1_000)}k`
-    : num > 0.1
-    ? round(num)
-    : num > 0.01
-    ? precise(num, 2)
-    : num > 0.001
-    ? precise(num, 1)
-    : num.toString();
+      ? `${round(num / 1_000_000_000)}b`
+      : num > 1_000_000
+        ? `${round(num / 1_000_000)}m`
+        : num > 1_000
+          ? `${round(num / 1_000)}k`
+          : num > 0.1
+            ? round(num)
+            : num > 0.01
+              ? precise(num, 2)
+              : num > 0.001
+                ? precise(num, 1)
+                : num.toString();
 }
 
 const nf = new Intl.NumberFormat();

@@ -17,14 +17,14 @@ export const TokenDecimalInput = (props: TokenDecimalInputProps) => {
   const { defaultValueInWei, onInputChange, decimals } = props;
 
   const [displayValue, setDisplayValue] = React.useState<string>(
-    defaultValueInWei || '0'
+    defaultValueInWei || '0',
   );
   const [isInputInWei, setIsInputInWei] = React.useState<boolean>(false);
   const [caption, setCaption] = React.useState<string>(
-    `Using ${decimals} decimal precision`
+    `Using ${decimals} decimal precision`,
   );
   const [valueInWei, setValueInWei] = React.useState<string>(
-    defaultValueInWei || '0'
+    defaultValueInWei || '0',
   );
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export const TokenDecimalInput = (props: TokenDecimalInputProps) => {
               setValueInWei(
                 isInputInWei || !inputNumber
                   ? inputNumber
-                  : tokensToWei(inputNumber, decimals)
+                  : tokensToWei(inputNumber, decimals),
               );
             } catch (err) {
               console.log(`Input conversion failed: ${v.target.value}`);

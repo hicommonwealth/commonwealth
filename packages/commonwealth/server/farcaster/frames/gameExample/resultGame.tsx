@@ -33,8 +33,8 @@ export const resultGame = frames(async (ctx) => {
   const color = msg.includes('Draw')
     ? 'lightgray'
     : msg.includes('win')
-    ? 'lightgreen'
-    : 'lightpink';
+      ? 'lightgreen'
+      : 'lightpink';
 
   return {
     image: CardWithText({

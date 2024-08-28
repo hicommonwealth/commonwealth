@@ -54,7 +54,7 @@ export class MarkdownShortcuts {
               0,
               'header',
               size - 1,
-              'api'
+              'api',
             );
             this.quill.deleteText(selection.index - size, size, 'api');
           }, 0);
@@ -71,7 +71,7 @@ export class MarkdownShortcuts {
               1,
               'blockquote',
               true,
-              'api'
+              'api',
             );
             this.quill.deleteText(selection.index - 2, 2, 'api');
           }, 0);
@@ -88,7 +88,7 @@ export class MarkdownShortcuts {
               1,
               'code-block',
               true,
-              'api'
+              'api',
             );
             this.quill.deleteText(selection.index - 3, 3, 'api');
           }, 0);
@@ -137,16 +137,18 @@ export class MarkdownShortcuts {
               openingDelimiter === '*' || openingDelimiter === '_'
                 ? { italic: true }
                 : openingDelimiter === '**' || openingDelimiter === '__'
-                ? { bold: true }
-                : { bold: true, italic: true };
+                  ? { bold: true }
+                  : { bold: true, italic: true };
             this.quill.deleteText(
               startIndex + whitespaceStartOffset,
-              annotatedText.length - whitespaceStartOffset - whitespaceEndOffset
+              annotatedText.length -
+                whitespaceStartOffset -
+                whitespaceEndOffset,
             );
             this.quill.insertText(
               startIndex + whitespaceStartOffset,
               matchedText,
-              formatting
+              formatting,
             );
             this.quill.format('bold', false);
             this.quill.format('italic', false);
@@ -219,7 +221,7 @@ export class MarkdownShortcuts {
                 start,
                 'image',
                 hrefLink.slice(1, hrefLink.length - 1),
-                'api'
+                'api',
               );
             }, 0);
           }
@@ -242,7 +244,7 @@ export class MarkdownShortcuts {
                 hrefText.slice(1, hrefText.length - 1),
                 'link',
                 hrefLink.slice(1, hrefLink.length - 1),
-                'api'
+                'api',
               );
             }, 0);
           }

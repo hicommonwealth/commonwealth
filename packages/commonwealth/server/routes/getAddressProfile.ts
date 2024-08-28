@@ -30,8 +30,8 @@ const getAddressProfiles = async (
         address: { [Op.in]: req.body.addresses },
       }
     : req.user
-    ? { user_id: req.user.id }
-    : {};
+      ? { user_id: req.user.id }
+      : {};
 
   const where = {
     ...userWhere,

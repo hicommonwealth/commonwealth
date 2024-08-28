@@ -1,9 +1,9 @@
-import type { ICompletable } from '../../shared';
 import { BigNumber } from 'ethers';
 import type {
   IProposalCreated,
   IVoteCast,
 } from '../../../chain/types/compound';
+import type { ICompletable } from '../../shared';
 
 export type ICompoundProposalResponse = Omit<IProposalCreated, 'kind'> &
   ICompletable & {

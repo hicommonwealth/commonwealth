@@ -81,8 +81,8 @@ export const SnapshotPollCardContainer = (
   const voteErrorText = !validatedAgainstStrategies
     ? VotingError.NOT_VALIDATED
     : hasVoted
-    ? VotingError.ALREADY_VOTED
-    : null;
+      ? VotingError.ALREADY_VOTED
+      : null;
 
   const timeRemaining = useMemo(() => {
     return calculateTimeRemaining(proposal);

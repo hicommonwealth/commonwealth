@@ -94,7 +94,9 @@
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0.02em;
-    font-feature-settings: 'tnum' on, 'lnum' on;
+    font-feature-settings:
+      'tnum' on,
+      'lnum' on;
     color: $white;
     word-break: break-word;
   }

@@ -291,11 +291,11 @@ export const CWTable = ({
                         </span>
 
                         {header.column.getCanSort()
-                          ? displaySortIcon(
+                          ? (displaySortIcon(
                               header.column.getIsSorted() as string,
                               // @ts-expect-error <StrictNullChecks/>
                               header.column.getToggleSortingHandler(),
-                            ) ?? null
+                            ) ?? null)
                           : null}
                       </div>
                     )}

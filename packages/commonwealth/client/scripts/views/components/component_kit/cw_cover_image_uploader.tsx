@@ -352,8 +352,8 @@ export const CWCoverImageUploader = ({
           uploadStatus === 'success'
             ? 'Image upload succeeded.'
             : uploadStatus === 'failure'
-            ? 'Image upload failed.'
-            : null
+              ? 'Image upload failed.'
+              : null
         }
         validationStatus={uploadStatus}
       />

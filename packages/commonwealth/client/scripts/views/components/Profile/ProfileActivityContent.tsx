@@ -2,10 +2,10 @@ import React from 'react';
 
 import 'components/Profile/Profile.scss';
 
-import { CWText } from '../component_kit/cw_text';
 import type Thread from 'models/Thread';
-import ProfileActivityRow from './ProfileActivityRow';
+import { CWText } from '../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
+import ProfileActivityRow from './ProfileActivityRow';
 
 enum ProfileActivityType {
   Addresses,

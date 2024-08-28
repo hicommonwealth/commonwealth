@@ -125,10 +125,10 @@ const getRequirementSubFormSchema = (
         requirementTokenId: true,
       })
     : !is1155Requirement
-    ? requirementSubFormValidationSchema.omit({
-        requirementTokenId: true,
-      })
-    : requirementSubFormValidationSchema;
+      ? requirementSubFormValidationSchema.omit({
+          requirementTokenId: true,
+        })
+      : requirementSubFormValidationSchema;
   return schema;
 };
 

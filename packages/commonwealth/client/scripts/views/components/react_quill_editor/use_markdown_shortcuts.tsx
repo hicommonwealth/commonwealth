@@ -30,7 +30,7 @@ export const useMarkdownShortcuts = ({
           editor.deleteText(selection.index, selection.length);
           editor.insertText(
             selection.index,
-            `${markdownChars}${text.trim()}${markdownChars}`
+            `${markdownChars}${text.trim()}${markdownChars}`,
           );
           setContentDelta({
             ...editor.getContents(),

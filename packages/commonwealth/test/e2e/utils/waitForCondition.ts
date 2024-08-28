@@ -1,7 +1,7 @@
 export function waitForCondition(
   conditionFn: () => boolean | Promise<boolean>,
   checkInterval: number = 100,
-  timeoutMs: number = 5000
+  timeoutMs: number = 5000,
 ): Promise<void> {
   return new Promise(async (resolve, reject) => {
     const startTime = Date.now();

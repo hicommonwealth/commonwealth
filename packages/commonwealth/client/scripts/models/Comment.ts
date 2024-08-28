@@ -65,8 +65,8 @@ export class Comment<T extends IUniqueId> {
               typeof history.author === 'string'
                 ? JSON.parse(history.author)
                 : typeof history.author === 'object'
-                ? history.author
-                : null;
+                  ? history.author
+                  : null;
             history.timestamp = moment(history.timestamp);
           } catch (e) {
             console.log(e);
@@ -89,8 +89,8 @@ export class Comment<T extends IUniqueId> {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
-      : null;
+        ? versionHistory[0].timestamp
+        : null;
     // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.length > 0 ? true : false;

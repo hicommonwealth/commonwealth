@@ -121,8 +121,8 @@ export const generateBreadcrumbs = (
         ? // @ts-expect-error StrictNullChecks
           currentDiscussion.currentThreadName
         : matchedBreadcrumb
-        ? matchedBreadcrumb.breadcrumb
-        : removedThreadId;
+          ? matchedBreadcrumb.breadcrumb
+          : removedThreadId;
 
     if (pathSegments[0] === 'profile' && index === 1) {
       label = 'Edit Profile';

@@ -92,8 +92,8 @@ export const UpgradeRolesForm = ({
       selectedRole === 'Admin'
         ? 'admin'
         : selectedRole === 'Moderator'
-        ? 'moderator'
-        : '';
+          ? 'moderator'
+          : '';
 
     try {
       const response = await axios.post(`${SERVER_URL}/upgradeMember`, {

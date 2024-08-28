@@ -44,7 +44,7 @@ function createMockThresholdRequirements(
             }
           })(),
         },
-      } as Requirement),
+      }) as Requirement,
   );
 }
 

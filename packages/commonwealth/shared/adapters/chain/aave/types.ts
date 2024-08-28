@@ -1,6 +1,6 @@
+import { BigNumber } from 'ethers';
 import type { IProposalCreated, IVoteEmitted } from '../../../chain/types/aave';
 import type { ICompletable } from '../../shared';
-import { BigNumber } from 'ethers';
 
 export type IAaveProposalResponse = Omit<IProposalCreated, 'kind'> &
   ICompletable & {

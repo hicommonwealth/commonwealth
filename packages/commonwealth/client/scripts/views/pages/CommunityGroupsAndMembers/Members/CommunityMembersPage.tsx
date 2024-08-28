@@ -216,9 +216,12 @@ const CommunityMembersPage = () => {
     const clonedMembersPages = [...members.pages];
 
     const results = clonedMembersPages
-      .reduce((acc, page) => {
-        return [...acc, ...page.results];
-      }, [] as SearchProfilesResponse['results'])
+      .reduce(
+        (acc, page) => {
+          return [...acc, ...page.results];
+        },
+        [] as SearchProfilesResponse['results'],
+      )
       .map((p) => ({
         userId: p.user_id,
         avatarUrl: p.avatar_url,

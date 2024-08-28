@@ -20,7 +20,7 @@ export const TopicSummaryRowSkeleton = () => {
               <div
                 className={getClasses<{ isLoading?: boolean }>(
                   { isLoading: true },
-                  'recent-thread-row'
+                  'recent-thread-row',
                 )}
               >
                 <Skeleton count={4} />

@@ -105,5 +105,5 @@ export const re_weburl = new RegExp(
     // resource path (optional)
     '(?:[/?#]\\S*)?' +
     '$',
-  'i'
+  'i',
 );

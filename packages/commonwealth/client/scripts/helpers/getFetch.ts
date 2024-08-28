@@ -1,6 +1,6 @@
 export default async function getFetch(
   url: string,
-  queryParams?: { [key: string]: any }
+  queryParams?: { [key: string]: any },
 ) {
   let queryUrl;
   if (queryParams) queryUrl = url + '?' + new URLSearchParams(queryParams);

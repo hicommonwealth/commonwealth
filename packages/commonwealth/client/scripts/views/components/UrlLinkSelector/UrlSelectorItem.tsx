@@ -1,7 +1,7 @@
+import { Link } from 'models/Thread';
 import React from 'react';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { CWText } from '../component_kit/cw_text';
-import { Link } from 'models/Thread';
 
 interface UrlSelectorItemProps {
   link: Link;

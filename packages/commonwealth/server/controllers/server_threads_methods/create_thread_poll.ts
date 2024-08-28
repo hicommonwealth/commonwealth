@@ -38,8 +38,8 @@ export async function __createThreadPoll(
     customDuration === Infinity
       ? null
       : customDuration
-      ? moment().add(customDuration, 'days').toDate()
-      : moment().add(5, 'days').toDate();
+        ? moment().add(customDuration, 'days').toDate()
+        : moment().add(5, 'days').toDate();
 
   const thread = await this.models.Thread.findOne({
     where: {

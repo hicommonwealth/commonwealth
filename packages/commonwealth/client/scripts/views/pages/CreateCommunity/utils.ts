@@ -26,8 +26,8 @@ export const getFormSteps = (
         createCommunityStep < CreateCommunityStep.BasicInformation
           ? 'inactive'
           : createCommunityStep === CreateCommunityStep.BasicInformation
-          ? 'active'
-          : 'completed',
+            ? 'active'
+            : 'completed',
     },
     ...((showCommunityStakeStep
       ? [
@@ -37,8 +37,8 @@ export const getFormSteps = (
               createCommunityStep < CreateCommunityStep.CommunityStake
                 ? 'inactive'
                 : createCommunityStep === CreateCommunityStep.CommunityStake
-                ? 'active'
-                : 'completed',
+                  ? 'active'
+                  : 'completed',
           },
         ]
       : []) as CWFormStepsProps['steps']),

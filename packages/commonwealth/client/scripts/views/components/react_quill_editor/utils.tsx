@@ -51,8 +51,8 @@ export const getTextFromDelta = (delta: DeltaStatic): string => {
         typeof op.insert === 'string'
           ? op.insert
           : op.insert.twitter
-          ? '(tweet)'
-          : '(image)\n';
+            ? '(tweet)'
+            : '(image)\n';
       return acc + text;
     }, '');
 };

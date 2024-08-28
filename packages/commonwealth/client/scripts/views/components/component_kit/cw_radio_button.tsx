@@ -49,7 +49,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
           checked,
           disabled,
         },
-        ComponentType.RadioButton
+        ComponentType.RadioButton,
       )}
     >
       <input className="radio-input" {...params} />

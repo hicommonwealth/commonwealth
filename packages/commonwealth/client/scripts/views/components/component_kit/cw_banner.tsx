@@ -22,7 +22,7 @@ export const Old_CWBanner = ({
     <div
       className={getClasses<{ className?: string }>(
         { className },
-        ComponentType.Banner
+        ComponentType.Banner,
       )}
     >
       <CWText type="b2">{bannerContent}</CWText>
@@ -40,7 +40,7 @@ export const CWMessageBanner = ({
     <div
       className={getClasses<{ className?: string }>(
         { className },
-        ComponentType.MessageBanner
+        ComponentType.MessageBanner,
       )}
     >
       <CWText type="b1" fontWeight="semiBold">

@@ -68,11 +68,11 @@ const RequirementSubForm = ({
                     ...Object.values(CW_SPECIFICATIONS),
                   ].includes(x.value)
                 : app.chain.base === ChainBase.Solana
-                ? [SPL_SPECIFICATION].includes(x.value)
-                : [
-                    TOKENS.EVM_TOKEN,
-                    ...Object.values(ERC_SPECIFICATIONS),
-                  ].includes(x.value),
+                  ? [SPL_SPECIFICATION].includes(x.value)
+                  : [
+                      TOKENS.EVM_TOKEN,
+                      ...Object.values(ERC_SPECIFICATIONS),
+                    ].includes(x.value),
             )
             .map((requirement) => ({
               label: requirement.label,
@@ -131,8 +131,8 @@ const RequirementSubForm = ({
                   (isCosmosRequirement
                     ? 'cosmos'
                     : isSPLRequirement
-                    ? 'solana'
-                    : 'ethereum'),
+                      ? 'solana'
+                      : 'ethereum'),
               )
               ?.map((chainType) => ({
                 label: chainType.label,

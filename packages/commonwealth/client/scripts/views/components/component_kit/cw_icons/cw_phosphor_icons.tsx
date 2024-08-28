@@ -22,7 +22,7 @@ export const withPhosphorIcon = (Icon: PhosphorIcon) => (props: IconProps) => {
     <Icon
       className={getClasses<IconStyleProps>(
         { className, disabled, iconButtonTheme, iconSize, selected },
-        componentType
+        componentType,
       )}
       onClick={otherProps.onClick}
       onMouseEnter={otherProps.onMouseEnter}

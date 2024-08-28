@@ -33,9 +33,8 @@ test.describe('Community proposals page', () => {
     await waitForCompletedProposals({ page });
     const inactiveCardsCollection = await page.$$('.CardsCollection');
     const inactiveCardsContainer = await inactiveCardsCollection?.[1];
-    const inactiveCardsSpinner = await inactiveCardsContainer?.$(
-      '.LoadingSpinner',
-    );
+    const inactiveCardsSpinner =
+      await inactiveCardsContainer?.$('.LoadingSpinner');
     await inactiveCardsSpinner?.waitForElementState('hidden');
     const inactiveCards = await inactiveCardsContainer?.$('.cards');
 

@@ -1,9 +1,9 @@
-import Web3 from 'web3';
 import {
   SignTypedDataVersion,
-  signTypedData,
   personalSign,
+  signTypedData,
 } from '@metamask/eth-sig-util';
+import Web3 from 'web3';
 
 export class MockMetaMaskProvider {
   private privateKey: string;
@@ -49,7 +49,7 @@ export class MockMetaMaskProvider {
         return this.personalSign(payload.params);
       default:
         throw Error(
-          `method "${payload.method}" not supported by mock provider`
+          `method "${payload.method}" not supported by mock provider`,
         );
     }
   }
