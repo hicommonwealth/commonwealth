@@ -34,7 +34,7 @@ export const SubscriptionButton = ({
         if (notificationsOn) {
           deleteCommunityAlert({
             id: user.id,
-            community_ids: [app.activeChainId()],
+            community_ids: [app.activeChainId() || ''],
           })
             .then(() => {
               setNotificationsOn(false);
@@ -46,7 +46,7 @@ export const SubscriptionButton = ({
         } else {
           createCommunityAlert({
             id: user.id,
-            community_id: app.activeChainId(),
+            community_id: app.activeChainId() || '',
           })
             .then(() => {
               setNotificationsOn(true);

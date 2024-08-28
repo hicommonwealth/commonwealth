@@ -69,7 +69,7 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const { stakeData } = useCommunityStake();
   const namespace = stakeData?.Community?.namespace;
   const { isContestAvailable, contestsData, stakeEnabled } =
@@ -105,10 +105,12 @@ export const HeaderWithFilters = ({
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
-  const { stagesEnabled, customStages } = app.chain?.meta || {};
+  const { stages_enabled, custom_stages } = app.chain?.meta || {};
 
+  const communityId = app.activeChainId() || '';
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const urlParams = Object.fromEntries(
@@ -134,7 +136,7 @@ export const HeaderWithFilters = ({
     type: 'contest',
   }));
 
-  const stages = !customStages
+  const stages = !custom_stages
     ? [
         ThreadStage.Discussion,
         ThreadStage.ProposalInReview,
@@ -142,7 +144,7 @@ export const HeaderWithFilters = ({
         ThreadStage.Passed,
         ThreadStage.Failed,
       ]
-    : parseCustomStages(customStages);
+    : parseCustomStages(custom_stages);
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
@@ -397,7 +399,7 @@ export const HeaderWithFilters = ({
                   dropdownPosition={rightFiltersDropdownPosition}
                 />
               ) : (
-                stagesEnabled && (
+                stages_enabled && (
                   <Select
                     selected={selectedStage || 'All Stages'}
                     onSelect={(item) =>

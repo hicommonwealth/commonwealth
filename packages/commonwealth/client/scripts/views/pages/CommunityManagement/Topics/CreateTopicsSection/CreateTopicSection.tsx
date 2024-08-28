@@ -24,8 +24,10 @@ import { topicCreationValidationSchema } from './validation';
 export const CreateTopicSection = () => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
+  const communityId = app.activeChainId() || '';
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);

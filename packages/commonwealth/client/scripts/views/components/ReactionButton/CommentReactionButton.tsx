@@ -35,10 +35,11 @@ export const CommentReactionButton = ({
       communityId: app.activeChainId(),
     });
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: deleteCommentReaction } =
     useDeleteCommentReactionMutation({
       commentId: comment.id,
-      communityId: app.activeChainId(),
+      communityId,
       threadId: comment.threadId,
     });
 
@@ -68,7 +69,7 @@ export const CommentReactionButton = ({
         return r.author === activeAddress;
       });
       deleteCommentReaction({
-        communityId: app.activeChainId(),
+        communityId,
         address: user.activeAccount?.address,
         // @ts-expect-error <StrictNullChecks/>
         canvasHash: foundReaction.canvasHash,
@@ -85,7 +86,7 @@ export const CommentReactionButton = ({
       createCommentReaction({
         address: activeAddress,
         commentId: comment.id,
-        communityId: app.activeChainId(),
+        communityId,
         threadId: comment.threadId,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {

@@ -314,7 +314,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         setDarkMode(true);
       }
       if (app.chain) {
-        await updateActiveAddresses(app.activeChainId());
+        await updateActiveAddresses(app.activeChainId() || '');
       }
     }
 
@@ -493,7 +493,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           ? addressSwapper({
               address: selectedAddress,
               currentPrefix: parseInt(
-                (app.chain as Substrate)?.meta.ss58Prefix,
+                `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
                 10,
               ),
             })
@@ -551,7 +551,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
               ? addressSwapper({
                   address: address,
                   currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
                     10,
                   ),
                 })

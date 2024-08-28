@@ -63,7 +63,7 @@ export const CreateComment = ({
     profileAddresses: user.activeAccount?.address
       ? [user.activeAccount?.address]
       : [],
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!user.activeAccount?.profile,
   });
   if (user.activeAccount) {
@@ -83,7 +83,7 @@ export const CreateComment = ({
     setErrorMsg(null);
     setSendingComment(true);
 
-    const communityId = app.activeChainId();
+    const communityId = app.activeChainId() || '';
     const asyncHandle = async () => {
       try {
         const newComment = await createComment({

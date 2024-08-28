@@ -89,25 +89,28 @@ export const CommentTree = ({
 
   const [highlightedComment, setHighlightedComment] = useState(false);
 
+  const communityId = app.activeChainId() || '';
+
   const { data: allComments = [] } = useFetchCommentsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: parseInt(`${thread.id}`),
+    apiEnabled: !!communityId,
   });
 
   const { mutateAsync: deleteComment } = useDeleteCommentMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
     existingNumberOfComments: thread.numberOfComments,
   });
 
   const { mutateAsync: editComment } = useEditCommentMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
 
   const { mutateAsync: toggleCommentSpamStatus } =
     useToggleCommentSpamStatusMutation({
-      communityId: app.activeChainId(),
+      communityId,
       threadId: thread.id,
     });
 
@@ -190,9 +193,9 @@ export const CommentTree = ({
           onClick: async () => {
             try {
               await deleteComment({
+                communityId,
                 commentId: comment.id,
                 canvasHash: comment.canvasHash,
-                communityId: app.activeChainId(),
                 address: user.activeAccount?.address || '',
                 existingNumberOfComments: thread.numberOfComments,
               });
@@ -344,11 +347,11 @@ export const CommentTree = ({
 
     try {
       await editComment({
+        communityId,
         commentId: comment.id,
         updatedBody: serializeDelta(newDelta) || comment.text,
         threadId: thread.id,
         parentCommentId: comment.parentComment,
-        communityId: app.activeChainId(),
         profile: {
           userId: user.activeAccount?.profile?.userId || 0,
           address: user.activeAccount?.address || '',
@@ -433,9 +436,9 @@ export const CommentTree = ({
           onClick: async () => {
             try {
               await toggleCommentSpamStatus({
+                communityId,
                 commentId: comment.id,
                 isSpam: !comment.markedAsSpamAt,
-                communityId: app.activeChainId(),
                 address: user.activeAccount?.address || '',
               });
             } catch (err) {

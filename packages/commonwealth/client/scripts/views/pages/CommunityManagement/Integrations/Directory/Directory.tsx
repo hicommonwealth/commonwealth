@@ -27,10 +27,11 @@ const Directory = () => {
   const chainNodeOptionsSorted = (chainNodeOptions || []).sort((a, b) =>
     a.label.localeCompare(b.label),
   );
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
       includeNodeInfo: true,
     });
 

@@ -61,7 +61,7 @@ export const SnapshotVotesTable = (props: SnapshotVotesTableProps) => {
             {app.chain ? (
               <User
                 userAddress={vote?.voter}
-                userCommunityId={app.activeChainId()}
+                userCommunityId={app.activeChainId() || ''}
                 shouldLinkProfile
                 shouldShowPopover
               />

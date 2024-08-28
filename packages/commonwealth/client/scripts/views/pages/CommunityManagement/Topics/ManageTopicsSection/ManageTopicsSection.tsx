@@ -19,7 +19,7 @@ export const ManageTopicsSection = () => {
   const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => topic.featuredInSidebar)
-      .map((topic) => ({ ...topic } as Topic));
+      .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
 
@@ -38,7 +38,7 @@ export const ManageTopicsSection = () => {
   const getRegularTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => !topic.featuredInSidebar)
-      .map((topic) => ({ ...topic } as Topic));
+      .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
 
@@ -56,8 +56,10 @@ export const ManageTopicsSection = () => {
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
+  const communityId = app.activeChainId() || '';
   const { data: rawTopics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const { mutateAsync: updateFeaturedTopicsOrder } =
