@@ -16,7 +16,7 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { useCallback } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 
 import './Editor.scss';
 
@@ -27,6 +27,7 @@ import useUserStore from 'state/ui/user';
 import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
 import { codeBlockLanguages } from 'views/pages/Editor/codeBlockLanguages';
 import { DesktopEditorFooter } from 'views/pages/Editor/DesktopEditorFooter';
+import { DragIndicator } from 'views/pages/Editor/DragIndicator';
 import { fileToText } from 'views/pages/Editor/fileToText';
 import { iconComponentFor } from 'views/pages/Editor/iconComponentFor';
 import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
@@ -68,9 +69,10 @@ type EditorProps = {
   readonly placeholder?: string;
 };
 
-export const Editor = (props: EditorProps) => {
+export const Editor = memo((props: EditorProps) => {
   const imageUploadHandler = useImageUploadHandlerLocal();
   const errorHandler = useEditorErrorHandler();
+  const [dragging, setDragging] = useState(false);
 
   const mode = props.mode ?? 'desktop';
   // const mode = props.mode ?? 'mobile';
@@ -84,42 +86,44 @@ export const Editor = (props: EditorProps) => {
     mdxEditorRef.current?.setMarkdown(text);
   }, []);
 
-  // TODO: handle html but I'm not sure about the correct way to handle it
-  // because I have to convert to markdown
+  const handleDropAsync = useCallback(async (event: React.DragEvent) => {
+    console.log(event.dataTransfer.files.length);
+
+    const nrFiles = event.dataTransfer.files.length;
+
+    if (nrFiles === 1) {
+      const type = event.dataTransfer.files[0].type;
+
+      if (['text/markdown', 'text/plain'].includes(type)) {
+        await handleFile(event.dataTransfer.files[0]);
+      } else {
+        // TODO: use a snackbar
+        console.log('File not markdown');
+      }
+    }
+
+    if (nrFiles <= 0) {
+      // TODO: use a snackbar
+      console.log('No files given');
+      return;
+    }
+
+    if (nrFiles > 1) {
+      // TODO: use a snackbar
+      console.log('Too many files given');
+      return;
+    }
+  }, []);
+
+  // TODO: handle html files but I'm not sure about the correct way to handle it
+  // because I have to convert to markdown.  This isn't really a typical use
+  // case though
   const handleDrop = useCallback(
     (event: React.DragEvent) => {
-      async function doAsync() {
-        console.log(event.dataTransfer.files.length);
-
-        const nrFiles = event.dataTransfer.files.length;
-
-        if (nrFiles === 1) {
-          const type = event.dataTransfer.files[0].type;
-
-          if (['text/markdown', 'text/plain'].includes(type)) {
-            await handleFile(event.dataTransfer.files[0]);
-          } else {
-            // TODO: use a snackbar
-            console.log('File not markdown');
-          }
-        }
-
-        if (nrFiles <= 0) {
-          // TODO: use a snackbar
-          console.log('No files given');
-          return;
-        }
-
-        if (nrFiles > 1) {
-          // TODO: use a snackbar
-          console.log('Too many files given');
-          return;
-        }
-      }
-
-      doAsync().catch(console.error);
+      event.preventDefault();
+      handleDropAsync(event).catch(console.error);
     },
-    [handleFile],
+    [handleFile, handleDropAsync],
   );
 
   const handleImportMarkdown = useCallback(
@@ -133,6 +137,25 @@ export const Editor = (props: EditorProps) => {
     [handleFile],
   );
 
+  const handleDragEnter = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+
+    console.log('handleDragStart');
+    setDragging(true);
+  }, []);
+
+  const handleDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    // This is necessary to allow a drop
+    event.dataTransfer!.dropEffect = 'copy'; // Shows a copy cursor when dragging files
+  }, []);
+
+  const handleDragLeave = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    console.log('handleDragLeave');
+    setDragging(false);
+  }, []);
+
   return (
     <div
       className={clsx(
@@ -140,6 +163,9 @@ export const Editor = (props: EditorProps) => {
         'mdxeditor-container-mode-' + mode,
       )}
       onDrop={handleDrop}
+      // onDragEnter={handleDragEnter}
+      // onDragOver={handleDragOver}
+      // onDragLeave={handleDragLeave}
     >
       <MDXEditor
         onError={errorHandler}
@@ -193,6 +219,8 @@ export const Editor = (props: EditorProps) => {
       {mode === 'desktop' && (
         <DesktopEditorFooter onImportMarkdown={handleImportMarkdown} />
       )}
+
+      {dragging && <DragIndicator />}
     </div>
   );
-};
+});

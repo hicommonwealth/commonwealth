@@ -21,6 +21,10 @@ body,
   display: flex;
   flex-direction: column;
 
+  // this is needed so that we can have a progress indicator on top of the main
+  // content.
+  position: relative;
+
   .mdxeditor-toolbar {
     border-top: solid #c6c6c6 1px;
     border-radius: inherit;
