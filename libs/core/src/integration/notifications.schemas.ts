@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import * as events from './events.schemas';
 
+/**
+ * Schema descriptions in this file are intentionally verbose as they are
+ * intended to be used by external teams (Growth/Product) to determine what
+ * data is available to them in a notifications workflow (e.g. Knock).
+ */
+
 // TODO: make this stricter by adding max/min character length
 export const CommentCreatedNotification = z.object({
   author: z
@@ -88,8 +94,29 @@ export const ChainProposalsNotification = z.object({
     .describe('The url to the snapshot proposal on Common'),
 });
 
-export const ThreadUpvoteNotification = z.object({});
-export const CommentUpvoteNotification = z.object({});
+export const BaseUpvoteNotification = z.object({
+  community_id: z
+    .string()
+    .describe('The community id in which the reaction was created'),
+  reaction: z
+    .enum(['like'])
+    .describe('The type of reaction. Currently only like is supported.'),
+  created_at: z
+    .string()
+    .describe('The ISO string date at which the reaction was created.'),
+});
+
+export const ThreadUpvoteNotification = BaseUpvoteNotification.extend({
+  thread_id: z
+    .number()
+    .describe('The id of the thread on which the reaction occurred'),
+});
+
+export const CommentUpvoteNotification = BaseUpvoteNotification.extend({
+  comment_id: z
+    .number()
+    .describe('The id of the comment on which the reaction occurred'),
+});
 
 export const UpvoteNotification = z.union([
   ThreadUpvoteNotification,

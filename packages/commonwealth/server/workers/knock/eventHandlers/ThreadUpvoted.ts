@@ -59,6 +59,11 @@ export const processThreadUpvoted: EventHandler<
   return await provider.triggerWorkflow({
     key: WorkflowKeys.NewUpvotes,
     users: [{ id: String(threadAuthorSubscription.user_id) }],
-    data: {},
+    data: {
+      community_id: payload.community_id,
+      reaction: payload.reaction,
+      thread_id: payload.thread_id!,
+      created_at: payload.created_at!.toISOString(),
+    },
   });
 };
