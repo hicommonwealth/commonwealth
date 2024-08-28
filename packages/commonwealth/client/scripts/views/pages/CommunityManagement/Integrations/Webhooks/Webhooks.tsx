@@ -78,6 +78,7 @@ const Webhooks = () => {
     const webhooksToCreate = webhooks.filter(
       (webhook) => !webhook.canConfigure,
     );
+    if (!webhooksToCreate.length) return;
     try {
       await Promise.all(
         webhooksToCreate.map(async (webhook) => {
@@ -87,7 +88,9 @@ const Webhooks = () => {
           });
         }),
       );
-
+      setLinks(
+        [...webhooks].map((webhook) => ({ ...webhook, canConfigure: true })),
+      );
       notifySuccess(
         `${pluralizeWithoutNumberPrefix(
           webhooksToCreate.length,
@@ -100,10 +103,6 @@ const Webhooks = () => {
           webhooksToCreate.length,
           'webhook',
         )}!`,
-      );
-    } finally {
-      setLinks(
-        [...webhooks].map((webhook) => ({ ...webhook, canConfigure: true })),
       );
     }
   };

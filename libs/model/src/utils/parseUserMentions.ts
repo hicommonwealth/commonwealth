@@ -1,8 +1,9 @@
 import { EventNames, events } from '@hicommonwealth/core';
-import { DB, emitEvent } from '@hicommonwealth/model';
 import { Comment, Thread } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
+import { DB } from '../models';
+import { emitEvent } from './utils';
 
 export type UserMention = {
   userId: string;
@@ -49,22 +50,26 @@ export const parseUserMentions = (text: string): UserMention[] => {
   if (!text) return [];
   try {
     const parsedText = JSON.parse(text);
-    return (parsedText.ops || [])
-      .filter((op) => {
-        return (
-          op.attributes?.link?.length > 0 &&
-          typeof op.insert === 'string' &&
-          op.insert?.slice(0, 1) === '@'
-        );
-      })
-      .map((op) => {
-        const chunks = op.attributes.link.split('/');
-        const refIdx = chunks.indexOf('account');
-        return {
-          profileName: chunks[refIdx - 1],
-          userId: chunks[refIdx + 1],
-        };
-      });
+    return (
+      (parsedText.ops || [])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .filter((op: any) => {
+          return (
+            op.attributes?.link?.length > 0 &&
+            typeof op.insert === 'string' &&
+            op.insert?.slice(0, 1) === '@'
+          );
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((op: any) => {
+          const chunks = op.attributes.link.split('/');
+          const refIdx = chunks.indexOf('account');
+          return {
+            profileName: chunks[refIdx - 1],
+            userId: chunks[refIdx + 1],
+          };
+        })
+    );
   } catch (e) {
     // matches profileName and number in [@${profileName}](/profile/id/${number})
     const regex = /\[@([^[]+)]\(\/profile\/id\/(\d+)\)/g;

@@ -3,6 +3,7 @@ import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import React from 'react';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
@@ -52,6 +53,8 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   });
   const { isContestAvailable, isContestDataLoading, contestsData } =
     useCommunityContests();
+
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const topicIdsIncludedInContest =
     getUniqueTopicIdsIncludedInActiveContest(contestsData);
@@ -120,7 +123,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               <SubscriptionButton communityAlerts={communityAlerts} />
             </div>
           )}
-          {app.isCustomDomain() && (
+          {domain?.isCustomDomain && (
             <div
               className="powered-by"
               onClick={() => {

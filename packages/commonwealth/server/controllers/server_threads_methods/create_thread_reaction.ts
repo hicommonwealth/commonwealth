@@ -60,14 +60,7 @@ export async function __createThreadReaction(
     throw new AppError(Errors.ThreadArchived);
   }
 
-  // check address ban
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check balance (bypass for admin)
   const isAdmin = await validateOwner({
@@ -113,7 +106,7 @@ export async function __createThreadReaction(
         throw new ServerError(`Invalid chain node`);
       }
       const node = await this.models.ChainNode.findByPk(
-        community.chain_node_id,
+        community.chain_node_id!,
       );
 
       if (!node || !node.eth_chain_id) {

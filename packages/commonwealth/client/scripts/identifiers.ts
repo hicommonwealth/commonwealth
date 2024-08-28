@@ -1,4 +1,5 @@
 import { ProposalType } from '@hicommonwealth/shared';
+import { fetchCachedCustomDomain } from 'state/api/configuration';
 import app from './state';
 
 // returns a URL path to a proposal based on its type and id, taking into account
@@ -15,7 +16,10 @@ export const getProposalUrlPath = (
   } else {
     basePath = `/proposal/${id}`;
   }
-  if (omitActiveId || (app.isCustomDomain() && !chainId)) {
+
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
+
+  if (omitActiveId || (isCustomDomain && !chainId)) {
     return basePath;
   } else {
     return `/${chainId || app.activeChainId()}${basePath}`;

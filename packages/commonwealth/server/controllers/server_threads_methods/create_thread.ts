@@ -9,21 +9,18 @@ import {
   ThreadAttributes,
   UserInstance,
   config,
+  emitMentions,
+  parseUserMentions,
   sanitizeQuillText,
   tokenBalanceCache,
+  uniqueMentions,
 } from '@hicommonwealth/model';
 import {
   BalanceSourceType,
-  NotificationCategories,
+  renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import {
-  emitMentions,
-  parseUserMentions,
-  uniqueMentions,
-} from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -100,14 +97,7 @@ export async function __createThread(
     throw new AppError(Errors.UnsupportedKind);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: community.id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check contest limits
   const activeContestManagers = await Contest.GetActiveContestManagers().body({
@@ -238,6 +228,14 @@ export async function __createThread(
       address.last_active = new Date();
       await address.save({ transaction });
 
+      await this.models.ThreadSubscription.create(
+        {
+          user_id: user.id!,
+          thread_id: thread.id!,
+        },
+        { transaction },
+      );
+
       await emitMentions(this.models, transaction, {
         authorAddressId: address.id!,
         authorUserId: user.id!,
@@ -248,7 +246,6 @@ export async function __createThread(
       });
 
       return thread.id;
-      // end of transaction
     },
   );
 
@@ -264,28 +261,6 @@ export async function __createThread(
   if (!finalThread) {
     throw new AppError(Errors.FailedCreateThread);
   }
-
-  // -----
-
-  // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.bulkCreate([
-    {
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewComment,
-      thread_id: finalThread.id,
-      community_id: finalThread.community_id,
-      is_active: true,
-    },
-    {
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewReaction,
-      thread_id: finalThread.id,
-      community_id: finalThread.community_id,
-      is_active: true,
-    },
-  ]);
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
