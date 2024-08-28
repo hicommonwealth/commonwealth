@@ -3,18 +3,15 @@ import { models } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
 import { BannedActor, NonMember, RejectedMember } from 'model/src/middleware';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { seed } from '../../src/tester';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { seed, seedRecord } from '../../src/tester';
 import { CreateThread } from '../../src/thread/CreateThread.command';
 
 const chance = Chance();
 
 describe('Thread lifecycle', () => {
-  let adminActor: Actor,
-    memberActor: Actor,
-    nonmemberActor: Actor,
-    bannedActor: Actor,
-    rejectedActor: Actor;
+  const roles = ['admin', 'member', 'nonmember', 'banned', 'rejected'] as const;
+  const actors = {} as Record<(typeof roles)[number], Actor>;
 
   const body = chance.paragraph();
   const title = chance.sentence();
@@ -36,86 +33,49 @@ describe('Thread lifecycle', () => {
   beforeAll(async () => {
     const groupId = 123456;
     const [node] = await seed('ChainNode', {});
-
-    const [admin] = await seed('User', { isAdmin: true });
-    const [member] = await seed('User', {});
-    const [nonmember] = await seed('User', {});
-    const [banned] = await seed('User', {});
-    const [rejected] = await seed('User', {});
-
+    const users = await seedRecord('User', roles, (role) => ({
+      profile: { name: role },
+      isAdmin: role === 'admin',
+    }));
     const [community] = await seed('Community', {
       chain_node_id: node!.id!,
       active: true,
       profile_count: 1,
-      Addresses: [
-        {
-          role: 'admin',
-          user_id: admin!.id,
-          is_banned: false,
-        },
-        {
-          role: 'member',
-          user_id: member!.id,
-          is_banned: false,
-        },
-        {
-          role: 'member',
-          user_id: nonmember!.id,
-          is_banned: false,
-        },
-        {
-          role: 'member',
-          user_id: banned!.id,
-          is_banned: true,
-        },
-        {
-          role: 'member',
-          user_id: rejected!.id,
-          is_banned: false,
-        },
-      ],
+      Addresses: roles.map((role) => ({
+        user_id: users[role].id,
+        role: role === 'admin' ? 'admin' : 'member',
+        is_banned: role === 'banned',
+      })),
       groups: [{ id: groupId }],
-      topics: [
-        {
-          group_ids: [groupId],
-        },
-      ],
+      topics: [{ group_ids: [groupId] }],
     });
     await seed('GroupPermission', {
       group_id: groupId,
       allowed_actions: [PermissionEnum.CREATE_THREAD],
     });
 
-    adminActor = {
-      user: { id: admin!.id!, email: admin!.email!, isAdmin: admin!.isAdmin! },
-      address: community!.Addresses!.at(0)!.address!,
-    };
-    memberActor = {
-      user: { id: member!.id!, email: member!.email! },
-      address: community!.Addresses!.at(1)!.address!,
-    };
-    nonmemberActor = {
-      user: { id: nonmember!.id!, email: nonmember!.email! },
-      address: community!.Addresses!.at(2)!.address!,
-    };
-    bannedActor = {
-      user: { id: banned!.id!, email: banned!.email! },
-      address: community!.Addresses!.at(3)!.address!,
-    };
-    rejectedActor = {
-      user: { id: rejected!.id!, email: rejected!.email! },
-      address: community!.Addresses!.at(4)!.address!,
-    };
+    roles.forEach((role) => {
+      const user = users[role];
+      const address = community!.Addresses!.find((a) => a.user_id === user.id);
+      actors[role] = {
+        user: {
+          id: user.id,
+          email: user.profile.email!,
+        },
+        address: address!.address,
+        addressId: address!.id,
+      };
+    });
 
     await models.Membership.bulkCreate([
       {
         group_id: groupId,
-        address_id: community!.Addresses!.at(1)!.id!,
+        address_id: actors['member'].addressId!,
         last_checked: new Date(),
       },
       {
         group_id: groupId,
-        address_id: community!.Addresses!.at(4)!.id!,
+        address_id: actors['rejected'].addressId!,
         reject_reason: [
           {
             message: 'User Balance of 0 below threshold 1',
@@ -143,51 +103,35 @@ describe('Thread lifecycle', () => {
     await dispose()();
   });
 
-  test('should create thread as admin', async () => {
-    const thread = await command(CreateThread(), {
-      actor: adminActor,
-      payload,
-    });
-    expect(thread?.title).to.equal(title);
-    expect(thread?.body).to.equal(body);
-    expect(thread?.stage).to.equal(stage);
-  });
+  const authorizationTests = {
+    admin: undefined,
+    member: undefined,
+    nonmember: NonMember,
+    banned: BannedActor,
+    rejected: RejectedMember,
+  } as Record<(typeof roles)[number], any>;
 
-  test('should create thread as member', async () => {
-    const thread = await command(CreateThread(), {
-      actor: memberActor,
-      payload,
-    });
-    expect(thread?.title).to.equal(title);
-    expect(thread?.body).to.equal(body);
-    expect(thread?.stage).to.equal(stage);
-  });
-
-  test('should reject non members', async () => {
-    await expect(
-      command(CreateThread(), {
-        actor: nonmemberActor,
-        payload,
-      }),
-    ).rejects.toThrowError(NonMember);
-  });
-
-  test('should reject banned members', async () => {
-    await expect(
-      command(CreateThread(), {
-        actor: bannedActor,
-        payload,
-      }),
-    ).rejects.toThrowError(BannedActor);
-  });
-
-  test('should reject rejected members', async () => {
-    await expect(
-      command(CreateThread(), {
-        actor: rejectedActor,
-        payload,
-      }),
-    ).rejects.toThrowError(RejectedMember);
+  roles.forEach((role) => {
+    if (!authorizationTests[role]) {
+      it(`should create thread as ${role}`, async () => {
+        const thread = await command(CreateThread(), {
+          actor: actors[role],
+          payload,
+        });
+        expect(thread?.title).to.equal(title);
+        expect(thread?.body).to.equal(body);
+        expect(thread?.stage).to.equal(stage);
+      });
+    } else {
+      it(`should reject create thread as ${role}`, async () => {
+        await expect(
+          command(CreateThread(), {
+            actor: actors[role],
+            payload,
+          }),
+        ).rejects.toThrowError(authorizationTests[role]);
+      });
+    }
   });
 
   // @rbennettcw do we have contest validation tests to include here?
