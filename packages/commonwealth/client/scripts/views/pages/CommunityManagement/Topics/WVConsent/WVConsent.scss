@@ -4,7 +4,6 @@
   display: flex;
 
   .header {
-    margin-top: 8px;
     width: 100%;
     display: flex;
     gap: 16px;
@@ -22,6 +21,7 @@
 
     .description {
       color: $neutral-500;
+      margin-top: -8px;
     }
 
     .info {
