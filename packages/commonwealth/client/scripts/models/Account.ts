@@ -1,5 +1,9 @@
 import { Session } from '@canvas-js/interfaces';
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import type {
+  ChainBase,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { serializeCanvas } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type momentType from 'moment';
@@ -8,13 +12,12 @@ import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { userStore } from 'state/ui/user';
 import NewProfilesController from '../controllers/server/newProfiles';
-import ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
 
 export type AccountCommunity = {
-  id: ChainInfo['id'];
-  base?: ChainInfo['base'];
-  ss58Prefix?: ChainInfo['ss58Prefix'] | number;
+  id: string;
+  base?: ChainBase;
+  ss58Prefix?: number;
 };
 
 class Account {
