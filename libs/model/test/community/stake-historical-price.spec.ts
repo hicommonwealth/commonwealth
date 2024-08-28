@@ -46,7 +46,7 @@ describe('Stake Historical Price', () => {
 
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: community!.Addresses![0].address,
+      address: community!.Addresses![0].address,
     };
 
     community_id = community!.id!;

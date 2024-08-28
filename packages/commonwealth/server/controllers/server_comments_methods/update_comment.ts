@@ -3,16 +3,17 @@ import {
   AddressInstance,
   CommentAttributes,
   UserInstance,
-} from '@hicommonwealth/model';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import { WhereOptions } from 'sequelize';
-import { validateOwner } from 'server/util/validateOwner';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import {
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-} from '../../util/parseUserMentions';
+} from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  ProposalType,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
+import { WhereOptions } from 'sequelize';
+import { validateOwner } from 'server/util/validateOwner';
 import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -69,14 +70,7 @@ export async function __updateComment(
     throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   const isAuthor = await validateOwner({
     models: this.models,

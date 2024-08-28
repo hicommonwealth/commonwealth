@@ -193,6 +193,7 @@ export const broker = port(function broker(broker?: Broker) {
  * External blob storage port factory
  */
 export const blobStorage = port(function blobStorage(
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   blobStorage?: BlobStorage,
 ) {
   return blobStorage || inMemoryBlobStorage;
@@ -202,6 +203,7 @@ export const blobStorage = port(function blobStorage(
  * Notifications provider port factory
  */
 export const notificationsProvider = port(function notificationsProvider(
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   notificationsProvider?: NotificationsProvider,
 ) {
   return (

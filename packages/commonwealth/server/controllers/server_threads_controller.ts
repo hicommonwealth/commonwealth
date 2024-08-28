@@ -1,5 +1,4 @@
 import { DB, GlobalActivityCache } from '@hicommonwealth/model';
-import BanCache from '../util/banCheckCache';
 
 import {
   CountThreadsOptions,
@@ -68,7 +67,6 @@ import {
 export class ServerThreadsController {
   constructor(
     public models: DB,
-    public banCache: BanCache,
     public globalActivityCache?: GlobalActivityCache,
   ) {}
 
