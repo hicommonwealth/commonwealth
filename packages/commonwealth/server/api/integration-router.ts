@@ -1,6 +1,6 @@
 import { express } from '@hicommonwealth/adapters';
 import { ChainEvents, Thread } from '@hicommonwealth/model';
-import { Router, raw } from 'express';
+import { RequestHandler, Router, raw } from 'express';
 
 // TODO: remove as we migrate to tRPC commands
 import DatabaseValidationService from 'server/middleware/databaseValidationService';
@@ -11,13 +11,20 @@ import { deleteBotThreadHandler } from 'server/routes/threads/delete_thread_bot_
 import { updateThreadHandler } from 'server/routes/threads/update_thread_handler';
 import { ServerControllers } from 'server/routing/router';
 
-// TODO: change path to /integration after reviwing existing requests to these endpoints
-const PATH = '/';
+const PATH = '/api/integration';
 
 function build(
   controllers: ServerControllers,
   validator: DatabaseValidationService,
 ) {
+  // Async middleware wrappers
+  const isBotUser: RequestHandler = (req, res, next) => {
+    validator.validateBotUser(req, res, next).catch(next);
+  };
+  const isAuthor: RequestHandler = (req, res, next) => {
+    validator.validateAuthor(req, res, next).catch(next);
+  };
+
   const router = Router();
   router.use(express.statsMiddleware);
 
@@ -38,44 +45,43 @@ function build(
   );
 
   // Discord BOT integration
-  const BOT_PATH = '/api/bot'; // TODO: change to /integration/both
   router.post(
-    `${BOT_PATH}/threads`,
-    validator.validateBotUser,
+    '/bot/threads',
+    isBotUser,
     express.command(Thread.CreateThread()),
   );
 
   router.patch(
-    `${BOT_PATH}/threads`,
-    validator.validateBotUser,
-    validator.validateAuthor,
+    '/bot/threads',
+    isBotUser,
+    isAuthor,
     updateThreadHandler.bind(this, controllers),
   );
 
   router.delete(
-    `${BOT_PATH}/threads/:message_id`,
-    validator.validateBotUser,
+    '/bot/threads/:message_id',
+    isBotUser,
     deleteBotThreadHandler.bind(this, controllers),
   );
 
   router.post(
-    `${BOT_PATH}/threads/:id/comments`,
-    validator.validateBotUser,
-    validator.validateAuthor,
+    '/bot/threads/:id/comments',
+    isBotUser,
+    isAuthor,
     createThreadCommentHandler.bind(this, controllers),
   );
 
   router.patch(
-    `${BOT_PATH}/threads/:id/comments`,
-    validator.validateBotUser,
-    validator.validateAuthor,
+    '/bot/threads/:id/comments',
+    isBotUser,
+    isAuthor,
     updateCommentHandler.bind(this, controllers),
   );
 
   router.delete(
-    `${BOT_PATH}/comments/:message_id`,
-    validator.validateBotUser,
-    validator.validateAuthor,
+    '/bot/comments/:message_id',
+    isBotUser,
+    isAuthor,
     deleteBotCommentHandler.bind(this, controllers),
   );
 

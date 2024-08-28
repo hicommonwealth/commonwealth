@@ -9,7 +9,7 @@ import axios from 'axios';
 import { QueryTypes } from 'sequelize';
 import { config } from '../config';
 
-const bot_path = `${config.SERVER_URL}/api/bot`;
+const bot_path = `${config.SERVER_URL}/api/integration/bot`;
 
 export async function handleThreadMessages(
   action: ThreadDiscordActions,
