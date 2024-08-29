@@ -69,7 +69,7 @@ import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 import type ViewCountCache from '../util/viewCountCache';
 
-import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
+import { type DB, type GlobalActivityCache } from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
@@ -110,7 +110,6 @@ import { config } from '../config';
 import farcasterRouter from '../farcaster/router';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
@@ -135,10 +134,8 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
-import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
-import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
@@ -201,6 +198,10 @@ function setupRouter(
   // API routes
   app.use(api.internal.PATH, api.internal.router);
   app.use(api.external.PATH, api.external.router);
+  app.use(
+    api.integration.PATH,
+    api.integration.build(serverControllers, databaseValidationService),
+  );
 
   registerRoute(
     router,
@@ -382,44 +383,6 @@ function setupRouter(
     getTopUsersHandler.bind(this, serverControllers),
   );
 
-  // threads
-  registerRoute(
-    router,
-    'post',
-    '/threads',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunityWithTopics,
-    createThreadHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/bot/threads',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunityWithTopics,
-    createThreadHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'patch',
-    '/bot/threads',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    updateThreadHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'delete',
-    '/bot/threads/:message_id',
-    databaseValidationService.validateBotUser,
-    deleteBotThreadHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'patch',
@@ -516,33 +479,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     createThreadCommentHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/bot/threads/:id/comments',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    createThreadCommentHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'patch',
-    '/bot/threads/:id/comments',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    updateCommentHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'delete',
-    '/bot/comments/:message_id',
-    databaseValidationService.validateBotUser,
-    databaseValidationService.validateAuthor,
-    deleteBotCommentHandler.bind(this, serverControllers),
   );
 
   registerRoute(

@@ -1,7 +1,6 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { ChainEvents } from '@hicommonwealth/model';
 import cors from 'cors';
-import { Router, raw } from 'express';
+import { Router } from 'express';
 import { config } from '../config';
 import * as community from './community';
 import * as contest from './contest';
@@ -36,24 +35,6 @@ const trpcRouter = trpc.router(api);
 export type API = typeof trpcRouter;
 
 router.use('/trpc', express.statsMiddleware, trpc.toExpress(trpcRouter));
-
-/**
- * Special integration endpoints
- */
-router.post(
-  '/chainevent/ChainEventCreated/:id',
-  raw({ type: '*/*', limit: '10mb', inflate: true }),
-  (req, _, next) => {
-    ChainEvents.verifyAlchemySignature(req);
-    return next();
-  },
-  // parse body as JSON (native express.json middleware doesn't work here)
-  (req, _, next) => {
-    req.body = JSON.parse(req.body);
-    next();
-  },
-  express.command(ChainEvents.ChainEventCreated()),
-);
 
 if (config.NODE_ENV !== 'production') {
   router.use(cors());
