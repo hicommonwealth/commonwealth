@@ -10,7 +10,7 @@ import {
 } from 'sequelize';
 import { isAddress } from 'web3-validator';
 import { config } from '../config';
-import { OutboxAttributes } from '../models';
+import { OutboxAttributes } from '../models/outbox';
 
 const log = logger(import.meta);
 
