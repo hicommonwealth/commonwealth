@@ -2,6 +2,7 @@ import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { GlobalActivityCache } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -56,6 +57,9 @@ export async function main(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  // @ts-expect-error StrictNullChecks
+  sgMail.setApiKey(config.SENDGRID.API_KEY);
 
   const cacheDecorator = new CacheDecorator();
 

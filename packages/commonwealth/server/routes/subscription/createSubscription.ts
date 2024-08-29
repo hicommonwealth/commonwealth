@@ -10,7 +10,6 @@ import {
 import { NotificationCategories } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
-import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
 import Errors from './errors';
 
 export default async (
@@ -31,10 +30,6 @@ export default async (
   });
   if (!category) {
     return next(new AppError(Errors.InvalidNotificationCategory));
-  }
-
-  if (!supportedSubscriptionCategories().includes(category.name)) {
-    return next(new AppError(Errors.InvalidSubscriptionCategory));
   }
 
   let obj: WhereOptions<SubscriptionAttributes>,
