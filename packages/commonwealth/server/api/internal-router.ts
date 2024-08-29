@@ -11,6 +11,7 @@ import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as thread from './threads';
 import * as user from './user';
+import * as wallet from './wallet';
 import * as webhook from './webhook';
 
 const api = {
@@ -27,6 +28,10 @@ const api = {
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
   api['email'] = email.trpcRouter;
+}
+
+if (config.ALCHEMY.AA.FLAG_COMMON_WALLET) {
+  api['wallet'] = wallet.trpcRouter;
 }
 
 const PATH = '/api/internal';

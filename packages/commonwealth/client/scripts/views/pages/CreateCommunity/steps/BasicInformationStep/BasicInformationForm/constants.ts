@@ -49,8 +49,8 @@ export const chainTypes =
       chainBase: chain.ethChainId
         ? 'ethereum'
         : chain.cosmosChainId
-        ? 'cosmos'
-        : 'solana',
+          ? 'cosmos'
+          : 'solana',
       altWalletUrl: chain.altWalletUrl,
       nodeUrl: chain.url,
       value: chain.ethChainId || chain.cosmosChainId || 'solana',
