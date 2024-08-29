@@ -37,13 +37,11 @@ import viewCount from '../routes/viewCount';
 
 import getProfileNew from '../routes/getNewProfile';
 import setDefaultRole from '../routes/setDefaultRole';
-import createSubscription from '../routes/subscription/createSubscription';
 import deleteSubscription from '../routes/subscription/deleteSubscription';
 import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
 import disableSubscriptions from '../routes/subscription/disableSubscriptions';
 import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
 import enableSubscriptions from '../routes/subscription/enableSubscriptions';
-import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
@@ -731,20 +729,6 @@ function setupRouter(
   );
 
   // notifications
-  registerRoute(
-    router,
-    'get',
-    '/viewSubscriptions',
-    passport.authenticate('jwt', { session: false }),
-    viewSubscriptions.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/createSubscription',
-    passport.authenticate('jwt', { session: false }),
-    createSubscription.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
