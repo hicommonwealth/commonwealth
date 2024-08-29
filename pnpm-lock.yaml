@@ -350,6 +350,9 @@ importers:
       hot-shots:
         specifier: ^9
         version: 9.3.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       mixpanel:
         specifier: ^0.14.0
         version: 0.14.0
