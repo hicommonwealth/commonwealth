@@ -18,12 +18,6 @@ async function deleteUser(user_id: number) {
       },
       transaction,
     });
-    await models.NotificationsRead.destroy({
-      where: {
-        user_id,
-      },
-      transaction,
-    });
     await models.StarredCommunity.destroy({
       where: {
         user_id,

@@ -6,7 +6,6 @@ import type { DB } from './factories';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.ProfileTags)
-    .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
