@@ -23,6 +23,8 @@
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@alchemy/aa-alchemy": "^3.17.0",
+    "@alchemy/aa-core": "^3.16.0",
     "@anatine/zod-mock": "^3.13.3",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/encoding": "0.32.3",
@@ -47,6 +49,7 @@
     "sequelize": "^6.32.1",
     "umzug": "^3.7.0",
     "uuid": "^9.0.1",
+    "viem": "^2.13.5",
     "web3": "^4.7.0",
     "web3-core": "^4.3.2",
     "web3-eth-abi": "^4.2.1",

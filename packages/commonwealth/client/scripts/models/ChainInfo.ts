@@ -185,8 +185,8 @@ class ChainInfo {
     let decimals = Contracts
       ? Contracts[0]?.decimals
       : base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+        ? 6
+        : 18;
 
     if (getCosmosChains(true)?.some((c) => c === id)) {
       decimals = 18;

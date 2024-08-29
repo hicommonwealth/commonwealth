@@ -104,7 +104,7 @@ describe('ServerThreadsController', () => {
       // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
-      const [newReaction, notificationOptions, analyticsOptions] =
+      const [newReaction, analyticsOptions] =
         await serverThreadsController.createThreadReaction({
           // @ts-expect-error ignore type
           user: user,
@@ -116,26 +116,6 @@ describe('ServerThreadsController', () => {
         });
 
       expect(newReaction).to.be.ok;
-
-      expect(notificationOptions).to.have.property('notification');
-      const { notification } = notificationOptions;
-      expect(notification).to.have.property('categoryId', 'new-reaction');
-
-      expect(notification.data).to.have.property('created_at');
-      expect(notification.data).to.include({
-        thread_id: 4,
-        root_title: 'Big Thread!',
-        root_type: 'discussion',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-
-      expect(notificationOptions).to.have.property('excludeAddresses');
-      const { excludeAddresses } = notificationOptions;
-      // @ts-expect-error ignore type
-      expect(excludeAddresses[0]).to.equal('0x123');
-
       expect(analyticsOptions).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
@@ -470,7 +450,7 @@ describe('ServerThreadsController', () => {
       // @ts-expect-error ignore type
       const serverThreadsController = new ServerThreadsController(db);
 
-      const [newComment, notificationOptions, analyticsOptions] =
+      const [newComment, analyticsOptions] =
         await serverThreadsController.createThreadComment({
           // @ts-expect-error ignore type
           user,
@@ -490,7 +470,6 @@ describe('ServerThreadsController', () => {
         address_id: address.id,
         community_id: 'ethereum',
       });
-      expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
         event: 'Create New Comment',
         community: 'ethereum',
