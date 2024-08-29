@@ -1,5 +1,5 @@
-import { config } from '@hicommonwealth/core';
 import Rollbar from 'rollbar';
+import { config } from '../config';
 
 export const rollbar = new Rollbar({
   accessToken: config.LOGGING.ROLLBAR_SERVER_TOKEN,

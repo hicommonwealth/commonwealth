@@ -1,4 +1,4 @@
-import { RoutingKey } from '@hicommonwealth/core';
+import { RoutingKey } from './interfaces';
 
 export const successfulInMemoryBroker = {
   name: 'successful-in-memory-broker',
