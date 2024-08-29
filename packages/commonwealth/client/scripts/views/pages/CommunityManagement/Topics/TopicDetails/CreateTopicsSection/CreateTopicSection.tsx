@@ -1,9 +1,8 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
-import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
@@ -15,7 +14,6 @@ import {
   ReactQuillEditor,
   createDeltaFromText,
 } from 'views/components/react_quill_editor';
-import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { CreateTopicStep } from '../../utils';
 import './CreateTopicSection.scss';
 import { topicCreationValidationSchema } from './validation';
@@ -27,15 +25,12 @@ interface CreateTopicSectionProps {
 export const CreateTopicSection = ({
   onStepChange,
 }: CreateTopicSectionProps) => {
-  const { mutateAsync: createTopic } = useCreateTopicMutation();
-  const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
   const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
   const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
@@ -44,26 +39,6 @@ export const CreateTopicSection = ({
   const [characterCount, setCharacterCount] = useState(0);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
-
-  const { isAddedToHomeScreen } = useAppStatus();
-
-  // TODO
-  // const handleCreateTopic = async (values: FormSubmitValues) => {
-  //   try {
-  //     await createTopic({
-  //       name: values.topicName,
-  //       // @ts-expect-error <StrictNullChecks/>
-  //       description: values.topicDescription,
-  //       featuredInSidebar,
-  //       featuredInNewPost: false,
-  //       defaultOffchainTemplate: '',
-  //       isPWA: isAddedToHomeScreen,
-  //     });
-  //     navigate(`/discussions/${encodeURI(name.toString().trim())}`);
-  //   } catch (err) {
-  //     setIsSaving(false);
-  //   }
-  // };
 
   const getCharacterCount = (delta) => {
     if (!delta || !delta.ops) {
@@ -176,7 +151,7 @@ export const CreateTopicSection = ({
             buttonType="primary"
             buttonHeight="med"
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
-            disabled={isSaving || !!nameErrorMsg || !!descErrorMsg}
+            disabled={!!nameErrorMsg || !!descErrorMsg}
             type="submit"
             onClick={handleSubmit}
           />
