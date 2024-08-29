@@ -28,7 +28,9 @@ describe('Thread subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node!.id!,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
@@ -39,7 +41,7 @@ describe('Thread subscription lifecycle', () => {
     });
 
     [threadOne] = await seed('Thread', {
-      address_id: community!.Addresses![0].id,
+      address_id: community!.Addresses![0].id!,
       community_id: community?.id,
       topic_id: community!.topics![0].id,
       pinned: false,
@@ -47,7 +49,7 @@ describe('Thread subscription lifecycle', () => {
       version_history: [],
     });
     [threadTwo] = await seed('Thread', {
-      address_id: community!.Addresses![0].id,
+      address_id: community!.Addresses![0].id!,
       community_id: community?.id,
       topic_id: community!.topics![0].id,
       pinned: false,
@@ -56,7 +58,7 @@ describe('Thread subscription lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: '0x',
+      address: '0x',
     };
   });
 

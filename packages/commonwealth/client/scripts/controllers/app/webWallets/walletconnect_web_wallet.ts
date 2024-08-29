@@ -4,8 +4,11 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
+import { z } from 'zod';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';
 import IWebWallet from '../../../models/IWebWallet';
@@ -47,7 +50,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return this._chainInfo.node?.ethChainId?.toString() || '1';
+    return this._chainInfo?.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,11 +100,22 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async enable() {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
-    // try {
-    // Create WalletConnect Provider
-    this._chainInfo =
-      app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-    const chainId = this._chainInfo.node?.ethChainId || 1;
+    this._chainInfo = app?.chain?.meta;
+
+    if (!this._chainInfo && app.activeChainId()) {
+      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        app.activeChainId() || '',
+        true,
+      );
+
+      const chainInfo = ChainInfo.fromTRPCResponse(
+        communityInfo as z.infer<typeof ExtendedCommunity>,
+      );
+
+      this._chainInfo = chainInfo;
+    }
+
+    const chainId = this._chainInfo?.node?.ethChainId || 1;
     const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
       .default;
     this._provider = await EthereumProvider.init({

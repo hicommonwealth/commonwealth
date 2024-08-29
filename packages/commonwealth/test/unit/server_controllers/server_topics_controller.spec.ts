@@ -65,8 +65,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
       },
     },
   };
-  const banCache: any = {};
-  const controller = new ServerTopicsController(db, banCache);
+  const controller = new ServerTopicsController(db);
   // @ts-expect-error StrictNullChecks
   const user = {
     getAddresses: async () => [],
@@ -78,7 +77,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 
 describe('ServerTopicsController', () => {
   test('#createTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController();
+    const { controller, user, chain } = createMockedTopicsController(true);
     const [topic] = await Promise.all(
       await controller.createTopic({
         user,
@@ -99,7 +98,7 @@ describe('ServerTopicsController', () => {
   });
 
   test('#deleteTopic', async () => {
-    const { controller, user } = createMockedTopicsController();
+    const { controller, user } = createMockedTopicsController(true);
     await controller.deleteTopic({
       user,
       topicId: 1,

@@ -18,6 +18,7 @@ export const Errors = {
   NoCommunityId: 'Must provide community ID',
   ReservedId: 'The id is reserved and cannot be used',
   CantChangeCustomDomain: 'Custom domain change not permitted',
+  CustomDomainIsTaken: 'Custom domain is taken by another community',
   CantChangeNetwork: 'Cannot change community network',
   NotAdmin: 'Not an admin',
   NoCommunityFound: 'Community not found',
@@ -118,13 +119,13 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  const nonEmptySocialLinks = social_links?.filter((s) => s && s !== '');
-  const invalidSocialLinks = nonEmptySocialLinks?.filter(
-    (s) => !urlHasValidHTTPPrefix(s),
+  const nonEmptySocialLinks = (social_links || [])?.filter(
+    (s) => typeof s === 'string',
   );
-  // @ts-expect-error StrictNullChecks
+  const invalidSocialLinks = nonEmptySocialLinks?.filter(
+    (s) => !urlHasValidHTTPPrefix(s || ''),
+  );
   if (nonEmptySocialLinks && invalidSocialLinks.length > 0) {
-    // @ts-expect-error StrictNullChecks
     throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     throw new AppError(Errors.InvalidCustomDomain);
@@ -144,7 +145,6 @@ export async function __updateCommunity(
   }
 
   const newSpaces = snapshot.filter((space) => {
-    // @ts-expect-error StrictNullChecks
     return !community.snapshot_spaces.includes(space);
   });
   for (const space of newSpaces) {
@@ -193,7 +193,7 @@ export async function __updateCommunity(
     if (directory_page_enabled) {
       // @ts-expect-error StrictNullChecks
       communitySelected = await this.models.Community.findOne({
-        where: { chain_node_id: directory_page_chain_node_id },
+        where: { chain_node_id: directory_page_chain_node_id! },
       });
     }
   }
@@ -216,7 +216,7 @@ export async function __updateCommunity(
 
     const namespaceAddress =
       await commonProtocol.newNamespaceValidator.validateNamespace(
-        namespace,
+        namespace!,
         transactionHash,
         communityAdmin.address,
         community,
@@ -234,6 +234,14 @@ export async function __updateCommunity(
   // external configuration (via heroku + whitelists).
   // Currently does not permit unsetting the custom domain; must be done manually.
   if (user.isAdmin && custom_domain) {
+    // verify if this custom domain is taken by another community
+    const foundCommunity = await this.models.Community.findOne({
+      where: { custom_domain: custom_domain! },
+    });
+    if (foundCommunity) {
+      throw new AppError(Errors.CustomDomainIsTaken);
+    }
+
     community.custom_domain = custom_domain;
   } else if (custom_domain && custom_domain !== community.custom_domain) {
     throw new AppError(Errors.CantChangeCustomDomain);

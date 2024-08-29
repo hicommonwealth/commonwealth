@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
 import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
@@ -30,7 +29,6 @@ const Profile = ({ userId }: ProfileProps) => {
   const [profile, setProfile] = useState<NewProfile>();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>();
-  const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
 
   const { data, error, isLoading } = useFetchProfileByIdQuery({
@@ -45,7 +43,6 @@ const Profile = ({ userId }: ProfileProps) => {
       setProfile(undefined);
       setThreads([]);
       setIsOwner(undefined);
-      setAddresses([]);
       setComments([]);
     }
     if (data) {
@@ -66,27 +63,6 @@ const Profile = ({ userId }: ProfileProps) => {
       });
       // @ts-expect-error <StrictNullChecks/>
       setComments(commentsWithAssociatedThread);
-
-      setAddresses(
-        // @ts-expect-error <StrictNullChecks/>
-        data.addresses.map((a) => {
-          try {
-            return new AddressInfo({
-              userId,
-              id: a.id!,
-              address: a.address,
-              communityId: a.community_id!,
-              walletId: a.wallet_id,
-              walletSsoSource: a.wallet_sso_source,
-              ghostAddress: a.ghost_address,
-            });
-          } catch (err) {
-            console.error(`Could not return AddressInfo: "${err}"`);
-            return null;
-          }
-        }),
-      );
-
       setIsOwner(data.isOwner);
       setErrorCode(ProfileError.None);
     }
@@ -165,12 +141,7 @@ const Profile = ({ userId }: ProfileProps) => {
           >
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity
-              threads={threads}
-              comments={comments}
-              // @ts-expect-error <StrictNullChecks/>
-              addresses={addresses}
-            />
+            <ProfileActivity threads={threads} comments={comments} />
           </div>
         </CWPageLayout>
       </div>
@@ -182,12 +153,7 @@ const Profile = ({ userId }: ProfileProps) => {
           <div className="ProfilePageContainer">
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity
-              threads={threads}
-              comments={comments}
-              // @ts-expect-error <StrictNullChecks/>
-              addresses={addresses}
-            />
+            <ProfileActivity threads={threads} comments={comments} />
           </div>
         </div>
       </CWPageLayout>

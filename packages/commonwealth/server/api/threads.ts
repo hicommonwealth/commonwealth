@@ -1,6 +1,15 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { Thread } from '@hicommonwealth/model';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
 export const trpcRouter = trpc.router({
-  getBulkThreads: trpc.query(Thread.GetBulkThreads),
+  createThread: trpc.command(
+    Thread.CreateThread,
+    trpc.Tag.Thread,
+    trpc.track(
+      MixpanelCommunityInteractionEvent.CREATE_THREAD,
+      ({ community_id }) => ({ community: community_id }),
+    ),
+  ),
+  getBulkThreads: trpc.query(Thread.GetBulkThreads, trpc.Tag.Thread),
 });

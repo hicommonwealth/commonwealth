@@ -4,10 +4,10 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import { dispose } from '@hicommonwealth/core';
+import { Thread } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
 import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
@@ -120,7 +120,7 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.UnsupportedKind);
+      expect(tRes.error).to.be.equal(Thread.CreateThreadErrors.UnsupportedKind);
     });
 
     test('should fail to create a forum thread with an empty title', async () => {
@@ -138,7 +138,9 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.DiscussionMissingTitle);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.DiscussionMissingTitle,
+      );
     });
 
     test('should fail to create a link thread with an empty title', async () => {
@@ -157,7 +159,9 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.LinkMissingTitleOrUrl);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.LinkMissingTitleOrUrl,
+      );
     });
 
     test('should fail to create a link thread with an empty URL', async () => {
@@ -177,7 +181,9 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.LinkMissingTitleOrUrl);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.LinkMissingTitleOrUrl,
+      );
     });
 
     test('should fail to create a comment on a readOnly thread', async () => {

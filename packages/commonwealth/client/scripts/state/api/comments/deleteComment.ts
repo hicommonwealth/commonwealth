@@ -4,8 +4,7 @@ import axios from 'axios';
 import { signDeleteComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
@@ -32,7 +31,7 @@ const deleteComment = async ({
     },
   );
 
-  await axios.delete(`${app.serverUrl()}/comments/${commentId}`, {
+  await axios.delete(`${SERVER_URL}/comments/${commentId}`, {
     data: {
       jwt: userStore.getState().jwt,
       address: address,

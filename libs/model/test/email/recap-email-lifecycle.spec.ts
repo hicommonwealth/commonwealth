@@ -52,6 +52,8 @@ describe('Recap email lifecycle', () => {
     });
     [community] = await seed('Community', {
       chain_node_id: node?.id,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
@@ -75,7 +77,6 @@ describe('Recap email lifecycle', () => {
 
     [comment] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
-      community_id: community?.id,
       thread_id: thread!.id!,
     });
   });

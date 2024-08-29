@@ -127,51 +127,26 @@ export enum CommunityCategoryType {
   DAO = 'DAO',
 }
 
-// TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
-// and just use id to identify specific chains for conditionals
+// This enum represents known values for the "network" field on Community, which can be used for
+// switched functionality against specific groups of communities (so we could e.g. group together all
+// communities on a specific testnet, or all ERC20s). In practice this field is deprecated, and should be
+// removed, but these following values remain as either defaults or for custom integration support.
 export enum ChainNetwork {
-  Edgeware = 'edgeware',
-  EdgewareTestnet = 'edgeware-testnet',
-  Kusama = 'kusama',
-  Kulupu = 'kulupu',
-  Polkadot = 'polkadot',
-  Plasm = 'plasm',
-  Stafi = 'stafi',
-  Darwinia = 'darwinia',
-  Phala = 'phala',
-  Centrifuge = 'centrifuge',
-  Straightedge = 'straightedge',
-  Osmosis = 'osmosis',
-  Injective = 'injective',
-  InjectiveTestnet = 'injective-testnet',
-  Terra = 'terra',
   Ethereum = 'ethereum',
-  NEAR = 'near',
-  NEARTestnet = 'near-testnet',
-  Compound = 'compound',
-  Aave = 'aave',
-  AaveLocal = 'aave-local',
-  dYdX = 'dydx',
-  Metacartel = 'metacartel',
-  ALEX = 'alex',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
   ERC1155 = 'erc1155',
-  CW20 = 'cw20',
-  CW721 = 'cw721',
-  Clover = 'clover',
-  HydraDX = 'hydradx',
-  Crust = 'crust',
-  Sputnik = 'sputnik',
-  SolanaDevnet = 'solana-devnet',
-  SolanaTestnet = 'solana-testnet',
+  Edgeware = 'edgeware',
+  Osmosis = 'osmosis',
+  Injective = 'injective',
   Solana = 'solana',
-  SPL = 'spl', // solana token
+  Terra = 'terra',
+  NEAR = 'near',
+  Stargaze = 'stargaze',
+  Compound = 'compound',
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
-  Stargaze = 'stargaze',
-  Cosmos = 'cosmos',
 }
 
 /**

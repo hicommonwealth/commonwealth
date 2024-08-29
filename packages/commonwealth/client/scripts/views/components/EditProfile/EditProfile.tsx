@@ -1,11 +1,8 @@
 import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import getLinkType from 'helpers/linkType';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import Account from 'models/Account';
+import { getLinkType, isLinkValid } from 'helpers/link';
 import AddressInfo from 'models/AddressInfo';
-import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -44,12 +41,11 @@ export type Image = {
 
 const EditProfile = () => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
+
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
-  const [account, setAccount] = useState<Account>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
   const [backgroundImageBehaviour, setBackgroundImageBehaviour] =
@@ -87,7 +83,7 @@ const EditProfile = () => {
     error,
     refetch,
   } = useFetchProfileByIdQuery({
-    apiCallEnabled: isLoggedIn,
+    apiCallEnabled: user.isLoggedIn,
     shouldFetchSelfProfile: true,
   });
 
@@ -133,9 +129,12 @@ const EditProfile = () => {
               userId: a.user_id!,
               id: a.id!,
               address: a.address,
-              communityId: a.community_id!,
-              walletId: a.wallet_id,
-              walletSsoSource: a.wallet_sso_source,
+              community: {
+                id: a.community_id!,
+                // we don't get other community properties from api + they aren't needed here
+              },
+              walletId: a.wallet_id!,
+              walletSsoSource: a.wallet_sso_source!,
               ghostAddress: a.ghost_address,
             });
           } catch (err) {
@@ -147,41 +146,6 @@ const EditProfile = () => {
       return;
     }
   }, [data, isLoadingProfile, error, setPreferenceTags, setLinks, user.id]);
-
-  useEffect(() => {
-    // need to create an account to pass to AvatarUpload to see last upload
-    // not the best solution because address is not always available
-    // should refactor AvatarUpload to make it work with new profiles
-    // @ts-expect-error <StrictNullChecks/>
-    if (addresses?.length > 0) {
-      const address = addresses![0];
-      const oldProfile = new MinimumProfile(
-        address.address,
-        address.community.name,
-      );
-
-      oldProfile.initialize(
-        profile!.userId,
-        profile!.name,
-        address.address,
-        avatarUrl!,
-        address.community.name,
-        null,
-      );
-
-      setAccount(
-        new Account({
-          community: address.community,
-          address: address.address,
-          profile: oldProfile,
-          ignoreProfile: false,
-        }),
-      );
-    } else {
-      // @ts-expect-error <StrictNullChecks/>
-      setAccount(null);
-    }
-  }, [addresses, avatarUrl, profile]);
 
   if (isLoadingProfile || isUpdatingProfile) {
     return (
@@ -306,7 +270,10 @@ const EditProfile = () => {
                 <div className="image-upload">
                   <AvatarUpload
                     scope="user"
-                    account={account}
+                    account={{
+                      avatarUrl: avatarUrl || '',
+                      userId: profile.userId,
+                    }}
                     uploadStartedCallback={() =>
                       setIsUploadingProfileImage(true)
                     }
@@ -350,9 +317,9 @@ const EditProfile = () => {
                 links={links.map((link) => ({
                   ...link,
                   customElementAfterLink:
-                    link.value && getLinkType(link.value, 'website') ? (
+                    link.value && isLinkValid(link.value) ? (
                       <CWTag
-                        label={getLinkType(link.value, 'website')}
+                        label={getLinkType(link.value) || 'website'}
                         type="group"
                         classNames="link-type"
                       />

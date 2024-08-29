@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 
 import {
@@ -14,11 +14,8 @@ import {
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
-import { useCreateCommentSubscriptionMutation } from 'state/api/trpc/subscription/useCreateCommentSubscriptionMutation';
-import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
 import useUserStore from 'state/ui/user';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -31,7 +28,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
-import { useCommentSubscriptions } from 'views/pages/NotificationSettings/useCommentSubscriptions';
+import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -120,24 +117,6 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  // this is in an inner loop but trpc will batch this so it's only called once.
-  const commentSubscriptions = useCommentSubscriptions();
-
-  const hasCommentSubscriptionDefault = useMemo(() => {
-    const matching = (commentSubscriptions.data || []).filter(
-      (current) => current.comment_id === comment.id,
-    );
-    return matching.length > 0;
-  }, [comment.id, commentSubscriptions.data]);
-
-  const [hasCommentSubscriptionState, setHasCommentSubscriptionState] =
-    useState<boolean | undefined>(undefined);
-
-  const hasCommentSubscription =
-    hasCommentSubscriptionState !== undefined
-      ? hasCommentSubscriptionState
-      : hasCommentSubscriptionDefault;
-
   const { data: config } = useFetchConfigurationQuery();
 
   const doVerify = useCallback(async () => {
@@ -151,45 +130,6 @@ export const CommentCard = ({
       // ignore invalid signed comments
     }
   }, [comment.canvasSignedData]);
-
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
-
-  const createCommentSubscriptionMutation =
-    useCreateCommentSubscriptionMutation();
-  const deleteCommentSubscriptionMutation =
-    useDeleteCommentSubscriptionMutation();
-
-  const doToggleSubscribe = useCallback(async () => {
-    if (hasCommentSubscription) {
-      await deleteCommentSubscriptionMutation.mutateAsync({
-        id: comment.id,
-        comment_ids: [comment.id],
-      });
-    } else {
-      await createCommentSubscriptionMutation.mutateAsync({
-        id: comment.id,
-        comment_id: comment.id,
-      });
-    }
-
-    setHasCommentSubscriptionState(!hasCommentSubscription);
-  }, [
-    hasCommentSubscription,
-    deleteCommentSubscriptionMutation,
-    comment.id,
-    createCommentSubscriptionMutation,
-  ]);
-
-  const handleToggleSubscribe = useCallback(
-    (e: React.MouseEvent) => {
-      // prevent clicks from propagating to discussion row
-      e.preventDefault();
-      e.stopPropagation();
-
-      doToggleSubscribe().catch(console.error);
-    },
-    [doToggleSubscribe],
-  );
 
   useEffect(() => {
     if (!config?.enforceSessionKeys) return;
@@ -211,7 +151,12 @@ export const CommentCard = ({
             // @ts-expect-error <StrictNullChecks/>
             authorAddress={app.chain ? author?.address : comment?.author}
             // @ts-expect-error <StrictNullChecks/>
-            authorCommunityId={author?.community?.id || author?.profile?.chain}
+            authorCommunityId={
+              author?.community?.id ||
+              author?.profile?.chain ||
+              comment?.communityId ||
+              comment?.authorChain
+            }
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
@@ -316,12 +261,10 @@ export const CommentCard = ({
                 />
               )}
 
-              {enableKnockInAppNotifications && userOwnsComment && (
-                <CWThreadAction
-                  action="subscribe"
-                  label="Subscribe"
-                  selected={!hasCommentSubscription}
-                  onClick={handleToggleSubscribe}
+              {user.id > 0 && (
+                <ToggleCommentSubscribe
+                  comment={comment}
+                  userOwnsComment={userOwnsComment}
                 />
               )}
 

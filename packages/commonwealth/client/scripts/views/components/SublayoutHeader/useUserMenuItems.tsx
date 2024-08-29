@@ -1,14 +1,15 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
+import { getUniqueUserAddresses } from 'helpers/user';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
 import {
@@ -30,6 +31,7 @@ import { useFetchConfigurationQuery } from 'state/api/configuration';
 
 import { useCommunityStake } from '../CommunityStake';
 
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
@@ -47,7 +49,7 @@ const resetWalletConnectSession = async () => {
 
 export const handleLogout = async () => {
   try {
-    await axios.get(`${app.serverUrl()}/logout`);
+    await axios.get(`${SERVER_URL}/logout`);
     await initAppState();
     await resetWalletConnectSession();
     for (const signer of getSessionSigners()) {
@@ -93,8 +95,6 @@ const useUserMenuItems = ({
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  const user = userData.addresses?.[0];
-
   const uniqueChainAddresses = getUniqueUserAddresses({
     forChain: app?.chain?.base,
   });
@@ -121,20 +121,52 @@ const useUserMenuItems = ({
     setSelectedAddress,
   ]);
 
-  const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
-    const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
-    const communityIdOrPrefix =
-      account.community.base === ChainBase.CosmosSDK
-        ? account.community.ChainNode?.bech32
-        : account.community.ChainNode?.ethChainId;
-    const communityCanvasChainId = chainBaseToCanvasChainId(
-      account.community.base,
-      // @ts-expect-error StrictNullChecks
-      communityIdOrPrefix,
-    );
-    const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+  const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
+    [],
+  );
 
-    const signed = authenticatedAddresses[caip2Address];
+  const updateCanvasSignedAddresses = useCallback(async () => {
+    const signedAddresses: string[] = [];
+
+    await Promise.all(
+      userData.accounts.map(async (account) => {
+        // making a fresh query to get chain and community info for this address
+        // as all the necessary fields don't exist on user.address, these should come
+        // from api in the user address response, and the extra api call here removed
+        const community = await EXCEPTION_CASE_VANILLA_getCommunityById(
+          account.community.id,
+          true,
+        );
+        if (community) {
+          const communityCaip2Prefix = chainBaseToCaip2(
+            account?.community?.base as ChainBase,
+          );
+          const communityIdOrPrefix =
+            community.base === ChainBase.CosmosSDK
+              ? community.ChainNode?.bech32
+              : community.ChainNode?.eth_chain_id;
+          const communityCanvasChainId = chainBaseToCanvasChainId(
+            account?.community?.base as ChainBase,
+            // @ts-expect-error StrictNullChecks
+            communityIdOrPrefix,
+          );
+          const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+
+          const signed = authenticatedAddresses[caip2Address];
+          if (signed) signedAddresses.push(account.address);
+        }
+      }),
+    );
+
+    setCanvasSignedAddresses(signedAddresses);
+  }, [authenticatedAddresses, userData.accounts]);
+
+  useEffect(() => {
+    updateCanvasSignedAddresses().catch(console.error);
+  }, [updateCanvasSignedAddresses]);
+
+  const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
+    const signed = canvasSignedAddresses.includes(account.address);
     const isActive = userData.activeAccount?.address === account.address;
     const walletSsoSource = userData.addresses.find(
       (address) => address.address === account.address,
@@ -228,7 +260,7 @@ const useUserMenuItems = ({
       {
         type: 'default',
         label: 'View profile',
-        onClick: () => navigate(`/profile/id/${user.userId}`, {}, null),
+        onClick: () => navigate(`/profile/id/${userData.id}`, {}, null),
       },
       {
         type: 'default',

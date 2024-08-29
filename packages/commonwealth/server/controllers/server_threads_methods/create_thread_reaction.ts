@@ -6,13 +6,13 @@ import {
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -23,22 +23,19 @@ export const Errors = {
   ThreadArchived: 'Thread is archived',
   FailedCreateReaction: 'Failed to create reaction',
   CommunityNotFound: 'Community not found',
+  MustHaveStake: 'Must have stake to upvote',
 };
 
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  reaction: string;
+  reaction: 'like';
   threadId: number;
   canvasSignedData?: string;
   canvasHash?: string;
 };
 
-export type CreateThreadReactionResult = [
-  ReactionAttributes,
-  EmitOptions,
-  TrackOptions,
-];
+export type CreateThreadReactionResult = [ReactionAttributes, TrackOptions];
 
 export async function __createThreadReaction(
   this: ServerThreadsController,
@@ -63,14 +60,7 @@ export async function __createThreadReaction(
     throw new AppError(Errors.ThreadArchived);
   }
 
-  // check address ban
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check balance (bypass for admin)
   const isAdmin = await validateOwner({
@@ -111,8 +101,12 @@ export async function __createThreadReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
+
+      if (!community.chain_node_id) {
+        throw new ServerError(`Invalid chain node`);
+      }
       const node = await this.models.ChainNode.findByPk(
-        community.chain_node_id,
+        community.chain_node_id!,
       );
 
       if (!node || !node.eth_chain_id) {
@@ -125,8 +119,13 @@ export async function __createThreadReaction(
           node.eth_chain_id,
           [address.address],
         );
+      const stakeBalance = stakeBalances[address.address];
+      if (BigNumber.from(stakeBalance).lte(0)) {
+        // stake is enabled but user has no stake
+        throw new AppError(Errors.MustHaveStake);
+      }
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalances[address.address],
+        stakeBalance,
         voteWeight,
       );
     }
@@ -136,13 +135,10 @@ export async function __createThreadReaction(
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: thread.community_id,
-    // @ts-expect-error StrictNullChecks
     thread_id: thread.id,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
     canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
@@ -153,24 +149,6 @@ export async function __createThreadReaction(
     // @ts-expect-error StrictNullChecks
     defaults: reactionData,
   });
-
-  // build notification options
-  const notificationOptions: EmitOptions = {
-    notification: {
-      categoryId: NotificationCategories.NewReaction,
-      data: {
-        created_at: new Date(),
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread.id,
-        root_title: thread.title,
-        root_type: 'discussion',
-        community_id: thread.community_id,
-        author_address: address.address,
-        author_community_id: address.community_id!,
-      },
-    },
-    excludeAddresses: [address.address],
-  };
 
   // build analytics options
   const analyticsOptions: TrackOptions = {
@@ -183,5 +161,5 @@ export async function __createThreadReaction(
     Address: address,
   };
 
-  return [finalReactionWithAddress, notificationOptions, analyticsOptions];
+  return [finalReactionWithAddress, analyticsOptions];
 }

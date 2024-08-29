@@ -46,16 +46,6 @@ export default (
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
       user_id: { type: Sequelize.INTEGER, allowNull: true },
-      is_councillor: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      is_validator: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       ghost_address: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
@@ -64,6 +54,11 @@ export default (
       wallet_id: { type: Sequelize.STRING, allowNull: true },
       wallet_sso_source: { type: Sequelize.STRING, allowNull: true },
       block_info: { type: Sequelize.STRING, allowNull: true },
+      is_banned: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       hex: {
         type: Sequelize.STRING(64),
         allowNull: true,

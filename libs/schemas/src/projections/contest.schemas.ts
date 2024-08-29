@@ -16,7 +16,7 @@ export const ContestAction = z
     voting_power: PG_INT.gte(0).describe(
       'Voting power of address when action was recorded',
     ),
-    created_at: z.date().describe('Date-time when action was recorded'),
+    created_at: z.coerce.date().describe('Date-time when action was recorded'),
   })
   .describe('On-Chain content related actions on contest instance');
 

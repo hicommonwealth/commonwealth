@@ -1,9 +1,8 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
-import { getUniqueCommunities } from 'helpers/addresses';
 import { useFlag } from 'hooks/useFlag';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
@@ -21,14 +20,14 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import './index.scss';
 
-type NotificationSection = 'community-alerts' | 'subscriptions';
+type NotificationSection = 'community-alerts' | 'threads' | 'comments';
 
 const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
   const threadSubscriptions = useThreadSubscriptions();
-  const communityAlerts = useCommunityAlertsQuery();
+  const communityAlerts = useCommunityAlertsQuery({});
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     (communityAlerts.data as unknown as ReadonlyArray<
@@ -41,7 +40,7 @@ const NotificationSettings = () => {
 
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
-  } else if (!isLoggedIn) {
+  } else if (!user.isLoggedIn) {
     return <PageNotFound />;
   }
 
@@ -76,14 +75,20 @@ const NotificationSettings = () => {
 
         <CWTabsRow>
           <CWTab
-            label="Community Alerts"
+            label="Community"
             isSelected={section === 'community-alerts'}
             onClick={() => setSection('community-alerts')}
           />
           <CWTab
-            label="Subscriptions"
-            isSelected={section === 'subscriptions'}
-            onClick={() => setSection('subscriptions')}
+            label="Threads"
+            isSelected={section === 'threads'}
+            onClick={() => setSection('threads')}
+          />
+
+          <CWTab
+            label="Comments"
+            isSelected={section === 'comments'}
+            onClick={() => setSection('comments')}
           />
         </CWTabsRow>
 
@@ -98,29 +103,28 @@ const NotificationSettings = () => {
               communities.
             </CWText>
 
-            {getUniqueCommunities().map((community) => {
+            {user.communities.map((community) => {
               return (
                 <CommunityEntry
                   key={community.id}
-                  communityInfo={community}
-                  communityAlert={communityAlertsIndex[community.id]}
+                  id={community.id || ''}
+                  name={community.name || ''}
+                  iconUrl={community.iconUrl || ''}
+                  alert={communityAlertsIndex[community.id]}
                 />
               );
             })}
           </>
         )}
 
-        {section === 'subscriptions' && (
+        {section === 'threads' && (
           <>
-            <CWText type="h4" fontWeight="semiBold" className="section-header">
-              Subscriptions
-            </CWText>
-
-            <CWText className="page-subheader-text">
-              Manage your subscriptions to these discussions
-            </CWText>
             <ThreadSubscriptions />
+          </>
+        )}
 
+        {section === 'comments' && (
+          <>
             <CommentSubscriptions />
           </>
         )}

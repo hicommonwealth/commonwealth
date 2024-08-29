@@ -21,8 +21,11 @@ import { CosmosExtension } from '@magic-ext/cosmos';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { Magic } from 'magic-sdk';
 
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import app from 'state';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { SERVER_URL } from 'state/api/config';
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import {
   onUpdateEmailError,
@@ -32,10 +35,11 @@ import {
 import { authModal } from 'state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
+import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
-import type ChainInfo from '../../models/ChainInfo';
+import ChainInfo from '../../models/ChainInfo';
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
@@ -49,7 +53,7 @@ export function linkExistingAddressToChainOrCommunity(
   community: string,
   originChain: string,
 ) {
-  return axios.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
+  return axios.post(`${SERVER_URL}/linkExistingAddressToCommunity`, {
     address,
     community_id: community,
     originChain, // not used
@@ -60,7 +64,7 @@ export function linkExistingAddressToChainOrCommunity(
 export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
   try {
-    const response = await axios.post(`${app.serverUrl()}/setDefaultRole`, {
+    const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
       address: account.address,
       author_community_id: account.community.id,
       community_id: community,
@@ -97,7 +101,7 @@ export async function completeClientLogin(account: Account) {
         userId: user.id,
         id: account.addressId,
         address: account.address,
-        communityId: account.community.id,
+        community: account.community,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
@@ -111,14 +115,13 @@ export async function completeClientLogin(account: Account) {
   }
 }
 
-export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
+export async function updateActiveAddresses(chainId: string) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   userStore.getState().setData({
     accounts: userStore
       .getState()
-      .addresses // @ts-expect-error StrictNullChecks
-      .filter((a) => a.community.id === chain.id)
+      .addresses.filter((a) => a.community.id === chainId)
       .map((addr) => {
         const tempAddr = app.chain?.accounts.get(addr.address, false);
         tempAddr.profile = addr.profile;
@@ -130,8 +133,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
 
   // select the address that the new chain should be initialized with
   const memberAddresses = userStore.getState().accounts.filter((account) => {
-    // @ts-expect-error StrictNullChecks
-    return account.community.id === chain.id;
+    return account.community.id === chainId;
   });
 
   if (memberAddresses.length === 1) {
@@ -144,7 +146,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
     const communityAddressesSortedByLastUsed = [
       ...(userStore
         .getState()
-        .addresses.filter((a) => a.community.id === chain?.id) || []),
+        .addresses.filter((a) => a.community.id === chainId) || []),
     ].sort((a, b) => {
       if (b.lastActive && a.lastActive) return b.lastActive.diff(a.lastActive);
       if (!b.lastActive && !a.lastActive) return 0; // no change
@@ -201,8 +203,7 @@ export function updateActiveUser(data) {
       emailNotificationInterval: '',
       knockJWT: '',
       addresses: [],
-      starredCommunities: [],
-      joinedCommunitiesWithNewContent: [],
+      communities: [],
       accounts: [],
       activeAccount: null,
       jwt: null,
@@ -210,6 +211,7 @@ export function updateActiveUser(data) {
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
+      isLoggedIn: false,
     });
   } else {
     const addresses = data.addresses.map(
@@ -218,7 +220,11 @@ export function updateActiveUser(data) {
           userId: user.id,
           id: a.id,
           address: a.address,
-          communityId: a.community_id,
+          community: {
+            id: a.community_id,
+            base: a.Community.base,
+            ss58Prefix: a.Community.ss58_prefix,
+          },
           walletId: a.wallet_id,
           walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,
@@ -226,34 +232,25 @@ export function updateActiveUser(data) {
         }),
     );
 
-    const joinedCommunitiesWithNewContent = (() => {
-      if (!data.unseenPosts) return [];
-
-      const communityIds: string[] = [];
-
-      // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8391
-      Object.keys(data.unseenPosts).map(
-        (c) =>
-          (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
-          communityIds.push(c),
-      );
-
-      return communityIds;
-    })();
-
     user.setData({
       id: data.id || 0,
       email: data.email || '',
       emailNotificationInterval: data.emailInterval || '',
       knockJWT: data.knockJwtToken || '',
       addresses,
-      joinedCommunitiesWithNewContent,
       jwt: data.jwt || null,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+      communities: (data?.communities || []).map((c) => ({
+        id: c.id || '',
+        iconUrl: c.icon_url || '',
+        name: c.name || '',
+        isStarred: c.is_starred || false,
+      })),
+      isLoggedIn: true,
     });
   }
 }
@@ -270,7 +267,7 @@ export async function createUserWithAddress(
   newlyCreated: boolean;
   joinedCommunity: boolean;
 }> {
-  const response = await axios.post(`${app.serverUrl()}/createAddress`, {
+  const response = await axios.post(`${SERVER_URL}/createAddress`, {
     address,
     community_id: chain,
     jwt: userStore.getState().jwt,
@@ -282,11 +279,23 @@ export async function createUserWithAddress(
   });
 
   const id = response.data.result.id;
-  const chainInfo = app.config.chains.getById(chain);
+
+  const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+    chain || '',
+    true,
+  );
+  const chainInfo = ChainInfo.fromTRPCResponse(
+    communityInfo as z.infer<typeof ExtendedCommunity>,
+  );
+
   const account = new Account({
     addressId: id,
     address,
-    community: chainInfo,
+    community: {
+      id: chainInfo.id,
+      base: chainInfo.base,
+      ss58Prefix: chainInfo.ss58Prefix,
+    },
     validationToken: response.data.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
@@ -313,9 +322,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
             // so we can't use app.chain.meta?.node?.url
-            rpcUrl: `${
-              document.location.origin
-            }${app.serverUrl()}/magicCosmosProxy/${chain}`,
+            rpcUrl: `${document.location.origin}${SERVER_URL}/magicCosmosProxy/${chain}`,
           }),
         ],
   });
@@ -327,12 +334,14 @@ export async function startLoginWithMagicLink({
   redirectTo,
   chain,
   isCosmos,
+  isLoggedIn,
 }: {
   email?: string;
   provider?: WalletSsoSource;
   redirectTo?: string;
   chain?: string;
   isCosmos: boolean;
+  isLoggedIn: boolean;
 }) {
   if (!email && !provider)
     throw new Error('Must provide email or SSO provider');
@@ -347,6 +356,7 @@ export async function startLoginWithMagicLink({
       walletSsoSource: WalletSsoSource.Email,
       returnEarlyIfNewAddress:
         authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
+      isLoggedIn,
     });
 
     return { bearer, address, isAddressNew };
@@ -355,7 +365,7 @@ export async function startLoginWithMagicLink({
       redirectTo ? encodeURIComponent(redirectTo) : ''
     }&chain=${chain || ''}&sso=${provider}`;
     await magic.oauth.loginWithRedirect({
-      provider: provider as any,
+      provider,
       redirectURI: new URL(
         '/finishsociallogin' + params,
         window.location.origin,
@@ -404,16 +414,26 @@ export async function handleSocialLoginCallback({
   chain,
   walletSsoSource,
   returnEarlyIfNewAddress = false,
+  isLoggedIn,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
   returnEarlyIfNewAddress?: boolean;
+  isLoggedIn?: boolean;
 }): Promise<{ address: string; isAddressNew: boolean }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
-  // @ts-expect-error StrictNullChecks
-  const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
+  let desiredChain = app.chain?.meta;
+  if (!desiredChain && chain) {
+    const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+      chain || '',
+      true,
+    );
+    desiredChain = ChainInfo.fromTRPCResponse(
+      communityInfo as z.infer<typeof ExtendedCommunity>,
+    );
+  }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
   const isEmail = walletSsoSource === WalletSsoSource.Email;
@@ -460,7 +480,7 @@ export async function handleSocialLoginCallback({
 
   isAddressNew = profileAddresses?.length === 0;
   const isAttemptingToConnectAddressToCommunity =
-    app.isLoggedIn() && app.activeChainId();
+    isLoggedIn && app.activeChainId();
   if (
     isAddressNew &&
     !isAttemptingToConnectAddressToCommunity &&
@@ -504,7 +524,7 @@ export async function handleSocialLoginCallback({
 
       const sessionSigner = new SIWESigner({
         signer,
-        chainId: app.chain?.meta.node?.ethChainId || 1,
+        chainId: app.chain?.meta?.node?.ethChainId || 1,
       });
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {
@@ -523,7 +543,7 @@ export async function handleSocialLoginCallback({
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await axios.post(
-    `${app.serverUrl()}/auth/magic`,
+    `${SERVER_URL}/auth/magic`,
     {
       data: {
         community_id: desiredChain?.id,
@@ -548,10 +568,19 @@ export async function handleSocialLoginCallback({
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:
     if (app.chain) {
-      const c =
-        userStore.getState().activeCommunity ||
-        app.config.chains.getById(app.activeChainId());
-      await updateActiveAddresses({ chain: c });
+      let chainInfo = userStore.getState().activeCommunity;
+
+      if (!chainInfo && chain) {
+        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+          chain || '',
+          true,
+        );
+        chainInfo = ChainInfo.fromTRPCResponse(
+          communityInfo as z.infer<typeof ExtendedCommunity>,
+        );
+      }
+
+      chainInfo && (await updateActiveAddresses(chainInfo.id));
     }
 
     const { Profiles: profiles, email: ssoEmail } = response.data.result;

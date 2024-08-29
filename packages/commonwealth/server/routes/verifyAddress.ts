@@ -6,7 +6,6 @@ import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   DynamicTemplate,
-  NotificationCategories,
   WalletId,
   addressSwapper,
   deserializeCanvas,
@@ -44,6 +43,10 @@ const processAddress = async (
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: community.id, address },
+      include: {
+        model: models.Community,
+        attributes: ['ss58_prefix'],
+      },
     },
   );
   if (!addressInstance) {
@@ -85,18 +88,6 @@ const processAddress = async (
       const newUser = await models.User.create({
         email: null,
         profile: {},
-      });
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      });
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
       });
       addressInstance.user_id = newUser.id;
     }
@@ -223,6 +214,7 @@ const verifyAddress = async (
     req.login(user, (err) => {
       const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
@@ -231,6 +223,7 @@ const verifyAddress = async (
         );
         return next(err);
       }
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,

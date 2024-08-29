@@ -21,7 +21,7 @@ The goal of this document is to describe the current state of the app initializa
     3. Active user and sign-in state are updated.
         - The websocket connection is initialized or disconnected depending on whether the user is logged in or out, respectively.
         - Sets the users’ starred communities, selected chain, and display name
-    4. If a custom domain is passed as an argument to the invocation of `initAppState`, the `setCustomDomain` setter is fired. If the function's `shouldRedraw` param is set to true, then the app's `loginStateEmitter` emits a redraw.
+    4. If a custom domain is passed as an argument to the invocation of `initAppState`, the `setCustomDomain` setter is fired.
 7. A `Router` component within the `App` component conditionally renders if state variable `isLoading` is false; this router uses `react-router-dom` library methods to conditionally create either custom domain routes, or common domain routes, depending on whether a custom domain param is passed.
     1. All routes are configured in the `client/scripts/navigation` directory.
     2. `CommonDomainRoutes.tsx` and `CustomDomainRoutes.tsx` declare the routes to front-end pages, switched in `navigation/Router.tsx` based on results of the `/domain` call.
@@ -30,12 +30,11 @@ The goal of this document is to describe the current state of the app initializa
     1. The `LayoutWrapper` injects the page’s specific params into the page as child, and injects the `scope` argument into the `Layout` component.
     2. This `Layout` component includes a nested `Suspense` component (via the `react` library) and `ErrorBoundary` component (via the `react-error-boundary` library).
     3. The `LayoutComponent` operates as follows:
-        1. If, _at render time_, `app.loadingError` is set, display an application error.
-        2. If, _at render time_, the `app.loginStatusLoaded()` method returns false, a loading spinner is shown, triggered by `shouldShowLoadingState`.
-        3. If, _at render time_, `app.config.chains.getById(scope)` does not return successfully, render a `PageNotFound` view.
-        4. If, _at render time_, there is no `selectedScope`, and no custom domain, then whatever chain is currently being loaded is deinitialized by `deinitChainOrCommunity`, and the `ScopeToLoad` state variable set to `null`. A loading spinner is shown, triggered by `shouldShowLoadingState`.
-        5. If, _at render time_, the `selectedScope` differs from `app.activeChainId()`, the `isLoading` and `scopeToLoad` global state variables are updated (to `true` and `selectedScope`, respectively). `selectChain()` is fired, receiving new scope's chain as argument; on completion, the `isLoading` state variable is set to `false`.
-        6. If none of these conditions apply, the routed-to page is rendered.
+        1. If, _at render time_, `appError.loadingError` is set, display an application error.
+        2. If, _at render time_, `useGetCommunityByIdQuery(scope)` does not return successfully, render a `PageNotFound` view.
+        3. If, _at render time_, there is no `providedCommunityScope`, and no custom domain, then whatever chain is currently being loaded is deinitialized by `deinitChainOrCommunity`, and the `communityToLoad` state variable set to `null`. A loading spinner is shown, triggered by `shouldShowLoadingState`.
+        4. If, _at render time_, the `providedCommunityScope` differs from `app.activeChainId()`, the `isLoading` and `communityToLoad` global state variables are updated (to `true` and `providedCommunityScope`, respectively). `selectChain()` is fired, receiving new scope's chain as argument; on completion, the `isLoading` state variable is set to `false`.
+        5. If none of these conditions apply, the routed-to page is rendered.
 9. If `selectChain()` (`/helpers/chain.ts`) is fired, per step #8:
     1. If no `chain` argument is passed, the function defaults to a `chain` value set my `app.user.selectedChain`, or else 'edgeware'.
     2. If we do not need to initialize a new chain (i.e. the chain we are switching to has already been initialized and selected), exit the function immediately.

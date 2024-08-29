@@ -34,11 +34,11 @@ export default defineConfig(({ mode }) => {
   const featureFlags = {
     'process.env.FLAG_CONTEST': JSON.stringify(env.FLAG_CONTEST),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
-    'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
-      env.FLAG_KNOCK_INTEGRATION_ENABLED,
-    ),
     'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
       env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
+    ),
+    'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
+      env.FLAG_FARCASTER_CONTEST,
     ),
   };
 

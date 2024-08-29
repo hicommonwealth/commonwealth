@@ -95,6 +95,7 @@ export async function getActivityFeed(models: DB, id = 0) {
         RTS.activity_rank_date DESC NULLS LAST;
   `;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const threads: any = await models.sequelize.query(query, {
     type: QueryTypes.SELECT,
     raw: true,
@@ -125,6 +126,7 @@ export class GlobalActivityCache {
 
   public async start() {
     await this.refreshGlobalActivity();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(this.refreshGlobalActivity.bind(this), this._cacheTTL * 1000);
   }
 

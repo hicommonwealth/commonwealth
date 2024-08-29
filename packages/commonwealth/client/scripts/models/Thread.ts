@@ -77,11 +77,11 @@ function processVersionHistory(versionHistory: any[]) {
           typeof history.author === 'string'
             ? JSON.parse(history.author)
             : typeof history.author === 'object'
-            ? history.author
-            : null;
+              ? history.author
+              : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
-        console.log(e);
+        console.log(e, versionHistory);
       }
       return history;
     });
@@ -137,7 +137,7 @@ function processAssociatedReactions(
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
         updated_at: tempReactionTimestamps[i],
-        voting_weight: tempReactionWeights[i] || 1,
+        voting_weight: tempReactionWeights[i] || 0,
         reactedProfileName: emptyStringToNull(reactedProfileName?.[i]),
         reactedProfileAvatarUrl: emptyStringToNull(
           reactedProfileAvatarUrl?.[i],
@@ -431,8 +431,8 @@ export class Thread implements IUniqueId {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-      ? this.versionHistory[0].timestamp
-      : null;
+        ? this.versionHistory[0].timestamp
+        : null;
     // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
@@ -487,6 +487,7 @@ export class Thread implements IUniqueId {
               },
             },
           },
+          Thread: undefined,
           discord_meta: rc?.discord_meta,
           marked_as_spam_at: rc?.marked_as_spam_at,
           deleted_at: rc?.deleted_at,

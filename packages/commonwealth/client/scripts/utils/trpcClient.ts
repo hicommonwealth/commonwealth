@@ -1,18 +1,20 @@
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
-import type { ApiV1 } from '../../../server/api/index';
+import type { API } from '../../../server/api/internal-router';
 import { userStore } from '../state/ui/user';
 
-export const trpc = createTRPCReact<ApiV1>();
+export const trpc = createTRPCReact<API>();
+
+export const BASE_API_PATH = '/api/internal/trpc';
 
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: '/api/v1',
+      url: BASE_API_PATH,
       async headers() {
         return {
           authorization: userStore.getState().jwt || '',
-          address_id: userStore.getState().activeAccount?.address,
+          address: userStore.getState().activeAccount?.address,
         };
       },
     }),

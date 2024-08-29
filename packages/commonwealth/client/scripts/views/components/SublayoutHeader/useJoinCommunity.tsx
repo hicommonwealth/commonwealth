@@ -35,8 +35,7 @@ const useJoinCommunity = () => {
     }
 
     // add all items on same base as active chain
-    const addressChainInfo = app.config.chains.getById(a.community.id);
-    if (addressChainInfo?.base !== activeBase) {
+    if (a?.community?.base !== activeBase) {
       return false;
     }
 
@@ -44,8 +43,7 @@ const useJoinCommunity = () => {
     const addressExists = !!user.addresses.slice(idx + 1).find(
       (prev) =>
         activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.community.id)?.base ===
-        ChainBase.Substrate
+        (prev.community?.base === ChainBase.Substrate
           ? addressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -91,34 +89,52 @@ const useJoinCommunity = () => {
   // Handles linking the specified address to the specified community
   const linkSpecificAddressToSpecificCommunity = async ({
     address,
-    communityId,
-    communityChainBase,
+    community,
     activeChainId,
   }: {
     address: string;
-    communityId: string;
-    communityChainBase: string;
+    community: {
+      id: string;
+      name: string;
+      iconUrl: string;
+      base: string;
+    };
     activeChainId?: string;
   }) => {
     try {
       const res = await linkExistingAddressToChainOrCommunity(
         address,
-        communityId,
-        communityChainBase,
+        community.id,
+        community.base,
       );
 
       if (res && res.data.result) {
         const { verification_token, addresses, encodedAddress } =
           res.data.result;
 
-        // update addresses
+        // update addresses and user communities
         user.setData({
+          ...(!user.communities.find((c) => c.id === community.id) && {
+            communities: [
+              ...user.communities,
+              {
+                id: community.id,
+                iconUrl: activeChainInfo.iconUrl || '',
+                name: activeChainInfo.name || '',
+                isStarred: false,
+              },
+            ],
+          }),
           addresses: addresses.map((a) => {
             return new AddressInfo({
               userId: user.id,
               id: a.id,
               address: a.address,
-              communityId: a.community_id,
+              community: {
+                id: a.community_id,
+                base: a.Community?.base,
+                ss58Prefix: a.Community?.ss58_prefix,
+              },
               walletId: a.wallet_id,
             });
           }),
@@ -165,8 +181,12 @@ const useJoinCommunity = () => {
 
         await linkSpecificAddressToSpecificCommunity({
           address,
-          communityId: targetCommunity,
-          communityChainBase: originAddressInfo.community.id,
+          community: {
+            id: targetCommunity,
+            name: activeChainInfo.name,
+            base: activeChainInfo.base,
+            iconUrl: activeChainInfo.iconUrl || '',
+          },
           activeChainId: activeCommunityId,
         });
 

@@ -3,7 +3,7 @@ import assert from 'assert';
 
 import {
   CANVAS_TOPIC,
-  NotificationCategories,
+  addressSwapper,
   getSessionSignerForAddress,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
@@ -25,9 +25,25 @@ const verifySessionSignature = async (
   user_id: number | undefined | null,
   session: Session,
 ): Promise<void> => {
-  const expectedAddress = addressModel.address;
+  const storedAddress = addressModel.address;
 
-  const walletAddress = session.address.split(':')[2];
+  // Re-encode BOTH address if needed for substrate verification, to ensure matching
+  //  between stored address (re-encoded based on community joined at creation time)
+  //  and address provided directly from wallet.
+  const expectedAddress = addressModel.Community?.ss58_prefix
+    ? addressSwapper({
+        address: storedAddress,
+        currentPrefix: 42,
+      })
+    : addressModel.address;
+
+  const sessionRawAddress = session.address.split(':')[2];
+  const walletAddress = addressModel.Community?.ss58_prefix
+    ? addressSwapper({
+        address: sessionRawAddress,
+        currentPrefix: 42,
+      })
+    : sessionRawAddress;
   assert(
     walletAddress === expectedAddress,
     `session.address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
@@ -75,16 +91,6 @@ const verifySessionSignature = async (
           return userEntity;
         });
         if (!user || !user.id) throw new Error('Failed to create user');
-        await models.Subscription.create({
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewMention,
-          is_active: true,
-        });
-        await models.Subscription.create({
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewCollaboration,
-          is_active: true,
-        });
         addressModel.user_id = user!.id;
       }
     }

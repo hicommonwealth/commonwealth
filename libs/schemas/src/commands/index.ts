@@ -11,3 +11,4 @@ export * from './thread.schemas';
 export * from './todo.schemas';
 export * from './user.schemas';
 export * from './wallet.schemas';
+export * from './webhook.schemas';

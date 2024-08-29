@@ -1,9 +1,9 @@
 import {
   Comment,
+  PG_INT,
   Reaction,
   SubscriptionPreference,
   Thread,
-  zDate,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import {
@@ -23,9 +23,16 @@ export const ThreadCreated = Thread.extend({
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.extend({
+  community_id: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
-export const CommentCreated = Comment;
+export const CommentCreated = Comment.extend({
+  community_id: z.string(),
+  users_mentioned: z
+    .array(PG_INT)
+    .optional()
+    .describe('An array of user ids that are mentioned in the comment'),
+});
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
@@ -200,8 +207,8 @@ const ContestManagerEvent = EventMetadata.extend({
 });
 
 export const ContestStarted = ContestManagerEvent.extend({
-  start_time: zDate.describe('Contest start time'),
-  end_time: zDate.describe('Contest end time'),
+  start_time: z.coerce.date().describe('Contest start time'),
+  end_time: z.coerce.date().describe('Contest end time'),
   contest_id: z.number().int().gte(1).describe('Recurring contest id'),
 }).describe('When a contest instance gets started');
 
@@ -229,4 +236,4 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   mobile_push_admin_alerts_enabled: true,
   created_at: true,
   updated_at: true,
-}).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
+}).merge(SubscriptionPreference.pick({ user_id: true }));

@@ -3,8 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import AddressInfo from 'models/AddressInfo';
 import moment from 'moment';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { z } from 'zod';
 import useUserStore, { userStore } from '../../ui/user';
 
@@ -27,7 +26,7 @@ const fetchProfileById = async ({
 > => {
   const response = await axios.get<{
     result: z.infer<typeof GetNewProfileResp>;
-  }>(`${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ID}`, {
+  }>(`${SERVER_URL}${ApiEndpoints.FETCH_PROFILES_BY_ID}`, {
     params: {
       ...(userId
         ? { userId }
@@ -43,9 +42,13 @@ const fetchProfileById = async ({
         userId: userStore.getState().id,
         id: a.id!,
         address: a.address,
-        communityId: a.community_id!,
-        walletId: a.wallet_id,
-        walletSsoSource: a.wallet_sso_source,
+        community: {
+          id: a.community_id!,
+          base: a.Community.base,
+          ss58Prefix: a.Community.ss58_prefix || undefined,
+        },
+        walletId: a.wallet_id!,
+        walletSsoSource: a.wallet_sso_source!,
         ghostAddress: a.ghost_address,
       });
     } catch (err) {
@@ -89,12 +92,16 @@ const useFetchProfileByIdQuery = ({
               new AddressInfo({
                 userId: user.id,
                 id: a.id!,
-                walletId: a?.wallet_id,
-                communityId: a.community_id!,
+                walletId: a.wallet_id!,
+                community: {
+                  id: a.community_id!,
+                  base: a.Community.base,
+                  ss58Prefix: a.Community.ss58_prefix || undefined,
+                },
                 address: a?.address,
                 ghostAddress: a?.ghost_address,
                 lastActive: a.last_active ? moment(a.last_active) : undefined,
-                walletSsoSource: a?.wallet_sso_source,
+                walletSsoSource: a.wallet_sso_source!,
               }),
           ),
         });

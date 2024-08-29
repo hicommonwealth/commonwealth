@@ -313,7 +313,6 @@ test.describe('Community proposals page', () => {
     const proposalsPageUrl = `http://localhost:8080/${chain}/proposals`;
 
     test('Proposal fetch fails', async ({ page }) => {
-      // @ts-expect-error StrictNullChecks
       await models.ChainNode.update(
         { alt_wallet_url: null, cosmos_gov_version: null },
         { where: { cosmos_chain_id: 'qwoyn' } },

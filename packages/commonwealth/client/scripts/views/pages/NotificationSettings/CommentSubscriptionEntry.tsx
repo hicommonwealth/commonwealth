@@ -3,11 +3,9 @@ import { getThreadUrl, safeTruncateBody } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
-import { useCommonNavigate } from 'navigation/helpers';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
-import { getCommunityUrl } from 'utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -31,16 +29,6 @@ export const CommentSubscriptionEntry = (
   const deleteCommentSubscriptionMutation =
     useDeleteCommentSubscriptionMutation();
 
-  const threadUrl = getThreadUrl(
-    {
-      chain: thread.community_id,
-      id: comment.id!,
-      title: thread.title,
-    },
-    comment_id,
-    true,
-  );
-
   const handleDeleteSubscription = useCallback(() => {
     async function doAsync() {
       await deleteCommentSubscriptionMutation.mutateAsync({
@@ -59,8 +47,32 @@ export const CommentSubscriptionEntry = (
 
   const navigate = useCommonNavigate();
 
+  if (!thread) {
+    return;
+  }
+
   const handleNavigateToThread = () => {
+    const threadUrl = getThreadUrl(
+      {
+        chain: `${thread.community_id}`,
+        id: `${thread.id}`,
+        title: decodeURIComponent(thread.title),
+      },
+      comment_id,
+      true,
+    );
+
     navigate(threadUrl);
+  };
+
+  const handleNavigateToCommunity = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    navigateToCommunity({
+      navigate,
+      path: '/',
+      chain: thread.Community.id!,
+    });
   };
 
   return (
@@ -69,16 +81,16 @@ export const CommentSubscriptionEntry = (
         <div>
           <CWCommunityAvatar
             community={{
-              iconUrl: thread.Community.icon_url!,
-              name: thread.Community.name,
+              iconUrl: thread.Community.icon_url || '',
+              name: thread.Community.name || '',
             }}
             size="small"
           />
         </div>
         <div>
-          <Link to={getCommunityUrl(thread.Community.name)}>
+          <a onClick={handleNavigateToCommunity}>
             <CWText fontWeight="semiBold">{thread.Community.name}</CWText>
-          </Link>
+          </a>
         </div>
 
         <div>•</div>
@@ -96,17 +108,11 @@ export const CommentSubscriptionEntry = (
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <Link to={threadUrl}>
-            <QuillRenderer
-              doc={safeTruncateBody(decodeURI(comment.text))}
-              cutoffLines={4}
-              customShowMoreButton={
-                <CWText type="b1" className="show-more-btn">
-                  Show more
-                </CWText>
-              }
-            />
-          </Link>
+          <QuillRenderer
+            doc={safeTruncateBody(decodeURI(comment.text))}
+            cutoffLines={4}
+            customShowMoreButton={<></>}
+          />
         </CWText>
       </div>
 

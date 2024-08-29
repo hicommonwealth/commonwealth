@@ -1,11 +1,9 @@
-import axios from 'axios';
-import React, { useEffect } from 'react';
-import app, { initAppState } from 'state';
+import { useEffect, useState } from 'react';
+import { initAppState } from 'state';
 import useGroupMutationBannerStore from '../state/ui/group';
 
 const useInitApp = () => {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [customDomain, setCustomDomain] = React.useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const { readFromStorageAndSetGatingGroupBannerForCommunities } =
     useGroupMutationBannerStore();
 
@@ -13,21 +11,12 @@ const useInitApp = () => {
     // read localstorage and set informational banner for gated communities on the members page group section
     readFromStorageAndSetGatingGroupBannerForCommunities();
 
-    Promise.all([axios.get(`${app.serverUrl()}/domain`), initAppState()])
-      .then(([domainResp]) => {
-        const serverCustomDomain = domainResp.data.customDomain;
-        if (serverCustomDomain) {
-          app.setCustomDomain(serverCustomDomain);
-        }
-        setCustomDomain(serverCustomDomain);
-        return Promise.resolve(serverCustomDomain);
-      })
-      .catch((err) => console.log('Failed fetching custom domain', err))
+    initAppState()
+      .catch((err) => console.log('App initialization failed', err))
       .finally(() => setIsLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [readFromStorageAndSetGatingGroupBannerForCommunities]);
 
-  return { isLoading, customDomain };
+  return { isLoading };
 };
 
 export default useInitApp;

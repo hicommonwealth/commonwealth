@@ -1,14 +1,14 @@
 import { z } from 'zod';
-import { discordMetaSchema, linksSchema, PG_INT, zDate } from '../utils';
+import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const Thread = z.object({
-  Address: Address.nullish(),
+  id: PG_INT.optional(),
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
   stage: z.string(),
-  id: PG_INT.nullish(),
   body: z.string().nullish(),
   plaintext: z.string().nullish(),
   url: z.string().nullish(),
@@ -26,28 +26,32 @@ export const Thread = z.object({
   canvas_signed_data: z.string().nullish(),
   canvas_hash: z.string().nullish(),
 
-  created_at: zDate.nullish(),
-  updated_at: zDate.nullish(),
-  last_edited: zDate.nullish(),
-  deleted_at: zDate.nullish(),
-  last_commented_on: zDate.nullish(),
-  marked_as_spam_at: zDate.nullish(),
-  archived_at: zDate.nullish(),
-  locked_at: zDate.nullish(),
-  discord_meta: z.object(discordMetaSchema).nullish(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  last_edited: z.coerce.date().nullish(),
+  deleted_at: z.coerce.date().nullish(),
+  last_commented_on: z.coerce.date().nullish(),
+  marked_as_spam_at: z.coerce.date().nullish(),
+  archived_at: z.coerce.date().nullish(),
+  locked_at: z.coerce.date().nullish(),
+  discord_meta: DiscordMetaSchema.nullish(),
 
   //counts
   reaction_count: PG_INT,
   reaction_weights_sum: PG_INT,
   comment_count: PG_INT,
 
-  activity_rank_date: zDate.nullish(),
+  activity_rank_date: z.coerce.date().nullish(),
 
   //notifications
   max_notif_id: PG_INT,
 
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
+
+  // associations
+  Address: Address.nullish(),
+  topic: Topic.nullish(),
 });
 
 export const ThreadVersionHistory = z.object({

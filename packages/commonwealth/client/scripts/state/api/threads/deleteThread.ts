@@ -3,12 +3,11 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { userStore } from '../../ui/user';
 import { removeThreadFromAllCaches } from './helpers/cache';
-import { updateCommunityThreadCount } from './helpers/counts';
 
 interface DeleteThreadProps {
   communityId: string;
@@ -25,7 +24,7 @@ const deleteThread = async ({
     thread_id: threadId,
   });
 
-  return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
+  return await axios.delete(`${SERVER_URL}/threads/${threadId}`, {
     data: {
       author_community_id: communityId,
       community_id: communityId,
@@ -64,9 +63,6 @@ const useDeleteThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
-
-      // decrement communities thread count
-      if (communityId) updateCommunityThreadCount(communityId, 'decrement');
 
       return response.data;
     },

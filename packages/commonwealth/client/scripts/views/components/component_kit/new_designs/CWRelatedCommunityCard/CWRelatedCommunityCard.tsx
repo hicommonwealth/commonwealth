@@ -1,12 +1,13 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import type ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
+import { z } from 'zod';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -23,7 +24,7 @@ import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
-  community: ChainInfo;
+  community: z.infer<typeof ExtendedCommunity>;
   memberCount: string | number;
   threadCount: string | number;
   canBuyStake?: boolean;
@@ -44,11 +45,11 @@ export const CWRelatedCommunityCard = ({
   onlyShowIfStakeEnabled,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
   const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
-    community: community,
+    community,
     // @ts-expect-error <StrictNullChecks/>
     ethUsdRate,
     stakeId: 2,
@@ -71,6 +72,9 @@ export const CWRelatedCommunityCard = ({
         event: MixpanelClickthroughEvent.DIRECTORY_TO_COMMUNITY_PAGE,
         isPWA: isAddedToHomeScreen,
       });
+
+      if (!community.id) return;
+
       if (isCommandClick(e)) {
         window.open(`/${community.id}`, '_blank');
         return;
@@ -83,10 +87,22 @@ export const CWRelatedCommunityCard = ({
   const handleBuyStakeClick = () => {
     onStakeBtnClick?.();
     setModeOfManageCommunityStakeModal('buy');
-    setSelectedCommunity(community);
+    if (community.id && community.namespace && community.ChainNode) {
+      setSelectedCommunity({
+        id: community.id,
+        name: community.name,
+        base: community.base,
+        namespace: community.namespace,
+        iconUrl: community.icon_url || '',
+        ChainNode: {
+          url: community.ChainNode.url || '',
+          ethChainId: community.ChainNode.eth_chain_id || 0,
+        },
+      });
+    }
   };
 
-  const disableStakeButton = !isLoggedIn || !canBuyStake;
+  const disableStakeButton = !user.isLoggedIn || !canBuyStake;
 
   const stakeButton = (
     <CWButton
@@ -115,7 +131,13 @@ export const CWRelatedCommunityCard = ({
           <div className="community-info">
             <div className="header">
               <div className="community-name">
-                <CWCommunityAvatar community={community} size="large" />
+                <CWCommunityAvatar
+                  community={{
+                    iconUrl: community.icon_url || '',
+                    name: community.name,
+                  }}
+                  size="large"
+                />
                 <CWText type="h5" title={community.name} fontWeight="medium">
                   {community.name}
                 </CWText>
@@ -179,7 +201,7 @@ export const CWRelatedCommunityCard = ({
               <CWTooltip
                 placement="right"
                 content={disabledStakeButtonTooltipText({
-                  isLoggedIn: isLoggedIn,
+                  isLoggedIn: user.isLoggedIn,
                   connectBaseChainToBuy: community.base,
                 })}
                 renderTrigger={(handleInteraction) => (

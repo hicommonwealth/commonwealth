@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 import 'components/Profile/ProfileHeader.scss';
 
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { DEFAULT_NAME, renderQuillDeltaToText } from '@hicommonwealth/shared';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { renderQuillDeltaToText } from '../../../../../shared/utils';
 import type NewProfile from '../../../models/NewProfile';
 import { CWText } from '../component_kit/cw_text';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
@@ -20,12 +19,12 @@ type ProfileHeaderProps = {
 
 const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   if (!profile) return;
   const { bio, name } = profile;
 
-  const isCurrentUser = isLoggedIn && isOwner;
+  const isCurrentUser = user.isLoggedIn && isOwner;
   const hasBio = () => {
     try {
       if (!bio || bio.trim().length === 0) return false;

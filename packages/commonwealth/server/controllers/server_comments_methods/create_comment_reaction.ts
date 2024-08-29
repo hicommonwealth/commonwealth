@@ -6,14 +6,14 @@ import {
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/shared';
+import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommentsController } from '../server_comments_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -23,22 +23,19 @@ const Errors = {
   BalanceCheckFailed: 'Could not verify user token balance',
   FailedCreateReaction: 'Failed to create reaction',
   CommunityNotFound: 'Community not found',
+  MustHaveStake: 'Must have stake to upvote',
 };
 
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  reaction: string;
+  reaction: 'like';
   commentId: number;
   canvasSignedData?: string;
   canvasHash?: string;
 };
 
-export type CreateCommentReactionResult = [
-  ReactionAttributes,
-  EmitOptions[],
-  TrackOptions[],
-];
+export type CreateCommentReactionResult = [ReactionAttributes, TrackOptions[]];
 
 export async function __createCommentReaction(
   this: ServerCommentsController,
@@ -68,19 +65,12 @@ export async function __createCommentReaction(
     throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
-  // check address ban
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check balance (bypass for admin)
   const addressAdminRoles = await findAllRoles(
     this.models,
-    { where: { address_id: address.id } },
+    { where: { address_id: address.id! } },
     thread.community_id,
     ['admin'],
   );
@@ -122,19 +112,31 @@ export async function __createCommentReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
+
+      if (!community.chain_node_id) {
+        throw new ServerError(`Invalid chain node`);
+      }
       const node = await this.models.ChainNode.findByPk(
-        community.chain_node_id,
+        community.chain_node_id!,
       );
+
+      if (!node || !node.eth_chain_id) {
+        throw new ServerError(`Invalid chain node ${node ? node.id : ''}`);
+      }
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
           community.namespace_address!,
           stake.stake_id,
-          // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
         );
+      const stakeBalance = stakeBalances[address.address];
+      if (BigNumber.from(stakeBalance).lte(0)) {
+        // stake is enabled but user has no stake
+        throw new AppError(Errors.MustHaveStake);
+      }
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalances[address.address],
+        stakeBalance,
         voteWeight,
       );
     }
@@ -144,12 +146,10 @@ export async function __createCommentReaction(
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: thread.community_id,
     comment_id: comment.id!,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
     canvas_hash: canvasHash,
     canvas_signed_data: canvasSignedData,
@@ -159,29 +159,6 @@ export async function __createCommentReaction(
     where: reactionWhere,
     // @ts-expect-error StrictNullChecks
     defaults: reactionData,
-  });
-  // build notification options
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.NewReaction,
-      data: {
-        created_at: new Date(),
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread.id,
-        // @ts-expect-error StrictNullChecks
-        comment_id: comment.id,
-        comment_text: comment.text,
-        root_title: thread.title,
-        // @ts-expect-error StrictNullChecks
-        root_type: null, // What is this for?
-        community_id: thread.community_id,
-        author_address: address.address,
-        author_community_id: address.community_id!,
-      },
-    },
-    excludeAddresses: [address.address],
   });
 
   // build analytics options
@@ -202,9 +179,5 @@ export async function __createCommentReaction(
     Address: address,
   };
 
-  return [
-    finalReactionWithAddress,
-    allNotificationOptions,
-    allAnalyticsOptions,
-  ];
+  return [finalReactionWithAddress, allAnalyticsOptions];
 }

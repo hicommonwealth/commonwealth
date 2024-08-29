@@ -29,7 +29,9 @@ describe('Comment subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node!.id!,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
@@ -39,7 +41,7 @@ describe('Comment subscription lifecycle', () => {
     });
 
     const [thread] = await seed('Thread', {
-      address_id: community?.Addresses?.at(0)?.id,
+      address_id: community!.Addresses!.at(0)!.id!,
       community_id: community?.id,
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
@@ -49,17 +51,15 @@ describe('Comment subscription lifecycle', () => {
 
     [commentOne] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
-      community_id: community?.id,
       thread_id: thread!.id!,
     });
     [commentTwo] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
-      community_id: community?.id,
       thread_id: thread!.id!,
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: undefined,
+      address: undefined,
     };
   });
 
