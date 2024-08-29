@@ -36,3 +36,8 @@ Now, try sending an action from the CLI:
 creating a session
 sending thread([object Object])
 ```
+
+This will *not* currently push new interactions to Commonwealth. Once
+the API handlers are complete in the other direction (this is part of the
+API refactor), then interactions sent from the command line will also
+appear in the forum.
