@@ -4,15 +4,12 @@ import {
   parseEvmEvent,
   type Command,
 } from '@hicommonwealth/core';
-import {
-  config,
-  emitEvent,
-  equalEvmAddresses,
-  models,
-} from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol as cp } from '@hicommonwealth/shared';
 import { Hmac, createHmac } from 'crypto';
+import { config } from '../config';
+import { models } from '../database';
+import { emitEvent, equalEvmAddresses } from '../utils/utils';
 
 // TODO: how do we handle chain re-orgs
 //  Alchemy re-emits logs with `removed: true` -> modify event handlers to rollback changes if `removed: true`.
