@@ -9,7 +9,10 @@ import {
 } from '@hicommonwealth/core';
 import { Knock, Schedule } from '@knocklabs/node';
 import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
+import _ from 'lodash';
 import { config } from '../config';
+
+const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 
 const log = logger(import.meta);
 
@@ -78,14 +81,21 @@ export function KnockProvider(): NotificationsProvider {
         return true;
       }
 
-      const runId = await knock.workflows.trigger(options.key, {
-        recipients: options.users,
-        data: options.data,
-        // TODO: disabled pending Knock support - UPDATE: PR merged in Knock SDK repo but await new release
-        // actor: options.actor,
+      const recipientChunks = _.chunk(
+        options.users,
+        MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER,
+      );
+      const triggerPromises = recipientChunks.map((chunk) => {
+        return knock.workflows.trigger(options.key, {
+          recipients: chunk,
+          data: options.data,
+          // TODO: disabled pending Knock support - UPDATE: PR merged in Knock SDK repo but await new release
+          // actor: options.actor,
+        });
       });
 
-      return !!runId;
+      await Promise.all(triggerPromises);
+      return true;
     },
     async getMessages(
       options: NotificationsProviderGetMessagesOptions,
