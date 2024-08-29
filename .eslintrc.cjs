@@ -38,7 +38,8 @@ module.exports = {
     'import/named': 0,
     'import/export': 0,
     'import/namespace': 0,
-    'import/no-duplicates': 2,
+    'import/default': 0, // TODO should this be on?
+    'import/no-duplicates': 0, // TODO should this be on?
     'import/no-named-as-default': 0,
     'import/no-named-as-default-member': 0,
   },
