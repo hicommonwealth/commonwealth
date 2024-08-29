@@ -3,10 +3,14 @@ import React, { useState } from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import TokenBanner from 'views/components/TokenBanner';
+
 import { CreateTopicStep } from '../utils';
+
 import './WVDetails.scss';
 
 interface WVConsentProps {
@@ -16,7 +20,18 @@ interface WVConsentProps {
 const WVDetails = ({ onStepChange }: WVConsentProps) => {
   const navigate = useCommonNavigate();
   const [multiplier, setMultiplier] = useState(1);
+  const [token, setToken] = useState('');
+
   const options = [{ label: 'BASE', value: 1 }];
+
+  const validationFn = (value: string): [ValidationStatus, string] | [] => {
+    // TODO: proper validation will be done in upcoming PR
+    if (value.length > 3) {
+      return ['failure', 'You must enter a valid token address'];
+    }
+
+    return ['success', 'Token found!'];
+  };
 
   return (
     <div className="WVDetails">
@@ -47,7 +62,23 @@ const WVDetails = ({ onStepChange }: WVConsentProps) => {
         Any token features such as voting or tipping require your community to
         connect a primary token.
       </CWText>
-      <CWTextInput fullWidth placeholder="Please enter primary token" />
+      <CWTextInput
+        containerClassName="token-input"
+        fullWidth
+        placeholder="Please enter primary token"
+        value={token}
+        onInput={(e) => setToken(e.target.value)}
+        inputValidationFn={validationFn}
+        label="Token"
+      />
+
+      <TokenBanner
+        avatarUrl="https://avatar.iran.liara.run/public/39"
+        name="Ethereum"
+        ticker="ETH"
+        value={23.2}
+        change={2.4}
+      />
 
       <CWText type="h5">Vote weight multiplier</CWText>
 

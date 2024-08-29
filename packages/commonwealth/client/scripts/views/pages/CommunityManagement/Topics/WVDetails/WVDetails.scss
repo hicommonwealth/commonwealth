@@ -11,6 +11,12 @@
     margin-top: -8px;
   }
 
+  .token-input {
+    .MessageRow:first-child {
+      display: none;
+    }
+  }
+
   .input-row {
     display: flex;
     align-items: baseline;
