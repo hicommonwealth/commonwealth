@@ -35,10 +35,7 @@ import verifyAddress from '../routes/verifyAddress';
 import viewComments from '../routes/viewComments';
 import viewCount from '../routes/viewCount';
 
-import clearNotifications from '../routes/clearNotifications';
-import clearReadNotifications from '../routes/clearReadNotifications';
 import getProfileNew from '../routes/getNewProfile';
-import markNotificationsRead from '../routes/markNotificationsRead';
 import setDefaultRole from '../routes/setDefaultRole';
 import createSubscription from '../routes/subscription/createSubscription';
 import deleteSubscription from '../routes/subscription/deleteSubscription';
@@ -51,9 +48,6 @@ import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
-import viewNotifications, {
-  RouteNotificationCategories,
-} from '../routes/viewNotifications';
 import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
@@ -776,29 +770,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/viewDiscussionNotifications',
-    passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(
-      this,
-      models,
-      RouteNotificationCategories.Discussion,
-    ),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/viewChainEventNotifications',
-    passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(
-      this,
-      models,
-      RouteNotificationCategories.ChainEvents,
-    ),
-  );
-
-  registerRoute(
-    router,
-    'post',
     '/viewUserActivity',
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models),
@@ -810,27 +781,6 @@ function setupRouter(
     viewGlobalActivity.bind(this, models, globalActivityCache),
   );
 
-  registerRoute(
-    router,
-    'post',
-    '/markNotificationsRead',
-    passport.authenticate('jwt', { session: false }),
-    markNotificationsRead.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/clearReadNotifications',
-    passport.authenticate('jwt', { session: false }),
-    clearReadNotifications.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/clearNotifications',
-    passport.authenticate('jwt', { session: false }),
-    clearNotifications.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
