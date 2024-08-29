@@ -2,7 +2,7 @@ import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import { AbstractSessionData, Session } from '@canvas-js/interfaces';
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { addressSwapper } from '@hicommonwealth/shared';
+import { addressSwapper } from '../utils';
 
 /**
  * In Canvas, the default behaviour is that a SessionSigner saves a session key in localStorage for
