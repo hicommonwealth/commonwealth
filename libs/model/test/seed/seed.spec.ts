@@ -137,7 +137,7 @@ describe('Seed functions', () => {
         ],
       });
 
-      const community = await testSeed('Community', {
+      await testSeed('Community', {
         id: 'superEth',
         network: ChainNetwork.Ethereum,
         default_symbol: 'SETH',
