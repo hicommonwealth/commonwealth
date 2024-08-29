@@ -37,8 +37,6 @@ import viewCount from '../routes/viewCount';
 
 import getProfileNew from '../routes/getNewProfile';
 import setDefaultRole from '../routes/setDefaultRole';
-import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
-import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
@@ -68,7 +66,6 @@ import getDiscordChannels from '../routes/discord/getDiscordChannels';
 import removeDiscordBotConfig from '../routes/discord/removeDiscordBotConfig';
 import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
-import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -742,20 +739,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/enableImmediateEmails',
-    passport.authenticate('jwt', { session: false }),
-    enableImmediateEmails.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/disableImmediateEmails',
-    passport.authenticate('jwt', { session: false }),
-    disableImmediateEmails.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -913,13 +896,6 @@ function setupRouter(
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/getSubscribedCommunities',
-    getSubscribedCommunities.bind(this, models),
   );
 
   // Group routes
