@@ -9,7 +9,6 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
-import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
@@ -56,7 +55,6 @@ export const Factories = {
   CommentSubscription,
   Community,
   CommunityAlert,
-  CommunityBanner,
   CommunityContract,
   CommunityStake,
   CommunityTags,

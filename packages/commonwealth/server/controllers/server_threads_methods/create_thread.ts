@@ -9,22 +9,20 @@ import {
   ThreadAttributes,
   UserInstance,
   config,
+  emitMentions,
+  parseUserMentions,
   sanitizeQuillText,
   tokenBalanceCache,
+  uniqueMentions,
 } from '@hicommonwealth/model';
 import {
   BalanceSourceType,
   NotificationCategories,
   ProposalType,
+  renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import {
-  emitMentions,
-  parseUserMentions,
-  uniqueMentions,
-} from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -106,14 +104,7 @@ export async function __createThread(
     throw new AppError(Errors.UnsupportedKind);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: community.id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check contest limits
   const activeContestManagers = await Contest.GetActiveContestManagers().body({

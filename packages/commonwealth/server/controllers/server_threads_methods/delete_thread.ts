@@ -49,16 +49,7 @@ export async function __deleteThread(
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
-  if (address) {
-    // check ban
-    const [canInteract, banError] = await this.banCache.checkBan({
-      communityId: thread.community_id,
-      address: address.address,
-    });
-    if (!canInteract) {
-      throw new AppError(`Ban error: ${banError}`);
-    }
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check ownership (bypass if admin)
   const isOwnerOrAdmin = await validateOwner({
