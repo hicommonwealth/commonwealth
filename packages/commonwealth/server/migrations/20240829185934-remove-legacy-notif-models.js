@@ -4,7 +4,10 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.dropTable('NotificationsRead', { transaction });
       await queryInterface.dropTable('Subscriptions', { transaction });
+      await queryInterface.dropTable('Notifications', { transaction });
+      await queryInterface.dropTable('NotificationCategories', { transaction });
 
       await queryInterface.removeColumn(
         'Communities',

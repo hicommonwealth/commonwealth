@@ -75,34 +75,19 @@ export async function __updateCommunityId(
     //  and then delete the old data once redirect from old to new community
     //  is enabled
     const models: ModelStatic<ModelInstance<{ community_id?: string }>>[] = [
-      // @ts-expect-error StrictNullChecks
       this.models.Address,
-      // @ts-expect-error StrictNullChecks
       this.models.Comment,
-      // @ts-expect-error StrictNullChecks
       this.models.Topic,
-      // @ts-expect-error StrictNullChecks
       this.models.Thread,
-      this.models.Notification,
-      // @ts-expect-error StrictNullChecks
       this.models.Poll,
-      // @ts-expect-error StrictNullChecks
       this.models.Reaction,
-      // @ts-expect-error StrictNullChecks
       this.models.StarredCommunity,
-      // @ts-expect-error StrictNullChecks
       this.models.Vote,
-      // @ts-expect-error StrictNullChecks
       this.models.Webhook,
-      // @ts-expect-error StrictNullChecks
       this.models.CommunityContract,
-      // @ts-expect-error StrictNullChecks
       this.models.CommunityStake,
-      // @ts-expect-error StrictNullChecks
       this.models.DiscordBotConfig,
-      // @ts-expect-error StrictNullChecks
       this.models.Group,
-      this.models.Subscription,
     ];
     for (const model of models) {
       await model.update(

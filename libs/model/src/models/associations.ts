@@ -57,7 +57,6 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Notification)
     .withMany(db.Webhook)
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
@@ -94,7 +93,6 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.Notification)
     .withMany(db.ThreadVersionHistory);
 
   db.Comment.withMany(db.Reaction, {
@@ -124,10 +122,6 @@ export const buildAssociations = (db: DB) => {
     asOne: 'poll',
     asMany: 'votes',
     onDelete: 'CASCADE',
-  });
-
-  db.NotificationCategory.withMany(db.Notification, {
-    foreignKey: 'category_id',
   });
 
   db.Group.withMany(db.GroupPermission);
