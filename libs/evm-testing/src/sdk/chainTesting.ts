@@ -1,7 +1,7 @@
+import { config } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { RegisteredSubscription } from 'web3-eth';
 import { AbiItem } from 'web3-utils';
-import { config } from '../config';
 import erc_1155_abi from '../utils/abi/erc1155';
 import erc_721_abi from '../utils/abi/erc721';
 import { advanceTime, mineBlocks } from '../utils/chainUtil';

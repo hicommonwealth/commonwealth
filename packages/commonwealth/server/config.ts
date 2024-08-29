@@ -1,6 +1,5 @@
 import { config as adapters_config } from '@hicommonwealth/adapters';
 import { configure } from '@hicommonwealth/core';
-import { config as evm_config } from '@hicommonwealth/evm-testing';
 import { config as model_config } from '@hicommonwealth/model';
 import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -51,7 +50,7 @@ const DEFAULTS = {
 };
 
 export const config = configure(
-  { ...model_config, ...adapters_config, ...evm_config },
+  { ...model_config, ...adapters_config },
   {
     SEND_EMAILS,
     NO_PRERENDER: NO_PRERENDER === 'true',

@@ -115,7 +115,6 @@ import { deleteCommentHandler } from '../routes/comments/delete_comment_handler'
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
-import { createCommunityHandler } from '../routes/communities/create_community_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
@@ -271,13 +270,6 @@ function setupRouter(
   );
 
   // communities
-  registerRoute(
-    router,
-    'post',
-    '/communities',
-    passport.authenticate('jwt', { session: false }),
-    createCommunityHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',
