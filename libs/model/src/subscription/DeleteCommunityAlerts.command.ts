@@ -1,3 +1,4 @@
+console.log('LOADING src/subscription/DeleteCommunityAlerts.command.ts START');
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -19,3 +20,5 @@ export function DeleteCommunityAlerts(): Command<
     },
   };
 }
+
+console.log('LOADING src/subscription/DeleteCommunityAlerts.command.ts END');

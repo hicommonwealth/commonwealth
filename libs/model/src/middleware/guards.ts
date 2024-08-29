@@ -1,3 +1,4 @@
+console.log('LOADING src/middleware/guards.ts START');
 import { InvalidState, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 
@@ -21,3 +22,5 @@ export const shouldExist = <T>(subject: string, state?: T | null) => {
   }
   return true;
 };
+
+console.log('LOADING src/middleware/guards.ts END');

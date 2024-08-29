@@ -1,3 +1,4 @@
+console.log('LOADING src/types/discord.ts START');
 export type ThreadDiscordActions =
   | 'thread-delete'
   | 'thread-title-update'
@@ -34,3 +35,5 @@ export interface IDiscordMeta {
   channel_id: string;
   message_id: string;
 }
+
+console.log('LOADING src/types/discord.ts END');

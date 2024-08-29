@@ -1,3 +1,4 @@
+console.log('LOADING src/models/email_update_token.ts START');
 import crypto from 'crypto';
 import Sequelize from 'sequelize';
 import type { ModelInstance } from './types';
@@ -62,3 +63,5 @@ export default (
 
   return EmailUpdateToken;
 };
+
+console.log('LOADING src/models/email_update_token.ts END');

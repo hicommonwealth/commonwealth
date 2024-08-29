@@ -1,3 +1,4 @@
+console.log('LOADING src/models/contract.ts START');
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type {
@@ -66,3 +67,5 @@ export default (
       updatedAt: 'updated_at',
     },
   );
+
+console.log('LOADING src/models/contract.ts END');

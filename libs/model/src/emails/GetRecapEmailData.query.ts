@@ -1,3 +1,4 @@
+console.log('LOADING src/emails/GetRecapEmailData.query.ts START');
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,
@@ -239,3 +240,5 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
     },
   };
 }
+
+console.log('LOADING src/emails/GetRecapEmailData.query.ts END');

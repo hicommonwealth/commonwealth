@@ -1,3 +1,4 @@
+console.log('LOADING src/community/GetMembers.query.ts START');
 import { InvalidState, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import _ from 'lodash';
@@ -308,3 +309,5 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
     },
   };
 }
+
+console.log('LOADING src/community/GetMembers.query.ts END');

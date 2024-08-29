@@ -1,3 +1,4 @@
+console.log('LOADING src/community/CreateCommunity.command.sample.ts START');
 import type { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -18,3 +19,5 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
     },
   };
 }
+
+console.log('LOADING src/community/CreateCommunity.command.sample.ts END');

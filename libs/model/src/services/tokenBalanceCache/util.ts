@@ -1,3 +1,4 @@
+console.log('LOADING src/services/tokenBalanceCache/util.ts START');
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { logger } from '@hicommonwealth/core';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
@@ -320,3 +321,5 @@ export async function getTendermintClient(
   );
   return await Tendermint34Client.create(batchClient);
 }
+
+console.log('LOADING src/services/tokenBalanceCache/util.ts END');

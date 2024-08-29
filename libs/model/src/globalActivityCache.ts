@@ -1,3 +1,4 @@
+console.log('LOADING src/globalActivityCache.ts START');
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -227,3 +228,5 @@ export class GlobalActivityCache {
     );
   }
 }
+
+console.log('LOADING src/globalActivityCache.ts END');

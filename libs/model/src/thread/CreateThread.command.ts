@@ -1,3 +1,4 @@
+console.log('LOADING src/thread/CreateThread.command.ts START');
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -17,3 +18,5 @@ export function CreateThread(): Command<typeof schemas.CreateTodo> {
     },
   };
 }
+
+console.log('LOADING src/thread/CreateThread.command.ts END');

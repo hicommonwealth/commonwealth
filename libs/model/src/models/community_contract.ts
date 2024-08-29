@@ -1,3 +1,4 @@
+console.log('LOADING src/models/community_contract.ts START');
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ContractAttributes, ContractInstance } from './contract';
@@ -41,3 +42,5 @@ export default (
       updatedAt: 'updated_at',
     },
   );
+
+console.log('LOADING src/models/community_contract.ts END');

@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/subscription/DeleteCommentSubscription.command.ts START',
+);
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -19,3 +22,7 @@ export function DeleteCommentSubscription(): Command<
     },
   };
 }
+
+console.log(
+  'LOADING src/subscription/DeleteCommentSubscription.command.ts END',
+);

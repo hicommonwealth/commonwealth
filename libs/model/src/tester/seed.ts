@@ -1,3 +1,4 @@
+console.log('LOADING src/tester/seed.ts START');
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
@@ -95,3 +96,5 @@ async function _seed(
   level === 0 && options.log && console.log(model.tableName, record);
   return record;
 }
+
+console.log('LOADING src/tester/seed.ts END');

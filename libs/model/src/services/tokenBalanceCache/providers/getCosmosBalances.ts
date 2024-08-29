@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/getCosmosBalances.ts START',
+);
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { logger } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
@@ -103,3 +106,7 @@ export async function getCosmosBalances(
 
   return { ...transformedFreshBalances, ...transformedCachedBalances };
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/getCosmosBalances.ts END',
+);

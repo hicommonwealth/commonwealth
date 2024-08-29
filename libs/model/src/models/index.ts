@@ -1,3 +1,4 @@
+console.log('LOADING src/models/index.ts START');
 import { Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
 import { Factories, type DB } from './factories';
@@ -83,3 +84,5 @@ export * from './types';
 export * from './user';
 export * from './vote';
 export * from './webhook';
+
+console.log('LOADING src/models/index.ts END');

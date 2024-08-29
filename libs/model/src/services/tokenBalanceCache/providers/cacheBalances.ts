@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/cacheBalances.ts START',
+);
 import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { config } from '../../../config';
@@ -87,3 +90,7 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
 function getAddressFromCacheKey(key: string): string {
   return key.substring(key.lastIndexOf('_') + 1);
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/cacheBalances.ts END',
+);

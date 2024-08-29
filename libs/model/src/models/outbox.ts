@@ -1,3 +1,4 @@
+console.log('LOADING src/models/outbox.ts START');
 import { EventContext, Events, Outbox } from '@hicommonwealth/core';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -58,3 +59,5 @@ export default (
   outbox.removeAttribute('id');
   return outbox;
 };
+
+console.log('LOADING src/models/outbox.ts END');

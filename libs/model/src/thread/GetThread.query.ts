@@ -1,3 +1,4 @@
+console.log('LOADING src/thread/GetThread.query.ts START');
 import { z } from 'zod';
 
 export const GetThreadsParamsSchema = z.object({
@@ -26,3 +27,5 @@ export const GetBulkThreadsParamsSchema = z.object({
 });
 
 export type GetThreadsParams = z.infer<typeof GetThreadsParamsSchema>;
+
+console.log('LOADING src/thread/GetThread.query.ts END');

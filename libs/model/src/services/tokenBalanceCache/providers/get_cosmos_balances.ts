@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_cosmos_balances.ts START',
+);
 import {
   BankExtension,
   Coin,
@@ -102,3 +105,7 @@ async function getCosmosNativeBalance(
     return {};
   }
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_cosmos_balances.ts END',
+);

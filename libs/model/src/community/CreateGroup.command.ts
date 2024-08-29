@@ -6,6 +6,8 @@ import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
+console.log('LOADING src/community/CreateGroup.command.ts START');
+
 export const MAX_GROUPS_PER_COMMUNITY = 20;
 export const Errors = {
   MaxGroups: 'Exceeded max number of groups',
@@ -90,3 +92,5 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
     },
   };
 }
+
+console.log('LOADING src/community/CreateGroup.command.ts END');

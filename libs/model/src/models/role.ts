@@ -1,3 +1,4 @@
+console.log('LOADING src/models/role.ts START');
 import { Role } from '@hicommonwealth/shared';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
@@ -19,3 +20,5 @@ export type RoleAttributes = {
   Address?: AddressAttributes;
   Community?: CommunityAttributes;
 };
+
+console.log('LOADING src/models/role.ts END');

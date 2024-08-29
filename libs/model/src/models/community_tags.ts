@@ -1,3 +1,4 @@
+console.log('LOADING src/models/community_tags.ts START');
 import Sequelize from 'sequelize';
 import type { ModelInstance } from './types';
 
@@ -40,3 +41,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       },
     },
   );
+
+console.log('LOADING src/models/community_tags.ts END');

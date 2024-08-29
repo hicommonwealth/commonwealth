@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/subscription/RegisterClientRegistrationToken.command.ts START',
+);
 import { notificationsProvider, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 
@@ -22,3 +25,7 @@ export function RegisterClientRegistrationToken(): Command<
     },
   };
 }
+
+console.log(
+  'LOADING src/subscription/RegisterClientRegistrationToken.command.ts END',
+);

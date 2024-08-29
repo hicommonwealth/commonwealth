@@ -1,3 +1,4 @@
+console.log('LOADING src/models/community_banner.ts START');
 import Sequelize from 'sequelize';
 import type { ModelInstance } from './types';
 
@@ -31,3 +32,5 @@ export default (
       timestamps: true,
     },
   );
+
+console.log('LOADING src/models/community_banner.ts END');

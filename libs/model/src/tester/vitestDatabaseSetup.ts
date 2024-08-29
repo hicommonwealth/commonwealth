@@ -1,3 +1,4 @@
+console.log('LOADING src/tester/vitestDatabaseSetup.ts START');
 import { config } from '../config';
 
 /**
@@ -36,3 +37,5 @@ export async function setup(): Promise<void> {
 }
 
 export default setup;
+
+console.log('LOADING src/tester/vitestDatabaseSetup.ts END');

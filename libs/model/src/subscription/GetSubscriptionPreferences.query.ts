@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/subscription/GetSubscriptionPreferences.query.ts START',
+);
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -23,3 +26,5 @@ export function GetSubscriptionPreferences(): Query<
     },
   };
 }
+
+console.log('LOADING src/subscription/GetSubscriptionPreferences.query.ts END');

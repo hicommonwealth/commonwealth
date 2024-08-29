@@ -1,3 +1,4 @@
+console.log('LOADING src/subscription/GetCommentSubscriptions.query.ts START');
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -20,3 +21,5 @@ export function GetCommentSubscriptions(): Query<
     },
   };
 }
+
+console.log('LOADING src/subscription/GetCommentSubscriptions.query.ts END');

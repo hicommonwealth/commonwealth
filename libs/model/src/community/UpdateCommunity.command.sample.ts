@@ -1,3 +1,4 @@
+console.log('LOADING src/community/UpdateCommunity.command.sample.ts START');
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -28,3 +29,5 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
     },
   };
 }
+
+console.log('LOADING src/community/UpdateCommunity.command.sample.ts END');

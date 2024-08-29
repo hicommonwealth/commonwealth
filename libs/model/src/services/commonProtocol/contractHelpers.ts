@@ -1,3 +1,4 @@
+console.log('LOADING src/services/commonProtocol/contractHelpers.ts START');
 import { AppError } from '@hicommonwealth/core';
 import {
   BalanceSourceType,
@@ -140,3 +141,5 @@ export const getTokenAttributes = async (
     decimals: parseInt(String(decimals)),
   };
 };
+
+console.log('LOADING src/services/commonProtocol/contractHelpers.ts END');

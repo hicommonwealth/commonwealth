@@ -1,3 +1,4 @@
+console.log('LOADING src/reaction/CreateReaction.command.ts START');
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -17,3 +18,5 @@ export function CreateReaction(): Command<typeof schemas.CreateTodo> {
     },
   };
 }
+
+console.log('LOADING src/reaction/CreateReaction.command.ts END');

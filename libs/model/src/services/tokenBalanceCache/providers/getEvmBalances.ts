@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/getEvmBalances.ts START',
+);
 import { logger } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
@@ -82,3 +85,7 @@ export async function getEvmBalances(
 
   return { ...freshBalances, ...cachedBalances };
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/getEvmBalances.ts END',
+);

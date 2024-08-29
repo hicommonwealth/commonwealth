@@ -1,3 +1,4 @@
+console.log('LOADING src/models/contest.ts START');
 import { Contest } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -40,3 +41,5 @@ export default (
       indexes: [{ fields: ['start_time'] }],
     },
   );
+
+console.log('LOADING src/models/contest.ts END');

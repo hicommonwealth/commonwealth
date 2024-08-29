@@ -1,3 +1,4 @@
+console.log('LOADING src/utils/utils.ts START');
 import { EventNames, events, logger } from '@hicommonwealth/core';
 import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
@@ -230,3 +231,5 @@ export function equalEvmAddresses(
 
   return normalizedAddress1 === normalizedAddress2;
 }
+
+console.log('LOADING src/utils/utils.ts END');

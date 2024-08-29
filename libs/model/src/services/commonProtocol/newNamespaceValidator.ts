@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/commonProtocol/newNamespaceValidator.ts START',
+);
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
@@ -95,3 +98,5 @@ export const validateNamespace = async (
 
   return activeNamespace;
 };
+
+console.log('LOADING src/services/commonProtocol/newNamespaceValidator.ts END');

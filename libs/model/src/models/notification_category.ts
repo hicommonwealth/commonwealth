@@ -1,3 +1,4 @@
+console.log('LOADING src/models/notification_category.ts START');
 import Sequelize from 'sequelize';
 import type { ModelInstance } from './types';
 
@@ -29,3 +30,5 @@ export default (
       updatedAt: 'updated_at',
     },
   );
+
+console.log('LOADING src/models/notification_category.ts END');

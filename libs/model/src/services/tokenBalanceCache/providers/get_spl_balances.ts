@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_spl_balances.ts START',
+);
 import { logger } from '@hicommonwealth/core';
 import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
@@ -100,3 +103,7 @@ async function getSingleSPLBalance(
     return '0';
   }
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_spl_balances.ts END',
+);

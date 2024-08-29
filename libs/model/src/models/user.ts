@@ -1,3 +1,4 @@
+console.log('LOADING src/models/user.ts START');
 import { User } from '@hicommonwealth/schemas';
 import type { CreateOptions } from 'sequelize';
 import Sequelize from 'sequelize';
@@ -124,3 +125,5 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
 
   return User;
 };
+
+console.log('LOADING src/models/user.ts END');

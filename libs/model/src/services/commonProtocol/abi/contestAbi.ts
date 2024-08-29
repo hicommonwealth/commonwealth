@@ -1,3 +1,4 @@
+console.log('LOADING src/services/commonProtocol/abi/contestAbi.ts START');
 export const contestABI = [
   {
     inputs: [
@@ -242,3 +243,5 @@ export const contestABI = [
     type: 'function',
   },
 ];
+
+console.log('LOADING src/services/commonProtocol/abi/contestAbi.ts END');

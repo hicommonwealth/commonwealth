@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/commonProtocol/communityStakeConfigValidator.ts START',
+);
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/shared';
 import Web3, { AbiFunctionFragment } from 'web3';
@@ -75,3 +78,7 @@ export const validateCommunityStakeConfig = async (
     return new AppError('Community Stake not configured');
   }
 };
+
+console.log(
+  'LOADING src/services/commonProtocol/communityStakeConfigValidator.ts END',
+);

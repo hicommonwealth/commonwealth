@@ -1,3 +1,4 @@
+console.log('LOADING src/models/lastProcessedEvmBlock.ts START');
 import Sequelize from 'sequelize';
 import { ModelInstance } from './types';
 
@@ -26,3 +27,5 @@ export default (
       tableName: 'LastProcessedEvmBlocks',
     },
   );
+
+console.log('LOADING src/models/lastProcessedEvmBlock.ts END');

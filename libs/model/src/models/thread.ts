@@ -1,3 +1,4 @@
+console.log('LOADING src/models/thread.ts START');
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
@@ -177,3 +178,5 @@ export default (
       },
     },
   );
+
+console.log('LOADING src/models/thread.ts END');

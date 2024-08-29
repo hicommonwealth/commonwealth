@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/contest/CreateContestManagerMetadata.command.ts START',
+);
 import type { Command } from '@hicommonwealth/core';
 import { InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
@@ -77,3 +80,5 @@ export function CreateContestManagerMetadata(): Command<
     },
   };
 }
+
+console.log('LOADING src/contest/CreateContestManagerMetadata.command.ts END');

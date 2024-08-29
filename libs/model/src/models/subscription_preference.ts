@@ -1,3 +1,4 @@
+console.log('LOADING src/models/subscription_preference.ts START');
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -63,3 +64,5 @@ export default (
       ],
     },
   );
+
+console.log('LOADING src/models/subscription_preference.ts END');

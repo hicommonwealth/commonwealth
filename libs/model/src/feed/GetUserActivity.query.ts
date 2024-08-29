@@ -1,3 +1,4 @@
+console.log('LOADING src/feed/GetUserActivity.query.ts START');
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -64,3 +65,5 @@ export function GetUserActivity(): Query<typeof schemas.ThreadFeed> {
     },
   };
 }
+
+console.log('LOADING src/feed/GetUserActivity.query.ts END');

@@ -1,3 +1,4 @@
+console.log('LOADING src/feed/GetChainActivity.query.ts START');
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
@@ -23,3 +24,5 @@ export function GetChainActivity(): Query<typeof schemas.ChainFeed> {
     },
   };
 }
+
+console.log('LOADING src/feed/GetChainActivity.query.ts END');

@@ -1,3 +1,4 @@
+console.log('LOADING src/models/notifications_read.ts START');
 import Sequelize from 'sequelize';
 import type { NotificationAttributes } from './notification';
 import type { SubscriptionAttributes } from './subscription';
@@ -37,3 +38,5 @@ export default (
       indexes: [{ fields: ['subscription_id'] }],
     },
   );
+
+console.log('LOADING src/models/notifications_read.ts END');

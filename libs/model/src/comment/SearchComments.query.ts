@@ -1,3 +1,4 @@
+console.log('LOADING src/comment/SearchComments.query.ts START');
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -105,3 +106,5 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     },
   };
 }
+
+console.log('LOADING src/comment/SearchComments.query.ts END');

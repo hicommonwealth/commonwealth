@@ -1,3 +1,4 @@
+console.log('LOADING src/models/contest_topic.ts START');
 import { ContestTopic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -24,3 +25,5 @@ export default (
       indexes: [],
     },
   );
+
+console.log('LOADING src/models/contest_topic.ts END');

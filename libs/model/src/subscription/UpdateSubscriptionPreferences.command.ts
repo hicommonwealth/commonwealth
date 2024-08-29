@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/subscription/UpdateSubscriptionPreferences.command.ts START',
+);
 import { EventNames, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
@@ -83,3 +86,7 @@ export function UpdateSubscriptionPreferences(): Command<
     },
   };
 }
+
+console.log(
+  'LOADING src/subscription/UpdateSubscriptionPreferences.command.ts END',
+);

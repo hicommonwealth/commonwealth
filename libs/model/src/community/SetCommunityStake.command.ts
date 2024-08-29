@@ -1,3 +1,4 @@
+console.log('LOADING src/community/SetCommunityStake.command.ts START');
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -56,3 +57,5 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
     },
   };
 }
+
+console.log('LOADING src/community/SetCommunityStake.command.ts END');

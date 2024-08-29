@@ -1,3 +1,4 @@
+console.log('LOADING src/models/role_assignment.ts START');
 import type { AddressAttributes } from './address';
 import type { CommunityRoleAttributes } from './community_role';
 
@@ -14,3 +15,5 @@ export type RoleAssignmentAttributes = {
   CommunityRole?: CommunityRoleAttributes;
   Address?: AddressAttributes;
 };
+
+console.log('LOADING src/models/role_assignment.ts END');

@@ -1,3 +1,4 @@
+console.log('LOADING src/models/address.ts START');
 import { Role, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { decrementProfileCount } from '../utils';
@@ -170,3 +171,5 @@ export default (
       },
     },
   );
+
+console.log('LOADING src/models/address.ts END');

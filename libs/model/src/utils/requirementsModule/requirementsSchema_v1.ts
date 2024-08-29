@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/utils/requirementsModule/requirementsSchema_v1.ts START',
+);
 export default {
   $schema: 'http://json-schema.org/draft-07/schema#',
   definitions: {
@@ -171,3 +174,7 @@ export default {
     },
   ],
 };
+
+console.log(
+  'LOADING src/utils/requirementsModule/requirementsSchema_v1.ts END',
+);

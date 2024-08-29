@@ -1,3 +1,4 @@
+console.log('LOADING src/models/community.ts START');
 import { Community } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -172,3 +173,5 @@ export default (
       indexes: [{ fields: ['include_in_digest_email'] }],
     },
   );
+
+console.log('LOADING src/models/community.ts END');

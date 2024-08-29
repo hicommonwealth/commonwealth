@@ -1,3 +1,4 @@
+console.log('LOADING src/tester/e2eSeeds.ts START');
 import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import type {
   AddressInstance,
@@ -371,3 +372,5 @@ export const e2eTestEntities = async function (
     throw e;
   }
 };
+
+console.log('LOADING src/tester/e2eSeeds.ts END');

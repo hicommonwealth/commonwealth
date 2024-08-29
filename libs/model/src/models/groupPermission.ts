@@ -1,3 +1,4 @@
+console.log('LOADING src/models/groupPermission.ts START');
 import { GroupPermission } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -35,3 +36,5 @@ export default (
       updatedAt: 'updated_at',
     },
   );
+
+console.log('LOADING src/models/groupPermission.ts END');

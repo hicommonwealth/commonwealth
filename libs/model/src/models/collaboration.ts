@@ -1,3 +1,4 @@
+console.log('LOADING src/models/collaboration.ts START');
 import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
@@ -51,3 +52,5 @@ export default (
       underscored: true,
     },
   );
+
+console.log('LOADING src/models/collaboration.ts END');

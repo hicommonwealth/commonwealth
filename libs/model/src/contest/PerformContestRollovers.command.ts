@@ -1,3 +1,4 @@
+console.log('LOADING src/contest/PerformContestRollovers.command.ts START');
 import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -96,3 +97,5 @@ export function PerformContestRollovers(): Command<
     },
   };
 }
+
+console.log('LOADING src/contest/PerformContestRollovers.command.ts END');

@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_eth_balances.ts START',
+);
 import { logger } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
@@ -124,3 +127,7 @@ async function getEthBalance(
     };
   }
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_eth_balances.ts END',
+);

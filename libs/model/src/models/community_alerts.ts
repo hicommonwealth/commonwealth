@@ -1,3 +1,4 @@
+console.log('LOADING src/models/community_alerts.ts START');
 import { CommunityAlert } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -45,3 +46,5 @@ export default (
       ],
     },
   );
+
+console.log('LOADING src/models/community_alerts.ts END');

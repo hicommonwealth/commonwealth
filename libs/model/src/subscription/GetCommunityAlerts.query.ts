@@ -1,3 +1,4 @@
+console.log('LOADING src/subscription/GetCommunityAlerts.query.ts START');
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -18,3 +19,5 @@ export function GetCommunityAlerts(): Query<typeof schemas.GetCommunityAlerts> {
     },
   };
 }
+
+console.log('LOADING src/subscription/GetCommunityAlerts.query.ts END');

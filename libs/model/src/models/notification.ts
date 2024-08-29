@@ -1,3 +1,4 @@
+console.log('LOADING src/models/notification.ts START');
 import { logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -83,3 +84,5 @@ export default (
       indexes: [{ fields: ['thread_id'] }],
     },
   );
+
+console.log('LOADING src/models/notification.ts END');

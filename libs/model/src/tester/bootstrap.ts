@@ -1,3 +1,4 @@
+console.log('LOADING src/tester/bootstrap.ts START');
 import { dispose } from '@hicommonwealth/core';
 import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
@@ -232,3 +233,5 @@ export const bootstrap_testing = async (truncate = false): Promise<DB> => {
 };
 
 config.NODE_ENV === 'test' && dispose(async () => truncate_db(db));
+
+console.log('LOADING src/tester/bootstrap.ts END');

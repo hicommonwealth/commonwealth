@@ -1,3 +1,4 @@
+console.log('LOADING src/models/topic.ts START');
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
@@ -79,3 +80,5 @@ export default (
       },
     },
   );
+
+console.log('LOADING src/models/topic.ts END');

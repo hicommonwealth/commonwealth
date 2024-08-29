@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/utils/requirementsModule/makeGetBalancesOptions.ts START',
+);
 import {
   BalanceSourceType,
   ContractSource,
@@ -180,3 +183,7 @@ export function makeGetBalancesOptions(
 
   return allOptions;
 }
+
+console.log(
+  'LOADING src/utils/requirementsModule/makeGetBalancesOptions.ts END',
+);

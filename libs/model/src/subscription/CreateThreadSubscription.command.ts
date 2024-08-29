@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/subscription/CreateThreadSubscription.command.ts START',
+);
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -20,3 +23,5 @@ export function CreateThreadSubscription(): Command<
     },
   };
 }
+
+console.log('LOADING src/subscription/CreateThreadSubscription.command.ts END');

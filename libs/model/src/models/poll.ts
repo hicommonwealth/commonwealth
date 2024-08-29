@@ -1,3 +1,4 @@
+console.log('LOADING src/models/poll.ts START');
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
@@ -50,3 +51,5 @@ export default (
       indexes: [{ fields: ['thread_id'] }, { fields: ['community_id'] }],
     },
   );
+
+console.log('LOADING src/models/poll.ts END');

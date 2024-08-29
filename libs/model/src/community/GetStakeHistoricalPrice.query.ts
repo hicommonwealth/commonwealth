@@ -1,3 +1,4 @@
+console.log('LOADING src/community/GetStakeHistoricalPrice.query.ts START');
 import type { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -37,3 +38,5 @@ export function GetStakeHistoricalPrice(): Query<
     },
   };
 }
+
+console.log('LOADING src/community/GetStakeHistoricalPrice.query.ts END');

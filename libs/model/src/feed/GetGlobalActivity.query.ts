@@ -1,3 +1,4 @@
+console.log('LOADING src/feed/GetGlobalActivity.query.ts START');
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -13,3 +14,5 @@ export function GetGlobalActivity(): Query<typeof schemas.ThreadFeed> {
     },
   };
 }
+
+console.log('LOADING src/feed/GetGlobalActivity.query.ts END');

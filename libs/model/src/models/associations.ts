@@ -1,3 +1,4 @@
+console.log('LOADING src/models/associations.ts START');
 import type { DB } from './factories';
 
 /**
@@ -230,3 +231,5 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'community_id',
   });
 };
+
+console.log('LOADING src/models/associations.ts END');

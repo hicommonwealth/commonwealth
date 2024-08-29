@@ -1,3 +1,4 @@
+console.log('LOADING src/middleware/authorization.ts START');
 import {
   InvalidActor,
   InvalidInput,
@@ -131,3 +132,5 @@ export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the comment');
 };
+
+console.log('LOADING src/middleware/authorization.ts END');

@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_cw20_balances.ts START',
+);
 import { WasmExtension, setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
 import { QueryClient } from '@cosmjs/stargate';
 import { logger } from '@hicommonwealth/core';
@@ -99,3 +102,7 @@ async function getCw20Balance(
     return {};
   }
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_cw20_balances.ts END',
+);

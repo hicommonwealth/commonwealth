@@ -1,3 +1,4 @@
+console.log('LOADING src/services/tokenBalanceCache/types.ts START');
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import { ChainNodeInstance } from '../../models/chain_node';
 
@@ -109,3 +110,5 @@ export type TokenAttributes = {
   ticker: string | commonProtocol.Denominations;
   decimals: number;
 };
+
+console.log('LOADING src/services/tokenBalanceCache/types.ts END');

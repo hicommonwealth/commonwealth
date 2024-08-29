@@ -1,3 +1,4 @@
+console.log('LOADING src/models/discord_bot_config.ts START');
 import Sequelize from 'sequelize';
 import type { ModelInstance } from './types';
 
@@ -51,3 +52,5 @@ export default (
       updatedAt: 'updated_at',
     },
   );
+
+console.log('LOADING src/models/discord_bot_config.ts END');

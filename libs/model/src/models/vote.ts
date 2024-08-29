@@ -1,3 +1,4 @@
+console.log('LOADING src/models/vote.ts START');
 import Sequelize from 'sequelize';
 import type { PollAttributes } from './poll';
 import type { ModelInstance } from './types';
@@ -40,3 +41,5 @@ export default (
       updatedAt: 'updated_at',
     },
   );
+
+console.log('LOADING src/models/vote.ts END');

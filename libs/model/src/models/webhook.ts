@@ -1,3 +1,4 @@
+console.log('LOADING src/models/webhook.ts START');
 import { WebhookCategory } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
@@ -41,3 +42,5 @@ export default (
       updatedAt: 'updated_at',
     },
   );
+
+console.log('LOADING src/models/webhook.ts END');

@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/contest/UpdateContestManagerMetadata.command.ts START',
+);
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
@@ -98,3 +101,5 @@ export function UpdateContestManagerMetadata(): Command<
     },
   };
 }
+
+console.log('LOADING src/contest/UpdateContestManagerMetadata.command.ts END');

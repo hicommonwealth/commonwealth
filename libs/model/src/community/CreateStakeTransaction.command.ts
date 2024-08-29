@@ -1,3 +1,4 @@
+console.log('LOADING src/community/CreateStakeTransaction.command.ts START');
 import type { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
@@ -145,3 +146,5 @@ export function CreateStakeTransaction(): Command<
     },
   };
 }
+
+console.log('LOADING src/community/CreateStakeTransaction.command.ts END');

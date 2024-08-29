@@ -1,3 +1,4 @@
+console.log('LOADING src/models/comment_subscriptions.ts START');
 import { CommentSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -36,3 +37,5 @@ export default (
       indexes: [{ fields: ['comment_id'] }],
     },
   );
+
+console.log('LOADING src/models/comment_subscriptions.ts END');

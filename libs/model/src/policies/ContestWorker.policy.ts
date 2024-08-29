@@ -1,3 +1,4 @@
+console.log('LOADING src/policies/ContestWorker.policy.ts START');
 import { events, logger, Policy } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -218,3 +219,5 @@ export function ContestWorker(): Policy<typeof inputs> {
     },
   };
 }
+
+console.log('LOADING src/policies/ContestWorker.policy.ts END');

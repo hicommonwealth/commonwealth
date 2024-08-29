@@ -1,3 +1,4 @@
+console.log('LOADING src/models/community_stake.ts START');
 import { CommunityStake } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -42,3 +43,5 @@ export default (
       indexes: [{ fields: ['community_id'] }, { fields: ['stake_id'] }],
     },
   );
+
+console.log('LOADING src/models/community_stake.ts END');

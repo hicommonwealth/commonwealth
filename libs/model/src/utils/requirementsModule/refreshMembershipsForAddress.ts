@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/utils/requirementsModule/refreshMembershipsForAddress.ts START',
+);
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
@@ -148,3 +151,7 @@ function computeMembership(
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
 }
+
+console.log(
+  'LOADING src/utils/requirementsModule/refreshMembershipsForAddress.ts END',
+);

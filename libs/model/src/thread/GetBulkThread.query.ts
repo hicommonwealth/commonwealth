@@ -1,3 +1,4 @@
+console.log('LOADING src/thread/GetBulkThread.query.ts START');
 import { ServerError, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import moment from 'moment';
@@ -278,3 +279,5 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
     },
   };
 }
+
+console.log('LOADING src/thread/GetBulkThread.query.ts END');

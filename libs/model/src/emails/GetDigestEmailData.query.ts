@@ -1,3 +1,4 @@
+console.log('LOADING src/emails/GetDigestEmailData.query.ts START');
 import {
   EnrichedThread,
   ExternalServiceUserIds,
@@ -55,3 +56,5 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
     },
   };
 }
+
+console.log('LOADING src/emails/GetDigestEmailData.query.ts END');

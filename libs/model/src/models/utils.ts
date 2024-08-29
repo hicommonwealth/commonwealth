@@ -1,3 +1,4 @@
+console.log('LOADING src/models/utils.ts START');
 import { decamelize } from '@hicommonwealth/shared';
 import {
   Model,
@@ -277,3 +278,5 @@ export const syncHooks = {
     options.logging = false;
   },
 };
+
+console.log('LOADING src/models/utils.ts END');

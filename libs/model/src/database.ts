@@ -1,8 +1,9 @@
+console.log('LOADING src/database.ts START');
 import { logger } from '@hicommonwealth/core';
 import { Sequelize } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { config } from './config';
-import { buildDb } from './models';
+import { buildDb } from './models/db';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -32,3 +33,5 @@ export const sequelize = new Sequelize(config.DB.URI, {
 });
 
 export const models = buildDb(sequelize);
+
+console.log('LOADING src/database.ts END');

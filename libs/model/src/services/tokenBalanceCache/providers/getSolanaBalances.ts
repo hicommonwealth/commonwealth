@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/getSolanaBalances.ts START',
+);
 import { logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import { models } from '../../../database';
@@ -31,3 +34,7 @@ export async function getSolanaBalances(
 
   return { ...freshBalances, ...cachedBalances };
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/getSolanaBalances.ts END',
+);

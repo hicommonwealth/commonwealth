@@ -1,3 +1,4 @@
+console.log('LOADING src/models/comment.ts START');
 import { EventNames, logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -183,3 +184,5 @@ export default (
       ],
     },
   );
+
+console.log('LOADING src/models/comment.ts END');

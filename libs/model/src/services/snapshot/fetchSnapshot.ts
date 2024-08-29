@@ -1,3 +1,4 @@
+console.log('LOADING src/services/snapshot/fetchSnapshot.ts START');
 import { logger } from '@hicommonwealth/core';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
@@ -45,3 +46,5 @@ export async function fetchNewSnapshotProposal(id: string) {
     return err;
   }
 }
+
+console.log('LOADING src/services/snapshot/fetchSnapshot.ts END');

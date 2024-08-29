@@ -1,3 +1,4 @@
+console.log('LOADING src/models/group.ts START');
 import { Group } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import z from 'zod';
@@ -37,3 +38,5 @@ export default (
       indexes: [{ fields: ['community_id'] }],
     },
   );
+
+console.log('LOADING src/models/group.ts END');

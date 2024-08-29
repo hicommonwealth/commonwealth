@@ -1,3 +1,4 @@
+console.log('LOADING src/utils/denormalizedCountUtils.ts START');
 import { Transaction } from 'sequelize';
 
 export const incrementProfileCount = async (
@@ -50,3 +51,5 @@ export const decrementProfileCount = async (
     },
   );
 };
+
+console.log('LOADING src/utils/denormalizedCountUtils.ts END');

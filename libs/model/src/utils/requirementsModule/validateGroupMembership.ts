@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/utils/requirementsModule/validateGroupMembership.ts START',
+);
 import {
   AllowlistData,
   BalanceSourceType,
@@ -219,3 +222,7 @@ function _allowlistCheck(
     };
   }
 }
+
+console.log(
+  'LOADING src/utils/requirementsModule/validateGroupMembership.ts END',
+);

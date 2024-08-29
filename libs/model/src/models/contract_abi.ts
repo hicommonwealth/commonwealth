@@ -1,3 +1,4 @@
+console.log('LOADING src/models/contract_abi.ts START');
 import type { AbiType } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { hashAbi } from '../utils';
@@ -60,3 +61,5 @@ export default (
       },
     },
   );
+
+console.log('LOADING src/models/contract_abi.ts END');

@@ -1,3 +1,4 @@
+console.log('LOADING src/contest/GetAllContests.query.ts START');
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -113,3 +114,5 @@ order by
     },
   };
 }
+
+console.log('LOADING src/contest/GetAllContests.query.ts END');

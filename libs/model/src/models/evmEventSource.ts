@@ -1,3 +1,4 @@
+console.log('LOADING src/models/evmEventSource.ts START');
 import Sequelize from 'sequelize';
 import { ChainNodeAttributes } from './chain_node';
 import { ContractAttributes } from './contract';
@@ -63,3 +64,5 @@ export default (
       timestamps: false,
     },
   );
+
+console.log('LOADING src/models/evmEventSource.ts END');

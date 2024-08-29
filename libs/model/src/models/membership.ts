@@ -1,3 +1,4 @@
+console.log('LOADING src/models/membership.ts START');
 import Sequelize from 'sequelize';
 import { AddressAttributes } from './address';
 import { GroupAttributes } from './group';
@@ -47,3 +48,5 @@ export default (
       indexes: [{ fields: ['address_id'] }, { fields: ['group_id'] }],
     },
   );
+
+console.log('LOADING src/models/membership.ts END');

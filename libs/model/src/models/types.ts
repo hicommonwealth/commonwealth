@@ -1,3 +1,4 @@
+console.log('LOADING src/models/types.ts START');
 import { Attributes, Model, ModelStatic } from 'sequelize';
 
 export type State = Record<string, unknown>;
@@ -119,3 +120,5 @@ export type Associable<M> = M extends ModelStatic<infer Source>
       _fks: FkMap[];
     }
   : never;
+
+console.log('LOADING src/models/types.ts END');

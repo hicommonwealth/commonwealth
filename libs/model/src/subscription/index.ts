@@ -1,3 +1,4 @@
+console.log('LOADING src/subscription/index.ts START');
 export * from './CreateCommentSubscription.command';
 export * from './CreateCommunityAlert.command';
 export * from './CreateThreadSubscription.command';
@@ -10,3 +11,5 @@ export * from './GetSubscriptionPreferences.query';
 export * from './GetThreadSubscriptions.query';
 export * from './RegisterClientRegistrationToken.command';
 export * from './UpdateSubscriptionPreferences.command';
+
+console.log('LOADING src/subscription/index.ts END');

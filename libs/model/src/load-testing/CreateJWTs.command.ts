@@ -1,3 +1,4 @@
+console.log('LOADING src/load-testing/CreateJWTs.command.ts START');
 import { ExternalServiceUserIds, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import jwt from 'jsonwebtoken';
@@ -43,3 +44,5 @@ export function CreateJWTs(): Command<typeof schemas.CreateJWTs> {
     },
   };
 }
+
+console.log('LOADING src/load-testing/CreateJWTs.command.ts END');

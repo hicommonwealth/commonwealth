@@ -1,3 +1,4 @@
+console.log('LOADING src/config.ts START');
 import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
@@ -94,3 +95,5 @@ export const config = configure(
       ),
   }),
 );
+
+console.log('LOADING src/config.ts END');

@@ -1,3 +1,4 @@
+console.log('LOADING src/tester/seedDb.ts START');
 import {
   BalanceType,
   ChainBase,
@@ -523,3 +524,5 @@ export const seedDb = async () => {
     throw error;
   }
 };
+
+console.log('LOADING src/tester/seedDb.ts END');

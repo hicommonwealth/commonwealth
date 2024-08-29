@@ -1,3 +1,4 @@
+console.log('LOADING src/utils/requirementsModule/validateMetadata.ts START');
 import { GroupMetadata } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
@@ -17,3 +18,5 @@ export function validateMetadata(
   }
   return null;
 }
+
+console.log('LOADING src/utils/requirementsModule/validateMetadata.ts END');

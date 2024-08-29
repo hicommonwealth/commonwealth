@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/subscription/CreateCommentSubscription.command.ts START',
+);
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -22,3 +25,7 @@ export function CreateCommentSubscription(): Command<
     },
   };
 }
+
+console.log(
+  'LOADING src/subscription/CreateCommentSubscription.command.ts END',
+);

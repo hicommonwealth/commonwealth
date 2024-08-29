@@ -1,3 +1,4 @@
+console.log('LOADING src/models/subscription.ts START');
 import {
   EmitNotification,
   NotificationCategories,
@@ -118,3 +119,5 @@ export default (
       },
     },
   );
+
+console.log('LOADING src/models/subscription.ts END');

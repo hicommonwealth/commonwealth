@@ -1,3 +1,4 @@
+console.log('LOADING src/services/snapshot/checkSnapshotObjectExists.ts START');
 import { logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 
@@ -34,3 +35,5 @@ export async function checkSnapshotObjectExists(
 
   return false;
 }
+
+console.log('LOADING src/services/snapshot/checkSnapshotObjectExists.ts END');

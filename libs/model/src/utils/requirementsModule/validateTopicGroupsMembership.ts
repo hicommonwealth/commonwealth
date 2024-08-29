@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/utils/requirementsModule/validateTopicGroupsMembership.ts START',
+);
 import { GroupPermissionAction } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import {
@@ -95,3 +98,7 @@ export async function validateTopicGroupsMembership(
 
   return { isValid: true };
 }
+
+console.log(
+  'LOADING src/utils/requirementsModule/validateTopicGroupsMembership.ts END',
+);

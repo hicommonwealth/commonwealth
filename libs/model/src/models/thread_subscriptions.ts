@@ -1,3 +1,4 @@
+console.log('LOADING src/models/thread_subscriptions.ts START');
 import { ThreadSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -53,3 +54,5 @@ export default (
       ],
     },
   );
+
+console.log('LOADING src/models/thread_subscriptions.ts END');

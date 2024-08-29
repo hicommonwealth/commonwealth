@@ -1,3 +1,4 @@
+console.log('LOADING src/services/commonProtocol/abi/feeManagerAbi.ts START');
 export const feeManagerABI = [
   {
     inputs: [
@@ -24,3 +25,5 @@ export const feeManagerABI = [
     type: 'function',
   },
 ];
+
+console.log('LOADING src/services/commonProtocol/abi/feeManagerAbi.ts END');

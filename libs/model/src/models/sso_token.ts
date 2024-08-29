@@ -1,3 +1,4 @@
+console.log('LOADING src/models/sso_token.ts START');
 import { SsoToken } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -40,3 +41,5 @@ export default (
       },
     },
   );
+
+console.log('LOADING src/models/sso_token.ts END');

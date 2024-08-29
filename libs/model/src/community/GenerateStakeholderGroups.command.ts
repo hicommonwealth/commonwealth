@@ -1,3 +1,4 @@
+console.log('LOADING src/community/GenerateStakeholderGroups.command.ts START');
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
@@ -130,3 +131,5 @@ export function GenerateStakeholderGroups(): Command<
     },
   };
 }
+
+console.log('LOADING src/community/GenerateStakeholderGroups.command.ts END');

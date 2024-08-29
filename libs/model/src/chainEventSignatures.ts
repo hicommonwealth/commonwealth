@@ -1,3 +1,4 @@
+console.log('LOADING src/chainEventSignatures.ts START');
 export const deployedNamespaceEventSignature =
   '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5';
 
@@ -13,3 +14,5 @@ export const proposalEventSignatures = [
   '0x9c85b616f29fca57a17eafe71cf9ff82ffef41766e2cf01ea7f8f7878dd3ec24',
   '0xd272d67d2c8c66de43c1d2515abb064978a5020c173e15903b6a2ab3bf7440ec',
 ];
+
+console.log('LOADING src/chainEventSignatures.ts END');

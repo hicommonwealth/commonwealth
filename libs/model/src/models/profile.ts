@@ -1,3 +1,4 @@
+console.log('LOADING src/models/profile.ts START');
 import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ModelInstance } from './types';
@@ -66,3 +67,5 @@ export default (
       indexes: [{ fields: ['user_id'] }],
     },
   );
+
+console.log('LOADING src/models/profile.ts END');

@@ -1,3 +1,4 @@
+console.log('LOADING src/models/ban.ts START');
 import Sequelize from 'sequelize';
 import type { ModelInstance } from './types';
 
@@ -32,3 +33,5 @@ export default (
       indexes: [{ fields: ['community_id'] }],
     },
   );
+
+console.log('LOADING src/models/ban.ts END');

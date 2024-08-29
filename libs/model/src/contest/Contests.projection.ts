@@ -1,3 +1,4 @@
+console.log('LOADING src/contest/Contests.projection.ts START');
 import {
   EvmRecurringContestEventSignatures,
   EvmSingleContestEventSignatures,
@@ -308,3 +309,5 @@ export function Contests(): Projection<typeof inputs> {
     },
   };
 }
+
+console.log('LOADING src/contest/Contests.projection.ts END');

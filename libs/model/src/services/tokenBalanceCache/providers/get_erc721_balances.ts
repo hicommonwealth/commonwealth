@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_erc721_balances.ts START',
+);
 import { logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import * as AbiCoder from 'web3-eth-abi';
@@ -109,3 +112,7 @@ async function getErc721Balance(
     };
   }
 }
+
+console.log(
+  'LOADING src/services/tokenBalanceCache/providers/get_erc721_balances.ts END',
+);

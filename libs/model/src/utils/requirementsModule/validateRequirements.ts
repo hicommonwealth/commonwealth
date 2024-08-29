@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/utils/requirementsModule/validateRequirements.ts START',
+);
 import { Requirement } from '@hicommonwealth/shared';
 import Ajv from 'ajv';
 import requirementsSchema from './requirementsSchema_v1';
@@ -25,3 +28,5 @@ export function validateRequirements(
   }
   return null;
 }
+
+console.log('LOADING src/utils/requirementsModule/validateRequirements.ts END');

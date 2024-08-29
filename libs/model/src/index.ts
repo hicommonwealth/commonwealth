@@ -1,3 +1,4 @@
+console.log('LOADING src/index.ts START');
 // Core Domain
 export * as Comment from './comment';
 export * as Community from './community';
@@ -28,3 +29,5 @@ export * from './database';
 export * from './globalActivityCache';
 export * from './models';
 export * from './utils';
+
+console.log('LOADING src/index.ts END');

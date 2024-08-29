@@ -1,3 +1,4 @@
+console.log('LOADING src/contest/GetContestLog.query.ts START');
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -57,3 +58,5 @@ export function GetContestLog(): Query<typeof schemas.GetContestLog> {
     },
   };
 }
+
+console.log('LOADING src/contest/GetContestLog.query.ts END');

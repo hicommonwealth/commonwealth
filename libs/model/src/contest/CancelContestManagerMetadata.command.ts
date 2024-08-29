@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/contest/CancelContestManagerMetadata.command.ts START',
+);
 import type { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
@@ -27,3 +30,5 @@ export function CancelContestManagerMetadata(): Command<
     },
   };
 }
+
+console.log('LOADING src/contest/CancelContestManagerMetadata.command.ts END');

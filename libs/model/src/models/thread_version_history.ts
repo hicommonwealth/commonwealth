@@ -1,3 +1,4 @@
+console.log('LOADING src/models/thread_version_history.ts START');
 import { ThreadVersionHistory } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -32,3 +33,5 @@ export default (
       indexes: [{ fields: ['thread_id'] }],
     },
   );
+
+console.log('LOADING src/models/thread_version_history.ts END');

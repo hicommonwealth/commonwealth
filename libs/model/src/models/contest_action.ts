@@ -1,3 +1,4 @@
+console.log('LOADING src/models/contest_action.ts START');
 import { CONTEST_ACTIONS, ContestAction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -47,3 +48,5 @@ export default (
       indexes: [],
     },
   );
+
+console.log('LOADING src/models/contest_action.ts END');

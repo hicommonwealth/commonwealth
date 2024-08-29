@@ -1,3 +1,4 @@
+console.log('LOADING src/services/commonProtocol/contestHelper.ts START');
 import { AppError } from '@hicommonwealth/core';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
@@ -398,3 +399,5 @@ export const rollOverContest = async (
     return true;
   });
 };
+
+console.log('LOADING src/services/commonProtocol/contestHelper.ts END');

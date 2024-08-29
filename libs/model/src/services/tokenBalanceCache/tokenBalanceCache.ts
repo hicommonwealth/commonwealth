@@ -1,3 +1,6 @@
+console.log(
+  'LOADING src/services/tokenBalanceCache/tokenBalanceCache.ts START',
+);
 import { logger, stats } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
@@ -74,3 +77,5 @@ export async function getBalances(
   );
   return balances;
 }
+
+console.log('LOADING src/services/tokenBalanceCache/tokenBalanceCache.ts END');
