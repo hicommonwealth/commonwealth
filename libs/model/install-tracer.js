@@ -25,8 +25,8 @@ function installTracers(path) {
   const buff = readFileSync(path);
   const content = buff.toString('utf8');
 
-  const startTracer = `console.log('LOADING ' + import.meta.url + ' START');`;
-  const endTracer = `console.log('LOADING ' + import.meta.url + ' END');`;
+  const startTracer = `console.log('LOADING ${path} START');`;
+  const endTracer = `console.log('LOADING ${path} END');`;
 
   const newContent = startTracer + '\n' + content + '\n' + endTracer;
 
