@@ -37,11 +37,8 @@ import viewCount from '../routes/viewCount';
 
 import getProfileNew from '../routes/getNewProfile';
 import setDefaultRole from '../routes/setDefaultRole';
-import deleteSubscription from '../routes/subscription/deleteSubscription';
 import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
-import disableSubscriptions from '../routes/subscription/disableSubscriptions';
 import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
-import enableSubscriptions from '../routes/subscription/enableSubscriptions';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
@@ -726,29 +723,6 @@ function setupRouter(
     '/getUploadSignature',
     passport.authenticate('jwt', { session: false }),
     getUploadSignature.bind(this, models),
-  );
-
-  // notifications
-  registerRoute(
-    router,
-    'post',
-    '/deleteSubscription',
-    passport.authenticate('jwt', { session: false }),
-    deleteSubscription.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/enableSubscriptions',
-    passport.authenticate('jwt', { session: false }),
-    enableSubscriptions.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/disableSubscriptions',
-    passport.authenticate('jwt', { session: false }),
-    disableSubscriptions.bind(this, models),
   );
 
   registerRoute(
