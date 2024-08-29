@@ -59,9 +59,9 @@ function isString(
  */
 export async function seed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas[T]>>,
+  values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<[z.infer<typeof schemas[T]> | undefined, State[]]> {
+): Promise<[z.infer<(typeof schemas)[T]> | undefined, State[]]> {
   const db = await bootstrap_testing();
 
   const records: State[] = [];

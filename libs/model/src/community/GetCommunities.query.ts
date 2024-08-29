@@ -94,12 +94,12 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                         `
                             : ''
                         }${
-          network
-            ? `
+                          network
+                            ? `
                           AND "Community"."network" = '${network}'
                         `
-            : ''
-        }
+                            : ''
+                        }
                         ${
                           has_groups
                             ? `
