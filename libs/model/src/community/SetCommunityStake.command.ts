@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { commonProtocol } from '../services';
+import { validateCommunityStakeConfig } from '../services/commonProtocol/communityStakeConfigValidator';
 
 export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
   return {
@@ -40,10 +40,7 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
         );
 
       // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
-      await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
-        community,
-        rest.stake_id,
-      );
+      await validateCommunityStakeConfig(community, rest.stake_id);
 
       // !side effects
       const [updated] = await models.CommunityStake.upsert({

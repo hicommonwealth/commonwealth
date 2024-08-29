@@ -1,9 +1,9 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
+import { models } from '../../database';
 import { CommunityAttributes } from '../../models';
-import { equalEvmAddresses } from '../../utils';
+import { equalEvmAddresses } from '../../utils/utils';
 import { getBalances } from '../tokenBalanceCache';
 import { getNamespace } from './contractHelpers';
 

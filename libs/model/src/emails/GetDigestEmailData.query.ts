@@ -4,9 +4,9 @@ import {
   GetDigestEmailData,
   Query,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
+import { models } from '../database';
 
 export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
   return {
@@ -42,7 +42,7 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
 
       if (!threads.length) return {};
 
-      const result: z.infer<typeof GetDigestEmailData['output']> = {};
+      const result: z.infer<(typeof GetDigestEmailData)['output']> = {};
       for (const thread of threads) {
         if (!result[thread.community_id]) {
           result[thread.community_id] = [thread];

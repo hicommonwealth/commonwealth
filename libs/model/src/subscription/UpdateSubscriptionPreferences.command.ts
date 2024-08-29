@@ -1,9 +1,9 @@
 import { EventNames, type Command } from '@hicommonwealth/core';
-import { emitEvent } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { models } from '../database';
+import { emitEvent } from '../utils/utils';
 
 function getDifferences(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

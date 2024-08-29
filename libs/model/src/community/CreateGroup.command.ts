@@ -2,7 +2,7 @@ import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
-import { isCommunityAdminOrModerator } from '../middleware';
+import { isCommunityAdminOrModerator } from '../middleware/authorization';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 

@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
-import * as protocol from '../services/commonProtocol';
+import { contestHelper, contractHelpers } from '../services/commonProtocol';
 import { decodeThreadContentUrl } from '../utils';
 
 const log = logger(import.meta);
@@ -67,10 +67,12 @@ async function updateOrCreateWithAlert(
       `Chain node url not found on namespace ${namespace}`,
     );
 
-  const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(contest_address, url);
+  const { ticker, decimals } = await contractHelpers.getTokenAttributes(
+    contest_address,
+    url,
+  );
 
-  const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
+  const { startTime, endTime } = await contestHelper.getContestStatus(
     url,
     contest_address,
     isOneOff,
@@ -205,13 +207,12 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const { scores, contestBalance } =
-      await protocol.contestHelper.getContestScore(
-        details.url,
-        contest_address,
-        undefined,
-        oneOff,
-      );
+    const { scores, contestBalance } = await contestHelper.getContestScore(
+      details.url,
+      contest_address,
+      undefined,
+      oneOff,
+    );
 
     const prizePool =
       (Number(contestBalance) *

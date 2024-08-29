@@ -13,7 +13,7 @@ import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodObject, ZodSchema, ZodString, z } from 'zod';
-import { models } from '..';
+import { models } from '../database';
 
 export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
 export type ThreadMiddleware = CommandHandler<

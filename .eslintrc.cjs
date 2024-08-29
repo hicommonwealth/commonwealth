@@ -36,6 +36,10 @@ module.exports = {
     'n/no-process-exit': 'error',
     'import/no-cycle': 2,
     'import/named': 0,
+    'import/export': 0,
     'import/namespace': 0,
+    'import/no-duplicates': 2,
+    'import/no-named-as-default': 0,
+    'import/no-named-as-default-member': 0,
   },
 };
