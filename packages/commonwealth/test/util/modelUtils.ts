@@ -310,9 +310,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     args: ThreadArgs,
   ): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
     const {
+      jwt,
       chainId,
       address,
-      jwt,
       title,
       body,
       topicId,
@@ -347,23 +347,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post('/api/threads')
+      .post('/api/v1/CreateThread/0')
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
-        author_chain: chainId,
-        chain: chainId,
-        address: address.split(':')[2],
+        jwt,
+        community_id: chainId,
+        topic_id: topicId,
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
-        topic_id: topicId,
+        stage: '',
         url,
-        readOnly: readOnly || false,
-        jwt,
+        read_only: readOnly || false,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
-    return res.body;
+    if (res.ok) return { result: res.body, status: 'Success' };
+    return { status: res.status.toString() };
   },
 
   createLink: async (args: createDeleteLinkArgs) => {

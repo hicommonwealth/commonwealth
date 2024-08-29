@@ -136,7 +136,7 @@ export async function main(
       );
 
     app.use((req, res, next) => {
-      if (req.path.startsWith(`${api.internal.PATH}/chainevent/`)) next();
+      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
       else parseJson(req, res, next);
     });
 
