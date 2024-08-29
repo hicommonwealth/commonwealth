@@ -4,11 +4,7 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import type {
-  AddressInstance,
-  CommunityBannerInstance,
-  DB,
-} from '@hicommonwealth/model';
+import type { AddressInstance, DB } from '@hicommonwealth/model';
 import { AddressRole } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { TypedRequest, TypedResponse } from 'server/types';
@@ -35,40 +31,33 @@ const bulkOffchain = async (
   const { community } = req;
 
   // parallelized queries
-  const [adminsAndMods, numVotingThreads, numTotalThreads, communityBanner] =
-    await (<
-      Promise<[AddressInstance[], number, number, CommunityBannerInstance]>
-    >Promise.all([
-      // admins
-      models.Address.findAll({
-        where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-          [Op.or]: [{ role: 'admin' }, { role: 'moderator' }],
-        },
-        attributes: ['address', 'role'],
-      }),
-      models.Thread.count({
-        where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-          stage: 'voting',
-        },
-      }),
-      models.Thread.count({
-        where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-          marked_as_spam_at: null,
-        },
-      }),
-      models.CommunityBanner.findOne({
-        where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-        },
-      }),
-    ]));
+  const [adminsAndMods, numVotingThreads, numTotalThreads] = await (<
+    Promise<[AddressInstance[], number, number]>
+  >Promise.all([
+    // admins
+    models.Address.findAll({
+      where: {
+        // @ts-expect-error StrictNullChecks
+        community_id: community.id,
+        [Op.or]: [{ role: 'admin' }, { role: 'moderator' }],
+      },
+      attributes: ['address', 'role'],
+    }),
+    models.Thread.count({
+      where: {
+        // @ts-expect-error StrictNullChecks
+        community_id: community.id,
+        stage: 'voting',
+      },
+    }),
+    models.Thread.count({
+      where: {
+        // @ts-expect-error StrictNullChecks
+        community_id: community.id,
+        marked_as_spam_at: null,
+      },
+    }),
+  ]));
 
   return res.json({
     status: 'Success',
@@ -76,7 +65,7 @@ const bulkOffchain = async (
       numVotingThreads,
       numTotalThreads,
       adminsAndMods: adminsAndMods.map((a) => a.toJSON()),
-      communityBanner: communityBanner?.banner_text || '',
+      communityBanner: community?.banner_text || '',
     },
   });
 };

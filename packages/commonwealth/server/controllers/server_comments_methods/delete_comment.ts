@@ -47,14 +47,7 @@ export async function __deleteComment(
     throw new AppError(Errors.CommentNotFound);
   }
 
-  // check if author can delete post
-  const [canInteract, error] = await this.banCache.checkBan({
-    communityId: community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${error}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   const isAdminOrOwner = await validateOwner({
     models: this.models,
