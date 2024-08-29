@@ -21,7 +21,7 @@ canvas: started libp2p with multiaddrs [
 In another terminal, use the libp2p multiaddr to start a node:
 
 ```
-canvas run libs/shared/src/canvas/runtime/contract.ts --bootstrap-list /ip4/127.0.0.1/tcp/8090/ws/p2p/12D3KooWPbkvKDxziibMP3cxrQP7NNnZCDNfj2cT3Ej3TH23wWBS
+canvas run libs/shared/src/canvas/runtime/contract.ts --bootstrap /ip4/127.0.0.1/tcp/8090/ws/p2p/12D3KooWPbkvKDxziibMP3cxrQP7NNnZCDNfj2cT3Ej3TH23wWBS
 ```
 
 As you interact with Commonwealth
@@ -32,10 +32,14 @@ node running in the CLI.
 Now, try sending an action from the CLI:
 
 ```
-> thread({ community: 'hi', title: 'hi', body: 'hello world', link: undefined, topic: 'g' })
+> thread({ community: 'hi', title: 'hi', body: 'hello world', link: '', topic: 'g' })
 creating a session
 sending thread([object Object])
 ```
+
+Since typed autocomplete isn't working in the CLI yet, you might have
+to provide empty strings or encode `undefined` as `null` when sending
+actions from the CLI.
 
 This will *not* currently push new interactions to Commonwealth. Once
 the API handlers are complete in the other direction (this is part of the

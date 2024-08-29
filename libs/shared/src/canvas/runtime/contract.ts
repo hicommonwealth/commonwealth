@@ -1,4 +1,4 @@
-import { Contract } from '@canvas-js/core';
+import type { Contract } from '@canvas-js/core';
 
 export const contractTopic = 'common.xyz';
 
@@ -154,3 +154,6 @@ export const contract = {
     },
   },
 } satisfies Contract;
+
+export const actions = contract.actions;
+export const models = contract.models;
