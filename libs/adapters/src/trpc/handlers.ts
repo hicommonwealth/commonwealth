@@ -55,6 +55,7 @@ export enum Tag {
   User = 'User',
   Community = 'Community',
   Thread = 'Thread',
+  Topic = 'Topic',
   Comment = 'Comment',
   Reaction = 'Reaction',
   Integration = 'Integration',

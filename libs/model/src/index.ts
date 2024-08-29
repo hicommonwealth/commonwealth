@@ -9,6 +9,7 @@ export * as LoadTest from './load-testing';
 export * as Reaction from './reaction';
 export * as Subscription from './subscription';
 export * as Thread from './thread';
+export * as Topic from './topic';
 export * as User from './user';
 export * as Webhook from './webhook';
 

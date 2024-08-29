@@ -3,9 +3,13 @@ import cors from 'cors';
 import { Router } from 'express';
 import * as comment from './comment';
 import * as community from './community';
+import * as thread from './thread';
+import * as topic from './topic';
 
 const { getCommunities, getCommunity, getMembers } = community.trpcRouter;
 const { getComments } = comment.trpcRouter;
+const { getThreads } = thread.trpcRouter;
+const { getTopics } = topic.trpcRouter;
 //const { getBulkThreads } = thread.trpcRouter;
 
 const api = {
@@ -13,6 +17,8 @@ const api = {
   getCommunity,
   getMembers,
   getComments,
+  getThreads,
+  getTopics,
   //getBulkThreads,
 };
 

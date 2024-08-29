@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { Thread } from '../entities';
 import {
   DiscordMetaSchema,
   linksSchema,
   paginationSchema,
   PG_INT,
 } from '../utils';
+import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
@@ -89,5 +91,19 @@ export const GetBulkThreads = {
     numVotingThreads: PG_INT,
     cursor: PG_INT,
     threads: z.array(BulkThread),
+  }),
+};
+
+export const GetThreads = {
+  input: PaginationParamsSchema.extend({
+    community_id: z.string(),
+    topic_id: PG_INT.optional(),
+    thread_id: PG_INT.optional(),
+    include_comments: z.coerce.boolean(),
+    include_user: z.coerce.boolean(),
+    include_reactions: z.coerce.boolean(),
+  }),
+  output: PaginatedResultSchema.extend({
+    result: Thread.array(),
   }),
 };
