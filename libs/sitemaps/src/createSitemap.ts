@@ -1,5 +1,8 @@
 import { createBuffer } from './createBuffer';
 import { Link } from './createDatabasePaginator';
+import { logger } from '@hicommonwealth/core';
+
+const log = logger(import.meta);
 
 /**
  * Creates a sitemap XML string based on the provided links array.
@@ -16,6 +19,7 @@ export function createSitemap(links: ReadonlyArray<Link>): string {
   for (const link of links) {
     if (link.priority !== undefined && link.priority < 0) {
       // disable indexing by setting the priority to -1
+      log.info("Skipping sitemap indexing due to link priority: " + link.priority)
       continue;
     }
 
