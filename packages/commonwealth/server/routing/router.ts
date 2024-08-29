@@ -113,7 +113,6 @@ import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
-import farcasterRouter from '../farcaster/router';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -1124,8 +1123,6 @@ function setupRouter(
   app.use(endpoint, router);
 
   app.use(methodNotAllowedMiddleware());
-
-  app.use('/api/farcaster', farcasterRouter);
 
   app.use('/api/*', function (_req, res) {
     res.status(404);
