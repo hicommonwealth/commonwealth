@@ -84,12 +84,6 @@ export class DatabaseCleaner {
     this.log.info('Database clean-up starting...');
 
     try {
-      await this.cleanNotifications(this._oneRunMax);
-    } catch (e) {
-      this.log.error('Failed to clean notifications', e);
-    }
-
-    try {
       await this.cleanSubscriptions(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
@@ -105,109 +99,20 @@ export class DatabaseCleaner {
   }
 
   /**
-   * Deletes notifications that are older than 3 months. Only 10,000 notifications are deleted at a time to reduce
-   * database load. Between each deletion there is a 5-second pause to again reduce database load and allow other
-   * transactions to complete.
-   * @param oneRunMax If set to true the deletion query will be executed just once (primarily used for testing).
-   */
-  public async cleanNotifications(oneRunMax = false) {
-    // determines the maximum amount of notifications to delete in a single go
-    // if the actual amount of notifications deleted is less than this then the
-    // query will not rerun
-    const DELETE_NOTIF_THRESHOLD = 10000;
-    // the number of notifications deleted in a single execution of the transaction
-    let numNotifDeleted;
-    let totalNotifDeleted = 0;
-
-    // determines whether the query should run again
-    const shouldContinueNotifDelete = () => {
-      // always run at least once
-      if (numNotifDeleted === undefined) return true;
-      else if (oneRunMax) return false;
-      else return numNotifDeleted === DELETE_NOTIF_THRESHOLD;
-    };
-
-    while (shouldContinueNotifDelete()) {
-      await this._models.sequelize.transaction(async (t) => {
-        await this._models.sequelize.query(
-          `
-          CREATE TEMPORARY TABLE notif_ids_to_delete as (
-            SELECT id FROM "Notifications"
-            WHERE created_at < NOW() - interval '3 months'
-            ORDER BY created_at
-            LIMIT ?
-          );
-        `,
-          { replacements: [DELETE_NOTIF_THRESHOLD], transaction: t },
-        );
-
-        await this._models.sequelize.query(
-          `
-          DELETE FROM "NotificationsRead" NR
-              USING notif_ids_to_delete ND
-          WHERE NR.notification_id = ND.id;
-        `,
-          { type: QueryTypes.BULKDELETE, transaction: t },
-        );
-
-        numNotifDeleted = await this._models.sequelize.query(
-          `
-          DELETE FROM "Notifications" N
-              USING notif_ids_to_delete ND
-          WHERE N.id = ND.id;
-        `,
-          { type: QueryTypes.BULKDELETE, transaction: t },
-        );
-
-        await this._models.sequelize.query(
-          `
-          DROP TABLE notif_ids_to_delete;
-        `,
-          { transaction: t },
-        );
-      });
-
-      totalNotifDeleted += numNotifDeleted;
-
-      if (shouldContinueNotifDelete())
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
-
-    this.log.info(`Deleted ${totalNotifDeleted} notifications.`);
-  }
-
-  /**
    * Deletes subscriptions that are associated with users that have not logged-in in the past year. Only 10,000
    * subscriptions are deleted at a time to reduce database load. Between each there is a 5-second pause to again
    * reduce database load and allow other transactions to complete.
    * @param oneRunMax If set to true the deletion query will be executed just once (primarily used for testing).
    */
   public async cleanSubscriptions(oneRunMax = false) {
-    // instead of one really long-running transaction that will block INSERTS and UPDATES we make many small
-    // deletions of ~10k subscriptions at a time
-    // The subscriptions table is so large and unwieldy that even this simple deletion is very time-consuming
-    // (5 seconds per deletion).
-    const DELETE_SUBS_THRESHOLD = 10000;
-    // the number of subscriptions deleted in a single execution of the transaction
-    let numSubsDeleted;
-    let totalSubsDeleted = 0;
-
-    // determines whether the query should run again
-    const shouldContinueSubDelete = () => {
-      // always run at least once
-      if (numSubsDeleted === undefined) return true;
-      else if (oneRunMax) return false;
-      else return numSubsDeleted === DELETE_SUBS_THRESHOLD;
-    };
-
-    while (shouldContinueSubDelete()) {
-      await this._models.sequelize.transaction(async (t) => {
-        // user has no addresses at all, and user was last updated before a year ago
-        const noAccountsAndIsOldUser = `
+    let subsDeleted = 0;
+    await this._models.sequelize.transaction(async (t) => {
+      // user has no addresses at all, and user was last updated before a year ago
+      const noAccountsAndIsOldUser = `
           COUNT(A.user_id) = 0 AND MIN(U.updated_at) < NOW() - INTERVAL '12 months'
         `;
-        // user has no addresses that were active within the last year
-        const noActiveAccountsQuery = `
+      // user has no addresses that were active within the last year
+      const noActiveAccountsQuery = `
           SUM(
             CASE
               WHEN A.last_active >= NOW() - INTERVAL '12 months' THEN 1
@@ -215,59 +120,57 @@ export class DatabaseCleaner {
             END
           ) = 0
         `;
-        await this._models.sequelize.query(
-          `
-            CREATE TEMPORARY TABLE sub_ids_to_delete as (
-              WITH user_ids_to_delete AS MATERIALIZED (
-                SELECT U.id
-                FROM "Users" U
-                LEFT JOIN "Addresses" A ON U.id = A.user_id
-                GROUP BY U.id
-                HAVING (${noAccountsAndIsOldUser}) OR (${noActiveAccountsQuery})
-              )
-              SELECT S.id
-              FROM "Subscriptions" S
-                JOIN user_ids_to_delete UD ON UD.id = S.subscriber_id
-              ORDER BY UD.id
-              LIMIT ?
-            );
+      await this._models.sequelize.query(
+        `
+            CREATE TEMPORARY TABLE user_ids_to_delete as (SELECT U.id
+                                                          FROM "Users" U
+                                                                   LEFT JOIN "Addresses" A ON U.id = A.user_id
+                                                          GROUP BY U.id
+                                                          HAVING (${noAccountsAndIsOldUser})
+                                                              OR (${noActiveAccountsQuery}));
         `,
-          { transaction: t, replacements: [DELETE_SUBS_THRESHOLD] },
-        );
+        { transaction: t },
+      );
 
-        await this._models.sequelize.query(
-          `
-          DELETE FROM "NotificationsRead" NR
-              USING sub_ids_to_delete SD
-          WHERE NR.subscription_id = SD.id;
+      subsDeleted += await this._models.sequelize.query(
+        `
+            DELETE
+            FROM "ThreadSubscriptions" TS
+                USING user_ids_to_delete U
+            WHERE TS.user_id = U.id;
         `,
-          { type: QueryTypes.BULKDELETE, transaction: t },
-        );
+        { type: QueryTypes.BULKDELETE, transaction: t },
+      );
 
-        numSubsDeleted = await this._models.sequelize.query(
-          `
-          DELETE FROM "Subscriptions" S
-              USING sub_ids_to_delete SD
-          WHERE S.id = SD.id;
+      subsDeleted += await this._models.sequelize.query(
+        `
+            DELETE
+            FROM "CommentSubscriptions" CS
+                USING user_ids_to_delete U
+            WHERE CS.user_id = U.id;
         `,
-          { type: QueryTypes.BULKDELETE, transaction: t },
-        );
+        { type: QueryTypes.BULKDELETE, transaction: t },
+      );
 
-        await this._models.sequelize.query(
-          `
-          DROP TABLE sub_ids_to_delete;
+      subsDeleted += await this._models.sequelize.query(
+        `
+            DELETE
+            FROM "CommunityAlerts" CA
+                USING user_ids_to_delete U
+            WHERE CA.user_id = U.id;
         `,
-          { transaction: t },
-        );
-        totalSubsDeleted += numSubsDeleted;
+        { type: QueryTypes.BULKDELETE, transaction: t },
+      );
 
-        if (shouldContinueSubDelete()) {
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-        }
-      });
-    }
+      await this._models.sequelize.query(
+        `
+            DROP TABLE user_ids_to_delete;
+        `,
+        { transaction: t },
+      );
+    });
 
-    this.log.info(`Deleted ${totalSubsDeleted} subscriptions`);
+    this.log.info(`Deleted ${subsDeleted} subscriptions`);
   }
 
   /**
