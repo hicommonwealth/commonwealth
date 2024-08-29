@@ -54,7 +54,7 @@ describe('DatabaseCleaner Tests', async () => {
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours() + 4, true);
+      dbCleaner.initLoop(models, now.getUTCHours() + 4);
 
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
@@ -69,7 +69,7 @@ describe('DatabaseCleaner Tests', async () => {
       now.setUTCMinutes(0);
       now.setUTCMilliseconds(0);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours(), true);
+      dbCleaner.initLoop(models, now.getUTCHours());
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getUTCHours()).to.be.equal(now.getUTCHours());
@@ -79,7 +79,7 @@ describe('DatabaseCleaner Tests', async () => {
     test('should not run if started after the correct hour', () => {
       const now = new Date();
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours() - 4, true);
+      dbCleaner.initLoop(models, now.getUTCHours() - 4);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       now.setUTCDate(now.getUTCDate() + 1);
@@ -92,24 +92,24 @@ describe('DatabaseCleaner Tests', async () => {
 
     test('should not run if an hour to run is not provided', () => {
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, NaN, true);
+      dbCleaner.initLoop(models, NaN);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
     test('should not run if the hour provided is invalid', () => {
       let dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 24, true);
+      dbCleaner.initLoop(models, 24);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 25, true);
+      dbCleaner.initLoop(models, 25);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, -1, true);
+      dbCleaner.initLoop(models, -1);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });

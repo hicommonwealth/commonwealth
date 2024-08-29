@@ -13,7 +13,6 @@ export class DatabaseCleaner {
   private _models: DB;
   private _timeToRun: Date;
   private _completed = false;
-  private _oneRunMax = false;
   private _timeoutID;
   private _lockName = 'cw_database_cleaner_locker';
   // lock times out in 12 hours
@@ -26,11 +25,9 @@ export class DatabaseCleaner {
   /**
    * @param models An instance of the DB containing the sequelize instance and all the models.
    * @param hourToRun A number in [0, 24) indicating the hour in which to run the cleaner. Uses UTC!
-   * @param oneRunMax If set to true the database clean will only occur once and will not be re-scheduled
    */
-  public initLoop(models: DB, hourToRun: number, oneRunMax = false) {
+  public initLoop(models: DB, hourToRun: number) {
     this.init(models);
-    this._oneRunMax = oneRunMax;
 
     if (!hourToRun && hourToRun !== 0) {
       this.log.warn(`No hourToRun given. The cleaner will not run.`);
@@ -84,7 +81,7 @@ export class DatabaseCleaner {
     this.log.info('Database clean-up starting...');
 
     try {
-      await this.cleanSubscriptions(this._oneRunMax);
+      await this.cleanSubscriptions();
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
     }
@@ -100,9 +97,8 @@ export class DatabaseCleaner {
 
   /**
    * Deletes subscriptions that are associated with users that have not logged-in in the past year.
-   * @param oneRunMax If set to true the deletion query will be executed just once (primarily used for testing).
    */
-  public async cleanSubscriptions(oneRunMax = false) {
+  public async cleanSubscriptions() {
     let subsDeleted = 0;
     await this._models.sequelize.transaction(async (t) => {
       // user has no addresses at all, and user was last updated before a year ago
