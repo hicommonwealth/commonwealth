@@ -25,7 +25,6 @@ import Group from './group';
 import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import Membership from './membership';
-import NotificationCategory from './notification_category';
 import Outbox from './outbox';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
@@ -69,7 +68,6 @@ export const Factories = {
   GroupPermission,
   LastProcessedEvmBlock,
   Membership,
-  NotificationCategory,
   Outbox,
   Poll,
   ProfileTags,
