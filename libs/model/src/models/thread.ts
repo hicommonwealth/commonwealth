@@ -105,13 +105,6 @@ export default (
         defaultValue: new Date(),
       },
 
-      //notifications
-      max_notif_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-
       version_history_updated: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

@@ -164,7 +164,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               comment_count: 0,
               reaction_count: 0,
               reaction_weights_sum: 0,
-              max_notif_id: 0,
             },
             {
               transaction,

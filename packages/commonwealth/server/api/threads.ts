@@ -11,5 +11,4 @@ export const trpcRouter = trpc.router({
       ({ community_id }) => ({ community: community_id }),
     ),
   ),
-  getBulkThreads: trpc.query(Thread.GetBulkThreads, trpc.Tag.Thread),
 });

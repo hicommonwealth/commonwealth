@@ -126,7 +126,6 @@ export const e2eTestEntities = async function (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           has_homepage: 'false' as any,
           collapsed_on_homepage: false,
-          has_chain_events_listener: false,
           directory_page_enabled: false,
         })),
       )),

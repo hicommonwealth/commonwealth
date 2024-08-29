@@ -125,13 +125,13 @@ export async function __deleteCommunity(
           if (threadsToDelete.length > 0) {
             const commentsToDelete = await this.models.Comment.findAll({
               where: {
-                thread_id: threadsToDelete.map((t) => t.id!),
+                thread_id: threadsToDelete.map((th) => th.id!),
               },
               transaction: t,
             });
             await this.models.Reaction.destroy({
               where: {
-                thread_id: threadsToDelete.map((t) => t.id!),
+                thread_id: threadsToDelete.map((th) => th.id!),
               },
               transaction: t,
             });
