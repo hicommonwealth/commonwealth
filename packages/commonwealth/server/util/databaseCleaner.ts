@@ -65,12 +65,6 @@ export class DatabaseCleaner {
     }
 
     this._completed = true;
-    if (!this._oneRunMax) {
-      this._timeoutID = setTimeout(
-        this.startLoop.bind(this),
-        this.getTimeout(),
-      );
-    }
   }
 
   public async executeQueries() {
