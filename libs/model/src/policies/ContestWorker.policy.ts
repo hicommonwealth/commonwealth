@@ -3,7 +3,7 @@ import { QueryTypes } from 'sequelize';
 import { config, Contest } from '..';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
-import { buildThreadContentUrl } from '../utils';
+import { buildThreadContentUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 
