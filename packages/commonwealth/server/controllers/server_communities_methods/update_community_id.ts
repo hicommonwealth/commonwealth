@@ -74,13 +74,11 @@ export async function __updateCommunityId(
     //  in the long-term. Alternative is to gradually duplicate the data
     //  and then delete the old data once redirect from old to new community
     //  is enabled
-    const models: ModelStatic<ModelInstance<{ community_id?: string }>>[] = [
+    const models: ModelStatic<ModelInstance<{ community_id: string }>>[] = [
       this.models.Address,
-      this.models.Comment,
       this.models.Topic,
       this.models.Thread,
       this.models.Poll,
-      this.models.Reaction,
       this.models.StarredCommunity,
       this.models.Vote,
       this.models.Webhook,

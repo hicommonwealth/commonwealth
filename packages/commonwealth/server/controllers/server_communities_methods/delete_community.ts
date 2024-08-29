@@ -61,8 +61,8 @@ export async function __deleteCommunity(
 
           // Add the created by field to comments for redundancy
           await sequelize.query(
-            `UPDATE "Comments" SET
-                created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id)
+            `UPDATE "Comments"
+             SET created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id)
              WHERE community_id = '${community.id}'`,
             { transaction: t },
           );
@@ -75,22 +75,22 @@ export async function __deleteCommunity(
 
           // Add the created by field to threads for redundancy
           await sequelize.query(
-            `UPDATE "Threads" SET
-                created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id)
+            `UPDATE "Threads"
+             SET created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id)
              WHERE community_id = :community_id`,
             { transaction: t, replacements: { community_id: community.id } },
           );
 
           await this.models.sequelize.query(
             `
-            WITH addresses_to_delete AS (
-                SELECT id
-                FROM "Addresses"
-                WHERE community_id = :community_id
-            ) DELETE FROM "Memberships" M
-            USING addresses_to_delete atd
-            WHERE atd.id = M.address_id;
-          `,
+                WITH addresses_to_delete AS (SELECT id
+                                             FROM "Addresses"
+                                             WHERE community_id = :community_id)
+                DELETE
+                FROM "Memberships" M
+                    USING addresses_to_delete atd
+                WHERE atd.id = M.address_id;
+            `,
             {
               transaction: t,
               replacements: {
@@ -101,14 +101,14 @@ export async function __deleteCommunity(
 
           await this.models.sequelize.query(
             `
-            WITH addresses_to_delete AS (
-                SELECT id
-                FROM "Addresses"
-                WHERE community_id = :community_id
-            ) DELETE FROM "Collaborations" C
-            USING addresses_to_delete atd
-            WHERE atd.id = C.address_id;
-          `,
+                WITH addresses_to_delete AS (SELECT id
+                                             FROM "Addresses"
+                                             WHERE community_id = :community_id)
+                DELETE
+                FROM "Collaborations" C
+                    USING addresses_to_delete atd
+                WHERE atd.id = C.address_id;
+            `,
             {
               transaction: t,
               replacements: {
@@ -117,23 +117,52 @@ export async function __deleteCommunity(
             },
           );
 
-          const models: ModelStatic<
-            ModelInstance<{ community_id?: string }>
-          >[] = [
-            this.models.CommunityStake,
-            this.models.DiscordBotConfig,
-            this.models.Reaction,
-            this.models.Comment,
-            this.models.Topic,
-            this.models.CommunityContract,
-            this.models.Webhook,
-            this.models.Vote,
-            this.models.Poll,
-            this.models.Thread,
-            this.models.StarredCommunity,
-            this.models.Group,
-            this.models.Address,
-          ];
+          const threadsToDelete = await this.models.Thread.findAll({
+            where: {
+              community_id: community.id,
+            },
+          });
+          if (threadsToDelete.length > 0) {
+            const commentsToDelete = await this.models.Comment.findAll({
+              where: {
+                thread_id: threadsToDelete.map((t) => t.id!),
+              },
+              transaction: t,
+            });
+            await this.models.Reaction.destroy({
+              where: {
+                thread_id: threadsToDelete.map((t) => t.id!),
+              },
+              transaction: t,
+            });
+            await this.models.Reaction.destroy({
+              where: {
+                comment_id: commentsToDelete.map((c) => c.id!),
+              },
+              transaction: t,
+            });
+            await this.models.Comment.destroy({
+              where: {
+                id: commentsToDelete.map((c) => c.id!),
+              },
+              transaction: t,
+            });
+          }
+
+          const models: ModelStatic<ModelInstance<{ community_id: string }>>[] =
+            [
+              this.models.CommunityStake,
+              this.models.DiscordBotConfig,
+              this.models.Topic,
+              this.models.CommunityContract,
+              this.models.Webhook,
+              this.models.Vote,
+              this.models.Poll,
+              this.models.Thread,
+              this.models.StarredCommunity,
+              this.models.Group,
+              this.models.Address,
+            ];
 
           for (const model of models) {
             await model.destroy({
