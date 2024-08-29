@@ -99,9 +99,7 @@ export class DatabaseCleaner {
   }
 
   /**
-   * Deletes subscriptions that are associated with users that have not logged-in in the past year. Only 10,000
-   * subscriptions are deleted at a time to reduce database load. Between each there is a 5-second pause to again
-   * reduce database load and allow other transactions to complete.
+   * Deletes subscriptions that are associated with users that have not logged-in in the past year.
    * @param oneRunMax If set to true the deletion query will be executed just once (primarily used for testing).
    */
   public async cleanSubscriptions(oneRunMax = false) {
