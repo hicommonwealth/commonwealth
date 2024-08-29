@@ -4,6 +4,7 @@ import axios from 'axios';
 import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
 import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateCommunityThreadCount } from '../communities/getCommuityById';
@@ -46,6 +47,7 @@ const useDeleteThreadMutation = ({
   threadId,
   currentStage,
 }: UseDeleteThreadMutationProps) => {
+  const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
@@ -59,6 +61,7 @@ const useDeleteThreadMutation = ({
           communityId,
           'decrement',
           currentStage === ThreadStage.Voting,
+          utils,
         );
       }
 

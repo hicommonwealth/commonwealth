@@ -7,6 +7,7 @@ import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadCountsByStageChange } from '../communities/getCommuityById';
@@ -119,6 +120,7 @@ const useEditThreadMutation = ({
   currentStage,
   currentTopicId,
 }: UseEditThreadMutationProps) => {
+  const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
@@ -130,6 +132,7 @@ const useEditThreadMutation = ({
           communityId,
           currentStage,
           updatedThread.stage,
+          utils,
         );
       }
 

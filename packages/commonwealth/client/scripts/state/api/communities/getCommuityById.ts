@@ -15,14 +15,14 @@ type UseGetCommunityByIdProps = {
 
 const getQueryKeysForCommunity = (communityId: string) => {
   return [
-    trpc.community.getCommunity.getQueryKey({
+    {
       id: communityId,
       include_node_info: true,
-    }),
-    trpc.community.getCommunity.getQueryKey({
+    },
+    {
       id: communityId,
       include_node_info: false,
-    }),
+    },
   ];
 };
 
@@ -30,22 +30,34 @@ export const updateThreadCountsByStageChange = (
   communityId: string,
   currentStage: ThreadStage,
   updatedStage: ThreadStage,
+  trpcUtils: ReturnType<typeof trpc.useUtils>,
 ) => {
   // get all the query keys for this community
   const queryKeys = getQueryKeysForCommunity(communityId);
 
-  queryKeys.map((key) => {
-    const data =
-      queryClient.getQueryData<z.infer<typeof ExtendedCommunity>>(key);
+  // calc change by value
+  let changeBy = 0;
+  if (currentStage === ThreadStage.Voting) changeBy--;
+  if (updatedStage === ThreadStage.Voting) changeBy++;
 
-    if (data) {
-      queryClient.setQueryData(key, () => {
-        let incBy = 0;
-        if (currentStage === ThreadStage.Voting) incBy--;
-        if (updatedStage === ThreadStage.Voting) incBy++;
-        data.numVotingThreads = (data.numVotingThreads || 0) + incBy;
-        return { ...data };
+  queryKeys.map((key) => {
+    const queryKey = trpc.community.getCommunity.getQueryKey(key);
+
+    // update react query cache
+    const rqData =
+      queryClient.getQueryData<z.infer<typeof ExtendedCommunity>>(queryKey);
+    if (rqData) {
+      queryClient.setQueryData(queryKey, () => {
+        rqData.numVotingThreads = (rqData.numVotingThreads || 0) + changeBy;
+        return { ...rqData };
       });
+    }
+
+    // update trpc cache
+    const trpcData = trpcUtils.community.getCommunity.getData(key);
+    if (trpcData && trpcData.numVotingThreads >= 0) {
+      trpcData.numVotingThreads += changeBy;
+      trpcUtils.community.getCommunity.setData(key, trpcData);
     }
   });
 };
@@ -54,23 +66,38 @@ export const updateCommunityThreadCount = (
   communityId: string,
   type: 'increment' | 'decrement',
   isVotingThread: boolean,
+  trpcUtils: ReturnType<typeof trpc.useUtils>,
 ) => {
   // get all the query keys for this community
   const queryKeys = getQueryKeysForCommunity(communityId);
+  const count = type === 'increment' ? 1 : -1;
 
   queryKeys.map((key) => {
-    const data =
-      queryClient.getQueryData<z.infer<typeof ExtendedCommunity>>(key);
+    const queryKey = trpc.community.getCommunity.getQueryKey(key);
 
-    if (data) {
-      queryClient.setQueryData(key, () => {
-        const count = type === 'increment' ? 1 : -1;
-        data.lifetime_thread_count = (data.lifetime_thread_count || 0) + count;
+    // update react query cache
+    const rqData =
+      queryClient.getQueryData<z.infer<typeof ExtendedCommunity>>(queryKey);
+    if (rqData) {
+      queryClient.setQueryData(queryKey, () => {
+        rqData.lifetime_thread_count =
+          (rqData.lifetime_thread_count || 0) + count;
         if (isVotingThread) {
-          data.numVotingThreads = (data.numVotingThreads || 0) + count;
+          rqData.numVotingThreads = (rqData.numVotingThreads || 0) + count;
         }
-        return { ...data };
+        return { ...rqData };
       });
+    }
+
+    // update trpc cache
+    const trpcData = trpcUtils.community.getCommunity.getData(key);
+    if (
+      trpcData &&
+      trpcData.lifetime_thread_count &&
+      trpcData.lifetime_thread_count >= 0
+    ) {
+      trpcData.lifetime_thread_count += count;
+      trpcUtils.community.getCommunity.setData(key, trpcData);
     }
   });
 };
@@ -83,7 +110,9 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
   if (queryKeys.length > 0) {
     await Promise.all(
       queryKeys.map(async (key) => {
-        const params = { queryKey: key };
+        const params = {
+          queryKey: trpc.community.getCommunity.getQueryKey(key),
+        };
         await queryClient.cancelQueries(params);
         await queryClient.invalidateQueries(params);
       }),

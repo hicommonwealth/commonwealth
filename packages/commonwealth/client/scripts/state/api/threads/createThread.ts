@@ -8,6 +8,7 @@ import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
@@ -81,6 +82,8 @@ const createThread = async ({
 const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
+  const utils = trpc.useUtils();
+
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -100,6 +103,7 @@ const useCreateThreadMutation = ({
           communityId,
           'increment',
           newThread.stage === ThreadStage.Voting,
+          utils,
         );
       }
 
