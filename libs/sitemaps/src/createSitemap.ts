@@ -14,10 +14,20 @@ export function createSitemap(links: ReadonlyArray<Link>): string {
   buff.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n');
 
   for (const link of links) {
+    if (link.priority !== undefined && link.priority < 0) {
+      // disable indexing by setting the priority to -1
+      continue;
+    }
+
     buff.append('<url>\n');
     // loc, changefreq, priority, lastmod
     buff.append(`<loc>${link.url}</loc>\n`);
     buff.append(`<lastmod>${link.updated_at}</lastmod>\n`);
+
+    if (link.priority !== undefined) {
+      buff.append(`<priority>${link.priority}</priority>\n`);
+    }
+
     buff.append('</url>\n');
   }
 

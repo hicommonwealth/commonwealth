@@ -1,7 +1,8 @@
 import { expect } from 'chai';
+import { describe, test } from 'vitest';
 
 describe('todo', () => {
-  it('todo', () => {
+  test('todo', () => {
     expect(true).to.eq(true);
   });
 });

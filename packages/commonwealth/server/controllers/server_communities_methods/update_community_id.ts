@@ -60,6 +60,10 @@ export async function __updateCommunityId(
         id: new_community_id,
         ...communityData,
         redirect: community_id,
+        network:
+          communityData.network === id
+            ? new_community_id
+            : communityData.network,
       },
       { transaction },
     );
@@ -74,11 +78,7 @@ export async function __updateCommunityId(
       // @ts-expect-error StrictNullChecks
       this.models.Address,
       // @ts-expect-error StrictNullChecks
-      this.models.Ban,
-      // @ts-expect-error StrictNullChecks
       this.models.Comment,
-      // @ts-expect-error StrictNullChecks
-      this.models.CommunityBanner,
       // @ts-expect-error StrictNullChecks
       this.models.Topic,
       // @ts-expect-error StrictNullChecks
@@ -117,18 +117,6 @@ export async function __updateCommunityId(
         },
       );
     }
-
-    await this.models.Template.update(
-      {
-        created_for_community: new_community_id,
-      },
-      {
-        where: {
-          created_for_community: community_id,
-        },
-        transaction,
-      },
-    );
 
     await this.models.User.update(
       {

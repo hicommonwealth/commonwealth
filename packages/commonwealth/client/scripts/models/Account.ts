@@ -1,17 +1,25 @@
+import { Session } from '@canvas-js/interfaces';
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
-import app from 'state';
-import NewProfilesController from '../controllers/server/newProfiles';
-
+import { serializeCanvas } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
+import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
-import type ChainInfo from './ChainInfo';
+import { userStore } from 'state/ui/user';
+import NewProfilesController from '../controllers/server/newProfiles';
+import ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
+
+export type AccountCommunity = {
+  id: ChainInfo['id'];
+  base?: ChainInfo['base'];
+  ss58Prefix?: ChainInfo['ss58Prefix'] | number;
+};
 
 class Account {
   public readonly address: string;
-  public readonly community: ChainInfo;
+  public readonly community: AccountCommunity;
   public readonly ghostAddress: boolean;
   public lastActive?: momentType.Moment;
 
@@ -50,7 +58,7 @@ class Account {
     lastActive,
   }: {
     // required args
-    community: ChainInfo;
+    community: AccountCommunity;
     address: string;
 
     // optional args
@@ -107,10 +115,10 @@ class Account {
           );
         } else {
           updatedProfile.initialize(
+            data?.userId,
             data?.name,
             data.address,
             data?.avatarUrl,
-            data.id,
             updatedProfile.chain,
             data?.lastActive,
           );
@@ -170,63 +178,17 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
-  public async validate(
-    signature: string,
-    timestamp: number,
-    chainId: string | number,
-    shouldRedraw = true,
-  ) {
-    if (!signature) {
-      throw new Error('signature required for validation');
-    }
-
+  public async validate(session: Session) {
     const params = {
       address: this.address,
       community_id: this.community.id,
-      chain_id: chainId,
-      jwt: app.user.jwt,
-      signature,
+      jwt: userStore.getState().jwt,
+      session: serializeCanvas(session),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
-      session_public_address: await app.sessions.getOrCreateAddress(
-        this.community.base,
-        chainId.toString(),
-        this.address,
-      ),
-      session_timestamp: timestamp,
-      session_block_data: this.validationBlockInfo,
     };
 
-    const res = await axios.post(`${app.serverUrl()}/verifyAddress`, params);
-
-    if (res.data.result.status === 'Success') {
-      // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(
-        ({ address, ghostAddress, community }) =>
-          ghostAddress &&
-          this.community.id === community.id &&
-          app.user.activeAccounts.some(
-            (account) => account.address === address,
-          ),
-      );
-
-      if (hasGhostAddress) {
-        const response = await axios.post(
-          `${app.serverUrl()}/updateAddress`,
-          params,
-        );
-
-        if (response.data.success && response.data.ghostAddressId) {
-          // remove ghost address from addresses
-          app.user.setAddresses(
-            app.user.addresses.filter(({ ghostAddress }) => {
-              return !ghostAddress;
-            }),
-          );
-          app.user.setActiveAccounts([], shouldRedraw);
-        }
-      }
-    }
+    return await axios.post(`${SERVER_URL}/verifyAddress`, params);
   }
 }
 

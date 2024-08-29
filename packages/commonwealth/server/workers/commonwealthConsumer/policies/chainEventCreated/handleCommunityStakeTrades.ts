@@ -1,12 +1,10 @@
-import { events, logger } from '@hicommonwealth/core';
+import { CommunityStakeTrade, events, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
-import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { z } from 'zod';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function handleCommunityStakeTrades(
   models: DB,
@@ -20,7 +18,7 @@ export async function handleCommunityStakeTrades(
     4: ethAmount,
     // 5: protocolEthAmount,
     // 6: nameSpaceEthAmount,
-  } = event.parsedArgs as z.infer<typeof events.CommunityStakeTrade>;
+  } = event.parsedArgs as z.infer<typeof CommunityStakeTrade>;
 
   const existingTxn = await models.StakeTransaction.findOne({
     where: {
@@ -42,7 +40,7 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const chainNode = await models.ChainNode.findOne({
+  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
       id: event.eventSource.chainNodeId,
     },
@@ -52,6 +50,13 @@ export async function handleCommunityStakeTrades(
       event,
     });
     return;
+  }
+
+  if (!chainNode.private_url) {
+    log.error('ChainNode is missing a private url', undefined, {
+      event,
+      chainNode: chainNode.toJSON(),
+    });
   }
 
   if (community.chain_node_id != chainNode.id) {
@@ -65,7 +70,7 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const web3 = new Web3(chainNode.private_url || chainNode.url);
+  const web3 = new Web3(chainNode.private_url!);
 
   const [tradeTxReceipt, block] = await Promise.all([
     web3.eth.getTransactionReceipt(event.rawLog.transactionHash),

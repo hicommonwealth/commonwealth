@@ -1,23 +1,20 @@
 import {
-  EvmRecurringContestEventSignatures,
-  EvmSingleContestEventSignatures,
+  EvmEventSignatures,
   InvalidState,
   Projection,
   events,
   logger,
 } from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
-import { Op, QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
+import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
-import { models, sequelize } from '../database';
+import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
 import { decodeThreadContentUrl } from '../utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export class MissingContestManager extends Error {
   constructor(
@@ -38,6 +35,15 @@ const inputs = {
   ContestContentUpvoted: events.ContestContentUpvoted,
 };
 
+// TODO: remove kind column from EvmEventSources
+const signatureToKind = {
+  [EvmEventSignatures.Contests.ContentAdded]: 'ContentAdded',
+  [EvmEventSignatures.Contests.RecurringContestStarted]: 'ContestStarted',
+  [EvmEventSignatures.Contests.RecurringContestVoterVoted]: 'VoterVoted',
+  [EvmEventSignatures.Contests.SingleContestStarted]: 'ContestStarted',
+  [EvmEventSignatures.Contests.SingleContestVoterVoted]: 'VoterVoted',
+};
+
 /**
  * Makes sure contest manager (off-chain metadata) record exists
  * - Alerts when not found and inserts default record to patch distributed transaction
@@ -55,7 +61,7 @@ async function updateOrCreateWithAlert(
       required: false,
     },
   });
-  const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
+  const url = community?.ChainNode?.private_url;
   if (!url)
     throw new InvalidState(
       `Chain node url not found on namespace ${namespace}`,
@@ -124,16 +130,23 @@ async function updateOrCreateWithAlert(
     });
     if (mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi)) {
       const sigs = isOneOff
-        ? EvmSingleContestEventSignatures
-        : EvmRecurringContestEventSignatures;
-      const sourcesToCreate: EvmEventSourceAttributes[] = Object.keys(sigs).map(
-        (eventName) => {
-          const eventSignature = (sigs as Record<string, string>)[eventName];
+        ? [
+            EvmEventSignatures.Contests.ContentAdded,
+            EvmEventSignatures.Contests.SingleContestStarted,
+            EvmEventSignatures.Contests.SingleContestVoterVoted,
+          ]
+        : [
+            EvmEventSignatures.Contests.ContentAdded,
+            EvmEventSignatures.Contests.RecurringContestStarted,
+            EvmEventSignatures.Contests.RecurringContestVoterVoted,
+          ];
+      const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
+        (eventSignature) => {
           return {
             chain_node_id: community!.ChainNode!.id!,
             contract_address: contest_address,
             event_signature: eventSignature,
-            kind: eventName,
+            kind: signatureToKind[eventSignature],
             abi_id: contestAbi.id,
           };
         },
@@ -148,6 +161,7 @@ type ContestDetails = {
   prize_percentage: number;
   payout_structure: number[];
 };
+
 /**
  * Gets chain node url from contest address
  */
@@ -156,17 +170,14 @@ async function getContestDetails(
 ): Promise<ContestDetails | undefined> {
   const [result] = await models.sequelize.query<ContestDetails>(
     `
-  select
-    coalesce(cn.private_url, cn.url) as url,
-    cm.prize_percentage,
-    cm.payout_structure
-  from
-    "ContestManagers" cm
-    join "Communities" c on cm.community_id = c.id
-    join "ChainNodes" cn on c.chain_node_id = cn.id
-  where
-    cm.contest_address = :contest_address;
-  `,
+        select coalesce(cn.private_url, cn.url) as url,
+               cm.prize_percentage,
+               cm.payout_structure
+        from "ContestManagers" cm
+                 join "Communities" c on cm.community_id = c.id
+                 join "ChainNodes" cn on c.chain_node_id = cn.id
+        where cm.contest_address = :contest_address;
+    `,
     {
       type: QueryTypes.SELECT,
       raw: true,
@@ -177,9 +188,9 @@ async function getContestDetails(
 }
 
 /**
- * Updates contest score (eventually winners)
+ * Updates contest score (only works if contest_id is currently active!)
  */
-async function updateScore(contest_address: string, contest_id: number) {
+export async function updateScore(contest_address: string, contest_id: number) {
   try {
     const contestManager = await models.ContestManager.findOne({
       where: {
@@ -198,11 +209,14 @@ async function updateScore(contest_address: string, contest_id: number) {
       await protocol.contestHelper.getContestScore(
         details.url,
         contest_address,
-        contest_id,
+        undefined,
         oneOff,
       );
+
     const prizePool =
-      (Number(contestBalance) * Number(details.prize_percentage)) / 100;
+      (Number(contestBalance) *
+        Number(oneOff ? 100 : details.prize_percentage)) /
+      100;
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
@@ -210,8 +224,8 @@ async function updateScore(contest_address: string, contest_id: number) {
       prize:
         i < Number(details.payout_structure.length)
           ? (
-              (BigInt(prizePool) * BigInt(details.payout_structure[i])) /
-              100n
+              (Number(prizePool) * Number(details.payout_structure[i])) /
+              100
             ).toString()
           : '0',
     }));
@@ -227,31 +241,6 @@ async function updateScore(contest_address: string, contest_id: number) {
         },
       },
     );
-  } catch (err) {
-    err instanceof Error
-      ? log.error(err.message, err)
-      : log.error(err as string);
-  }
-}
-
-/**
- * Makes sure all previous contests have an updated score
- */
-async function updateEndedContests(
-  contest_address: string,
-  contest_id: number,
-) {
-  try {
-    const outdated = await models.Contest.findAll({
-      where: {
-        contest_address: contest_address,
-        contest_id: { [Op.lt]: contest_id },
-        score_updated_at: { [Op.lte]: sequelize.col('end_time') },
-      },
-    });
-    for (const contest of outdated) {
-      await updateScore(contest_address, contest.contest_id);
-    }
   } catch (err) {
     err instanceof Error
       ? log.error(err.message, err)
@@ -286,15 +275,10 @@ export function Contests(): Projection<typeof inputs> {
       // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
         const contest_id = payload.contest_id!;
-        // update winners on ended contests
         await models.Contest.create({
           ...payload,
           contest_id,
         });
-        contest_id > 0 &&
-          setImmediate(() =>
-            updateEndedContests(payload.contest_address, contest_id),
-          );
       },
 
       ContestContentAdded: async ({ payload }) => {
@@ -316,7 +300,6 @@ export function Contests(): Projection<typeof inputs> {
         const add_action = await models.ContestAction.findOne({
           where: {
             contest_address: payload.contest_address,
-            contest_id,
             content_id: payload.content_id,
             action: 'added',
           },
@@ -328,10 +311,11 @@ export function Contests(): Projection<typeof inputs> {
           contest_id,
           actor_address: payload.voter_address,
           action: 'upvoted',
-          thread_id: add_action?.thread_id,
+          thread_id: add_action!.thread_id,
           created_at: new Date(),
         });
-        // update score if vote is less than 1hr old
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },

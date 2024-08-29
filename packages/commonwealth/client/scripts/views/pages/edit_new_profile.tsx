@@ -1,12 +1,12 @@
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import React from 'react';
-import EditProfileComponent from '../components/edit_profile';
+import useUserStore from 'state/ui/user';
+import EditProfileComponent from '../components/EditProfile';
 import { PageNotFound } from '../pages/404';
 
 const EditNewProfile = () => {
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
-  if (!isLoggedIn) {
+  if (!user.isLoggedIn) {
     return (
       <PageNotFound message="You must be signed in to edit your profile." />
     );

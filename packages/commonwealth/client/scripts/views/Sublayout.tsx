@@ -9,13 +9,10 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { getUniqueUserAddresses } from '../helpers/user';
-import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
-import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
-import { Footer } from './Footer';
+import useUserStore from '../state/ui/user';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
@@ -31,101 +28,44 @@ type SublayoutProps = {
   isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
-const Sublayout = ({
-  children,
-  hideFooter = true,
-  isInsideCommunity,
-}: SublayoutProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
-  const { isLoggedIn } = useUserLoggedIn();
+const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const [authModalType, setAuthModalType] = useState<AuthModalType>();
-  const [profileId, setProfileId] = useState(null);
+
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
-    stickyBehaviourEnabled: userOnboardingEnabled,
+    stickyBehaviourEnabled: true,
     zIndex: 70,
   });
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
+  const { authModalType, setAuthModalType } = useAuthModalStore();
+  const user = useUserStore();
 
-  useEffect(() => {
-    if (triggerOpenModalType) {
-      setAuthModalType(triggerOpenModalType);
-      // @ts-expect-error StrictNullChecks
-      setTriggerOpenModalType(undefined);
-    }
-  }, [triggerOpenModalType, setTriggerOpenModalType]);
-
-  const {
-    onboardedProfiles,
-    setProfileAsOnboarded,
-    isWelcomeOnboardModalOpen,
-    setIsWelcomeOnboardModalOpen,
-  } = useWelcomeOnboardModal();
-
-  useEffect(() => {
-    let timeout = null;
-    if (isLoggedIn) {
-      // @ts-expect-error StrictNullChecks
-      timeout = setTimeout(() => {
-        // @ts-expect-error StrictNullChecks
-        setProfileId(app?.user?.addresses?.[0]?.profile?.id);
-      }, 100);
-    } else {
-      setProfileId(null);
-    }
-
-    return () => {
-      if (timeout !== null) clearTimeout(timeout);
-    };
-  }, [isLoggedIn]);
+  const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
+    useWelcomeOnboardModal();
 
   useNecessaryEffect(() => {
     if (
-      isLoggedIn &&
-      userOnboardingEnabled &&
+      user.isLoggedIn &&
       !isWelcomeOnboardModalOpen &&
-      profileId
+      user.id &&
+      !user.isWelcomeOnboardFlowComplete
     ) {
-      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
-      const hasUsername = app?.user?.addresses?.find(
-        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
-      );
-
-      const userUniqueAddresses = getUniqueUserAddresses({});
-
-      // open welcome modal if user is not onboarded and there is a single connected address
-      if (
-        !hasUsername &&
-        !onboardedProfiles[profileId] &&
-        userUniqueAddresses.length === 1
-      ) {
-        setIsWelcomeOnboardModalOpen(true);
-      }
-
-      // if the user has a set username, mark as onboarded
-      if (hasUsername && !onboardedProfiles[profileId]) {
-        setProfileAsOnboarded(profileId);
-      }
+      setIsWelcomeOnboardModalOpen(true);
     }
 
-    if (!isLoggedIn && isWelcomeOnboardModalOpen) {
+    if (!user.isLoggedIn && isWelcomeOnboardModalOpen) {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
-    profileId,
-    onboardedProfiles,
-    userOnboardingEnabled,
+    user.id,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
-    setProfileAsOnboarded,
-    isLoggedIn,
+    user.isLoggedIn,
   ]);
 
   const location = useLocation();
@@ -177,10 +117,8 @@ const Sublayout = ({
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
-  // @ts-expect-error StrictNullChecks
-  const terms = app.chain ? chain.terms : null;
-  // @ts-expect-error StrictNullChecks
-  const banner = app.chain ? chain.communityBanner : null;
+  const terms = app.chain ? chain?.terms : null;
+  const banner = app.chain ? chain?.communityBanner : null;
 
   return (
     <div className="Sublayout">
@@ -224,14 +162,12 @@ const Sublayout = ({
             resizing,
           )}
         >
-          {/* @ts-expect-error StrictNullChecks */}
-          <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+          <SublayoutBanners banner={banner || ''} terms={terms || ''} />
 
           <div className="Body">
             <div
               className={clsx('mobile-auth-buttons', {
-                isVisible:
-                  !isLoggedIn && userOnboardingEnabled && isWindowExtraSmall,
+                isVisible: !user.isLoggedIn && isWindowExtraSmall,
               })}
               id="mobile-auth-buttons"
             >
@@ -241,22 +177,17 @@ const Sublayout = ({
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {userOnboardingEnabled && !routesWithoutGenericSliders && (
-              <UserTrainingSlider />
-            )}
+            {!routesWithoutGenericSliders && <UserTrainingSlider />}
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
             {children}
-            {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        {userOnboardingEnabled && (
-          <WelcomeOnboardModal
-            isOpen={isWelcomeOnboardModalOpen}
-            onClose={() => setIsWelcomeOnboardModalOpen(false)}
-          />
-        )}
+        <WelcomeOnboardModal
+          isOpen={isWelcomeOnboardModalOpen}
+          onClose={() => setIsWelcomeOnboardModalOpen(false)}
+        />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

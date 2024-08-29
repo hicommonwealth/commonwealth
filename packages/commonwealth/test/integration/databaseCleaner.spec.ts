@@ -5,6 +5,14 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import { DatabaseCleaner } from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
@@ -13,11 +21,11 @@ const { expect } = chai;
 describe('DatabaseCleaner Tests', async () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     models = await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -42,7 +50,7 @@ describe('DatabaseCleaner Tests', async () => {
       sinon.restore();
     });
 
-    it('should not run if started before the correct hour', () => {
+    test('should not run if started before the correct hour', () => {
       const now = new Date();
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
@@ -57,7 +65,7 @@ describe('DatabaseCleaner Tests', async () => {
       expect(dbCleaner.completed).to.be.false;
     });
 
-    it('should run exactly once (immediately) if started in the correct hour', () => {
+    test('should run exactly once (immediately) if started in the correct hour', () => {
       const now = new Date();
       now.setUTCMinutes(0);
       now.setUTCMilliseconds(0);
@@ -69,7 +77,7 @@ describe('DatabaseCleaner Tests', async () => {
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(now.getTime());
     });
 
-    it('should not run if started after the correct hour', () => {
+    test('should not run if started after the correct hour', () => {
       const now = new Date();
       const dbCleaner = new DatabaseCleaner();
       dbCleaner.initLoop(models, now.getUTCHours() - 4, true);
@@ -83,14 +91,14 @@ describe('DatabaseCleaner Tests', async () => {
       expect(dbCleaner.completed).to.be.false;
     });
 
-    it('should not run if an hour to run is not provided', () => {
+    test('should not run if an hour to run is not provided', () => {
       const dbCleaner = new DatabaseCleaner();
       dbCleaner.initLoop(models, NaN, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
-    it('should not run if the hour provided is invalid', () => {
+    test('should not run if the hour provided is invalid', () => {
       let dbCleaner = new DatabaseCleaner();
       dbCleaner.initLoop(models, 24, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
@@ -111,7 +119,7 @@ describe('DatabaseCleaner Tests', async () => {
   describe('Tests what the cleaner cleans', () => {
     let clock: sinon.SinonFakeTimers;
 
-    before(function () {
+    beforeAll(function () {
       const now = new Date();
       now.setUTCHours(8);
       now.setUTCMinutes(0);
@@ -124,11 +132,11 @@ describe('DatabaseCleaner Tests', async () => {
       });
     });
 
-    after(function () {
+    afterAll(function () {
       clock.restore();
     });
 
-    it('Should only delete notifications older than 3 months', async () => {
+    test('Should only delete notifications older than 3 months', async () => {
       const currentNotifLength = (await models.Notification.findAll()).length;
       expect(currentNotifLength).to.equal(0);
 
@@ -170,7 +178,7 @@ describe('DatabaseCleaner Tests', async () => {
       );
     });
 
-    it('Should only delete subscriptions associated with users that have not logged-in in over 1 year', async () => {
+    test('Should only delete subscriptions associated with users that have not logged-in in over 1 year', async () => {
       const now = new Date();
 
       const oneYearAndTwoDaysAgo = new Date(now);
@@ -180,10 +188,10 @@ describe('DatabaseCleaner Tests', async () => {
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
       // create old user and address
-      // @ts-expect-error StrictNullChecks
-      const oldUser = await models.User.createWithProfile({
+      const oldUser = await models.User.create({
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
+        profile: {},
       });
       // @ts-expect-error StrictNullChecks
       await models.Address.create({
@@ -195,10 +203,10 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       // create new user and address
-      // @ts-expect-error StrictNullChecks
-      const newUser = await models.User.createWithProfile({
+      const newUser = await models.User.create({
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
+        profile: {},
       });
       // @ts-expect-error StrictNullChecks
       await models.Address.create({

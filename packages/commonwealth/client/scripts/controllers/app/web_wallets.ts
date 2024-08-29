@@ -1,6 +1,8 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import CoinbaseWebWalletController from './webWallets/coinbase_web_wallet';
@@ -9,7 +11,6 @@ import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_walle
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import LeapWebWalletController from './webWallets/leap_web_wallet';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
-import NearWebWalletController from './webWallets/near_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
@@ -54,18 +55,18 @@ export default class WebWalletController {
 
   // sets a WalletId on the backend for an account whose walletId has not already been set
   public async _setWalletId(account: Account, wallet: WalletId): Promise<void> {
-    if (app.user.activeAccount.address !== account.address) {
+    if (userStore.getState().activeAccount?.address !== account.address) {
       console.error('account must be active to set wallet id');
       return;
     }
     // do nothing on failure
     try {
-      await axios.post(`${app.serverUrl()}/setAddressWallet`, {
+      await axios.post(`${SERVER_URL}/setAddressWallet`, {
         address: account.address,
         author_community_id: account.community.id,
         wallet_id: wallet,
         wallet_sso_source: null,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       });
     } catch (e) {
       console.error(`Failed to set wallet for address: ${e.message}`);
@@ -88,7 +89,7 @@ export default class WebWalletController {
       throw new Error('No wallet available');
     }
 
-    if (app.user.addresses[0].walletId === 'magic') {
+    if (userStore.getState().addresses?.[0]?.walletId === 'magic') {
       throw new Error(
         'On-chain Transactions not currently available for magic',
       );
@@ -112,18 +113,14 @@ export default class WebWalletController {
 
   constructor() {
     this._wallets = [
-      // @ts-expect-error StrictNullChecks
       new PolkadotWebWalletController(),
       new MetamaskWebWalletController(),
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
       new LeapWebWalletController(),
-      // @ts-expect-error StrictNullChecks
-      new NearWebWalletController(),
       new TerraStationWebWalletController(),
       new CosmosEvmMetamaskWalletController(),
       new KeplrEthereumWalletController(),
-      // @ts-expect-error StrictNullChecks
       new PhantomWebWalletController(),
       new TerraWalletConnectWebWalletController(),
       new CoinbaseWebWalletController(),

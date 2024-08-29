@@ -44,6 +44,8 @@ interface ContestsListProps {
   isLoading: boolean;
   stakeEnabled: boolean;
   isContestAvailable: boolean;
+  feeManagerBalance?: string;
+  onSetContestSelectionView?: () => void;
 }
 const ContestsList = ({
   contests,
@@ -51,6 +53,8 @@ const ContestsList = ({
   isLoading,
   stakeEnabled,
   isContestAvailable,
+  feeManagerBalance,
+  onSetContestSelectionView,
 }: ContestsListProps) => {
   const [fundDrawerAddress, setFundDrawerAddress] = useState('');
 
@@ -71,6 +75,7 @@ const ContestsList = ({
           <EmptyContestsList
             isStakeEnabled={stakeEnabled}
             isContestAvailable={isContestAvailable}
+            onSetContestSelectionView={onSetContestSelectionView}
           />
         ) : (
           contests.map((contest) => {
@@ -81,8 +86,6 @@ const ContestsList = ({
 
             const { end_time, score } =
               sortedContests[sortedContests.length - 1] || {};
-
-            const hasEnded = moment(end_time) < moment();
 
             return (
               <ContestCard
@@ -97,10 +100,14 @@ const ContestsList = ({
                 topics={contest.topics}
                 // @ts-expect-error <StrictNullChecks/>
                 score={score}
-                finishDate={moment(end_time).toISOString()}
-                isActive={!contest.cancelled && !hasEnded}
+                decimals={contest.decimals}
+                ticker={contest.ticker}
+                finishDate={end_time ? moment(end_time).toISOString() : ''}
+                isCancelled={contest.cancelled}
                 // @ts-expect-error <StrictNullChecks/>
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
+                feeManagerBalance={feeManagerBalance}
+                isRecurring={!contest.funding_token_address}
               />
             );
           })

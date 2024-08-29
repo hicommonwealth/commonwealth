@@ -1,9 +1,7 @@
-import useTransactionHistory from 'client/scripts/hooks/useTransactionHistory';
 import { formatAddressShort } from 'helpers';
-import { getCommunityStakeSymbol } from 'helpers/stakes';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useTransactionHistory from 'hooks/useTransactionHistory';
 import React, { useState } from 'react';
-import app from 'state';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -27,21 +25,19 @@ const BASE_ADDRESS_FILTER = {
 };
 
 const MyCommunityStake = () => {
-  const { isLoggedIn } = useUserLoggedIn();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchText: '',
     selectedAddress: BASE_ADDRESS_FILTER,
   });
+  const user = useUserStore();
 
   const ADDRESS_FILTERS = [
     BASE_ADDRESS_FILTER,
-    ...[...new Set((app?.user?.addresses || []).map((x) => x.address))].map(
-      (address) => ({
-        label: formatAddressShort(address, 5, 6),
-        value: address,
-      }),
-    ),
+    ...[...new Set(user.addresses.map((x) => x.address))].map((address) => ({
+      label: formatAddressShort(address, 5, 6),
+      value: address,
+    })),
   ];
 
   const possibleAddresses = ADDRESS_FILTERS.filter((a) => a.value !== '').map(
@@ -59,14 +55,11 @@ const MyCommunityStake = () => {
     filterOptions,
     addressFilter,
   });
-  const updatedData = data.map((info) => {
-    info.chain = getCommunityStakeSymbol(
-      app.config.chains.getById(info.community.id)?.ChainNode?.name || '',
-    );
-    return info;
-  });
 
-  if (!isLoggedIn) return <PageNotFound />;
+  if (!user.isLoggedIn) {
+    return <PageNotFound />;
+  }
+
   return (
     <CWPageLayout>
       <section className="MyCommunityStake">
@@ -123,11 +116,9 @@ const MyCommunityStake = () => {
             </CWTabsRow>
 
             {activeTabIndex === 0 ? (
-              // @ts-expect-error <StrictNullChecks/>
-              <Stakes transactions={updatedData} />
+              <Stakes transactions={data || []} />
             ) : (
-              // @ts-expect-error <StrictNullChecks/>
-              <Transactions transactions={updatedData} />
+              <Transactions transactions={data || []} />
             )}
           </>
         )}

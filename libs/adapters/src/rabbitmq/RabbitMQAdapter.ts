@@ -4,18 +4,20 @@ import {
   BrokerSubscriptions,
   CustomRetryStrategyError,
   EventContext,
+  EventNames,
   EventSchemas,
   Events,
   EventsHandlerMetadata,
   ILogger,
   InvalidInput,
   RetryStrategyFn,
+  RoutingKey,
+  RoutingKeyTags,
   handleEvent,
   logger,
 } from '@hicommonwealth/core';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
-import { fileURLToPath } from 'url';
 
 /**
  * Build a retry strategy function based on custom retry strategies map.
@@ -34,6 +36,7 @@ export function buildRetryStrategy(
   return function (
     err: Error | InvalidInput | CustomRetryStrategyError,
     topic: BrokerSubscriptions,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: any,
     ackOrNackFn: AckOrNack,
     log: ILogger,
@@ -85,8 +88,7 @@ export class RabbitMQAdapter implements Broker {
   private readonly _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
-    const __filename = fileURLToPath(import.meta.url);
-    this._log = logger(__filename);
+    this._log = logger(import.meta);
     this._rawVhost =
       _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -154,7 +156,7 @@ export class RabbitMQAdapter implements Broker {
 
     try {
       const publication = await this.broker!.publish(topic, event, {
-        routingKey: event.name,
+        routingKey: this.getRoutingKey(event),
       });
 
       return new Promise<boolean>((resolve, reject) => {
@@ -192,6 +194,12 @@ export class RabbitMQAdapter implements Broker {
     topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<EventSchemas>,
     retryStrategy?: RetryStrategyFn,
+    hooks?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      beforeHandleEvent: (topic: string, event: any, context: any) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      afterHandleEvent: (topic: string, event: any, context: any) => void;
+    },
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
@@ -216,6 +224,17 @@ export class RabbitMQAdapter implements Broker {
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
+          const { beforeHandleEvent, afterHandleEvent } = hooks || {};
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const context: any = {};
+          try {
+            beforeHandleEvent?.(topic, content, context);
+          } catch (err) {
+            this._log.error(
+              `beforeHandleEvent failed on topic ${topic}`,
+              err as Error,
+            );
+          }
           handleEvent(handler, content, true)
             .then(() => {
               this._log.debug('Message Acked', {
@@ -235,6 +254,16 @@ export class RabbitMQAdapter implements Broker {
                   ackOrNackFn,
                   this._log,
                 );
+            })
+            .finally(() => {
+              try {
+                afterHandleEvent?.(topic, content, context);
+              } catch (err) {
+                this._log.error(
+                  `afterHandleEvent failed on topic ${topic}`,
+                  err as Error,
+                );
+              }
             });
         },
       );
@@ -264,12 +293,27 @@ export class RabbitMQAdapter implements Broker {
     return false;
   }
 
+  public getRoutingKey<Name extends Events>(
+    event: EventContext<Name>,
+  ): RoutingKey {
+    if (
+      (event.name === EventNames.ThreadCreated ||
+        event.name === EventNames.ThreadUpvoted) &&
+      'contestManagers' in event.payload &&
+      event.payload.contestManagers?.length
+    ) {
+      return `${event.name}.${RoutingKeyTags.Contest}`;
+    } else {
+      return `${event.name}`;
+    }
+  }
+
   public get name(): string {
     return 'RabbitMQAdapter';
   }
 
   public async dispose(): Promise<void> {
-    await this.broker!.shutdown();
+    await this.broker?.shutdown();
     this._initialized = false;
   }
 

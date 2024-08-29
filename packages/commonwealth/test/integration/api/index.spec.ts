@@ -1,19 +1,13 @@
 /* eslint-disable no-unused-expressions */
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { dispose } from '@hicommonwealth/core';
-import { ChainBase } from '@hicommonwealth/shared';
-import { personalSign } from '@metamask/eth-sig-util';
+import { CANVAS_TOPIC, serializeCanvas } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { ethers } from 'ethers';
 import { bech32ToHex } from 'shared/utils';
-import * as siwe from 'siwe';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import {
-  TEST_BLOCK_INFO_BLOCKHASH,
-  TEST_BLOCK_INFO_STRING,
-  createSiweMessage,
-} from '../../../shared/adapters/chain/ethereum/keys';
-import { createCanvasSessionPayload } from '../../../shared/canvas';
+import { TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -21,16 +15,16 @@ const { expect } = chai;
 describe('API Tests', () => {
   let server: TestServer;
 
-  before('reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('address tests', () => {
-    it('should call the /api/status route', async () => {
+    test('should call the /api/status route', async () => {
       const res = await chai
         .request(server.app)
         .get('/api/status')
@@ -38,8 +32,11 @@ describe('API Tests', () => {
       expect(res.body).to.not.be.null;
     });
 
-    it('should create an ETH address', async () => {
-      const { address } = server.seeder.generateEthAddress();
+    test('should create an ETH address', async () => {
+      const wallet = new SIWESigner({ chainId: 1 });
+      const { payload: session } = await wallet.newSession(CANVAS_TOPIC);
+      const address = session.address.split(':')[2];
+
       const chain = 'ethereum';
       const wallet_id = 'metamask';
       const res = await chai
@@ -60,7 +57,7 @@ describe('API Tests', () => {
       expect(res.body.result.verification_token).to.be.not.null;
     });
 
-    it('should create a Cosmos address', async () => {
+    test('should create a Cosmos address', async () => {
       const address = 'osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6';
       const expectedHex = await bech32ToHex(address);
       const community_id = 'osmosis';
@@ -84,8 +81,13 @@ describe('API Tests', () => {
       expect(res.body.result.verification_token).to.be.not.null;
     });
 
-    it('should verify an ETH address', async () => {
-      const { privateKey, address } = server.seeder.generateEthAddress();
+    test('should verify an ETH address', async () => {
+      const chainId = '1'; // use ETH mainnet for testing
+
+      const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
+      const { payload: session } = await sessionSigner.newSession(CANVAS_TOPIC);
+      const address = session.address.split(':')[2];
+
       const community_id = 'ethereum';
       const wallet_id = 'metamask';
       let res = await chai
@@ -98,23 +100,6 @@ describe('API Tests', () => {
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
-      const chain_id = '1'; // use ETH mainnet for testing
-      const sessionWallet = ethers.Wallet.createRandom();
-      const timestamp = 1665083987891;
-      const message = createCanvasSessionPayload(
-        'ethereum' as ChainBase,
-        chain_id,
-        address,
-        sessionWallet.address,
-        timestamp,
-        TEST_BLOCK_INFO_BLOCKHASH,
-      );
-      // const data = getEIP712SignableSession(message);
-      const nonce = siwe.generateNonce();
-      const domain = 'https://commonwealth.test';
-      const siweMessage = createSiweMessage(message, domain, nonce);
-      const signatureData = personalSign({ privateKey, data: siweMessage });
-      const signature = `${domain}/${nonce}/${signatureData}`;
       res = await chai
         .request(server.app)
         .post('/api/verifyAddress')
@@ -122,12 +107,8 @@ describe('API Tests', () => {
         .send({
           address,
           community_id,
-          chain_id,
-          signature,
           wallet_id,
-          session_public_address: sessionWallet.address,
-          session_timestamp: timestamp,
-          session_block_data: TEST_BLOCK_INFO_STRING,
+          session: serializeCanvas(session),
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');

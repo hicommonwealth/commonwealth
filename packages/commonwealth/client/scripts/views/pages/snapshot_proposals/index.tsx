@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
-import { NotificationCategories } from '@hicommonwealth/shared';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
@@ -10,7 +9,6 @@ import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
   CWTab,
   CWTabsRow,
@@ -30,21 +28,9 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     active: Array<SnapshotProposal>;
     ended: Array<SnapshotProposal>;
   }>({ active: [], ended: [] });
+
   const proposalsToDisplay =
     activeTab === 1 ? proposals.active : proposals.ended;
-
-  const spaceSubscription = useMemo(
-    () =>
-      app.user.notifications.findNotificationSubscription({
-        categoryId: NotificationCategories.SnapshotProposal,
-        options: { snapshotId },
-      }),
-    [snapshotId],
-  );
-
-  const [hasSubscription, setHasSubscription] = useState<boolean>(
-    spaceSubscription !== undefined,
-  );
 
   useManageDocumentTitle('Snapshots');
 
@@ -76,23 +62,6 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     fetch();
   }, [snapshotId]);
 
-  const updateSubscription = () => {
-    if (hasSubscription) {
-      app.user.notifications.deleteSubscription(spaceSubscription).then(() => {
-        setHasSubscription(false);
-      });
-    } else {
-      app.user.notifications
-        .subscribe({
-          categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId },
-        })
-        .then(() => {
-          setHasSubscription(true);
-        });
-    }
-  };
-
   return (
     <CWPageLayout>
       <div className="SnapshotProposalsPage">
@@ -110,18 +79,6 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
               />
             ))}
           </CWTabsRow>
-          <div>
-            <CWButton
-              label={
-                hasSubscription
-                  ? 'Remove Subscription'
-                  : 'Subscribe to Notifications'
-              }
-              iconLeft={hasSubscription ? 'mute' : 'bell'}
-              onClick={updateSubscription}
-              buttonHeight="sm"
-            />
-          </div>
         </div>
         {!isSnapshotProposalsLoading ? (
           proposalsToDisplay.length > 0 ? (

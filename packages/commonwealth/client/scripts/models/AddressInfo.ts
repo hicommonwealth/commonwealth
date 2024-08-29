@@ -1,40 +1,32 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import moment from 'moment';
-import app from 'state';
-import Account from './Account';
+import Account, { AccountCommunity } from './Account';
 
 class AddressInfo extends Account {
-  public readonly keytype: string;
-  public readonly id: number;
-  public readonly profileId: number;
+  public readonly userId: number;
 
   constructor({
+    userId,
     id,
     address,
-    communityId,
-    keytype,
+    community,
     walletId,
     walletSsoSource,
     ghostAddress,
-    profileId,
     lastActive,
   }: {
-    id: number | null | undefined;
+    userId: number;
+    id: number;
     address: string;
-    communityId: string;
-    keytype?: string;
+    community: AccountCommunity;
     walletId?: WalletId;
     walletSsoSource?: WalletSsoSource;
     ghostAddress?: boolean;
-    profileId?: number;
     lastActive?: string | moment.Moment;
   }) {
-    const chain = app.config.chains.getById(communityId);
-    if (!chain) throw new Error(`Failed to locate chain: ${communityId}`);
     super({
       address,
-      community: chain,
-      // @ts-expect-error StrictNullChecks
+      community,
       addressId: id,
       walletId,
       walletSsoSource,
@@ -42,12 +34,7 @@ class AddressInfo extends Account {
       ignoreProfile: false,
       lastActive,
     });
-    // @ts-expect-error StrictNullChecks
-    this.id = id;
-    // @ts-expect-error StrictNullChecks
-    this.keytype = keytype;
-    // @ts-expect-error StrictNullChecks
-    this.profileId = profileId;
+    this.userId = userId;
   }
 }
 

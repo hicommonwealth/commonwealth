@@ -1,7 +1,4 @@
-import axios from 'axios';
-import type moment from 'moment';
-import { notifyError } from '../controllers/app/notifications';
-import app from '../state';
+import moment from 'moment';
 import Vote from './Vote';
 
 class Poll {
@@ -12,15 +9,7 @@ class Poll {
   public readonly endsAt: moment.Moment;
   public readonly prompt: string;
   public readonly options: string[];
-
-  private _votes: Vote[];
-  public get votes() {
-    return this._votes;
-  }
-
-  public get votesNum() {
-    return this._votes.length;
-  }
+  private readonly _votes: Vote[];
 
   constructor({
     id,
@@ -51,49 +40,46 @@ class Poll {
     this._votes = votes;
   }
 
+  public get votes() {
+    return this._votes;
+  }
+
   public getUserVote(chain: string, address: string) {
     return (this.votes || []).find(
-      (vote) => vote.address === address && vote.authorCommunityId === chain
+      (vote) => vote.address === address && vote.authorCommunityId === chain,
     );
   }
 
-  public getVotes(): Vote[] {
-    return this.votes;
-  }
+  public static fromJSON(json) {
+    const {
+      id,
+      thread_id,
+      community_id,
+      prompt,
+      options,
+      ends_at,
+      votes = [],
+      created_at,
+    } = json;
 
-  public async submitVote(
-    authorChain: string,
-    address: string,
-    option: string
-  ) {
-    const selectedOption = this.options.find((o: string) => o === option);
-    if (!selectedOption) {
-      notifyError('Invalid voting option');
+    let pollOptions;
+
+    try {
+      pollOptions = JSON.parse(options);
+    } catch (e) {
+      pollOptions = [];
     }
-    const response = await axios.put(
-      `${app.serverUrl()}/polls/${this.id}/votes`,
-      {
-        poll_id: this.id,
-        chain_id: this.communityId,
-        author_chain: authorChain,
-        option: selectedOption,
-        address,
-        jwt: app.user.jwt,
-      }
-    );
-    // TODO Graham 5/3/22: We should have a dedicated controller + store
-    // to handle logic like this
-    const vote = new Vote(response.data.result);
-    // Remove existing vote
-    const existingVoteIndex = this.votes.findIndex(
-      (v) => v.address === address && v.authorCommunityId === authorChain
-    );
-    if (existingVoteIndex !== -1) {
-      this.votes.splice(existingVoteIndex, 1);
-    }
-    // Add new or updated vote
-    this.votes.push(vote);
-    return vote;
+
+    return new Poll({
+      id,
+      threadId: thread_id,
+      communityId: community_id,
+      prompt,
+      options: pollOptions,
+      endsAt: moment(ends_at),
+      votes: votes.map((v) => new Vote(v)),
+      createdAt: moment(created_at),
+    });
   }
 }
 

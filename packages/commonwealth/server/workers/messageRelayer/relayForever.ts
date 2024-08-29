@@ -1,17 +1,19 @@
 import { broker, logger, stats } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { relay } from './relay';
 
 const INITIAL_ERROR_TIMEOUT = 2_000;
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 export let numUnrelayedEvents = 0;
 
 export function incrementNumUnrelayedEvents(numEvents: number) {
   numUnrelayedEvents += numEvents;
   stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
+}
+
+export function resetNumUnrelayedEvents() {
+  numUnrelayedEvents = 0;
 }
 
 export async function relayForever(maxIterations?: number) {
@@ -20,7 +22,7 @@ export async function relayForever(maxIterations?: number) {
   let iteration = 0;
   let errorTimeout = INITIAL_ERROR_TIMEOUT;
   while (true) {
-    if (maxIterations && iteration >= maxIterations) {
+    if (typeof maxIterations === 'number' && iteration >= maxIterations) {
       break;
     }
 

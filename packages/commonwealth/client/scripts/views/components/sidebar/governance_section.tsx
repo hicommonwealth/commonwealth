@@ -57,25 +57,18 @@ export const GovernanceSection = () => {
   const hasProposals =
     app.chain &&
     (app.chain.base === ChainBase.CosmosSDK ||
-      app.chain.network === ChainNetwork.Sputnik ||
-      app.chain.network === ChainNetwork.Compound ||
-      app.chain.network === ChainNetwork.Aave ||
-      // app.chain.network === ChainNetwork.CommonProtocol ||
-      app.chain.meta.snapshot?.length);
+      app.chain.meta?.snapshot?.length);
 
-  const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
+  const isNotOffchain = app.chain?.meta?.type !== ChainType.Offchain;
 
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
     !!app.chain?.meta.snapshot?.length;
 
   const showProposals =
-    (isNotOffchain &&
-      app.chain?.base === ChainBase.CosmosSDK &&
-      app.chain.network !== ChainNetwork.Terra) ||
-    app.chain?.network === ChainNetwork.Sputnik ||
-    app.chain?.network === ChainNetwork.Compound ||
-    app.chain?.network === ChainNetwork.Aave;
+    isNotOffchain &&
+    app.chain?.base === ChainBase.CosmosSDK &&
+    app.chain.network !== ChainNetwork.Terra;
 
   // ---------- Build Toggle Tree ---------- //
   const governanceDefaultToggleTree: ToggleTree = {
@@ -165,7 +158,7 @@ export const GovernanceSection = () => {
       setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
       resetSidebarState();
       // Check if we have multiple snapshots for conditional redirect
-      const snapshotSpaces = app.chain.meta.snapshot;
+      const snapshotSpaces = app.chain?.meta?.snapshot;
       if (snapshotSpaces.length > 1) {
         handleRedirectClicks(
           navigate,

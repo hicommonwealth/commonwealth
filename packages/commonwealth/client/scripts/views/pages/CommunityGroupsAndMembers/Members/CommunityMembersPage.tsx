@@ -1,8 +1,6 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -12,6 +10,7 @@ import {
   MixpanelPageViewEventPayload,
 } from 'shared/analytics/types';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import {
   useFetchGroupsQuery,
@@ -19,6 +18,7 @@ import {
 } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
+import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { trpc } from 'utils/trpcClient';
@@ -29,38 +29,46 @@ import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { useFlag } from '../../../../hooks/useFlag';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
+import {
+  BaseGroupFilter,
+  MemberResultsOrderBy,
+  SearchFilters,
+} from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
   { value: 'groups', label: 'Groups' },
 ];
 
-const GROUP_AND_MEMBER_FILTERS = [
+const GROUP_AND_MEMBER_FILTERS: { label: string; value: BaseGroupFilter }[] = [
   { label: 'All groups', value: 'all-community' },
   { label: 'Ungrouped', value: 'not-in-group' },
 ];
 
 const CommunityMembersPage = () => {
-  const allowlistEnabled = useFlag('allowlist');
-  useUserActiveAccount();
   const location = useLocation();
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
-  const [searchFilters, setSearchFilters] = useState({
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const {
     shouldShowGroupMutationBannerForCommunities,
@@ -74,17 +82,20 @@ const CommunityMembersPage = () => {
 
   const { data: memberships = null } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
   });
 
-  const debouncedSearchTerm = useDebounce<string>(
+  const debouncedSearchTerm = useDebounce<string | undefined>(
     searchFilters.searchText,
     500,
   );
 
-  const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
-    .namespace;
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+  });
+  const isStakedCommunity = !!community?.namespace;
 
   const columns: CWTableColumnInfo[] = [
     {
@@ -112,7 +123,6 @@ const CommunityMembersPage = () => {
     {
       key: 'lastActive',
       header: 'Last Active',
-      hasCustomSortValue: true,
       numeric: false,
       sortable: true,
     },
@@ -124,6 +134,17 @@ const CommunityMembersPage = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
+  const membershipsFilter = (() => {
+    const { groupFilter } = searchFilters;
+    if (groupFilter === 'not-in-group') {
+      return searchFilters.groupFilter;
+    }
+    if (typeof groupFilter === 'number') {
+      return `in-group:${searchFilters.groupFilter}`;
+    }
+    return null;
+  })();
+
   const {
     data: members,
     fetchNextPage,
@@ -131,37 +152,40 @@ const CommunityMembersPage = () => {
   } = trpc.community.getMembers.useInfiniteQuery(
     {
       limit: 30,
-      order_by: tableState.orderBy,
+      order_by: (tableState.orderBy === 'lastActive'
+        ? 'last_active'
+        : tableState.orderBy) as MemberResultsOrderBy,
       // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
-      search: debouncedSearchTerm,
+      ...(debouncedSearchTerm && {
+        search: debouncedSearchTerm,
+      }),
       community_id: app.activeChainId(),
       include_roles: true,
-      ...(!['all-community', 'not-in-group'].includes(
-        `${searchFilters.groupFilter}`,
-      ) &&
-        searchFilters.groupFilter && {
-          memberships: `in-group:${searchFilters.groupFilter}`,
-        }),
-      ...(searchFilters.groupFilter === 'Ungrouped' && {
-        memberships: 'not-in-group',
+      ...(membershipsFilter && {
+        memberships: membershipsFilter,
       }),
       include_group_ids: true,
       // only include stake balances if community has staking enabled
-      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-        .namespace,
+      include_stake_balances: !!community?.namespace,
     },
     {
       initialCursor: 1,
-      getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) {
+          return nextPageNum;
+        }
+        return undefined;
+      },
+      enabled: user.activeAccount?.address ? !!memberships : true,
     },
   );
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled: user.activeAccount?.address ? !!memberships : true,
   });
 
   const filterOptions = useMemo(
@@ -196,11 +220,10 @@ const CommunityMembersPage = () => {
         return [...acc, ...page.results];
       }, [] as SearchProfilesResponse['results'])
       .map((p) => ({
-        id: p.id,
+        userId: p.user_id,
         avatarUrl: p.avatar_url,
-        name: p.profile_name || 'Anonymous',
-        // @ts-expect-error <StrictNullChecks/>
-        role: p.roles[0],
+        name: p.profile_name || DEFAULT_NAME,
+        role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map(
             (groupId) =>
@@ -211,19 +234,10 @@ const CommunityMembersPage = () => {
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
-      }))
-      .filter((p) =>
-        debouncedSearchTerm
-          ? p.groups.find((g) =>
-              // @ts-expect-error <StrictNullChecks/>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-            ) ||
-            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-          : true,
-      );
+      }));
 
     return results;
-  }, [members, groups, debouncedSearchTerm]);
+  }, [members, groups]);
 
   const filteredGroups = useMemo(() => {
     const modifiedGroupsArr = (groups || []).map((group) => ({
@@ -273,14 +287,15 @@ const CommunityMembersPage = () => {
 
     trackAnalytics({
       event: eventType,
+      isPWA: isAddedToHomeScreen,
     });
   };
 
   useEffect(() => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
-  }, []);
+    refetch().catch((e) => console.log(e));
+  }, [refetch]);
 
   useEffect(() => {
     // Set the active tab based on URL
@@ -357,9 +372,7 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TABS[1].value &&
-        groups?.length === 0 &&
-        !allowlistEnabled ? (
+        {selectedTab === TABS[1].value && groups?.length === 0 ? (
           <></>
         ) : (
           <section
@@ -390,7 +403,7 @@ const CommunityMembersPage = () => {
                 }))
               }
             />
-            {app.user.activeAccount && (
+            {user.activeAccount && (
               <div className="select-dropdown-container">
                 <CWText type="b2" fontWeight="bold" className="filter-text">
                   Filter
@@ -408,8 +421,7 @@ const CommunityMembersPage = () => {
                   onChange={(option) => {
                     setSearchFilters((g) => ({
                       ...g,
-                      // @ts-expect-error <StrictNullChecks/>
-                      groupFilter: option.value as string,
+                      groupFilter: option?.value as BaseGroupFilter,
                     }));
                   }}
                 />

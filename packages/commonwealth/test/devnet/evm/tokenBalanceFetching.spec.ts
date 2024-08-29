@@ -12,10 +12,16 @@ import {
   type Balances,
   type DB,
 } from '@hicommonwealth/model';
-import { BalanceSourceType, BalanceType, delay } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  BalanceType,
+  DISCORD_BOT_ADDRESS,
+  delay,
+} from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
 import BN from 'bn.js';
 import { expect } from 'chai';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 
@@ -39,9 +45,7 @@ function checkZeroBalances(balances: Balances, skipAddress: string[]) {
   }
 }
 
-describe('Token Balance Cache EVM Tests', function () {
-  this.timeout(160000);
-
+describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
   let models: DB;
   let anvil: Anvil;
 
@@ -49,7 +53,6 @@ describe('Token Balance Cache EVM Tests', function () {
 
   const addressOne = '0xCEB3C3D4B78d5d10bd18930DC0757ddB588A862a';
   const addressTwo = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
-  const discobotAddress = '0xdiscordbot';
 
   const bulkAddresses = generateEVMAddresses(20);
   bulkAddresses.splice(4, 0, addressOne);
@@ -89,14 +92,14 @@ describe('Token Balance Cache EVM Tests', function () {
     }
   }
 
-  before(async () => {
+  beforeAll(async () => {
     anvil = await getAnvil();
     models = await tester.seedDb();
     cache(new RedisCache('redis://localhost:6379'));
     await cache().ready();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await anvil.stop();
     await dispose()();
   });
@@ -107,7 +110,7 @@ describe('Token Balance Cache EVM Tests', function () {
     let finalAddressOneBalance: string, finalAddressTwoBalance: string;
     const transferAmount = '76';
 
-    before('Transfer balances to addresses', async () => {
+    beforeAll(async () => {
       const erc20 = sdk.getErc20Contract(chainLinkAddress);
       await resetChainNode(ethChainId);
       originalAddressOneBalance = await erc20.getBalance(addressOne);
@@ -124,7 +127,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('Single address', () => {
-      it('should not fail if no address is given', async () => {
+      test('should not fail if no address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [],
@@ -138,10 +141,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should not fail if a single invalid address is given', async () => {
+      test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
@@ -152,7 +155,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should return a single balance', async () => {
+      test('should return a single balance', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne],
@@ -169,7 +172,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('on-chain batching', () => {
-      it('should return many balances', async () => {
+      test('should return many balances', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne, addressTwo],
@@ -185,10 +188,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      it('should not throw if a single address fails', async () => {
+      test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
@@ -201,7 +204,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      it('should correctly batch balance requests', async () => {
+      test('should correctly batch balance requests', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: bulkAddresses,
@@ -222,7 +225,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('off-chain batching', () => {
       const newEthChainId = 1864339501;
-      before('Update ChainNodes.eth_chain_id', async () => {
+      beforeAll(async () => {
         // set eth_chain_id to some random value that is NOT
         // defined in mapNodeToBalanceFetcherContract. This
         // forces an off-chain batching strategy
@@ -236,7 +239,7 @@ describe('Token Balance Cache EVM Tests', function () {
         );
       });
 
-      it('should return many balances', async () => {
+      test('should return many balances', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne, addressTwo],
@@ -252,10 +255,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      it('should not throw if a single address fails', async () => {
+      test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: newEthChainId,
             contractAddress: chainLinkAddress,
@@ -269,7 +272,7 @@ describe('Token Balance Cache EVM Tests', function () {
         checkZeroBalances(balances, [addressOne, addressTwo]);
       });
 
-      it('should correctly batch balance requests', async () => {
+      test('should correctly batch balance requests', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: bulkAddresses,
@@ -293,7 +296,7 @@ describe('Token Balance Cache EVM Tests', function () {
     let finalAddressOneBalance: string, finalAddressTwoBalance: string;
     const transferAmount = '3';
 
-    before('Transfer balances to addresses', async () => {
+    beforeAll(async () => {
       await resetChainNode(ethChainId);
       const web3 = new Web3(
         new Web3.providers.HttpProvider('http://localhost:8545'),
@@ -316,7 +319,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('Single address', () => {
-      it('should not fail if no address is given', async () => {
+      test('should not fail if no address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [],
@@ -328,10 +331,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should not fail if a single invalid address is given', async () => {
+      test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
           },
@@ -341,7 +344,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should return a single balance', async () => {
+      test('should return a single balance', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne],
@@ -357,7 +360,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('on-chain batching', () => {
-      it('should return many balances', async () => {
+      test('should return many balances', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne, addressTwo],
@@ -372,10 +375,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      it('should not throw if a single address fails', async () => {
+      test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: ethChainId,
           },
@@ -387,7 +390,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      it('should correctly batch balance requests', async () => {
+      test('should correctly batch balance requests', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: bulkAddresses,
@@ -407,7 +410,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('off-chain batching', () => {
       const newEthChainId = 1864339501;
-      before('Update ChainNodes.eth_chain_id', async () => {
+      beforeAll(async () => {
         // set eth_chain_id to some random value that is NOT
         // defined in mapNodeToBalanceFetcherContract. This
         // forces an off-chain batching strategy
@@ -421,7 +424,7 @@ describe('Token Balance Cache EVM Tests', function () {
         );
       });
 
-      it('should return many balances', async () => {
+      test('should return many balances', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne, addressTwo],
@@ -436,10 +439,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      it('should not throw if a single address fails', async () => {
+      test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: newEthChainId,
           },
@@ -451,7 +454,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      it('should correctly batch balance requests', async () => {
+      test('should correctly batch balance requests', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: bulkAddresses,
@@ -473,7 +476,7 @@ describe('Token Balance Cache EVM Tests', function () {
   describe('ERC721', () => {
     let nft: ERC721;
     let addressOne721: string, addressTwo721: string;
-    before('Deploy/transfer NFT and reset ChainNode', async () => {
+    beforeAll(async () => {
       await resetChainNode(ethChainId);
       nft = await sdk.deployNFT();
       await nft.mint('1', 1);
@@ -485,7 +488,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('Single address', () => {
-      it('should not fail if no address is given', async () => {
+      test('should not fail if no address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [],
@@ -499,10 +502,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should not fail if a single invalid address is given', async () => {
+      test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: nft.address,
@@ -513,7 +516,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should return a single balance', async () => {
+      test('should return a single balance', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [addressOne721],
@@ -530,7 +533,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('off-chain batching', () => {
-      it('should return many balances', async () => {
+      test('should return many balances', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [addressOne721, addressTwo721],
@@ -546,10 +549,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo721]).to.equal('2');
       });
 
-      it('should not throw if a single address fails', async () => {
+      test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
-          addresses: [addressOne721, discobotAddress, addressTwo721],
+          addresses: [addressOne721, DISCORD_BOT_ADDRESS, addressTwo721],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: nft.address,
@@ -562,7 +565,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo721]).to.equal('2');
       });
 
-      it('should correctly batch balance requests', async () => {
+      test('should correctly batch balance requests', async () => {
         const bulkAddresses721 = generateEVMAddresses(20);
         bulkAddresses721.splice(4, 0, addressOne721);
         bulkAddresses721.splice(5, 0, addressTwo721);
@@ -588,7 +591,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
   describe('ERC1155', () => {
     let erc1155: ERC1155;
-    before('Deploy/mint ERC1155 and reset ChainNode', async () => {
+    beforeAll(async () => {
       await resetChainNode(ethChainId);
       erc1155 = await sdk.deployErc1155();
       await erc1155.mint('1', 10, addressOne);
@@ -598,7 +601,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('Single address', () => {
-      it('should not fail if no address is given', async () => {
+      test('should not fail if no address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [],
@@ -613,10 +616,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should not fail if a single invalid address is given', async () => {
+      test('should not fail if a single invalid address is given', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
-          addresses: [discobotAddress],
+          addresses: [DISCORD_BOT_ADDRESS],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: erc1155.address,
@@ -628,7 +631,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(0);
       });
 
-      it('should return a single balance', async () => {
+      test('should return a single balance', async () => {
         const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [addressOne],
@@ -660,7 +663,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('on-chain batching', () => {
-      it('should return many balances', async () => {
+      test('should return many balances', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [addressOne, addressTwo],
@@ -677,10 +680,10 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal('20');
       });
 
-      it('should not throw if a single address fails', async () => {
+      test('should not throw if a single address fails', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
-          addresses: [addressOne, discobotAddress, addressTwo],
+          addresses: [addressOne, DISCORD_BOT_ADDRESS, addressTwo],
           sourceOptions: {
             evmChainId: ethChainId,
             contractAddress: erc1155.address,
@@ -694,7 +697,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressTwo]).to.equal('20');
       });
 
-      it('should correctly batch balance requests', async () => {
+      test('should correctly batch balance requests', async () => {
         const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: bulkAddresses,
@@ -721,13 +724,13 @@ describe('Token Balance Cache EVM Tests', function () {
     const chainLinkAddress = '0x514910771AF9Ca656af840dff83E8264EcF986CA';
     const transferAmount = '76';
 
-    before('Set TBC caching TTL and reset chain node', async () => {
+    beforeAll(async () => {
       await resetChainNode(ethChainId);
       // clear all Redis keys
       await cache().flushAll();
     });
 
-    it('should cache for TTL but not longer', async () => {
+    test('should cache for TTL but not longer', async () => {
       const erc20 = sdk.getErc20Contract(chainLinkAddress);
       const originalAddressOneBalance = await erc20.getBalance(addressOne);
 

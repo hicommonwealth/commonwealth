@@ -1,9 +1,5 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
+import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import z from 'zod';
-
-export const socialLinkValidation = z
-  .string()
-  .url({ message: VALIDATION_MESSAGES.INVALID_INPUT });
 
 export const basicInformationFormValidationSchema = z.object({
   communityName: z
@@ -12,7 +8,8 @@ export const basicInformationFormValidationSchema = z.object({
     .max(255, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
   communityDescription: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+    .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
   communityProfileImageURL: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),

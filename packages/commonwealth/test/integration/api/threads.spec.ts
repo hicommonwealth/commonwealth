@@ -4,16 +4,17 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import { dispose } from '@hicommonwealth/core';
+import { Thread } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
 import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
-import { testServer, TestServer } from '../../../server-test';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 import type { CommunityArgs } from '../../util/modelUtils';
@@ -52,7 +53,7 @@ describe.skip('Thread Tests', () => {
 
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     topicId = await server.seeder.getTopicId({ chain });
@@ -96,14 +97,14 @@ describe.skip('Thread Tests', () => {
     expect(userJWT2).to.not.be.null;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('POST /threads', () => {
     const readOnly = true;
 
-    it('should fail to create a thread without a kind', async () => {
+    test('should fail to create a thread without a kind', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
         // @ts-expect-error StrictNullChecks
@@ -119,10 +120,10 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.UnsupportedKind);
+      expect(tRes.error).to.be.equal(Thread.CreateThreadErrors.UnsupportedKind);
     });
 
-    it('should fail to create a forum thread with an empty title', async () => {
+    test('should fail to create a forum thread with an empty title', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -137,10 +138,12 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.DiscussionMissingTitle);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.DiscussionMissingTitle,
+      );
     });
 
-    it('should fail to create a link thread with an empty title', async () => {
+    test('should fail to create a link thread with an empty title', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
         kind: 'link',
@@ -156,10 +159,12 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.LinkMissingTitleOrUrl);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.LinkMissingTitleOrUrl,
+      );
     });
 
-    it('should fail to create a link thread with an empty URL', async () => {
+    test('should fail to create a link thread with an empty URL', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
         kind: 'link',
@@ -176,10 +181,12 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.LinkMissingTitleOrUrl);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.LinkMissingTitleOrUrl,
+      );
     });
 
-    it('should fail to create a comment on a readOnly thread', async () => {
+    test('should fail to create a comment on a readOnly thread', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -212,7 +219,7 @@ describe.skip('Thread Tests', () => {
       expect(cRes.error).not.to.be.null;
     });
 
-    it('should create a discussion thread', async () => {
+    test('should create a discussion thread', async () => {
       const res = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -237,7 +244,7 @@ describe.skip('Thread Tests', () => {
       expect(res.result.Address.address).to.equal(userAddress);
     });
 
-    it('should fail to create a thread without a topic name (if the community has topics)', async () => {
+    test('should fail to create a thread without a topic name (if the community has topics)', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -253,7 +260,7 @@ describe.skip('Thread Tests', () => {
       expect(tRes.error).to.not.be.null;
     });
 
-    it('should create a thread with mentions to non-existent addresses', async () => {
+    test('should create a thread with mentions to non-existent addresses', async () => {
       const res = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -278,7 +285,7 @@ describe.skip('Thread Tests', () => {
       expect(res.result.Address.address).to.equal(userAddress);
     });
 
-    it('Thread Create should fail because address does not have permission', async () => {
+    test('Thread Create should fail because address does not have permission', async () => {
       const res2 = await server.seeder.createThread({
         address: userAddress2,
         kind,
@@ -296,7 +303,7 @@ describe.skip('Thread Tests', () => {
   });
 
   describe('/threads (bulkThreads)', () => {
-    it('should return bulk threads for a public chain', async () => {
+    test('should return bulk threads for a public chain', async () => {
       const res = await chai.request
         .agent(server.app)
         .get('/api/threads')
@@ -310,7 +317,7 @@ describe.skip('Thread Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
     });
-    it.skip('should pass as admin of private community', async () => {
+    test.skip('should pass as admin of private community', async () => {
       const communityArgs: CommunityArgs = {
         jwt: userJWT,
         isAuthenticatedForum: 'false',
@@ -346,7 +353,7 @@ describe.skip('Thread Tests', () => {
       thread = res2.result;
     });
 
-    it('should create a comment for a thread', async () => {
+    test('should create a comment for a thread', async () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
@@ -365,7 +372,7 @@ describe.skip('Thread Tests', () => {
       expect(cRes.result.Address.address).to.equal(userAddress);
     });
 
-    it('should create a comment for a thread with an non-existent mention', async () => {
+    test('should create a comment for a thread with an non-existent mention', async () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
@@ -384,7 +391,7 @@ describe.skip('Thread Tests', () => {
       expect(cRes.result.Address.address).to.equal(userAddress);
     });
 
-    it('should create a comment reply for a comment', async () => {
+    test('should create a comment reply for a comment', async () => {
       let cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
@@ -415,7 +422,7 @@ describe.skip('Thread Tests', () => {
       expect(cRes.result.Address.address).to.equal(userAddress);
     });
 
-    it('should fail to create a comment without a thread_id', async () => {
+    test('should fail to create a comment without a thread_id', async () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
@@ -430,7 +437,7 @@ describe.skip('Thread Tests', () => {
       expect(cRes.error).to.be.equal(CreateCommentErrors.MissingThreadId);
     });
 
-    it('should fail to create a comment without text', async () => {
+    test('should fail to create a comment without text', async () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
@@ -445,7 +452,7 @@ describe.skip('Thread Tests', () => {
       expect(cRes.error).to.be.equal(CreateCommentErrors.MissingText);
     });
 
-    it('should fail to create a comment on a non-existent thread', async () => {
+    test('should fail to create a comment on a non-existent thread', async () => {
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
@@ -480,7 +487,7 @@ describe.skip('Thread Tests', () => {
       thread = res2.result;
     });
 
-    it("should fail to edit an admin's post as a user", async () => {
+    test("should fail to edit an admin's post as a user", async () => {
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
       const readOnly = false;
@@ -502,7 +509,7 @@ describe.skip('Thread Tests', () => {
       expect(res.status).to.be.equal(400);
     });
 
-    it('should fail to edit a thread without passing a thread id', async () => {
+    test('should fail to edit a thread without passing a thread id', async () => {
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
       const readOnly = false;
@@ -528,7 +535,7 @@ describe.skip('Thread Tests', () => {
       );
     });
 
-    it('should fail to edit a thread without passing a body', async () => {
+    test('should fail to edit a thread without passing a body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
@@ -553,32 +560,36 @@ describe.skip('Thread Tests', () => {
       expect(res.body.error).to.be.equal(EditThreadErrors.NoBody);
     });
 
-    it('should succeed in updating a thread body', async () => {
-      const thread_id = thread.id;
-      const thread_kind = thread.kind;
-      const thread_stage = thread.stage;
-      const newBody = 'new Body';
-      const readOnly = false;
-      const res = await chai.request
-        .agent(server.app)
-        .put('/api/editThread')
-        .set('Accept', 'application/json')
-        .send({
-          chain,
-          address: adminAddress,
-          author_chain: chain,
-          thread_id,
-          kind: thread_kind,
-          stage: thread_stage,
-          body: newBody,
-          read_only: readOnly,
-          jwt: adminJWT,
-        });
-      expect(res.status).to.be.equal(200);
-      expect(res.body.result.body).to.be.equal(newBody);
-    }).timeout(400000);
+    test(
+      'should succeed in updating a thread body',
+      { timeout: 400_000 },
+      async () => {
+        const thread_id = thread.id;
+        const thread_kind = thread.kind;
+        const thread_stage = thread.stage;
+        const newBody = 'new Body';
+        const readOnly = false;
+        const res = await chai.request
+          .agent(server.app)
+          .put('/api/editThread')
+          .set('Accept', 'application/json')
+          .send({
+            chain,
+            address: adminAddress,
+            author_chain: chain,
+            thread_id,
+            kind: thread_kind,
+            stage: thread_stage,
+            body: newBody,
+            read_only: readOnly,
+            jwt: adminJWT,
+          });
+        expect(res.status).to.be.equal(200);
+        expect(res.body.result.body).to.be.equal(newBody);
+      },
+    );
 
-    it('should succeed in updating a thread title', async () => {
+    test('should succeed in updating a thread title', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
@@ -608,7 +619,7 @@ describe.skip('Thread Tests', () => {
   describe('/updateThreadPrivacy', () => {
     let tempThread;
 
-    it('should turn on readonly', async () => {
+    test('should turn on readonly', async () => {
       const res1 = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -636,7 +647,7 @@ describe.skip('Thread Tests', () => {
       expect(res.body.result.read_only).to.be.true;
     });
 
-    it('should fail to comment on a read_only thread', async () => {
+    test('should fail to comment on a read_only thread', async () => {
       // create new user + jwt
       const res = await server.seeder.createAndVerifyAddress(
         { chain },
@@ -660,7 +671,7 @@ describe.skip('Thread Tests', () => {
       expect(cRes.error).to.be.equal(CreateCommentErrors.CantCommentOnReadOnly);
     });
 
-    it('should turn off readonly as an admin of community', async () => {
+    test('should turn off readonly as an admin of community', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/updateThreadPrivacy')
@@ -676,7 +687,7 @@ describe.skip('Thread Tests', () => {
   });
 
   describe('/comments/:id', () => {
-    it('should edit a comment', async () => {
+    test('should edit a comment', async () => {
       const text = 'tes text';
       const tRes = await server.seeder.createThread({
         chainId: chain,
@@ -717,7 +728,7 @@ describe.skip('Thread Tests', () => {
   });
 
   describe('/viewCount', () => {
-    it('should track views on chain', async () => {
+    test('should track views on chain', async () => {
       const threadRes = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -771,7 +782,7 @@ describe.skip('Thread Tests', () => {
       expect(res.body.result.view_count).to.equal(2);
     });
 
-    it('should track views on community', async () => {
+    test('should track views on community', async () => {
       const threadRes = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -800,7 +811,7 @@ describe.skip('Thread Tests', () => {
       expect(res.body.result.view_count).to.equal(1);
     });
 
-    it('should not track views without object_id', async () => {
+    test('should not track views without object_id', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewCount')
@@ -811,7 +822,7 @@ describe.skip('Thread Tests', () => {
       expect(res.body.error).to.equal(ViewCountErrors.NoObjectId);
     });
 
-    it('should not track views without chain or community', async () => {
+    test('should not track views without chain or community', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewCount')
@@ -822,7 +833,7 @@ describe.skip('Thread Tests', () => {
       // expect(res.body.error).to.equal(ViewCountErrors.NoChainOrComm);
     });
 
-    it('should not track views with invalid chain or community', async () => {
+    test('should not track views with invalid chain or community', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewCount')
@@ -833,7 +844,7 @@ describe.skip('Thread Tests', () => {
       // expect(res.body.error).to.equal(ViewCountErrors.InvalidChainOrComm);
     });
 
-    it('should not track views with invalid object_id', async () => {
+    test('should not track views with invalid object_id', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewCount')
@@ -847,7 +858,7 @@ describe.skip('Thread Tests', () => {
 
   describe('/updateThreadPinned route tests', () => {
     let pinThread;
-    before(async () => {
+    beforeAll(async () => {
       const res = await server.seeder.createThread({
         address: userAddress,
         kind,
@@ -864,7 +875,7 @@ describe.skip('Thread Tests', () => {
       pinThread = res.result.id;
     });
 
-    it('admin can toggle thread to pinned', async () => {
+    test('admin can toggle thread to pinned', async () => {
       const res2 = await chai
         .request(server.app)
         .post('/api/updateThreadPinned')
@@ -874,7 +885,7 @@ describe.skip('Thread Tests', () => {
       expect(res2.body.result.pinned).to.be.true;
     });
 
-    it('admin can toggle thread to unpinned', async () => {
+    test('admin can toggle thread to unpinned', async () => {
       const res2 = await chai
         .request(server.app)
         .post('/api/updateThreadPinned')

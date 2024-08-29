@@ -1,13 +1,14 @@
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
-import * as siwe from 'siwe';
 import app from 'state';
 import type Web3 from 'web3';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
+import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
-import Account from '../../../models/Account';
+import { z } from 'zod';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';
 import IWebWallet from '../../../models/IWebWallet';
@@ -49,7 +50,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return this._chainInfo.node?.ethChainId?.toString() || '1';
+    return this._chainInfo?.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -66,22 +67,18 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    sessionPayload: SessionPayload,
-  ): Promise<string> {
-    const nonce = siwe.generateNonce();
-    // this must be open-ended, because of custom domains
-    const domain = document.location.origin;
-    const message = createSiweMessage(sessionPayload, domain, nonce);
-    const signature = await this._provider.request({
-      method: 'personal_sign',
-      params: [message, account.address],
-      jsonrpc: '2.0',
+  public getSessionSigner() {
+    return new SIWESigner({
+      signer: {
+        getAddress: () => this._accounts[0],
+        signMessage: (message) =>
+          this._provider.request({
+            method: 'personal_sign',
+            params: [message, this._accounts[0]],
+          }),
+      },
+      chainId: parseInt(this.getChainId()),
     });
-
-    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-    return `${domain}/${nonce}/${signature}`;
   }
 
   public async reset() {
@@ -91,7 +88,11 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       localStorage.removeItem('walletconnect');
       return;
     }
-    await this._provider.wc.killSession();
+    try {
+      await this._provider.wc.killSession();
+    } catch (err) {
+      // api may not be available
+    }
     this._provider.disconnect();
     this._enabled = false;
   }
@@ -99,11 +100,22 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async enable() {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
-    // try {
-    // Create WalletConnect Provider
-    this._chainInfo =
-      app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-    const chainId = this._chainInfo.node?.ethChainId || 1;
+    this._chainInfo = app?.chain?.meta;
+
+    if (!this._chainInfo && app.activeChainId()) {
+      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        app.activeChainId() || '',
+        true,
+      );
+
+      const chainInfo = ChainInfo.fromTRPCResponse(
+        communityInfo as z.infer<typeof ExtendedCommunity>,
+      );
+
+      this._chainInfo = chainInfo;
+    }
+
+    const chainId = this._chainInfo?.node?.ethChainId || 1;
     const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
       .default;
     this._provider = await EthereumProvider.init({
@@ -140,9 +152,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._provider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = app.user.activeAccounts.find(
-        (addr) => addr.address === accounts[0],
-      );
+      const updatedAddress = userStore
+        .getState()
+        .accounts.find((addr) => addr.address === accounts[0]);
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
     });

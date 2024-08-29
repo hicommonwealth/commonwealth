@@ -1,5 +1,7 @@
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
+import { NamespaceAbi } from './Abi/NamespaceAbi';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
 import { reservationHookAbi } from './Abi/ReservationHookAbi';
 import ContractBase from './ContractBase';
@@ -28,7 +30,7 @@ class NamespaceFactory extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     const addr = await this.contract.methods.reservationHook().call();
-    if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
+    if (addr.toLowerCase() !== ZERO_ADDRESS) {
       this.reservationHook = new this.web3.eth.Contract(
         reservationHookAbi as AbiItem[],
         addr,
@@ -63,7 +65,7 @@ class NamespaceFactory extends ContractBase {
       await this.initialize();
     }
     const activeNamespace = await this.getNamespaceAddress(name);
-    if (activeNamespace !== '0x0000000000000000000000000000000000000000') {
+    if (activeNamespace !== ZERO_ADDRESS) {
       return false;
     }
     if (this.reservationHook) {
@@ -96,7 +98,7 @@ class NamespaceFactory extends ContractBase {
     if (!namespaceStatus) {
       throw new Error('Namespace already reserved');
     }
-
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       const uri = `${window.location.origin}/api/namespaceMetadata/${name}/{id}`;
@@ -104,8 +106,9 @@ class NamespaceFactory extends ContractBase {
         .deployNamespace(name, uri, feeManager, [])
         .send({
           from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch (error) {
       throw new Error('Transaction failed: ' + error);
@@ -131,7 +134,7 @@ class NamespaceFactory extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
@@ -139,14 +142,15 @@ class NamespaceFactory extends ContractBase {
           name,
           name + ' Community Stake',
           stakesId,
-          '0x0000000000000000000000000000000000000000',
+          ZERO_ADDRESS,
           2000000,
           0,
         )
         .send({
           from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch {
       throw new Error('Transaction failed');
@@ -169,6 +173,7 @@ class NamespaceFactory extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
+    const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
       if (!exchangeToken) {
@@ -185,8 +190,9 @@ class NamespaceFactory extends ContractBase {
           )
           .send({
             from: walletAddress,
-            maxPriorityFeePerGas: null,
-            maxFeePerGas: null,
+            type: '0x2',
+            maxFeePerGas: maxFeePerGasEst?.toString(),
+            maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
           });
       } else {
         txReceipt = await this.contract.methods
@@ -201,14 +207,99 @@ class NamespaceFactory extends ContractBase {
           )
           .send({
             from: walletAddress,
-            maxPriorityFeePerGas: null,
-            maxFeePerGas: null,
+            type: '0x2',
+            maxFeePerGas: maxFeePerGasEst?.toString(),
+            maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
           });
       }
     } catch {
       throw new Error('Transaction failed');
     }
     return txReceipt;
+  }
+
+  async getFeeManagerBalance(
+    namespace: string,
+    token?: string,
+    decimals?: number,
+  ): Promise<string> {
+    const namespaceAddr = await this.getNamespaceAddress(namespace);
+    const namespaceContract = new this.web3.eth.Contract(
+      [
+        {
+          inputs: [],
+          stateMutability: 'view',
+          type: 'function',
+          name: 'feeManager',
+          outputs: [
+            {
+              internalType: 'address',
+              name: '',
+              type: 'address',
+            },
+          ],
+        },
+      ],
+      namespaceAddr,
+    );
+    const feeManager = await namespaceContract.methods.feeManager().call();
+
+    if (!token) {
+      const balance = await this.web3.eth.getBalance(String(feeManager));
+      return this.web3.utils.fromWei(balance, 'ether');
+    } else {
+      const calldata =
+        '0x70a08231' +
+        this.web3.eth.abi
+          .encodeParameters(['address'], [feeManager])
+          .substring(2);
+      const result = await this.web3.eth.call({
+        to: token,
+        data: calldata,
+      });
+      const balance: number = Number(
+        this.web3.eth.abi.decodeParameter('uint256', result),
+      );
+      return String(balance / (10 ^ (decimals ?? 18)));
+    }
+  }
+  /**
+   * mints namespace tokens to assignee on id with desired balance
+   * @param namespace the namespace name
+   * @param id the id on the namespace to mint(admin = 0)
+   * @param desiredBalance the total desired balance(admin = 1)
+   * @param assigneeAddress the address to assign the token to
+   * @param chainId the current chainId
+   * @param walletAddress The senders wallet address
+   * @returns txReceipt
+   * NOTE: If address already has > balance no tokens will be minted
+   */
+  async mintNamespaceTokens(
+    namespace: string,
+    id: number,
+    desiredBalance: number,
+    assigneeAddress: string,
+    chainId: string,
+    walletAddress: string,
+  ) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId);
+    }
+    const namespaceAddr = await this.getNamespaceAddress(namespace);
+    const namespaceContract = new this.web3.eth.Contract(
+      NamespaceAbi,
+      namespaceAddr,
+    );
+    const balance = await namespaceContract.methods
+      .balanceOf(assigneeAddress, id)
+      .call();
+    const balanceDiff = desiredBalance - Number(balance);
+    if (balanceDiff > 0) {
+      const txReceipt = await namespaceContract.methods
+        .mintId(assigneeAddress, id, balanceDiff, '0x')
+        .send({ from: walletAddress });
+      return txReceipt;
+    }
   }
 }
 

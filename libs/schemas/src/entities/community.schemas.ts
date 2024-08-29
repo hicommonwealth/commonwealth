@@ -1,4 +1,5 @@
 import {
+  BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
@@ -6,58 +7,86 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { ChainNode } from './chain.schemas';
 import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
 import { CommunityStake } from './stake.schemas';
-import { Tag as CommunityTag } from './tag.schemas';
+import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const Community = z.object({
+  // 1. Regular fields are nullish when nullable instead of optional
+  id: z.string().optional(),
   name: z.string(),
-  chain_node_id: PG_INT,
+  chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
-  network: z.nativeEnum(ChainNetwork).default(ChainNetwork.Ethereum),
+  network: z.string().default(ChainNetwork.Ethereum),
   base: z.nativeEnum(ChainBase),
-  icon_url: z.string(),
+  icon_url: z.string().nullish(),
   active: z.boolean(),
   type: z.nativeEnum(ChainType).default(ChainType.Chain),
-  id: z.string().optional(),
-  description: z.string().optional(),
-  social_links: z.array(z.string()).optional(),
-  ss58_prefix: PG_INT.optional(),
-  stages_enabled: z.boolean().optional(),
-  custom_stages: z.array(z.string()).optional(),
-  custom_domain: z.string().optional(),
-  block_explorer_ids: z.string().optional(),
-  collapsed_on_homepage: z.boolean().optional(),
-  substrate_spec: z.string().optional(),
-  has_chain_events_listener: z.boolean().optional(),
-  default_summary_view: z.boolean().optional(),
-  default_page: z.nativeEnum(DefaultPage).optional(),
-  has_homepage: z.enum(['true', 'false']).optional().default('false').nullish(),
-  terms: z.string().optional(),
-  admin_only_polling: z.boolean().optional(),
-  bech32_prefix: z.string().optional(),
-  hide_projects: z.boolean().optional(),
-  token_name: z.string().optional(),
-  ce_verbose: z.boolean().optional(),
-  discord_config_id: PG_INT.optional().nullish(),
-  category: z.unknown().optional(), // Assuming category can be any type
-  discord_bot_webhooks_enabled: z.boolean().optional(),
-  directory_page_enabled: z.boolean().optional(),
-  directory_page_chain_node_id: PG_INT.optional(),
-  namespace: z.string().optional(),
-  namespace_address: z.string().optional(),
-  redirect: z.string().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  description: z.string().nullish(),
+  social_links: z.array(z.string().nullish()).default([]),
+  ss58_prefix: PG_INT.nullish(),
+  stages_enabled: z.boolean().default(true),
+  custom_stages: z.array(z.string()).default([]),
+  custom_domain: z.string().nullish(),
+  block_explorer_ids: z.string().nullish(),
+  collapsed_on_homepage: z.boolean().default(false),
+  has_chain_events_listener: z.boolean().default(false),
+  default_summary_view: z.boolean().nullish(),
+  default_page: z.nativeEnum(DefaultPage).nullish(),
+  has_homepage: z.enum(['true', 'false']).default('false').nullish(),
+  terms: z.string().nullish(),
+  admin_only_polling: z.boolean().nullish(),
+  bech32_prefix: z.string().nullish(),
+  hide_projects: z.boolean().nullish(),
+  token_name: z.string().nullish(),
+  ce_verbose: z.boolean().nullish(),
+  discord_config_id: PG_INT.nullish(),
+  category: z.unknown().nullish(), // Assuming category can be any type
+  discord_bot_webhooks_enabled: z.boolean().nullish(),
+  directory_page_enabled: z.boolean().default(false),
+  directory_page_chain_node_id: PG_INT.nullish(),
+  namespace: z.string().nullish(),
+  namespace_address: z.string().nullish(),
+  redirect: z.string().nullish(),
+  snapshot_spaces: z.array(z.string().max(255)).default([]),
+  include_in_digest_email: z.boolean().nullish(),
+  profile_count: PG_INT.nullish(),
+  lifetime_thread_count: PG_INT.optional(),
+  banner_text: z.string().nullish(),
+
+  // 2. Timestamps are managed by sequelize, thus optional
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+
+  // 3. Associations are optional
   Addresses: z.array(Address).optional(),
-  CommunityStakes: z.array(CommunityStake).optional(),
-  CommunityTags: z.array(CommunityTag).optional(),
+  CommunityStakes: z.array(CommunityStake).nullish(),
+  CommunityTags: z.array(CommunityTags).nullish(),
+  ChainNode: ChainNode.extend({
+    url: z.string().max(255).nullish(),
+    balance_type: z.nativeEnum(BalanceType).nullish(),
+    name: z.string().max(255).nullish(),
+  }).nullish(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
-  snapshot_spaces: z.array(z.string().max(255)).default([]).optional(),
-  include_in_digest_email: z.boolean().nullish(),
 });
+
+export const ExtendedCommunity = Community.extend({
+  numVotingThreads: PG_INT,
+  numTotalThreads: PG_INT,
+  adminsAndMods: z.array(
+    z.object({
+      address: z.string(),
+      role: z.enum(['admin', 'moderator']),
+    }),
+  ),
+  communityBanner: z.string().nullish(),
+});
+
+// aliases
+export const Chain = Community;

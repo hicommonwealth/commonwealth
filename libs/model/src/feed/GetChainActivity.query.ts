@@ -7,6 +7,7 @@ export function GetChainActivity(): Query<typeof schemas.ChainFeed> {
   return {
     ...schemas.ChainFeed,
     auth: [],
+    secure: false,
     body: async () => {
       const ceNotifs = await models.Notification.findAll({
         where: {
@@ -16,8 +17,9 @@ export function GetChainActivity(): Query<typeof schemas.ChainFeed> {
         order: [['created_at', 'DESC']],
       });
 
-      return ceNotifs.map((n) =>
-        JSON.parse(n.toJSON()['notification_data']),
+      return ceNotifs.map(
+        (n) => JSON.parse(n.toJSON()['notification_data']),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as any;
     },
   };

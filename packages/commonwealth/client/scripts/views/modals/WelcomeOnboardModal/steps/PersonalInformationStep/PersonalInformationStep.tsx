@@ -1,17 +1,20 @@
-import { WalletId } from '@hicommonwealth/shared';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from 'client/scripts/helpers/constants';
+import { DEFAULT_NAME, WalletId } from '@hicommonwealth/shared';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import app from 'state';
 import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,
-  useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
+// eslint-disable-next-line max-len
+import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscription/useUpdateSubscriptionPreferencesMutation';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+  useUpdateUserMutation,
+} from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { generateUsername } from 'unique-username-generator';
 import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -22,7 +25,6 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
@@ -35,13 +37,17 @@ const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
   const formMethodsRef = useRef<CWFormRef>();
-  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
-    useUpdateProfileByAddressMutation();
+  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+    useUpdateUserMutation();
   const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
 
+  const user = useUserStore();
+  const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
+  const { mutateAsync: updateEmailSettings } =
+    useUpdateUserEmailSettingsMutation();
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
     shouldFetchSelfProfile: true,
@@ -49,22 +55,22 @@ const PersonalInformationStep = ({
 
   useNecessaryEffect(() => {
     // if user authenticated with SSO, by default we show username granted by the SSO service
-    const addresses = app?.user?.addresses;
+    const addresses = user.addresses;
     const defaultSSOUsername =
       addresses?.length === 1 && addresses?.[0]?.walletId === WalletId.Magic
         ? addresses?.[0]?.profile?.name
         : '';
 
     if (formMethodsRef.current) {
-      if (defaultSSOUsername) {
+      if (defaultSSOUsername && defaultSSOUsername !== DEFAULT_NAME) {
         formMethodsRef.current.setValue('username', defaultSSOUsername, {
           shouldDirty: true,
         });
         formMethodsRef.current.trigger('username').catch(console.error);
       }
 
-      if (app?.user?.email) {
-        formMethodsRef.current.setValue('email', app.user.email, {
+      if (user.email) {
+        formMethodsRef.current.setValue('email', user.email, {
           shouldDirty: true,
         });
         formMethodsRef.current.trigger('email').catch(console.error);
@@ -73,20 +79,20 @@ const PersonalInformationStep = ({
     }
   }, []);
 
-  const { toggleAllInAppNotifications } = useNotificationSettings();
+  const { mutateAsync: updateSubscriptionPreferences } =
+    useUpdateSubscriptionPreferencesMutation();
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
       limit: 1000,
-      includeRoles: false,
       searchTerm: debouncedSearchTerm,
       communityId: 'all_communities',
       orderBy: APIOrderBy.LastActive,
       orderDirection: APIOrderDirection.Desc,
     });
 
-  const existingUsernames = (profiles?.pages?.[0]?.results || []).map((user) =>
-    user?.profile_name?.trim?.().toLowerCase(),
+  const existingUsernames = (profiles?.pages?.[0]?.results || []).map(
+    (userResult) => userResult?.profile_name?.trim?.().toLowerCase(),
   );
   const isUsernameTaken = existingUsernames.includes(
     currentUsername.toLowerCase(),
@@ -116,26 +122,32 @@ const PersonalInformationStep = ({
   ) => {
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
-    await updateProfile({
-      // @ts-expect-error <StrictNullChecks/>
-      address: app.user.activeAccount?.profile?.address,
-      // @ts-expect-error <StrictNullChecks/>
-      chain: app.user.activeAccount?.profile?.chain,
-      name: values.username,
-      ...(values.email && {
-        email: values.email,
-      }),
+    await updateUser({
+      id: user.id,
+      promotional_emails_enabled: values.enableProductUpdates,
+      profile: {
+        name: values.username.trim(),
+        email: values.email.trim(),
+      },
     });
 
     // set email for notifications
     if (values.email) {
-      await app.user.updateEmail(values.email);
+      await updateEmail({ email: values.email });
     }
 
-    // enable/disable all in-app notifications for user
-    await toggleAllInAppNotifications(values.enableAccountNotifications);
+    if (values.enableAccountNotifications) {
+      await updateSubscriptionPreferences({
+        id: user.id,
+        email_notifications_enabled: true,
+        recap_email_enabled: true,
+        digest_email_enabled: true,
+      });
+    }
     // enable/disable promotional emails flag for user
-    await app.user.writeEmailSettings('', values.enableProductUpdates);
+    await updateEmailSettings({
+      promotionalEmailsEnabled: values.enableProductUpdates,
+    });
 
     // refetch profile data
     await refetchProfileData().catch(console.error);
@@ -212,11 +224,7 @@ const PersonalInformationStep = ({
               name="enableProductUpdates"
               hookToForm
               label="Send me product updates and news"
-              disabled={
-                watch('email')?.trim() === '' ||
-                !formState.isDirty ||
-                isCheckingUsernameUniqueness
-              }
+              disabled={watch('email')?.trim() === '' || !formState.isDirty}
             />
           </div>
 
@@ -226,6 +234,7 @@ const PersonalInformationStep = ({
             type="submit"
             disabled={
               isUpdatingProfile ||
+              isCheckingUsernameUniqueness ||
               !formState.isDirty ||
               watch('username')?.trim() === ''
             }

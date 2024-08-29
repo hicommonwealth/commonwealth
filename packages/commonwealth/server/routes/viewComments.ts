@@ -6,6 +6,7 @@ import { sanitizeDeletedComment } from 'server/util/sanitizeDeletedComment';
 
 export const Errors = {
   NoRootId: 'Must provide thread_id',
+  InvalidId: 'Invalid thread_id',
 };
 
 const viewComments = async (
@@ -21,9 +22,12 @@ const viewComments = async (
     return next(new AppError(Errors.NoRootId));
   }
 
+  const parsedInt = parseInt(threadId, 10);
+  if (isNaN(parsedInt) || parsedInt !== parseFloat(threadId)) {
+    return next(new AppError(Errors.InvalidId));
+  }
+
   const comments = await models.Comment.findAll({
-    // @ts-expect-error StrictNullChecks
-    where: { community_id: community.id, thread_id: threadId },
     include: [
       {
         model: models.Address,
@@ -32,17 +36,15 @@ const viewComments = async (
             model: models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
+      },
+      {
+        model: models.Thread,
+        attributes: ['id'],
+        required: true,
+        where: { id: threadId, community_id: community!.id },
       },
       {
         model: models.Reaction,
@@ -58,15 +60,7 @@ const viewComments = async (
                 model: models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
+                attributes: ['id', 'profile'],
               },
             ],
           },

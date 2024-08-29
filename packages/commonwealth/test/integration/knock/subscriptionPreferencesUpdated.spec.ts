@@ -12,6 +12,14 @@ import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
@@ -25,7 +33,7 @@ describe('subscriptionPreferencesUpdated', () => {
     | z.infer<typeof schemas.SubscriptionPreference>
     | undefined;
 
-  before(async () => {
+  beforeAll(async () => {
     [user] = await tester.seed('User', {
       isAdmin: false,
       selected_community_id: null,
@@ -56,11 +64,11 @@ describe('subscriptionPreferencesUpdated', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should delete all exiting email schedules if emails are disabled', async () => {
+  test('should delete all exiting email schedules if emails are disabled', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(
       SpyNotificationsProvider(sandbox, {
@@ -105,15 +113,14 @@ describe('subscriptionPreferencesUpdated', () => {
     });
   });
 
-  it('should create schedules if emails are enabled', async () => {
+  test('should create schedules if emails are enabled', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );
@@ -129,10 +136,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: true,
       },
     });
@@ -167,15 +171,14 @@ describe('subscriptionPreferencesUpdated', () => {
     ).to.equal(RepeatFrequency.Weekly);
   });
 
-  it('should not create a schedule if one already exists', async () => {
+  test('should not create a schedule if one already exists', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );
@@ -209,21 +212,19 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
-      user_id: String(user.id!),
+      user_id: String(user!.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
   });
 
-  it('should delete a single schedule even if emails are enabled', async () => {
+  test('should delete a single schedule even if emails are enabled', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );
@@ -260,8 +261,7 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
-      user_id: String(user.id!),
+      user_id: String(user!.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
     expect(
@@ -271,15 +271,14 @@ describe('subscriptionPreferencesUpdated', () => {
     });
   });
 
-  it('should not throw if attempting to delete a schedule that does not exist', async () => {
+  test('should not throw if attempting to delete a schedule that does not exist', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );

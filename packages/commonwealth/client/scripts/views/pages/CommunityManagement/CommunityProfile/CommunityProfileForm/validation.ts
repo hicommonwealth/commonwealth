@@ -1,9 +1,5 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
+import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import z from 'zod';
-
-export const linkValidationSchema = z.string().url({
-  message: VALIDATION_MESSAGES.INVALID_INPUT,
-});
 
 export const communityProfileValidationSchema = z.object({
   communityName: z
@@ -13,9 +9,9 @@ export const communityProfileValidationSchema = z.object({
   communityDescription: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  communityProfileImageURL: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  communityProfileImageURL: z.string({
+    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+  }),
   defaultPage: z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
   hasStagesEnabled: z.boolean({
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,

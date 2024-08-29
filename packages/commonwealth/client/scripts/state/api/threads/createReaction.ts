@@ -1,9 +1,14 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { useFlag } from 'hooks/useFlag';
+import axios, { AxiosError } from 'axios';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { signThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
+import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
@@ -13,43 +18,49 @@ interface IuseCreateThreadReactionMutation {
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
+  isPWA?: boolean;
 }
 
 const createReaction = async ({
   address,
   reactionType = 'like',
   threadId,
+  isPWA,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signThreadReaction(address, {
+  const canvasSignedData = await signThreadReaction(address, {
     thread_id: threadId,
     like: reactionType === 'like',
   });
 
-  return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
-    author_community_id: app.user.activeAccount.community.id,
-    thread_id: threadId,
-    community_id: app.chain.id,
-    address,
-    reaction: reactionType,
-    jwt: app.user.jwt,
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
-  });
+  return await axios.post(
+    `${SERVER_URL}/threads/${threadId}/reactions`,
+    {
+      author_community_id: userStore.getState().activeAccount?.community?.id,
+      thread_id: threadId,
+      community_id: app.chain.id,
+      address,
+      reaction: reactionType,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
+    },
+  );
 };
 
 const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
 }: IuseCreateThreadReactionMutation) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
-
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
+  const user = useUserStore();
 
   return useMutation({
     mutationFn: createReaction,
@@ -59,7 +70,7 @@ const useCreateThreadReactionMutation = ({
         address: response.data.result.Address.address,
         type: 'like',
         updated_at: response.data.result.updated_at,
-        voting_weight: response.data.result.calculated_voting_weight || 1,
+        voting_weight: response.data.result.calculated_voting_weight || 0,
       };
       updateThreadInAllCaches(
         communityId,
@@ -68,14 +79,17 @@ const useCreateThreadReactionMutation = ({
         'combineAndRemoveDups',
       );
 
-      if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          // @ts-expect-error StrictNullChecks
-          profileId,
-        );
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.data?.error?.toLowerCase().includes('stake')) {
+          notifyError('Buy stake in community to upvote threads');
+        }
       }
+      return checkForSessionKeyRevalidationErrors(error);
     },
   });
 };

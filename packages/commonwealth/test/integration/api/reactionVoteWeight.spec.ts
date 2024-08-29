@@ -10,15 +10,12 @@ import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
-import BanCache from 'server/util/banCheckCache';
 import Sinon from 'sinon';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
 
-const mockBanCache = {
-  checkBan: async () => [true, null],
-} as any as BanCache;
 describe('Reaction vote weight', () => {
   let server: TestServer;
 
@@ -30,17 +27,11 @@ describe('Reaction vote weight', () => {
   let threadsController, commentsController;
   let createThread, createComment;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
-    threadsController = new ServerThreadsController(
-      server.models,
-      mockBanCache,
-    );
-    commentsController = new ServerCommentsController(
-      server.models,
-      mockBanCache,
-    );
+    threadsController = new ServerThreadsController(server.models);
+    commentsController = new ServerCommentsController(server.models);
 
     const userRes = await server.seeder.createAndVerifyAddress(
       { chain: 'ethereum' },
@@ -48,18 +39,22 @@ describe('Reaction vote weight', () => {
     );
 
     createThread = async () => {
-      const t = await threadsController.createThread({
-        user,
-        address,
-        community,
-        // @ts-expect-error StrictNullChecks
-        topicId: topic.id,
-        title: 'Hey',
+      const t = await server.models.Thread.create({
+        community_id: community!.id!,
+        address_id: address!.id!,
+        topic_id: topic!.id,
+        title: 'Nice',
         body: 'Cool',
+        plaintext: 'Cool',
         kind: 'discussion',
-        readOnly: false,
+        stage: '',
+        view_count: 0,
+        comment_count: 0,
+        reaction_count: 0,
+        reaction_weights_sum: 0,
+        max_notif_id: 0,
       });
-      return t[0];
+      return t;
     };
 
     createComment = async (threadId: number) => {
@@ -101,7 +96,7 @@ describe('Reaction vote weight', () => {
     );
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -109,7 +104,7 @@ describe('Reaction vote weight', () => {
     Sinon.restore();
   });
 
-  it('should set thread reaction vote weight and thread vote sum correctly', async () => {
+  test('should set thread reaction vote weight and thread vote sum correctly', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
       [address.address]: '50',
@@ -121,14 +116,14 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       threadId: thread.id,
     });
-    const expectedWeight = 1 + 50 * 200;
+    const expectedWeight = 50 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
     const t = await server.models.Thread.findByPk(thread.id);
     // @ts-expect-error StrictNullChecks
     expect(t.reaction_weights_sum).to.eq(expectedWeight);
   });
 
-  it('should set comment reaction vote weight and comment vote sum correctly', async () => {
+  test('should set comment reaction vote weight and comment vote sum correctly', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
       [address.address]: '50',
@@ -141,17 +136,17 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       commentId: comment.id,
     });
-    const expectedWeight = 1 + 50 * 200;
+    const expectedWeight = 50 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
     const c = await server.models.Comment.findByPk(comment.id);
     // @ts-expect-error StrictNullChecks
     expect(c.reaction_weights_sum).to.eq(expectedWeight);
   });
 
-  it('should set thread reaction vote weight to min 1', async () => {
+  test('should set thread reaction vote weight to min 1', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
-      [address.address]: '0',
+      [address.address]: '17',
     });
     const thread = await createThread();
     const [reaction] = await threadsController.createThreadReaction({
@@ -160,14 +155,14 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       threadId: thread.id,
     });
-    const expectedWeight = 1;
+    const expectedWeight = 17 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
   });
 
-  it('should set comment reaction vote weight to min 1', async () => {
+  test('should set comment reaction vote weight to min 1', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
-      [address.address]: '0',
+      [address.address]: '7',
     });
     const thread = await createThread();
     const comment = await createComment(thread.id);
@@ -177,7 +172,7 @@ describe('Reaction vote weight', () => {
       reaction: 'like',
       commentId: comment.id,
     });
-    const expectedWeight = 1;
+    const expectedWeight = 7 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
   });
 });

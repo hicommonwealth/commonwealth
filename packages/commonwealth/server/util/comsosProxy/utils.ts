@@ -4,12 +4,10 @@ import { CosmosGovernanceVersion, NodeHealth } from '@hicommonwealth/shared';
 import axios, { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import _ from 'lodash';
-import { fileURLToPath } from 'url';
 
 export const IGNORE_COSMOS_CHAIN_IDS = ['csdk', 'evmosdev'];
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 const DEVNET_COSMOS_ID_RE = /^(csdk|evmosdev)/;
 const IGNORE_COSMOS_METHODS = ['tx', 'auth'];
 const IGNORE_ERRORS = ['cosmos_chain_id is required'];
@@ -166,6 +164,7 @@ export async function queryExternalProxy(
     url = req.originalUrl.replace(req.baseUrl, proxyUrl);
   }
 
+  log.info(`Querying Cosmos node at ${url}`);
   return await axios.post(url, _.isEmpty(req.body) ? null : req.body, {
     headers: {
       origin: 'https://commonwealth.im',

@@ -1,14 +1,11 @@
-import React, { useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Virtuoso } from 'react-virtuoso';
-
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -20,15 +17,19 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { slugify } from '@hicommonwealth/shared';
+import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -39,23 +40,24 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
-  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
+
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
   ) as ThreadFeaturedFilterTypes;
+
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
     'dateRange',
   ) as ThreadTimelineFilterTypes;
-  const { data: topics } = useFetchTopicsQuery({
+
+  const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
   });
   const contestAddress = searchParams.get('contest');
@@ -69,13 +71,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
+  const user = useUserStore();
+
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const { data: domain } = useFetchCustomDomainQuery();
+
+  const { contestsData } = useCommunityContests();
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -83,7 +89,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isOnArchivePage =
     location.pathname ===
-    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
+    (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -105,7 +111,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
-      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -123,7 +128,35 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
+  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
+  const topicNameFromURL = splitAndDecodeURL(location.pathname);
+
+  //checks for malformed url in topics and redirects if the topic does not exist
+  useEffect(() => {
+    if (
+      !isLoadingTopics &&
+      topicNameFromURL &&
+      topicNameFromURL !== 'archived'
+    ) {
+      const validTopics = topics?.some(
+        (topic) => topic?.name === topicNameFromURL,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics, topicNameFromURL, isLoadingTopics]);
+
   useManageDocumentTitle('Discussions');
+
+  const activeContestsInTopic = contestsData?.filter((contest) => {
+    const isContestInTopic = (contest.topics || []).find(
+      (topic) => topic.id === topicId,
+    );
+    const isActive = isContestActive({ contest });
+    return isContestInTopic && isActive;
+  });
 
   return (
     // @ts-expect-error <StrictNullChecks/>
@@ -158,11 +191,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: !!hasJoinedCommunity,
+            isCommunityMember: !!user.activeAccount,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
           });
+
+          const isThreadTopicInContest = checkIsTopicInContest(
+            contestsData,
+            thread?.topic?.id,
+          );
 
           return (
             <ThreadCard
@@ -182,9 +220,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusEditor=true`)
+                navigate(`${discussionLink}?focusComments=true`)
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
+              hideRecentComments
+              editingDisabled={isThreadTopicInContest}
             />
           );
         }}
@@ -204,8 +244,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           Header: () => (
             <>
               <Breadcrumbs />
-              {userOnboardingEnabled && <UserTrainingSlider />}
+              <UserTrainingSlider />
               <AdminOnboardingSlider />
+
               <HeaderWithFilters
                 // @ts-expect-error <StrictNullChecks/>
                 topic={topicName}
@@ -216,14 +257,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                    ? totalThreadsInCommunity
-                    : 0
+                      ? app?.chain?.meta?.lifetimeThreadCount
+                      : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}
                 isIncludingArchivedThreads={includeArchivedThreads}
                 onIncludeArchivedThreads={setIncludeArchivedThreads}
                 isOnArchivePage={isOnArchivePage}
+                activeContests={activeContestsInTopic}
               />
             </>
           ),

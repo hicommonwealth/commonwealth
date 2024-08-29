@@ -5,21 +5,29 @@ import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import type { IconSize } from './component_kit/cw_icons/types';
 
 import { CWText } from './component_kit/cw_text';
-import ChainInfo from 'client/scripts/models/ChainInfo';
 
 type CommunityLabelProps = {
-  community: ChainInfo;
+  iconUrl: string;
+  name: string;
   size?: IconSize;
 };
 
-export const CommunityLabel = (props: CommunityLabelProps) => {
-  const { community, size = 'small' } = props;
-
+export const CommunityLabel = ({
+  name,
+  iconUrl,
+  size = 'small',
+}: CommunityLabelProps) => {
   return (
     <div className="CommunityLabel">
-      <CWCommunityAvatar community={community} size={size} />
-      <CWText noWrap type="b1" fontWeight="medium" title={community.name}>
-        {community.name}
+      <CWCommunityAvatar
+        community={{
+          name,
+          iconUrl,
+        }}
+        size={size}
+      />
+      <CWText noWrap type="b1" fontWeight="medium" title={name}>
+        {name}
       </CWText>
     </div>
   );

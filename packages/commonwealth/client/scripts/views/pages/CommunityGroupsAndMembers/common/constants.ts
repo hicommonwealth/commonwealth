@@ -1,4 +1,4 @@
-import app from 'state';
+import { fetchCachedNodes } from 'state/api/nodes';
 
 export const TOKENS = {
   COSMOS_TOKEN: 'cosmos_native',
@@ -48,19 +48,21 @@ export const conditionTypes = [
   { value: AMOUNT_CONDITIONS.LESS, label: 'Less than' },
 ];
 
-// Get chain id's from the app.config.chains for all eth and cosmos chains
-export const chainTypes = app.config.nodes
-  .getAll()
-  .filter(
-    (chain) =>
-      chain.ethChainId || chain.cosmosChainId || chain.balanceType === 'solana',
-  )
-  .map((chain) => ({
-    chainBase: chain.ethChainId
-      ? 'ethereum'
-      : chain.balanceType === 'solana'
-      ? 'solana'
-      : 'cosmos',
-    value: chain.ethChainId || chain.cosmosChainId || 0,
-    label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
-  }));
+// Get chain id's from the fetchCachedNodes for all eth and cosmos chains
+export const chainTypes =
+  fetchCachedNodes()
+    ?.filter(
+      (chain) =>
+        chain.ethChainId ||
+        chain.cosmosChainId ||
+        chain.balanceType === 'solana',
+    )
+    ?.map((chain) => ({
+      chainBase: chain.ethChainId
+        ? 'ethereum'
+        : chain.balanceType === 'solana'
+          ? 'solana'
+          : 'cosmos',
+      value: chain.ethChainId || chain.cosmosChainId || 0,
+      label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+    })) || [];

@@ -1,14 +1,25 @@
-import ChainInfo from 'client/scripts/models/ChainInfo';
+import { ChainBase } from '@hicommonwealth/shared';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
+type SelectedCommunity = {
+  id: string;
+  name: string;
+  base: ChainBase;
+  iconUrl: string;
+  namespace: string;
+  ChainNode: {
+    url: string;
+    ethChainId: number;
+  };
+};
 interface ManageCommunityStakeModalStore {
   selectedAddress?: Readonly<string>;
   setSelectedAddress: (address: string) => void;
-  selectedCommunity?: Readonly<ChainInfo>;
-  setSelectedCommunity: (community: ChainInfo) => void;
+  selectedCommunity?: Readonly<SelectedCommunity>;
+  setSelectedCommunity: (community: SelectedCommunity) => void;
   modeOfManageCommunityStakeModal: ManageCommunityStakeModalMode;
   setModeOfManageCommunityStakeModal: (
     modalType: ManageCommunityStakeModalMode,

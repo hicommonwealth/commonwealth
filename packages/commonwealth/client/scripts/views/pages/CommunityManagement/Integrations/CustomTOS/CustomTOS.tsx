@@ -1,17 +1,41 @@
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
+import { notifySuccess } from 'controllers/app/notifications';
+import { linkValidationSchema } from 'helpers/formValidations/common';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
+import {
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
+} from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { ZodError } from 'zod';
-import { linkValidationSchema } from '../common/validation';
 import './CustomTOS.scss';
 
 const CustomTOS = () => {
-  const [community] = useState(app.config.chains.getById(app.activeChainId()));
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: app.activeChainId(),
+      enabled: !!app.activeChainId(),
+    });
+
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
+
+  useRunOnceOnCondition({
+    callback: () => {
+      setTerms({
+        value: community?.terms || '',
+        error: '',
+      });
+    },
+    shouldRun: !isLoadingCommunity && !!community,
+  });
+
   const [terms, setTerms] = useState({
-    value: community.terms || '',
+    value: '',
     error: '',
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -22,7 +46,7 @@ const CustomTOS = () => {
 
     if (value) {
       try {
-        linkValidationSchema.parse(value);
+        linkValidationSchema.required.parse(value);
       } catch (e: any) {
         const zodError = e as ZodError;
         error = zodError.errors[0].message;
@@ -33,12 +57,13 @@ const CustomTOS = () => {
   }, []);
 
   const onSaveChanges = useCallback(async () => {
-    if (isSaving || terms.error) return;
+    if (isSaving || terms.error || !community?.id) return;
     setIsSaving(true);
 
     try {
-      await community.updateChainData({
-        terms: terms.value,
+      await updateCommunity({
+        communityId: community?.id,
+        terms: terms.value || '',
       });
 
       notifySuccess('TOS link updated!');
@@ -47,7 +72,7 @@ const CustomTOS = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [isSaving, terms, community]);
+  }, [isSaving, terms, community, updateCommunity]);
 
   return (
     <section className="CustomTOS">

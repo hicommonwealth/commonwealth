@@ -2,7 +2,9 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';
@@ -12,6 +14,8 @@ import { generateBreadcrumbs } from './utils';
 export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
+  const userData = useUserStore();
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
@@ -24,15 +28,11 @@ export const Breadcrumbs = () => {
       location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
 
-  const user = app?.user?.addresses?.[0];
-  // @ts-expect-error StrictNullChecks
-  const profileId = user?.profileId || user?.profile.id;
-
   const currentDiscussion = {
-    currentThreadName: linkedThreads?.[0]?.title,
-    currentTopic: linkedThreads?.[0]?.topic.name,
-    // @ts-expect-error StrictNullChecks
-    topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
+    currentThreadName: linkedThreads?.[0]?.title || '',
+    currentTopic: linkedThreads?.[0]?.topic?.name || '',
+    topicURL:
+      `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` || '',
   };
 
   let standalone = false;
@@ -56,13 +56,13 @@ export const Breadcrumbs = () => {
     standalone = true;
   }
 
+  const user = userData.addresses?.[0];
   const pathnames = generateBreadcrumbs(
     location.pathname,
-    profileId,
     navigate,
-    // @ts-expect-error StrictNullChecks
-    app.isCustomDomain() ? app.activeChainId() : undefined,
+    domain?.isCustomDomain ? app.activeChainId() : '',
     currentDiscussion,
+    user?.userId,
   );
 
   //Gets the tooltip copy based on the current page.
@@ -101,6 +101,9 @@ export const Breadcrumbs = () => {
           />
         )}
       </nav>
+      {/* an empty div that takes the block content area on the active page, similar
+      to the area that the fixed position BreadcrumbsComponent would take */}
+      <div className="BreadcrumbsBlockContentArea" />
     </CWPageLayout>
   );
 };

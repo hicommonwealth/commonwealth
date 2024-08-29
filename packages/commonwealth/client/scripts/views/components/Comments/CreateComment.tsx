@@ -2,11 +2,13 @@ import { ContentType } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
+import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import useUserStore from 'state/ui/user';
+import useAppStatus from '../../../hooks/useAppStatus';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -36,8 +38,8 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
-  const urlParams = new URLSearchParams(location.search);
-  const focusEditorParam = urlParams.get('focusEditor') === 'true';
+  const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
@@ -54,88 +56,73 @@ export const CreateComment = ({
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const { data: profile } = useFetchProfilesByAddressesQuery({
-    profileChainIds: [app.user.activeAccount?.community?.id],
-    profileAddresses: [app.user.activeAccount?.address],
+  const { data } = useFetchProfilesByAddressesQuery({
+    profileChainIds: user.activeAccount?.community?.id
+      ? [user.activeAccount?.community?.id]
+      : [],
+    profileAddresses: user.activeAccount?.address
+      ? [user.activeAccount?.address]
+      : [],
     currentChainId: app.activeChainId(),
-    apiCallEnabled: !!app.user.activeAccount?.profile,
+    apiCallEnabled: !!user.activeAccount?.profile,
   });
-
-  if (app.user.activeAccount) {
-    app.user.activeAccount.profile = profile?.[0];
+  if (user.activeAccount) {
+    user.activeAccount.profile = data?.[0];
   }
-  const author = app.user.activeAccount;
+  const author = user.activeAccount;
 
-  const {
-    mutateAsync: createComment,
-    error: createCommentError,
-    reset: resetCreateCommentMutation,
-  } = useCreateCommentMutation({
+  const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
     communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetCreateCommentMutation,
-    error: createCommentError,
-  });
+  const handleSubmitComment = () => {
+    if (!user.activeAccount) return;
 
-  const handleSubmitComment = async () => {
     setErrorMsg(null);
     setSendingComment(true);
 
     const communityId = app.activeChainId();
+    const asyncHandle = async () => {
+      try {
+        const newComment = await createComment({
+          communityId,
+          profile: user.activeAccount!.profile!.toUserProfile(),
+          threadId: rootThread.id,
+          unescapedText: serializeDelta(contentDelta),
+          parentCommentId: parentCommentId ?? null,
+          existingNumberOfComments: rootThread.numberOfComments || 0,
+          isPWA: isAddedToHomeScreen,
+        });
 
-    try {
-      const newComment: any = await createComment({
-        threadId: rootThread.id,
-        communityId,
-        profile: {
-          // @ts-expect-error <StrictNullChecks/>
-          id: app.user.activeAccount.profile.id,
-          address: app.user.activeAccount.address,
-          // @ts-expect-error <StrictNullChecks/>
-          avatarUrl: app.user.activeAccount.profile.avatarUrl,
-          // @ts-expect-error <StrictNullChecks/>
-          name: app.user.activeAccount.profile.name,
-          // @ts-expect-error <StrictNullChecks/>
-          lastActive: app.user.activeAccount.profile.lastActive?.toString(),
-        },
-        // @ts-expect-error <StrictNullChecks/>
-        parentCommentId: parentCommentId,
-        unescapedText: serializeDelta(contentDelta),
-        existingNumberOfComments: rootThread.numberOfComments || 0,
-      });
+        setErrorMsg(null);
+        setContentDelta(createDeltaFromText(''));
+        clearDraft();
 
-      setErrorMsg(null);
-      setContentDelta(createDeltaFromText(''));
-      clearDraft();
+        setTimeout(() => {
+          // Wait for dom to be updated before scrolling to comment
+          jumpHighlightComment(newComment?.id as number);
+        }, 100);
+      } catch (err) {
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        const errMsg = err?.responseJSON?.error || err?.message;
+        console.error(errMsg);
 
-      setTimeout(() => {
-        // Wait for dom to be updated before scrolling to comment
-        jumpHighlightComment(newComment.id);
-      }, 100);
+        notifyError('Failed to create comment');
+        setErrorMsg(errMsg);
+      } finally {
+        setSendingComment(false);
 
-      // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
-      // once we are receiving notifications from the websocket
-      await app.user.notifications.refresh();
-    } catch (err) {
-      if (err instanceof SessionKeyError) {
-        return;
+        if (handleIsReplying) {
+          handleIsReplying(false);
+        }
       }
-      const errMsg = err?.responseJSON?.error || err?.message;
-      console.error(errMsg);
+    };
 
-      notifyError('Failed to create comment');
-      setErrorMsg(errMsg);
-    } finally {
-      setSendingComment(false);
-
-      if (handleIsReplying) {
-        handleIsReplying(false);
-      }
-    }
+    asyncHandle().then().catch(console.error);
   };
 
   const disabled = editorValue.length === 0 || sendingComment;
@@ -154,30 +141,22 @@ export const CreateComment = ({
     saveDraft(contentDelta);
   }, [handleIsReplying, saveDraft, contentDelta]);
 
-  return (
-    <>
-      {rootThread.archivedAt === null ? (
-        <>
-          <CommentEditor
-            parentType={parentType}
-            canComment={canComment}
-            handleSubmitComment={handleSubmitComment}
-            // @ts-expect-error <StrictNullChecks/>
-            errorMsg={errorMsg}
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
-            disabled={disabled}
-            onCancel={handleCancel}
-            author={author}
-            editorValue={editorValue}
-            shouldFocus={canComment && focusEditorParam}
-            tooltipText={tooltipText}
-          />
-          {RevalidationModal}
-        </>
-      ) : (
-        <ArchiveMsg archivedAt={rootThread.archivedAt} />
-      )}
-    </>
+  return rootThread.archivedAt === null ? (
+    <CommentEditor
+      parentType={parentType}
+      canComment={canComment}
+      handleSubmitComment={handleSubmitComment}
+      // @ts-expect-error <StrictNullChecks/>
+      errorMsg={errorMsg}
+      contentDelta={contentDelta}
+      setContentDelta={setContentDelta}
+      disabled={disabled}
+      onCancel={handleCancel}
+      author={author as Account}
+      editorValue={editorValue}
+      tooltipText={tooltipText}
+    />
+  ) : (
+    <ArchiveMsg archivedAt={rootThread.archivedAt} />
   );
 };

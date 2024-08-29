@@ -1,14 +1,13 @@
 @import 'mixins/buttons';
 @import 'mixins/media_queries';
-@import 'mixins/breakpoints';
+@import 'mixins/breakpoints.module';
 @import 'mixins/elevation';
-@import 'mixins/colors';
+@import 'mixins/colors.module';
 @import 'mixins/border_radius';
 @import 'mixins/choice';
 @import 'mixins/inputs';
 @import 'mixins/icons';
 @import 'mixins/text';
-@import 'mixins/scrollbars';
 @import 'utils';
 
 // layout & global nav parameters

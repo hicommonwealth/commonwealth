@@ -58,16 +58,13 @@ export const createCommunityStakeHandler = async (
     where: {
       id: community_id,
     },
-    include: [
-      {
-        model: models.ChainNode,
-        attributes: ['eth_chain_id', 'url'],
-      },
-    ],
   });
 
+  if (!community) {
+    throw new AppError('Invalid Community');
+  }
+
   await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
-    // @ts-expect-error StrictNullChecks
     community,
     stake_id,
   );
@@ -90,13 +87,11 @@ export const createCommunityStakeHandler = async (
   // since the stake is already created, generate group in background
   // so this request doesn't fail
   await command(Community.GenerateStakeholderGroups(), {
-    // @ts-expect-error StrictNullChecks
-    id: community.id,
     actor: {
       // @ts-expect-error StrictNullChecks
       user: undefined,
     },
-    payload: {},
+    payload: { id: community.id! },
   }).catch((err) => console.error(err));
 
   return success(res, results);

@@ -1,28 +1,23 @@
-import { AppError, ServerError } from '@hicommonwealth/core';
+import { AppError, EventNames, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   CommentInstance,
   UserInstance,
-} from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import moment from 'moment';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import { getCommentDepth } from '../../util/getCommentDepth';
-import {
-  createCommentMentionNotifications,
+  emitEvent,
   emitMentions,
   parseUserMentions,
-  queryMentionedUsers,
+  sanitizeQuillText,
   uniqueMentions,
-} from '../../util/parseUserMentions';
+} from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
+import { renderQuillDeltaToText } from '@hicommonwealth/shared';
+import moment from 'moment';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { getCommentDepth } from '../../util/getCommentDepth';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
@@ -46,17 +41,12 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
-export type CreateThreadCommentResult = [
-  CommentAttributes,
-  EmitOptions[],
-  TrackOptions,
-];
+export type CreateThreadCommentResult = [CommentAttributes, TrackOptions];
 
 export async function __createThreadComment(
   this: ServerThreadsController,
@@ -66,8 +56,7 @@ export async function __createThreadComment(
     parentId,
     threadId,
     text,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     discordMeta,
   }: CreateThreadCommentOptions,
@@ -83,14 +72,7 @@ export async function __createThreadComment(
     throw new AppError(Errors.ThreadNotFound);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // check if thread is archived
   if (thread.archived_at) {
@@ -109,7 +91,6 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        community_id: thread.community_id,
       },
       include: [this.models.Address],
     });
@@ -174,10 +155,8 @@ export async function __createThreadComment(
     // @ts-expect-error StrictNullChecks
     address_id: address.id,
     community_id: thread.community_id,
-    // @ts-expect-error StrictNullChecks
     parent_id: null,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,
@@ -192,7 +171,6 @@ export async function __createThreadComment(
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   let comment: CommentInstance;
   try {
@@ -201,39 +179,46 @@ export async function __createThreadComment(
         transaction,
       });
 
+      await this.models.CommentVersionHistory.create(
+        {
+          comment_id: comment.id!,
+          text: comment.text!,
+          timestamp: comment.created_at!,
+        },
+        {
+          transaction,
+        },
+      );
+
       await emitMentions(this.models, transaction, {
-        // @ts-expect-error StrictNullChecks
-        authorAddressId: address.id,
-        // @ts-expect-error StrictNullChecks
-        authorUserId: user.id,
+        authorAddressId: address.id!,
+        authorUserId: user.id!,
         authorAddress: address.address,
-        // @ts-expect-error StrictNullChecks
-        authorProfileId: address.profile_id,
-        mentions: mentionedAddresses,
+        mentions: mentions,
         comment,
+        community_id: thread.community_id,
       });
 
-      await this.models.Subscription.bulkCreate(
+      await emitEvent(
+        this.models.Outbox,
         [
           {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewReaction,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id,
-            is_active: true,
-          },
-          {
-            // @ts-expect-error StrictNullChecks
-            subscriber_id: user.id,
-            category_id: NotificationCategories.NewComment,
-            // @ts-expect-error StrictNullChecks
-            community_id: comment.community_id || null,
-            comment_id: comment.id,
-            is_active: true,
+            event_name: EventNames.CommentCreated,
+            event_payload: {
+              ...comment.toJSON(),
+              community_id: thread.community_id,
+              users_mentioned: mentions.map((u) => parseInt(u.userId)),
+            },
           },
         ],
+        transaction,
+      );
+
+      await this.models.CommentSubscription.create(
+        {
+          user_id: user.id!,
+          comment_id: comment.id!,
+        },
         { transaction },
       );
     });
@@ -241,69 +226,12 @@ export async function __createThreadComment(
     throw new ServerError('Failed to create comment', e);
   }
 
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push(
-    // @ts-expect-error StrictNullChecks
-    ...createCommentMentionNotifications(mentionedAddresses, comment, address),
-  );
-
-  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
+  const excludedAddrs: string[] = [];
   excludedAddrs.push(address.address);
 
   const rootNotifExcludeAddresses = [...excludedAddrs];
   if (parentComment && parentComment.Address) {
     rootNotifExcludeAddresses.push(parentComment.Address.address);
-  }
-
-  const root_title = thread.title || '';
-
-  // build notification for root thread
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.NewComment,
-      data: {
-        created_at: new Date(),
-        thread_id: threadId,
-        root_title,
-        root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
-        comment_id: +comment.id,
-        // @ts-expect-error StrictNullChecks
-        comment_text: comment.text,
-        // @ts-expect-error StrictNullChecks
-        community_id: comment.community_id,
-        author_address: address.address,
-        author_community_id: address.community_id,
-      },
-    },
-    excludeAddresses: rootNotifExcludeAddresses,
-  });
-
-  // if child comment, build notification for parent author
-  if (parentId && parentComment) {
-    allNotificationOptions.push({
-      notification: {
-        categoryId: NotificationCategories.NewComment,
-        data: {
-          created_at: new Date(),
-          thread_id: +threadId,
-          root_title,
-          root_type: ProposalType.Thread,
-          // @ts-expect-error StrictNullChecks
-          comment_id: +comment.id,
-          // @ts-expect-error StrictNullChecks
-          comment_text: comment.text,
-          parent_comment_id: +parentId,
-          parent_comment_text: parentComment.text,
-          // @ts-expect-error StrictNullChecks
-          community_id: comment.community_id,
-          author_address: address.address,
-          author_community_id: address.community_id,
-        },
-      },
-      excludeAddresses: excludedAddrs,
-    });
   }
 
   // update author last saved (in background)
@@ -323,5 +251,5 @@ export async function __createThreadComment(
   // @ts-expect-error StrictNullChecks
   const commentJson = comment.toJSON();
   commentJson.Address = address.toJSON();
-  return [commentJson, allNotificationOptions, analyticsOptions];
+  return [commentJson, analyticsOptions];
 }

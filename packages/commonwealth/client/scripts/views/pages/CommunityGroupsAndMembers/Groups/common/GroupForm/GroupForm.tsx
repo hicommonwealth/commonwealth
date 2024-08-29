@@ -10,19 +10,18 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
-import { useFlag } from '../../../../../../hooks/useFlag';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
-import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import Allowlist from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
@@ -141,8 +140,6 @@ const GroupForm = ({
   allowedAddresses,
   setAllowedAddresses,
 }: GroupFormProps) => {
-  const allowlistEnabled = useFlag('allowlist');
-
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -169,28 +166,7 @@ const GroupForm = ({
     useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
-  >(
-    !allowlistEnabled
-      ? [
-          {
-            defaultValues: {
-              requirementCondition: conditionTypes.find(
-                (x) => x.value === AMOUNT_CONDITIONS.MORE,
-              ),
-            },
-            values: {
-              requirementAmount: '',
-              requirementChain: '',
-              requirementCondition: AMOUNT_CONDITIONS.MORE,
-              requirementContractAddress: '',
-              requirementType: '',
-              requirementTokenId: '',
-            },
-            errors: {},
-          },
-        ]
-      : [],
-  );
+  >([]);
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -400,247 +376,247 @@ const GroupForm = ({
   };
 
   // + 1 for allowlists
-  const maxRequirements = allowlistEnabled
-    ? requirementSubForms.length + 1
-    : requirementSubForms.length;
+  const maxRequirements = requirementSubForms.length + 1;
 
   return (
-    <CWForm
-      className="GroupForm"
-      initialValues={{
-        groupName: initialValues.groupName || '',
-        groupDescription: initialValues.groupDescription || '',
-        requirementsToFulfill: initialValues.requirementsToFulfill
-          ? initialValues.requirementsToFulfill ===
-            REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
-            ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
-            : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
-          : '',
-        topics: initialValues.topics || '',
-      }}
-      validationSchema={groupValidationSchema}
-      onSubmit={handleSubmit}
-      onErrors={validateSubForms}
-    >
-      {({ formState }) => (
-        <>
-          {/* Form header */}
-          <div className="header-row">
-            <CWText type="h2" fontWeight="semiBold" className="header-text">
-              {formType === 'create' ? 'Create a group' : 'Edit group'}
-            </CWText>
-            <CWText type="b2">
-              {formType === 'create'
-                ? 'Create attributes-based groups for gating topics within your community'
-                : 'Update group attributes'}
-            </CWText>
-          </div>
-
-          {/* Basic information section */}
-          <section className="form-section">
-            <CWText type="h3" fontWeight="semiBold" className="header-text">
-              Basic information
-            </CWText>
-            <CWTextInput
-              name="groupName"
-              hookToForm
-              label="Group name"
-              placeholder="Group name"
-              fullWidth
-              instructionalMessage="Can be up to 40 characters long"
-              customError={isNameTaken ? 'Group name is already taken' : ''}
-              onInput={(e) => {
-                setIsNameTaken(
-                  takenGroupNames.includes(e.target.value.toLowerCase()),
-                );
-              }}
-            />
-            <CWTextArea
-              name="groupDescription"
-              hookToForm
-              label="Description (optional)"
-              placeholder="Add a description for your group"
-              instructionalMessage="Can be up to 250 characters long"
-            />
-          </section>
-
-          <CWDivider />
-
-          {/* Requirements section */}
-          <section className="form-section">
+    <CWPageLayout>
+      <CWForm
+        className="GroupForm"
+        initialValues={{
+          groupName: initialValues.groupName || '',
+          groupDescription: initialValues.groupDescription || '',
+          requirementsToFulfill: initialValues.requirementsToFulfill
+            ? initialValues.requirementsToFulfill ===
+              REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
+              ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
+              : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
+            : '',
+          topics: initialValues.topics || '',
+        }}
+        validationSchema={groupValidationSchema}
+        onSubmit={handleSubmit}
+        onErrors={validateSubForms}
+      >
+        {({ formState }) => (
+          <>
+            {/* Form header */}
             <div className="header-row">
-              <CWText type="h3" fontWeight="semiBold" className="header-text">
-                Requirements
+              <CWText type="h2" fontWeight="semiBold" className="header-text">
+                {formType === 'create' ? 'Create a group' : 'Edit group'}
               </CWText>
               <CWText type="b2">
-                Add requirements for access to gated topics
+                {formType === 'create'
+                  ? 'Create attributes-based groups for gating topics within your community'
+                  : 'Update group attributes'}
               </CWText>
             </div>
 
-            {/* Sub-section: Necessary requirements */}
+            {/* Basic information section */}
             <section className="form-section">
-              {/* Added Requirements */}
-              {requirementSubForms.map((subForm, index) => (
-                <RequirementSubForm
-                  key={index}
-                  // @ts-expect-error <StrictNullChecks/>
-                  defaultValues={subForm.defaultValues}
-                  errors={subForm.errors}
-                  onChange={(val) => validateChangedValue(val, index)}
-                  isRemoveable={allowlistEnabled || index > 0}
-                  onRemove={() => removeRequirementByIndex(index)}
-                />
-              ))}
-              <CWButton
-                disabled={requirementSubForms.length === MAX_REQUIREMENTS}
-                type="button"
-                label={
-                  requirementSubForms.length === MAX_REQUIREMENTS
-                    ? 'Cannot add more than 10 requirements'
-                    : 'Add requirement'
-                }
-                // @ts-expect-error <StrictNullChecks/>
-                iconLeft={
-                  requirementSubForms.length === MAX_REQUIREMENTS
-                    ? null
-                    : 'plus'
-                }
-                buttonWidth="full"
-                buttonType="secondary"
-                buttonHeight="med"
-                onClick={(e) => {
-                  (e?.target as HTMLButtonElement)?.blur();
-                  addRequirementSubForm();
+              <CWText type="h3" fontWeight="semiBold" className="header-text">
+                Basic information
+              </CWText>
+              <CWTextInput
+                name="groupName"
+                hookToForm
+                label="Group name"
+                placeholder="Group name"
+                fullWidth
+                instructionalMessage="Can be up to 40 characters long"
+                customError={isNameTaken ? 'Group name is already taken' : ''}
+                onInput={(e) => {
+                  setIsNameTaken(
+                    takenGroupNames.includes(e.target.value.toLowerCase()),
+                  );
                 }}
               />
-
-              <CWText
-                type="h4"
-                fontWeight="semiBold"
-                className="header-row header-text"
-              >
-                Necessary requirements
-              </CWText>
-
-              <div className="radio-buttons">
-                <CWRadioButton
-                  label="All requirements must be satisfied"
-                  value={REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS}
-                  name="requirementsToFulfill"
-                  hookToForm
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setIsSelectedCustomRequirementsToFulfillOption(false);
-                    }
-                  }}
-                />
-
-                <CWRequirementsRadioButton
-                  maxRequirements={maxRequirements}
-                  inputValue={cwRequiremenetsLabelInputValue}
-                  // @ts-expect-error <StrictNullChecks/>
-                  isSelected={isSelectedCustomRequirementsToFulfillOption}
-                  onSelect={() =>
-                    setIsSelectedCustomRequirementsToFulfillOption(true)
-                  }
-                  onInputValueChange={(value) => {
-                    setCwRequiremenetsLabelInputValue(value);
-                  }}
-                />
-
-                {formState?.errors?.requirementsToFulfill?.message && (
-                  <MessageRow
-                    hasFeedback
-                    statusMessage={
-                      formState?.errors?.requirementsToFulfill?.message
-                    }
-                    validationStatus="failure"
-                  />
-                )}
-              </div>
-            </section>
-
-            {/* Sub-section: Gated topics */}
-            <section className="form-section">
-              <div className="header-row">
-                <CWText type="h4" fontWeight="semiBold" className="header-text">
-                  Gate topics
-                </CWText>
-                <CWText type="b2">
-                  Add topics that only group members who satisfy the
-                  requirements above can participate in.
-                </CWText>
-              </div>
-
-              <CWSelectList
-                name="topics"
+              <CWTextArea
+                name="groupDescription"
                 hookToForm
-                isMulti
-                isClearable={false}
-                label="Topics"
-                placeholder="Type in topic name"
-                options={sortedTopics.map((topic) => ({
-                  label: topic.name,
-                  value: topic.id,
-                }))}
+                label="Description (optional)"
+                placeholder="Add a description for your group"
+                instructionalMessage="Can be up to 250 characters long"
               />
             </section>
-          </section>
 
-          {allowlistEnabled && (
+            <CWDivider />
+
+            {/* Requirements section */}
+            <section className="form-section">
+              <div className="header-row">
+                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                  Requirements
+                </CWText>
+                <CWText type="b2">
+                  Add requirements for access to gated topics
+                </CWText>
+              </div>
+
+              {/* Sub-section: Necessary requirements */}
+              <section className="form-section">
+                {/* Added Requirements */}
+                {requirementSubForms.map((subForm, index) => (
+                  <RequirementSubForm
+                    key={index}
+                    // @ts-expect-error <StrictNullChecks/>
+                    defaultValues={subForm.defaultValues}
+                    errors={subForm.errors}
+                    onChange={(val) => validateChangedValue(val, index)}
+                    isRemoveable={index > 0}
+                    onRemove={() => removeRequirementByIndex(index)}
+                  />
+                ))}
+                <CWButton
+                  disabled={requirementSubForms.length === MAX_REQUIREMENTS}
+                  type="button"
+                  label={
+                    requirementSubForms.length === MAX_REQUIREMENTS
+                      ? 'Cannot add more than 10 requirements'
+                      : 'Add requirement'
+                  }
+                  // @ts-expect-error <StrictNullChecks/>
+                  iconLeft={
+                    requirementSubForms.length === MAX_REQUIREMENTS
+                      ? null
+                      : 'plus'
+                  }
+                  buttonWidth="full"
+                  buttonType="secondary"
+                  buttonHeight="med"
+                  onClick={(e) => {
+                    (e?.target as HTMLButtonElement)?.blur();
+                    addRequirementSubForm();
+                  }}
+                />
+
+                <CWText
+                  type="h4"
+                  fontWeight="semiBold"
+                  className="header-row header-text"
+                >
+                  Necessary requirements
+                </CWText>
+
+                <div className="radio-buttons">
+                  <CWRadioButton
+                    label="All requirements must be satisfied"
+                    value={REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS}
+                    name="requirementsToFulfill"
+                    hookToForm
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setIsSelectedCustomRequirementsToFulfillOption(false);
+                      }
+                    }}
+                  />
+
+                  <CWRequirementsRadioButton
+                    maxRequirements={maxRequirements}
+                    inputValue={cwRequiremenetsLabelInputValue}
+                    // @ts-expect-error <StrictNullChecks/>
+                    isSelected={isSelectedCustomRequirementsToFulfillOption}
+                    onSelect={() =>
+                      setIsSelectedCustomRequirementsToFulfillOption(true)
+                    }
+                    onInputValueChange={(value) => {
+                      setCwRequiremenetsLabelInputValue(value);
+                    }}
+                  />
+
+                  {formState?.errors?.requirementsToFulfill?.message && (
+                    <MessageRow
+                      hasFeedback
+                      statusMessage={
+                        formState?.errors?.requirementsToFulfill?.message
+                      }
+                      validationStatus="failure"
+                    />
+                  )}
+                </div>
+              </section>
+
+              {/* Sub-section: Gated topics */}
+              <section className="form-section">
+                <div className="header-row">
+                  <CWText
+                    type="h4"
+                    fontWeight="semiBold"
+                    className="header-text"
+                  >
+                    Gate topics
+                  </CWText>
+                  <CWText type="b2">
+                    Add topics that only group members who satisfy the
+                    requirements above can participate in.
+                  </CWText>
+                </div>
+
+                <CWSelectList
+                  name="topics"
+                  hookToForm
+                  isMulti
+                  isClearable={false}
+                  label="Topics"
+                  placeholder="Type in topic name"
+                  options={sortedTopics.map((topic) => ({
+                    label: topic.name,
+                    value: topic.id,
+                  }))}
+                />
+              </section>
+            </section>
+
             <Allowlist
               allowedAddresses={allowedAddresses}
               setAllowedAddresses={setAllowedAddresses}
             />
-          )}
-          {(formType === 'create' || formType === 'edit') &&
-            !allowlistEnabled && <TopicGatingHelpMessage />}
 
-          {/* Form action buttons */}
-          <div className="action-buttons">
-            {formType === 'edit' ? (
+            {/* Form action buttons */}
+            <div className="action-buttons">
+              {formType === 'edit' ? (
+                <CWButton
+                  label="Delete group"
+                  buttonWidth="narrow"
+                  buttonType="destructive"
+                  type="button"
+                  onClick={onDelete}
+                />
+              ) : (
+                <CWButton
+                  label="Back"
+                  buttonWidth="wide"
+                  buttonType="secondary"
+                  type="button"
+                  onClick={() => navigate('/members?tab=groups')}
+                />
+              )}
+
+              {formType === 'edit' && (
+                <CWButton
+                  containerClassName="ml-auto"
+                  label="Cancel"
+                  buttonWidth="narrow"
+                  buttonType="secondary"
+                  type="button"
+                  onClick={() => navigate('/members?tab=groups')}
+                />
+              )}
+
               <CWButton
-                label="Delete group"
-                buttonWidth="narrow"
-                buttonType="destructive"
-                type="button"
-                onClick={onDelete}
-              />
-            ) : (
-              <CWButton
-                label="Back"
+                type="submit"
                 buttonWidth="wide"
-                buttonType="secondary"
-                type="button"
-                onClick={() => navigate('/members?tab=groups')}
+                disabled={
+                  isNameTaken ||
+                  (requirementSubForms.length === 0 &&
+                    allowedAddresses.length === 0)
+                }
+                label={formType === 'create' ? 'Create group' : 'Save changes'}
               />
-            )}
-
-            {formType === 'edit' && (
-              <CWButton
-                containerClassName="ml-auto"
-                label="Cancel"
-                buttonWidth="narrow"
-                buttonType="secondary"
-                type="button"
-                onClick={() => navigate('/members?tab=groups')}
-              />
-            )}
-
-            <CWButton
-              type="submit"
-              buttonWidth="wide"
-              disabled={
-                isNameTaken ||
-                (requirementSubForms.length === 0 &&
-                  allowedAddresses.length === 0)
-              }
-              label={formType === 'create' ? 'Create group' : 'Save changes'}
-            />
-          </div>
-        </>
-      )}
-    </CWForm>
+            </div>
+          </>
+        )}
+      </CWForm>
+    </CWPageLayout>
   );
 };
 

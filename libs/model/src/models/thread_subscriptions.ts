@@ -3,10 +3,18 @@ import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type ThreadSubscriptionAttributes = z.infer<typeof ThreadSubscription>;
+export type ThreadSubscriptionAttributes = z.infer<
+  typeof ThreadSubscription
+> & {
+  // associations
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Thread?: any;
+};
 
 export type ThreadSubscriptionInstance =
-  ModelInstance<ThreadSubscriptionAttributes>;
+  ModelInstance<ThreadSubscriptionAttributes> & {
+    // no mixins used
+  };
 
 export default (
   sequelize: Sequelize.Sequelize,

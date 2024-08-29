@@ -1,8 +1,87 @@
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { CommunityMember, CommunityStake } from '../entities';
+import {
+  Community,
+  CommunityMember,
+  CommunityStake,
+  ExtendedCommunity,
+} from '../entities';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+
+export const GetCommunities = {
+  input: PaginationParamsSchema.extend({
+    // eslint-disable-next-line max-len
+    relevance_by: z
+      .enum(['tag_ids', 'membership'])
+      .optional()
+      .describe(
+        '\n' +
+          // eslint-disable-next-line max-len
+          " - When 'tag_ids', results would be 'DESC' ordered based on the provided 'tag_ids' param, and wouldn't strictly include matching 'tag_ids'\n" +
+          // eslint-disable-next-line max-len
+          " - When 'memberships', results would be 'DESC' ordered, the communities with auth-user membership will come before non-membership communities\n",
+      ),
+    network: z.nativeEnum(ChainNetwork).optional(),
+    base: z.nativeEnum(ChainBase).optional(),
+    // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
+    //    Instead we support comma-separated strings of ids.
+    tag_ids: z
+      .preprocess((value) => {
+        if (typeof value === 'string') {
+          return value.split(',').map((id) => id.trim());
+        }
+        return value;
+      }, z.array(z.coerce.number().positive()))
+      .optional(),
+    include_node_info: z.boolean().optional(),
+    stake_enabled: z.boolean().optional(),
+    has_groups: z.boolean().optional(),
+    include_last_30_day_thread_count: z.boolean().optional(),
+    order_by: z
+      .enum([
+        'profile_count',
+        'lifetime_thread_count',
+        'last_30_day_thread_count',
+      ])
+      .optional(),
+  }).refine(
+    (data) => {
+      // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
+      if (
+        !data.include_last_30_day_thread_count &&
+        data.order_by === 'last_30_day_thread_count'
+      ) {
+        return false; // fail validation
+      }
+
+      // pass validation
+      return true;
+    },
+    {
+      message:
+        "'order_by' cannot be 'last_30_day_thread_count' when 'include_last_30_day_thread_count' is not specified",
+    },
+  ),
+  output: PaginatedResultSchema.extend({
+    results: Community.extend({
+      last_30_day_thread_count: PG_INT.optional().nullish(),
+    }).array(),
+  }),
+};
+
+export const GetCommunity = {
+  input: z.object({
+    id: z.string(),
+    include_node_info: z.boolean().optional(),
+  }),
+  output: z.union([ExtendedCommunity, z.undefined()]),
+};
 
 export const GetCommunityStake = {
   input: z.object({
@@ -35,6 +114,7 @@ export const GetCommunityMembers = {
     include_group_ids: z.coerce.boolean().optional(),
     include_stake_balances: z.coerce.boolean().optional(),
     allowedAddresses: z.string().optional(),
+    order_by: z.enum(['last_active', 'name']).optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
@@ -56,10 +136,11 @@ export const GetStakeTransaction = {
       stake_direction: z.string(),
       community: z.object({
         id: z.string(),
-        default_symbol: z.string(),
-        icon_url: z.string(),
+        default_symbol: z.string().nullish(),
+        icon_url: z.string().nullish(),
         name: z.string(),
-        chain_node_id: PG_INT.nullable(),
+        chain_node_id: PG_INT.nullish(),
+        chain_node_name: z.string().nullish(),
       }),
     })
     .array(),
@@ -74,7 +155,7 @@ export const GetStakeHistoricalPrice = {
   output: z
     .object({
       community_id: z.string(),
-      old_price: z.string().nullable(),
+      old_price: z.string().nullish(),
     })
     .array(),
 };

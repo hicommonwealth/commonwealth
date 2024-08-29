@@ -3,18 +3,19 @@ import {
   KnockProvider,
   MixpanelAnalytics,
   RedisCache,
+  S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   analytics,
+  blobStorage,
   cache,
   logger,
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
 import express from 'express';
-import { fileURLToPath } from 'url';
 import { config } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
@@ -22,10 +23,11 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 import 'express-async-errors';
 
 // bootstrap production adapters
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+
+const log = logger(import.meta);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
+blobStorage(S3BlobStorage());
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
@@ -51,7 +53,7 @@ const app = express();
  */
 const start = async () => {
   const { models } = await import('@hicommonwealth/model');
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
 
   const { main } = await import('./main');
 
@@ -59,12 +61,7 @@ const start = async () => {
     port: config.PORT,
     noGlobalActivityCache: config.NO_GLOBAL_ACTIVITY_CACHE,
     withLoggingMiddleware: true,
-    withStatsMiddleware: true,
-    withFrontendBuild: !config.NO_CLIENT,
-    withPrerender:
-      config.NODE_ENV === 'production' &&
-      !config.NO_PRERENDER &&
-      config.SERVER_URL.includes('commonwealth.im'),
+    withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
   })
     .then(() => {
       isServiceHealthy = true;

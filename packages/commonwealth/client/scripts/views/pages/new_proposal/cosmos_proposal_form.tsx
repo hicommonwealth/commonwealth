@@ -1,4 +1,3 @@
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -8,6 +7,7 @@ import {
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
@@ -16,11 +16,13 @@ import {
   useDepositParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
+import useUserStore from 'state/ui/user';
 import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import {
   minimalToNaturalDenom,
   naturalDenomToMinimal,
 } from '../../../../../shared/utils';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { Skeleton } from '../../components/Skeleton';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
@@ -46,9 +48,13 @@ export const CosmosProposalForm = () => {
 
   const navigate = useCommonNavigate();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
-  const author = app.user.activeAccount as CosmosAccount;
+  const user = useUserStore();
+
+  const author = user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
   const meta = cosmos.meta;
 
@@ -110,6 +116,7 @@ export const CosmosProposalForm = () => {
       );
       trackAnalytics({
         event: MixpanelGovernanceEvents.COSMOS_PROPOSAL_CREATED,
+        isPWA: isAddedToHomeScreen,
       });
       navigate(`/proposal/${result}`);
     } catch (err) {
@@ -162,7 +169,7 @@ export const CosmosProposalForm = () => {
       {cosmosProposalType !== 'textProposal' && (
         <CWTextInput
           label="Recipient"
-          placeholder={app.user.activeAccount.address}
+          placeholder={user.activeAccount?.address}
           defaultValue=""
           onInput={(e) => {
             setRecipient(e.target.value);

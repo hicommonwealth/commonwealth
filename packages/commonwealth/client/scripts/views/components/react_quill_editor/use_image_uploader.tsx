@@ -1,9 +1,10 @@
 import { DeltaStatic } from 'quill';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill from 'react-quill';
+import { SERVER_URL } from 'state/api/config';
 import { SerializableDeltaStatic, uploadFileToS3 } from './utils';
 
-import app from 'state';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 
 type UseImageUploaderProps = {
@@ -17,6 +18,8 @@ export const useImageUploader = ({
   setIsUploading,
   setContentDelta,
 }: UseImageUploaderProps) => {
+  const user = useUserStore();
+
   const handleImageUploader = useCallback(
     async (file: File) => {
       const editor = editorRef.current?.editor;
@@ -38,8 +41,8 @@ export const useImageUploader = ({
 
         const uploadedFileUrl = await uploadFileToS3(
           compressedFile,
-          app.serverUrl(),
-          app.user.jwt,
+          SERVER_URL,
+          user.jwt || '',
         );
 
         // insert image op at the selected index
@@ -59,7 +62,7 @@ export const useImageUploader = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading],
+    [editorRef, setContentDelta, setIsUploading, user.jwt],
   );
 
   return { handleImageUploader };

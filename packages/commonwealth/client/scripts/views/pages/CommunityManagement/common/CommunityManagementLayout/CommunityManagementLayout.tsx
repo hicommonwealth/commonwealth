@@ -1,6 +1,5 @@
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { ReactNode } from 'react';
-import app from 'state';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -26,10 +25,10 @@ const CommunityManagementLayout = ({
   featureHint,
   className,
 }: CommunityManagementLayout) => {
-  useUserActiveAccount();
+  const user = useUserStore();
 
   if (
-    !app.isLoggedIn() ||
+    !user.isLoggedIn ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
   ) {
     return <PageNotFound />;

@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { decrementProfileCount } from '@hicommonwealth/model';
 import { WalletId } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -43,13 +44,24 @@ const deleteAddress = async (
     return next(new AppError(Errors.CannotDeleteMagic));
   }
 
-  // @ts-expect-error StrictNullChecks
-  addressObj.profile_id = null;
-  // @ts-expect-error StrictNullChecks
-  addressObj.user_id = null;
-  // @ts-expect-error StrictNullChecks
-  addressObj.verified = null;
-  await addressObj.save();
+  await models.sequelize.transaction(async (transaction) => {
+    await models.Address.update(
+      { user_id: null, verified: null },
+      {
+        where: {
+          id: addressObj.id,
+        },
+        transaction,
+      },
+    );
+    await decrementProfileCount(
+      models,
+      community.id!,
+      req!.user!.id!,
+      transaction,
+    );
+  });
+
   return res.json({ status: 'Success', response: 'Deleted address' });
 };
 

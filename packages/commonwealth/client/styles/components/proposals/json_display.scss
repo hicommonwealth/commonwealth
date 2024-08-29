@@ -2,7 +2,6 @@
 
 .BlobContainer {
   display: flex;
-  align-items: flex-start;
   justify-content: center;
   gap: 12px;
   flex-direction: column;
@@ -12,6 +11,12 @@
   .labelText {
     color: $neutral-600;
     padding: 15px 15px 0px;
+  }
+  .title-and-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px 15px 0 0;
   }
 
   .Blob {

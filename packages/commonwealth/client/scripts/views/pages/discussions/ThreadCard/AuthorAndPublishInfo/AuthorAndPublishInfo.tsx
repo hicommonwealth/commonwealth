@@ -1,13 +1,14 @@
 import { PopperPlacementType } from '@mui/base/Popper';
-import CommunityInfo from 'client/scripts/views/components/component_kit/CommunityInfo';
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
 import React, { useRef } from 'react';
-import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
+import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
@@ -92,7 +93,7 @@ export const AuthorAndPublishInfo = ({
 
   const collaboratorLookupInfo: Record<string, string> =
     collaboratorsInfo?.reduce((acc, collaborator) => {
-      acc[collaborator.address] = collaborator.User.Profiles[0].name;
+      acc[collaborator.address] = collaborator.User.profile.name;
       return acc;
     }, {}) ?? {};
 
@@ -109,19 +110,29 @@ export const AuthorAndPublishInfo = ({
   }));
 
   const isCommunityFirstLayout = layoutType === 'community-first';
-  const communtyInfo = app.config.chains.getById(authorCommunityId);
+  const { data: communtyInfo, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: authorCommunityId,
+      enabled: !!authorCommunityId,
+    });
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
       {isCommunityFirstLayout && (
         <>
-          <CommunityInfo
-            name={communtyInfo.name}
-            iconUrl={communtyInfo.iconUrl}
-            iconSize="regular"
-            communityId={authorCommunityId}
-          />
-          {dotIndicator}
+          {isLoadingCommunity ? (
+            <CWCircleMultiplySpinner />
+          ) : (
+            <>
+              <CommunityInfo
+                name={communtyInfo?.name || ''}
+                iconUrl={communtyInfo?.icon_url || ''}
+                iconSize="regular"
+                communityId={authorCommunityId}
+              />
+              {dotIndicator}
+            </>
+          )}
         </>
       )}
       <FullUser
@@ -184,7 +195,7 @@ export const AuthorAndPublishInfo = ({
                         key={address}
                         userAddress={address}
                         userCommunityId={community_id}
-                        profile={User.Profiles[0]}
+                        profile={User.profile}
                       />
                     );
                   })}
@@ -204,7 +215,7 @@ export const AuthorAndPublishInfo = ({
             <div className="version-history">
               <CWSelectList
                 options={versionHistoryOptions}
-                placeholder={`Edited ${publishDate
+                placeholder={`Edited ${moment(versionHistory?.[0]?.timestamp)
                   ?.utc?.()
                   ?.local?.()
                   ?.format('DD/MM/YYYY')}`}
@@ -224,7 +235,7 @@ export const AuthorAndPublishInfo = ({
               placement="top"
               content={
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {publishDate?.utc?.()?.local?.()?.format('MMMM Do, YYYY')}{' '}
+                  {publishDate?.utc?.()?.local?.()?.format('Do MMMM, YYYY')}{' '}
                   {dotIndicator}{' '}
                   {publishDate?.utc?.()?.local?.()?.format('h:mm A')}
                 </div>

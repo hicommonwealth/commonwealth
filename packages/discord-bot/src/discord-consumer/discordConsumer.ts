@@ -21,13 +21,12 @@ import {
   IDiscordMessage,
   ThreadDiscordActions,
 } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
+import { DISCORD_BOT_ADDRESS } from '@hicommonwealth/shared';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
@@ -69,7 +68,7 @@ const processDiscordMessageCreated: EventHandler<
         user: parsedMessage.user,
       },
       author_chain: topic.community_id,
-      address: config.DISCORD.DISCOBOT_ADDRESS,
+      address: DISCORD_BOT_ADDRESS,
       chain: topic.community_id,
     };
 
@@ -114,7 +113,7 @@ const processDiscordMessageCreated: EventHandler<
 };
 
 async function main() {
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
 
   let brokerInstance: Broker;
   try {

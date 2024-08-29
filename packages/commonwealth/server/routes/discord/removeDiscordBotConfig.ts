@@ -17,8 +17,7 @@ const removeDiscordBotConfig = async (
 ) => {
   const config = await models.DiscordBotConfig.findOne({
     where: {
-      // @ts-expect-error StrictNullChecks
-      community_id: req.community.id,
+      community_id: req.community!.id!,
     },
   });
 
@@ -42,8 +41,7 @@ const removeDiscordBotConfig = async (
     );
     await models.DiscordBotConfig.destroy({
       where: {
-        // @ts-expect-error StrictNullChecks
-        community_id: req.community.id,
+        community_id: req.community!.id!,
       },
       transaction,
     });

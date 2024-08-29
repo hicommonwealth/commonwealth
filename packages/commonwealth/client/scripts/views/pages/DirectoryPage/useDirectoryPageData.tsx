@@ -1,23 +1,24 @@
-import app from 'client/scripts/state';
 import { isCommandClick } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useMemo } from 'react';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
+import { useFetchNodesQuery } from 'state/api/nodes';
+import { getNodeById } from 'state/api/nodes/utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 
 export enum ViewType {
   Rows = 'Rows',
   Tiles = 'Tiles',
 }
 interface UseDirectoryPageDataProps {
-  chainNodeId: number;
+  chainNodeId?: number;
   searchTerm: string;
   selectedViewType: ViewType;
 }
@@ -28,10 +29,13 @@ const useDirectoryPageData = ({
   selectedViewType,
 }: UseDirectoryPageDataProps) => {
   const navigate = useCommonNavigate();
+  const { data: nodes } = useFetchNodesQuery();
   const { data: relatedCommunities = [], isLoading } =
     useFetchRelatedCommunitiesQuery({
       chainNodeId,
     });
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
@@ -43,6 +47,7 @@ const useDirectoryPageData = ({
       e.preventDefault();
       trackAnalytics({
         event: MixpanelClickthroughEvent.DIRECTORY_TO_COMMUNITY_PAGE,
+        isPWA: isAddedToHomeScreen,
       });
       if (isCommandClick(e)) {
         window.open(`/${communityId}`, '_blank');
@@ -50,23 +55,23 @@ const useDirectoryPageData = ({
       }
       navigateToCommunity({ navigate, path: '', chain: communityId });
     },
-    [navigate, trackAnalytics],
+    [navigate, trackAnalytics, isAddedToHomeScreen],
   );
 
   const relatedCommunitiesData = useMemo(
     () =>
       relatedCommunities.map((c) => ({
-        ChainNode: app.config.nodes.getById(c.chain_node_id),
+        ChainNode: getNodeById(c.chain_node_id, nodes),
         name: c.community,
         nameLower: c.community.toLowerCase(),
         namespace: c.namespace,
         description: c.description,
-        members: c.address_count,
-        threads: c.thread_count,
+        members: c.profile_count,
+        threads: c.lifetime_thread_count,
         iconUrl: c.icon_url,
         id: c.id,
       })),
-    [relatedCommunities],
+    [nodes, relatedCommunities],
   );
 
   const filteredRelatedCommunitiesData = useMemo(
@@ -89,7 +94,7 @@ const useDirectoryPageData = ({
         >
           <CWCommunityAvatar
             size="medium"
-            community={{ iconUrl: c.iconUrl, name: c.name } as ChainInfo}
+            community={{ iconUrl: c.iconUrl, name: c.name }}
           />
           <CWText type="b2" fontWeight="medium">
             {c.name}

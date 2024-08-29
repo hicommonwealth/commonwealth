@@ -1,6 +1,14 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { Role } from '@hicommonwealth/shared';
 import app from 'state';
-import Account from '../models/Account';
+import { z } from 'zod';
 import Thread from '../models/Thread';
+import { userStore } from '../state/ui/user';
+
+type SelectedCommunity = Pick<
+  z.infer<typeof ExtendedCommunity>,
+  'adminsAndMods' | 'id'
+>;
 
 const ROLES = {
   ADMIN: 'admin',
@@ -9,39 +17,45 @@ const ROLES = {
 
 const isSiteAdmin = () => {
   return (
-    (app?.user?.activeAccount || app?.user?.addresses?.length > 0) &&
-    app.user.isSiteAdmin
+    (userStore.getState().activeAccount ||
+      userStore.getState().addresses?.length > 0) &&
+    userStore.getState().isSiteAdmin
   );
 };
 
-const isCommunityMember = (communityId?: string) => {
-  return (
-    app.roles.getAllRolesInCommunity({
-      community: communityId || app.activeChainId(),
-    }).length > 0
-  );
+const isCommunityMember = (communityId = app.activeChainId()) => {
+  if (!communityId) {
+    return false;
+  }
+  return userStore
+    .getState()
+    .addresses.some(({ community }) => community.id === communityId);
 };
 
-const isCommunityAdmin = (account?: Account, communityId?: string) => {
-  return (
-    (app?.user?.activeAccount || app?.user?.addresses?.length > 0) &&
-    app.roles.isRoleOfCommunity({
-      role: ROLES.ADMIN,
-      community: communityId || app.activeChainId(),
-      ...(account && { account }),
-    })
-  );
+const isCommunityRole = (
+  adminOrMod: Role,
+  selectedCommunity?: SelectedCommunity,
+) => {
+  const adminAndMods =
+    selectedCommunity?.adminsAndMods || app.chain?.meta?.adminsAndMods; // selected or active community mods
+  const communityId = selectedCommunity?.id || app.chain?.meta?.id; // selected or active community id
+  if (!adminAndMods || !communityId) return false;
+  return userStore.getState().addresses.some(({ community, address }) => {
+    return (
+      community.id === communityId &&
+      (adminAndMods || []).some(
+        (role) => role.address === address && role.role === adminOrMod,
+      )
+    );
+  });
 };
 
-const isCommunityModerator = (account?: Account, communityId?: string) => {
-  return (
-    (app?.user?.activeAccount || app?.user?.addresses?.length > 0) &&
-    app.roles.isRoleOfCommunity({
-      role: ROLES.MODERATOR,
-      community: communityId || app.activeChainId(),
-      ...(account && { account }),
-    })
-  );
+const isCommunityAdmin = (selectedCommunity?: SelectedCommunity) => {
+  return isCommunityRole('admin', selectedCommunity);
+};
+
+const isCommunityModerator = (selectedCommunity?: SelectedCommunity) => {
+  return isCommunityRole('moderator', selectedCommunity);
 };
 
 const isThreadCollaborator = (thread: Thread) => {
@@ -49,8 +63,8 @@ const isThreadCollaborator = (thread: Thread) => {
     // @ts-expect-error StrictNullChecks
     thread?.collaborators?.filter((c) => {
       return (
-        c?.address === app?.user?.activeAccount?.address &&
-        c?.community_id === app?.user?.activeAccount?.community.id
+        c?.address === userStore.getState().activeAccount?.address &&
+        c?.community_id === userStore.getState().activeAccount?.community.id
       );
     })?.length > 0
   );
@@ -58,8 +72,8 @@ const isThreadCollaborator = (thread: Thread) => {
 
 const isThreadAuthor = (thread: Thread) => {
   return (
-    app?.user?.activeAccount?.address === thread?.author &&
-    app?.user?.activeAccount?.community.id === thread?.authorCommunity
+    userStore.getState().activeAccount?.address === thread?.author &&
+    userStore.getState().activeAccount?.community.id === thread?.authorCommunity
   );
 };
 

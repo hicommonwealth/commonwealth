@@ -53,9 +53,8 @@ const upgradeMember = async (
   // check if address provided exists
   const targetAddress = await models.Address.findOne({
     where: {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      address: address,
+      community_id: community!.id!,
+      address,
     },
   });
 
@@ -72,8 +71,7 @@ const upgradeMember = async (
   ) {
     const otherExistingAdmin = await models.Address.findOne({
       where: {
-        // @ts-expect-error StrictNullChecks
-        community_id: community.id,
+        community_id: community!.id!,
         role: 'admin',
         id: {
           [Op.ne]: targetAddress.id,
@@ -94,16 +92,9 @@ const upgradeMember = async (
   return res.json({
     status: 'Success',
     result: {
-      is_user_default: targetAddress.is_user_default,
-      id: targetAddress.id,
       address: targetAddress.address,
-      address_id: targetAddress.id,
-      updated_at: targetAddress.updated_at,
-      created_at: targetAddress.created_at,
       community_id: targetAddress.community_id,
-      permission: targetAddress.role,
-      allow: '0',
-      deny: '0',
+      role: targetAddress.role,
     },
   });
 };

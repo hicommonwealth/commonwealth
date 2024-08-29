@@ -1,4 +1,5 @@
 import {
+  CommunityStakeTrade,
   events,
   logger,
   notificationsProvider,
@@ -6,19 +7,17 @@ import {
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { getCommunityUrl } from '../../../../../shared/utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function handleCommunityStakeTrades(
   models: DB,
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const { 1: namespaceAddress, 2: isBuy } = event.parsedArgs as z.infer<
-    typeof events.CommunityStakeTrade
+    typeof CommunityStakeTrade
   >;
 
   const community = await models.Community.findOne({
@@ -37,10 +36,10 @@ export async function handleCommunityStakeTrades(
 
   const users = await models.sequelize.query<{ id: string }>(
     `
-        SELECT DISTINCT(user_id)::TEXT as id
-        FROM "Addresses"
-        WHERE community_id = :communityId
-          AND role = 'admin';
+        SELECT DISTINCT(U.id)::TEXT as id
+        FROM "Users" U
+        JOIN "Addresses" A ON A.user_id = U.id
+        WHERE A.community_id = :communityId AND (A.role = 'admin' OR U."isAdmin" = true);
     `,
     {
       raw: true,

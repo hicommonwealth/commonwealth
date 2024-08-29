@@ -7,18 +7,16 @@ import {
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { DaysOfWeek } from '@knocklabs/node';
-import { fileURLToPath } from 'node:url';
 import z from 'zod';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const output = z.boolean();
 
 function mapDateToDaysOfWeek(
   date: Date,
   // @ts-expect-error StrictNullChecks
-): typeof DaysOfWeek[keyof typeof DaysOfWeek] {
+): (typeof DaysOfWeek)[keyof typeof DaysOfWeek] {
   switch (date.getDay()) {
     case 0:
       return DaysOfWeek.Sun;
@@ -128,13 +126,11 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
 
   const subPreferences = await models.SubscriptionPreference.findOne({
     where: {
-      id: payload.id,
       user_id: payload.user_id,
     },
   });
 
-  // @ts-expect-error StrictNullChecks
-  if (subPreferences.email_notifications_enabled) {
+  if (subPreferences!.email_notifications_enabled) {
     if (payload.recap_email_enabled === true) {
       await createScheduleIfNotExists(
         WorkflowKeys.EmailRecap,

@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface RemoveDiscordBotConfigProps {
   communityId: string;
@@ -10,13 +10,10 @@ interface RemoveDiscordBotConfigProps {
 const removeDiscordBotConfig = async ({
   communityId,
 }: RemoveDiscordBotConfigProps) => {
-  await axios.post(
-    `${app.serverUrl()}${ApiEndpoints.REMOVE_DISCORD_BOT_CONFIG}`,
-    {
-      community_id: communityId,
-      jwt: app.user.jwt,
-    },
-  );
+  await axios.post(`${SERVER_URL}${ApiEndpoints.REMOVE_DISCORD_BOT_CONFIG}`, {
+    community_id: communityId,
+    jwt: userStore.getState().jwt,
+  });
 };
 
 const useRemoveDiscordBotConfigMutation = () => {

@@ -23,9 +23,8 @@ export default async (models: DB, req: Request, res: Response) => {
   }
 
   const comment = await models.Comment.findOne({
-    where: {
-      id: commentId,
-    },
+    where: { id: commentId },
+    include: [{ model: models.Thread, attributes: ['community_id'] }],
   });
   if (!comment) {
     throw new AppError(Errors.CommentNotFound);
@@ -35,7 +34,7 @@ export default async (models: DB, req: Request, res: Response) => {
     models: models,
     user: req.user,
     entity: comment,
-    communityId: comment.community_id,
+    communityId: comment.Thread!.community_id!,
     allowMod: true,
     allowAdmin: true,
     allowSuperAdmin: true,

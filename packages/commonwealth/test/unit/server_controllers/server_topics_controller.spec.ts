@@ -1,6 +1,7 @@
 import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
+import { describe, test } from 'vitest';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {
   const db: any = {
@@ -64,8 +65,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
       },
     },
   };
-  const banCache: any = {};
-  const controller = new ServerTopicsController(db, banCache);
+  const controller = new ServerTopicsController(db);
   // @ts-expect-error StrictNullChecks
   const user = {
     getAddresses: async () => [],
@@ -76,8 +76,8 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 };
 
 describe('ServerTopicsController', () => {
-  describe('#createTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController();
+  test('#createTopic', async () => {
+    const { controller, user, chain } = createMockedTopicsController(true);
     const [topic] = await Promise.all(
       await controller.createTopic({
         user,
@@ -96,21 +96,25 @@ describe('ServerTopicsController', () => {
     expect(topic.featured_in_new_post).to.equal(false);
     expect(topic.featured_in_sidebar).to.equal(false);
   });
-  describe('#deleteTopic', async () => {
-    const { controller, user } = createMockedTopicsController();
+
+  test('#deleteTopic', async () => {
+    const { controller, user } = createMockedTopicsController(true);
     await controller.deleteTopic({
       user,
       topicId: 1,
     });
   });
-  describe('#getTopics', async () => {
+
+  test('#getTopics', async () => {
     const { controller, chain } = createMockedTopicsController();
     const topics = await controller.getTopics({
       community: chain,
+      with_contest_managers: false,
     });
     expect(topics).to.have.length(1);
   });
-  describe('#updateTopicChannel', async () => {
+
+  test('#updateTopicChannel', async () => {
     const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopicChannel({
       user,
@@ -118,7 +122,8 @@ describe('ServerTopicsController', () => {
       channelId: 'ccc',
     });
   });
-  describe('#updateTopic', async () => {
+
+  test('#updateTopic', async () => {
     const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopic({
       user,
@@ -128,7 +133,8 @@ describe('ServerTopicsController', () => {
       },
     });
   });
-  describe('#updateTopicsOrder', async () => {
+
+  test('#updateTopicsOrder', async () => {
     const { controller, user, chain } = createMockedTopicsController(true);
     await controller.updateTopicsOrder({
       user,

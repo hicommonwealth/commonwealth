@@ -13,6 +13,7 @@ import { AbiType, commonProtocol, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
@@ -60,7 +61,7 @@ describe('Contests projection lifecycle', () => {
   let getContestScore: Sinon.SinonStub;
   let getContestStatus: Sinon.SinonStub;
 
-  before(async () => {
+  beforeAll(async () => {
     getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
     getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
@@ -90,6 +91,7 @@ describe('Contests projection lifecycle', () => {
           },
         ],
         url: 'https://test',
+        private_url: 'https://test',
       });
       const [user] = await seed(
         'User',
@@ -106,11 +108,12 @@ describe('Contests projection lifecycle', () => {
           namespace_address: namespace,
           chain_node_id: chain!.id,
           discord_config_id: undefined,
+          lifetime_thread_count: 0,
+          profile_count: 1,
           Addresses: [
             {
               user_id: user?.id,
               role: 'admin',
-              profile_id: undefined,
             },
           ],
           CommunityStakes: [],
@@ -176,7 +179,7 @@ describe('Contests projection lifecycle', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -184,7 +187,7 @@ describe('Contests projection lifecycle', () => {
     Sinon.restore();
   });
 
-  it('should project events on multiple contests', async () => {
+  test('should project events on multiple contests', async () => {
     const contestBalance = 10000000000;
     const prizePool =
       (BigInt(contestBalance) * BigInt(prize_percentage)) / 100n;
@@ -400,7 +403,7 @@ describe('Contests projection lifecycle', () => {
     ] as Array<DeepPartial<z.infer<typeof ContestResults>>>);
   });
 
-  it('should raise invalid state when community with namespace not found', async () => {
+  test('should raise invalid state when community with namespace not found', async () => {
     expect(
       handleEvent(Contests(), {
         name: EventNames.RecurringContestManagerDeployed,
@@ -414,7 +417,7 @@ describe('Contests projection lifecycle', () => {
     ).to.eventually.be.rejectedWith(InvalidState);
   });
 
-  it('should raise retryable error when protocol helper fails', async () => {
+  test('should raise retryable error when protocol helper fails', async () => {
     getTokenAttributes.rejects(new Error());
     expect(
       handleEvent(Contests(), {

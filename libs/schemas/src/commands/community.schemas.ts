@@ -2,7 +2,6 @@ import {
   ALL_COMMUNITIES,
   ChainBase,
   ChainType,
-  CommunityCategoryType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -27,7 +26,7 @@ export const CreateCommunity = {
       .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
       .optional(),
     social_links: z.array(z.string().url()).default([]),
-    tags: z.array(z.nativeEnum(CommunityCategoryType)).default([]),
+    tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
@@ -35,16 +34,10 @@ export const CreateCommunity = {
     // hidden optional params
     user_address: z.string().optional(), // address for the user
     alt_wallet_url: z.string().url().optional(),
-    eth_chain_id: z.coerce
-      .number()
-      .int()
-      .min(MIN_SCHEMA_INT)
-      .max(MAX_SCHEMA_INT)
-      .optional(),
+    eth_chain_id: z.string().optional(),
     cosmos_chain_id: z.string().optional(),
     address: z.string().optional(), // address for the contract of the chain
     decimals: PG_INT.optional(),
-    substrate_spec: z.string().optional(),
     bech32_prefix: z.string().optional(), // required for cosmos communities
     token_name: z.string().optional(),
 
@@ -63,6 +56,7 @@ export const CreateCommunity = {
 
 export const SetCommunityStake = {
   input: z.object({
+    id: z.string(),
     stake_id: z.coerce.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
     stake_token: z.string().default(''),
     vote_weight: z.coerce
@@ -78,6 +72,7 @@ export const SetCommunityStake = {
 
 export const CreateStakeTransaction = {
   input: z.object({
+    id: z.string(), // should be id instead of community_id
     transaction_hash: z.string().length(66),
     community_id: z.string(),
   }),
@@ -86,6 +81,7 @@ export const CreateStakeTransaction = {
 
 export const UpdateCommunity = {
   input: z.object({
+    id: z.string(),
     namespace: z.string(),
     txHash: z.string(),
     address: z.string(),
@@ -94,7 +90,9 @@ export const UpdateCommunity = {
 };
 
 export const GenerateStakeholderGroups = {
-  input: z.object({}),
+  input: z.object({
+    id: z.string(),
+  }),
   output: z.object({
     groups: z.array(Group),
     created: z.boolean(),

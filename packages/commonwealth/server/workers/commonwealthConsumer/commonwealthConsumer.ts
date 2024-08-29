@@ -8,9 +8,11 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
+  Actor,
   Broker,
   BrokerSubscriptions,
   broker,
+  command,
   logger,
   stats,
 } from '@hicommonwealth/core';
@@ -19,15 +21,14 @@ import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: __filename.endsWith(process.argv[1]),
+  enabled: fileURLToPath(import.meta.url).endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {
@@ -72,6 +73,16 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     BrokerSubscriptions.ContestWorkerPolicy,
     ContestWorker(),
     buildRetryStrategy(undefined, 20_000),
+    {
+      beforeHandleEvent: (topic, event, context) => {
+        context.start = Date.now();
+      },
+      afterHandleEvent: (topic, event, context) => {
+        const duration = Date.now() - context.start;
+        const handler = `${topic}.${event.name}`;
+        stats().histogram(`cw.handlerExecutionTime`, duration, { handler });
+      },
+    },
   );
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
@@ -110,11 +121,28 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   }
 }
 
+function startRolloverLoop() {
+  log.info('Starting rollover loop');
+
+  // TODO: move to external service triggered via scheduler?
+  setInterval(() => {
+    command(
+      Contest.PerformContestRollovers(),
+      {
+        actor: {} as Actor,
+        payload: { id: '' },
+      },
+      false,
+    ).catch(console.error);
+  }, 1_000 * 60);
+}
+
 async function main() {
   try {
     log.info('Starting main consumer');
     await setupCommonwealthConsumer();
     isServiceHealthy = true;
+    startRolloverLoop();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }

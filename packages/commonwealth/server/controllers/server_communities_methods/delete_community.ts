@@ -125,8 +125,6 @@ export async function __deleteCommunity(
             // @ts-expect-error StrictNullChecks
             this.models.DiscordBotConfig,
             // @ts-expect-error StrictNullChecks
-            this.models.Ban,
-            // @ts-expect-error StrictNullChecks
             this.models.Reaction,
             // @ts-expect-error StrictNullChecks
             this.models.Comment,
@@ -145,8 +143,6 @@ export async function __deleteCommunity(
             this.models.Thread,
             // @ts-expect-error StrictNullChecks
             this.models.StarredCommunity,
-            // @ts-expect-error StrictNullChecks
-            this.models.CommunityBanner,
             this.models.Notification,
             // @ts-expect-error StrictNullChecks
             this.models.Group,
@@ -166,13 +162,6 @@ export async function __deleteCommunity(
             // @ts-expect-error StrictNullChecks
             where: {
               thread_id: { [Op.in]: threads.map((thread) => thread.id) },
-            },
-            transaction: t,
-          });
-
-          await this.models.Template.destroy({
-            where: {
-              created_for_community: community.id,
             },
             transaction: t,
           });

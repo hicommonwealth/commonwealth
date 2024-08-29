@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface UpdateFeaturedTopicsOrderProps {
   featuredTopics: Topic[];
@@ -16,10 +17,10 @@ const updateFeaturedTopicsOrder = async ({
     .sort((a, b) => a.order - b.order)
     .map((t) => t.id);
 
-  await axios.put(`${app.serverUrl()}/topics-order`, {
+  await axios.put(`${SERVER_URL}/topics-order`, {
     community_id: app.activeChainId(),
     orderedIds,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 };
 

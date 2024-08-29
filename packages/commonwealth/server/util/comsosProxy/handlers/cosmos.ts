@@ -13,10 +13,7 @@ import {
   upgradeBetaNodeIfNeeded,
 } from '../utils';
 
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 // @ts-expect-error StrictNullChecks
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300;
@@ -46,44 +43,28 @@ export async function cosmosHandler(
   );
 
   if (
-    // @ts-expect-error StrictNullChecks
-    !community.ChainNode.health ||
-    // @ts-expect-error StrictNullChecks
-    community.ChainNode.health === NodeHealth.Healthy ||
-    // @ts-expect-error StrictNullChecks
-    (community.ChainNode.health === NodeHealth.Failed &&
+    !community.ChainNode!.health ||
+    community.ChainNode!.health === NodeHealth.Healthy ||
+    (community.ChainNode!.health === NodeHealth.Failed &&
       new Date() > nodeTimeoutEnd)
   ) {
     let url: string;
-    console.log(
-      '\noriginalUrl',
-      req.originalUrl,
-      '\nbaseUrl',
-      req.baseUrl,
-      '\nurl',
-      req.url,
-    );
-    // @ts-expect-error StrictNullChecks
-    if (requestType === 'REST' && community.ChainNode.alt_wallet_url) {
+    if (requestType === 'REST' && community.ChainNode!.alt_wallet_url) {
       url = req.originalUrl.replace(
         req.baseUrl,
         // remove trailing slash
-        // @ts-expect-error StrictNullChecks
-        community.ChainNode.alt_wallet_url.trim().replace(/\/$/, ''),
+        community.ChainNode!.alt_wallet_url.trim().replace(/\/$/, ''),
       );
     } else if (requestType === 'RPC') {
       url =
-        // @ts-expect-error StrictNullChecks
-        community.ChainNode.private_url?.trim() ||
-        // @ts-expect-error StrictNullChecks
-        community.ChainNode.url?.trim();
+        community.ChainNode!.private_url?.trim() ||
+        community.ChainNode!.url?.trim();
     }
 
     // @ts-expect-error StrictNullChecks
     if (!url) {
       log.error('No URL found for chain node', undefined, {
-        // @ts-expect-error StrictNullChecks
-        cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
+        cosmos_chain_id: community.ChainNode!.cosmos_chain_id,
       });
       throw new Error('No URL found for chain node');
     }

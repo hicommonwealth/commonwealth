@@ -1,4 +1,4 @@
-import * as colors from '../../../../../../../../styles/mixins/colors.scss';
+import colors from '../../../../../../../../styles/mixins/colors.module.scss';
 
 export const INITIAL_PERCENTAGE_VALUE = 10;
 export const MAX_WINNERS = 10;
@@ -44,3 +44,15 @@ export const getPrizeColor = (index: number) => {
 
   return '#000';
 };
+
+export const DAY_IN_SECONDS = 24 * 60 * 60;
+
+export const farcasterDurationOptions = Array.from({ length: 7 }, (_, i) => {
+  const days = i + 1;
+  return {
+    label: `${days} Day${days > 1 ? 's' : ''}`,
+    value: days * DAY_IN_SECONDS,
+  };
+});
+
+export const initialFarcasterDuration = farcasterDurationOptions[6].value;

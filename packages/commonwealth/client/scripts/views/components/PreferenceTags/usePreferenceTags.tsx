@@ -1,5 +1,5 @@
-import { useFetchTagsQuery } from 'client/scripts/state/api/tags';
 import { useEffect, useRef, useState } from 'react';
+import { useFetchTagsQuery } from 'state/api/tags';
 import { SelectedTag, Tag } from './types';
 
 const usePreferenceTags = () => {

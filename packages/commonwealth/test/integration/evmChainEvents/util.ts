@@ -128,7 +128,7 @@ export async function getTestContract(version?: 'v1' | 'v2') {
   const [contract] = await models.Contract.findOrCreate({
     where: {
       address,
-      chain_node_id: chainNode.id,
+      chain_node_id: chainNode.id!,
       type: 'erc20',
     },
   });
@@ -155,6 +155,7 @@ export async function getTestUser() {
   const [user] = await models.User.findOrCreate({
     where: {
       email: 'test@gmail.com',
+      profile: {},
     },
   });
 
@@ -199,7 +200,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
   // signatures are the same for v1 and v2
   const [es1] = await models.EvmEventSource.findOrCreate({
     where: {
-      chain_node_id: chainNode.id,
+      chain_node_id: chainNode.id!,
       contract_address: contractAddress,
       event_signature: compoundPropCreatedSignature,
       kind: 'proposal-created',
@@ -209,7 +210,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
 
   const [es2] = await models.EvmEventSource.findOrCreate({
     where: {
-      chain_node_id: chainNode.id,
+      chain_node_id: chainNode.id!,
       contract_address: contractAddress,
       event_signature: compoundPropQueuedSignature,
       kind: 'proposal-queued',

@@ -1,12 +1,17 @@
-import { useFetchTopicsQuery } from 'client/scripts/state/api/topics';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import {
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
+} from 'state/api/communities';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import {
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
 } from 'state/api/discord';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
@@ -21,10 +26,18 @@ const CTA_TEXT = {
 };
 
 const Discord = () => {
-  const [community] = useState(app.config.chains.getById(app.activeChainId()));
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+  });
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
-    community.discordConfigId ? 'connected' : 'none',
+    community?.discord_config_id ? 'connected' : 'none',
   );
+
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const queryParams = useMemo(() => {
     return new URLSearchParams(window.location.search);
@@ -35,7 +48,7 @@ const Discord = () => {
     app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
   }
   const [isDiscordWebhooksEnabled, setIsDiscordWebhooksEnabled] = useState(
-    community.discordBotWebhooksEnabled,
+    community?.discord_bot_webhooks_enabled,
   );
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
     chainId: app.activeChainId(),
@@ -50,7 +63,7 @@ const Discord = () => {
   } = useRemoveDiscordBotConfigMutation();
 
   useEffect(() => {
-    if (community.discordConfigId) {
+    if (community?.discord_config_id) {
       setConnectionStatus('connected');
     }
   }, [community]);
@@ -63,16 +76,19 @@ const Discord = () => {
     try {
       const verificationToken = uuidv4();
       await app.discord.createConfig(verificationToken);
-      const isCustomDomain = app.isCustomDomain();
 
       const redirectURL = encodeURI(
-        !isCustomDomain ? window.location.origin : 'https://commonwealth.im',
+        !domain?.isCustomDomain
+          ? window.location.origin
+          : 'https://commonwealth.im',
       );
       const currentState = encodeURI(
         JSON.stringify({
           cw_chain_id: app.activeChainId(),
           verification_token: verificationToken,
-          redirect_domain: isCustomDomain ? window.location.origin : undefined,
+          redirect_domain: domain?.isCustomDomain
+            ? window.location.origin
+            : undefined,
         }),
       );
       const link =
@@ -86,7 +102,7 @@ const Discord = () => {
       notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
     }
-  }, [connectionStatus]);
+  }, [connectionStatus, domain?.isCustomDomain]);
 
   const onDisconnect = useCallback(async () => {
     if (connectionStatus === 'connecting' || connectionStatus === 'none')
@@ -110,11 +126,13 @@ const Discord = () => {
   }, [connectionStatus, queryParams, removeDiscordBotConfig]);
 
   const onToggleWebhooks = useCallback(async () => {
+    if (!community?.id) return;
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
 
     try {
-      await community.updateChainData({
-        discord_bot_webhooks_enabled: !isDiscordWebhooksEnabled,
+      await updateCommunity({
+        communityId: community?.id,
+        discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
       });
       setIsDiscordWebhooksEnabled(!isDiscordWebhooksEnabled);
 
@@ -122,7 +140,7 @@ const Discord = () => {
     } catch (e) {
       notifyError(e || `Failed to ${toggleMsgType} discord webhooks!`);
     }
-  }, [isDiscordWebhooksEnabled, community]);
+  }, [community?.id, isDiscordWebhooksEnabled, updateCommunity]);
 
   const onConnectDiscordChannel = async (
     channelId: string,
@@ -207,7 +225,7 @@ const Discord = () => {
               </CWText>
               <CWToggle
                 size="small"
-                checked={isDiscordWebhooksEnabled}
+                checked={!!isDiscordWebhooksEnabled}
                 onChange={onToggleWebhooks}
               />
             </div>

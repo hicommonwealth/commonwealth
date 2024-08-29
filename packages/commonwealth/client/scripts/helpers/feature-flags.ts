@@ -19,21 +19,14 @@ const buildFlag = (env: string | undefined) => {
 };
 
 // WARN: for frontend work you MUST define these feature flags in
-// webpack.base.config.mjs or they won't be passed to the frontend.
+// vite.config.ts (locally) or in Unleash (remote apps) or they won't be passed to the frontend.
 const featureFlags = {
-  allowlist: buildFlag(process.env.FLAG_ALLOWLIST),
   contest: buildFlag(process.env.FLAG_CONTEST),
-  proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
-  communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
-  communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
-  userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
-  knockInAppNotifications: buildFlag(
-    process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
-  ),
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
   knockPushNotifications: buildFlag(
     process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   ),
+  farcasterContest: buildFlag(process.env.FLAG_FARCASTER_CONTEST),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

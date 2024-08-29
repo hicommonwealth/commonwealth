@@ -1,11 +1,14 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type {
   Action,
-  ActionPayload,
+  Awaitable,
+  Message,
   Session,
-  SessionPayload,
+  SessionSigner,
+  Signature,
 } from '@canvas-js/interfaces';
 import type {
   CommunityAttributes,
@@ -13,35 +16,51 @@ import type {
   ThreadAttributes,
 } from '@hicommonwealth/model';
 import {
-  ChainBase,
-  ChainNetwork,
+  CANVAS_TOPIC,
+  CanvasSignResult,
+  CanvasSignedData,
+  SubstrateSignerCW,
+  serializeCanvas,
+  toCanvasSignedDataApiArgs,
   type Link,
   type LinkSource,
   type Role,
 } from '@hicommonwealth/shared';
-import {
-  SignTypedDataVersion,
-  personalSign,
-  signTypedData,
-} from '@metamask/eth-sig-util';
-import { Keyring } from '@polkadot/api';
-import { stringToU8a } from '@polkadot/util';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
+import { encode } from '@ipld/dag-json';
+import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
-import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
-import { ethers } from 'ethers';
 import type { Application } from 'express';
-import { configure as configureStableStringify } from 'safe-stable-stringify';
-import * as siwe from 'siwe';
-import Web3 from 'web3';
-import { createRole, findOneRole } from '../../server/util/roles';
-import {
-  TEST_BLOCK_INFO_BLOCKHASH,
-  TEST_BLOCK_INFO_STRING,
-  createSiweMessage,
-  getEIP712SignableAction,
-} from '../../shared/adapters/chain/ethereum/keys';
-import { createCanvasSessionPayload } from '../../shared/canvas';
+import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
+
+function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
+  const sessionMessage = {
+    clock: 0,
+    parents: [],
+    payload: session,
+    topic: CANVAS_TOPIC,
+  };
+  const sessionMessageSignature = sign(sessionMessage);
+
+  const actionMessage = {
+    clock: 0,
+    parents: [],
+    payload: action,
+    topic: CANVAS_TOPIC,
+  };
+  const actionMessageSignature = sign(actionMessage);
+
+  const canvasSignedData: CanvasSignedData = {
+    actionMessage,
+    actionMessageSignature,
+    sessionMessage,
+    sessionMessageSignature,
+  };
+  const canvasHash = Buffer.from(sha256(encode(actionMessage))).toString('hex');
+  return {
+    canvasSignedData,
+    canvasHash,
+  };
+}
 
 export interface ThreadArgs {
   jwt: any;
@@ -55,7 +74,7 @@ export interface ThreadArgs {
   url?: string;
   readOnly?: boolean;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 type createDeleteLinkArgs = {
@@ -79,7 +98,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   thread_id?: any;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 export interface EditCommentArgs {
@@ -108,7 +127,7 @@ export interface CreateReactionArgs {
   comment_id?: number;
   thread_id?: number;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 export interface CreateThreadReactionArgs {
@@ -119,7 +138,7 @@ export interface CreateThreadReactionArgs {
   jwt: string;
   thread_id?: number;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 export interface EditTopicArgs {
@@ -164,23 +183,7 @@ export interface SetSiteAdminArgs {
   user_id: number;
 }
 
-const sortedStringify = configureStableStringify({
-  bigint: false,
-  circularValue: Error,
-  strict: true,
-  deterministic: true,
-});
-
-const generateEthAddress = () => {
-  const keypair = ethers.Wallet.createRandom();
-  const lowercaseAddress = keypair.address.toString();
-  const address = Web3.utils.toChecksumAddress(lowercaseAddress);
-  const privateKey = Buffer.from(keypair.privateKey.slice(2), 'hex');
-  return { privateKey, address };
-};
-
 export type ModelSeeder = {
-  generateEthAddress: () => { privateKey: Buffer; address: string };
   getTopicId: (args: { chain: string }) => Promise<string>;
   createAndVerifyAddress: (
     args: { chain: string },
@@ -192,7 +195,7 @@ export type ModelSeeder = {
     email: string;
     session: Session;
     sessionSigner?: any;
-    sign: (actionPayload: ActionPayload) => string;
+    sign: (message: Message<Action | Session>) => Awaitable<Signature>;
   }>;
   updateProfile: (args: {
     chain: string;
@@ -218,17 +221,14 @@ export type ModelSeeder = {
     jwt: string;
   }) => Promise<any>;
   updateRole: (args: AssignRoleArgs) => Promise<any>;
-  createSubscription: (
-    args: SubscriptionArgs,
-  ) => Promise<NotificationSubscription>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  createSubscription: (args: SubscriptionArgs) => Promise<any>;
   createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
 
 export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
-  generateEthAddress,
-
   getTopicId: async ({ chain }: { chain: string }) => {
     const res = await chai.request
       .agent(app)
@@ -242,138 +242,59 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   createAndVerifyAddress: async ({ chain }, mnemonic = 'Alice') => {
+    let wallet_id: string;
+    let chain_id: string;
+    let sessionSigner: SessionSigner;
     if (chain === 'ethereum' || chain === 'alex') {
-      const wallet_id = 'metamask';
-      const { privateKey, address } = generateEthAddress();
-      let res = await chai.request
-        .agent(app)
-        .post('/api/createAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address,
-          community_id: chain,
-          wallet_id,
-          block_info: TEST_BLOCK_INFO_STRING,
-        });
-      const address_id = res.body.result.id;
-      const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
-      const sessionWallet = ethers.Wallet.createRandom();
-      const timestamp = 1665083987891;
-      const sessionPayload = createCanvasSessionPayload(
-        'ethereum' as ChainBase,
-        chain_id,
-        address,
-        sessionWallet.address,
-        timestamp,
-        TEST_BLOCK_INFO_BLOCKHASH,
-      );
-      const nonce = siwe.generateNonce();
-      const domain = 'https://commonwealth.test';
-      const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
-      const signatureData = personalSign({
-        privateKey,
-        data: siweMessage,
+      wallet_id = 'metamask';
+      chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
+      sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
+    } else if (chain === 'edgeware') {
+      wallet_id = 'polkadot';
+      sessionSigner = new SubstrateSignerCW();
+    } else {
+      throw new Error(`invalid chain ${chain}`);
+    }
+
+    const { payload: session, signer } =
+      await sessionSigner.newSession(CANVAS_TOPIC);
+    const walletAddress = session.address.split(':')[2];
+
+    let res = await chai.request
+      .agent(app)
+      .post('/api/createAddress')
+      .set('Accept', 'application/json')
+      .send({
+        address: walletAddress,
+        community_id: chain,
+        wallet_id,
+        block_info: TEST_BLOCK_INFO_STRING,
       });
-      const signature = `${domain}/${nonce}/${signatureData}`;
-      const session: Session = {
-        type: 'session',
-        payload: sessionPayload,
-        signature: signature,
-      };
-      res = await chai.request
-        .agent(app)
-        .post('/api/verifyAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address,
-          community_id: chain,
-          chain_id,
-          signature,
-          wallet_id,
-          session_public_address: sessionWallet.address,
-          session_timestamp: timestamp,
-          session_block_data: TEST_BLOCK_INFO_STRING,
-        });
-      const user_id = res.body.result.user.id;
-      const email = res.body.result.user.email;
-      return {
-        address_id,
-        address,
-        user_id,
-        email,
-        session,
-        sign: (actionPayload: ActionPayload) => {
-          return signTypedData({
-            privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
-            data: getEIP712SignableAction(actionPayload),
-            version: SignTypedDataVersion.V4,
-          });
-        },
-      };
-    }
-    if (chain === 'edgeware') {
-      const wallet_id = 'polkadot';
-      const keyPair = new Keyring({
-        type: 'sr25519',
-        ss58Format: 7,
-      }).addFromMnemonic(mnemonic);
-      const address = keyPair.address;
-      let res = await chai.request
-        .agent(app)
-        .post('/api/createAddress')
-        .set('Accept', 'application/json')
-        .send({ address: keyPair.address, community_id: chain, wallet_id });
 
-      // generate session wallet
-      const sessionKeyring = new Keyring();
-      const sessionWallet = sessionKeyring.addFromUri(
-        mnemonicGenerate(),
-        {},
-        'ed25519',
-      );
-      const chain_id = ChainNetwork.Edgeware;
-      const timestamp = 1665083987891;
-      const sessionPayload: SessionPayload = createCanvasSessionPayload(
-        'substrate' as ChainBase,
+    const address_id = res.body.result.id;
+
+    res = await chai.request
+      .agent(app)
+      .post('/api/verifyAddress')
+      .set('Accept', 'application/json')
+      .send({
+        address: walletAddress,
+        community_id: chain,
+        // @ts-expect-error <StrictNullChecks>
         chain_id,
-        address,
-        sessionWallet.address,
-        timestamp,
-        TEST_BLOCK_INFO_BLOCKHASH,
-      );
-      const signature = keyPair.sign(
-        stringToU8a(sortedStringify(sessionPayload)),
-      );
-      const session: Session = {
-        type: 'session',
-        payload: sessionPayload,
-        signature: new Buffer(signature).toString('hex'),
-      };
-
-      const address_id = res.body.result.id;
-      res = await chai.request
-        .agent(app)
-        .post('/api/verifyAddress')
-        .set('Accept', 'application/json')
-        .send({ address, community_id: chain, signature, wallet_id });
-      const user_id = res.body.result.user.id;
-      const email = res.body.result.user.email;
-      return {
-        address_id,
-        address,
-        user_id,
-        email,
-        session,
-        sessionSigner: keyPair,
-        sign: (actionPayload: ActionPayload) => {
-          const signatureBytes = sessionWallet.sign(
-            stringToU8a(sortedStringify(actionPayload)),
-          );
-          return new Buffer(signatureBytes).toString('hex');
-        },
-      };
-    }
-    throw new Error('invalid chain');
+        wallet_id,
+        session: serializeCanvas(session),
+      });
+    const user_id = res.body.result.user.id;
+    const email = res.body.result.user.email;
+    return {
+      address_id,
+      address: session.address,
+      user_id,
+      email,
+      session,
+      sign: signer.sign.bind(signer),
+    };
   },
 
   updateProfile: async ({ chain, address, data, jwt, skipChainFetch }) => {
@@ -389,9 +310,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     args: ThreadArgs,
   ): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
     const {
+      jwt,
       chainId,
       address,
-      jwt,
       title,
       body,
       topicId,
@@ -402,11 +323,12 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sign,
     } = args;
 
-    const actionPayload: ActionPayload = {
-      app: session.payload.app,
-      block: session.payload.block,
-      call: 'thread',
-      callArgs: {
+    const action = {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'thread',
+      args: {
         community: chainId || '',
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
@@ -414,41 +336,35 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         link: url || '',
         topic: topicId || '',
       },
-      chain: 'eip155:1',
-      from: session.payload.from,
       timestamp: Date.now(),
     };
-    const action: Action = {
-      type: 'action',
-      payload: actionPayload,
-      session: session.payload.sessionAddress,
-      signature: sign(actionPayload),
-    };
-    const canvas_session = sortedStringify(session);
-    const canvas_action = sortedStringify(action);
-    const canvas_hash = ''; // getActionHash(action)
+
+    const canvasSignResult = createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
 
     const res = await chai.request
       .agent(app)
-      .post('/api/threads')
+      .post('/api/v1/CreateThread/0')
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
-        author_chain: chainId,
-        chain: chainId,
-        address,
+        jwt,
+        community_id: chainId,
+        topic_id: topicId,
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
-        topic_id: topicId,
+        stage: '',
         url,
-        readOnly: readOnly || false,
-        jwt,
-        canvas_action,
-        canvas_session,
-        canvas_hash,
+        read_only: readOnly || false,
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
-    return res.body;
+    if (res.ok) return { result: res.body, status: 'Success' };
+    return { status: res.status.toString() };
   },
 
   createLink: async (args: createDeleteLinkArgs) => {
@@ -490,29 +406,23 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sign,
     } = args;
 
-    const actionPayload: ActionPayload = {
-      app: session.payload.app,
-      block: session.payload.block,
-      call: 'comment',
-      callArgs: {
+    const action = {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'comment',
+      args: {
         body: text,
         thread_id,
-        parent_comment_id: parentCommentId,
+        parent_comment_id: parentCommentId || null,
       },
-      chain: 'eip155:1',
-      from: session.payload.from,
       timestamp: Date.now(),
     };
-    const action: Action = {
-      type: 'action',
-      payload: actionPayload,
-      session: session.payload.sessionAddress,
-      signature: sign(actionPayload),
-    };
-    const canvas_session = sortedStringify(session);
-    const canvas_action = sortedStringify(action);
-    const canvas_hash = ''; // getActionHash(action)
-    // TODO
+    const canvasSignResult = createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
 
     const res = await chai.request
       .agent(app)
@@ -521,13 +431,12 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         author_chain: chain,
         chain,
-        address,
-        parent_id: parentCommentId,
+        address: address.split(':')[2],
+        parent_id: parentCommentId || null,
+        thread_id,
         text,
         jwt,
-        canvas_action,
-        canvas_session,
-        canvas_hash,
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
   },
@@ -562,42 +471,34 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sign,
     } = args;
 
-    const actionPayload: ActionPayload = {
-      app: session.payload.app,
-      block: session.payload.block,
-      call: 'reactComment',
-      // @ts-expect-error StrictNullChecks
-      callArgs: { comment_id, value: reaction },
-      chain: 'eip155:1',
-      from: session.payload.from,
+    const action = {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'reactComment',
+      args: { comment_id, value: reaction },
       timestamp: Date.now(),
     };
-    const action: Action = {
-      type: 'action',
-      payload: actionPayload,
-      session: session.payload.sessionAddress,
-      signature: sign(actionPayload),
-    };
-    const canvas_session = sortedStringify(session);
-    const canvas_action = sortedStringify(action);
-    const canvas_hash = ''; // getActionHash(action)
-    // TODO
+    const canvasSignResult = createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
 
+    const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
       .post(`/api/comments/${comment_id}/reactions`)
       .set('Accept', 'application/json')
       .send({
         chain,
-        address,
+        address: walletAddress,
         reaction,
         comment_id,
         author_chain,
         jwt,
         thread_id,
-        canvas_session,
-        canvas_action,
-        canvas_hash,
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
   },
@@ -614,41 +515,32 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sign,
     } = args;
 
-    const actionPayload: ActionPayload = {
-      app: session.payload.app,
-      block: session.payload.block,
-      call: 'reactThread',
-      // @ts-expect-error StrictNullChecks
-      callArgs: { thread_id, value: reaction },
-      chain: 'eip155:1',
-      from: session.payload.from,
+    const action = {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'reactThread',
+      args: { thread_id, value: reaction },
       timestamp: Date.now(),
     };
-    const action: Action = {
-      type: 'action',
-      payload: actionPayload,
-      session: session.payload.sessionAddress,
-      signature: sign(actionPayload),
-    };
-    const canvas_session = sortedStringify(session);
-    const canvas_action = sortedStringify(action);
-    const canvas_hash = ''; // getActionHash(action)
-    // TODO
-
+    const canvasSignResult = createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
+    const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
       .post(`/api/threads/${thread_id}/reactions`)
       .set('Accept', 'application/json')
       .send({
         chain,
-        address,
+        address: walletAddress,
         reaction,
         author_chain,
         jwt,
         thread_id,
-        canvas_session,
-        canvas_action,
-        canvas_hash,
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
   },
@@ -691,48 +583,14 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   updateRole: async (args: AssignRoleArgs) => {
-    const currentRole = await findOneRole(
-      models,
-      { where: { address_id: args.address_id } },
-      args.chainOrCommObj.chain_id,
+    await models.sequelize.query(
+      `
+          UPDATE "Addresses"
+          SET role = '${args.role}'
+          WHERE id = ${args.address_id};
+      `,
     );
-    let role;
-    // Can only be a promotion
-    if (currentRole.toJSON().permission === 'member') {
-      role = await createRole(
-        models,
-        args.address_id,
-        args.chainOrCommObj.chain_id,
-        args.role,
-      );
-    }
-    // Can be demoted or promoted
-    else if (currentRole.toJSON().permission === 'moderator') {
-      // Demotion
-      if (args.role === 'member') {
-        role = await models['RoleAssignment'].destroy({
-          where: {
-            community_role_id: currentRole.toJSON().community_role_id,
-            address_id: args.address_id,
-          },
-        });
-      }
-      // Promotion
-      else if (args.role === 'admin') {
-        role = await createRole(
-          models,
-          args.address_id,
-          args.chainOrCommObj.chain_id,
-          args.role,
-        );
-      }
-    }
-    // If current role is admin, you cannot change it is the assumption
-    else {
-      return null;
-    }
-    if (!role) return null;
-    return role;
+    return true;
   },
 
   createSubscription: async (args: SubscriptionArgs) => {
@@ -756,28 +614,20 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {
-    const { jwt, address, chain, originChain, address_id } = args;
+    const { jwt, address, chain, originChain } = args;
     try {
       await chai.request
         .agent(app)
         .post('/api/linkExistingAddressToCommunity')
         .set('Accept', 'application/json')
         .send({
-          address,
+          address: address.split(':')[2],
           community_id: chain,
           originChain,
           jwt,
         });
     } catch (e) {
       console.error('Failed to link an existing address to a chain');
-      console.error(e);
-      return false;
-    }
-
-    try {
-      await createRole(models, address_id, chain, 'member', false);
-    } catch (e) {
-      console.error('Failed to create a role for a new member');
       console.error(e);
       return false;
     }

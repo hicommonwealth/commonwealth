@@ -1,12 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 export const updateTags = async (
   tag_ids: number[],
   models: DB,
   id: number | string,
-  idType: 'profile_id' | 'community_id',
+  idType: 'user_id' | 'community_id',
+  transaction?: Transaction,
 ) => {
   // tag_ids should be defined, even if its an empty array, then we remove existing tags
   if (!tag_ids) return;
@@ -27,30 +28,34 @@ export const updateTags = async (
   }
 
   // remove all existing tags
-  const deleteParams = {
-    where: {
-      [idType]: id,
-    },
-  };
-  idType === 'profile_id'
-    ? await models.ProfileTags.destroy(deleteParams)
-    : await models.CommunityTags.destroy(deleteParams);
+  idType === 'user_id'
+    ? await models.ProfileTags.destroy({ where: { user_id: id } })
+    : await models.CommunityTags.destroy({ where: { community_id: id } });
 
   // create new tags
   if (tag_ids.length > 0) {
-    const createParams = tag_ids.map((tag_id) => ({
-      tag_id: tag_id,
-      [idType]: idType === 'profile_id' ? Number(`${id}`) : `${id}`,
-    }));
-
     const [status, newRows] =
-      idType === 'profile_id'
-        ? // @ts-expect-error StrictNullChecks
-          await models.ProfileTags.bulkCreate(createParams)
-        : // @ts-expect-error StrictNullChecks
-          await models.CommunityTags.bulkCreate(createParams);
+      idType === 'user_id'
+        ? await models.ProfileTags.bulkCreate(
+            tag_ids.map((tag_id) => ({
+              tag_id,
+              user_id: +id,
+              created_at: new Date(),
+              updated_at: new Date(),
+            })),
+            { transaction },
+          )
+        : await models.CommunityTags.bulkCreate(
+            tag_ids.map((tag_id) => ({
+              tag_id,
+              community_id: `${id}`,
+              created_at: new Date(),
+              updated_at: new Date(),
+            })),
+            { transaction },
+          );
 
-    if (!status || !newRows) {
+    if (!(status || newRows)) {
       throw new AppError('Failed');
     }
   }

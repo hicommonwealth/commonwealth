@@ -1,7 +1,5 @@
 import type { ChainBase } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
-
-import axios from 'axios';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
@@ -10,7 +8,6 @@ import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import ProposalModule from './ProposalModule';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -43,16 +40,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
-    const [response] = await Promise.all([
-      axios.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        params: {
-          chain: this.id,
-          community: null,
-          jwt: this.app.user.jwt,
-        },
-      }),
-    ]);
 
+    // only on `1inch`, force enable dark mode
     const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
       darkModePreferenceSet
@@ -60,22 +49,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    const {
-      admins,
-      numVotingThreads,
-      numTotalThreads,
-      communityBanner,
-      contractsWithTemplatesData,
-    } = response.data.result;
-    // Update community level thread counters variables (Store in state instead of react query here is an
-    // exception case, view the threadCountersStore code for more details)
+    // TODO: cleanup EXCEPTION_CASE_threadCountersStore in 8812
     EXCEPTION_CASE_threadCountersStore.setState({
-      totalThreadsInCommunity: numTotalThreads,
-      totalThreadsInCommunityForVoting: numVotingThreads,
+      totalThreadsInCommunity: this.meta.numTotalThreads,
+      totalThreadsInCommunityForVoting: this.meta.numVotingThreads,
     });
-    this.meta.setAdmins(admins);
-    this.meta.setBanner(communityBanner);
-    this.app.contracts.initialize(contractsWithTemplatesData, true);
 
     this._serverLoaded = true;
     return true;
@@ -114,19 +92,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       !localStorage.getItem('user-dark-mode-state')
     ) {
       setDarkMode(false);
-    }
-  }
-
-  public async loadModules(modules: ProposalModule<any, any, any>[]) {
-    if (!this.loaded) {
-      throw new Error('secondary loading cmd called before chain load');
-    }
-    // TODO: does this need debouncing?
-    if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
-      await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts)),
-      );
-      this.app.chainModuleReady.emit('ready');
     }
   }
 

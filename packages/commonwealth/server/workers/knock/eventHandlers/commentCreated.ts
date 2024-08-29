@@ -4,14 +4,14 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, Webhook } from '@hicommonwealth/model';
+import { safeTruncateBody } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { fileURLToPath } from 'url';
 import z from 'zod';
-import { getCommentUrl } from '../util';
+import { config } from '../../../config';
+import { getCommentUrl, getProfileUrl } from '../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const output = z.boolean();
 
@@ -27,10 +27,8 @@ export const processCommentCreated: EventHandler<
   typeof output
 > = async ({ payload }) => {
   const author = await models.Address.findOne({
-    where: {
-      id: payload.address_id,
-    },
-    include: [{ model: models.Profile, required: true }],
+    where: { id: payload.address_id },
+    include: [{ model: models.User, required: true, attributes: ['profile'] }],
   });
 
   if (!author || !author.user_id) {
@@ -41,9 +39,7 @@ export const processCommentCreated: EventHandler<
   }
 
   const community = await models.Community.findOne({
-    where: {
-      id: payload.community_id,
-    },
+    where: { id: payload.community_id },
   });
 
   if (!community) {
@@ -54,12 +50,14 @@ export const processCommentCreated: EventHandler<
   }
 
   let users: { user_id: number }[] = [];
+  const excludeUsers: number[] = [author.user_id];
+  if (payload.users_mentioned) excludeUsers.push(...payload.users_mentioned);
 
   if (payload.parent_id) {
     users = (await models.CommentSubscription.findAll({
       where: {
         comment_id: Number(payload.parent_id),
-        user_id: { [Op.not]: author.user_id },
+        user_id: { [Op.notIn]: excludeUsers },
       },
       attributes: ['user_id'],
       raw: true,
@@ -68,35 +66,83 @@ export const processCommentCreated: EventHandler<
     users = (await models.ThreadSubscription.findAll({
       where: {
         thread_id: payload.thread_id,
-        user_id: { [Op.not]: author.user_id },
+        user_id: { [Op.notIn]: excludeUsers },
       },
       attributes: ['user_id'],
       raw: true,
     })) as { user_id: number }[];
   }
 
+  const commentSummary = safeTruncateBody(
+    decodeURIComponent(payload.text),
+    255,
+  );
+  const commentUrl = getCommentUrl(
+    payload.community_id,
+    payload.thread_id,
+    // @ts-expect-error StrictNullChecks
+    payload.id,
+    community.custom_domain,
+  );
+
   if (users.length > 0) {
     const provider = notificationsProvider();
 
-    // TODO: error handling -> Ryan's event handling utility?
-    return await provider.triggerWorkflow({
+    await provider.triggerWorkflow({
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
         // @ts-expect-error StrictNullChecks
-        author: author.Profile.profile_name || author.address.substring(0, 8),
+        author: author.User.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
-        comment_body: decodeURIComponent(payload.text).substring(0, 255),
-        comment_url: getCommentUrl(
-          payload.community_id,
-          payload.thread_id,
-          // @ts-expect-error StrictNullChecks
-          payload.id,
-        ),
+        comment_body: commentSummary,
+        comment_url: commentUrl,
         comment_created_event: payload,
       },
       actor: { id: String(author.user_id) },
+    });
+  }
+
+  const webhooks = await models.Webhook.findAll({
+    where: {
+      community_id: community.id!,
+      events: { [Op.contains]: ['CommentCreated'] },
+    },
+  });
+  if (webhooks.length > 0) {
+    const thread = await models.Thread.findByPk(payload.thread_id, {
+      attributes: ['title'],
+    });
+    const previewImg = Webhook.getPreviewImageUrl(
+      community,
+      decodeURIComponent(payload.text),
+    );
+
+    const provider = notificationsProvider();
+
+    await provider.triggerWorkflow({
+      key: WorkflowKeys.Webhooks,
+      users: webhooks.map((w) => ({
+        id: `webhook-${w.id}`,
+        webhook_url: w.url,
+        destination: w.destination,
+      })),
+      data: {
+        sender_username: 'Common',
+        sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
+        community_id: community.id!,
+        title_prefix: 'Comment on: ',
+        preview_image_url: previewImg.previewImageUrl,
+        preview_image_alt_text: previewImg.previewImageAltText,
+        profile_name:
+          author.User!.profile.name || author.address.substring(0, 8),
+        profile_url: getProfileUrl(author.user_id, community.custom_domain),
+        profile_avatar_url: author.User!.profile.avatar_url ?? '',
+        object_title: Webhook.getRenderedTitle(thread!.title),
+        object_url: commentUrl,
+        object_summary: commentSummary,
+      },
     });
   }
 

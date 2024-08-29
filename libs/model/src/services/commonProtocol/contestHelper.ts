@@ -1,11 +1,16 @@
 import { AppError } from '@hicommonwealth/core';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
 
+const nonceMutex = new Mutex();
+
 export type AddContentResponse = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   txReceipt: any;
   contentId: string;
 };
@@ -31,6 +36,7 @@ export type ContestScores = {
  * @param rpc the rpc of the network to use helper with
  * @returns
  */
+// eslint-disable-next-line @typescript-eslint/require-await
 const createWeb3Provider = async (rpc: string): Promise<Web3> => {
   if (!config.WEB3.PRIVATE_KEY) throw new AppError('WEB3 private key not set!');
   const web3 = new Web3(rpc);
@@ -59,17 +65,23 @@ const addContent = async (
   nonce?: number,
 ): Promise<AddContentResponse> => {
   if (!web3) {
+    // eslint-disable-next-line no-param-reassign
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
   );
+
+  const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt;
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
-      gas: '200000',
+      gas: '1000000',
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -112,8 +124,10 @@ const voteContent = async (
   contentId: string,
   web3?: Web3,
   nonce?: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> => {
   if (!web3) {
+    // eslint-disable-next-line no-param-reassign
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
@@ -121,11 +135,15 @@ const voteContent = async (
     contest,
   );
 
+  const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt;
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
-      gas: '200000',
+      gas: '1000000',
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -178,7 +196,8 @@ export const getContestStatus = async (
  * Gets vote and more information about winners of a given contest
  * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
- * @param contestId the id of the contest for data within the contest contract. No contest id will return current winners
+ * @param contestId the id of the contest for data within the contest contract.
+ * No contest id will return current winners
  * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
@@ -203,11 +222,12 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new AppError(
-      `getContestScore ERROR: Contest Id (${contestId}) not found on Contest address: ${contest}`,
+    throw new Error(
+      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const votePromises: any[] = [];
   winnerIds.forEach((w) => {
     votePromises.push(contestInstance.methods.content(w).call());
@@ -263,7 +283,7 @@ export const getContestBalance = async (
       feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
     );
   }
-  if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
+  if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
       web3.eth.getBalance(contest).then((v) => {
         return Number(v);
@@ -299,41 +319,118 @@ export const addContentBatch = async (
   contest: string[],
   creator: string,
   url: string,
-): Promise<Promise<AddContentResponse>[]> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
-  let currNonce = Number(
-    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
-  );
+): Promise<PromiseSettledResult<AddContentResponse>[]> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+    );
 
-  const promises: Promise<AddContentResponse>[] = [];
+    const promises: Promise<AddContentResponse>[] = [];
 
-  contest.forEach((c) => {
-    promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
-    currNonce++;
+    contest.forEach((c) => {
+      promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
   });
-
-  return promises;
 };
 
+export type VoteContentBatchEntry = {
+  contestAddress: string;
+  contentId: string;
+};
 export const voteContentBatch = async (
   rpcNodeUrl: string,
-  contest: string[],
   voter: string,
-  contentId: string,
-): Promise<Promise<any>[]> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
-  let currNonce = Number(
-    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
-  );
-
-  const promises: Promise<any>[] = [];
-
-  contest.forEach((c) => {
-    promises.push(
-      voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+  entries: VoteContentBatchEntry[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<PromiseSettledResult<any>[]> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
     );
-    currNonce++;
-  });
 
-  return promises;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const promises: Promise<any>[] = [];
+
+    entries.forEach(({ contestAddress, contentId }) => {
+      promises.push(
+        voteContent(
+          rpcNodeUrl,
+          contestAddress,
+          voter,
+          contentId,
+          web3,
+          currNonce,
+        ),
+      );
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
+  });
+};
+
+/**
+ * attempts to rollover and payout a provided contest. Returns false and does not attempt
+ * transaction if contest is still active
+ * @param rpcNodeUrl the chain node to use
+ * @param contest the address of the contest
+ * @param oneOff indicate if the contest is oneOff
+ * @returns boolean indicating if contest was rolled over
+ * NOTE: A false return does not indicate an error, rather that the contest was still ongoing
+ * errors will still be throw for other issues
+ */
+export const rollOverContest = async (
+  rpcNodeUrl: string,
+  contest: string,
+  oneOff: boolean,
+): Promise<boolean> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    const contestInstance = new web3.eth.Contract(
+      contestABI as AbiItem[],
+      contest,
+    );
+
+    const contractCall = oneOff
+      ? contestInstance.methods.endContest()
+      : contestInstance.methods.newContest();
+
+    let gasResult;
+    try {
+      gasResult = await contractCall.estimateGas({
+        from: web3.eth.defaultAccount,
+      });
+    } catch {
+      return false;
+    }
+    const maxFeePerGasEst = await estimateGas(web3);
+    await contractCall.send({
+      from: web3.eth.defaultAccount,
+      gas: gasResult.toString(),
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+    });
+    return true;
+  });
+};
+
+const estimateGas = async (web3: Web3): Promise<bigint | null> => {
+  try {
+    const latestBlock = await web3.eth.getBlock('latest');
+
+    // Calculate maxFeePerGas and maxPriorityFeePerGas
+    const baseFeePerGas = latestBlock.baseFeePerGas;
+    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
+    const maxFeePerGas =
+      baseFeePerGas! * BigInt(2) + BigInt(parseInt(maxPriorityFeePerGas));
+    return maxFeePerGas;
+  } catch {
+    return null;
+  }
 };

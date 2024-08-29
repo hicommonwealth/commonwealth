@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { formatAddressShort } from 'helpers';
 import _ from 'lodash';
-import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
@@ -17,6 +17,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './NewCommunityAdminModal.scss';
 
@@ -33,7 +34,8 @@ const NewCommunityAdminModal = ({
   handleClickContinue,
   selectedCommunity,
 }: NewCommunityAdminModalProps) => {
-  const availableAddressesOnSelectedChain = app.user?.addresses?.filter(
+  const user = useUserStore();
+  const availableAddressesOnSelectedChain = user.addresses?.filter(
     (addressInfo) => addressInfo.community.base === selectedCommunity.chainBase,
   );
 
@@ -55,6 +57,8 @@ const NewCommunityAdminModal = ({
 
   const [tempAddress, setTempAddress] = useState(addressOptions?.[0]);
   const walletsAvailable = availableAddresses?.length > 0;
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   useEffect(() => {
     if (!tempAddress) {
@@ -96,6 +100,7 @@ const NewCommunityAdminModal = ({
                 trackAnalytics({
                   event:
                     MixpanelCommunityCreationEvent.CONNECT_NEW_WALLET_PRESSED,
+                  isPWA: isAddedToHomeScreen,
                 });
                 handleClickConnectNewWallet();
               }}

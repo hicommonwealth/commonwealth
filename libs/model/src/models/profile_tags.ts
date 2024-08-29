@@ -1,15 +1,9 @@
+import { ProfileTags } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type ProfileTagsAttributes = {
-  id?: number;
-  profile_id: number;
-  tag_id: number;
-  created_at?: Date;
-  updated_at?: Date;
-};
-
-export type ProfileTagsInstance = ModelInstance<ProfileTagsAttributes>;
+export type ProfileTagsInstance = ModelInstance<z.infer<typeof ProfileTags>>;
 
 export type ProfileTagsModelStatic = Sequelize.ModelStatic<ProfileTagsInstance>;
 
@@ -17,12 +11,8 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ProfileTagsModelStatic>sequelize.define<ProfileTagsInstance>(
     'ProfileTags',
     {
-      profile_id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-      },
-      tag_id: { type: Sequelize.INTEGER, primaryKey: true, allowNull: false },
+      user_id: { type: Sequelize.INTEGER, primaryKey: true },
+      tag_id: { type: Sequelize.INTEGER, primaryKey: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },

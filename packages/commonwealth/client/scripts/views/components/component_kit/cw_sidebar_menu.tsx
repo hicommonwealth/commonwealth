@@ -6,8 +6,8 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
-import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses, isWindowSmallInclusive } from './helpers';
@@ -33,9 +33,13 @@ const resetSidebarState = () => {
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+  const user = useUserStore();
+
+  // eslint-disable-next-line react/destructuring-assignment
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   if (props.type === 'default') {
     const {
       disabled,
@@ -82,20 +86,23 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'header') {
     return (
       <div className="SidebarMenuItem header">
+        {/* eslint-disable-next-line react/destructuring-assignment */}
         <CWText type="caption">{props.label}</CWText>
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'community') {
+    /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
-    // @ts-expect-error <StrictNullChecks/>
-    const roles = app.roles.getAllRolesInCommunity({ community: item.id });
+    if (!item) return <></>;
+
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
-          // @ts-expect-error <StrictNullChecks/>
           { isSelected: app.activeChainId() === item.id },
           'SidebarMenuItem community',
         )}
@@ -107,33 +114,20 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           navigateToCommunity({
             navigate,
             path: '/',
-            // @ts-expect-error <StrictNullChecks/>
             chain: item.id,
           });
         }}
       >
-        {/*// @ts-expect-error <StrictNullChecks/>*/}
-        <CommunityLabel community={item} />
-        {app.isLoggedIn() && roles.length > 0 && (
+        {item && (
+          <CommunityLabel name={item.name || ''} iconUrl={item.iconUrl} />
+        )}
+        {user.isLoggedIn && (
           <div className="roles-and-star">
-            <User
-              avatarSize={18}
-              shouldShowAvatarOnly
-              userAddress={roles?.[0]?.address}
-              userCommunityId={
-                roles?.[0]?.address_chain || roles?.[0]?.community_id
-              }
-              shouldShowAsDeleted={
-                !roles?.[0]?.address &&
-                !(roles?.[0]?.address_chain || roles?.[0]?.community_id)
-              }
-            />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  // @ts-expect-error <StrictNullChecks/>
                   community: item.id,
                 });
                 setIsStarred((prevState) => !prevState);
@@ -152,6 +146,7 @@ type SidebarMenuProps = {
   menuItems: Array<MenuItem>;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
@@ -178,15 +173,14 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
           const itemProps = {
             ...item,
             isStarred:
-              item.type === 'community'
-                ? // @ts-expect-error <StrictNullChecks/>
-                  app.user.isCommunityStarred(item.community.id)
-                : false,
+              item.type === 'community' ? item.community?.isStarred : false,
           };
 
           return (
             <CWSidebarMenuItem
-              key={i}
+              key={`${i}-${
+                item?.type === 'community' ? item?.community?.isStarred : false
+              }`}
               type={item.type || 'default'}
               {...itemProps}
             />

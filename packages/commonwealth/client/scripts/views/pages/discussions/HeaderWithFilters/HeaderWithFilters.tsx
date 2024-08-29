@@ -1,25 +1,27 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import {
-  CommunityStakeBanner,
-  useCommunityStake,
-} from 'views/components/CommunityStake';
-import DismissStakeBannerModal from 'views/components/CommunityStake/DismissStakeBannerModal';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
+import { useCommunityStake } from 'views/components/CommunityStake';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { useFlag } from '../../../../hooks/useFlag';
 import type Topic from '../../../../models/Topic';
 import {
@@ -28,10 +30,6 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
-import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import useCommunityStakeStore from 'state/ui/communityStake';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import './HeaderWithFilters.scss';
 
 type HeaderWithFiltersProps = {
@@ -45,6 +43,7 @@ type HeaderWithFiltersProps = {
   isIncludingArchivedThreads: boolean;
   onIncludeArchivedThreads: (includeArchived: boolean) => any;
   isOnArchivePage?: boolean;
+  activeContests: Contest[];
 };
 
 export const HeaderWithFilters = ({
@@ -58,27 +57,34 @@ export const HeaderWithFilters = ({
   isIncludingArchivedThreads,
   onIncludeArchivedThreads,
   isOnArchivePage,
+  activeContests,
 }: HeaderWithFiltersProps) => {
-  const communityStakeEnabled = useFlag('communityStake');
   const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
   const location = useLocation();
   // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
-  const [isDismissStakeBannerModalOpen, setIsDismissStakeBannerModalOpen] =
-    useState(false);
-  const forceRerender = useForceRerender();
+
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
-  const { isLoggedIn } = useUserLoggedIn();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const { stakeData } = useCommunityStake();
+  const namespace = stakeData?.Community?.namespace;
+  const { isContestAvailable, contestsData, stakeEnabled } =
+    useCommunityContests();
+
+  const { data: feeManagerBalance } = useGetFeeManagerBalanceQuery({
+    ethChainId: ethChainId!,
+    namespace,
+    apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
+  });
+
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
-  const { stakeEnabled } = useCommunityStake();
-  const { dismissBanner, isBannerVisible } = useCommunityStakeStore();
-  const { isContestAvailable, contestsData } = useCommunityContests();
+
+  const user = useUserStore();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -98,14 +104,6 @@ export const HeaderWithFilters = ({
   }, []);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
-
-  useEffect(() => {
-    app.loginStateEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.loginStateEmitter.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
@@ -207,35 +205,10 @@ export const HeaderWithFilters = ({
     }
   };
 
-  const handleDismissStakeBannerModal = (
-    dismissForThisCommunity: boolean,
-    dismissForAnyCommunity: boolean,
-  ) => {
-    setIsDismissStakeBannerModalOpen(false);
-
-    dismissBanner({
-      communityId: app.activeChainId(),
-      communityDismissal: dismissForThisCommunity,
-      allCommunitiesDismissal: dismissForAnyCommunity,
-    });
-  };
-
-  const stakeBannerEnabled =
-    isLoggedIn &&
-    communityStakeEnabled &&
-    stakeEnabled &&
-    isBannerVisible(app.activeChainId());
-
   const contestFiltersVisible = contestsEnabled && isContestAvailable;
 
   return (
     <div className="HeaderWithFilters">
-      {stakeBannerEnabled && (
-        <CommunityStakeBanner
-          onClose={() => setIsDismissStakeBannerModalOpen(true)}
-        />
-      )}
-
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic)
@@ -265,7 +238,7 @@ export const HeaderWithFilters = ({
                   }`,
                 );
               }}
-              disabled={!hasJoinedCommunity}
+              disabled={!user.activeAccount}
             />
           )}
         </div>
@@ -384,9 +357,7 @@ export const HeaderWithFilters = ({
                       : []),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
-                  canEditOption={app.roles?.isAdminOfEntity({
-                    community: app.activeChainId(),
-                  })}
+                  canEditOption={Permissions.isCommunityAdmin()}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
                       // @ts-expect-error <StrictNullChecks/>
@@ -514,6 +485,36 @@ export const HeaderWithFilters = ({
         )}
       </div>
 
+      {(activeContests || []).map((contest) => {
+        const { end_time, score } =
+          // @ts-expect-error <StrictNullChecks/>
+          contest?.contests[0] || {};
+
+        return (
+          <ContestCard
+            key={contest.contest_address}
+            isAdmin={false}
+            // @ts-expect-error <StrictNullChecks/>
+            address={contest.contest_address}
+            // @ts-expect-error <StrictNullChecks/>
+            name={contest.name}
+            imageUrl={contest.image_url}
+            // @ts-expect-error <StrictNullChecks/>
+            topics={contest.topics}
+            // @ts-expect-error <StrictNullChecks/>
+            score={score}
+            decimals={contest.decimals}
+            ticker={contest.ticker}
+            finishDate={end_time ? moment(end_time).toISOString() : ''}
+            isCancelled={contest.cancelled}
+            isRecurring={!contest.funding_token_address}
+            isHorizontal
+            showShareButton={false}
+            feeManagerBalance={feeManagerBalance}
+          />
+        );
+      })}
+
       <CWModal
         size="medium"
         content={
@@ -526,17 +527,6 @@ export const HeaderWithFilters = ({
         // @ts-expect-error <StrictNullChecks/>
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
-      />
-      <CWModal
-        size="small"
-        content={
-          <DismissStakeBannerModal
-            onModalClose={() => setIsDismissStakeBannerModalOpen(false)}
-            onDismiss={handleDismissStakeBannerModal}
-          />
-        }
-        onClose={() => setIsDismissStakeBannerModalOpen(false)}
-        open={isDismissStakeBannerModalOpen}
       />
     </div>
   );

@@ -3,19 +3,17 @@ import axios from 'axios';
 declare let window: any;
 
 import type Web3 from 'web3';
-import type Account from '../../../models/Account';
 import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 
-import * as siwe from 'siwe';
 import { hexToNumber } from 'web3-utils';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
-
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
+import { fetchCachedConfiguration } from 'state/api/configuration';
+import { userStore } from 'state/ui/user';
 import { Web3BaseProvider } from 'web3';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
@@ -58,7 +56,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return app.chain?.meta.node?.ethChainId?.toString() || '1';
+    return app.chain?.meta?.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,22 +73,18 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    sessionPayload: SessionPayload,
-  ): Promise<string> {
-    const nonce = siwe.generateNonce();
-    // this must be open-ended, because of custom domains
-    const domain = document.location.origin;
-    const message = createSiweMessage(sessionPayload, domain, nonce);
-
-    const signature = await this._web3.givenProvider.request({
-      method: 'personal_sign',
-      params: [account.address, message],
+  public getSessionSigner() {
+    return new SIWESigner({
+      signer: {
+        signMessage: (message) =>
+          this._web3.givenProvider.request({
+            method: 'personal_sign',
+            params: [this.accounts[0], message],
+          }),
+        getAddress: () => this.accounts[0],
+      },
+      chainId: parseInt(this.getChainId()),
     });
-
-    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-    return `${domain}/${nonce}/${signature}`;
   }
 
   // ACTIONS
@@ -137,7 +131,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       });
       const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
       try {
-        if (app.config.evmTestEnv !== 'test') {
+        const config = fetchCachedConfiguration();
+
+        if (config?.evmTestEnv !== 'test') {
           await this._web3.givenProvider.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: chainIdHex }],
@@ -146,9 +142,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
-          const wsRpcUrl = app.chain?.meta?.node.url ?? '';
+          const wsRpcUrl = app.chain?.meta?.node?.url ?? '';
           const rpcUrl =
-            app.chain?.meta?.node.altWalletUrl ?? wsRpcUrl
+            app.chain?.meta?.node?.altWalletUrl ?? wsRpcUrl
               ? new URL(wsRpcUrl).host
               : '';
 
@@ -198,7 +194,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     } catch (error) {
       let errorMsg = `Failed to enable Metamask: ${error.message}`;
       if (error.code === 4902) {
-        errorMsg = `Failed to enable Metamask: Please add chain ID ${app.chain.meta.node.ethChainId}`;
+        errorMsg = `Failed to enable Metamask: Please add chain ID ${app?.chain?.meta?.node?.ethChainId}`;
       }
       console.error(errorMsg);
       this._enabling = false;
@@ -210,9 +206,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
-        const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === accounts[0],
-        );
+        const updatedAddress = userStore
+          .getState()
+          .accounts.find((addr) => addr.address === accounts[0]);
         if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
       },
@@ -241,7 +237,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
           const url =
             rpcUrl.length > 0
               ? rpcUrl[0].replace(/(https:\/\/)+/, 'https://')
-              : app.chain.meta.node.altWalletUrl;
+              : app?.chain?.meta?.node?.altWalletUrl;
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [

@@ -5,6 +5,7 @@ import {
   sepolia,
 } from '@alchemy/aa-core';
 import { AppError } from '@hicommonwealth/core';
+import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import Web3 from 'web3';
 
 const message =
@@ -20,7 +21,7 @@ export const verifySignature = (
     message,
     signedMessage,
   );
-  if (signerAddress.toLowerCase() !== recoveredSignerAddress.toLowerCase()) {
+  if (equalEvmAddresses(signerAddress, recoveredSignerAddress)) {
     throw new AppError('Validation Error: Invalid signature');
   }
 };
@@ -34,16 +35,16 @@ const createSmartAccountClient = async (
 
   const signer: SmartAccountSigner =
     LocalAccountSigner.privateKeyToAccountSigner(
-      `0x${process.env.AA_PRIVATE_KEY}`,
+      `0x${config.ALCHEMY.AA.PRIVATE_KEY}`,
     );
   const smartAccountClient = await createModularAccountAlchemyClient({
-    apiKey: process.env.AA_ALCHEMY_KEY,
+    apiKey: config.ALCHEMY.AA.ALCHEMY_KEY,
     chain,
     signer,
     owners,
     accountAddress,
     gasManagerConfig: {
-      policyId: process.env.AA_GAS_POLICY!,
+      policyId: config.ALCHEMY.AA.GAS_POLICY!,
     },
   });
 

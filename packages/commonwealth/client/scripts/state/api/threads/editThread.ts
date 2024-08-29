@@ -1,9 +1,14 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { signThread } from 'controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
+import { userStore } from '../../ui/user';
 import {
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
@@ -62,11 +67,7 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps): Promise<Thread> => {
-  const {
-    action = null,
-    session = null,
-    hash = null,
-  } = await app.sessions.signThread(address, {
+  const canvasSignedData = await signThread(address, {
     community: app.activeChainId(),
     title: newTitle,
     body: newBody,
@@ -74,12 +75,12 @@ const editThread = async ({
     topic: topicId,
   });
 
-  const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
+  const response = await axios.patch(`${SERVER_URL}/threads/${threadId}`, {
     // common payload
     author_community_id: communityId,
     address: address,
     community_id: communityId,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     // for edit profile
     ...(url && { url }),
     ...(newBody && { body: encodeURIComponent(newBody) }),
@@ -99,10 +100,10 @@ const editThread = async ({
     ...(topicId !== undefined && { topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
+
+  console.log(response.data.result);
 
   return new Thread(response.data.result);
 };
@@ -120,6 +121,8 @@ const useEditThreadMutation = ({
   currentStage,
   currentTopicId,
 }: UseEditThreadMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: editThread,
     onSuccess: async (updatedThread) => {
@@ -142,6 +145,7 @@ const useEditThreadMutation = ({
 
       return updatedThread;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -1,4 +1,5 @@
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
@@ -6,18 +7,20 @@ import {
   TOKENS,
 } from '../../../common/constants';
 import { convertRequirementAmountFromTokensToWei } from '../../../common/helpers';
+import { AllowListGroupFilters } from '../GroupForm/Allowlist/index.types';
 import { GroupResponseValuesType } from '../GroupForm/index.types';
 
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (
   formSubmitValues: GroupResponseValuesType,
+  isAddedToHomeScreen: boolean,
   allowedAddresses?: string[],
 ) => {
   // @ts-expect-error StrictNullChecks
   const extraRequrirements = allowedAddresses?.length > 0 ? 1 : 0;
   const payload = {
     communityId: app.activeChainId(),
-    address: app.user.activeAccount.address,
+    address: userStore.getState().activeAccount?.address || '',
     groupName: formSubmitValues.groupName.trim(),
     groupDescription: (formSubmitValues.groupDescription || '').trim(),
     topicIds: formSubmitValues.topics.map((x) => parseInt(x.value)),
@@ -27,6 +30,7 @@ export const makeGroupDataBaseAPIPayload = (
           formSubmitValues.requirements.length + extraRequrirements
         : formSubmitValues.requirementsToFulfill,
     requirements: [],
+    isPWA: isAddedToHomeScreen,
   };
 
   // @ts-expect-error StrictNullChecks
@@ -114,7 +118,7 @@ export const makeGroupDataBaseAPIPayload = (
 export const getTotalPages = (
   members,
   allowedAddresses: string[],
-  filter: string,
+  filter: AllowListGroupFilters | undefined,
   membersPerPage: number,
 ) => {
   let totalPages = members?.totalPages ?? 0;

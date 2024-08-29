@@ -81,7 +81,7 @@ const defaultMeta = {
   },
   'twitter:image': {
     name: 'twitter:image',
-    content: 'https://commonwealth.im/static/img/branding/common.png',
+    content: 'https://commonwealth.im/img/brand_assets/common.png',
   },
   'og:type': {
     property: 'og:type',
@@ -105,7 +105,7 @@ const defaultMeta = {
   },
   'og:image': {
     property: 'og:image',
-    content: 'https://commonwealth.im/static/img/branding/common.png',
+    content: 'https://commonwealth.im/img/brand_assets/common.png',
   },
 } as const;
 

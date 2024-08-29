@@ -6,13 +6,11 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 let isServiceHealthy = false;
 
@@ -53,10 +51,17 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
   });
   incrementNumUnrelayedEvents(count);
 
-  await setupListener();
+  const pgClient = await setupListener();
 
   isServiceHealthy = true;
-  return relayForever(maxRelayIterations);
+  relayForever(maxRelayIterations).catch((err) => {
+    log.fatal(
+      'Unknown error fatal requires immediate attention. Restart REQUIRED!',
+      err,
+    );
+  });
+
+  return pgClient;
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {

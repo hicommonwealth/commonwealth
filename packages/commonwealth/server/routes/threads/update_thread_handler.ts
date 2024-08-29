@@ -9,7 +9,7 @@ export const Errors = {
 
 type UpdateThreadRequestBody = {
   title?: string;
-  body?: string;
+  body: string;
   stage?: string;
   url?: string;
   locked?: boolean;
@@ -21,9 +21,8 @@ type UpdateThreadRequestBody = {
     toAdd?: number[];
     toRemove?: number[];
   };
-  canvasSession?: any;
-  canvasAction?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discord_meta?: IDiscordMeta; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
@@ -59,9 +58,7 @@ export const updateThreadHandler = async (
     // @ts-expect-error StrictNullChecks
     collaborators,
     // @ts-expect-error StrictNullChecks
-    canvasSession,
-    // @ts-expect-error StrictNullChecks
-    canvasAction,
+    canvasSignedData,
     // @ts-expect-error StrictNullChecks
     canvasHash,
     // @ts-expect-error StrictNullChecks
@@ -72,7 +69,7 @@ export const updateThreadHandler = async (
 
   // this is a patch update, so properties should be
   // `undefined` if they are not intended to be updated
-  const [updatedThread, notificationOptions, analyticsOptions] =
+  const [updatedThread, analyticsOptions] =
     await controllers.threads.updateThread({
       // @ts-expect-error StrictNullChecks
       user,
@@ -90,15 +87,10 @@ export const updateThreadHandler = async (
       spam,
       topicId,
       collaborators,
-      canvasSession,
-      canvasAction,
+      canvasSignedData,
       canvasHash,
       discordMeta,
     });
-
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
 
   for (const a of analyticsOptions) {
     controllers.analytics.track(a).catch(console.error);

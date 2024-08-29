@@ -1,25 +1,35 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
+import type { Session } from '@canvas-js/interfaces';
+import {
+  addressSwapper,
+  ChainBase,
+  DEFAULT_NAME,
+  verifySession,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
   completeClientLogin,
   createUserWithAddress,
+  setActiveAccount,
   startLoginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
+import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import WebWalletController from 'controllers/app/web_wallets';
-import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { signSessionWithAccount } from 'controllers/server/sessions';
+import {
+  getSessionFromWallet,
+  signSessionWithAccount,
+} from 'controllers/server/sessions';
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
-import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
-import { addressSwapper } from 'utils';
+import { SERVER_URL } from 'state/api/config';
+import { useUpdateUserMutation } from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -28,30 +38,35 @@ import {
 } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { setDarkMode } from '../../../helpers/darkMode';
-import { getAddressFromWallet, loginToNear } from '../../../helpers/wallet';
+import { getAddressFromWallet } from '../../../helpers/wallet';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import { useFlag } from '../../../hooks/useFlag';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import {
   DISCOURAGED_NONREACTIVE_fetchProfilesByAddress,
   fetchProfilesByAddress,
 } from '../../../state/api/profiles/fetchProfilesByAddress';
-import { authModal } from '../../../state/ui/modals/authModal';
+import useAuthModalStore, {
+  authModal,
+} from '../../../state/ui/modals/authModal';
+import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
-  onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
+  onSuccess?: (
+    address?: string | null | undefined,
+    isNewlyCreated?: boolean,
+  ) => void;
   onModalClose: () => void;
   onUnrecognizedAddressReceived?: () => boolean;
-  useSessionKeyLoginFlow?: boolean;
+  withSessionKeyLoginFlow?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
 
 const useAuthentication = (props: UseAuthenticationProps) => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
-  const [username, setUsername] = useState<string>('Anonymous');
+  const [username, setUsername] = useState<string>(DEFAULT_NAME);
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<Wallet>>();
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
@@ -62,6 +77,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  const user = useUserStore();
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -77,14 +96,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onAction: true,
   });
 
-  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
+  const { mutateAsync: updateUser } = useUpdateUserMutation();
+
+  const { sessionKeyValidationError } = useAuthModalStore();
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           );
         })
@@ -99,7 +120,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const sortedChainBases = [
         ChainBase.CosmosSDK,
         ChainBase.Ethereum,
-        // ChainBase.NEAR,
         ChainBase.Substrate,
         ChainBase.Solana,
       ];
@@ -113,6 +133,71 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   }, []);
 
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 8)}...${address.slice(-5)}`;
+  };
+
+  const handleSuccess = async (
+    authAddress?: string | null | undefined,
+    isNew?: boolean,
+  ) => {
+    props?.onSuccess?.(authAddress, isNew);
+
+    // show address mismatch message, if user revalidated session with unexpected address
+    if (props.withSessionKeyLoginFlow) {
+      // @ts-expect-error StrictNullChecks
+      const isSubstrate = user.accounts.find(
+        (addr) => addr.address === sessionKeyValidationError?.address,
+      ).community?.ss58Prefix;
+      if (
+        authAddress === sessionKeyValidationError?.address ||
+        (isSubstrate &&
+          addressSwapper({
+            address: sessionKeyValidationError?.address || '',
+            currentPrefix: 42,
+          }) === authAddress)
+      ) {
+        const updatedAddress = user.accounts.find(
+          (addr) => addr.address === sessionKeyValidationError?.address,
+        );
+        await setActiveAccount(updatedAddress!);
+      } else {
+        const signedAddressAccount = user.accounts.find(
+          (addr) => addr.address === authAddress,
+        );
+        await setActiveAccount(signedAddressAccount!);
+        openConfirmation({
+          title: 'Address Mismatch',
+          description: (
+            <>
+              You tried to sign in as
+              {formatAddress(sessionKeyValidationError?.address || '')} but your
+              wallet has the address {formatAddress(authAddress || '')}.
+              {signedAddressAccount ? (
+                <p>
+                  We&apos;ve switched your active address to the one in your
+                  wallet. You can switch it back in the user menu.
+                </p>
+              ) : (
+                <p>
+                  Select <strong>Connect a new address</strong> in the user menu
+                  to connect this as a new address, or switch addresses in your
+                  wallet to continue.
+                </p>
+              )}
+            </>
+          ),
+          buttons: [
+            {
+              label: 'Continue',
+              buttonType: 'primary',
+            },
+          ],
+        });
+      }
+    }
+  };
+
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
     trackAnalytics({
       event: MixpanelLoginEvent.LOGIN,
@@ -122,6 +207,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       isSocialLogin: isSocialLogin,
       loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
       isMobile,
+      isPWA: isAddedToHomeScreen,
     });
   };
 
@@ -141,13 +227,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
       const isAttemptingToConnectAddressToCommunity =
-        app.isLoggedIn() && app.activeChainId();
+        user.isLoggedIn && app.activeChainId();
       const { address: magicAddress, isAddressNew } =
         await startLoginWithMagicLink({
           email: tempEmailToUse,
           isCosmos,
           redirectTo: document.location.pathname + document.location.search,
           chain: app.chain?.id,
+          isLoggedIn: user.isLoggedIn,
         });
       setIsMagicLoading(false);
 
@@ -157,10 +244,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // then open the user auth type guidance modal
       // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
       if (
-        userOnboardingEnabled &&
         isAddressNew &&
         !isAttemptingToConnectAddressToCommunity &&
-        !app.isLoggedIn()
+        !user.isLoggedIn
       ) {
         authModal
           .getState()
@@ -168,7 +254,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         return;
       }
 
-      props?.onSuccess?.(magicAddress, isNewlyCreated);
+      await handleSuccess(magicAddress, isNewlyCreated);
       props?.onModalClose?.();
 
       trackLoginEvent('email', true);
@@ -190,10 +276,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
+        isLoggedIn: user.isLoggedIn,
       });
       setIsMagicLoading(false);
 
-      props?.onSuccess?.(magicAddress, isNewlyCreated);
+      await handleSuccess(magicAddress, isNewlyCreated);
       props?.onModalClose?.();
 
       trackLoginEvent(provider, true);
@@ -209,7 +296,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     account: Account,
     exitOnComplete: boolean,
     newelyCreated = false,
-    shouldRedrawApp = true,
   ) => {
     const profile = account.profile;
 
@@ -219,28 +305,22 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setUsername(profile.name);
     }
 
-    if (app.isLoggedIn()) {
+    if (user.isLoggedIn) {
       await completeClientLogin(account);
     } else {
       // log in as the new user
-      await initAppState(false, shouldRedrawApp);
+      await initAppState(false);
       if (localStorage.getItem('user-dark-mode-state') === 'on') {
         setDarkMode(true);
       }
       if (app.chain) {
-        const community =
-          app.user.selectedCommunity ||
-          app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses({
-          chain: community,
-          shouldRedraw: shouldRedrawApp,
-        });
+        await updateActiveAddresses(app.activeChainId());
       }
     }
 
     if (exitOnComplete) {
       props?.onModalClose?.();
-      props?.onSuccess?.(account.address, newelyCreated);
+      await handleSuccess(account.address, newelyCreated);
     }
   };
 
@@ -251,27 +331,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     linking: boolean,
     wallet?: Wallet,
   ) => {
-    if (props.useSessionKeyLoginFlow) {
-      props?.onSuccess?.(account.address, newlyCreated);
+    if (props.withSessionKeyLoginFlow) {
+      await handleSuccess(account.address, newlyCreated);
       return;
     }
 
     const walletToUse = wallet || selectedWallet;
 
     // Handle Logged in and joining community of different chain base
-    if (app.activeChainId() && app.isLoggedIn()) {
-      const timestamp = +new Date();
-      const { signature, chainId, sessionPayload } =
-        // @ts-expect-error <StrictNullChecks>
-        await signSessionWithAccount(walletToUse, account, timestamp);
-      await account.validate(signature, timestamp, chainId);
-      app.sessions.authSession(
-        app.chain.base,
-        chainId,
-        account.address,
-        sessionPayload,
-        signature,
-      );
+    if (app.activeChainId() && user.isLoggedIn) {
+      // @ts-expect-error StrictNullChecks
+      const session = await getSessionFromWallet(walletToUse);
+      await account.validate(session);
       await onLogInWithAccount(account, true, newlyCreated);
       return;
     }
@@ -294,19 +365,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     // Handle receiving and caching wallet signature strings
     if (!newlyCreated && !linking) {
       try {
-        const timestamp = +new Date();
-        const { signature, sessionPayload, chainId } =
-          // @ts-expect-error <StrictNullChecks>
-          await signSessionWithAccount(walletToUse, account, timestamp);
-        await account.validate(signature, timestamp, chainId);
-        app.sessions.authSession(
-          // @ts-expect-error <StrictNullChecks>
-          app.chain ? app.chain.base : walletToUse.chain,
-          chainId,
-          account.address,
-          sessionPayload,
-          signature,
-        );
+        // @ts-expect-error StrictNullChecks
+        const session = await getSessionFromWallet(walletToUse);
+        await account.validate(session);
         await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -316,22 +377,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (linking) return;
 
       try {
-        const timestamp = +new Date();
-        const { signature, chainId, sessionPayload } =
-          // @ts-expect-error <StrictNullChecks>
-          await signSessionWithAccount(walletToUse, account, timestamp);
+        // @ts-expect-error StrictNullChecks
+        const session = await signSessionWithAccount(walletToUse, account);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
         props.onSuccess?.(account.address, newlyCreated);
 
         // Create the account with default values
-        await onCreateNewAccount(
-          walletToUse,
-          signature,
-          timestamp,
-          chainId,
-          sessionPayload,
-          account,
-        );
+        // await onCreateNewAccount(walletToUse, session, account);
+        await onCreateNewAccount(session, account);
         await onSaveProfileInfo(account, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -341,40 +394,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handle Logic for creating a new account, including validating signature
-  const onCreateNewAccount = async (
-    wallet?: Wallet,
-    walletSignature?: string,
-    cachedTimestamp?: number,
-    cachedChainId?: string,
-    cachedSessionPayload?: SessionPayload,
-    account?: Account,
-  ) => {
-    const walletToUse = wallet || selectedWallet;
-
+  const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
+      // @ts-expect-error StrictNullChecks
+      await account.validate(session);
+      // @ts-expect-error StrictNullChecks
+      await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
-      if (walletToUse.chain !== 'near') {
-        // @ts-expect-error <StrictNullChecks>
-        await account.validate(
-          // @ts-expect-error <StrictNullChecks>
-          walletSignature,
-          cachedTimestamp,
-          cachedChainId,
-          false,
-        );
-        app.sessions.authSession(
-          // @ts-expect-error <StrictNullChecks>
-          walletToUse.chain,
-          // @ts-expect-error <StrictNullChecks>
-          cachedChainId,
-          // @ts-expect-error <StrictNullChecks>
-          account.address,
-          cachedSessionPayload,
-          walletSignature,
-        );
-      }
-      // @ts-expect-error <StrictNullChecks>
-      await onLogInWithAccount(account, false, true, false);
+      await onLogInWithAccount(account, false, true);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
@@ -389,21 +416,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (!currentUserUpdatedProfile) {
         console.log('No profile yet.');
       } else {
-        // @ts-expect-error <StrictNullChecks>
-        account.profile.initialize(
-          currentUserUpdatedProfile?.name,
+        account?.profile?.initialize(
+          currentUserUpdatedProfile.userId,
+          currentUserUpdatedProfile.name,
           currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile?.avatarUrl,
-          currentUserUpdatedProfile.id,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          currentUserUpdatedProfile?.lastActive,
+          currentUserUpdatedProfile.avatarUrl,
+          account?.profile?.chain,
+          currentUserUpdatedProfile.lastActive,
         );
       }
     } catch (e) {
-      notifyError(`Error creating account. Please try again.`);
-      console.error(`Error creating account: ${e}`);
-      props?.onModalClose?.();
+      console.log(e);
+      notifyError('Failed to create account. Please try again.');
     }
   };
 
@@ -413,20 +437,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     newelyCreated?: boolean,
   ) => {
     try {
-      if (username) {
-        await updateProfile({
-          // @ts-expect-error <StrictNullChecks>
-          address: account.profile.address,
-          // @ts-expect-error <StrictNullChecks>
-          chain: account.profile.chain,
-          name: username,
+      if (username && account?.profile) {
+        await updateUser({
+          id: account.profile.userId,
+          profile: {
+            name: username.trim(),
+          },
         });
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
       }
       // @ts-expect-error <StrictNullChecks>
-      props?.onSuccess?.(account.profile.address, newelyCreated);
-      app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
+      await handleSuccess(account.profile.address, newelyCreated);
     } catch (e) {
       notifyError('Failed to save profile info');
       console.error(`Failed to save profile info: ${e}`);
@@ -447,56 +469,61 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onWalletSelect = async (wallet: Wallet) => {
-    await wallet.enable();
+    try {
+      await wallet.enable();
+    } catch (error) {
+      notifyError(error?.message || error);
+      return;
+    }
     setSelectedWallet(wallet);
 
-    if (wallet.chain === 'near') {
-      await loginToNear(app.chain as Near, app.isCustomDomain());
+    const selectedAddress = getAddressFromWallet(wallet);
+    if (!selectedAddress) {
+      notifyError(
+        `We couldn't fetch an address from your wallet! Please make sure your wallet account is setup and try again`,
+      );
+      return;
+    }
+
+    // check if address exists
+    const profileAddresses = await fetchProfilesByAddress({
+      currentChainId: '',
+      profileAddresses: [
+        wallet.chain === ChainBase.Substrate
+          ? addressSwapper({
+              address: selectedAddress,
+              currentPrefix: parseInt(
+                (app.chain as Substrate)?.meta.ss58Prefix,
+                10,
+              ),
+            })
+          : selectedAddress,
+      ],
+      profileChainIds: [],
+      initiateProfilesAfterFetch: false,
+    });
+    const addressExists = profileAddresses?.length > 0;
+    const isAttemptingToConnectAddressToCommunity =
+      user.isLoggedIn && app.activeChainId();
+    if (
+      !addressExists &&
+      !isAttemptingToConnectAddressToCommunity &&
+      props.onUnrecognizedAddressReceived
+    ) {
+      const shouldContinue = props.onUnrecognizedAddressReceived();
+      if (!shouldContinue) return;
+    }
+
+    if (props.withSessionKeyLoginFlow) {
+      await onSessionKeyRevalidation(wallet, selectedAddress);
     } else {
-      const selectedAddress = getAddressFromWallet(wallet);
-
-      if (userOnboardingEnabled) {
-        // check if address exists
-        const profileAddresses = await fetchProfilesByAddress({
-          currentChainId: '',
-          profileAddresses: [
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: selectedAddress,
-                  currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
-                    10,
-                  ),
-                })
-              : selectedAddress,
-          ],
-          profileChainIds: [app.activeChainId() ?? wallet.chain],
-          initiateProfilesAfterFetch: false,
-        });
-        const addressExists = profileAddresses?.length > 0;
-        const isAttemptingToConnectAddressToCommunity =
-          app.isLoggedIn() && app.activeChainId();
-        if (
-          !addressExists &&
-          !isAttemptingToConnectAddressToCommunity &&
-          props.onUnrecognizedAddressReceived
-        ) {
-          const shouldContinue = props.onUnrecognizedAddressReceived();
-          if (!shouldContinue) return;
-        }
-      }
-
-      if (props.useSessionKeyLoginFlow) {
-        await onSessionKeyRevalidation(wallet, selectedAddress);
-      } else {
-        await onNormalWalletLogin(wallet, selectedAddress);
-      }
+      await onNormalWalletLogin(wallet, selectedAddress);
     }
   };
 
   const onWalletAddressSelect = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
-    if (props.useSessionKeyLoginFlow) {
+    if (props.withSessionKeyLoginFlow) {
       await onSessionKeyRevalidation(wallet, address);
     } else {
       await onNormalWalletLogin(wallet, address);
@@ -516,9 +543,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
 
-    if (app.isLoggedIn()) {
+    if (user.isLoggedIn) {
       try {
-        const res = await axios.post(`${app.serverUrl()}/getAddressStatus`, {
+        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
           address:
             wallet.chain === ChainBase.Substrate
               ? addressSwapper({
@@ -530,7 +557,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
                 })
               : address,
           community_id: app.activeChainId() ?? wallet.chain,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         });
 
         if (res.data.result.exists && res.data.result.belongsToUser) {
@@ -550,12 +577,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      const sessionPublicAddress = await app.sessions.getOrCreateAddress(
-        wallet.chain,
-        // @ts-expect-error <StrictNullChecks>
-        wallet.getChainId().toString(),
-        address,
-      );
+      const session = await getSessionFromWallet(wallet);
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       const validationBlockInfo = await getWalletRecentBlock(
@@ -573,7 +595,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         // @ts-expect-error <StrictNullChecks>
         null, // no sso source
         chainIdentifier,
-        sessionPublicAddress,
+        session.publicKey,
         validationBlockInfo,
       );
 
@@ -588,6 +610,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (joinedCommunity) {
         trackAnalytics({
           event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+          isPWA: isAddedToHomeScreen,
         });
       }
 
@@ -599,13 +622,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onSessionKeyRevalidation = async (wallet: Wallet, address: string) => {
-    const timestamp = +new Date();
-    const sessionAddress = await app.sessions.getOrCreateAddress(
-      wallet.chain,
-      // @ts-expect-error <StrictNullChecks>
-      wallet.getChainId().toString(),
-      address,
-    );
+    const session = await getSessionFromWallet(wallet);
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
     const validationBlockInfo = await getWalletRecentBlock(
       wallet,
@@ -620,7 +637,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // @ts-expect-error <StrictNullChecks>
       null, // no sso source?
       chainIdentifier,
-      sessionAddress,
+      // TODO: I don't think we need this field in Account at all
+      session.publicKey,
       validationBlockInfo,
     );
     account.setValidationBlockInfo(
@@ -628,20 +646,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
     );
 
-    const { chainId, sessionPayload, signature } = await signSessionWithAccount(
-      wallet,
-      account,
-      timestamp,
-    );
-    await account.validate(signature, timestamp, chainId);
-    app.sessions.authSession(
-      wallet.chain,
-      chainId,
-      account.address,
-      sessionPayload,
-      signature,
-    );
-    console.log('Started new session for', wallet.chain, chainId);
+    await account.validate(session);
+    await verifySession(session);
+    console.log('Started new session for', wallet.chain, chainIdentifier);
 
     // ensure false for newlyCreated / linking vars on revalidate
     if (isMobile) {

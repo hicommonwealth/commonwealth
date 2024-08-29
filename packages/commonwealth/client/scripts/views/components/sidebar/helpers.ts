@@ -1,6 +1,8 @@
 import _ from 'lodash';
 
 import app from 'state';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import type { ToggleTree } from './types';
 
 function comparisonCustomizer(value1, value2) {
@@ -20,17 +22,21 @@ export function verifyCachedToggleTree(
   return _.isEqualWith(cachedTree, toggleTree, comparisonCustomizer);
 }
 
-export const getUniqueTopicIdsIncludedInContest = (
-  contestData: {
-    topics?: { id?: number }[];
-  }[],
+export const getUniqueTopicIdsIncludedInActiveContest = (
+  contestData: Contest[],
 ) => {
   if (!contestData) {
     return [];
   }
 
-  const topicIds = contestData.reduce((acc, curr) => {
-    return [...acc, ...(curr.topics || []).map((t) => t.id)];
+  const topicIds = contestData.reduce((acc, contest) => {
+    const isActive = isContestActive({ contest });
+
+    if (!isActive) {
+      return acc;
+    }
+
+    return [...acc, ...(contest?.topics || []).map((t) => t.id)];
   }, []);
 
   return [...new Set(topicIds)];

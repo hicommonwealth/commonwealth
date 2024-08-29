@@ -9,17 +9,17 @@ export const ContestManager = z
     contest_address: z.string().describe('On-Chain contest manager address'),
     community_id: z.string(),
     name: z.string(),
-    image_url: z.string().optional(),
+    image_url: z.string().nullish(),
     funding_token_address: z
       .string()
-      .optional()
+      .nullish()
       .describe('Provided by admin on creation when stake funds are not used'),
     prize_percentage: z
       .number()
       .int()
       .min(0)
       .max(100)
-      .optional()
+      .nullish()
       .describe('Percentage of pool used for prizes in recurring contests'),
     payout_structure: z
       .array(z.number().int().min(0).max(100))
@@ -30,17 +30,23 @@ export const ContestManager = z
       .min(0)
       .max(MAX_SCHEMA_INT)
       .describe('Recurring contest interval, 0 when one-off'),
-    ticker: z.string().optional().default(commonProtocol.Denominations.ETH),
-    decimals: PG_INT.optional().default(
+    ticker: z.string().default(commonProtocol.Denominations.ETH),
+    decimals: PG_INT.default(
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
     cancelled: z
       .boolean()
-      .optional()
+      .nullish()
       .describe('Flags when contest policy is cancelled by admin'),
-    topics: z.array(Topic).optional(),
-    contests: z.array(Contest).optional(),
+    ended: z
+      .boolean()
+      .nullish()
+      .describe(
+        'Flags when the one-off contest has ended and rollover was completed',
+      ),
+    topics: z.array(Topic).nullish(),
+    contests: z.array(Contest).nullish(),
   })
   .describe('On-Chain Contest Manager');
 
@@ -48,6 +54,6 @@ export const ContestTopic = z
   .object({
     contest_address: z.string(),
     topic_id: PG_INT,
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   })
   .describe('X-Ref to topics in contest');

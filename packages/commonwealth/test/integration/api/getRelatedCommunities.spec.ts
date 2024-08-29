@@ -1,20 +1,21 @@
 import { dispose } from '@hicommonwealth/core';
 import { tester, type DB } from '@hicommonwealth/model';
 import { assert } from 'chai';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 
 describe('GetRelatedCommunities Tests', async () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     models = await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('Correctly returns nothing if base does not match chainNode', async () => {
+  test('Correctly returns nothing if base does not match chainNode', async () => {
     // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const response = await controller.getRelatedCommunities({
@@ -24,7 +25,7 @@ describe('GetRelatedCommunities Tests', async () => {
     assert.equal(response.length, 0);
   });
 
-  it('Correctly returns results if base matches some chainNode.name', async () => {
+  test('Correctly returns results if base matches some chainNode.name', async () => {
     // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const response = await controller.getRelatedCommunities({ chainNodeId: 2 });
@@ -33,21 +34,21 @@ describe('GetRelatedCommunities Tests', async () => {
 
     const ethereumCommunity = response.find((r) => r.community === 'Ethereum');
     // @ts-expect-error StrictNullChecks
-    assert.equal(ethereumCommunity.address_count, 2);
+    assert.equal(ethereumCommunity.profile_count, 2);
     // @ts-expect-error StrictNullChecks
-    assert.equal(ethereumCommunity.thread_count, 0);
+    assert.equal(ethereumCommunity.lifetime_thread_count, 0);
     // @ts-expect-error StrictNullChecks
-    assert.equal(ethereumCommunity.icon_url, '/static/img/protocols/eth.png');
+    assert.equal(ethereumCommunity.icon_url, 'assets/img/protocols/eth.png');
     // @ts-expect-error StrictNullChecks
     assert.equal(ethereumCommunity.description, null);
 
     const sushiCommunity = response.find((r) => r.community === 'Sushi');
     // @ts-expect-error StrictNullChecks
-    assert.equal(sushiCommunity.address_count, 0);
+    assert.equal(sushiCommunity.profile_count, 0);
     // @ts-expect-error StrictNullChecks
-    assert.equal(sushiCommunity.thread_count, 0);
+    assert.equal(sushiCommunity.lifetime_thread_count, 0);
     // @ts-expect-error StrictNullChecks
-    assert.equal(sushiCommunity.icon_url, '/static/img/protocols/eth.png');
+    assert.equal(sushiCommunity.icon_url, 'assets/img/protocols/eth.png');
     // @ts-expect-error StrictNullChecks
     assert.equal(sushiCommunity.description, 'sushi community description');
 
@@ -55,13 +56,13 @@ describe('GetRelatedCommunities Tests', async () => {
       (r) => r.community === 'yearn.finance',
     );
     // @ts-expect-error StrictNullChecks
-    assert.equal(yearnFinanceCommunity.address_count, 0);
+    assert.equal(yearnFinanceCommunity.profile_count, 0);
     // @ts-expect-error StrictNullChecks
-    assert.equal(yearnFinanceCommunity.thread_count, 0);
+    assert.equal(yearnFinanceCommunity.lifetime_thread_count, 0);
     assert.equal(
       // @ts-expect-error StrictNullChecks
       yearnFinanceCommunity.icon_url,
-      '/static/img/protocols/eth.png',
+      'assets/img/protocols/eth.png',
     );
     // @ts-expect-error StrictNullChecks
     assert.equal(yearnFinanceCommunity.description, null);

@@ -1,4 +1,3 @@
-import { AccessLevel, RoleObject } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -21,20 +20,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .replace(/(\s|-)+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
-};
-
-export const getThreadUrlWithoutObject = (
-  proposalCommunity,
-  proposalId,
-  comment?,
-) => {
-  const aId = proposalCommunity;
-  const tId = proposalId;
-  const cId = comment ? `?comment=${comment.id}` : '';
-
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
 };
 
 // WARN: Using process.env to avoid webpack failures
@@ -69,103 +54,6 @@ export const validURL = (str) => {
 
 export const urlHasValidHTTPPrefix = (url: string) => {
   return url.indexOf('http://') === 0 || url.indexOf('https://') === 0;
-};
-
-export const preprocessQuillDeltaForRendering = (nodes) => {
-  // split up nodes at line boundaries
-  const lines = [];
-  for (const node of nodes) {
-    if (typeof node.insert === 'string') {
-      const matches = node.insert.match(/[^\n]+\n?|\n/g);
-      (matches || []).forEach((line) => {
-        // @ts-expect-error StrictNullChecks
-        lines.push({ attributes: node.attributes, insert: line });
-      });
-    } else {
-      // @ts-expect-error StrictNullChecks
-      lines.push(node);
-    }
-  }
-  // group nodes under parents
-  const result = [];
-  let parent = { children: [], attributes: undefined };
-  for (const node of lines) {
-    // @ts-expect-error StrictNullChecks
-    if (typeof node.insert === 'string' && node.insert.endsWith('\n')) {
-      // @ts-expect-error StrictNullChecks
-      parent.attributes = node.attributes;
-      // concatenate code-block node parents together, keeping newlines
-      if (
-        result.length > 0 &&
-        // @ts-expect-error StrictNullChecks
-        result[result.length - 1].attributes &&
-        parent.attributes &&
-        parent.attributes['code-block'] &&
-        // @ts-expect-error StrictNullChecks
-        result[result.length - 1].attributes['code-block']
-      ) {
-        // @ts-expect-error StrictNullChecks
-        parent.children.push({ insert: node.insert });
-        // @ts-expect-error StrictNullChecks
-        result[result.length - 1].children = result[
-          result.length - 1
-          // @ts-expect-error StrictNullChecks
-        ].children.concat(parent.children);
-      } else {
-        // @ts-expect-error StrictNullChecks
-        parent.children.push({ insert: node.insert });
-        // @ts-expect-error StrictNullChecks
-        result.push(parent);
-      }
-      parent = { children: [], attributes: undefined };
-    } else {
-      parent.children.push(node);
-    }
-  }
-  // If there was no \n at the end of the document, we need to push whatever remains in `parent`
-  // onto the result. This may happen if we are rendering a truncated Quill document
-  if (parent.children.length > 0) {
-    // @ts-expect-error StrictNullChecks
-    result.push(parent);
-  }
-
-  // trim empty newlines at end of document
-  while (
-    result.length &&
-    // @ts-expect-error StrictNullChecks
-    result[result.length - 1].children.length === 1 &&
-    // @ts-expect-error StrictNullChecks
-    typeof result[result.length - 1].children[0].insert === 'string' &&
-    // @ts-expect-error StrictNullChecks
-    result[result.length - 1].children[0].insert === '\n' &&
-    // @ts-expect-error StrictNullChecks
-    result[result.length - 1].children[0].attributes === undefined
-  ) {
-    result.pop();
-  }
-
-  return result;
-};
-
-export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
-  return preprocessQuillDeltaForRendering(delta.ops)
-    .map((parent) => {
-      // @ts-expect-error StrictNullChecks
-      return parent.children
-        .map((child) => {
-          if (typeof child.insert === 'string')
-            return child.insert.trimRight('\n');
-          if (child.insert?.image) return '(image)';
-          if (child.insert?.twitter) return '(tweet)';
-          if (child.insert?.video) return '(video)';
-          return '';
-        })
-        .filter((child) => !!child)
-        .join(' ')
-        .replace(/  +/g, ' '); // remove multiple spaces
-    })
-    .filter((parent) => !!parent)
-    .join(paragraphSeparator);
 };
 
 export function formatAddressShort(
@@ -226,34 +114,6 @@ export const addressSwapper = (options: {
     return options.address;
   }
 };
-
-export function aggregatePermissions(
-  roles: RoleObject[],
-  chain_permissions: { allow: number; deny: number },
-) {
-  const ORDER: AccessLevel[] = [
-    AccessLevel.Member,
-    AccessLevel.Moderator,
-    AccessLevel.Admin,
-  ];
-
-  function compare(o1: RoleObject, o2: RoleObject) {
-    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
-  }
-
-  roles = roles.sort(compare);
-
-  const permissionsAllowDeny: Array<{
-    allow: number;
-    deny: number;
-  }> = roles.map(({ allow, deny }) => ({ allow, deny }));
-
-  // add chain default permissions to beginning of permissions array
-  permissionsAllowDeny.unshift(chain_permissions);
-
-  // compute permissions
-  return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
-}
 
 /**
  * Convert Cosmos-style minimal denom amount to readable full-denom amount

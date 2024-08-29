@@ -1,9 +1,7 @@
 import { CacheNamespaces, logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
 import { CacheDecorator, KeyFunction } from './redis';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export class Activity<T extends (...args: any[]) => any> {
   queryWithCache: T;
@@ -31,10 +29,12 @@ export class Activity<T extends (...args: any[]) => any> {
     ) as unknown as T;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async startTask(...args: any) {
     try {
       const jobId = daemon.startTask(
         this.label,
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         async () => await this.queryWithCacheOverride(...args),
         this.cacheDuration,
       );
@@ -61,7 +61,7 @@ export class Daemons {
     // don't accept to run jobs more often than 1 minute
     if (timeoutMs < 60 * 1000) return;
 
-    const jobId = setInterval(async () => {
+    const jobId = setInterval(() => {
       try {
         log.info(`Running task ${label}`);
         fn();

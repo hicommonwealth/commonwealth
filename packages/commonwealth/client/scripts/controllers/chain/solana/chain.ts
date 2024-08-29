@@ -34,6 +34,7 @@ export default class SolanaChain
     this._app = app;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async init(chain: ChainInfo, reset = false) {
     // default to 9 decimals
     this._decimals = new BN(10).pow(new BN(chain.decimals || 9));
@@ -43,9 +44,9 @@ export default class SolanaChain
 
     const solw3 = await import('@solana/web3.js');
     try {
-      url = solw3.clusterApiUrl(chain.node.url as solw3.Cluster);
+      url = solw3.clusterApiUrl(chain?.node?.url as solw3.Cluster);
     } catch (e) {
-      url = chain.node.url;
+      url = chain?.node?.url;
       // TODO: test if custom url is valid
     }
     // TODO: validate config here -- maybe we want ws?
@@ -73,10 +74,15 @@ export default class SolanaChain
   }
 
   public createTXModalData(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     author: SolanaAccount,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txFunc,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     objName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('unsupported');

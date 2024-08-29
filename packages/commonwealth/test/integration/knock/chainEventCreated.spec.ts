@@ -19,6 +19,14 @@ import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import z from 'zod';
 import { processChainEventCreated } from '../../../server/workers/knock/eventHandlers/chainEventCreated';
 import { getChainProposalUrl } from '../../../server/workers/knock/util';
@@ -36,10 +44,9 @@ describe('chainEventCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let chainNode: z.infer<typeof schemas.ChainNode> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
-  let userProfile: z.infer<typeof schemas.Profile> | undefined,
-    sandbox: sinon.SinonSandbox;
+  let sandbox: sinon.SinonSandbox;
 
-  before(async () => {
+  beforeAll(async () => {
     [chainNode] = await tester.seed(
       'ChainNode',
       {
@@ -52,17 +59,16 @@ describe('chainEventCreated Event Handler', () => {
       { mock: false },
     );
     [user] = await tester.seed('User', {});
-    [userProfile] = await tester.seed('Profile', {
-      user_id: user!.id,
-    });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode!.id,
       namespace_address: namespaceAddress,
+      lifetime_thread_count: 0,
+      profile_count: 0,
       Addresses: [],
     });
     const [contract] = await tester.seed('Contract', {
       address: communityStakesAddress,
-      chain_node_id: chainNode!.id,
+      chain_node_id: chainNode!.id!,
       abi_id: null,
     });
     await tester.seed('CommunityContract', {
@@ -87,11 +93,11 @@ describe('chainEventCreated Event Handler', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should do nothing if the event signature is unsupported', async () => {
+  test('should do nothing if the event signature is unsupported', async () => {
     const res = await processChainEventCreated({
       name: EventNames.ChainEventCreated,
       payload: {
@@ -104,7 +110,7 @@ describe('chainEventCreated Event Handler', () => {
   });
 
   describe('Community Stakes', () => {
-    it('should not throw if the community is invalid', async () => {
+    test('should not throw if the community is invalid', async () => {
       const res = await processChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
@@ -117,7 +123,7 @@ describe('chainEventCreated Event Handler', () => {
       expect(res).to.be.false;
     });
 
-    it('should do nothing if there are no relevant subscriptions', async () => {
+    test('should do nothing if there are no relevant subscriptions', async () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -135,7 +141,7 @@ describe('chainEventCreated Event Handler', () => {
         .true;
     });
 
-    it('should execute triggerWorkflow with the appropriate data', async () => {
+    test('should execute triggerWorkflow with the appropriate data', async () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -143,7 +149,6 @@ describe('chainEventCreated Event Handler', () => {
         community_id: community!.id,
         role: 'admin',
         user_id: user!.id,
-        profile_id: userProfile!.id,
       });
 
       const res = await processChainEventCreated({
@@ -173,7 +178,7 @@ describe('chainEventCreated Event Handler', () => {
       });
     });
 
-    it('should throw if triggerWorkflow fails', async () => {
+    test('should throw if triggerWorkflow fails', async () => {
       sandbox = sinon.createSandbox();
       notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
@@ -181,7 +186,6 @@ describe('chainEventCreated Event Handler', () => {
         community_id: community!.id,
         role: 'admin',
         user_id: user!.id,
-        profile_id: userProfile!.id,
       });
 
       await expect(
@@ -199,7 +203,7 @@ describe('chainEventCreated Event Handler', () => {
   });
 
   describe('Chain Proposals', () => {
-    it('should not throw if the community is invalid', async () => {
+    test('should not throw if the community is invalid', async () => {
       const res = await processChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
@@ -216,7 +220,7 @@ describe('chainEventCreated Event Handler', () => {
       expect(res).to.be.false;
     });
 
-    it('should do nothing if there are no relevant subscriptions', async () => {
+    test('should do nothing if there are no relevant subscriptions', async () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -238,7 +242,7 @@ describe('chainEventCreated Event Handler', () => {
         .true;
     });
 
-    it('should execute triggerWorkflow with the appropriate data', async () => {
+    test('should execute triggerWorkflow with the appropriate data', async () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -279,7 +283,7 @@ describe('chainEventCreated Event Handler', () => {
       });
     });
 
-    it('should throw if triggerWorkflow fails', async () => {
+    test('should throw if triggerWorkflow fails', async () => {
       sandbox = sinon.createSandbox();
       notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 

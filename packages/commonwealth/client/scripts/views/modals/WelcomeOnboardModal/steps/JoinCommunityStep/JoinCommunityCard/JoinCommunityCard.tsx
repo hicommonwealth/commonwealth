@@ -1,14 +1,17 @@
-import { pluralizeWithoutNumberPrefix } from 'client/scripts/helpers';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CWCommunityAvatar } from 'client/scripts/views/components/component_kit/cw_community_avatar';
 import clsx from 'clsx';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
+import ChainInfo from 'models/ChainInfo';
 import React from 'react';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './JoinCommunityCard.scss';
 
 type JoinCommunityCardProps = {
-  community: ChainInfo;
+  community: Pick<
+    ChainInfo,
+    'name' | 'iconUrl' | 'profileCount' | 'lifetimeThreadCount'
+  >;
   isJoined?: boolean;
   canJoin?: boolean;
   onJoinClick?: () => void;
@@ -21,12 +24,18 @@ const JoinCommunityCard = ({
   onJoinClick = () => {},
 }: JoinCommunityCardProps) => {
   const roundedAddressCount =
-    community?.addressCount > 1000
-      ? `${(community?.addressCount / 1000) | 0}K+`
-      : community?.addressCount;
+    community?.profileCount > 1000
+      ? `${(community?.profileCount / 1000) | 0}K+`
+      : community?.profileCount;
   return (
     <div className="JoinCommunityCard">
-      <CWCommunityAvatar community={community} size="xl" />
+      <CWCommunityAvatar
+        community={{
+          iconUrl: community.iconUrl,
+          name: community.name,
+        }}
+        size="xl"
+      />
 
       <div className="info">
         <CWText type="h4" title={community?.name} fontWeight="semiBold">
@@ -34,16 +43,19 @@ const JoinCommunityCard = ({
         </CWText>
 
         <div className="counts">
-          <CWText type="b2" title={`${community?.addressCount}`}>
+          <CWText type="b2" title={`${community?.profileCount}`}>
             {roundedAddressCount}&nbsp;
-            {pluralizeWithoutNumberPrefix(community?.addressCount, 'Member')}
+            {pluralizeWithoutNumberPrefix(community?.profileCount, 'Member')}
           </CWText>
 
           <CWText className="dot">•</CWText>
 
-          <CWText type="b2" title={`${community?.threadCount}`}>
-            {community?.threadCount}&nbsp;
-            {pluralizeWithoutNumberPrefix(community?.threadCount, 'Thread')}
+          <CWText type="b2" title={`${community?.lifetimeThreadCount}`}>
+            {community?.lifetimeThreadCount}&nbsp;
+            {pluralizeWithoutNumberPrefix(
+              community?.lifetimeThreadCount,
+              'Thread',
+            )}
           </CWText>
         </div>
       </div>
@@ -61,8 +73,7 @@ const JoinCommunityCard = ({
           iconLeftWeight: 'fill',
         })}
         disabled={!canJoin}
-        // @ts-expect-error <StrictNullChecks/>
-        onClick={canJoin ? onJoinClick : null}
+        onClick={canJoin ? onJoinClick : undefined}
       />
     </div>
   );

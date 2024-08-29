@@ -9,13 +9,18 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import CopyAddressInput from '../../../CopyAddressInput';
 import FundContestDrawer from '../../../FundContestDrawer';
 
+import contestSuccess from 'assets/img/contestSuccess.png';
 import './ContestLiveStep.scss';
 
 interface ContestLiveStepProps {
   createdContestAddress: string;
+  isFarcasterContest: boolean;
 }
 
-const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
+const ContestLiveStep = ({
+  createdContestAddress,
+  isFarcasterContest,
+}: ContestLiveStepProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const navigate = useCommonNavigate();
@@ -25,7 +30,7 @@ const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
     <>
       <CWPageLayout>
         <div className="ContestLiveStep" style={animationStyles}>
-          <img src="/static/img/contestSuccess.png" alt="" className="img" />
+          <img src={contestSuccess} alt="" className="img" />
           <CWText type="h4">Your contest is live!</CWText>
           <div className="content-container" style={animationStyles}>
             <CWText type="b1" className="description">
@@ -44,8 +49,14 @@ const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
               />
               <CWButton
                 containerClassName="cta-btn"
-                label="Go to contests"
-                onClick={() => navigate('/manage/contests')}
+                label={
+                  isFarcasterContest ? 'Copy Farcaster Frame' : 'Go to contests'
+                }
+                onClick={() =>
+                  isFarcasterContest
+                    ? console.log('Farcaster frame copied')
+                    : navigate('/manage/contests')
+                }
               />
             </div>
           </div>

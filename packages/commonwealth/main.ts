@@ -2,6 +2,7 @@ import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { GlobalActivityCache } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -15,25 +16,22 @@ import express, {
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import passport from 'passport';
-import { dirname } from 'path';
+import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import favicon from 'serve-favicon';
-import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
+import * as api from './server/api';
 import { config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
-import BanCache from './server/util/banCheckCache';
-import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
-import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const parseJson = json({ limit: '1mb' });
 
 /**
  * Bootstraps express app
@@ -45,24 +43,23 @@ export async function main(
     port,
     noGlobalActivityCache = true,
     withLoggingMiddleware = false,
-    withStatsMiddleware = false,
-    withFrontendBuild = false,
     withPrerender = false,
   }: {
     port: number;
     noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
-    withStatsMiddleware?: boolean;
-    withFrontendBuild?: boolean;
     withPrerender?: boolean;
   },
 ) {
-  const log = logger(__filename);
+  const log = logger(import.meta);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  // @ts-expect-error StrictNullChecks
+  sgMail.setApiKey(config.SENDGRID.API_KEY);
 
   const cacheDecorator = new CacheDecorator();
 
@@ -114,33 +111,12 @@ export async function main(
     // dynamic compression settings used
     app.use(compression());
 
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
-
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
       res.set('Content-Security-Policy', "frame-ancestors 'none';");
       next();
     });
-
-    // serve static files
-    app.use(favicon(`${__dirname}/favicon.ico`));
-    app.use('/robots.txt', express.static('robots.txt'));
-    app.use('/static', express.static('static'));
 
     withLoggingMiddleware &&
       app.use(
@@ -158,9 +134,12 @@ export async function main(
           },
         }),
       );
-    withStatsMiddleware && app.use(expressStatsInit());
 
-    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use((req, res, next) => {
+      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
+      else parseJson(req, res, next);
+    });
+
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
@@ -173,8 +152,6 @@ export async function main(
 
   setupMiddleware();
   setupPassport(db);
-
-  const banCache = new BanCache(db);
 
   // TODO: decouple as global singleton
   const globalActivityCache = GlobalActivityCache.getInstance(db);
@@ -191,35 +168,42 @@ export async function main(
     app,
     db,
     viewCountCache,
-    banCache,
     globalActivityCache,
     dbValidationService,
+    cacheDecorator,
   );
 
-  setupCosmosProxies(app, cacheDecorator);
-  setupIpfsProxy(app, cacheDecorator);
+  app.use('/robots.txt', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/robots.txt`);
+  });
 
-  if (withFrontendBuild) {
-    if (config.NODE_ENV !== 'production') {
-      // lazy import because we want to keep all of webpacks dependencies in devDependencies
-      const setupWebpackDevServer = (
-        await import('./server/scripts/setupWebpackDevServer')
-      ).default;
-      await setupWebpackDevServer(app);
-    } else {
-      app.use(
-        '/build',
-        express.static('build', {
-          setHeaders: (res) => {
-            res.setHeader('Cache-Control', 'public');
-          },
-        }),
-      );
-    }
-  }
+  app.use('/manifest.json', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
+  });
+
+  app.use(
+    '/assets',
+    express.static(path.join(__dirname, 'assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
+
+  app.use(
+    '/brand_assets',
+    express.static(path.join(__dirname, 'brand_assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
 
   app.get('*', (req: Request, res: Response) => {
-    log.info(`setupAppRoutes sendFiles ${req.path}`);
     res.sendFile(`${__dirname}/index.html`);
   });
 

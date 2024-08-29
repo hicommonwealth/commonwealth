@@ -1,25 +1,33 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread, { Link } from 'models/Thread';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface AddThreadLinksProps {
   communityId: string;
   threadId: number;
   links: Link[];
+  isPWA?: boolean;
 }
 
 const addThreadLinks = async ({
   threadId,
   links,
+  isPWA,
 }: AddThreadLinksProps): Promise<Thread> => {
   const response = await axios.post(
-    `${app.serverUrl()}/linking/addThreadLinks`,
+    `${SERVER_URL}/linking/addThreadLinks`,
     {
       thread_id: threadId,
       links,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
     },
   );
 
@@ -29,6 +37,7 @@ const addThreadLinks = async ({
 interface UseAddThreadLinksMutationProps {
   communityId: string;
   threadId: number;
+  isPWA?: boolean;
 }
 
 const useAddThreadLinksMutation = ({

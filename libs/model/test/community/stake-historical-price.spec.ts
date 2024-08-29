@@ -2,8 +2,9 @@ import { Actor, dispose, query } from '@hicommonwealth/core';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { bootstrap_testing, seed } from 'model/src/tester';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { GetStakeHistoricalPrice } from '../../src/community/GetStakeHistoricalPrice.query';
-import { seed } from '../../src/tester/index';
 
 chai.use(chaiAsPromised);
 
@@ -11,7 +12,8 @@ describe('Stake Historical Price', () => {
   let community_id: string;
   let actor: Actor;
 
-  before(async () => {
+  beforeAll(async () => {
+    await bootstrap_testing(true);
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
       name: 'Sepolia Testnet',
@@ -24,6 +26,8 @@ describe('Stake Historical Price', () => {
     });
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'admin',
@@ -42,7 +46,7 @@ describe('Stake Historical Price', () => {
 
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: community!.Addresses![0].address,
+      address: community!.Addresses![0].address,
     };
 
     community_id = community!.id!;
@@ -77,11 +81,11 @@ describe('Stake Historical Price', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should return undefined if no historical price', async () => {
+  test('should return undefined if no historical price', async () => {
     const results = await query(GetStakeHistoricalPrice(), {
       actor,
       payload: {
@@ -93,7 +97,7 @@ describe('Stake Historical Price', () => {
     expect(results).to.deep.equal([]);
   });
 
-  it('should return the historical price', async () => {
+  test('should return the historical price', async () => {
     const results = await query(GetStakeHistoricalPrice(), {
       actor,
       payload: {

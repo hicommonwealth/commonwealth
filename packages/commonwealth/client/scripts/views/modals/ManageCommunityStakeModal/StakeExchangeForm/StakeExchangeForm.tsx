@@ -13,9 +13,12 @@ import {
   useBuyStakeMutation,
   useSellStakeMutation,
 } from 'state/api/communityStake';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import NumberSelector from 'views/components/NumberSelector';
 import { Skeleton } from 'views/components/Skeleton';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -29,6 +32,7 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
 import {
@@ -40,9 +44,6 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from './CustomAddressOption';
-
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -60,7 +61,6 @@ interface StakeExchangeFormProps {
   numberOfStakeToExchange: number;
   onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
   denomination: string;
-  community?: ChainInfo;
 }
 
 const StakeExchangeForm = ({
@@ -73,16 +73,18 @@ const StakeExchangeForm = ({
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
   denomination,
-  community,
 }: StakeExchangeFormProps) => {
+  const user = useUserStore();
+
+  const { selectedCommunity: community } = useManageCommunityStakeModalStore();
+
   const chainRpc =
     community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
   const ethChainId =
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   // Use the `selectedAddress.value` if buying stake in a non active community (i.e app.activeChainId() != community.id)
-  const activeAccountAddress = community
-    ? selectedAddress?.value
-    : app?.user?.activeAccount?.address;
+  const activeAccountAddress =
+    (community ? selectedAddress?.value : user.activeAccount?.address) || '';
 
   const {
     buyPriceData,
@@ -94,7 +96,10 @@ const StakeExchangeForm = ({
     mode,
     address: selectedAddress?.value,
     numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
-    community,
+    community: {
+      namespace: community?.namespace,
+      ChainNode: community?.ChainNode,
+    },
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
@@ -118,6 +123,8 @@ const StakeExchangeForm = ({
   const isBuyMode = mode === 'buy';
 
   const communityId = community?.id || app.activeChainId();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -150,14 +157,18 @@ const StakeExchangeForm = ({
       onSetModalState(ManageCommunityStakeModalState.Success);
 
       // join user to community if not already a member
-      const isMemberOfCommunity = app.user.addresses.find(
+      const isMemberOfCommunity = user.addresses.find(
         (x) => x.community.id === communityId,
       );
       if (!isMemberOfCommunity) {
         await linkSpecificAddressToSpecificCommunity({
           address: selectedAddress?.value,
-          communityId: communityId,
-          communityChainBase: community?.base || app?.chain?.base,
+          community: {
+            id: communityId,
+            name: community?.name || app?.chain?.meta?.name,
+            base: community?.base || app?.chain?.base,
+            iconUrl: community?.iconUrl || app?.chain?.meta?.iconUrl,
+          },
           ...(app.activeChainId() && { activeChainId: app.activeChainId() }),
         });
       }
@@ -165,8 +176,9 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
         community: communityId,
-        userId: app?.user?.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.userId || 0,
         userAddress: selectedAddress?.value,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log('Error buying: ', err);
@@ -200,8 +212,9 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_SOLD,
         community: communityId,
-        userId: app?.user?.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.userId || 0,
         userAddress: selectedAddress?.value,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log('Error selling: ', err);

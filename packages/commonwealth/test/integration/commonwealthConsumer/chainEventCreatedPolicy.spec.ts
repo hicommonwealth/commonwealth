@@ -3,6 +3,7 @@ import { DB, tester } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 // eslint-disable-next-line max-len
 import { processChainEventCreated } from '../../../server/workers/commonwealthConsumer/policies/chainEventCreated/chainEventCreatedPolicy';
 
@@ -64,13 +65,14 @@ describe('ChainEventCreated Policy', () => {
   let models: DB;
   let chainNode, community;
 
-  before(async () => {
+  beforeAll(async () => {
     const res = await import('@hicommonwealth/model');
     models = res['models'];
     [chainNode] = await tester.seed(
       'ChainNode',
       {
         url: 'https://ethereum-sepolia.publicnode.com',
+        private_url: 'https://ethereum-sepolia.publicnode.com',
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
@@ -86,11 +88,12 @@ describe('ChainEventCreated Policy', () => {
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
       namespace_address: namespaceAddress,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'admin',
           user_id: user!.id,
-          profile_id: undefined,
         },
       ],
       CommunityStakes: [
@@ -104,15 +107,15 @@ describe('ChainEventCreated Policy', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  afterEach('Clear Stake Transactions', async () => {
+  afterEach(async () => {
     await models.StakeTransaction.truncate();
   });
 
-  it("should save stake transactions that don't exist", async () => {
+  test("should save stake transactions that don't exist", async () => {
     await processValidStakeTransaction(chainNode.id);
     const txns = await models.StakeTransaction.findAll();
     expect(txns.length).to.equal(1);
@@ -128,7 +131,7 @@ describe('ChainEventCreated Policy', () => {
     });
   });
 
-  it('should ignore stake transactions that already exist', async () => {
+  test('should ignore stake transactions that already exist', async () => {
     await tester.seed('StakeTransaction', {
       transaction_hash: transactionHash,
       community_id: community.id,

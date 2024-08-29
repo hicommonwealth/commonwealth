@@ -46,14 +46,14 @@ export const convertTwitterLinksToEmbeds = (
   const newContent = _.cloneDeep(content);
 
   for (let i = 0; i < (newContent.ops?.length || 0); i++) {
-    const op = newContent.ops[i];
-    const link = op.attributes?.link || '';
+    const op = newContent.ops?.[i];
+    const link = op?.attributes?.link || '';
     if (link) {
       const embeddableTweet = twitterLinkRegex.test(link);
       if (embeddableTweet) {
         const id = link.match(twitterLinkRegex)[1];
         if (typeof id === 'string' && id) {
-          newContent.ops[i] = {
+          newContent.ops![i] = {
             insert: {
               twitter: {
                 id,
