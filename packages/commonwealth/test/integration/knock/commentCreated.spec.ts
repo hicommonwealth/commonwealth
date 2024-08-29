@@ -61,6 +61,8 @@ describe('CommentCreated Event Handler', () => {
     [community] = await tester.seed('Community', {
       custom_domain: customDomain,
       chain_node_id: chainNode?.id,
+      lifetime_thread_count: 0,
+      profile_count: 2,
       Addresses: [
         {
           role: 'member',

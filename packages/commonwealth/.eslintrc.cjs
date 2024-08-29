@@ -4,6 +4,7 @@ module.exports = {
   parserOptions: {
     sourceType: 'module',
     ecmaVersion: 'latest',
+    suppressDeprecatedPropertyWarnings: true,
   },
   settings: {
     'import/resolver': {

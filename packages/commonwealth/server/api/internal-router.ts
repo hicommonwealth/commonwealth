@@ -13,6 +13,7 @@ import * as subscription from './subscription';
 import * as thread from './threads';
 import * as user from './user';
 import * as wallet from './wallet';
+import * as webhook from './webhook';
 
 const api = {
   user: user.trpcRouter,
@@ -23,7 +24,7 @@ const api = {
   contest: contest.trpcRouter,
   subscription: subscription.trpcRouter,
   loadTest: loadTest.trpcRouter,
-  wallet: wallet.trpcRouter,
+  webhook: webhook.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

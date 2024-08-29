@@ -21,14 +21,14 @@ export const paginationSchema = {
   page: z.coerce.number().int().default(1).describe('The page returned'),
 };
 
-export const discordMetaSchema = {
+export const DiscordMetaSchema = z.object({
   user: z.object({
     id: z.string(),
     username: z.string(),
   }),
   channel_id: z.string(),
   message_id: z.string(),
-};
+});
 
 export const linksSchema = {
   source: z.nativeEnum(LinkSource),

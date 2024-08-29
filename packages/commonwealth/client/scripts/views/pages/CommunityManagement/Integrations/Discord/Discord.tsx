@@ -6,6 +6,7 @@ import {
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
 } from 'state/api/communities';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import {
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
@@ -35,6 +36,8 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community?.discord_config_id ? 'connected' : 'none',
   );
+
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const queryParams = useMemo(() => {
     return new URLSearchParams(window.location.search);
@@ -73,16 +76,19 @@ const Discord = () => {
     try {
       const verificationToken = uuidv4();
       await app.discord.createConfig(verificationToken);
-      const isCustomDomain = app.isCustomDomain();
 
       const redirectURL = encodeURI(
-        !isCustomDomain ? window.location.origin : 'https://commonwealth.im',
+        !domain?.isCustomDomain
+          ? window.location.origin
+          : 'https://commonwealth.im',
       );
       const currentState = encodeURI(
         JSON.stringify({
           cw_chain_id: app.activeChainId(),
           verification_token: verificationToken,
-          redirect_domain: isCustomDomain ? window.location.origin : undefined,
+          redirect_domain: domain?.isCustomDomain
+            ? window.location.origin
+            : undefined,
         }),
       );
       const link =
@@ -96,7 +102,7 @@ const Discord = () => {
       notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
     }
-  }, [connectionStatus]);
+  }, [connectionStatus, domain?.isCustomDomain]);
 
   const onDisconnect = useCallback(async () => {
     if (connectionStatus === 'connecting' || connectionStatus === 'none')

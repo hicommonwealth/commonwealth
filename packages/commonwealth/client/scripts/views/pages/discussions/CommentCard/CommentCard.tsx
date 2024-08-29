@@ -14,7 +14,6 @@ import {
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
@@ -101,8 +100,6 @@ export const CommentCard = ({
   shareURL,
 }: CommentCardProps) => {
   const user = useUserStore();
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
-
   const userOwnsComment = comment.profile.userId === user.id;
 
   const [commentText, setCommentText] = useState(comment.text);
@@ -154,7 +151,12 @@ export const CommentCard = ({
             // @ts-expect-error <StrictNullChecks/>
             authorAddress={app.chain ? author?.address : comment?.author}
             // @ts-expect-error <StrictNullChecks/>
-            authorCommunityId={author?.community?.id || author?.profile?.chain}
+            authorCommunityId={
+              author?.community?.id ||
+              author?.profile?.chain ||
+              comment?.communityId ||
+              comment?.authorChain
+            }
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
@@ -259,7 +261,7 @@ export const CommentCard = ({
                 />
               )}
 
-              {enableKnockInAppNotifications && user.id > 0 && (
+              {user.id > 0 && (
                 <ToggleCommentSubscribe
                   comment={comment}
                   userOwnsComment={userOwnsComment}

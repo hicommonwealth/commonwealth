@@ -7,8 +7,15 @@ import {
   ThreadAttributes,
   ThreadInstance,
   UserInstance,
+  emitMentions,
+  findMentionDiff,
+  parseUserMentions,
 } from '@hicommonwealth/model';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import {
+  NotificationCategories,
+  ProposalType,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
 import _ from 'lodash';
 import {
   Op,
@@ -18,12 +25,7 @@ import {
   WhereOptions,
 } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import {
-  emitMentions,
-  findMentionDiff,
-  parseUserMentions,
-} from '../../util/parseUserMentions';
+import { validURL } from '../../../shared/utils';
 import { findAllRoles } from '../../util/roles';
 import { addVersionHistory } from '../../util/versioning';
 import { TrackOptions } from '../server_analytics_controller';
@@ -136,14 +138,7 @@ export async function __updateThread(
   );
   const isContestThread = contestManagers.length > 0;
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   // get various permissions
   const userOwnedAddressIds = (await user.getAddresses())
