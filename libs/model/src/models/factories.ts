@@ -1,3 +1,5 @@
+console.log('FIXME: START ' + import.meta.url);
+
 import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
@@ -106,3 +108,5 @@ export type DB = {
   sequelize: Sequelize.Sequelize;
   Sequelize: typeof Sequelize.Sequelize;
 };
+
+console.log('FIXME: END ' + import.meta.url);

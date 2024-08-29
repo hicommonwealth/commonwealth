@@ -1,3 +1,5 @@
+console.log('FIXME: START ' + import.meta.url);
+
 import { decamelize } from '@hicommonwealth/shared';
 import {
   Model,
@@ -277,3 +279,5 @@ export const syncHooks = {
     options.logging = false;
   },
 };
+
+console.log('FIXME: END ' + import.meta.url);

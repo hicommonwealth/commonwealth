@@ -1,3 +1,5 @@
+console.log('FIXME: START ' + import.meta.url);
+
 import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
@@ -94,3 +96,5 @@ export const config = configure(
       ),
   }),
 );
+
+console.log('FIXME: END ' + import.meta.url);

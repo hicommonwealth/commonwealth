@@ -1,5 +1,7 @@
 import { Attributes, Model, ModelStatic } from 'sequelize';
 
+console.log('FIXME init types.ts... 1');
+
 export type State = Record<string, unknown>;
 export type ModelInstance<Attrs extends State> = Model<Attrs> & Attrs;
 

@@ -1,4 +1,10 @@
+console.log('FIXME: START ' + import.meta.url);
+
+console.log('FIXME init associations... 1');
+
 import type { DB } from './factories';
+
+console.log('FIXME init associations... 2');
 
 /**
  * Associates models with type safety
@@ -230,3 +236,6 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'community_id',
   });
 };
+
+console.log('FIXME done associations... 1');
+console.log('FIXME: END ' + import.meta.url);
