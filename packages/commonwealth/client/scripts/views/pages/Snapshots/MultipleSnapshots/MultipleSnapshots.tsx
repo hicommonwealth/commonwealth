@@ -1,15 +1,18 @@
+import React from 'react';
+
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
-import 'pages/snapshot/multiple_snapshots_page.scss';
-import React from 'react';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { Skeleton } from 'views/components/Skeleton';
+import { CardsCollection } from 'views/components/cards_collection';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { Skeleton } from '../../components/Skeleton';
-import { CardsCollection } from '../../components/cards_collection';
+
 import { SnapshotSpaceCard } from './SnapshotSpaceCard';
 
-const MultipleSnapshotsPage = () => {
+import './MultipleSnapshots.scss';
+
+const MultipleSnapshots = () => {
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId(),
   });
@@ -29,7 +32,7 @@ const MultipleSnapshotsPage = () => {
 
     return (
       <CWPageLayout>
-        <div className="MultipleSnapshotsPage">
+        <div className="MultipleSnapshots">
           <Skeleton count={1} width="40%" />
           <br />
           <CardsCollection
@@ -49,7 +52,7 @@ const MultipleSnapshotsPage = () => {
 
   return (
     <CWPageLayout>
-      <div className="MultipleSnapshotsPage">
+      <div className="MultipleSnapshots">
         {app.chain && spacesMetadata && (
           <CardsCollection
             content={spacesMetadata.map((data, index) => (
@@ -66,4 +69,4 @@ const MultipleSnapshotsPage = () => {
   );
 };
 
-export default MultipleSnapshotsPage;
+export default MultipleSnapshots;

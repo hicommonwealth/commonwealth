@@ -1,7 +1,9 @@
-import 'pages/snapshot/SnapshotSpaceCard.scss';
 import React from 'react';
-import { Skeleton } from '../../components/Skeleton';
-import { CWCard } from '../../components/component_kit/cw_card';
+
+import { CWCard } from 'views/components/component_kit/cw_card';
+import { Skeleton } from 'views/components/Skeleton';
+
+import './SnapshotSpaceCard.scss';
 
 export const SnapshotSpaceCardSkeleton = () => {
   return (

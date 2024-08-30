@@ -87,7 +87,7 @@ const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
-  () => import('views/pages/view_multiple_snapshot_spaces'),
+  () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
 const ViewSnapshotsProposalPage = lazy(
   () => import('views/pages/view_snapshot_proposal'),
