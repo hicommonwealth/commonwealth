@@ -57,7 +57,6 @@ export async function __createGroup(
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
@@ -108,7 +107,7 @@ export async function __createGroup(
   const createGroupWithTransaction = async (t: Transaction) => {
     const group = await this.models.Group.create(
       {
-        // @ts-expect-error StrictNullChecks
+        id: 0,
         community_id: community.id,
         metadata,
         requirements,
