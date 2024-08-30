@@ -70,7 +70,6 @@ export const ThreadSubscription = z.object({
         }),
       }),
     )
-    .optional()
     .nullish(),
 });
 
@@ -111,7 +110,6 @@ export const CommentSubscription = z.object({
               }),
             }),
           )
-          .optional()
           .nullish(),
       }),
     )
