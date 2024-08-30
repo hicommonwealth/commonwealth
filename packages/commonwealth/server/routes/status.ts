@@ -31,7 +31,6 @@ type StatusResp = {
     isAdmin: boolean;
     disableRichText: boolean;
     communities: StarredCommunityAttributes[];
-    starredCommunities: StarredCommunityAttributes[];
   };
   communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
