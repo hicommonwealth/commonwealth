@@ -3,7 +3,6 @@ import assert from 'assert';
 
 import {
   CANVAS_TOPIC,
-  NotificationCategories,
   addressSwapper,
   getSessionSignerForAddress,
 } from '@hicommonwealth/shared';
@@ -92,16 +91,6 @@ const verifySessionSignature = async (
           return userEntity;
         });
         if (!user || !user.id) throw new Error('Failed to create user');
-        await models.Subscription.create({
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewMention,
-          is_active: true,
-        });
-        await models.Subscription.create({
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewCollaboration,
-          is_active: true,
-        });
         addressModel.user_id = user!.id;
       }
     }

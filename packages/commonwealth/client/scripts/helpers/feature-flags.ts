@@ -22,9 +22,6 @@ const buildFlag = (env: string | undefined) => {
 // vite.config.ts (locally) or in Unleash (remote apps) or they won't be passed to the frontend.
 const featureFlags = {
   contest: buildFlag(process.env.FLAG_CONTEST),
-  knockInAppNotifications: buildFlag(
-    process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
-  ),
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
   knockPushNotifications: buildFlag(
     process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,

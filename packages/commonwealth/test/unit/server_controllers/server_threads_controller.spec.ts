@@ -3,7 +3,6 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
-import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 import { afterEach, beforeEach, describe, test } from 'vitest';
 
 chai.use(chaiAsPromised);
@@ -99,59 +98,24 @@ describe('ServerThreadsController', () => {
         address: '0x123',
         community_id: 'ethereum',
       };
-      const chain = {
-        id: 'ethereum',
-      };
-      const banCache = BAN_CACHE_MOCK_FN(chain.id);
       const reaction = {};
       const threadId = 123;
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
-      const [newReaction, notificationOptions, analyticsOptions] =
+      const [newReaction, analyticsOptions] =
         await serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user: user,
+          // @ts-expect-error ignore type
+          address: address,
+          // @ts-expect-error ignore type
+          reaction: reaction,
           threadId: threadId,
         });
 
-      expect(
-        serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          reaction: reaction as any,
-          threadId: threadId,
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
-
       expect(newReaction).to.be.ok;
-
-      expect(notificationOptions).to.have.property('notification');
-      const { notification } = notificationOptions;
-      expect(notification).to.have.property('categoryId', 'new-reaction');
-
-      expect(notification.data).to.have.property('created_at');
-      expect(notification.data).to.include({
-        thread_id: 4,
-        root_title: 'Big Thread!',
-        root_type: 'discussion',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-
-      expect(notificationOptions).to.have.property('excludeAddresses');
-      const { excludeAddresses } = notificationOptions;
-      // @ts-expect-error StrictNullChecks
-      expect(excludeAddresses[0]).to.equal('0x123');
-
       expect(analyticsOptions).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
@@ -193,9 +157,6 @@ describe('ServerThreadsController', () => {
           query: sandbox.stub().resolves([]),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -203,16 +164,17 @@ describe('ServerThreadsController', () => {
       const address = {};
       const reaction = {};
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user: user,
+          // @ts-expect-error ignore type
+          address: address,
+          // @ts-expect-error ignore type
+          reaction: reaction,
           threadId: 123,
         }),
       ).to.be.rejectedWith('Thread not found: 123');
@@ -255,9 +217,6 @@ describe('ServerThreadsController', () => {
           }),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -266,84 +225,20 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
+          reaction,
           threadId,
         }),
       ).to.be.rejectedWith('Thread is archived');
-    });
-
-    test('should throw error (banned)', () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            chain: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              chain: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Thread: {
-          findOne: sandbox.stub().resolves({
-            id: 4,
-            title: 'Big Thread!',
-            community_id: 'ethereum',
-          }),
-        },
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-        },
-      };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([false, 'big ban err']),
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {};
-      const reaction = {};
-      const threadId = 123;
-
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
-
-      expect(
-        serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
-          threadId,
-        }),
-      ).to.be.rejectedWith('Ban error: big ban err');
     });
 
     test('should throw error (token balance)', () => {
@@ -450,9 +345,6 @@ describe('ServerThreadsController', () => {
           query: sandbox.stub().resolves([]),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -463,16 +355,17 @@ describe('ServerThreadsController', () => {
       const reaction = {};
       const threadId = 123;
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          reaction: reaction as any,
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
+          reaction,
           threadId,
         }),
       ).to.be.rejectedWith(
@@ -537,8 +430,8 @@ describe('ServerThreadsController', () => {
         CommentVersionHistory: {
           create: () => null,
         },
-        Subscription: {
-          bulkCreate: async () => ({}),
+        CommentSubscription: {
+          create: () => null,
         },
         Topic: {
           findOne: async () => ({
@@ -553,20 +446,17 @@ describe('ServerThreadsController', () => {
           bulkCreate: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
-      const [newComment, notificationOptions, analyticsOptions] =
+      const [newComment, analyticsOptions] =
         await serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -580,81 +470,10 @@ describe('ServerThreadsController', () => {
         address_id: address.id,
         community_id: 'ethereum',
       });
-      expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
         event: 'Create New Comment',
         community: 'ethereum',
       });
-    });
-
-    test('should throw error (banned)', () => {
-      const db = {
-        Thread: {
-          findOne: async () => ({
-            save: async () => ({}),
-          }),
-        },
-        // for findAllRoles
-        CommunityRole: {
-          findAll: async () => [
-            {
-              toJSON: () => ({}),
-            },
-          ],
-        },
-        sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
-          query: () => Promise.resolve([]),
-        },
-        Comment: {
-          create: async () => ({}),
-          findOne: async () => ({
-            Address: {
-              id: 1,
-              address: '0x123',
-            },
-            destroy: async () => ({}),
-            toJSON: () => ({}),
-          }),
-        },
-        Subscription: {
-          create: async () => ({}),
-        },
-      };
-      const banCache = {
-        checkBan: async () => [false, 'big bad error'],
-      };
-
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
-
-      const user = {};
-      const address = {
-        id: 1,
-        address: '0x123',
-        save: async () => ({}),
-      };
-      const parentId = null;
-      const threadId = 1;
-      const text = 'hello';
-
-      expect(
-        serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
-          // @ts-expect-error StrictNullChecks
-          parentId,
-          threadId,
-          text,
-          canvasHash: undefined,
-          canvasSignedData: undefined,
-        }),
-      ).to.be.rejectedWith('Ban error: big bad error');
     });
 
     test('should throw error (thread not found)', () => {
@@ -692,14 +511,9 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -713,9 +527,11 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -787,20 +603,17 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -848,14 +661,9 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -869,9 +677,11 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
-          // @ts-expect-error StrictNullChecks
+          // @ts-expect-error ignore type
+          user: user,
+          // @ts-expect-error ignore type
+          address: address,
+          // @ts-expect-error ignore type
           parentId,
           threadId,
           text,
@@ -924,14 +734,9 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -944,8 +749,10 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error ignore type
+          user: user,
+          // @ts-expect-error ignore type
+          address: address,
           parentId,
           threadId,
           text,
@@ -994,14 +801,9 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
 
       const user = {};
       const address = {
@@ -1015,8 +817,10 @@ describe('ServerThreadsController', () => {
 
       expect(
         serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
+          // @ts-expect-error ignore type
+          user: user,
+          // @ts-expect-error ignore type
+          address: address,
           parentId,
           threadId,
           text,
@@ -1061,34 +865,23 @@ describe('ServerThreadsController', () => {
           query: () => Promise.resolve([]),
         },
       };
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const address = {
         address: '0x123',
       };
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
       const threadId = 1;
       await serverThreadsController.deleteThread({
-        user: user as any,
+        // @ts-expect-error ignore type
+        user: user,
         threadId,
-        address: address as any,
+        // @ts-expect-error ignore type
+        address: address,
       });
-
-      expect(
-        serverThreadsController.deleteThread({
-          user: user as any,
-          threadId,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
     });
 
     test('should should throw error (thread not found)', () => {
@@ -1111,13 +904,9 @@ describe('ServerThreadsController', () => {
           query: () => Promise.resolve([]),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
@@ -1127,60 +916,13 @@ describe('ServerThreadsController', () => {
       };
       expect(
         serverThreadsController.deleteThread({
-          user: user as any,
+          // @ts-expect-error ignore type
+          user: user,
           threadId,
-          address: address as any,
+          // @ts-expect-error ignore type
+          address: address,
         }),
       ).to.be.rejectedWith('Thread not found: 1');
-    });
-
-    test('should throw error (banned)', () => {
-      const db = {
-        Thread: {
-          findOne: async () => ({
-            id: 1,
-            Address: {
-              id: 1,
-              address: '0x123',
-            },
-          }),
-          destroy: async () => ({}),
-        },
-        CommunityRole: {
-          findAll: async () => [
-            {
-              toJSON: () => ({}),
-            },
-          ],
-        },
-        Subscription: {
-          destroy: async () => ({}),
-        },
-        sequelize: {
-          query: () => Promise.resolve([]),
-        },
-      };
-      const banCache = {
-        checkBan: async () => [false, 'bad'],
-      };
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
-      const user = {
-        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
-      };
-      const threadId = 1;
-      const address = {
-        address: '0x123',
-      };
-      expect(
-        serverThreadsController.deleteThread({
-          user: user as any,
-          threadId,
-          address: address as any,
-        }),
-      ).to.be.rejectedWith('Ban error: bad');
     });
 
     test('should throw error (not owned)', () => {
@@ -1208,13 +950,9 @@ describe('ServerThreadsController', () => {
           query: () => Promise.resolve([]),
         },
       };
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
+
+      // @ts-expect-error ignore type
+      const serverThreadsController = new ServerThreadsController(db);
       const user = {
         // address is different from thread author
         getAddresses: async () => [{ id: 2, address: '0x124', verified: true }],
@@ -1225,166 +963,13 @@ describe('ServerThreadsController', () => {
       };
       expect(
         serverThreadsController.deleteThread({
-          user: user as any,
+          // @ts-expect-error ignore type
+          user: user,
           threadId,
-          address: address as any,
+          // @ts-expect-error ignore type
+          address: address,
         }),
       ).to.be.rejectedWith('Not owned by this user');
-    });
-  });
-
-  describe('#createThread', () => {
-    test('should create a thread', async () => {
-      let data = {};
-
-      const db = {
-        CommunityRole: {
-          findAll: async () => [
-            {
-              toJSON: () => ({
-                chain_id: 'ethereum',
-                name: 'member',
-                allow: '0',
-                deny: '0',
-                RoleAssignments: [{}],
-              }),
-            },
-          ],
-        },
-        Chain: {
-          findOne: async () => ({}),
-        },
-        sequelize: {
-          transaction: async (callback) => {
-            return callback();
-          },
-          query: async () => ({}),
-        },
-        Group: {
-          findAll: async () => [],
-        },
-        Topic: {
-          findOrCreate: async () => ({}),
-          findOne: async () => ({
-            group_ids: [],
-          }),
-        },
-        Thread: {
-          findOne: async () => ({
-            ...data,
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            toJSON: () => ({
-              ...data,
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-            }),
-          }),
-          create: async (d) => {
-            data = {
-              id: 1,
-              ...d,
-            };
-            return data;
-          },
-        },
-        Subscription: {
-          bulkCreate: async () => ({}),
-        },
-        Address: {
-          findAll: async () => [{}], // used in findOneRole
-        },
-        CommentVersionHistory: {
-          create: () => null,
-        },
-        ThreadVersionHistory: {
-          create: () => null,
-        },
-      };
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
-      const serverThreadsController = new ServerThreadsController(
-        db as any,
-        banCache as any,
-      );
-      const user = {
-        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
-      };
-      const address = {
-        id: 1,
-        address: '0x123',
-        chain: 'ethereum',
-        save: async () => ({}),
-      };
-      const chain = {
-        id: 'ethereum',
-      };
-      const body = 'hello';
-      const kind = 'discussion';
-      const readOnly = false;
-      const topicId = 1;
-      const title = 'mythread';
-      const stage = 'stage';
-      const url = 'http://blah';
-
-      const [thread, notificationOptions] =
-        await serverThreadsController.createThread({
-          user: user as any,
-          address: address as any,
-          community: chain as any,
-          title,
-          body,
-          kind,
-          readOnly,
-          topicId,
-          stage,
-          url,
-          canvasHash: undefined,
-          canvasSignedData: undefined,
-        });
-
-      expect(
-        serverThreadsController.createThread({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          community: chain as any,
-          title,
-          body,
-          kind,
-          readOnly,
-          topicId,
-          stage,
-          url,
-          canvasHash: undefined,
-          canvasSignedData: undefined,
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
-
-      expect(thread.title).to.equal(title);
-      expect(thread.body).to.equal(body);
-      expect(thread.stage).to.equal(stage);
-
-      expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.have.property('notification');
-      expect(notificationOptions[0].notification).to.include({
-        categoryId: 'new-thread-creation',
-      });
-      expect(notificationOptions[0].notification.data).to.include({
-        thread_id: 1,
-        root_type: 'discussion',
-        root_title: 'mythread',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-      // @ts-expect-error StrictNullChecks
-      expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });
   });
 });
