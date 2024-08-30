@@ -145,7 +145,7 @@ async function isTopicMember(
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
     where: {
-      group_id: { [Op.in]: allowed.map((g) => g.id) },
+      group_id: { [Op.in]: allowed.map((g) => g.id!) },
       address_id: actor.addressId,
     },
     include: [

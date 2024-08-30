@@ -606,7 +606,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createCommunity: async (args: CommunityArgs) => {
     const res = await chai
       .request(app)
-      .post(`/api/v1/CreateCommunity/${args.id}`)
+      .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
       //.set('address', address.split(':')[2])
       .send({
