@@ -309,55 +309,65 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           transaction,
         });
 
-        await models.Community.create({
-          id,
-          name,
-          default_symbol,
-          icon_url,
-          description,
-          network,
-          type,
-          social_links: uniqueLinksArray,
-          base,
-          bech32_prefix,
-          active: true,
-          chain_node_id: node.id,
-          token_name,
-          has_chain_events_listener:
-            network === 'aave' || network === 'compound',
-          default_page: DefaultPage.Discussions,
-          has_homepage: 'true',
-          collapsed_on_homepage: false,
-          custom_stages: [],
-          directory_page_enabled: false,
-          snapshot_spaces: [],
-          stages_enabled: true,
-        });
+        await models.Community.create(
+          {
+            id,
+            name,
+            default_symbol,
+            icon_url,
+            description,
+            network,
+            type,
+            social_links: uniqueLinksArray,
+            base,
+            bech32_prefix,
+            active: true,
+            chain_node_id: node.id,
+            token_name,
+            has_chain_events_listener:
+              network === 'aave' || network === 'compound',
+            default_page: DefaultPage.Discussions,
+            has_homepage: 'true',
+            collapsed_on_homepage: false,
+            custom_stages: [],
+            directory_page_enabled: false,
+            snapshot_spaces: [],
+            stages_enabled: true,
+          },
+          { transaction },
+        );
 
-        await models.Topic.create({
-          community_id: id,
-          name: 'General',
-          featured_in_sidebar: true,
-        });
+        await models.Topic.create(
+          {
+            community_id: id,
+            name: 'General',
+            featured_in_sidebar: true,
+          },
+          { transaction },
+        );
 
-        await models.Address.create({
-          user_id: actor.user.id,
-          address: admin_address.address,
-          community_id: id,
-          hex:
-            base === ChainBase.CosmosSDK
-              ? bech32ToHex(admin_address.address)
-              : undefined,
-          verification_token: admin_address.verification_token,
-          verification_token_expires: admin_address.verification_token_expires,
-          verified: admin_address.verified,
-          wallet_id: admin_address.wallet_id,
-          is_user_default: true,
-          role: 'admin',
-          last_active: new Date(),
-          ghost_address: false,
-          is_banned: false,
-        });
+        await models.Address.create(
+          {
+            user_id: actor.user.id,
+            address: admin_address.address,
+            community_id: id,
+            hex:
+              base === ChainBase.CosmosSDK
+                ? bech32ToHex(admin_address.address)
+                : undefined,
+            verification_token: admin_address.verification_token,
+            verification_token_expires:
+              admin_address.verification_token_expires,
+            verified: admin_address.verified,
+            wallet_id: admin_address.wallet_id,
+            is_user_default: true,
+            role: 'admin',
+            last_active: new Date(),
+            ghost_address: false,
+            is_banned: false,
+          },
+          { transaction },
+        );
       });
       // == end of command transaction boundary ==
 
