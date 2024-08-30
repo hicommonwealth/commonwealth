@@ -15,7 +15,7 @@ import {
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import z from 'zod';
-import { models } from '..';
+import { models } from '../database';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
