@@ -46,8 +46,8 @@ export const createThreadReactionHandler = async (
   }
 
   const reactionFields: CreateThreadReactionOptions = {
-    user,
-    address: address,
+    user: user!,
+    address: address!,
     reaction,
     threadId,
   };

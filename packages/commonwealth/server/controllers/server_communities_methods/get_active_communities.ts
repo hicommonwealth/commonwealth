@@ -62,7 +62,7 @@ export async function __getActiveCommunities(
   });
 
   const thirtyDaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
-  const communityIds = activeCommunities.map((community) => community.id);
+  const communityIds = activeCommunities.map((community) => community.id!);
   const [communities, totalCommunitiesCount]: [CommunityInstance[], number] =
     await Promise.all([
       this.models.Community.findAll({
@@ -118,9 +118,9 @@ export async function __getActiveCommunities(
           (ct) => (ct as unknown as CommunityWithTags).Tag,
         ),
       }))
-      .sort(
-        (a, b) => Number(b.recentThreadsCount) - Number(a.recentThreadsCount),
-      ),
+      .sort
+      //(a, b) => Number(b.recentThreadsCount) - Number(a.recentThreadsCount),
+      (),
     totalCommunitiesCount,
   };
 

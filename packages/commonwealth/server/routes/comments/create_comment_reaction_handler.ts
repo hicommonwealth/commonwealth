@@ -44,8 +44,8 @@ export const createCommentReactionHandler = async (
   }
 
   const commentReactionFields: CreateCommentReactionOptions = {
-    user,
-    address,
+    user: user!,
+    address: address!,
     reaction,
     commentId,
   };

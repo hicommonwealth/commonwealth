@@ -168,7 +168,7 @@ export const status = async (
         communityWithRedirects: communityWithRedirects || [],
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
-      });
+      } as StatusResp);
     }
   } catch (error) {
     console.log(error);
