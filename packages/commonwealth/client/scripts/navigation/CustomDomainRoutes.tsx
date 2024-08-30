@@ -81,7 +81,7 @@ const Contests = lazy(() => import('views/pages/Contests'));
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
 const SnapshotProposalPage = lazy(
-  () => import('views/pages/snapshot_proposals'),
+  () => import('views/pages/Snapshots/SnapshotProposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
   () => import('views/pages/Snapshots/MultipleSnapshots'),

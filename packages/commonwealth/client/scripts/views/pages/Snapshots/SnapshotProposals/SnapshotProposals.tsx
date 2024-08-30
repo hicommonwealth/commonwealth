@@ -1,26 +1,28 @@
+import moment from 'moment';
 import React, { useState } from 'react';
+import app from 'state';
 
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import moment from 'moment';
-import 'pages/snapshot_proposals.scss';
-import app from 'state';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { CardsCollection } from 'views/components/cards_collection';
+import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
-import { CardsCollection } from '../../components/cards_collection';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
-} from '../../components/component_kit/new_designs/CWTabs';
+} from 'views/components/component_kit/new_designs/CWTabs';
+
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 
-type SnapshotProposalsPageProps = {
+import './SnapshotProposals.scss';
+
+type SnapshotProposalsProps = {
   topic?: string;
   snapshotId: string;
 };
 
-const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
+const SnapshotProposals = ({ snapshotId }: SnapshotProposalsProps) => {
   const [activeTab, setActiveTab] = useState<number>(1);
   const [isSnapshotProposalsLoading, setIsSnapshotProposalsLoading] =
     useState<boolean>(true);
@@ -64,7 +66,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   return (
     <CWPageLayout>
-      <div className="SnapshotProposalsPage">
+      <div className="SnapshotProposals">
         <CWText type="h2" fontWeight="medium" className="header">
           Snapshots
         </CWText>
@@ -113,4 +115,4 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
   );
 };
 
-export default SnapshotProposalsPage;
+export default SnapshotProposals;

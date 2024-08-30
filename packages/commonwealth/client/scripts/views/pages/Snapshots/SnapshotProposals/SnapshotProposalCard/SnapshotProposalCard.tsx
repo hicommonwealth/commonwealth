@@ -1,14 +1,17 @@
-import 'components/ProposalCard/ProposalCard.scss';
+import moment from 'moment';
+import React from 'react';
+
 import { formatLastUpdated, formatTimestamp } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
 import app from 'state';
-import { ProposalTag } from '../../components/ProposalCard/ProposalTag';
-import { CWCard } from '../../components/component_kit/cw_card';
-import { CWText } from '../../components/component_kit/cw_text';
+import { ProposalTag } from 'views/components/ProposalCard/ProposalTag';
+import { CWCard } from 'views/components/component_kit/cw_card';
+import { CWText } from 'views/components/component_kit/cw_text';
+
 import { SnapshotProposalCardSkeleton } from './SnapshotProposalCardSkeleton';
+
+import './SnapshotProposalCard.scss';
 
 type SnapshotProposalCardProps = {
   snapshotId: string;
