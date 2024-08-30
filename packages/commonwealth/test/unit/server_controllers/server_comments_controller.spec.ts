@@ -558,6 +558,7 @@ describe('ServerCommentsController', () => {
       const db = {
         sequelize: {
           query: Promise.resolve([]),
+          transaction: (callback) => Promise.resolve(callback()),
         },
         Address: {
           findAll: async () => [{ address_id: 1 }], // used in findOneRole
@@ -572,7 +573,7 @@ describe('ServerCommentsController', () => {
           }),
           update: () => ({}),
         },
-        Subscription: {
+        CommentSubscription: {
           destroy: async () => ({}),
         },
       };
