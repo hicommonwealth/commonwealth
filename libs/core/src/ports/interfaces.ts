@@ -202,6 +202,7 @@ export enum BrokerSubscriptions {
   DiscordListener = 'DiscordMessage',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
+  NotificationsSettings = 'NotificationsSettings',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
 }

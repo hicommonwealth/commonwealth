@@ -120,6 +120,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.NotificationsSettings]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
     [RascalQueues.ContestWorkerPolicy]: {
       ...queueConfig,
       options: {
@@ -156,8 +162,13 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.NotificationsProviderChainEventCreated,
         RascalRoutingKeys.NotificationsProviderSnapshotProposalCreated,
         RascalRoutingKeys.NotificationsProviderUserMentioned,
-        RascalRoutingKeys.NotificationsProviderPreferencesUpdated,
       ],
+    },
+    [RascalBindings.NotificationsSettings]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsSettings,
+      destinationType: 'queue',
+      bindingKeys: [RascalRoutingKeys.NotificationsSettingsPreferencesUpdated],
     },
     [RascalBindings.ContestWorkerPolicy]: {
       source: RascalExchanges.MessageRelayer,
@@ -213,6 +224,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.ContestProjection]: {
       queue: RascalQueues.ContestProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.NotificationsSettings]: {
+      queue: RascalQueues.NotificationsSettings,
       ...subscriptionConfig,
     },
   };
