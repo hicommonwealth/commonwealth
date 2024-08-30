@@ -1,6 +1,7 @@
 import { Actor, events, logger, Policy } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { config, Contest } from '..';
+import { config } from '../config';
+import { GetActiveContestManagers } from '../contest/GetActiveContestManagers.query';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
 import { buildThreadContentUrl } from '../utils/utils';
@@ -31,14 +32,13 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload.id!,
         );
 
-        const activeContestManagers =
-          await Contest.GetActiveContestManagers().body({
-            actor: {} as Actor,
-            payload: {
-              community_id: payload.community_id,
-              topic_id: payload.topic_id,
-            },
-          });
+        const activeContestManagers = await GetActiveContestManagers().body({
+          actor: {} as Actor,
+          payload: {
+            community_id: payload.community_id,
+            topic_id: payload.topic_id,
+          },
+        });
         if (!activeContestManagers?.length) {
           log.warn('ThreadCreated: no matching contest managers found');
           return;
