@@ -2,10 +2,12 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
+  ENFORCE_SESSION_KEYS,
   TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
+  DEFAULT_COMMONWEALTH_LOGO,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
@@ -16,6 +18,10 @@ const {
   ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
   ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
   ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+  ALCHEMY_AA_PRIVATE_KEY,
+  ALCHEMY_AA_KEY,
+  ALCHEMY_AA_GAS_POLICY,
+  FLAG_COMMON_WALLET,
   SITEMAP_THREAD_PRIORITY,
   SITEMAP_PROFILE_PRIORITY,
 } = process.env;
@@ -27,11 +33,14 @@ const DEFAULTS = {
   JWT_SECRET: 'my secret',
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
+  DEFAULT_COMMONWEALTH_LOGO:
+    'https://s3.amazonaws.com/assets.commonwealth.im/common-white.png',
 };
 
 export const config = configure(
   target,
   {
+    ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
@@ -68,6 +77,12 @@ export const config = configure(
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY:
         ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
+      AA: {
+        FLAG_COMMON_WALLET: FLAG_COMMON_WALLET === 'true',
+        ALCHEMY_KEY: ALCHEMY_AA_KEY,
+        PRIVATE_KEY: ALCHEMY_AA_PRIVATE_KEY,
+        GAS_POLICY: ALCHEMY_AA_GAS_POLICY,
+      },
     },
     SITEMAP: {
       THREAD_PRIORITY: SITEMAP_THREAD_PRIORITY
@@ -77,8 +92,11 @@ export const config = configure(
         ? parseInt(SITEMAP_PROFILE_PRIORITY)
         : -1,
     },
+    DEFAULT_COMMONWEALTH_LOGO:
+      DEFAULT_COMMONWEALTH_LOGO ?? DEFAULTS.DEFAULT_COMMONWEALTH_LOGO,
   },
   z.object({
+    ENFORCE_SESSION_KEYS: z.boolean(),
     DB: z.object({
       URI: z
         .string()
@@ -138,10 +156,23 @@ export const config = configure(
       BASE_WEBHOOK_SIGNING_KEY: z.string().optional(),
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY: z.string().optional(),
       ETH_SEPOLIA_WEBHOOOK_SIGNING_KEY: z.string().optional(),
-    }), // TODO: make these mandatory in production before chain-event v3 (Alchemy Webhooks) goes live
+      AA: z
+        .object({
+          FLAG_COMMON_WALLET: z.boolean().optional(),
+          PRIVATE_KEY: z.string().optional(),
+          ALCHEMY_KEY: z.string().optional(),
+          GAS_POLICY: z.string().optional(),
+        })
+        .refine((data) => {
+          if (data.FLAG_COMMON_WALLET && target.APP_ENV === 'production')
+            return data.PRIVATE_KEY && data.ALCHEMY_KEY && data.GAS_POLICY;
+          return true;
+        }),
+    }),
     SITEMAP: z.object({
       THREAD_PRIORITY: z.coerce.number(),
       PROFILE_PRIORITY: z.coerce.number(),
     }),
+    DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
   }),
 );

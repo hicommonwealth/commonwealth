@@ -23,7 +23,7 @@ export const seedDb = async () => {
   try {
     const models = await bootstrap_testing(true);
 
-    const [drew] = await models.User.bulkCreate(
+    await models.User.bulkCreate(
       [{ email: 'drewstone329@gmail.com' }, { email: 'temp@gmail.com' }].map(
         (x) => ({
           ...x,
@@ -447,6 +447,7 @@ export const seedDb = async () => {
         role: 'admin' as Role,
         is_user_default: false,
         ghost_address: false,
+        is_banned: false,
       })),
     );
 
@@ -486,20 +487,6 @@ export const seedDb = async () => {
       {
         name: NotificationCategories.SnapshotProposal,
         description: 'Snapshot proposal notifications',
-      },
-    ]);
-
-    // Admins need to be subscribed to mentions and collaborations
-    await models.Subscription.bulkCreate([
-      {
-        subscriber_id: drew.id!,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      },
-      {
-        subscriber_id: drew.id!,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
       },
     ]);
 

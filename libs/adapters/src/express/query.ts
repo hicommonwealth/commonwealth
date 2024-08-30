@@ -19,7 +19,7 @@ export const query =
   ) => {
     try {
       const results = await core.query(md, {
-        actor: { user: req.user as User, address_id: req.body.address_id },
+        actor: { user: req.user as User, address: req.body.address },
         payload: { ...req.query, ...req.params } as z.infer<Input>,
       });
       return res.json(results);

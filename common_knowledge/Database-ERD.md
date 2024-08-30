@@ -280,7 +280,7 @@ erDiagram
     character-varying(255)[] social_links
     character-varying(255) namespace
     text redirect
-    integer thread_count
+    integer lifetime_thread_count
     integer address_count
     boolean stages_enabled
     text[] custom_stages

@@ -27,7 +27,6 @@ import {
   type Role,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
-import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
@@ -240,9 +239,8 @@ export type ModelSeeder = {
     jwt: string;
   }) => Promise<any>;
   updateRole: (args: AssignRoleArgs) => Promise<any>;
-  createSubscription: (
-    args: SubscriptionArgs,
-  ) => Promise<NotificationSubscription>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  createSubscription: (args: SubscriptionArgs) => Promise<any>;
   createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
@@ -331,10 +329,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     args: ThreadArgs,
   ): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
     const {
+      jwt,
       chainId,
       address,
       did,
-      jwt,
       title,
       body,
       topicId,
@@ -370,23 +368,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post('/api/threads')
+      .post('/api/v1/CreateThread/0')
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
-        author_chain: chainId,
-        chain: chainId,
-        address,
+        jwt,
+        community_id: chainId,
+        topic_id: topicId,
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
-        topic_id: topicId,
+        stage: '',
         url,
-        readOnly: readOnly || false,
-        jwt,
+        read_only: readOnly || false,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
-    return res.body;
+    if (res.ok) return { result: res.body, status: 'Success' };
+    return { status: res.status.toString() };
   },
 
   createLink: async (args: createDeleteLinkArgs) => {
@@ -615,10 +614,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   updateRole: async (args: AssignRoleArgs) => {
     await models.sequelize.query(
       `
-      UPDATE "Addresses"
-      SET role = '${args.role}'
-      WHERE id = ${args.address_id};
-    `,
+          UPDATE "Addresses"
+          SET role = '${args.role}'
+          WHERE id = ${args.address_id};
+      `,
     );
     return true;
   },

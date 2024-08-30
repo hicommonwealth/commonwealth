@@ -11,7 +11,6 @@ const {
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
   SEND_EMAILS: _SEND_EMAILS,
-  SEND_WEBHOOKS_EMAILS,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
@@ -20,11 +19,10 @@ const {
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
   ADDRESS_TOKEN_EXPIRES_IN,
-  DEFAULT_COMMONWEALTH_LOGO,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
   DISCORD_CLIENT_ID,
-  DISCORD_BOT_TOKEN,
+  DISCORD_TOKEN,
   REACTION_WEIGHT_OVERRIDE,
   CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
@@ -40,8 +38,6 @@ const NO_PRERENDER = _NO_PRERENDER;
 
 const DEFAULTS = {
   GENERATE_IMAGE_RATE_LIMIT: '10',
-  DEFAULT_COMMONWEALTH_LOGO:
-    'https://commonwealth.im/static/brand_assets/logo_stacked.png',
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: '60',
@@ -58,10 +54,6 @@ export const config = configure(
   { ...model_config, ...adapters_config, ...evm_config },
   {
     SEND_EMAILS,
-    // Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
-    // Risks sending webhooks/emails to real users if incorrectly set to true
-    SEND_WEBHOOKS_EMAILS:
-      model_config.APP_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
@@ -69,8 +61,6 @@ export const config = configure(
       GENERATE_IMAGE_RATE_LIMIT ?? DEFAULTS.GENERATE_IMAGE_RATE_LIMIT,
       10,
     ),
-    DEFAULT_COMMONWEALTH_LOGO:
-      DEFAULT_COMMONWEALTH_LOGO ?? DEFAULTS.DEFAULT_COMMONWEALTH_LOGO,
     MEMBERSHIP_REFRESH_BATCH_SIZE: parseInt(
       MEMBERSHIP_REFRESH_BATCH_SIZE ?? DEFAULTS.MEMBERSHIP_REFRESH_BATCH_SIZE,
       10,
@@ -112,7 +102,7 @@ export const config = configure(
     },
     DISCORD: {
       CLIENT_ID: DISCORD_CLIENT_ID,
-      BOT_TOKEN: DISCORD_BOT_TOKEN,
+      BOT_TOKEN: DISCORD_TOKEN,
     },
     CLOUDFLARE: {
       ZONE_ID: CF_ZONE_ID,
@@ -142,14 +132,10 @@ export const config = configure(
   },
   z.object({
     SEND_EMAILS: z.boolean(),
-    SEND_WEBHOOKS_EMAILS: z
-      .boolean()
-      .refine((data) => !(model_config.APP_ENV !== 'production' && data)),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
-    DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
     REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),

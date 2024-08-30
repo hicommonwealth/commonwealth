@@ -163,8 +163,12 @@ const StakeExchangeForm = ({
       if (!isMemberOfCommunity) {
         await linkSpecificAddressToSpecificCommunity({
           address: selectedAddress?.value,
-          communityId: communityId,
-          communityChainBase: community?.base || app?.chain?.base,
+          community: {
+            id: communityId,
+            name: community?.name || app?.chain?.meta?.name,
+            base: community?.base || app?.chain?.base,
+            iconUrl: community?.iconUrl || app?.chain?.meta?.iconUrl,
+          },
           ...(app.activeChainId() && { activeChainId: app.activeChainId() }),
         });
       }

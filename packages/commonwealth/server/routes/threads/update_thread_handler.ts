@@ -69,7 +69,7 @@ export const updateThreadHandler = async (
 
   // this is a patch update, so properties should be
   // `undefined` if they are not intended to be updated
-  const [updatedThread, notificationOptions, analyticsOptions] =
+  const [updatedThread, analyticsOptions] =
     await controllers.threads.updateThread({
       // @ts-expect-error StrictNullChecks
       user,
@@ -91,10 +91,6 @@ export const updateThreadHandler = async (
       canvasMsgId,
       discordMeta,
     });
-
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
 
   for (const a of analyticsOptions) {
     controllers.analytics.track(a).catch(console.error);

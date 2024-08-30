@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { Reaction } from './reaction.schemas';
 import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
 
@@ -38,6 +39,7 @@ export const Comment = z.object({
 
   Address: Address.nullish(),
   Thread: Thread.nullish(),
+  Reaction: Reaction.nullish(),
 });
 
 export const CommentVersionHistory = z.object({

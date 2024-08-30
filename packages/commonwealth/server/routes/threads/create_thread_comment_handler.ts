@@ -95,19 +95,13 @@ export const createThreadCommentHandler = async (
     await verifyComment(canvasSignedData, canvasComment);
   }
 
-  // create thread comment
-  const [comment, notificationOptions, analyticsOptions] =
+  const [comment, analyticsOptions] =
     await controllers.threads.createThreadComment(threadCommentFields);
 
   // publish signed data
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
     await applyCanvasSignedData(canvasSignedData);
-  }
-
-  // emit notifications
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
   }
 
   // track analytics events

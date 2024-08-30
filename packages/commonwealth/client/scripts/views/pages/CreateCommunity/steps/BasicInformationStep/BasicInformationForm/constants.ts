@@ -1,6 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import NodeInfo from 'models/NodeInfo';
-import app from 'state';
 import { fetchCachedNodes } from 'state/api/nodes';
 
 // used for default chain dropdown options
@@ -9,10 +8,6 @@ export const ETHEREUM_MAINNET_ID = '1';
 export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
 export const BLAST_ID = '81457';
-
-export const existingCommunityIds = app.config.chains
-  .getAll()
-  .map((community) => community.id);
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(
@@ -46,7 +41,7 @@ const chainIdsWithStakeEnabled = Object.values(
   commonProtocol.factoryContracts,
 ).map((c) => c.chainId);
 
-// Get chain id's from the app.config.chains for all eth and cosmos chains
+// Get chain id's from the fetchCachedNodes for all eth and cosmos chains
 export const chainTypes =
   fetchCachedNodes()
     ?.filter(particularChainNodes)
@@ -54,8 +49,8 @@ export const chainTypes =
       chainBase: chain.ethChainId
         ? 'ethereum'
         : chain.cosmosChainId
-        ? 'cosmos'
-        : 'solana',
+          ? 'cosmos'
+          : 'solana',
       altWalletUrl: chain.altWalletUrl,
       nodeUrl: chain.url,
       value: chain.ethChainId || chain.cosmosChainId || 'solana',

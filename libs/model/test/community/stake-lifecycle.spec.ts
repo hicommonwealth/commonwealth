@@ -41,6 +41,8 @@ describe('Stake lifecycle', () => {
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test1',
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'admin',
@@ -60,6 +62,8 @@ describe('Stake lifecycle', () => {
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test2',
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           ...community_with_stake!.Addresses!.at(0)!,
@@ -70,6 +74,8 @@ describe('Stake lifecycle', () => {
     const [community_without_stake] = await seed('Community', {
       active: true,
       chain_node_id: node!.id!,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           ...community_with_stake!.Addresses!.at(0)!,
@@ -83,7 +89,7 @@ describe('Stake lifecycle', () => {
     id_without_stake = community_without_stake!.id!;
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: community_with_stake!.Addresses!.at(0)!.address!,
+      address: community_with_stake!.Addresses!.at(0)!.address!,
     };
 
     Sinon.stub(

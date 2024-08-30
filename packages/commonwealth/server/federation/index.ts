@@ -5,8 +5,11 @@ const log = logger(import.meta);
 export const canvas = await startCanvasNode();
 
 log.info(
-  'canvas: started libp2p with multiaddrs',
-  canvas.libp2p.getMultiaddrs().map((m) => m.toString()),
+  'canvas: started libp2p with multiaddrs: ' +
+    canvas.libp2p
+      .getMultiaddrs()
+      .map((m) => m.toString())
+      .join(', '),
 );
 
 export const applyCanvasSignedData = async (data: CanvasSignedData) => {

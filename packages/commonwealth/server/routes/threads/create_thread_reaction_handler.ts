@@ -78,7 +78,7 @@ export const createThreadReactionHandler = async (
   }
 
   // create thread reaction
-  const [newReaction, notificationOptions, analyticsOptions] =
+  const [newReaction, analyticsOptions] =
     await controllers.threads.createThreadReaction(reactionFields);
 
   // publish signed data
@@ -92,9 +92,6 @@ export const createThreadReactionHandler = async (
   address.last_active = new Date();
   // @ts-expect-error StrictNullChecks
   address.save().catch(console.error);
-
-  // emit notification
-  controllers.notifications.emit(notificationOptions).catch(console.error);
 
   // track analytics event
   controllers.analytics.track(analyticsOptions, req).catch(console.error);

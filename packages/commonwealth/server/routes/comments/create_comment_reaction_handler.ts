@@ -77,23 +77,18 @@ export const createCommentReactionHandler = async (
   }
 
   // create comment reaction
-  const [newReaction, notificationOptions, analyticsOptions] =
+  const [newReaction, analyticsOptions] =
     await controllers.comments.createCommentReaction(commentReactionFields);
+
+  // track analytics events
+  for (const a of analyticsOptions) {
+    controllers.analytics.track(a, req).catch(console.error);
+  }
 
   // publish signed data
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
     await applyCanvasSignedData(canvasSignedData);
-  }
-
-  // emit notifications
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
-
-  // track analytics events
-  for (const a of analyticsOptions) {
-    controllers.analytics.track(a, req).catch(console.error);
   }
 
   return success(res, newReaction);

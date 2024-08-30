@@ -346,8 +346,6 @@ export const CommentTree = ({
       await editComment({
         commentId: comment.id,
         updatedBody: serializeDelta(newDelta) || comment.text,
-        threadId: thread.id,
-        parentCommentId: comment.parentComment,
         communityId: app.activeChainId(),
         commentMsgId: comment.canvasMsgId,
         profile: {

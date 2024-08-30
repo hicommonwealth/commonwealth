@@ -48,7 +48,7 @@ export const conditionTypes = [
   { value: AMOUNT_CONDITIONS.LESS, label: 'Less than' },
 ];
 
-// Get chain id's from the app.config.chains for all eth and cosmos chains
+// Get chain id's from the fetchCachedNodes for all eth and cosmos chains
 export const chainTypes =
   fetchCachedNodes()
     ?.filter(
@@ -61,8 +61,8 @@ export const chainTypes =
       chainBase: chain.ethChainId
         ? 'ethereum'
         : chain.balanceType === 'solana'
-        ? 'solana'
-        : 'cosmos',
+          ? 'solana'
+          : 'cosmos',
       value: chain.ethChainId || chain.cosmosChainId || 0,
       label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
     })) || [];

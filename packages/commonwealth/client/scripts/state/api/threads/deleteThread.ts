@@ -8,7 +8,6 @@ import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { userStore } from '../../ui/user';
 import { removeThreadFromAllCaches } from './helpers/cache';
-import { updateCommunityThreadCount } from './helpers/counts';
 
 interface DeleteThreadProps {
   communityId: string;
@@ -67,9 +66,6 @@ const useDeleteThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
-
-      // decrement communities thread count
-      if (communityId) updateCommunityThreadCount(communityId, 'decrement');
 
       return response.data;
     },
