@@ -1,16 +1,15 @@
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
+import { config } from '../../config';
 import {
-  tokenBalanceCache,
   type AddressAttributes,
   type DB,
   type GroupAttributes,
   type MembershipAttributes,
   type MembershipInstance,
-  type OptionsWithBalances,
-} from '../..';
-import { config } from '../../config';
+} from '../../models';
+import { tokenBalanceCache, type OptionsWithBalances } from '../../services';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import { validateGroupMembership } from './validateGroupMembership';
 
