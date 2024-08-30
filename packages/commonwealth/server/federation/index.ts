@@ -1,8 +1,10 @@
+import { logger } from '@hicommonwealth/core';
 import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
 
+const log = logger(import.meta);
 export const canvas = await startCanvasNode();
 
-console.log(
+log.info(
   'canvas: started libp2p with multiaddrs',
   canvas.libp2p.getMultiaddrs().map((m) => m.toString()),
 );
@@ -24,7 +26,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedSessionId = idSession;
     }
   } catch (err) {
-    console.log('could not apply canvas session:', err);
+    log.warn('could not apply canvas session:', err);
   }
 
   try {
@@ -40,7 +42,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedActionId = idAction;
     }
   } catch (err) {
-    console.log('could not apply canvas action:', err);
+    log.warn('could not apply canvas action:', err);
   }
 
   return { session: appliedSessionId, action: appliedActionId };
