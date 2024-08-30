@@ -2,13 +2,12 @@ import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
-  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyReaction,
 } from '@hicommonwealth/shared';
 import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
-import { canvas } from 'server/federation';
+import { applyCanvasSignedData } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -85,7 +84,7 @@ export const createThreadReactionHandler = async (
   // publish signed data
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-    await applyCanvasSignedData(canvas, canvasSignedData);
+    await applyCanvasSignedData(canvasSignedData);
   }
 
   // update address last active

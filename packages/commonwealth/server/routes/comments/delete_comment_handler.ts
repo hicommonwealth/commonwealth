@@ -1,12 +1,11 @@
 import { CommentAttributes } from '@hicommonwealth/model';
 import {
-  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyDeleteComment,
 } from '@hicommonwealth/shared';
 import { DeleteCommentOptions } from 'server/controllers/server_comments_methods/delete_comment';
-import { canvas } from 'server/federation';
+import { applyCanvasSignedData } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -46,7 +45,7 @@ export const deleteCommentHandler = async (
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
     if (canvasSignedData.actionMessage.payload.args.comment_id !== null) {
-      await applyCanvasSignedData(canvas, canvasSignedData);
+      await applyCanvasSignedData(canvasSignedData);
     }
   }
 

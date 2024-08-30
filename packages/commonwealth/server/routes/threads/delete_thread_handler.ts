@@ -1,12 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import {
-  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyDeleteThread,
 } from '@hicommonwealth/shared';
 import { DeleteThreadOptions } from 'server/controllers/server_threads_methods/delete_thread';
-import { canvas } from 'server/federation';
+import { applyCanvasSignedData } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -57,7 +56,7 @@ export const deleteThreadHandler = async (
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
     if (canvasSignedData.actionMessage.payload.args.thread_id !== null) {
-      await applyCanvasSignedData(canvas, canvasSignedData);
+      await applyCanvasSignedData(canvasSignedData);
     }
   }
 

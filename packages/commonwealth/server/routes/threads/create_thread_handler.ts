@@ -2,13 +2,12 @@ import { AppError } from '@hicommonwealth/core';
 import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
-  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyThread,
 } from '@hicommonwealth/shared';
 import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
-import { canvas } from 'server/federation';
+import { applyCanvasSignedData } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -97,7 +96,7 @@ export const createThreadHandler = async (
   // publish signed data
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-    await applyCanvasSignedData(canvas, canvasSignedData);
+    await applyCanvasSignedData(canvasSignedData);
   }
 
   // emit notifications

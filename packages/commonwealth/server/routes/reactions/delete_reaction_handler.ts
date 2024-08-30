@@ -1,11 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
 import {
-  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyDeleteReaction,
 } from '@hicommonwealth/shared';
-import { canvas } from 'server/federation';
+import { applyCanvasSignedData } from 'server/federation';
 import { ServerControllers } from 'server/routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -62,7 +61,7 @@ export const deleteReactionHandler = async (
 
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-    await applyCanvasSignedData(canvas, canvasSignedData);
+    await applyCanvasSignedData(canvasSignedData);
   }
 
   return success(res, undefined);

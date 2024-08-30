@@ -3,13 +3,12 @@ import { CommentInstance } from '@hicommonwealth/model';
 
 import {
   addressSwapper,
-  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyComment,
 } from '@hicommonwealth/shared';
 import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
-import { canvas } from 'server/federation';
+import { applyCanvasSignedData } from 'server/federation';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -103,7 +102,7 @@ export const createThreadCommentHandler = async (
   // publish signed data
   if (hasCanvasSignedDataApiArgs(req.body)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-    await applyCanvasSignedData(canvas, canvasSignedData);
+    await applyCanvasSignedData(canvasSignedData);
   }
 
   // emit notifications

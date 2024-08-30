@@ -10,10 +10,8 @@ export const fromCanvasSignedDataApiArgs = (
 
 export const toCanvasSignedDataApiArgs = (
   data: null | undefined | CanvasSignResult,
-): CanvasSignedDataApiArgs => {
-  // ignore undefined data
-  if (data === undefined || data === null) {
-    // @ts-expect-error <StrictNullChecks>
+): CanvasSignedDataApiArgs | undefined => {
+  if (!data) {
     return;
   }
 
