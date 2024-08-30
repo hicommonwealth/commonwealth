@@ -14,6 +14,7 @@ export const CreateWallet = {
 
 export const SendTransaction = {
   input: z.object({
+    id: z.number(),
     to: z.string(),
     value: z.number(),
     data: z.string(),
