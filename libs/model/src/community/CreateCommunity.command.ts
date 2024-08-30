@@ -134,9 +134,8 @@ async function validateChainInput(actor: Actor, payload: Payload) {
   return { node_url, private_url: null, alt_wallet_url };
 }
 
-// TODO: check with product if we need this logic, user_address should be required
-// try to make admin one of the user's addresses
-async function pickAdminAddress(
+// TODO: refactor after addresses are normalized
+async function findBaseAdminAddress(
   { user }: Actor,
   { base, type, user_address }: Payload,
 ) {
@@ -256,9 +255,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       if (community)
         throw new InvalidInput(CreateCommunityErrors.CommunityNameExists);
 
-      const baseCommunity = await models.Community.findOne({ where: { base } });
-      mustExist('Chain Base', baseCommunity);
-
       // requires super admin privilege for creating Chain/DAO
       if (type === ChainType.Chain || type === ChainType.DAO)
         mustBeSuperAdmin(actor);
@@ -275,89 +271,94 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         ),
       ];
 
+      const baseCommunity = await models.Community.findOne({ where: { base } });
+      mustExist('Chain Base', baseCommunity);
+
+      const admin_address = await findBaseAdminAddress(actor, payload);
+      if (
+        !mustExist(
+          `User address ${payload.user_address} in ${base} community`,
+          admin_address,
+        )
+      )
+        return;
+
       // == command transaction boundary ==
-      const admin_address = await models.sequelize.transaction(
-        async (transaction) => {
-          const [node] = await models.ChainNode.scope(
-            'withPrivateData',
-          ).findOrCreate({
-            where: { url: node_url },
-            defaults: {
-              url: node_url,
-              eth_chain_id,
-              cosmos_chain_id,
-              alt_wallet_url,
-              private_url,
-              balance_type:
-                base === ChainBase.CosmosSDK
-                  ? BalanceType.Cosmos
-                  : base === ChainBase.Substrate
-                    ? BalanceType.Substrate
-                    : base === ChainBase.Solana
-                      ? BalanceType.Solana
-                      : BalanceType.Ethereum,
-              // use first chain name as node name
-              name,
-            },
-            transaction,
-          });
-
-          await models.Community.create({
-            id,
+      await models.sequelize.transaction(async (transaction) => {
+        const [node] = await models.ChainNode.scope(
+          'withPrivateData',
+        ).findOrCreate({
+          where: { url: node_url },
+          defaults: {
+            url: node_url,
+            eth_chain_id,
+            cosmos_chain_id,
+            alt_wallet_url,
+            private_url,
+            balance_type:
+              base === ChainBase.CosmosSDK
+                ? BalanceType.Cosmos
+                : base === ChainBase.Substrate
+                  ? BalanceType.Substrate
+                  : base === ChainBase.Solana
+                    ? BalanceType.Solana
+                    : BalanceType.Ethereum,
+            // use first chain name as node name
             name,
-            default_symbol,
-            icon_url,
-            description,
-            network,
-            type,
-            social_links: uniqueLinksArray,
-            base,
-            bech32_prefix,
-            active: true,
-            chain_node_id: node.id,
-            token_name,
-            has_chain_events_listener:
-              network === 'aave' || network === 'compound',
-            default_page: DefaultPage.Discussions,
-            has_homepage: 'true',
-            collapsed_on_homepage: false,
-            custom_stages: [],
-            directory_page_enabled: false,
-            snapshot_spaces: [],
-            stages_enabled: true,
-          });
+          },
+          transaction,
+        });
 
-          await models.Topic.create({
-            community_id: id,
-            name: 'General',
-            featured_in_sidebar: true,
-          });
+        await models.Community.create({
+          id,
+          name,
+          default_symbol,
+          icon_url,
+          description,
+          network,
+          type,
+          social_links: uniqueLinksArray,
+          base,
+          bech32_prefix,
+          active: true,
+          chain_node_id: node.id,
+          token_name,
+          has_chain_events_listener:
+            network === 'aave' || network === 'compound',
+          default_page: DefaultPage.Discussions,
+          has_homepage: 'true',
+          collapsed_on_homepage: false,
+          custom_stages: [],
+          directory_page_enabled: false,
+          snapshot_spaces: [],
+          stages_enabled: true,
+        });
 
-          const _admin_address = await pickAdminAddress(actor, payload);
-          if (_admin_address) {
-            await models.Address.create({
-              user_id: actor.user.id,
-              address: _admin_address.address,
-              community_id: id,
-              hex:
-                base === ChainBase.CosmosSDK
-                  ? bech32ToHex(_admin_address.address)
-                  : undefined,
-              verification_token: _admin_address.verification_token,
-              verification_token_expires:
-                _admin_address.verification_token_expires,
-              verified: _admin_address.verified,
-              wallet_id: _admin_address.wallet_id,
-              is_user_default: true,
-              role: 'admin',
-              last_active: new Date(),
-              ghost_address: false,
-              is_banned: false,
-            });
-          }
-          return _admin_address;
-        },
-      );
+        await models.Topic.create({
+          community_id: id,
+          name: 'General',
+          featured_in_sidebar: true,
+        });
+
+        await models.Address.create({
+          user_id: actor.user.id,
+          address: admin_address.address,
+          community_id: id,
+          hex:
+            base === ChainBase.CosmosSDK
+              ? bech32ToHex(admin_address.address)
+              : undefined,
+          verification_token: admin_address.verification_token,
+          verification_token_expires: admin_address.verification_token_expires,
+          verified: admin_address.verified,
+          wallet_id: admin_address.wallet_id,
+          is_user_default: true,
+          role: 'admin',
+          last_active: new Date(),
+          ghost_address: false,
+          is_banned: false,
+        });
+      });
       // == end of command transaction boundary ==
 
       const new_community = await models.Community.findOne({
@@ -366,7 +367,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       });
       return {
         community: new_community!.toJSON(),
-        admin_address: admin_address?.address,
+        admin_address: admin_address.address,
       };
     },
   };
