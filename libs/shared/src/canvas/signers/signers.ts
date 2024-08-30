@@ -168,8 +168,8 @@ export class SubstrateSignerCW extends SubstrateSigner {
   } | null> {
     let did;
     if (options.address) {
-      const dids = this.listSessions(topic).filter((did) =>
-        did.endsWith(':' + options.address),
+      const dids = this.listSessions(topic).filter((d) =>
+        d.endsWith(':' + options.address),
       );
       if (dids.length === 0) return null;
       did = dids[0];
