@@ -1,6 +1,7 @@
 name: CI
 
 env:
+  APP_ENV: CI
   IS_CI: true
   CI: true # ensures Vitest allowOnly option is false so no tests are accidentally skipped
   NODE_ENV: 'test'
@@ -246,7 +247,7 @@ jobs:
 
       # To disable eslint-diff just comment the following two lines
       - name: Run eslint-diff
-        run: pnpm -F commonwealth run lint-diff
+        run: pnpm -r run lint-diff
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: pnpm -F commonwealth run lint-diff-canary
@@ -302,6 +303,9 @@ jobs:
       # TODO: use devmode instead to avoid building
       - name: Build
         run: pnpm -r build
+
+      - name: build
+        run: pnpm -r lint
 
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false

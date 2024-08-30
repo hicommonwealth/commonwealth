@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import 'components/Profile/ProfileActivity.scss';
 
-import type AddressInfo from 'models/AddressInfo';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
@@ -21,7 +20,6 @@ export type CommentWithAssociatedThread = Comment<IUniqueId> & {
 };
 
 type ProfileActivityProps = {
-  addresses: AddressInfo[];
   comments: CommentWithAssociatedThread[];
   threads: Thread[];
 };

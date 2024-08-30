@@ -1,11 +1,8 @@
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { linkExistingAddressToChainOrCommunity } from 'client/scripts/controllers/app/login';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { baseToNetwork } from 'helpers';
-import app, { initAppState } from 'state';
-import { updateAdminOnCreateCommunity } from 'views/pages/create_community/community_input_rows';
-import { userStore } from '../../ui/user';
+import { initAppState } from 'state';
 
 interface CreateCommunityProps {
   id: string;
@@ -23,7 +20,7 @@ interface CreateCommunityProps {
   isPWA?: boolean;
 }
 
-const createCommunity = async ({
+export const buildCreateCommunityInput = ({
   id,
   name,
   chainBase,
@@ -36,56 +33,42 @@ const createCommunity = async ({
   altWalletUrl,
   userAddress,
   bech32Prefix,
-  isPWA,
 }: CreateCommunityProps) => {
   const nameToSymbol = name.toUpperCase().slice(0, 4);
   const communityNetwork =
     chainBase === ChainBase.CosmosSDK
       ? cosmosChainId
       : baseToNetwork(chainBase);
-
-  return await axios.post(
-    `${app.serverUrl()}/communities`,
-    {
-      id,
-      name,
-      base: chainBase,
-      description,
-      icon_url: iconUrl,
-      social_links: socialLinks,
-      eth_chain_id: ethChainId,
-      cosmos_chain_id: cosmosChainId,
-      node_url: nodeUrl,
-      alt_wallet_url: altWalletUrl,
-      user_address: userAddress,
-      type: ChainType.Offchain,
-      network: communityNetwork,
-      default_symbol: nameToSymbol,
-      bech32_prefix: bech32Prefix,
-      jwt: userStore.getState().jwt,
-    },
-    {
-      headers: {
-        isPWA: isPWA?.toString(),
-      },
-    },
-  );
+  return {
+    id,
+    name,
+    base: chainBase,
+    description,
+    icon_url: iconUrl,
+    social_links: socialLinks,
+    eth_chain_id: ethChainId ? +ethChainId : undefined,
+    cosmos_chain_id: cosmosChainId,
+    node_url: nodeUrl,
+    alt_wallet_url: altWalletUrl,
+    user_address: userAddress,
+    type: ChainType.Offchain,
+    network: communityNetwork!,
+    default_symbol: nameToSymbol,
+    bech32_prefix: bech32Prefix,
+  };
 };
 
 const useCreateCommunityMutation = () => {
-  return useMutation({
-    mutationFn: createCommunity,
-    onSuccess: async ({ data }, variables) => {
-      if (data?.result?.admin_address) {
+  return trpc.community.createCommunity.useMutation({
+    onSuccess: async (output) => {
+      if (output.admin_address) {
         await linkExistingAddressToChainOrCommunity(
-          data.result.admin_address,
-          data.result.role.community_id,
-          data.result.role.community_id,
+          output.admin_address,
+          output.community.id,
+          output.community.id,
         );
       }
-
       await initAppState(false);
-      await updateAdminOnCreateCommunity(variables.id);
     },
   });
 };

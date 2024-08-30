@@ -1,20 +1,25 @@
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
-import app from 'state';
-import NewProfilesController from '../controllers/server/newProfiles';
-
 import { Session } from '@canvas-js/interfaces';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { serializeCanvas } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
+import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
-import { userStore } from '../state/ui/user';
-import type ChainInfo from './ChainInfo';
+import { userStore } from 'state/ui/user';
+import NewProfilesController from '../controllers/server/newProfiles';
+import ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
+
+export type AccountCommunity = {
+  id: ChainInfo['id'];
+  base?: ChainInfo['base'];
+  ss58Prefix?: ChainInfo['ss58Prefix'] | number;
+};
 
 class Account {
   public readonly address: string;
-  public readonly community: ChainInfo;
+  public readonly community: AccountCommunity;
   public readonly ghostAddress: boolean;
   public lastActive?: momentType.Moment;
 
@@ -53,7 +58,7 @@ class Account {
     lastActive,
   }: {
     // required args
-    community: ChainInfo;
+    community: AccountCommunity;
     address: string;
 
     // optional args
@@ -110,10 +115,10 @@ class Account {
           );
         } else {
           updatedProfile.initialize(
+            data?.userId,
             data?.name,
             data.address,
             data?.avatarUrl,
-            data.id,
             updatedProfile.chain,
             data?.lastActive,
           );
@@ -183,7 +188,7 @@ class Account {
       wallet_sso_source: this.walletSsoSource,
     };
 
-    return await axios.post(`${app.serverUrl()}/verifyAddress`, params);
+    return await axios.post(`${SERVER_URL}/verifyAddress`, params);
   }
 }
 

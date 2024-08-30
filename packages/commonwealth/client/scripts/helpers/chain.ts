@@ -1,8 +1,11 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
+import { z } from 'zod';
 import ChainInfo from '../models/ChainInfo';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
 
 export const deinitChainOrCommunity = async () => {
@@ -39,7 +42,13 @@ export const loadCommunityChainInfo = async (
     if (activeCommunity) {
       tempChain = activeCommunity;
     } else {
-      tempChain = app.config.chains.getById(DEFAULT_CHAIN);
+      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        DEFAULT_CHAIN,
+        true,
+      );
+      tempChain = ChainInfo.fromTRPCResponse(
+        communityInfo as z.infer<typeof ExtendedCommunity>,
+      );
     }
 
     if (!tempChain) {
@@ -53,11 +62,7 @@ export const loadCommunityChainInfo = async (
     return;
   }
 
-  // This is a bandaid fix used to stop chain deinit on navigation from createCommunities page. Should be removed.
-  if (!app.skipDeinitChain) {
-    await deinitChainOrCommunity();
-    app.skipDeinitChain = false;
-  }
+  await deinitChainOrCommunity();
   app.chainPreloading = true;
   document.title = `Common – ${tempChain.name}`;
 
@@ -116,7 +121,7 @@ export const loadCommunityChainInfo = async (
   app.chainPreloading = false;
 
   // Instantiate active addresses before chain fully loads
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses(chain?.id || '');
 
   return true;
 };
@@ -124,7 +129,7 @@ export const loadCommunityChainInfo = async (
 // Initializes a selected chain. Requires `app.chain` to be defined and valid
 // and not already initialized.
 export const initChain = async (): Promise<void> => {
-  if (!app.chain || !app.chain.meta || app.chain.loaded) {
+  if (!app.chain || !app.chain?.meta || app.chain.loaded) {
     return;
   }
 
@@ -144,5 +149,5 @@ export const initChain = async (): Promise<void> => {
   console.log(`${chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses(chain.id || '');
 };

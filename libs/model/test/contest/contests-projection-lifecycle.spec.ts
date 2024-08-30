@@ -91,6 +91,7 @@ describe('Contests projection lifecycle', () => {
           },
         ],
         url: 'https://test',
+        private_url: 'https://test',
       });
       const [user] = await seed(
         'User',
@@ -107,11 +108,12 @@ describe('Contests projection lifecycle', () => {
           namespace_address: namespace,
           chain_node_id: chain!.id,
           discord_config_id: undefined,
+          lifetime_thread_count: 0,
+          profile_count: 1,
           Addresses: [
             {
               user_id: user?.id,
               role: 'admin',
-              profile_id: undefined,
             },
           ],
           CommunityStakes: [],

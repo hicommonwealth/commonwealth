@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { z } from 'zod';
 import {
   EventContext,
@@ -5,13 +6,14 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
 } from '../framework';
-import { Events } from '../integration/events';
+import { EventNames, Events } from '../integration/events';
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
+  WebhookNotification,
 } from '../integration/notifications.schemas';
 import { ILogger } from '../logging/interfaces';
 
@@ -138,6 +140,7 @@ export interface Cache extends Disposable {
   ): Promise<boolean>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnalyticsOptions = Record<string, any>;
 
 /**
@@ -206,6 +209,20 @@ export enum BrokerSubscriptions {
 /**
  * Broker Port
  */
+export enum RoutingKeyTags {
+  Contest = 'contest',
+}
+
+type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
+
+type EventNamesType = `${EventNames}`;
+
+type RoutingKeyTagsType = `${RoutingKeyTags}`;
+
+export type RoutingKey =
+  | EventNamesType
+  | Concat<EventNamesType, RoutingKeyTagsType>;
+
 export interface Broker extends Disposable {
   publish<Name extends Events>(
     topic: BrokerPublications,
@@ -217,12 +234,42 @@ export interface Broker extends Disposable {
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
+
+  getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
 
+export type BlobType = string | Uint8Array | Buffer | Readable;
+export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
+export type BlobBucket = typeof BlobBuckets[number];
+
+/**
+ * External Blob Storage Port
+ */
+export interface BlobStorage extends Disposable {
+  upload(options: {
+    key: string;
+    bucket: BlobBucket;
+    content: BlobType;
+    contentType?: string;
+  }): Promise<{ url: string; location: string }>;
+  exists(options: { key: string; bucket: BlobBucket }): Promise<boolean>;
+  getSignedUrl(options: {
+    key: string;
+    bucket: BlobBucket;
+    contentType: string;
+    ttl: number;
+  }): Promise<string>;
+}
+
+/**
+ * Notifications
+ */
 export enum WorkflowKeys {
   CommentCreation = 'comment-creation',
   SnapshotProposals = 'snapshot-proposals',
@@ -231,6 +278,7 @@ export enum WorkflowKeys {
   ChainProposals = 'chain-event-proposals',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
+  Webhooks = 'webhooks',
 }
 
 export enum KnockChannelIds {
@@ -247,33 +295,41 @@ export type NotificationsProviderRecipient =
     };
 
 type BaseNotifProviderOptions = {
-  users: { id: string; email?: string }[];
+  users: { id: string; email?: string; webhook_url?: string }[];
   actor?: { id: string; email?: string };
 };
 
-export type NotificationsProviderTriggerOptions = BaseNotifProviderOptions &
-  (
-    | {
-        data: z.infer<typeof CommentCreatedNotification>;
-        key: WorkflowKeys.CommentCreation;
-      }
-    | {
-        data: z.infer<typeof SnapshotProposalCreatedNotification>;
-        key: WorkflowKeys.SnapshotProposals;
-      }
-    | {
-        data: z.infer<typeof UserMentionedNotification>;
-        key: WorkflowKeys.UserMentioned;
-      }
-    | {
-        data: z.infer<typeof CommunityStakeNotification>;
-        key: WorkflowKeys.CommunityStake;
-      }
-    | {
-        data: z.infer<typeof ChainProposalsNotification>;
-        key: WorkflowKeys.ChainProposals;
-      }
-  );
+type WebhookProviderOptions = {
+  key: WorkflowKeys.Webhooks;
+  users: { id: string; webhook_url: string; destination: string }[];
+  data: z.infer<typeof WebhookNotification>;
+};
+
+export type NotificationsProviderTriggerOptions =
+  | (BaseNotifProviderOptions &
+      (
+        | {
+            data: z.infer<typeof CommentCreatedNotification>;
+            key: WorkflowKeys.CommentCreation;
+          }
+        | {
+            data: z.infer<typeof SnapshotProposalCreatedNotification>;
+            key: WorkflowKeys.SnapshotProposals;
+          }
+        | {
+            data: z.infer<typeof UserMentionedNotification>;
+            key: WorkflowKeys.UserMentioned;
+          }
+        | {
+            data: z.infer<typeof CommunityStakeNotification>;
+            key: WorkflowKeys.CommunityStake;
+          }
+        | {
+            data: z.infer<typeof ChainProposalsNotification>;
+            key: WorkflowKeys.ChainProposals;
+          }
+      ))
+  | WebhookProviderOptions;
 
 export type NotificationsProviderGetMessagesOptions = {
   user_id: string;
@@ -297,6 +353,7 @@ export type NotificationsProviderGetMessagesReturn = Array<{
     version_id: string;
     key: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   __cursor?: string;
 }>;
@@ -376,5 +433,12 @@ export interface NotificationsProvider extends Disposable {
   registerClientRegistrationToken(
     userId: number,
     token: string,
+    channelType: 'FCM' | 'APNS',
+  ): Promise<boolean>;
+
+  unregisterClientRegistrationToken(
+    userId: number,
+    token: string,
+    channelType: 'FCM' | 'APNS',
   ): Promise<boolean>;
 }

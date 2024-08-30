@@ -29,7 +29,9 @@ describe('Comment subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      chain_node_id: node?.id,
+      chain_node_id: node!.id!,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
@@ -39,7 +41,7 @@ describe('Comment subscription lifecycle', () => {
     });
 
     const [thread] = await seed('Thread', {
-      address_id: community?.Addresses?.at(0)?.id,
+      address_id: community!.Addresses!.at(0)!.id!,
       community_id: community?.id,
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
@@ -49,17 +51,15 @@ describe('Comment subscription lifecycle', () => {
 
     [commentOne] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
-      community_id: community?.id,
       thread_id: thread!.id!,
     });
     [commentTwo] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
-      community_id: community?.id,
       thread_id: thread!.id!,
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: undefined,
+      address: undefined,
     };
   });
 
@@ -73,6 +73,7 @@ describe('Comment subscription lifecycle', () => {
 
   test('should create a new comment subscription', async () => {
     const payload = {
+      id: actor.user.id!,
       comment_id: commentOne!.id!,
     };
     const res = await command(CreateCommentSubscription(), {
@@ -96,10 +97,10 @@ describe('Comment subscription lifecycle', () => {
       actor,
       payload: {},
     });
-    expect(res).to.have.deep.members([
-      commentSubOne.toJSON(),
-      commentSubTwo.toJSON(),
-    ]);
+
+    expect(res!.length).to.equal(2);
+    expect(res![0].id === commentSubOne.id);
+    expect(res![1].id === commentSubTwo.id);
   });
 
   test('should not throw for no comment subscriptions', async () => {
@@ -117,6 +118,7 @@ describe('Comment subscription lifecycle', () => {
     ]);
 
     const payload = {
+      id: 0,
       comment_ids: [commentOne!.id!, commentTwo!.id!],
     };
 

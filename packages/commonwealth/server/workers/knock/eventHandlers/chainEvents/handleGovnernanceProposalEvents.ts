@@ -7,13 +7,11 @@ import {
 import { CommunityAttributes, DB } from '@hicommonwealth/model';
 import { ETHERS_BIG_NUMBER } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { getChainProposalUrl } from '../../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 const web3 = new Web3();
 
 export async function handleGovernanceProposalEvents(
@@ -76,7 +74,6 @@ export async function handleGovernanceProposalEvents(
       key: WorkflowKeys.ChainProposals,
       users,
       data: {
-        // @ts-expect-error StrictNullChecks
         community_id: community[0].id,
         community_name: community[0].name,
         proposal_kind: event.eventSource.kind as
@@ -85,7 +82,6 @@ export async function handleGovernanceProposalEvents(
           | 'proposal-executed'
           | 'proposal-queued',
         proposal_url: getChainProposalUrl(
-          // @ts-expect-error StrictNullChecks
           community[0].id,
           String(event.parsedArgs[0] as z.infer<typeof ETHERS_BIG_NUMBER>),
         ),

@@ -88,11 +88,12 @@ describe('ChainEventCreated Policy', () => {
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
       namespace_address: namespaceAddress,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'admin',
           user_id: user!.id,
-          profile_id: undefined,
         },
       ],
       CommunityStakes: [

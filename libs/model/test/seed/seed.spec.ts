@@ -123,10 +123,11 @@ describe('Seed functions', () => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: node!.id,
+        lifetime_thread_count: 1,
+        profile_count: 1,
         Addresses: [
           {
             user_id: user.id,
-            profile_id: undefined,
             address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
             community_id: 'ethereum',
             verification_token: 'PLACEHOLDER',
@@ -149,10 +150,11 @@ describe('Seed functions', () => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: node!.id,
+        lifetime_thread_count: 1,
+        profile_count: 1,
         Addresses: [
           {
             user_id: user.id,
-            profile_id: undefined,
             address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
             community_id: 'ethereum',
             verification_token: 'PLACEHOLDER',
@@ -193,7 +195,14 @@ describe('Seed functions', () => {
       expect(shouldExit).to.be.false;
       shouldExit = true;
       expect(
-        seed('Community', {}, { mock: false }),
+        seed(
+          'Community',
+          {
+            lifetime_thread_count: 0,
+            profile_count: 1,
+          },
+          { mock: false },
+        ),
       ).to.eventually.be.rejectedWith(ValidationError);
       shouldExit = false;
     });

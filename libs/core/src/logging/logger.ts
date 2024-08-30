@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import { config } from '../config';
 import { GetLogger, ILogger, LoggerIds } from './interfaces';
 import { getPinoLogger } from './pinoLogger';
@@ -11,10 +12,11 @@ const getDefaultLogger = (ids: LoggerIds): ILogger => {
 
 // Unified function implementation
 export function logger(
-  ids: string | LoggerIds,
+  ids: ImportMeta | LoggerIds,
   getLogger?: GetLogger,
 ): ILogger {
-  if (!Array.isArray(ids)) ids = [ids];
+  // eslint-disable-next-line no-param-reassign
+  if (!Array.isArray(ids)) ids = [fileURLToPath(ids.url)];
 
   if (getLogger) {
     return getLogger(ids);

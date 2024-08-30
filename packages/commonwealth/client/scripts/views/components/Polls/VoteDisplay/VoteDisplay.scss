@@ -1,0 +1,38 @@
+@import '../../../../../styles/shared';
+
+.VoteDisplay {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  width: 100%;
+
+  .vote-direction {
+    display: flex;
+
+    .vote-check-icon.Icon {
+      color: $green-500;
+      margin-right: 8px;
+    }
+  }
+
+  .completed-vote-information {
+    align-items: center;
+    background: $green-50;
+    border-radius: $border-radius-corners;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 4px 8px 4px;
+    width: 100%;
+    text-align: center;
+
+    .direction-text {
+      color: $neutral-500;
+    }
+  }
+
+  .time-remaining-text.Text {
+    color: $neutral-500;
+  }
+}

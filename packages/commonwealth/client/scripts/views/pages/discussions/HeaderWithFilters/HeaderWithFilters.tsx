@@ -1,7 +1,6 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,6 +10,7 @@ import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManager
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -65,7 +65,6 @@ export const HeaderWithFilters = ({
   // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
-  const forceRerender = useForceRerender();
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
@@ -105,14 +104,6 @@ export const HeaderWithFilters = ({
   }, []);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
-
-  useEffect(() => {
-    app.loginStateEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.loginStateEmitter.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
@@ -366,9 +357,7 @@ export const HeaderWithFilters = ({
                       : []),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
-                  canEditOption={app.roles?.isAdminOfEntity({
-                    community: app.activeChainId(),
-                  })}
+                  canEditOption={Permissions.isCommunityAdmin()}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
                       // @ts-expect-error <StrictNullChecks/>

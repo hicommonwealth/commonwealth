@@ -1,14 +1,12 @@
 import { ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { fileURLToPath } from 'url';
 
 export const Errors = {
   FailedToToggle: 'Failed to toggle community star',
 };
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const starCommunity = async (
   models: DB,

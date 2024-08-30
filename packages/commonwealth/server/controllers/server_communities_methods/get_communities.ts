@@ -11,7 +11,9 @@ export type GetCommunitiesOptions = {
   includeStakes?: boolean; // include community stakes
 };
 
-type CommunityWithTags = CommunityTagsAttributes & { Tag: TagsAttributes };
+export type CommunityWithTags = CommunityTagsAttributes & {
+  Tag: TagsAttributes;
+};
 
 type CommunityInstanceWithTags = CommunityInstance & {
   CommunityTags: TagsAttributes;
@@ -58,5 +60,5 @@ export async function __getCommunities(
         (ct) => (ct as unknown as CommunityWithTags).Tag,
       ),
     },
-  })) as GetCommunitiesResult;
+  })) as unknown as GetCommunitiesResult;
 }

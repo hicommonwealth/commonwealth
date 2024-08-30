@@ -1,14 +1,11 @@
 import type { ChainBase } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
-
-import axios from 'axios';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
-import { userStore } from '../state/ui/user';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
@@ -43,16 +40,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
-    const [response] = await Promise.all([
-      axios.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        params: {
-          chain: this.id,
-          community: null,
-          jwt: userStore.getState().jwt,
-        },
-      }),
-    ]);
 
+    // only on `1inch`, force enable dark mode
     const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
       darkModePreferenceSet
@@ -60,16 +49,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    const { admins, numVotingThreads, numTotalThreads, communityBanner } =
-      response.data.result;
-    // Update community level thread counters variables (Store in state instead of react query here is an
-    // exception case, view the threadCountersStore code for more details)
+    // TODO: cleanup EXCEPTION_CASE_threadCountersStore in 8812
     EXCEPTION_CASE_threadCountersStore.setState({
-      totalThreadsInCommunity: numTotalThreads,
-      totalThreadsInCommunityForVoting: numVotingThreads,
+      totalThreadsInCommunity: this.meta.numTotalThreads,
+      totalThreadsInCommunityForVoting: this.meta.numVotingThreads,
     });
-    this.meta.setAdmins(admins);
-    this.meta.setBanner(communityBanner);
 
     this._serverLoaded = true;
     return true;

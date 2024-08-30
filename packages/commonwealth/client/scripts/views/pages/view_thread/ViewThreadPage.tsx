@@ -1,5 +1,4 @@
 import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
-import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -8,7 +7,6 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -17,12 +15,14 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
 } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
+  useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
@@ -76,16 +76,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const navigate = useCommonNavigate();
 
-  const { isLoggedIn } = useUserLoggedIn();
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
-  const [polls, setPolls] = useState<Array<Poll>>([]);
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
-  // @ts-expect-error <StrictNullChecks/>
-  const [viewCount, setViewCount] = useState<number>(null);
-  const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [commentSortType, setCommentSortType] =
@@ -93,8 +88,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isReplying, setIsReplying] = useState(false);
   // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-  const [arePollsFetched, setArePollsFetched] = useState(false);
-  const [isViewMarked, setIsViewMarked] = useState(false);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
@@ -118,6 +111,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     communityId: app.activeChainId(),
     ids: [+threadId].filter(Boolean),
     apiCallEnabled: !!threadId, // only call the api if we have thread id
+  });
+
+  const { data: pollsData = [] } = useGetThreadPollsQuery({
+    threadId: +threadId,
+    communityId: app.activeChainId(),
+    apiCallEnabled: !!threadId,
   });
 
   const thread = data?.[0];
@@ -146,6 +145,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     communityId: app.activeChainId(),
     address: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address,
+  });
+
+  const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
+    communityId: app.activeChainId(),
+    objectId: thread?.id || '',
+    apiCallEnabled: !!thread?.id,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -207,13 +212,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     },
   });
 
-  useEffect(() => {
-    if (!initializedPolls && thread?.id) {
-      setInitializedPolls(true);
-      setPolls(app.polls.getByThreadId(thread?.id));
-    }
-  }, [initializedPolls, thread?.id]);
-
   // TODO: unnecessary code - must be in a redirect hook
   useNecessaryEffect(() => {
     if (!thread) {
@@ -230,45 +228,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
   // ------------
-
-  useNecessaryEffect(() => {
-    if (!thread || (thread && arePollsFetched)) {
-      return;
-    }
-
-    app.polls
-      .fetchPolls(app.activeChainId(), thread?.id)
-      .then(() => {
-        setPolls(app.polls.getByThreadId(thread.id));
-        setArePollsFetched(true);
-      })
-      .catch(() => {
-        notifyError('Failed to load polls');
-        setPolls([]);
-      });
-  }, [thread, arePollsFetched]);
-
-  useNecessaryEffect(() => {
-    if (!thread || (thread && isViewMarked)) {
-      return;
-    }
-
-    // load view count
-    axios
-      .post(`${app.serverUrl()}/viewCount`, {
-        community_id: app.activeChainId(),
-        object_id: thread.id,
-      })
-      .then((response) => {
-        setViewCount(response?.data?.result?.view_count || 0);
-      })
-      .catch(() => {
-        setViewCount(0);
-      })
-      .finally(() => {
-        setIsViewMarked(true);
-      });
-  }, [thread, isViewMarked]);
 
   useManageDocumentTitle('View thread', thread?.title);
 
@@ -367,7 +326,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isStageDefault = isDefaultStage(thread.stage);
 
   const tabsShouldBePresent =
-    showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
+    showLinkedProposalOptions ||
+    showLinkedThreadOptions ||
+    pollsData?.length > 0;
 
   const sortedComments = [...comments]
     .filter((c) => !c.parentComment)
@@ -383,7 +344,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
 
   const canUpdateThread =
-    isLoggedIn &&
+    user.isLoggedIn &&
     (Permissions.isSiteAdmin() ||
       Permissions.isCommunityAdmin() ||
       Permissions.isCommunityModerator() ||
@@ -514,7 +475,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showSidebar={
             showLinkedProposalOptions ||
             showLinkedThreadOptions ||
-            polls?.length > 0 ||
+            pollsData?.length > 0 ||
             isAuthor ||
             !!hasWebLinks
           }
@@ -654,7 +615,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         />
                       )}
                     </>
-                  ) : !isGloballyEditing && isLoggedIn ? (
+                  ) : !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
                       <CreateComment
@@ -803,7 +764,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     },
                   ]
                 : []),
-              ...(polls?.length > 0 ||
+              ...(pollsData?.length > 0 ||
               (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
                 ? [
                     {
@@ -812,21 +773,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <div className="cards-column">
                           {[
                             ...new Map(
-                              polls?.map((poll) => [poll.id, poll]),
+                              pollsData?.map((poll) => [poll.id, poll]),
                             ).values(),
                           ].map((poll: Poll) => {
                             return (
                               <ThreadPollCard
                                 poll={poll}
                                 key={poll.id}
-                                onVote={() => setInitializedPolls(false)}
                                 isTopicMembershipRestricted={
                                   isRestrictedMembership
                                 }
                                 showDeleteButton={isAuthor || isAdmin}
-                                onDelete={() => {
-                                  setInitializedPolls(false);
-                                }}
                               />
                             );
                           })}
@@ -835,8 +792,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               <ThreadPollEditorCard
                                 // @ts-expect-error <StrictNullChecks/>
                                 thread={thread}
-                                threadAlreadyHasPolling={!polls?.length}
-                                onPollCreate={() => setInitializedPolls(false)}
+                                threadAlreadyHasPolling={!pollsData?.length}
                               />
                             )}
                         </div>

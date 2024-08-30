@@ -85,11 +85,16 @@ export const ViewSnapshotProposalPage = ({
       return null;
     }
     return new AddressInfo({
-      id: null,
+      userId: 0, // TODO: is this OK?
+      id: 0, // TODO: is this OK?
       address: proposal.author,
-      communityId: activeCommunityId,
+      community: {
+        id: activeCommunityId,
+        base: user.activeAccount?.community.base,
+        ss58Prefix: user.activeAccount?.community.ss58Prefix,
+      },
     });
-  }, [proposal, activeCommunityId]);
+  }, [proposal, activeCommunityId, user.activeAccount?.community]);
 
   useManageDocumentTitle('View snapshot proposal', proposal?.title);
 

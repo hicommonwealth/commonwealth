@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import moment from 'moment';
 import React from 'react';
 
+import farcasterUrl from 'assets/img/farcaster.svg';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -60,6 +61,7 @@ interface ContestCardProps {
   isRecurring: boolean;
   showShareButton?: boolean;
   isHorizontal?: boolean;
+  isFarcaster?: boolean;
 }
 
 const ContestCard = ({
@@ -78,6 +80,7 @@ const ContestCard = ({
   isRecurring,
   showShareButton = true,
   isHorizontal = false,
+  isFarcaster = false,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -97,8 +100,8 @@ const ContestCard = ({
 
   const { data: oneOffContestBalance } = useGetContestBalanceQuery({
     contestAddress: address,
-    chainRpc: app.chain.meta.ChainNode.url,
-    ethChainId: app.chain.meta.ChainNode.ethChainId!,
+    chainRpc: app.chain.meta?.ChainNode?.url,
+    ethChainId: app.chain.meta?.ChainNode?.ethChainId || 0,
     apiEnabled: !isRecurring,
   });
 
@@ -142,6 +145,10 @@ const ContestCard = ({
 
   const handleFundClick = () => {
     onFund?.();
+  };
+
+  const handleFarcasterClick = () => {
+    console.log('Frame copied!');
   };
 
   const balance = isRecurring
@@ -251,7 +258,17 @@ const ContestCard = ({
             />
           )}
         </div>
+
+        {isFarcaster && (
+          <button className="farcaster-cta" onClick={handleFarcasterClick}>
+            <img src={farcasterUrl} alt="farcaster" />
+            <CWText type="h5" fontWeight="bold">
+              Copy Farcaster Frame
+            </CWText>
+          </button>
+        )}
       </div>
+
       {isAdmin && (
         <div className="contest-footer">
           <CWDivider />

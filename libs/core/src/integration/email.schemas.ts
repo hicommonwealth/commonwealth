@@ -8,29 +8,67 @@ import {
   UserMentionedNotification,
 } from './notifications.schemas';
 
+export const EnrichedNotificationNames = {
+  CommentCreated: 'CommentCreated',
+  UserMentioned: 'UserMentioned',
+  CommunityStakeTrade: 'CommunityStakeTrade',
+  ChainProposal: 'ChainProposal',
+  SnapshotProposalCreated: 'SnapshotProposalCreated',
+} as const;
+
 export const EnrichedCommentCreatedNotification =
   CommentCreatedNotification.extend({
+    event_name: z.literal(EnrichedNotificationNames.CommentCreated),
     author_avatar_url: z.string(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedUserMentionedNotification =
   UserMentionedNotification.extend({
-    author_avatar_url: z.string(),
+    event_name: z.literal(EnrichedNotificationNames.UserMentioned),
+    author_avatar_url: z.string().nullish(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedCommunityStakeNotification =
   CommunityStakeNotification.extend({
-    community_icon_url: z.string(),
+    event_name: z.literal(EnrichedNotificationNames.CommunityStakeTrade),
+    community_icon_url: z.string().nullish(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedChainProposalsNotification =
   ChainProposalsNotification.extend({
-    community_icon_url: z.string(),
+    event_name: z.literal(EnrichedNotificationNames.ChainProposal),
+    community_icon_url: z.string().nullish(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const EnrichedSnapshotProposalCreatedNotification =
   SnapshotProposalCreatedNotification.extend({
-    community_icon_url: z.string(),
+    event_name: z.literal(EnrichedNotificationNames.SnapshotProposalCreated),
+    community_icon_url: z.string().nullish(),
+    inserted_at: z
+      .string()
+      .describe(
+        'The string date at which a notification was registered with a notification provider',
+      ),
   });
 
 export const GetRecapEmailData = {
@@ -51,6 +89,8 @@ export const GetRecapEmailData = {
         EnrichedSnapshotProposalCreatedNotification,
       ]),
     ),
+    num_notifications: z.number(),
+    notifications_link: z.string(),
   }),
 };
 

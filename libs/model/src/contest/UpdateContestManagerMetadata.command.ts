@@ -16,12 +16,12 @@ export function UpdateContestManagerMetadata(): Command<
   return {
     ...schemas.UpdateContestManagerMetadata,
     auth: [isCommunityAdmin],
-    body: async ({ id, payload }) => {
+    body: async ({ payload }) => {
       const { topic_ids, ...rest } = payload;
 
       const contestManager = await models.ContestManager.findOne({
         where: {
-          community_id: id,
+          community_id: payload.id,
           contest_address: payload.contest_address,
         },
       });
@@ -90,6 +90,7 @@ export function UpdateContestManagerMetadata(): Command<
           contest_managers: [
             {
               ...result.get({ plain: true }),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               topics: contestTopics.map((ct) => (ct as any).Topic),
             },
           ],

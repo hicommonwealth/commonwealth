@@ -29,7 +29,10 @@ const useReserveCommunityNamespace = ({
     useState<ActionState>(defaultActionState);
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId,
+    reInitAppOnSuccess: true,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
@@ -67,7 +70,7 @@ const useReserveCommunityNamespace = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,
         community: chainId,
-        userId: user.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.userId,
         userAddress: userAddress,
         isPWA: isAddedToHomeScreen,
       });

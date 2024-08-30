@@ -3,9 +3,5 @@
 .CommentsTree {
   display: flex;
   flex-direction: column;
-  // breadcrumbs don't have an underlying elemnet that would fill in the space it overlays
-  // this causes an issue (first commnet is cutoff by the breadcrumbs overlay) when scrolling
-  // comments tree into view
-  // TODO: fix breadcrumbs and remove this
   scroll-margin-block-start: 40px;
 }

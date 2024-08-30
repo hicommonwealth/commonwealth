@@ -23,11 +23,15 @@ export const SearchBarCommunityPreviewRow: FC<
     onSearchItemClick?.();
   };
 
+  // XXX: only fields used here from ChainInfo are name and iconUrl
   const communityInfo = ChainInfo.fromJSON(searchResult as any);
 
   return (
     <div className="SearchBarCommunityPreviewRow" onClick={handleClick}>
-      <CommunityLabel community={communityInfo} />
+      <CommunityLabel
+        name={communityInfo.name || ''}
+        iconUrl={communityInfo.iconUrl || ''}
+      />
     </div>
   );
 };

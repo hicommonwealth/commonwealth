@@ -29,9 +29,7 @@ import {
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
-import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
-import { createRole, findOneRole } from '../../server/util/roles';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
@@ -223,9 +221,8 @@ export type ModelSeeder = {
     jwt: string;
   }) => Promise<any>;
   updateRole: (args: AssignRoleArgs) => Promise<any>;
-  createSubscription: (
-    args: SubscriptionArgs,
-  ) => Promise<NotificationSubscription>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  createSubscription: (args: SubscriptionArgs) => Promise<any>;
   createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
@@ -314,9 +311,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     args: ThreadArgs,
   ): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
     const {
+      jwt,
       chainId,
       address,
-      jwt,
       title,
       body,
       topicId,
@@ -351,23 +348,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post('/api/threads')
+      .post('/api/v1/CreateThread/0')
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
-        author_chain: chainId,
-        chain: chainId,
-        address: address.split(':')[2],
+        jwt,
+        community_id: chainId,
+        topic_id: topicId,
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
-        topic_id: topicId,
+        stage: '',
         url,
-        readOnly: readOnly || false,
-        jwt,
+        read_only: readOnly || false,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
-    return res.body;
+    if (res.ok) return { result: res.body, status: 'Success' };
+    return { status: res.status.toString() };
   },
 
   createLink: async (args: createDeleteLinkArgs) => {
@@ -586,48 +584,14 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   updateRole: async (args: AssignRoleArgs) => {
-    const currentRole = await findOneRole(
-      models,
-      { where: { address_id: args.address_id } },
-      args.chainOrCommObj.chain_id,
+    await models.sequelize.query(
+      `
+          UPDATE "Addresses"
+          SET role = '${args.role}'
+          WHERE id = ${args.address_id};
+      `,
     );
-    let role;
-    // Can only be a promotion
-    if (currentRole.toJSON().permission === 'member') {
-      role = await createRole(
-        models,
-        args.address_id,
-        args.chainOrCommObj.chain_id,
-        args.role,
-      );
-    }
-    // Can be demoted or promoted
-    else if (currentRole.toJSON().permission === 'moderator') {
-      // Demotion
-      if (args.role === 'member') {
-        role = await models['RoleAssignment'].destroy({
-          where: {
-            community_role_id: currentRole.toJSON().community_role_id,
-            address_id: args.address_id,
-          },
-        });
-      }
-      // Promotion
-      else if (args.role === 'admin') {
-        role = await createRole(
-          models,
-          args.address_id,
-          args.chainOrCommObj.chain_id,
-          args.role,
-        );
-      }
-    }
-    // If current role is admin, you cannot change it is the assumption
-    else {
-      return null;
-    }
-    if (!role) return null;
-    return role;
+    return true;
   },
 
   createSubscription: async (args: SubscriptionArgs) => {
@@ -643,15 +607,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createCommunity: async (args: CommunityArgs) => {
     const res = await chai
       .request(app)
-      .post('/api/createCommunity')
+      .post(`/api/v1/CreateCommunity/${args.id}`)
       .set('Accept', 'application/json')
-      .send({ ...args });
-    const community = res.body.result;
-    return community;
+      //.set('address', address.split(':')[2])
+      .send({
+        ...args,
+        type: 'offchain',
+        base: 'ethereum',
+        eth_chain_id: 1,
+        user_address: args.creator_address,
+        node_url: 'http://chain.url',
+        network: 'network',
+        default_symbol: 'test',
+      });
+    return res.body.community;
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {
-    const { jwt, address, chain, originChain, address_id } = args;
+    const { jwt, address, chain, originChain } = args;
     try {
       await chai.request
         .agent(app)
@@ -665,14 +638,6 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         });
     } catch (e) {
       console.error('Failed to link an existing address to a chain');
-      console.error(e);
-      return false;
-    }
-
-    try {
-      await createRole(models, address_id, chain, 'member', false);
-    } catch (e) {
-      console.error('Failed to create a role for a new member');
       console.error(e);
       return false;
     }

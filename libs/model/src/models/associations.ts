@@ -5,17 +5,14 @@ import type { DB } from './factories';
  */
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
-    .withMany(db.Profile, { onUpdate: 'CASCADE' })
     .withMany(db.ProfileTags)
     .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
     .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
-    });
-
-  // TODO: to be deprecated by #5564
-  db.Profile.withMany(db.Address);
+    })
+    .withMany(db.Wallets);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -64,8 +61,6 @@ export const buildAssociations = (db: DB) => {
     })
     .withMany(db.Notification)
     .withMany(db.Webhook)
-    .withMany(db.Ban)
-    .withMany(db.CommunityBanner)
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
@@ -152,18 +147,22 @@ export const buildAssociations = (db: DB) => {
       asOne: 'address',
     },
   );
+
   db.Collaboration.withManyToMany(
     { model: db.Address },
     { model: db.Thread, asMany: 'collaborators' },
   );
+
   db.CommunityContract.withManyToMany(
     { model: db.Community },
     { model: db.Contract },
   );
+
   db.StarredCommunity.withManyToMany(
     { model: db.Community, onUpdate: 'CASCADE' },
     { model: db.User, onUpdate: 'CASCADE' },
   );
+
   db.CommunityAlert.withManyToMany(
     {
       model: db.User,
@@ -189,6 +188,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     },
   );
+
   db.CommentSubscription.withManyToMany(
     {
       model: db.Comment,
@@ -201,6 +201,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     },
   );
+
   db.NotificationsRead.withManyToMany(
     { model: db.Subscription, onDelete: 'CASCADE' },
     {
@@ -210,13 +211,7 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
-  // "loose" FKs
-  db.Comment.belongsTo(db.Community, {
-    foreignKey: 'community_id',
-  });
-  db.Reaction.belongsTo(db.Community, {
-    foreignKey: 'community_id',
-  });
+  // subscriptions
   db.Subscription.belongsTo(db.Community, {
     foreignKey: 'community_id',
   });
@@ -225,8 +220,5 @@ export const buildAssociations = (db: DB) => {
   });
   db.Subscription.belongsTo(db.Comment, {
     foreignKey: 'comment_id',
-  });
-  db.ContestManager.belongsTo(db.ContestManager, {
-    foreignKey: 'community_id',
   });
 };

@@ -1,20 +1,23 @@
+import { AddressRole } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import RoleInfo from '../../../../../models/RoleInfo';
+import { formatAddressShort } from '../../../../../helpers/index';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../../../components/component_kit/cw_label';
+import { CWText } from '../../../../components/component_kit/cw_text';
 import './ManageRoles.scss';
 
 type ManageRoleRowProps = {
   label: string;
-  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
-  roledata?: Array<RoleInfo>;
+  onRoleUpdate: (oldRole: AddressRole, newRole: AddressRole) => void;
+  roledata?: AddressRole[];
 };
 
 export const ManageRoles = ({
@@ -25,13 +28,12 @@ export const ManageRoles = ({
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const removeRole = async (role: RoleInfo) => {
+  const removeRole = async (role: AddressRole) => {
     try {
-      const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
+      const res = await axios.post(`${SERVER_URL}/upgradeMember`, {
         community_id: app.activeChainId(),
         new_role: 'member',
-        // @ts-expect-error <StrictNullChecks/>
-        address: role.Address.address,
+        address: role.address,
         jwt: user.jwt,
       });
 
@@ -40,17 +42,10 @@ export const ManageRoles = ({
       }
 
       const roleData = res.data.result;
-      const newRole = new RoleInfo({
-        id: roleData.id,
-        address_id: roleData.address_id,
-        address_chain: roleData.community_id,
+      const newRole: AddressRole = {
         address: roleData.address,
-        community_id: roleData.community_id,
-        permission: roleData.permission,
-        allow: roleData.allow,
-        deny: roleData.deny,
-        is_user_default: roleData.is_user_default,
-      });
+        role: roleData.role,
+      };
       onRoleUpdate(role, newRole);
     } catch (err) {
       const errMsg = err.response?.data?.error || 'Failed to alter role.';
@@ -58,43 +53,31 @@ export const ManageRoles = ({
     }
   };
 
-  const handleDeleteRole = async (role: RoleInfo) => {
-    const isSelf =
-      // @ts-expect-error <StrictNullChecks/>
-      role.Address.address === user.activeAccount?.address &&
-      role.community_id === user.activeAccount?.community.id;
+  const handleDeleteRole = async (role: AddressRole) => {
+    const isSelf = role.address === user.activeAccount?.address;
 
-    const roleBelongsToUser = !!user.addresses.filter(
-      // @ts-expect-error <StrictNullChecks/>
-      (addr_) => addr_.id === (role.address_id || role.Address.id),
-    ).length;
+    const roleBelongsToUser = user.addresses.some(
+      ({ address }) => address === role.address,
+    );
 
-    const res = await axios.get(`${app.serverUrl()}/roles`, {
+    const res = await axios.get(`${SERVER_URL}/roles`, {
       params: {
         chain_id: app.activeChainId(),
         permissions: ['moderator', 'admin'],
       },
     });
-    const adminsAndMods = res.data.result;
+    const returnedAddrs = res.data.result;
 
-    const userAdminsAndMods = adminsAndMods.filter((role_) => {
+    const userAdminsAndMods = returnedAddrs.filter((addr) => {
       const belongsToUser = !!user.addresses.filter(
-        (addr_) => addr_.id === role_.address_id,
+        (addr_) => addr_.address === addr.address,
       ).length;
       return belongsToUser;
     });
 
-    // if (role.permission === 'admin') {
-    //   const admins = (adminsAndMods || []).filter((r) => r.permission === 'admin');
-    //   if (admins.length < 2) {
-    //     notifyError('Communities must have at least one admin.');
-    //     return;
-    //   }
-    // }
-
     const onlyModsRemaining = () => {
       const modCount = userAdminsAndMods.filter(
-        (r) => r.permission === 'moderator',
+        (r) => r.role === 'moderator',
       ).length;
 
       const remainingRoleCount = userAdminsAndMods.length - 1;
@@ -103,17 +86,16 @@ export const ManageRoles = ({
 
     const isLosingAdminPermissions =
       (userAdminsAndMods.length === 1 && isSelf) ||
-      (roleBelongsToUser && role.permission === 'admin' && onlyModsRemaining());
+      (roleBelongsToUser && role.role === 'admin' && onlyModsRemaining());
 
     openConfirmation({
       title: 'Warning',
       description: isLosingAdminPermissions ? (
         <>
-          You will lose all {role.permission} permissions in this community.
-          Continue?
+          You will lose all {role.role} permissions in this community. Continue?
         </>
       ) : (
-        <>Remove this {role.permission}?</>
+        <>Remove this {role.role}?</>
       ),
       buttons: [
         {
@@ -140,25 +122,29 @@ export const ManageRoles = ({
     <div className="ManageRoles">
       <CWLabel label={label} />
       <div className="roles-container">
-        {roledata?.map((role) => {
-          const addr = role.Address;
-
+        {roledata?.map((r) => {
+          const { role, address } = r;
           return (
-            // @ts-expect-error <StrictNullChecks/>
-            <div className="role-row" key={addr.id}>
+            <div className="role-row" key={address}>
               <User
-                // @ts-expect-error <StrictNullChecks/>
-                userAddress={addr?.address}
-                userCommunityId={role?.community_id}
-                shouldShowAsDeleted={!addr?.address && !role?.community_id}
+                userAddress={address}
+                userCommunityId={app.activeChainId()}
                 shouldShowPopover
                 shouldLinkProfile
                 shouldHideAvatar
               />
+              <CWText>&nbsp;- {formatAddressShort(address)}</CWText>
               <CWIcon
                 iconName="close"
                 iconSize="small"
-                onClick={() => handleDeleteRole(role)}
+                onClick={() => {
+                  void (async () => {
+                    await handleDeleteRole({
+                      address,
+                      role,
+                    });
+                  })();
+                }}
               />
             </div>
           );

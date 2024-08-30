@@ -19,38 +19,38 @@ describe('Digest email lifecycle', () => {
       isAdmin: false,
       selected_community_id: null,
     });
-    const [authorProfile] = await seed('Profile', {
-      user_id: authorUser!.id,
-    });
 
     [communityOne] = await seed('Community', {
       chain_node_id: undefined,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: undefined,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
       chain_node_id: undefined,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });

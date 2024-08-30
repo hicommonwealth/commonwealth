@@ -18,12 +18,14 @@ export type Aggregates = Extract<
   | 'CommunityAlert'
   | 'Address'
   | 'Topic'
-  | 'Profile'
   | 'CommentSubscription'
   | 'ThreadSubscription'
   | 'Contract'
   | 'CommunityContract'
+  | 'Wallets'
   | 'GroupPermission'
+  | 'Tags'
+  | 'CommunityTags'
 >;
 
 export * from './commands';

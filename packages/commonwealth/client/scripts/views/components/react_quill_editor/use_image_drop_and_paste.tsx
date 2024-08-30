@@ -2,8 +2,8 @@ import { DeltaOperation, DeltaStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
+import { SERVER_URL } from 'state/api/config';
 
-import app from 'state';
 import useUserStore from 'state/ui/user';
 import {
   SerializableDeltaStatic,
@@ -62,7 +62,7 @@ export const useImageDropAndPaste = ({
 
         const uploadedFileUrl = await uploadFileToS3(
           file,
-          app.serverUrl(),
+          SERVER_URL,
           user.jwt || '',
         );
 

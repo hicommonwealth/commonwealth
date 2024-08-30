@@ -1,12 +1,13 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { signCommentReaction } from 'controllers/server/sessions';
 import Reaction from 'models/Reaction';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -29,18 +30,15 @@ const createReaction = async ({
     like: reactionType === 'like',
   });
 
-  return await axios.post(
-    `${app.serverUrl()}/comments/${commentId}/reactions`,
-    {
-      author_community_id: userStore.getState().activeAccount?.community?.id,
-      community_id: communityId,
-      address,
-      reaction: reactionType,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-      comment_id: commentId,
-    },
-  );
+  return await axios.post(`${SERVER_URL}/comments/${commentId}/reactions`, {
+    author_community_id: userStore.getState().activeAccount?.community?.id,
+    community_id: communityId,
+    address,
+    reaction: reactionType,
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+    comment_id: commentId,
+  });
 };
 
 const useCreateCommentReactionMutation = ({
@@ -60,6 +58,8 @@ const useCreateCommentReactionMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
@@ -72,20 +72,25 @@ const useCreateCommentReactionMutation = ({
         const tempComments = [...comments];
         const commentToUpdate = tempComments.find((x) => x.id === commentId);
         reaction.Address.User = {
-          Profiles: [commentToUpdate.profile],
+          profile: commentToUpdate.profile,
         };
         commentToUpdate.reactions.push(new Reaction(reaction));
         return tempComments;
       });
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          profileId,
-        );
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
 
       return reaction;
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.data?.error?.toLowerCase().includes('stake')) {
+          notifyError('Buy stake in community to upvote comments');
+        }
+      }
+      return checkForSessionKeyRevalidationErrors(error);
     },
   });
 };

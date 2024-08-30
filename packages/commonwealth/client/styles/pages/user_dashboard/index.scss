@@ -1,6 +1,12 @@
 @import '../../shared';
 
 .UserDashboard {
+  padding-top: 20px;
+
+  @include extraSmall {
+    padding-top: 0; // because of the breadcrumbs being in static position on mobile
+  }
+
   .page-header {
     padding-bottom: 24px;
   }

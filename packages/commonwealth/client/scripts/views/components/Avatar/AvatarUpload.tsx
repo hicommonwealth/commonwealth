@@ -1,15 +1,14 @@
 import axios from 'axios';
 import 'components/Avatar/AvatarUpload.scss';
+import { notifyError } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-
-import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { Avatar } from 'views/components/Avatar/Avatar';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
-import Account from '../../../models/Account';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
 import { ComponentType } from '../component_kit/types';
@@ -34,7 +33,10 @@ type AvatarUploadStyleProps = {
 };
 
 type AvatarUploadProps = {
-  account?: Account;
+  account?: {
+    avatarUrl: string;
+    userId: number;
+  };
   darkMode?: boolean;
   scope: 'community' | 'user';
   uploadCompleteCallback?: (file: Array<any>) => void;
@@ -73,15 +75,12 @@ export const AvatarUpload = ({
     },
     onDropAccepted: async (acceptedFiles: any) => {
       try {
-        const response = await axios.post(
-          `${app.serverUrl()}/getUploadSignature`,
-          {
-            name: acceptedFiles[0].name, // imageName.png
-            mimetype: acceptedFiles[0].type, // image/png
-            auth: true,
-            jwt: user.jwt,
-          },
-        );
+        const response = await axios.post(`${SERVER_URL}/getUploadSignature`, {
+          name: acceptedFiles[0].name, // imageName.png
+          mimetype: acceptedFiles[0].type, // image/png
+          auth: true,
+          jwt: user.jwt,
+        });
         if (response.data.status !== 'Success') throw new Error();
 
         const uploadURL = response.data.result;
@@ -104,10 +103,8 @@ export const AvatarUpload = ({
 
   const avatarSize = size === 'small' ? 60 : 108;
   const forUser = scope === 'user';
-  const avatarUrl = forUser
-    ? account?.profile?.avatarUrl
-    : app.chain?.meta?.iconUrl;
-  const address = forUser ? account?.profile?.id : undefined;
+  const avatarUrl = forUser ? account?.avatarUrl : app.chain?.meta?.iconUrl;
+  const address = forUser ? account?.userId : undefined;
   const showAvatar = avatarUrl || address;
 
   return (

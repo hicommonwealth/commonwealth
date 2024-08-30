@@ -4,7 +4,6 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import { useFlag } from '../../../hooks/useFlag';
 import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
@@ -17,7 +16,6 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
-  const communityStakeEnabled = useFlag('communityStake');
   const {
     createCommunityStep,
     selectedCommunity,
@@ -90,11 +88,7 @@ const CreateCommunity = () => {
       <div className="CreateCommunity">
         {!isSuccessStep && (
           <CWFormSteps
-            steps={getFormSteps(
-              createCommunityStep,
-              showCommunityStakeStep,
-              communityStakeEnabled,
-            )}
+            steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
           />
         )}
 

@@ -1,5 +1,4 @@
 import { IconSize } from 'views/components/component_kit/cw_icons/types';
-import type ChainInfo from '../../../models/ChainInfo';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
@@ -54,7 +53,6 @@ export enum ComponentType {
   TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
-  WalletOptionRow = 'WalletOptionRow',
   SelectList = 'SelectList',
 }
 
@@ -97,7 +95,12 @@ type NotificationMenuItem = {
 };
 
 export type CommunityMenuItem = {
-  community?: ChainInfo;
+  community?: {
+    id: string;
+    name: string;
+    iconUrl: string;
+    isStarred: boolean;
+  };
   label?: string | JSX.Element;
   type?: 'community';
 };

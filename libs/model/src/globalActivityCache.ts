@@ -1,6 +1,5 @@
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { DB } from './models/index';
 
@@ -10,7 +9,7 @@ export async function getActivityFeed(models: DB, id = 0) {
    */
   const query = `
       WITH 
-      user_communities AS (SELECT community_id FROM "Addresses" WHERE user_id = :id),
+      user_communities AS (SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = :id),
       top_threads AS (
           SELECT T.*
           FROM "Threads" T
@@ -96,6 +95,7 @@ export async function getActivityFeed(models: DB, id = 0) {
         RTS.activity_rank_date DESC NULLS LAST;
   `;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const threads: any = await models.sequelize.query(query, {
     type: QueryTypes.SELECT,
     raw: true,
@@ -105,8 +105,7 @@ export async function getActivityFeed(models: DB, id = 0) {
   return threads;
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export class GlobalActivityCache {
   private _cacheKey = 'global_activity';
@@ -127,6 +126,7 @@ export class GlobalActivityCache {
 
   public async start() {
     await this.refreshGlobalActivity();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(this.refreshGlobalActivity.bind(this), this._cacheTTL * 1000);
   }
 

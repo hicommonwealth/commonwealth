@@ -1,5 +1,5 @@
-import ChainInfo from '../models/ChainInfo';
-import StakeInfo from '../models/StakeInfo';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { useGetBuyPriceQuery } from '../state/api/communityStake/index';
 import { convertEthToUsd } from '../views/modals/ManageCommunityStakeModal/utils';
 
@@ -17,27 +17,24 @@ export const useCommunityCardPrice = ({
   ethUsdRate,
   historicalPrice,
 }: {
-  community: ChainInfo;
+  community: z.infer<typeof ExtendedCommunity>;
   stakeId: number;
   ethUsdRate: string;
   historicalPrice: string;
 }) => {
-  // @ts-expect-error StrictNullChecks
-  const communityStake: StakeInfo = community?.CommunityStakes?.find(
-    (s) => s.stakeId === stakeId,
+  const communityStake = (community?.CommunityStakes || [])?.find(
+    (s) => s.stake_id === stakeId,
   );
-  const stakeEnabled = !!communityStake?.stakeEnabled;
+  const stakeEnabled = !!communityStake?.stake_enabled;
 
   // The price of buying one stake
   const { data: buyPriceData, isLoading } = useGetBuyPriceQuery({
-    // @ts-expect-error StrictNullChecks
-    namespace: community.namespace,
+    namespace: community?.namespace || '',
     stakeId: stakeId,
     amount: 1,
-    apiEnabled: stakeEnabled,
-    chainRpc: community.ChainNode?.url,
-    // @ts-expect-error StrictNullChecks
-    ethChainId: community.ChainNode?.ethChainId,
+    apiEnabled: stakeEnabled && !!community,
+    chainRpc: community?.ChainNode?.url || '',
+    ethChainId: community?.ChainNode?.eth_chain_id || 0,
   });
 
   if (!stakeEnabled || isLoading) {

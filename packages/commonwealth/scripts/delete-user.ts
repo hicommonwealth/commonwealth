@@ -1,9 +1,7 @@
 import { dispose, logger } from '@hicommonwealth/core';
 import { UserInstance, models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 async function deleteUser(user_id: number) {
   log.info(`Deleting user ${user_id}`);
@@ -104,12 +102,6 @@ async function deleteUser(user_id: number) {
       transaction,
     });
     await models.Address.destroy({
-      where: {
-        user_id,
-      },
-      transaction,
-    });
-    await models.Profile.destroy({
       where: {
         user_id,
       },

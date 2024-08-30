@@ -1,3 +1,5 @@
+export * from './chain-event.schemas';
+export * from './chain-event.utils';
 export * from './email.schemas';
 export * from './events';
 export * from './events.schemas';

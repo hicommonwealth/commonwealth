@@ -8,7 +8,7 @@ import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import { AccountSelector } from 'views/components/component_kit/AccountSelector/AccountSelector';
 import TOSModal from 'views/modals/TOSModal';
 import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
@@ -35,8 +35,7 @@ const useJoinCommunity = () => {
     }
 
     // add all items on same base as active chain
-    const addressChainInfo = app.config.chains.getById(a.community.id);
-    if (addressChainInfo?.base !== activeBase) {
+    if (a?.community?.base !== activeBase) {
       return false;
     }
 
@@ -44,8 +43,7 @@ const useJoinCommunity = () => {
     const addressExists = !!user.addresses.slice(idx + 1).find(
       (prev) =>
         activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.community.id)?.base ===
-        ChainBase.Substrate
+        (prev.community?.base === ChainBase.Substrate
           ? addressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -91,70 +89,65 @@ const useJoinCommunity = () => {
   // Handles linking the specified address to the specified community
   const linkSpecificAddressToSpecificCommunity = async ({
     address,
-    communityId,
-    communityChainBase,
+    community,
     activeChainId,
   }: {
     address: string;
-    communityId: string;
-    communityChainBase: string;
+    community: {
+      id: string;
+      name: string;
+      iconUrl: string;
+      base: string;
+    };
     activeChainId?: string;
   }) => {
     try {
       const res = await linkExistingAddressToChainOrCommunity(
         address,
-        communityId,
-        communityChainBase,
+        community.id,
+        community.base,
       );
 
       if (res && res.data.result) {
         const { verification_token, addresses, encodedAddress } =
           res.data.result;
 
-        // update addresses
+        // update addresses and user communities
         user.setData({
+          ...(!user.communities.find((c) => c.id === community.id) && {
+            communities: [
+              ...user.communities,
+              {
+                id: community.id,
+                iconUrl: activeChainInfo.iconUrl || '',
+                name: activeChainInfo.name || '',
+                isStarred: false,
+              },
+            ],
+          }),
           addresses: addresses.map((a) => {
             return new AddressInfo({
+              userId: user.id,
               id: a.id,
               address: a.address,
-              communityId: a.community_id,
-              keytype: a.keytype,
+              community: {
+                id: a.community_id,
+                base: a.Community?.base,
+                ss58Prefix: a.Community?.ss58_prefix,
+              },
               walletId: a.wallet_id,
             });
           }),
         });
 
-        // get newly added address info
-        const addressInfo = user.addresses.find(
-          (a) => a.address === encodedAddress && a.community.id === communityId,
-        );
-
         // set verification token for the newly created account
-        const account = app?.chain?.accounts?.get?.(
-          encodedAddress,
-          // @ts-expect-error <StrictNullChecks/>
-          addressInfo.keytype,
-        );
+        const account = app?.chain?.accounts?.get?.(encodedAddress);
         if (account && app.chain) {
           account?.setValidationToken?.(verification_token);
         }
 
         // set active address if in a community
         if (activeChainId) {
-          // set role in community
-          if (
-            !app.roles.getRoleInCommunity({
-              account,
-              community: activeChainId,
-            })
-          ) {
-            await app.roles.createRole({
-              // @ts-expect-error <StrictNullChecks/>
-              address: addressInfo,
-              community: activeChainId,
-            });
-          }
-
           account && (await setActiveAccount(account));
 
           // update active accounts
@@ -188,8 +181,12 @@ const useJoinCommunity = () => {
 
         await linkSpecificAddressToSpecificCommunity({
           address,
-          communityId: targetCommunity,
-          communityChainBase: originAddressInfo.community.id,
+          community: {
+            id: targetCommunity,
+            name: activeChainInfo.name,
+            base: activeChainInfo.base,
+            iconUrl: activeChainInfo.iconUrl || '',
+          },
           activeChainId: activeCommunityId,
         });
 

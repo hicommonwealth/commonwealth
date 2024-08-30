@@ -1,4 +1,5 @@
 export * from './address.schemas';
+export * from './chainEvent.schemas';
 export * from './chainNode.schemas';
 export * from './comment.schemas';
 export * from './community.schemas';
@@ -9,3 +10,5 @@ export * from './subscription.schemas';
 export * from './thread.schemas';
 export * from './todo.schemas';
 export * from './user.schemas';
+export * from './wallet.schemas';
+export * from './webhook.schemas';

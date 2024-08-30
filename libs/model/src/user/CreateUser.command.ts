@@ -7,8 +7,8 @@ export function CreateUser(): Command<typeof schemas.CreateTodo> {
   return {
     ...schemas.CreateTodo,
     auth: [],
-    body: async ({ id, payload }) => {
-      const user = await models.User.findOne({ where: { id } });
+    body: async ({ payload }) => {
+      const user = await models.User.findOne({ where: { id: payload.id } });
 
       mustNotExist('User', user);
 

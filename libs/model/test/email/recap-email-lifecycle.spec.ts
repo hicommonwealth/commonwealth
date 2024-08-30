@@ -8,13 +8,7 @@ import {
   notificationsProvider,
   query,
 } from '@hicommonwealth/core';
-import {
-  Comment,
-  Community,
-  Profile,
-  Thread,
-  User,
-} from '@hicommonwealth/schemas';
+import { Comment, Community, Thread, User } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -37,7 +31,6 @@ describe('Recap email lifecycle', () => {
   let thread: z.infer<typeof Thread> | undefined;
   let recipientUser: z.infer<typeof User> | undefined;
   let authorUser: z.infer<typeof User> | undefined;
-  let authorProfile: z.infer<typeof Profile> | undefined;
 
   let sandbox: sinon.SinonSandbox;
 
@@ -50,9 +43,6 @@ describe('Recap email lifecycle', () => {
       isAdmin: false,
       selected_community_id: null,
     });
-    [authorProfile] = await seed('Profile', {
-      user_id: authorUser!.id,
-    });
 
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
@@ -62,11 +52,12 @@ describe('Recap email lifecycle', () => {
     });
     [community] = await seed('Community', {
       chain_node_id: node?.id,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',
@@ -86,7 +77,6 @@ describe('Recap email lifecycle', () => {
 
     [comment] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
-      community_id: community?.id,
       thread_id: thread!.id!,
     });
   });
@@ -107,7 +97,6 @@ describe('Recap email lifecycle', () => {
   test('should return enriched discussion notifications', async () => {
     const discussionData = generateDiscussionData(
       authorUser!,
-      authorProfile!,
       community!.Addresses![0]!,
       recipientUser!,
       community!,

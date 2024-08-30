@@ -27,9 +27,6 @@ const FinishSocialLoginPage = lazy(
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 
-const NotificationSettingsOld = lazy(
-  () => import('views/pages/NotificationSettingsOld'),
-);
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
@@ -100,10 +97,7 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const CustomDomainRoutes = ({
-  contestEnabled,
-  knockInAppNotifications,
-}: RouteFeatureFlags) => {
+const CustomDomainRoutes = ({ contestEnabled }: RouteFeatureFlags) => {
   return [
     <Route
       key="/"
@@ -181,12 +175,7 @@ const CustomDomainRoutes = ({
     <Route
       key="/notification-settings"
       path="/notification-settings"
-      element={withLayout(
-        knockInAppNotifications
-          ? NotificationSettings
-          : NotificationSettingsOld,
-        { type: 'common' },
-      )}
+      element={withLayout(NotificationSettings, { type: 'common' })}
     />,
     // NOTIFICATIONS END
 
@@ -404,8 +393,8 @@ const CustomDomainRoutes = ({
       })}
     />,
     <Route
-      key="/profile/id/:profileId"
-      path="/profile/id/:profileId"
+      key="/profile/id/:userId"
+      path="/profile/id/:userId"
       element={withLayout(NewProfilePage, {
         scoped: true,
         type: 'common',
@@ -605,10 +594,10 @@ const CustomDomainRoutes = ({
       element={<Navigate to="/account" />}
     />,
     <Route
-      key="/:scope/profile/id/:profileId"
-      path="/:scope/profile/id/:profileId"
+      key="/:scope/profile/id/:userId"
+      path="/:scope/profile/id/:userId"
       element={
-        <Navigate to={(parameters) => `/profile/id/${parameters.profileId}`} />
+        <Navigate to={(parameters) => `/profile/id/${parameters.userId}`} />
       }
     />,
     <Route

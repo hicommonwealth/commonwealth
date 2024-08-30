@@ -1,4 +1,5 @@
 // Core Domain
+export * as ChainEvents from './chain-events';
 export * as Comment from './comment';
 export * as Community from './community';
 export * as Contest from './contest';
@@ -9,6 +10,8 @@ export * as Reaction from './reaction';
 export * as Subscription from './subscription';
 export * as Thread from './thread';
 export * as User from './user';
+export * as Wallet from './wallet';
+export * as Webhook from './webhook';
 
 // Core Services
 export * from './services';

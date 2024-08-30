@@ -1,10 +1,13 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { signThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -30,7 +33,7 @@ const createReaction = async ({
   });
 
   return await axios.post(
-    `${app.serverUrl()}/threads/${threadId}/reactions`,
+    `${SERVER_URL}/threads/${threadId}/reactions`,
     {
       author_community_id: userStore.getState().activeAccount?.community?.id,
       thread_id: threadId,
@@ -55,6 +58,8 @@ const useCreateThreadReactionMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   const user = useUserStore();
 
   return useMutation({
@@ -65,7 +70,7 @@ const useCreateThreadReactionMutation = ({
         address: response.data.result.Address.address,
         type: 'like',
         updated_at: response.data.result.updated_at,
-        voting_weight: response.data.result.calculated_voting_weight || 1,
+        voting_weight: response.data.result.calculated_voting_weight || 0,
       };
       updateThreadInAllCaches(
         communityId,
@@ -74,12 +79,17 @@ const useCreateThreadReactionMutation = ({
         'combineAndRemoveDups',
       );
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          profileId,
-        );
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
+        markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.data?.error?.toLowerCase().includes('stake')) {
+          notifyError('Buy stake in community to upvote threads');
+        }
+      }
+      return checkForSessionKeyRevalidationErrors(error);
     },
   });
 };

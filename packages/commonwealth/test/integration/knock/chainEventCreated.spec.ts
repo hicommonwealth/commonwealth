@@ -44,8 +44,7 @@ describe('chainEventCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let chainNode: z.infer<typeof schemas.ChainNode> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
-  let userProfile: z.infer<typeof schemas.Profile> | undefined,
-    sandbox: sinon.SinonSandbox;
+  let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
     [chainNode] = await tester.seed(
@@ -60,17 +59,16 @@ describe('chainEventCreated Event Handler', () => {
       { mock: false },
     );
     [user] = await tester.seed('User', {});
-    [userProfile] = await tester.seed('Profile', {
-      user_id: user!.id,
-    });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode!.id,
       namespace_address: namespaceAddress,
+      lifetime_thread_count: 0,
+      profile_count: 0,
       Addresses: [],
     });
     const [contract] = await tester.seed('Contract', {
       address: communityStakesAddress,
-      chain_node_id: chainNode!.id,
+      chain_node_id: chainNode!.id!,
       abi_id: null,
     });
     await tester.seed('CommunityContract', {
@@ -151,7 +149,6 @@ describe('chainEventCreated Event Handler', () => {
         community_id: community!.id,
         role: 'admin',
         user_id: user!.id,
-        profile_id: userProfile!.id,
       });
 
       const res = await processChainEventCreated({
@@ -175,7 +172,6 @@ describe('chainEventCreated Event Handler', () => {
           community_id: community!.id,
           transaction_type: 'minted',
           community_name: community!.name,
-          // @ts-expect-error StrictNullChecks
           community_stakes_url: getCommunityUrl(community!.id),
         },
       });
@@ -189,7 +185,6 @@ describe('chainEventCreated Event Handler', () => {
         community_id: community!.id,
         role: 'admin',
         user_id: user!.id,
-        profile_id: userProfile!.id,
       });
 
       await expect(
@@ -281,7 +276,6 @@ describe('chainEventCreated Event Handler', () => {
           community_id: community!.id,
           community_name: community!.name,
           proposal_kind: 'proposal-created',
-          // @ts-expect-error StrictNullChecks
           proposal_url: getChainProposalUrl(community!.id, proposalId),
         },
       });

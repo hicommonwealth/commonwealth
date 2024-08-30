@@ -1,16 +1,17 @@
-import { HotShotsStats } from '@hicommonwealth/adapters';
-import { dispose, logger, stats } from '@hicommonwealth/core';
+import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
 import {
-  createAsyncWriterS3,
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
 
-const log = logger(__filename);
+const log = logger(import.meta);
+blobStorage(S3BlobStorage());
 
 async function doExec() {
   if (process.env.SITEMAP_ENV !== 'production') {
     throw new Error(
+      // eslint-disable-next-line max-len
       'Define SITEMAP_ENV to signify you understand that this should only run in production to avoid breaking sitemaps.',
     );
   }
@@ -24,11 +25,10 @@ async function doExec() {
   stats(HotShotsStats()).increment('cw.scheduler.email-digest');
 
   log.info('Creating writer... ');
-  const writer = createAsyncWriterS3();
   log.info('Creating paginator... ');
   const paginator = createDatabasePaginatorDefault();
 
-  const { index } = await createSitemapGenerator(writer, [
+  const { index } = await createSitemapGenerator([
     paginator.threads,
     paginator.profiles,
   ]).exec();
@@ -38,9 +38,11 @@ async function doExec() {
 
 doExec()
   .then(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('EXIT', true);
   })
   .catch((err) => {
     log.fatal('Unable to process sitemaps: ', err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
   });

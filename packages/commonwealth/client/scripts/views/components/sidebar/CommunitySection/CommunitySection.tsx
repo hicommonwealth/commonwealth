@@ -1,10 +1,10 @@
+import { CommunityAlert } from '@hicommonwealth/schemas';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
   VoteWeightModule,
@@ -16,11 +16,9 @@ import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sideb
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { useFlag } from '../../../../hooks/useFlag';
+import { z } from 'zod';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
-import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
-import { CWText } from '../../component_kit/cw_text';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
 import { AdminSection } from '../AdminSection';
 import CreateCommunityButton from '../CreateCommunityButton';
@@ -35,15 +33,9 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
-  const communityHomepageEnabled = useFlag('communityHomepage');
-  const communityStakeEnabled = useFlag('communityStake');
-  const navigate = useCommonNavigate();
-  const { pathname } = useLocation();
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
   const {
     selectedAddress,
-    selectedCommunity,
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
@@ -62,28 +54,36 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { isContestAvailable, isContestDataLoading, contestsData } =
     useCommunityContests();
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const topicIdsIncludedInContest =
     getUniqueTopicIdsIncludedInActiveContest(contestsData);
+
+  const communityAlerts:
+    | ReadonlyArray<z.infer<typeof CommunityAlert>>
+    | undefined = useCommunityAlertsQuery({
+    enabled: user.isLoggedIn && !!app.chain,
+  }).data as unknown as ReadonlyArray<z.infer<typeof CommunityAlert>>;
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
-  const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isMod = Permissions.isCommunityModerator();
-  const showAdmin = isAdmin || isMod;
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
 
   return (
     <>
       <div className="community-menu">
-        {app.isLoggedIn() && (
+        {user.isLoggedIn && (
           <>
             <AccountConnectionIndicator
               connected={!!user.activeAccount}
               address={user.activeAccount?.address || ''}
             />
 
-            {communityStakeEnabled && stakeEnabled && (
+            {stakeEnabled && (
               <VoteWeightModule
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
@@ -97,20 +97,11 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CreateCommunityButton />
 
-        {showAdmin && (
+        {isAdmin && (
           <>
             <CWDivider />
             <AdminSection />
           </>
-        )}
-        {communityHomepageEnabled && app.chain?.meta.hasHomepage && (
-          <div
-            className={onHomeRoute ? 'home-button active' : 'home-button'}
-            onClick={() => navigate('/feed')}
-          >
-            <CWIcon iconName="home" iconSize="small" />
-            <CWText>Home</CWText>
-          </div>
         )}
 
         <CWDivider />
@@ -127,12 +118,12 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <ExternalLinksModule />
         <div className="buttons-container">
-          {isLoggedIn && app.chain && (
+          {user.isLoggedIn && app.chain && (
             <div className="subscription-button">
-              <SubscriptionButton />
+              <SubscriptionButton communityAlerts={communityAlerts} />
             </div>
           )}
-          {app.isCustomDomain() && (
+          {domain?.isCustomDomain && (
             <div
               className="powered-by"
               onClick={() => {
@@ -150,7 +141,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
-            {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
         // @ts-expect-error <StrictNullChecks/>

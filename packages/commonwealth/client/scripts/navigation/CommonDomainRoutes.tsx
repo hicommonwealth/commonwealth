@@ -5,7 +5,7 @@ import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/communities'));
+const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
@@ -29,9 +29,6 @@ const FinishSocialLoginPage = lazy(
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 
-const NotificationSettingsOld = lazy(
-  () => import('views/pages/NotificationSettingsOld'),
-);
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
@@ -103,11 +100,11 @@ const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+const CommunityNotFoundPage = lazy(
+  () => import('views/pages/CommunityNotFoundPage'),
+);
 
-const CommonDomainRoutes = ({
-  contestEnabled,
-  knockInAppNotifications,
-}: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({ contestEnabled }: RouteFeatureFlags) => [
   <Route
     key="/"
     path="/"
@@ -210,10 +207,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(
-      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
-      { type: 'common' },
-    )}
+    element={withLayout(NotificationSettings, { type: 'common' })}
   />,
   <Route
     key="/:scope/notification-settings"
@@ -527,8 +521,8 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
-    key="/profile/id/:profileId"
-    path="/profile/id/:profileId"
+    key="/profile/id/:userId"
+    path="/profile/id/:userId"
     element={withLayout(NewProfilePage, {
       scoped: true,
       type: 'common',
@@ -573,6 +567,15 @@ const CommonDomainRoutes = ({
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
   // LEGACY REDIRECTS END
+
+  // Community not found page - This should be at the end
+  <Route
+    key="/:scope/*"
+    path="/:scope/*"
+    element={withLayout(CommunityNotFoundPage, {
+      scoped: true,
+    })}
+  />,
 ];
 
 export default CommonDomainRoutes;

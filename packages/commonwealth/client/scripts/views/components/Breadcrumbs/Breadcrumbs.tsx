@@ -2,6 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -14,6 +15,7 @@ export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
   const userData = useUserStore();
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
@@ -25,9 +27,6 @@ export const Breadcrumbs = () => {
       // Only call when in discussion pages prevents unnecessary calls.
       location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
-
-  const user = userData.addresses?.[0];
-  const profileId = user?.profileId || user?.profile?.id || 0;
 
   const currentDiscussion = {
     currentThreadName: linkedThreads?.[0]?.title || '',
@@ -57,12 +56,13 @@ export const Breadcrumbs = () => {
     standalone = true;
   }
 
+  const user = userData.addresses?.[0];
   const pathnames = generateBreadcrumbs(
     location.pathname,
-    profileId,
     navigate,
-    app.isCustomDomain() ? app.activeChainId() : '',
+    domain?.isCustomDomain ? app.activeChainId() : '',
     currentDiscussion,
+    user?.userId,
   );
 
   //Gets the tooltip copy based on the current page.
@@ -101,6 +101,9 @@ export const Breadcrumbs = () => {
           />
         )}
       </nav>
+      {/* an empty div that takes the block content area on the active page, similar
+      to the area that the fixed position BreadcrumbsComponent would take */}
+      <div className="BreadcrumbsBlockContentArea" />
     </CWPageLayout>
   );
 };

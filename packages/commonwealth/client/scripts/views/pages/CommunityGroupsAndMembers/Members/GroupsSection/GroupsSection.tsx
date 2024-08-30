@@ -4,10 +4,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles/index';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { useFlag } from '../../../../../hooks/useFlag';
 import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
 import { chainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
@@ -25,7 +21,6 @@ const GroupsSection = ({
   canManageGroups,
   hasNoGroups,
 }: GroupSectionProps) => {
-  const allowlistEnabled = useFlag('allowlist');
   const navigate = useCommonNavigate();
 
   const profileAddresses = filteredGroups
@@ -46,28 +41,8 @@ const GroupsSection = ({
 
   return (
     <section className="GroupsSection">
-      {hasNoGroups && allowlistEnabled && <TopicGatingHelpMessage />}
-      {hasNoGroups && !allowlistEnabled && (
-        <div className="empty-groups-container">
-          <CWIcon iconName="members" iconSize="xxl" className="members-icon" />
-          <CWText type="h4" className="header">
-            <span className="capitalize">{app.activeChainId()}</span>&nbsp;does
-            not have any groups
-          </CWText>
-          <CWText type="b1" className="description">
-            Admins can create groups to gate discussion topics
-          </CWText>
-          {canManageGroups && (
-            <CWButton
-              className="cta-btn"
-              buttonWidth="narrow"
-              label="Create group"
-              iconLeft="plus"
-              onClick={() => navigate(`/members/groups/create`)}
-            />
-          )}
-        </div>
-      )}
+      {hasNoGroups && <TopicGatingHelpMessage />}
+
       {filteredGroups?.length > 0 && (
         <section className="list-container">
           {filteredGroups?.map((group, index) => (

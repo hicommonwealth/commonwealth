@@ -16,6 +16,7 @@ import {
 import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
+import useUserStore from 'state/ui/user';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -27,6 +28,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
+import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -97,6 +99,9 @@ export const CommentCard = ({
   className,
   shareURL,
 }: CommentCardProps) => {
+  const user = useUserStore();
+  const userOwnsComment = comment.profile.userId === user.id;
+
   const [commentText, setCommentText] = useState(comment.text);
   const commentBody = deserializeDelta(
     (editDraft || commentText) ?? comment.text,
@@ -146,7 +151,12 @@ export const CommentCard = ({
             // @ts-expect-error <StrictNullChecks/>
             authorAddress={app.chain ? author?.address : comment?.author}
             // @ts-expect-error <StrictNullChecks/>
-            authorCommunityId={author?.community?.id || author?.profile?.chain}
+            authorCommunityId={
+              author?.community?.id ||
+              author?.profile?.chain ||
+              comment?.communityId ||
+              comment?.authorChain
+            }
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
@@ -248,6 +258,13 @@ export const CommentCard = ({
                     // @ts-expect-error <StrictNullChecks/>
                     await onReply();
                   }}
+                />
+              )}
+
+              {user.id > 0 && (
+                <ToggleCommentSubscribe
+                  comment={comment}
+                  userOwnsComment={userOwnsComment}
                 />
               )}
 
