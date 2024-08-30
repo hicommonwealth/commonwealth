@@ -28,6 +28,7 @@ type StatusResp = {
     knockJwtToken: string;
     addresses: AddressInstance[];
     selectedCommunity: CommunityInstance;
+    k;
     isAdmin: boolean;
     disableRichText: boolean;
     communities: StarredCommunityAttributes[];
@@ -118,7 +119,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       isAdmin,
       disableRichText,
       communities: userCommunities?.[0] || [],
-      starredCommunities: userCommunities?.[0] || [],
     },
     id: user.id,
     email: user.email,
