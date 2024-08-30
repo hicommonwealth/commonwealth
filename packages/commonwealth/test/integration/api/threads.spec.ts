@@ -17,7 +17,6 @@ import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { markdownComment } from '../../util/fixtures/markdownComment';
-import type { CommunityArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -317,21 +316,22 @@ describe.skip('Thread Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
     });
-    test.skip('should pass as admin of private community', async () => {
-      const communityArgs: CommunityArgs = {
-        jwt: userJWT,
-        isAuthenticatedForum: 'false',
-        privacyEnabled: 'true',
-        id: 'test',
-        name: 'test community',
-        creator_address: userAddress,
-        creator_chain: chain,
-        description: 'test enabled community',
-        default_chain: chain,
-      };
 
-      await server.seeder.createCommunity(communityArgs);
-    });
+    // test.skip('should pass as admin of private community', async () => {
+    //   const communityArgs: CommunityArgs = {
+    //     jwt: userJWT,
+    //     isAuthenticatedForum: 'false',
+    //     privacyEnabled: 'true',
+    //     id: 'test',
+    //     name: 'test community',
+    //     creator_address: userAddress,
+    //     creator_chain: chain,
+    //     description: 'test enabled community',
+    //     default_chain: chain,
+    //   };
+
+    //   await server.seeder.createCommunity(communityArgs);
+    // });
   });
 
   describe('/thread/:id/comments', () => {
