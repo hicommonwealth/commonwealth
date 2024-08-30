@@ -635,11 +635,20 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createCommunity: async (args: CommunityArgs) => {
     const res = await chai
       .request(app)
-      .post('/api/createCommunity')
+      .post(`/api/v1/CreateCommunity/${args.id}`)
       .set('Accept', 'application/json')
-      .send({ ...args });
-    const community = res.body.result;
-    return community;
+      //.set('address', address.split(':')[2])
+      .send({
+        ...args,
+        type: 'offchain',
+        base: 'ethereum',
+        eth_chain_id: 1,
+        user_address: args.creator_address,
+        node_url: 'http://chain.url',
+        network: 'network',
+        default_symbol: 'test',
+      });
+    return res.body.community;
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {

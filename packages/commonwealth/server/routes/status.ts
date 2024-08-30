@@ -66,32 +66,32 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // get starred communities for user
   const userCommunities = await sequelize.query(
     `
-      SELECT 
-        id, 
-        icon_url, 
+      SELECT
+        id,
+        icon_url,
         name,
-        CASE 
+        CASE
           WHEN sc.community_id IS NOT NULL THEN TRUE
           ELSE FALSE
         END AS is_starred
-      FROM 
+      FROM
         "Communities" c
-      LEFT JOIN 
-        "StarredCommunities" sc 
-      ON 
-        c.id = sc.community_id 
+      LEFT JOIN
+        "StarredCommunities" sc
+      ON
+        c.id = sc.community_id
         AND sc.user_id = :user_id
-      WHERE 
+      WHERE
         id IN (
-          SELECT 
+          SELECT
             a.community_id
-          FROM 
+          FROM
             "Addresses" a
-          WHERE 
-            a.verified IS NOT NULL 
-            AND a.last_active IS NOT NULL 
+          WHERE
+            a.verified IS NOT NULL
+            AND a.last_active IS NOT NULL
             AND a.user_id = :user_id
-          GROUP BY 
+          GROUP BY
             a.community_id
         );
     `,
@@ -132,7 +132,7 @@ export const status = async (
     const { user: reqUser } = req;
     if (!reqUser) {
       return success(res, {
-        evmTestEnv: config.EVM.ETH_RPC,
+        evmTestEnv: config.TEST_EVM.ETH_RPC,
       });
     } else {
       // user is logged in
@@ -163,7 +163,7 @@ export const status = async (
         // @ts-expect-error StrictNullChecks
         user,
         communityWithRedirects: communityWithRedirects || [],
-        evmTestEnv: config.EVM.ETH_RPC,
+        evmTestEnv: config.TEST_EVM.ETH_RPC,
       });
     }
   } catch (error) {

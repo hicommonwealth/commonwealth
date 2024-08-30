@@ -490,7 +490,6 @@ async function magicLoginRoute(
         generatedAddresses.push({
           // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
-          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else if (
@@ -500,7 +499,6 @@ async function magicLoginRoute(
         generatedAddresses.push({
           // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
-          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else {
