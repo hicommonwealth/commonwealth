@@ -2,9 +2,7 @@ import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
 import {
-  makeGetBalancesOptions,
   tokenBalanceCache,
-  validateGroupMembership,
   type AddressAttributes,
   type DB,
   type GroupAttributes,
@@ -13,6 +11,8 @@ import {
   type OptionsWithBalances,
 } from '../..';
 import { config } from '../../config';
+import { makeGetBalancesOptions } from './makeGetBalancesOptions';
+import { validateGroupMembership } from './validateGroupMembership';
 
 /**
  * refreshMembershipsForAddress refreshes the memberships for the given address

@@ -28,6 +28,7 @@ const {
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
+  MEMBERSHIP_REFRESH_TTL_SECONDS,
 } = process.env;
 
 const NAME =
