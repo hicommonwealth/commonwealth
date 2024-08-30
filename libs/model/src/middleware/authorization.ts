@@ -3,6 +3,7 @@ import {
   INVALID_ACTOR_ERROR,
   InvalidActor,
   InvalidInput,
+  QueryHandler,
   type CommandContext,
   type CommandHandler,
   type CommandInput,
@@ -11,7 +12,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodSchema, z } from 'zod';
+import { ZodObject, ZodSchema, ZodString, z } from 'zod';
 import { models } from '..';
 
 export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
@@ -31,6 +32,30 @@ export class BannedActor extends InvalidActor {
   }
 }
 
+export class NonMember extends InvalidActor {
+  constructor(
+    public actor: Actor,
+    public topic: string,
+    public action: GroupPermissionAction,
+  ) {
+    super(
+      actor,
+      `User does not have permission to perform action ${action} in topic ${topic}`,
+    );
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
+export class RejectedMember extends InvalidActor {
+  constructor(
+    public actor: Actor,
+    public reasons: string[],
+  ) {
+    super(actor, reasons.join(', '));
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
 /**
  * TODO: review rules
  * We have to consider these scenarios
@@ -46,7 +71,12 @@ export class BannedActor extends InvalidActor {
  * @param roles roles filter
  */
 const authorizeAddress = async (
-  { actor, payload }: CommandContext<CommandInput>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // `CommandContext<CommandInput>` prevents use of this function in Query middleware
+  // due to `id` being required in the core command framework.
+  // This issue can be resolved with https://github.com/hicommonwealth/commonwealth/issues/9009
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<z.infer<typeof Address>> => {
   // By convention, secure requests must provide community_id/id + address arguments
@@ -117,11 +147,7 @@ async function isTopicMember(
   const allowed = groups.filter(
     (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
-  if (!allowed.length!)
-    throw new InvalidActor(
-      actor,
-      `User does not have permission to perform action ${action} in topic ${topic.name}`,
-    );
+  if (!allowed.length!) throw new NonMember(actor, topic.name, action);
 
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
@@ -136,10 +162,30 @@ async function isTopicMember(
       },
     ],
   });
+  if (!memberships.length) throw new NonMember(actor, topic.name, action);
+
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
-    throw new InvalidActor(actor, rejects.join('\n'));
+    throw new RejectedMember(
+      actor,
+      rejects.flatMap((reject) =>
+        reject.reject_reason!.map((reason) => reason.message),
+      ),
+    );
 }
+
+type CommunityQueryMiddleware = QueryHandler<
+  ZodObject<{
+    community_id: ZodString;
+  }>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any
+>;
+
+export const isCommunityAdminQuery: CommunityQueryMiddleware = async (ctx) => {
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin']);
+};
 
 /**
  * Community middleware

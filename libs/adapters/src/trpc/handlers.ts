@@ -60,6 +60,8 @@ export enum Tag {
   Integration = 'Integration',
   Subscription = 'Subscription',
   LoadTest = 'LoadTest',
+  Wallet = 'Wallet',
+  Webhook = 'Webhook',
 }
 
 export const command = <Input extends CommandInput, Output extends ZodSchema>(

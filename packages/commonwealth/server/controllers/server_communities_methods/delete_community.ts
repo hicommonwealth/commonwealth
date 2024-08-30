@@ -118,12 +118,11 @@ export async function __deleteCommunity(
           );
 
           const models: ModelStatic<
-            ModelInstance<{ community_id?: string }>
+            | ModelInstance<{ community_id: string }>
+            | ModelInstance<{ community_id?: string }>
           >[] = [
             this.models.CommunityStake,
             this.models.DiscordBotConfig,
-            this.models.Reaction,
-            this.models.Comment,
             this.models.Topic,
             this.models.Subscription,
             this.models.CommunityContract,
@@ -147,7 +146,7 @@ export async function __deleteCommunity(
 
           await this.models.Collaboration.destroy({
             where: {
-              thread_id: { [Op.in]: threads.map((thread) => thread.id) },
+              thread_id: { [Op.in]: threads.map((thread) => thread.id!) },
             },
             transaction: t,
           });

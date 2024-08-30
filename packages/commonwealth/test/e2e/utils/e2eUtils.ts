@@ -62,7 +62,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
     ...e2eEntities,
 
     addAlchemyKey: async function () {
-      const apiKey = config.EVM.ETH_ALCHEMY_API_KEY;
+      const apiKey = config.TEST_EVM.ETH_ALCHEMY_API_KEY;
       if (!apiKey) {
         throw Error('ETH_ALCHEMY_API_KEY not found');
       }
