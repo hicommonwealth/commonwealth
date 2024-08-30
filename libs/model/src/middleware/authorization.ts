@@ -47,10 +47,7 @@ export class NonMember extends InvalidActor {
 }
 
 export class RejectedMember extends InvalidActor {
-  constructor(
-    public actor: Actor,
-    public reasons: string[],
-  ) {
+  constructor(public actor: Actor, public reasons: string[]) {
     super(actor, reasons.join(', '));
     this.name = INVALID_ACTOR_ERROR;
   }

@@ -1,14 +1,11 @@
 import {
-  MembershipRejectReason,
-  OptionsWithBalances,
-} from '@hicommonwealth/model';
-import {
   AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
 } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
+import type { MembershipRejectReason, OptionsWithBalances } from '../..';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -23,7 +20,7 @@ export type ValidateGroupMembershipResponse = {
  * @param balances address balances
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
-export default function validateGroupMembership(
+export function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   balances: OptionsWithBalances[],
@@ -200,7 +197,7 @@ function _thresholdCheck(
   } catch (error) {
     return {
       result: false,
-      message: `Error: ${error.message}`,
+      message: `Error: ${(error as Error).message}`,
     };
   }
 }
@@ -218,7 +215,7 @@ function _allowlistCheck(
   } catch (error) {
     return {
       result: false,
-      message: `Error: ${error.message}`,
+      message: `Error: ${(error as Error).message}`,
     };
   }
 }

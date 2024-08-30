@@ -11,7 +11,7 @@ const chance = Chance();
 
 describe('Thread lifecycle', () => {
   const roles = ['admin', 'member', 'nonmember', 'banned', 'rejected'] as const;
-  const actors = {} as Record<(typeof roles)[number], Actor>;
+  const actors = {} as Record<typeof roles[number], Actor>;
 
   const body = chance.paragraph();
   const title = chance.sentence();
@@ -110,7 +110,7 @@ describe('Thread lifecycle', () => {
     nonmember: NonMember,
     banned: BannedActor,
     rejected: RejectedMember,
-  } as Record<(typeof roles)[number], any>;
+  } as Record<typeof roles[number], any>;
 
   roles.forEach((role) => {
     if (!authorizationTests[role]) {

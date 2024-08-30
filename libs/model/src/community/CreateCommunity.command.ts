@@ -299,10 +299,10 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               base === ChainBase.CosmosSDK
                 ? BalanceType.Cosmos
                 : base === ChainBase.Substrate
-                  ? BalanceType.Substrate
-                  : base === ChainBase.Solana
-                    ? BalanceType.Solana
-                    : BalanceType.Ethereum,
+                ? BalanceType.Substrate
+                : base === ChainBase.Solana
+                ? BalanceType.Solana
+                : BalanceType.Ethereum,
             // use first chain name as node name
             name,
           },

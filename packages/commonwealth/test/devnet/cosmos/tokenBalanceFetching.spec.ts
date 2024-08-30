@@ -268,8 +268,9 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           expect(balance[addressOne]).to.equal(originalAddressOneBalance);
 
           // transfer tokens
-          const wallet =
-            await DirectSecp256k1HdWallet.fromMnemonic(addressOneMnemonic);
+          const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
+            addressOneMnemonic,
+          );
           const client = await SigningStargateClient.connectWithSigner(
             rpcEndpoint,
             wallet,

@@ -96,8 +96,8 @@ export const Factories = {
 };
 
 export type DB = {
-  [K in keyof typeof Factories]: ReturnType<(typeof Factories)[K]> &
-    Associable<ReturnType<(typeof Factories)[K]>>;
+  [K in keyof typeof Factories]: ReturnType<typeof Factories[K]> &
+    Associable<ReturnType<typeof Factories[K]>>;
 } & {
   sequelize: Sequelize.Sequelize;
   Sequelize: typeof Sequelize.Sequelize;

@@ -1,24 +1,23 @@
-import {
-  AddressAttributes,
-  DB,
-  GroupAttributes,
-  MembershipAttributes,
-  MembershipInstance,
-  OptionsWithBalances,
-  tokenBalanceCache,
-} from '@hicommonwealth/model';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
 import { config } from '../../config';
+import {
+  type AddressAttributes,
+  type DB,
+  type GroupAttributes,
+  type MembershipAttributes,
+  type MembershipInstance,
+} from '../../models';
+import { tokenBalanceCache, type OptionsWithBalances } from '../../services';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
-import validateGroupMembership from './validateGroupMembership';
+import { validateGroupMembership } from './validateGroupMembership';
 
 /**
  * refreshMembershipsForAddress refreshes the memberships for the given address
+ * @param models Db
  * @param address Address associated with memberships
  * @param groups Groups to check requirements from
- * @param topics Topics associated with groups
  * @param cacheRefresh if true, forces TBC cache to refresh and force updates membership
  * @returns MembershipInstance[]
  */

@@ -1,6 +1,6 @@
 import type { AbiType } from '@hicommonwealth/shared';
-import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { hashAbi } from '../utils';
+import Sequelize from 'sequelize';
+import { hashAbi } from '../utils/utils';
 import type { ModelInstance } from './types';
 
 export type ContractAbiAttributes = {

@@ -7,14 +7,14 @@ import {
   MembershipAttributes,
   MembershipRejectReason,
   OptionsWithBalances,
+  makeGetBalancesOptions,
   tokenBalanceCache,
+  validateGroupMembership,
 } from '@hicommonwealth/model';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import { config } from '../../config';
-import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
-import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const log = logger(import.meta);

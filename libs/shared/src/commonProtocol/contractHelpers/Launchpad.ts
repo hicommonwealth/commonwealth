@@ -87,8 +87,9 @@ export const transferLiquidity = async (
   tokenAddress: string,
   walletAddress: string,
 ) => {
-  const remainingTokens =
-    await contract.methods._launchpadLiquidity(tokenAddress);
+  const remainingTokens = await contract.methods._launchpadLiquidity(
+    tokenAddress,
+  );
   const amountIn = await getAmountIn(
     contract,
     tokenAddress,

@@ -1,7 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { commonProtocol } from '@hicommonwealth/shared';
 import Web3, { AbiFunctionFragment } from 'web3';
+import { models } from '../../database';
 import { CommunityAttributes } from '../../models/community';
 
 export const validateCommunityStakeConfig = async (

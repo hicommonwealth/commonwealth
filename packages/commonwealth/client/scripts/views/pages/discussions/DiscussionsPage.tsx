@@ -257,8 +257,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                      ? app?.chain?.meta?.lifetimeThreadCount
-                      : 0
+                    ? app?.chain?.meta?.lifetimeThreadCount
+                    : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}

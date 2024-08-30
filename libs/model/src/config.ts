@@ -28,6 +28,7 @@ const {
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
+  MEMBERSHIP_REFRESH_TTL_SECONDS,
 } = process.env;
 
 const NAME =
@@ -55,6 +56,10 @@ export const config = configure(
       INIT_TEST_DB: INIT_TEST_DB === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
+    MEMBERSHIP_REFRESH_TTL_SECONDS: parseInt(
+      MEMBERSHIP_REFRESH_TTL_SECONDS ?? '120',
+      10,
+    ),
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
     },
@@ -129,6 +134,7 @@ export const config = configure(
       INIT_TEST_DB: z.boolean(),
       TRACE: z.boolean(),
     }),
+    MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
     WEB3: z.object({
       PRIVATE_KEY: z
         .string()

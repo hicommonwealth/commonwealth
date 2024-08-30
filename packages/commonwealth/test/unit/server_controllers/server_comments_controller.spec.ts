@@ -402,8 +402,9 @@ describe('ServerCommentsController', () => {
         orderDirection: 'DESC',
         includeCount: true,
       };
-      const comments =
-        await serverCommentsController.searchComments(searchOptions);
+      const comments = await serverCommentsController.searchComments(
+        searchOptions,
+      );
       expect(comments.results).to.have.length(5);
       expect(comments.results[0].id).to.equal(1);
       expect(comments.results[1].id).to.equal(2);

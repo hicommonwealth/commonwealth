@@ -4,13 +4,13 @@ import {
   ReactionAttributes,
   UserInstance,
   commonProtocol as commonProtocolService,
+  validateTopicGroupsMembership,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
-import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerThreadsController } from '../server_threads_controller';

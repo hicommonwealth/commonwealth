@@ -3,6 +3,7 @@ import {
   AddressInstance,
   CommentAttributes,
   CommentInstance,
+  DB,
   UserInstance,
   emitEvent,
   emitMentions,
@@ -15,7 +16,6 @@ import { renderQuillDeltaToText } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { getCommentDepth } from '../../util/getCommentDepth';
-import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -120,7 +120,6 @@ export async function __createThreadComment(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      // @ts-expect-error StrictNullChecks
       thread.topic_id,
       thread.community_id,
       address,
@@ -252,4 +251,15 @@ export async function __createThreadComment(
   const commentJson = comment.toJSON();
   commentJson.Address = address.toJSON();
   return [commentJson, analyticsOptions];
+}
+function validateTopicGroupsMembership(
+  models: DB,
+  topic_id: number | null | undefined,
+  community_id: string,
+  address: AddressInstance,
+  CREATE_COMMENT: PermissionEnum,
+):
+  | { isValid: any; message: any }
+  | PromiseLike<{ isValid: any; message: any }> {
+  throw new Error('Function not implemented.');
 }

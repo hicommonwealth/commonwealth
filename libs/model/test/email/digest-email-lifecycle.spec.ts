@@ -1,11 +1,11 @@
 import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
-import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
+import { models } from '../../src/database';
 import { GetDigestEmailDataQuery } from '../../src/emails';
+import { bootstrap_testing, seed } from '../../src/tester';
 import { generateThreads } from './util';
 
 describe('Digest email lifecycle', () => {

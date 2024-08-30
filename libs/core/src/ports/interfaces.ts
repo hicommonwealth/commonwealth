@@ -246,7 +246,7 @@ export interface Broker extends Disposable {
 
 export type BlobType = string | Uint8Array | Buffer | Readable;
 export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
-export type BlobBucket = (typeof BlobBuckets)[number];
+export type BlobBucket = typeof BlobBuckets[number];
 
 /**
  * External Blob Storage Port
@@ -376,11 +376,11 @@ const DaysOfWeek = {
 } as const;
 
 export type NotificationsProviderScheduleRepeats = Array<{
-  frequency: (typeof RepeatFrequency)[keyof typeof RepeatFrequency];
+  frequency: typeof RepeatFrequency[keyof typeof RepeatFrequency];
   interval?: number;
   day_of_month?: number;
   days?:
-    | Array<(typeof DaysOfWeek)[keyof typeof DaysOfWeek]>
+    | Array<typeof DaysOfWeek[keyof typeof DaysOfWeek]>
     | 'weekdays'
     | 'weekends';
   hours?: number;

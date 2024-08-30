@@ -2,7 +2,7 @@ import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
