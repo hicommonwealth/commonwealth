@@ -160,5 +160,23 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
     );
   }
 
+  const userProperties: { [key: string]: boolean } = {};
+  const keys = [
+    'mobile_push_notifications_enabled',
+    'mobile_push_discussion_activity_enabled',
+    'mobile_push_admin_alerts_enabled',
+  ];
+  keys.forEach((key) => {
+    if (key in payload) {
+      userProperties[key] = payload[key];
+    }
+  });
+
+  if (Object.keys(userProperties).length) {
+    await provider.identifyUser({
+      user_id: String(payload.user_id),
+      user_properties: userProperties,
+    });
+  }
   return true;
 };

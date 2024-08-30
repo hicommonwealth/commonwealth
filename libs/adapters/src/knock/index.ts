@@ -130,6 +130,13 @@ export function KnockProvider(): NotificationsProvider {
       return new Set(res.map((s) => s.id));
     },
 
+    async identifyUser(options) {
+      return await knock.users.identify(
+        options.user_id,
+        options.user_properties,
+      );
+    },
+
     async registerClientRegistrationToken(
       userId: number,
       token: string,
