@@ -848,7 +848,7 @@ describe('ServerThreadsController', () => {
           destroy: async () => ({}),
         },
         ThreadSubscription: {
-          destroy: async () => ({}),
+          destroy: () => Promise.resolve({}),
         },
         CommunityRole: {
           findAll: async () => [
