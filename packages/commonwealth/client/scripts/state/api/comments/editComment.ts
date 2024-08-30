@@ -13,8 +13,6 @@ import useFetchCommentsQuery from './fetchComments';
 interface EditCommentProps {
   profile: UserProfile;
   communityId: string;
-  parentCommentId: number | null;
-  threadId: number;
   commentId: number;
   commentMsgId: string;
   updatedBody: string;
@@ -23,8 +21,6 @@ interface EditCommentProps {
 const editComment = async ({
   profile,
   communityId,
-  // parentCommentId,
-  // threadId,
   commentId,
   commentMsgId,
   updatedBody,
