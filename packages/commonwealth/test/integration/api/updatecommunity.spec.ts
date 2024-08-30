@@ -3,6 +3,7 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { CommunityArgs } from 'test/util/modelUtils';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
@@ -53,20 +54,20 @@ describe('Update Community/Chain Tests', () => {
       config.AUTH.JWT_SECRET,
     );
 
-    // // create community for test
-    // const communityArgs: CommunityArgs = {
-    //   jwt: jwtToken,
-    //   isAuthenticatedForum: 'false',
-    //   privacyEnabled: 'false',
-    //   id: 'tester',
-    //   name: 'tester community',
-    //   creator_address: loggedInAddr,
-    //   creator_chain: chain,
-    //   description: 'Tester community community',
-    //   default_chain: chain,
-    // };
+    // create community for test
+    const communityArgs: CommunityArgs = {
+      jwt: jwtToken,
+      isAuthenticatedForum: 'false',
+      privacyEnabled: 'false',
+      id: 'tester',
+      name: 'tester community',
+      creator_address: loggedInAddr,
+      creator_chain: chain,
+      description: 'Tester community community',
+      default_chain: chain,
+    };
 
-    // await server.seeder.createCommunity(communityArgs);
+    await server.seeder.createCommunity(communityArgs);
   });
 
   afterAll(async () => {

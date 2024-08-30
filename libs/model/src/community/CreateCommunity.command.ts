@@ -211,7 +211,7 @@ async function pickAdminAddress(
     });
 }
 
-export async function bech32ToHex(address: string) {
+export function bech32ToHex(address: string) {
   try {
     const encodedData = fromBech32(address).data;
     return toHex(encodedData);
@@ -337,21 +337,21 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             featured_in_sidebar: true,
           });
 
-          const admin_address = await pickAdminAddress(actor, payload);
-          if (admin_address) {
+          const _admin_address = await pickAdminAddress(actor, payload);
+          if (_admin_address) {
             await models.Address.create({
               user_id: actor.user.id,
-              address: admin_address.address,
+              address: _admin_address.address,
               community_id: id,
               hex:
                 base === ChainBase.CosmosSDK
-                  ? await bech32ToHex(admin_address.address)
+                  ? bech32ToHex(_admin_address.address)
                   : undefined,
-              verification_token: admin_address.verification_token,
+              verification_token: _admin_address.verification_token,
               verification_token_expires:
-                admin_address.verification_token_expires,
-              verified: admin_address.verified,
-              wallet_id: admin_address.wallet_id,
+                _admin_address.verification_token_expires,
+              verified: _admin_address.verified,
+              wallet_id: _admin_address.wallet_id,
               is_user_default: true,
               role: 'admin',
               last_active: new Date(),
@@ -359,7 +359,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               is_banned: false,
             });
           }
-          return admin_address;
+          return _admin_address;
         },
       );
       // == end of command transaction boundary ==
