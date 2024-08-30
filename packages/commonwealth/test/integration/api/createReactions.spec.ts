@@ -165,7 +165,7 @@ describe('createReaction Integration Tests', () => {
       jwt: userJWT,
       reaction: 'like',
       thread_id: thread!.id,
-      thread_msg_id: thread.canvas_msg_id!,
+      thread_msg_id: thread!.canvas_msg_id,
       author_chain: 'ethereum',
       session: userSession.session,
       sign: userSession.sign,

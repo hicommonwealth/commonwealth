@@ -50,7 +50,7 @@ export const buildCreateThreadInput = async ({
     url,
     read_only: false,
     canvas_signed_data: canvas_args?.canvas_signed_data ?? '',
-    canvas_hash: canvas_args?.canvas_hash ?? '',
+    canvas_msg_id: canvas_args?.canvas_msg_id ?? '',
   };
 };
 
