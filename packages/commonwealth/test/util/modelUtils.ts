@@ -370,7 +370,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .agent(app)
       .post('/api/v1/CreateThread/0')
       .set('Accept', 'application/json')
-      .set('address', address.split(':')[2])
+      .set('address', address)
       .send({
         jwt,
         community_id: chainId,
