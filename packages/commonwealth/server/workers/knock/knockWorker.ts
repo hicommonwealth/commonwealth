@@ -4,6 +4,7 @@ import {
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
+  buildRetryStrategy,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
@@ -65,6 +66,18 @@ async function startKnockWorker() {
   const sub = await brokerInstance.subscribe(
     BrokerSubscriptions.NotificationsProvider,
     NotificationsPolicy(),
+    // This disables retry strategies on any handler error/failure
+    // This is because we cannot guarantee whether a Knock workflow trigger
+    // call was successful or not. It is better to 'miss' notifications then
+    // to double send a notification
+    buildRetryStrategy((err, topic, content, ackOrNackFn, log_) => {
+      log_.error(err.message, err, {
+        topic,
+        message: content,
+      });
+      ackOrNackFn({ strategy: 'ack' });
+      return true;
+    }),
   );
 
   if (!sub) {

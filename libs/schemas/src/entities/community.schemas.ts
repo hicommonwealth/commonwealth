@@ -17,7 +17,7 @@ import { Address } from './user.schemas';
 
 export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional
-  id: z.string().optional(),
+  id: z.string(),
   name: z.string(),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),

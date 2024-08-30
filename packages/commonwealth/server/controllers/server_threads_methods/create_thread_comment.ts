@@ -11,18 +11,13 @@ import {
   uniqueMentions,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import {
-  NotificationCategories,
-  ProposalType,
-  renderQuillDeltaToText,
-} from '@hicommonwealth/shared';
+import { renderQuillDeltaToText } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
@@ -51,11 +46,7 @@ export type CreateThreadCommentOptions = {
   discordMeta?: any;
 };
 
-export type CreateThreadCommentResult = [
-  CommentAttributes,
-  EmitOptions[],
-  TrackOptions,
-];
+export type CreateThreadCommentResult = [CommentAttributes, TrackOptions];
 
 export async function __createThreadComment(
   this: ServerThreadsController,
@@ -235,62 +226,12 @@ export async function __createThreadComment(
     throw new ServerError('Failed to create comment', e);
   }
 
-  const allNotificationOptions: EmitOptions[] = [];
-
   const excludedAddrs: string[] = [];
   excludedAddrs.push(address.address);
 
   const rootNotifExcludeAddresses = [...excludedAddrs];
   if (parentComment && parentComment.Address) {
     rootNotifExcludeAddresses.push(parentComment.Address.address);
-  }
-
-  const root_title = thread.title || '';
-
-  // build notification for root thread
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.NewComment,
-      data: {
-        created_at: new Date(),
-        thread_id: threadId,
-        root_title,
-        root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
-        comment_id: +comment.id,
-        // @ts-expect-error StrictNullChecks
-        comment_text: comment.text,
-        community_id: thread.community_id,
-        author_address: address.address,
-        author_community_id: address.community_id!,
-      },
-    },
-    excludeAddresses: rootNotifExcludeAddresses,
-  });
-
-  // if child comment, build notification for parent author
-  if (parentId && parentComment) {
-    allNotificationOptions.push({
-      notification: {
-        categoryId: NotificationCategories.NewComment,
-        data: {
-          created_at: new Date(),
-          thread_id: +threadId,
-          root_title,
-          root_type: ProposalType.Thread,
-          // @ts-expect-error StrictNullChecks
-          comment_id: +comment.id,
-          // @ts-expect-error StrictNullChecks
-          comment_text: comment.text,
-          parent_comment_id: +parentId,
-          parent_comment_text: parentComment.text,
-          community_id: thread.community_id,
-          author_address: address.address,
-          author_community_id: address.community_id!,
-        },
-      },
-      excludeAddresses: excludedAddrs,
-    });
   }
 
   // update author last saved (in background)
@@ -310,5 +251,5 @@ export async function __createThreadComment(
   // @ts-expect-error StrictNullChecks
   const commentJson = comment.toJSON();
   commentJson.Address = address.toJSON();
-  return [commentJson, allNotificationOptions, analyticsOptions];
+  return [commentJson, analyticsOptions];
 }

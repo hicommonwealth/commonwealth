@@ -7,16 +7,11 @@ import {
   findMentionDiff,
   parseUserMentions,
 } from '@hicommonwealth/model';
-import {
-  NotificationCategories,
-  ProposalType,
-  renderQuillDeltaToText,
-} from '@hicommonwealth/shared';
+import { renderQuillDeltaToText } from '@hicommonwealth/shared';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -35,7 +30,7 @@ export type UpdateCommentOptions = {
   discordMeta?: any;
 };
 
-export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
+export type UpdateCommentResult = [CommentAttributes];
 
 export async function __updateComment(
   this: ServerCommentsController,
@@ -149,37 +144,10 @@ export async function __updateComment(
     include: [this.models.Address],
   });
 
-  const root_title = thread.title || '';
-
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.CommentEdit,
-      data: {
-        created_at: new Date(),
-        thread_id: comment.thread_id,
-        root_title,
-        root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
-        comment_id: +finalComment.id,
-        // @ts-expect-error StrictNullChecks
-        comment_text: finalComment.text,
-        community_id: thread.community_id,
-        // @ts-expect-error StrictNullChecks
-        author_address: finalComment.Address.address,
-        // @ts-expect-error StrictNullChecks
-        author_community_id: finalComment.Address.community_id,
-      },
-    },
-    // @ts-expect-error StrictNullChecks
-    excludeAddresses: [finalComment.Address.address],
-  });
-
   // update address last active
   address.last_active = new Date();
   address.save();
 
   // @ts-expect-error StrictNullChecks
-  return [finalComment.toJSON(), allNotificationOptions];
+  return [finalComment.toJSON()];
 }
