@@ -1,63 +1,23 @@
+import _ from 'lodash';
+import moment from 'moment/moment';
 import React from 'react';
 
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import _ from 'lodash';
-import moment from 'moment';
-
-import 'pages/snapshot/snapshot_information_card.scss';
-
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import app from 'state';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/user/user';
-import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
+import { CWContentPageCard } from 'views/components/component_kit/CWContentPageCard';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { User } from 'views/components/user/user';
+import { SnapshotThreadLink } from 'views/pages/view_proposal/proposal_header_links';
 
-type SnapshotInfoRowProps = {
-  label: string;
-  value: string | React.ReactNode;
-};
+import { SnapshotInfoLinkRow, SnapshotInfoRow } from './SnapshotInfoRow';
 
-const SnapshotInfoRow = (props: SnapshotInfoRowProps) => {
-  const { label, value } = props;
-
-  return (
-    <div className="SnapshotInfoRow">
-      <CWText type="caption" className="snapshot-info-row-label">
-        {label}
-      </CWText>
-      <CWText noWrap>{value}</CWText>
-    </div>
-  );
-};
-
-type SnapshotInfoLinkRowProps = SnapshotInfoRowProps & { url: string };
-
-// eslint-disable-next-line react/no-multi-comp
-const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
-  const { label, url, value } = props;
-
-  return (
-    <div className="SnapshotInfoRow">
-      <CWText type="caption" className="snapshot-info-row-label">
-        {label}
-      </CWText>
-      <a href={url} target="_blank" rel="noreferrer">
-        <CWText className="snapshot-link" noWrap>
-          {value}
-        </CWText>
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </a>
-    </div>
-  );
-};
+import './SnapshotInformationCard.scss';
 
 type SnapshotInformationCardProps = {
   proposal: SnapshotProposal;
   threads: Array<{ id: number; title: string }> | null;
 };
 
-// eslint-disable-next-line react/no-multi-comp
 export const SnapshotInformationCard = ({
   proposal,
   threads,

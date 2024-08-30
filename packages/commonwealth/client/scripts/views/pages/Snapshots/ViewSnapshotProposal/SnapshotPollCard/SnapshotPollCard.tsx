@@ -1,10 +1,8 @@
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useEffect } from 'react';
-import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
-import useAppStatus from '../../../hooks/useAppStatus';
-import { CWCard } from '../../components/component_kit/cw_card';
-import { CWText } from '../../components/component_kit/cw_text';
+import React, { useEffect, useState } from 'react';
 
+import { MixpanelSnapshotEvents } from 'analytics/types';
+import useAppStatus from 'hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import {
   CastVoteSection,
   PollCardProps,
@@ -14,8 +12,10 @@ import {
   VoteInformation,
 } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
+import { CWCard } from 'views/components/component_kit/cw_card';
+import { CWText } from 'views/components/component_kit/cw_text';
 
-import '../../components/Polls/PollCard/PollCard.scss';
+import '../../../../components/Polls/PollCard/PollCard.scss';
 
 export type SnapshotPollCardProps = Omit<
   PollCardProps & {
@@ -24,35 +24,33 @@ export type SnapshotPollCardProps = Omit<
   'onResultsClick'
 >;
 
-export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
-  const {
-    disableVoteButton = false,
-    hasVoted,
-    isPreview,
-    onSnapshotVoteCast,
-    pollEnded,
-    proposalTitle,
-    timeRemaining,
-    tokenSymbol,
-    tooltipErrorMessage,
-    totalVoteCount,
-    votedFor,
-    voteInformation,
-  } = props;
-
+export const SnapshotPollCard = ({
+  disableVoteButton = false,
+  hasVoted,
+  isPreview,
+  onSnapshotVoteCast,
+  pollEnded,
+  proposalTitle,
+  timeRemaining,
+  tokenSymbol,
+  tooltipErrorMessage,
+  totalVoteCount,
+  votedFor,
+  voteInformation,
+}: SnapshotPollCardProps) => {
   const [internalHasVoted, setInternalHasVoted] =
     // @ts-expect-error <StrictNullChecks/>
-    React.useState<boolean>(hasVoted);
-  const [selectedOptions, setSelectedOptions] = React.useState<Array<string>>(
+    useState<boolean>(hasVoted);
+  const [selectedOptions, setSelectedOptions] = useState<Array<string>>(
     [], // is never updated?
   );
   const [internalTotalVoteCount, setInternalTotalVoteCount] =
-    React.useState<number>(totalVoteCount);
-  const [voteDirectionString, setVoteDirectionString] = React.useState<string>(
+    useState<number>(totalVoteCount);
+  const [voteDirectionString, setVoteDirectionString] = useState<string>(
     votedFor ? buildVoteDirectionString(votedFor) : '',
   );
   const [internalVoteInformation, setInternalVoteInformation] =
-    React.useState<Array<VoteInformation>>(voteInformation);
+    useState<Array<VoteInformation>>(voteInformation);
 
   const resultString = 'Results';
 

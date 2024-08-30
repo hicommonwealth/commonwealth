@@ -1,4 +1,4 @@
-@import '../../shared';
+@import '../../../../../../styles/shared';
 
 .SnapshotVotesTable {
   display: flex;
@@ -17,7 +17,7 @@
       height: 24px;
       justify-content: center;
       margin-left: 8px;
-      padding: 0px 8px 2px;
+      padding: 0 8px 2px;
 
       .vote-count-text.Text {
         color: $white;

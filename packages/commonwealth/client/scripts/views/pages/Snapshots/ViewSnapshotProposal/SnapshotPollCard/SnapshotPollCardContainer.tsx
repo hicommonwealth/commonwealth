@@ -6,10 +6,11 @@ import type {
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
 import moment from 'moment';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
-import { SnapshotPollCard } from './snapshot_poll_card';
+import { SnapshotPollCard } from './SnapshotPollCard';
+import { calculateTimeRemaining } from './utils';
 
 type SnapshotProposalCardsProps = {
   activeUserAddress: string;
@@ -29,18 +30,6 @@ type SnapshotProposalCardsProps = {
 const enum VotingError {
   NOT_VALIDATED = 'You cannot vote on this poll or are not signed in.',
   ALREADY_VOTED = 'Already Submitted Vote',
-}
-
-function calculateTimeRemaining(proposal: SnapshotProposal) {
-  const now = moment();
-  const endTime = moment(proposal.end * 1000);
-  const duration = moment.duration(endTime.diff(now));
-  const days = duration.days();
-  const hours = duration.hours();
-  const timeRemainingString = `${days} ${days > 1 ? 'days' : 'day'} ${hours}${
-    hours > 1 ? 'hrs' : 'hr'
-  } remaining`;
-  return timeRemainingString;
 }
 
 export const SnapshotPollCardContainer = (
@@ -81,8 +70,8 @@ export const SnapshotPollCardContainer = (
   const voteErrorText = !validatedAgainstStrategies
     ? VotingError.NOT_VALIDATED
     : hasVoted
-    ? VotingError.ALREADY_VOTED
-    : null;
+      ? VotingError.ALREADY_VOTED
+      : null;
 
   const timeRemaining = useMemo(() => {
     return calculateTimeRemaining(proposal);

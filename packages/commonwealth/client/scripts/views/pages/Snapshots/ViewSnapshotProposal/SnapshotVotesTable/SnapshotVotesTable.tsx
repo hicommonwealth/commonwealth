@@ -1,9 +1,11 @@
-import { formatNumberLong } from 'helpers';
-import 'pages/snapshot/snapshot_votes_table.scss';
-import React from 'react';
+import React, { useState } from 'react';
 import app from 'state';
-import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/user/user';
+
+import { formatNumberLong } from 'helpers';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { User } from 'views/components/user/user';
+
+import './SnapshotVotesTable.scss';
 
 type SnapshotVoteType = {
   balance: number;
@@ -20,11 +22,13 @@ type SnapshotVotesTableProps = {
   voters: Array<SnapshotVoteType>;
 };
 
-export const SnapshotVotesTable = (props: SnapshotVotesTableProps) => {
-  const { choices, symbol, voters } = props;
-
+export const SnapshotVotesTable = ({
+  choices,
+  symbol,
+  voters,
+}: SnapshotVotesTableProps) => {
   const [isVotersListExpanded, setIsVotersListExpanded] =
-    React.useState<boolean>(false);
+    useState<boolean>(false);
 
   const toggleExpandedVoterList = () => {
     setIsVotersListExpanded(!isVotersListExpanded);

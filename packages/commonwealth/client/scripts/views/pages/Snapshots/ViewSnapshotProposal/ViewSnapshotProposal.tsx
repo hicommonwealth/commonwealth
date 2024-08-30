@@ -12,34 +12,35 @@ import {
   VoteResultsData,
 } from 'helpers/snapshot_utils';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import AddressInfo from 'models/AddressInfo';
 import { LinkSource } from 'models/Thread';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
+import { CWContentPage } from 'views/components/component_kit/CWContentPage';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import AddressInfo from '../../../models/AddressInfo';
-import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
-} from '../../components/proposal_pills';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { SnapshotInformationCard } from './snapshot_information_card';
-import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
-import { SnapshotVotesTable } from './snapshot_votes_table';
+} from 'views/components/proposal_pills';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 
-type ViewSnapshotProposalPageProps = {
+import { SnapshotInformationCard } from './SnapshotInformationCard';
+import { SnapshotPollCardContainer } from './SnapshotPollCard';
+import { SnapshotVotesTable } from './SnapshotVotesTable';
+
+type ViewSnapshotProposalProps = {
   identifier: string;
   scope: string;
   snapshotId: string;
 };
 
-export const ViewSnapshotProposalPage = ({
+const ViewSnapshotProposal = ({
   identifier,
   snapshotId,
-}: ViewSnapshotProposalPageProps) => {
+}: ViewSnapshotProposalProps) => {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
@@ -207,4 +208,4 @@ export const ViewSnapshotProposalPage = ({
   );
 };
 
-export default ViewSnapshotProposalPage;
+export default ViewSnapshotProposal;
