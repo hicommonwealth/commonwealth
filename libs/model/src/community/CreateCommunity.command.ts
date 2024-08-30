@@ -1,7 +1,13 @@
+import { fromBech32, toHex } from '@cosmjs/encoding';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { Actor, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  ChainBase,
+  ChainType,
+  DefaultPage,
+} from '@hicommonwealth/shared';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import axios from 'axios';
@@ -17,60 +23,26 @@ import {
   mustNotExist,
 } from '../middleware/guards';
 
-// import { AppError } from '@hicommonwealth/core';
-// import type {
-//   AddressInstance,
-//   ChainNodeAttributes,
-//   CommunityAttributes,
-//   RoleAttributes,
-// } from '@hicommonwealth/model';
-// import { UserInstance } from '@hicommonwealth/model';
-// import { CreateCommunity } from '@hicommonwealth/schemas';
-// import {
-//   BalanceType,
-//   ChainBase,
-//   ChainType,
-//   DefaultPage,
-// } from '@hicommonwealth/shared';
-// import { Op } from 'sequelize';
-// import { z } from 'zod';
-// import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
-// import { ServerCommunitiesController } from '../server_communities_controller';
-
-// export type CreateCommunityResult = {
-//   community: CommunityAttributes;
-//   node: ChainNodeAttributes;
-//   role: RoleAttributes;
-//   admin_address: string;
-// };
-
 export const CreateCommunityErrors = {
-  // ReservedId: 'The id is reserved and cannot be used',
-  // MustBeWs: 'Node must support websockets on ethereum',
-  // InvalidCommunityIdOrUrl:
-  //   'Could not determine a valid endpoint for provided community',
-  // CommunityAddressExists: 'The address already exists',
-  // UserAddressNotExists: 'The user does not own the user_address specified',
   CommunityIDExists:
     'The id for this community already exists, please choose another id',
   CommunityNameExists:
     'The name for this community already exists, please choose another name',
-  // ChainNodeIdExists: 'The chain node with this id already exists',
-  // CosmosChainNameRequired:
-  //   'cosmos_chain_id is a required field. It should be the chain name as registered in the Cosmos Chain Registry.',
+  InvalidEthereumChainId: 'Ethereum chain ID not provided or unsupported',
+  CosmosChainNameRequired:
+    'cosmos_chain_id is a required field. It should be the chain name as registered in the Cosmos Chain Registry.',
   InvalidAddress: 'Address is invalid',
+  InvalidBase: 'Must provide valid chain base',
   MissingNodeUrl: 'Missing node url',
   InvalidNode: 'RPC url returned invalid response. Check your node url',
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
+type Payload = z.infer<typeof schemas.CreateCommunity.input>;
+
 async function checkEthereum(
   actor: Actor,
-  {
-    address,
-    node_url,
-    eth_chain_id,
-  }: z.infer<typeof schemas.CreateCommunity.input>,
+  { address, node_url, eth_chain_id, alt_wallet_url }: Payload,
 ) {
   // this is not part of input validation schema b/c we are using web3 utils
   if (!address || !Web3.utils.isAddress(address!))
@@ -84,7 +56,7 @@ async function checkEthereum(
   if (!node) mustBeSuperAdmin(actor);
 
   // must provide at least url to create a new node
-  const _node_url = node?.private_url ?? node_url;
+  const _node_url = node?.private_url ?? node?.url ?? node_url;
   if (!_node_url) throw new InvalidInput(CreateCommunityErrors.MissingNodeUrl);
 
   const provider =
@@ -100,12 +72,16 @@ async function checkEthereum(
     throw new InvalidInput(CreateCommunityErrors.InvalidAddress);
 
   // TODO: test altWalletUrl if available
+
+  // Replace payload urls when node is found
+  return {
+    node_url: _node_url,
+    private_url: node?.private_url,
+    alt_wallet_url: node?.alt_wallet_url ?? alt_wallet_url,
+  };
 }
 
-async function checkSolana({
-  address,
-  node_url,
-}: z.infer<typeof schemas.CreateCommunity.input>) {
+async function checkSolana({ address, node_url }: Payload) {
   try {
     const pubKey = new solw3.PublicKey(address!);
     const clusterUrl = solw3.clusterApiUrl(node_url as Cluster);
@@ -128,10 +104,7 @@ async function checkSolana({
 // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
 // It is a lowercase alphanumeric name, like 'osmosis'.
 // See: https://github.com/hicommonwealth/commonwealth/issues/4951
-async function checkCosmosInput({
-  cosmos_chain_id,
-  node_url,
-}: z.infer<typeof schemas.CreateCommunity.input>) {
+async function checkCosmosInput({ cosmos_chain_id, node_url }: Payload) {
   const node = await models.ChainNode.findOne({ where: { cosmos_chain_id } });
   mustNotExist('Cosmos chain node', node);
 
@@ -151,6 +124,102 @@ async function checkCosmosInput({
   }
 }
 
+async function validateChainInput(actor: Actor, payload: Payload) {
+  if (payload.type !== ChainType.Offchain) {
+    if (payload.base === ChainBase.Ethereum)
+      return await checkEthereum(actor, payload);
+    if (payload.base === ChainBase.Solana) await checkSolana(payload);
+    else if (payload.base === ChainBase.CosmosSDK)
+      await checkCosmosInput(payload);
+  }
+  const { node_url, alt_wallet_url } = payload;
+  return { node_url, private_url: null, alt_wallet_url };
+}
+
+// TODO: check with product if we need this logic, user_address should be required
+// try to make admin one of the user's addresses
+async function pickAdminAddress(
+  { user }: Actor,
+  { base, type, user_address }: Payload,
+) {
+  if (user_address)
+    return await models.Address.scope('withPrivateData').findOne({
+      where: {
+        user_id: user.id,
+        address: user_address,
+      },
+      include: [
+        {
+          model: models.Community,
+          where: { base },
+          required: true,
+        },
+      ],
+    });
+
+  if (base === ChainBase.NEAR)
+    throw new InvalidInput(CreateCommunityErrors.InvalidBase);
+
+  if (base === ChainBase.Ethereum)
+    return await models.Address.scope('withPrivateData').findOne({
+      where: {
+        user_id: user.id,
+        address: {
+          [Op.startsWith]: '0x',
+        },
+      },
+      include: [
+        {
+          model: models.Community,
+          where: { base },
+          required: true,
+        },
+      ],
+    });
+
+  if (base === ChainBase.Solana)
+    return await models.Address.scope('withPrivateData').findOne({
+      where: {
+        user_id: user.id,
+        address: {
+          // This is the regex formatting for solana addresses per their website
+          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}',
+        },
+      },
+      include: [
+        {
+          model: models.Community,
+          where: { base },
+          required: true,
+        },
+      ],
+    });
+
+  // Onchain community can be created by Admin only,
+  // but we allow offchain cmty to have any creator as admin:
+  // if signed in with Keplr or Magic:
+  if (base === ChainBase.CosmosSDK && type === ChainType.Offchain)
+    return await models.Address.scope('withPrivateData').findOne({
+      where: { user_id: user.id },
+      include: [
+        {
+          model: models.Community,
+          where: { base },
+          required: true,
+        },
+      ],
+    });
+}
+
+export async function bech32ToHex(address: string) {
+  try {
+    const encodedData = fromBech32(address).data;
+    return toHex(encodedData);
+  } catch (e) {
+    console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
+  }
+}
+
 export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
@@ -159,7 +228,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const {
         id,
         name,
-        node_url,
         default_symbol,
         icon_url,
         description,
@@ -174,10 +242,15 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         base,
         bech32_prefix,
         token_name,
-        user_address,
         eth_chain_id,
         cosmos_chain_id,
       } = payload;
+
+      // TODO: fix framework to allow the following validation as zod.refine in input schema (returning ZodEffects)
+      if (base === ChainBase.Ethereum && !eth_chain_id)
+        throw new InvalidInput(CreateCommunityErrors.InvalidEthereumChainId);
+      if (base === ChainBase.CosmosSDK && !cosmos_chain_id)
+        throw new InvalidInput(CreateCommunityErrors.CosmosChainNameRequired);
 
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
@@ -194,24 +267,9 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       if (type === ChainType.Chain || type === ChainType.DAO)
         mustBeSuperAdmin(actor);
 
-      // if not offchain, validate inputs
-      if (type !== ChainType.Offchain) {
-        if (base === ChainBase.Ethereum) await checkEthereum(actor, payload);
-        else if (base === ChainBase.Solana) await checkSolana(payload);
-        else if (base === ChainBase.CosmosSDK) await checkCosmosInput(payload);
-      }
-
-      // TODO: @rbennettcw can we create communities on behalf of other user addresses?
-      // let selectedUserAddress: string;
-      // if (user_address) {
-      //   const addresses = (await user.getAddresses()).filter(
-      //     (a) => a.address === user_address,
-      //   );
-      //   if (addresses.length === 0) {
-      //     throw new AppError(Errors.UserAddressNotExists);
-      //   }
-      //   selectedUserAddress = addresses[0].address;
-      // }
+      // validates inputs by chain, and returns validated urls
+      const { node_url, private_url, alt_wallet_url } =
+        await validateChainInput(actor, payload);
 
       const uniqueLinksArray = [
         ...new Set(
@@ -222,180 +280,98 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       ];
 
       // == command transaction boundary ==
+      const admin_address = await models.sequelize.transaction(
+        async (transaction) => {
+          const [node] = await models.ChainNode.scope(
+            'withPrivateData',
+          ).findOrCreate({
+            where: { url: node_url },
+            defaults: {
+              url: node_url,
+              eth_chain_id,
+              cosmos_chain_id,
+              alt_wallet_url,
+              private_url,
+              balance_type:
+                base === ChainBase.CosmosSDK
+                  ? BalanceType.Cosmos
+                  : base === ChainBase.Substrate
+                    ? BalanceType.Substrate
+                    : base === ChainBase.Solana
+                      ? BalanceType.Solana
+                      : BalanceType.Ethereum,
+              // use first chain name as node name
+              name,
+            },
+            transaction,
+          });
 
-      // const [node] = await models.ChainNode.scope(
-      //   'withPrivateData',
-      // ).findOrCreate({
-      //   where: { url: node_url },
-      //   defaults: {
-      //     url: node_url,
-      //     eth_chain_id,
-      //     cosmos_chain_id,
-      //     alt_wallet_url: altWalletUrl,
-      //     private_url: privateUrl,
-      //     balance_type:
-      //       base === ChainBase.CosmosSDK
-      //         ? BalanceType.Cosmos
-      //         : base === ChainBase.Substrate
-      //           ? BalanceType.Substrate
-      //           : base === ChainBase.Ethereum
-      //             ? BalanceType.Ethereum
-      //             : // beyond here should never really happen, but just to make sure...
-      //               base === ChainBase.Solana
-      //               ? BalanceType.Solana
-      //               : undefined,
-      //     // use first chain name as node name
-      //     name,
-      //   },
-      // });
+          await models.Community.create({
+            id,
+            name,
+            default_symbol,
+            icon_url,
+            description,
+            network,
+            type,
+            social_links: uniqueLinksArray,
+            base,
+            bech32_prefix,
+            active: true,
+            chain_node_id: node.id,
+            token_name,
+            has_chain_events_listener:
+              network === 'aave' || network === 'compound',
+            default_page: DefaultPage.Discussions,
+            has_homepage: 'true',
+            collapsed_on_homepage: false,
+            custom_stages: [],
+            directory_page_enabled: false,
+            snapshot_spaces: [],
+            stages_enabled: true,
+          });
 
-      // const createdCommunity = await models.Community.create({
-      //   id,
-      //   name,
-      //   default_symbol,
-      //   icon_url,
-      //   description,
-      //   network,
-      //   type,
-      //   social_links: uniqueLinksArray,
-      //   base,
-      //   bech32_prefix,
-      //   active: true,
-      //   chain_node_id: node.id,
-      //   token_name,
-      //   has_chain_events_listener: network === 'aave' || network === 'compound',
-      //   default_page: DefaultPage.Discussions,
-      //   has_homepage: 'true',
-      //   collapsed_on_homepage: false,
-      //   custom_stages: [],
-      //   directory_page_enabled: false,
-      //   snapshot_spaces: [],
-      //   stages_enabled: true,
-      // });
+          await models.Topic.create({
+            community_id: id,
+            name: 'General',
+            featured_in_sidebar: true,
+          });
 
-      // const nodeJSON = node.toJSON();
-      // delete nodeJSON.private_url;
-
-      // // Warning: looks like state mutations start here, make sure we are using the same transaction
-      // await models.Topic.create({
-      //   community_id: createdCommunity.id,
-      //   name: 'General',
-      //   featured_in_sidebar: true,
-      // });
-
-      // // try to make admin one of the user's addresses
-      // let addressToBeAdmin: AddressInstance | undefined;
-
-      // if (user_address) {
-      //   addressToBeAdmin = await models.Address.scope(
-      //     'withPrivateData',
-      //   ).findOne({
-      //     where: {
-      //       user_id: user.id,
-      //       address: selectedUserAddress,
-      //     },
-      //     include: [
-      //       {
-      //         model: models.Community,
-      //         where: { base: createdCommunity.base },
-      //         required: true,
-      //       },
-      //     ],
-      //   });
-      // } else if (createdCommunity.base === ChainBase.Ethereum) {
-      //   addressToBeAdmin = await models.Address.scope(
-      //     'withPrivateData',
-      //   ).findOne({
-      //     where: {
-      //       user_id: user.id,
-      //       address: {
-      //         [Op.startsWith]: '0x',
-      //       },
-      //     },
-      //     include: [
-      //       {
-      //         model: models.Community,
-      //         where: { base: createdCommunity.base },
-      //         required: true,
-      //       },
-      //     ],
-      //   });
-      // } else if (createdCommunity.base === ChainBase.NEAR) {
-      //   throw new AppError(Errors.InvalidBase);
-      // } else if (createdCommunity.base === ChainBase.Solana) {
-      //   addressToBeAdmin = await models.Address.scope(
-      //     'withPrivateData',
-      //   ).findOne({
-      //     where: {
-      //       user_id: user.id,
-      //       address: {
-      //         // This is the regex formatting for solana addresses per their website
-      //         [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}',
-      //       },
-      //     },
-      //     include: [
-      //       {
-      //         model: models.Community,
-      //         where: { base: createdCommunity.base },
-      //         required: true,
-      //       },
-      //     ],
-      //   });
-      // } else if (
-      //   createdCommunity.base === ChainBase.CosmosSDK &&
-      //   // Onchain community can be created by Admin only,
-      //   // but we allow offchain cmty to have any creator as admin:
-      //   community.type === ChainType.Offchain
-      // ) {
-      //   // if signed in with Keplr or Magic:
-      //   addressToBeAdmin = await models.Address.scope(
-      //     'withPrivateData',
-      //   ).findOne({
-      //     where: {
-      //       user_id: user.id,
-      //     },
-      //     include: [
-      //       {
-      //         model: models.Community,
-      //         where: { base: createdCommunity.base },
-      //         required: true,
-      //       },
-      //     ],
-      //   });
-      // }
-
-      // if (addressToBeAdmin) {
-      //   if (createdCommunity.base === ChainBase.CosmosSDK) {
-      //     hex = await bech32ToHex(addressToBeAdmin.address);
-      //   }
-
-      //   await models.Address.create({
-      //     user_id: user.id,
-      //     address: addressToBeAdmin.address,
-      //     community_id: createdCommunity.id!,
-      //     hex,
-      //     verification_token: addressToBeAdmin.verification_token,
-      //     verification_token_expires:
-      //       addressToBeAdmin.verification_token_expires,
-      //     verified: addressToBeAdmin.verified,
-      //     wallet_id: addressToBeAdmin.wallet_id,
-      //     is_user_default: true,
-      //     role: 'admin',
-      //     last_active: new Date(),
-      //     ghost_address: false,
-      //     is_banned: false,
-      //   });
-      // }
+          const admin_address = await pickAdminAddress(actor, payload);
+          if (admin_address) {
+            await models.Address.create({
+              user_id: actor.user.id,
+              address: admin_address.address,
+              community_id: id,
+              hex:
+                base === ChainBase.CosmosSDK
+                  ? await bech32ToHex(admin_address.address)
+                  : undefined,
+              verification_token: admin_address.verification_token,
+              verification_token_expires:
+                admin_address.verification_token_expires,
+              verified: admin_address.verified,
+              wallet_id: admin_address.wallet_id,
+              is_user_default: true,
+              role: 'admin',
+              last_active: new Date(),
+              ghost_address: false,
+              is_banned: false,
+            });
+          }
+          return admin_address;
+        },
+      );
       // == end of command transaction boundary ==
 
-      // return {
-      //   community: createdCommunity.toJSON(),
-      //   node: nodeJSON,
-      //   admin_address: addressToBeAdmin?.address,
-      // };
-      return community!.toJSON() as Partial<
-        z.infer<typeof schemas.CreateCommunity.output>
-      >;
+      const new_community = await models.Community.findOne({
+        where: { id },
+        include: [{ model: models.ChainNode }],
+      });
+      return {
+        community: new_community!.toJSON(),
+        admin_address: admin_address?.address,
+      };
     },
   };
 }

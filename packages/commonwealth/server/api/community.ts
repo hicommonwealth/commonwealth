@@ -12,8 +12,8 @@ export const trpcRouter = trpc.router({
     trpc.track(
       MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
       (result) => ({
-        chainBase: result.base,
-        community: result.id,
+        chainBase: result.community?.base,
+        community: result.community?.id,
         communityType: null,
       }),
     ),

@@ -1,6 +1,6 @@
+import { config } from '@hicommonwealth/model';
 import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
 import Web3 from 'web3';
-import { config } from '../config';
 import getProvider from './getProvider';
 
 export async function advanceTime(seconds: number, blocks = 1) {

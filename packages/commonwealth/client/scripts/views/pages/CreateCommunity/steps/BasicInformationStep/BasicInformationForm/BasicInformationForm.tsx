@@ -3,7 +3,9 @@ import { slugifyPreserveDashes } from 'utils';
 
 import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
-import useCreateCommunityMutation from 'state/api/communities/createCommunity';
+import useCreateCommunityMutation, {
+  buildCreateCommunityInput,
+} from 'state/api/communities/createCommunity';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
   CWCoverImageUploader,
@@ -147,18 +149,15 @@ const BasicInformationForm = ({
     );
 
     try {
-      await createCommunityMutation({
+      const input = buildCreateCommunityInput({
         id: communityId,
         name: values.communityName,
         chainBase: selectedCommunity.chainBase,
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
-        // @ts-expect-error StrictNullChecks
-        socialLinks: values.links,
-        // @ts-expect-error StrictNullChecks
-        nodeUrl: selectedChainNode?.nodeUrl,
-        // @ts-expect-error StrictNullChecks
-        altWalletUrl: selectedChainNode?.altWalletUrl,
+        socialLinks: values.links ?? [],
+        nodeUrl: selectedChainNode!.nodeUrl!,
+        altWalletUrl: selectedChainNode!.altWalletUrl!,
         userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
           ethChainId: values.chain.value,
@@ -169,6 +168,7 @@ const BasicInformationForm = ({
         }),
         isPWA: isAddedToHomeScreen,
       });
+      await createCommunityMutation(input);
       onSubmit(communityId, values.communityName);
     } catch (err) {
       if (

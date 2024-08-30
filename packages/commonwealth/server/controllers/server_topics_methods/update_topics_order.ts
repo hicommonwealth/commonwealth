@@ -42,7 +42,6 @@ export async function __updateTopicsOrder(
   const isAdminOrMod = await validateOwner({
     models: this.models,
     user: user,
-    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,

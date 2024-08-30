@@ -7,7 +7,6 @@ import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
-import type { CommunityArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -54,20 +53,20 @@ describe('Update Community/Chain Tests', () => {
       config.AUTH.JWT_SECRET,
     );
 
-    // create community for test
-    const communityArgs: CommunityArgs = {
-      jwt: jwtToken,
-      isAuthenticatedForum: 'false',
-      privacyEnabled: 'false',
-      id: 'tester',
-      name: 'tester community',
-      creator_address: loggedInAddr,
-      creator_chain: chain,
-      description: 'Tester community community',
-      default_chain: chain,
-    };
+    // // create community for test
+    // const communityArgs: CommunityArgs = {
+    //   jwt: jwtToken,
+    //   isAuthenticatedForum: 'false',
+    //   privacyEnabled: 'false',
+    //   id: 'tester',
+    //   name: 'tester community',
+    //   creator_address: loggedInAddr,
+    //   creator_chain: chain,
+    //   description: 'Tester community community',
+    //   default_chain: chain,
+    // };
 
-    await server.seeder.createCommunity(communityArgs);
+    // await server.seeder.createCommunity(communityArgs);
   });
 
   afterAll(async () => {
