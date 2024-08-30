@@ -29,10 +29,12 @@ export const mustNotExist = <T>(subject: string, state?: T | null) => {
 };
 
 /**
- * @timolegros what is this case? TODO: document this guard
- * @param subject
- * @param state
- * @returns
+ * Used for error reporting if data is missing or corrupt in a query.
+ * Won't throw errors if data is missing, but will at least log an error
+ * so we are made aware of the issue.
+ * @param subject state description
+ * @param state state representing a model
+ * @returns true if state is defined, false if undefined
  */
 export const shouldExist = <T>(subject: string, state?: T | null) => {
   if (!state) {

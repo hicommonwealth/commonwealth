@@ -244,7 +244,9 @@ export class ChainTesting extends SdkBase {
   }
 
   public async getChainSnapshot() {
-    const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+    const provider = new Web3.providers.HttpProvider(
+      config.TEST_EVM.PROVIDER_URL,
+    );
     const res = await provider.request({
       jsonrpc: '2.0',
       id: 1,
@@ -265,7 +267,9 @@ export class ChainTesting extends SdkBase {
       throw new Error(`Cannot re-use chain snapshot: ${snapshotId}`);
     }
 
-    const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+    const provider = new Web3.providers.HttpProvider(
+      config.TEST_EVM.PROVIDER_URL,
+    );
     const res = await provider.request({
       jsonrpc: '2.0',
       id: 1,

@@ -171,14 +171,7 @@ const BasicInformationForm = ({
       await createCommunityMutation(input);
       onSubmit(communityId, values.communityName);
     } catch (err) {
-      if (
-        err.response?.data?.error ===
-        'The id for this community already exists, please choose another id'
-      ) {
-        notifyError(`Community name is taken, please choose a different name!`);
-      } else {
-        notifyError(err.response?.data?.error);
-      }
+      notifyError(err.message);
     }
   };
 

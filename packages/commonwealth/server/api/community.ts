@@ -14,7 +14,6 @@ export const trpcRouter = trpc.router({
       (result) => ({
         chainBase: result.community?.base,
         community: result.community?.id,
-        communityType: null,
       }),
     ),
   ),

@@ -98,7 +98,7 @@ export const config = configure(
     },
     DEFAULT_COMMONWEALTH_LOGO:
       DEFAULT_COMMONWEALTH_LOGO ?? DEFAULTS.DEFAULT_COMMONWEALTH_LOGO,
-    EVM: {
+    TEST_EVM: {
       ETH_RPC: ETH_RPC || 'prod',
       // URL of the local Ganache, Anvil, or Hardhat chain
       PROVIDER_URL: PROVIDER_URL ?? 'http://127.0.0.1:8545',
@@ -188,7 +188,7 @@ export const config = configure(
       PROFILE_PRIORITY: z.coerce.number(),
     }),
     DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
-    EVM: z.object({
+    TEST_EVM: z.object({
       ETH_RPC: z.string(),
       PROVIDER_URL: z.string(),
       ETH_ALCHEMY_API_KEY: z.string().optional(),

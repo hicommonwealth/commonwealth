@@ -24,8 +24,6 @@ import {
 } from '../middleware/guards';
 
 export const CreateCommunityErrors = {
-  CommunityIDExists:
-    'The id for this community already exists, please choose another id',
   CommunityNameExists:
     'The name for this community already exists, please choose another name',
   InvalidEthereumChainId: 'Ethereum chain ID not provided or unsupported',
@@ -255,10 +253,8 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
       });
-      if (community?.name === name)
+      if (community)
         throw new InvalidInput(CreateCommunityErrors.CommunityNameExists);
-      if (community?.id === id || community?.redirect === id)
-        throw new InvalidInput(CreateCommunityErrors.CommunityIDExists);
 
       const baseCommunity = await models.Community.findOne({ where: { base } });
       mustExist('Chain Base', baseCommunity);
