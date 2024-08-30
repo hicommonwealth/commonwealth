@@ -231,7 +231,10 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         LEFT OUTER JOIN "CommunityStakes_CTE" ON "community_CTE"."id" = "CommunityStakes_CTE"."community_id"
         ${
           relevance_by === 'membership' && replacements.user_id
-            ? `LEFT OUTER JOIN "Addresses" authUserAddresses ON "community_CTE"."id" = authUserAddresses.community_id AND authUserAddresses.user_id = :user_id`
+            ? `LEFT OUTER JOIN 
+              (SELECT DISTINCT ON (community_id) * FROM "Addresses" WHERE user_id = :user_id) authUserAddresses 
+              ON "community_CTE"."id" = authUserAddresses.community_id 
+              AND authUserAddresses.user_id = :user_id`
             : ``
         }
         ${
