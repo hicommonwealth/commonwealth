@@ -70,7 +70,8 @@ export const ThreadSubscription = z.object({
         }),
       }),
     )
-    .optional(),
+    .optional()
+    .nullish(),
 });
 
 export const CommentSubscription = z.object({
@@ -110,7 +111,8 @@ export const CommentSubscription = z.object({
               }),
             }),
           )
-          .optional(),
+          .optional()
+          .nullish(),
       }),
     )
     .optional(),
