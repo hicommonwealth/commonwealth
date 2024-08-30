@@ -347,7 +347,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post('/api/v1/CreateThread/0')
+      .post('/api/v1/CreateThread')
       .set('Accept', 'application/json')
       .set('address', address.split(':')[2])
       .send({
