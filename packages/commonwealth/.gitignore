@@ -56,3 +56,5 @@ summary.json
 .eslintcache
 
 .eslintcache
+
+*storybook.log
