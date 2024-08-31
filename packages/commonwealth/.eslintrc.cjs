@@ -1,6 +1,12 @@
 const path = require('path');
 
 module.exports = {
+  extends: [
+    'prettier/prettier',
+    'plugin:@tanstack/eslint-plugin-query/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:react/recommended',
+  ],
   parserOptions: {
     sourceType: 'module',
     ecmaVersion: 'latest',
@@ -106,10 +112,4 @@ module.exports = {
     'react/jsx-key': 1,
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
-  extends: [
-    'prettier/prettier',
-    'plugin:@tanstack/eslint-plugin-query/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:react/recommended',
-  ],
 };
