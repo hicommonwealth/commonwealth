@@ -1,3 +1,6 @@
+// DEPRECATED.  This is deprecated.  Try to make most changes to the root eslint
+// file at /.eslintrc.cjs.
+
 module.exports = {
   extends: [
     'prettier',
