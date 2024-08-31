@@ -7,9 +7,10 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
   ],
-  plugins: ['@typescript-eslint', 'n'],
+  plugins: ['@typescript-eslint', 'n', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
+    ecmaVersion: 'latest',
     suppressDeprecatedPropertyWarnings: true,
   },
   // indicates this is the parent eslint so eslint will stop searching further up for eslint configs
@@ -27,6 +28,9 @@ module.exports = {
           './packages/*/tsconfig.test.json',
         ],
       },
+    },
+    react: {
+      version: 'detect',
     },
   },
   rules: {

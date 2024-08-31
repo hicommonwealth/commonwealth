@@ -49,6 +49,7 @@ export const migrate_db = async (sequelize: Sequelize) => {
     migrations: {
       glob: path.resolve('../../packages/commonwealth/server/migrations/*.js'),
       // migration resolver since we use v2 migration interface
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       resolve: ({ name, path, context }) => {
         return {
           name,
