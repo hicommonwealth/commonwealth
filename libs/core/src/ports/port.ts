@@ -124,9 +124,9 @@ process.once('unhandledRejection', async (arg?: any) => {
 /**
  * Stats port factory
  */
-export const stats = port(function stats(stats?: Stats) {
+export const stats = port(function stats(_stats?: Stats) {
   return (
-    stats || {
+    _stats || {
       name: 'in-memory-stats',
       dispose: () => Promise.resolve(),
       histogram: () => {},
@@ -146,9 +146,9 @@ export const stats = port(function stats(stats?: Stats) {
 /**
  * Cache port factory
  */
-export const cache = port(function cache(cache?: Cache) {
+export const cache = port(function cache(_cache?: Cache) {
   return (
-    cache || {
+    _cache || {
       name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
       ready: () => Promise.resolve(true),
@@ -172,9 +172,9 @@ export const cache = port(function cache(cache?: Cache) {
 /**
  * Analytics port factory
  */
-export const analytics = port(function analytics(analytics?: Analytics) {
+export const analytics = port(function analytics(_analytics?: Analytics) {
   return (
-    analytics || {
+    _analytics || {
       name: 'in-memory-analytics',
       dispose: () => Promise.resolve(),
       track: () => {},
@@ -185,8 +185,8 @@ export const analytics = port(function analytics(analytics?: Analytics) {
 /**
  * Broker port factory
  */
-export const broker = port(function broker(broker?: Broker) {
-  return broker || successfulInMemoryBroker;
+export const broker = port(function broker(_broker?: Broker) {
+  return _broker || successfulInMemoryBroker;
 });
 
 /**

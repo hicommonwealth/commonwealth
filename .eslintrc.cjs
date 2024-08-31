@@ -1,8 +1,11 @@
 module.exports = {
   extends: [
+    'prettier',
+    'plugin:@tanstack/eslint-plugin-query/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:react/recommended',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'prettier',
   ],
   plugins: ['@typescript-eslint', 'n'],
   parser: '@typescript-eslint/parser',
@@ -33,5 +36,16 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'n/no-process-exit': 'error',
+    'max-classes-per-file': ['error', 5],
+    'no-trailing-spaces': ['error'],
+    '@typescript-eslint/no-shadow': 'error',
+    '@typescript-eslint/no-empty-interface': [
+      'error',
+      {
+        allowSingleExtends: true,
+      },
+    ],
+    '@tanstack/query/exhaustive-deps': 'error',
+    '@tanstack/query/prefer-query-object-syntax': 'error',
   },
 };
