@@ -23,16 +23,16 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 import 'express-async-errors';
 
 // bootstrap production adapters
-
-const log = logger(import.meta);
-stats(HotShotsStats());
-analytics(MixpanelAnalytics());
-blobStorage(S3BlobStorage());
+if (config.APP_ENV === 'production') {
+  stats(HotShotsStats());
+  analytics(MixpanelAnalytics());
+  if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
+    notificationsProvider(KnockProvider());
+}
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
-if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
-  notificationsProvider(KnockProvider());
-else notificationsProvider();
+const log = logger(import.meta);
+blobStorage(S3BlobStorage());
 
 let isServiceHealthy = false;
 startHealthCheckLoop({
