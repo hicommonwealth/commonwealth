@@ -3,9 +3,10 @@ import {
   logger,
   notificationsProvider,
   RepeatFrequency,
+  SubscriptionPreferencesUpdated,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, SubscriptionPreferenceInstance } from '@hicommonwealth/model';
 import { DaysOfWeek } from '@knocklabs/node';
 import z from 'zod';
 
@@ -15,7 +16,6 @@ const output = z.boolean();
 
 function mapDateToDaysOfWeek(
   date: Date,
-  // @ts-expect-error StrictNullChecks
 ): (typeof DaysOfWeek)[keyof typeof DaysOfWeek] {
   switch (date.getDay()) {
     case 0:
@@ -30,7 +30,7 @@ function mapDateToDaysOfWeek(
       return DaysOfWeek.Thu;
     case 5:
       return DaysOfWeek.Fri;
-    case 6:
+    default:
       return DaysOfWeek.Sat;
   }
 }
@@ -95,14 +95,20 @@ async function deleteScheduleIfExists(
   return true;
 }
 
-export const processSubscriptionPreferencesUpdated: EventHandler<
-  'SubscriptionPreferencesUpdated',
-  typeof output
-> = async ({ payload }) => {
-  const provider = notificationsProvider();
+async function handleEmailPreferenceUpdates(
+  payload: z.infer<typeof SubscriptionPreferencesUpdated>,
+  subscriptionPreferences: SubscriptionPreferenceInstance,
+) {
+  if (
+    !('email_notifications_enabled' in payload) &&
+    !('recap_email_enabled' in payload) &&
+    !('digest_email_enabled' in payload)
+  )
+    return;
 
-  // remove recap/digest email schedules if emails are completely disabled
+  // Remove email schedules -> all emails disabled
   if (payload.email_notifications_enabled === false) {
+    const provider = notificationsProvider();
     const existingSchedules = await provider.getSchedules({
       user_id: String(payload.user_id),
     });
@@ -113,24 +119,21 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
           s.workflow === WorkflowKeys.EmailRecap,
       )
       .map((s) => s.id);
-    const deletedSchedules = await provider.deleteSchedules({
-      schedule_ids: ids,
-    });
-    const allDeleted = ids.every((id) => deletedSchedules.has(id));
-    if (!allDeleted) {
-      throw new Error('Failed to delete schedules');
-    }
 
-    return true;
+    if (ids.length) {
+      const deletedSchedules = await provider.deleteSchedules({
+        schedule_ids: ids,
+      });
+      const allDeleted = ids.every((id) => deletedSchedules.has(id));
+      if (!allDeleted) {
+        throw new Error('Failed to delete schedules');
+      }
+    }
+    return;
   }
 
-  const subPreferences = await models.SubscriptionPreference.findOne({
-    where: {
-      user_id: payload.user_id,
-    },
-  });
-
-  if (subPreferences!.email_notifications_enabled) {
+  // Add email schedules if a new email type is enabled
+  if (subscriptionPreferences.email_notifications_enabled === true) {
     if (payload.recap_email_enabled === true) {
       await createScheduleIfNotExists(
         WorkflowKeys.EmailRecap,
@@ -146,6 +149,7 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
     }
   }
 
+  // Remove specific email schedules
   if (payload.recap_email_enabled === false) {
     await deleteScheduleIfExists(
       WorkflowKeys.EmailRecap,
@@ -159,6 +163,24 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
       String(payload.user_id),
     );
   }
+}
+
+export const processSubscriptionPreferencesUpdated: EventHandler<
+  'SubscriptionPreferencesUpdated',
+  typeof output
+> = async ({ payload }) => {
+  const provider = notificationsProvider();
+  const subPreferences = await models.SubscriptionPreference.findOne({
+    where: {
+      user_id: payload.user_id,
+    },
+  });
+
+  if (!subPreferences) {
+    throw new Error('Failed to find user subscription preferences');
+  }
+
+  await handleEmailPreferenceUpdates(payload, subPreferences);
 
   const userProperties: { [key: string]: boolean } = {};
   const keys = [

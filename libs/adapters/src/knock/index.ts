@@ -110,11 +110,18 @@ export function KnockProvider(): NotificationsProvider {
     },
 
     async getSchedules(options): Promise<NotificationsProviderSchedulesReturn> {
-      const res = await knock.users.getSchedules(options.user_id, {
-        // @ts-expect-error Knock SDK doesn't support this option, but it works since the Knock API supports it
-        workflow: options.workflow_id,
-      });
-      return formatScheduleResponse(res.entries);
+      try {
+        const res = await knock.users.getSchedules(options.user_id, {
+          // @ts-expect-error Knock SDK doesn't support this option, but it works since the Knock API supports it
+          workflow: options.workflow_id,
+        });
+        return formatScheduleResponse(res.entries);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        if ('status' in e && e.status === 404) {
+          return [];
+        } else throw e;
+      }
     },
 
     async createSchedules(options) {
