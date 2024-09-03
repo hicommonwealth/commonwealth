@@ -782,7 +782,6 @@ function setupRouter(
     router,
     'post',
     '/linking/getLinks',
-    passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models),
   );
 
