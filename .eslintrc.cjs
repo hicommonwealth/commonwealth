@@ -3,6 +3,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
+    'plugin:import/recommended',
   ],
   plugins: ['@typescript-eslint', 'n'],
   parser: '@typescript-eslint/parser',
@@ -33,5 +34,9 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'n/no-process-exit': 'error',
+
+    'import/no-cycle': 0,
+    'import/named': 0,
+    'import/namespace': 0,
   },
 };

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { ChainBase } from '@hicommonwealth/shared';
 
 export const COSMOS_CHAIN_ID = 'cosmoshub-1';

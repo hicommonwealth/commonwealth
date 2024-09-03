@@ -1,6 +1,7 @@
 import pino, { DestinationStream } from 'pino';
 import { config } from '../config';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';
+// eslint-disable-next-line import/no-cycle
 import { rollbar } from './rollbar';
 
 let transport: DestinationStream;

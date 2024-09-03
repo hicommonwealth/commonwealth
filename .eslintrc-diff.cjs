@@ -35,8 +35,6 @@ module.exports = {
     '@typescript-eslint/ban-types': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
-    'import/no-cycle': 'off',
-    'import/named': 'off',
     'no-underscore-dangle': 0,
     'no-console': 0,
     camelcase: 0,
@@ -147,9 +145,16 @@ module.exports = {
     // "functional/no-let": "error",
     // "functional/no-method-signature": "error",
     // "functional/prefer-readonly-type": "error"
+
+    // ** block cyclical imports
+
+    'import/no-cycle': 2,
+    'import/named': 0,
+    'import/namespace': 0,
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
+    'plugin:import/recommended',
     'eslint:recommended',
     'plugin:@tanstack/eslint-plugin-query/recommended',
     'plugin:react-hooks/recommended',
