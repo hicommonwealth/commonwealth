@@ -53,7 +53,7 @@ export const Thread = z.object({
 
   // associations
   Address: Address.nullish(),
-  Comment: Comment.nullish(),
+  Comment: z.lazy(() => Comment.nullish()),
   Reaction: Reaction.nullish(),
   topic: Topic.nullish(),
 });

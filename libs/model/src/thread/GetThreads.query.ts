@@ -25,12 +25,12 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
       if (include_comments) {
         includeArray.push({
           model: models.Comment,
+          as: 'Comments',
           include: [
             {
               model: models.Address,
               as: 'Address',
-              required: true,
-              attributes: ['address', 'last_active'],
+              attributes: ['id', 'address', 'last_active'],
               include: [
                 {
                   model: models.User,
@@ -46,6 +46,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
       if (include_user) {
         includeArray.push({
           model: models.Address,
+          as: 'Address',
           include: [
             {
               model: models.User,
@@ -66,12 +67,10 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
               model: models.Address,
               as: 'Address',
               required: true,
-              attributes: ['address', 'last_active'],
+              attributes: ['id', 'address', 'last_active'],
               include: [
                 {
                   model: models.User,
-                  as: 'User',
-                  required: true,
                   attributes: ['id', 'profile'],
                 },
               ],

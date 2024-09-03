@@ -18,6 +18,7 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
       if (include_threads) {
         includeArray.push({
           model: models.Thread,
+          as: 'threads',
         });
       }
 

@@ -10,6 +10,6 @@ export const GetTopics = {
     include_threads: z.coerce.boolean(),
   }),
   output: PaginatedResultSchema.extend({
-    result: Topic.array(),
+    results: Topic.array(),
   }),
 };

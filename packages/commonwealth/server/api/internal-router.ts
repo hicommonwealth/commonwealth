@@ -10,7 +10,7 @@ import * as feed from './feed';
 import * as integrations from './integrations';
 import * as loadTest from './load-test';
 import * as subscription from './subscription';
-import * as thread from './threads';
+import * as thread from './thread';
 import * as user from './user';
 import * as webhook from './webhook';
 
