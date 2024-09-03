@@ -9,6 +9,7 @@ import {
 import { models, SubscriptionPreferenceInstance } from '@hicommonwealth/model';
 import { DaysOfWeek } from '@knocklabs/node';
 import z from 'zod';
+import { config } from '../../../config';
 
 const log = logger(import.meta);
 
@@ -180,25 +181,30 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
     throw new Error('Failed to find user subscription preferences');
   }
 
-  await handleEmailPreferenceUpdates(payload, subPreferences);
-
-  const userProperties: { [key: string]: boolean } = {};
-  const keys = [
-    'mobile_push_notifications_enabled',
-    'mobile_push_discussion_activity_enabled',
-    'mobile_push_admin_alerts_enabled',
-  ];
-  keys.forEach((key) => {
-    if (key in payload) {
-      userProperties[key] = payload[key];
-    }
-  });
-
-  if (Object.keys(userProperties).length) {
-    await provider.identifyUser({
-      user_id: String(payload.user_id),
-      user_properties: userProperties,
-    });
+  if (config.NOTIFICATIONS.SEND_EMAILS) {
+    await handleEmailPreferenceUpdates(payload, subPreferences);
   }
+
+  if (config.PUSH_NOTIFICATIONS.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED) {
+    const userProperties: { [key: string]: boolean } = {};
+    const keys = [
+      'mobile_push_notifications_enabled',
+      'mobile_push_discussion_activity_enabled',
+      'mobile_push_admin_alerts_enabled',
+    ];
+    keys.forEach((key) => {
+      if (key in payload) {
+        userProperties[key] = payload[key];
+      }
+    });
+
+    if (Object.keys(userProperties).length) {
+      await provider.identifyUser({
+        user_id: String(payload.user_id),
+        user_properties: userProperties,
+      });
+    }
+  }
+
   return true;
 };
