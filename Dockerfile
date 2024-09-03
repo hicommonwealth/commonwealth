@@ -15,9 +15,10 @@ RUN pnpm deploy --filter=commonwealth --prod /prod/commonwealth
 RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
 
 FROM base AS commonwealth
+ENV PORT 8080
 COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
-EXPOSE 8080
+EXPOSE ${PORT}
 CMD ["node", "--import=extensionless/register", "--enable-source-maps", "./build/server.js"]
 
 # If we plan on moving more applications to docker:
