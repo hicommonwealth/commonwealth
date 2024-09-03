@@ -54,5 +54,8 @@ module.exports = {
     ],
     '@tanstack/query/exhaustive-deps': 'error',
     '@tanstack/query/prefer-query-object-syntax': 'error',
+
+    // *********
+    // legacy rules MOST of which should be turned on in the lint-diff mode
   },
 };
