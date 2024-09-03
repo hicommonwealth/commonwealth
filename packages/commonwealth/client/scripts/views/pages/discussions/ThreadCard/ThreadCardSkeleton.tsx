@@ -3,6 +3,7 @@ import { Skeleton } from 'views/components/Skeleton';
 import './ThreadCard.scss';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
 
+// eslint-disable-next-line react/prop-types
 export const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
   return (
     <div className={'ThreadCard showSkeleton'}>

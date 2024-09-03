@@ -17,8 +17,10 @@ const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
 };
 
 // This component handles fixed size of the item in the list
+// eslint-disable-next-line react/prop-types
 const HeightPreservingItem = ({ children, ...props }) => {
   const [size, setSize] = useState(0);
+  // eslint-disable-next-line react/prop-types
   const knownSize = props['data-known-size'];
 
   useEffect(() => {

@@ -56,6 +56,7 @@ export const SelectList = <
           // @ts-expect-error <StrictNullChecks/>
           <CustomOption
             {...optionProps}
+            // eslint-disable-next-line react/no-children-prop
             children={optionProps.children}
             disabledOptionTooltipText={props.disabledOptionTooltipText}
           />
