@@ -133,7 +133,7 @@ export const status = async (
     const { user: reqUser } = req;
     if (!reqUser) {
       return success(res, {
-        evmTestEnv: config.EVM.ETH_RPC,
+        evmTestEnv: config.TEST_EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     } else {
@@ -165,7 +165,7 @@ export const status = async (
         // @ts-expect-error StrictNullChecks
         user,
         communityWithRedirects: communityWithRedirects || [],
-        evmTestEnv: config.EVM.ETH_RPC,
+        evmTestEnv: config.TEST_EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     }
