@@ -249,8 +249,8 @@ export const createFk = (
     ALTER TABLE "${source}" ADD CONSTRAINT "${name}"
     FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
     ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${
-    rules?.onDelete ?? 'NO ACTION'
-  };`);
+      rules?.onDelete ?? 'NO ACTION'
+    };`);
 
 /**
  * Drops composite FK constraints (not supported by sequelize)
