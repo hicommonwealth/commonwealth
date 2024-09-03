@@ -50,7 +50,6 @@ import {
 import useAuthModalStore, {
   authModal,
 } from '../../../state/ui/modals/authModal';
-import { formatAddress } from '../../components/user/user_block';
 import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
@@ -134,6 +133,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   }, []);
 
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 8)}...${address.slice(-5)}`;
+  };
+
   const handleSuccess = async (
     authAddress?: string | null | undefined,
     isNew?: boolean,
@@ -145,7 +148,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // @ts-expect-error StrictNullChecks
       const isSubstrate = user.accounts.find(
         (addr) => addr.address === sessionKeyValidationError?.address,
-      ).community.ss58Prefix;
+      ).community?.ss58Prefix;
       if (
         authAddress === sessionKeyValidationError?.address ||
         (isSubstrate &&

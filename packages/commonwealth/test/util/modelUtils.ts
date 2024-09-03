@@ -29,7 +29,6 @@ import {
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
-import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
@@ -222,9 +221,8 @@ export type ModelSeeder = {
     jwt: string;
   }) => Promise<any>;
   updateRole: (args: AssignRoleArgs) => Promise<any>;
-  createSubscription: (
-    args: SubscriptionArgs,
-  ) => Promise<NotificationSubscription>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  createSubscription: (args: SubscriptionArgs) => Promise<any>;
   createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
@@ -258,9 +256,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       throw new Error(`invalid chain ${chain}`);
     }
 
-    const { payload: session, signer } = await sessionSigner.newSession(
-      CANVAS_TOPIC,
-    );
+    const { payload: session, signer } =
+      await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = session.address.split(':')[2];
 
     let res = await chai.request
@@ -313,9 +310,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     args: ThreadArgs,
   ): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
     const {
+      jwt,
       chainId,
       address,
-      jwt,
       title,
       body,
       topicId,
@@ -350,23 +347,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post('/api/threads')
+      .post('/api/v1/CreateThread/0')
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
-        author_chain: chainId,
-        chain: chainId,
-        address: address.split(':')[2],
+        jwt,
+        community_id: chainId,
+        topic_id: topicId,
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
-        topic_id: topicId,
+        stage: '',
         url,
-        readOnly: readOnly || false,
-        jwt,
+        read_only: readOnly || false,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
-    return res.body;
+    if (res.ok) return { result: res.body, status: 'Success' };
+    return { status: res.status.toString() };
   },
 
   createLink: async (args: createDeleteLinkArgs) => {
@@ -587,10 +585,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   updateRole: async (args: AssignRoleArgs) => {
     await models.sequelize.query(
       `
-      UPDATE "Addresses"
-      SET role = '${args.role}'
-      WHERE id = ${args.address_id};
-    `,
+          UPDATE "Addresses"
+          SET role = '${args.role}'
+          WHERE id = ${args.address_id};
+      `,
     );
     return true;
   },
@@ -608,11 +606,20 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createCommunity: async (args: CommunityArgs) => {
     const res = await chai
       .request(app)
-      .post('/api/createCommunity')
+      .post(`/api/v1/CreateCommunity/${args.id}`)
       .set('Accept', 'application/json')
-      .send({ ...args });
-    const community = res.body.result;
-    return community;
+      //.set('address', address.split(':')[2])
+      .send({
+        ...args,
+        type: 'offchain',
+        base: 'ethereum',
+        eth_chain_id: 1,
+        user_address: args.creator_address,
+        node_url: 'http://chain.url',
+        network: 'network',
+        default_symbol: 'test',
+      });
+    return res.body.community;
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {

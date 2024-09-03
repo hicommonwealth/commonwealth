@@ -3,7 +3,9 @@ import { slugifyPreserveDashes } from 'utils';
 
 import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
-import useCreateCommunityMutation from 'state/api/communities/createCommunity';
+import useCreateCommunityMutation, {
+  buildCreateCommunityInput,
+} from 'state/api/communities/createCommunity';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
   CWCoverImageUploader,
@@ -32,7 +34,6 @@ import {
   ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
-  existingCommunityIds,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import { BasicInformationFormProps, FormSubmitValues } from './types';
@@ -76,12 +77,7 @@ const BasicInformationForm = ({
   } = useCreateCommunityMutation();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  let isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
-  if (!isCommunityNameTaken) {
-    isCommunityNameTaken = !!existingCommunityIds.find(
-      (id) => id === communityId,
-    );
-  }
+  const isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
 
   const getChainOptions = () => {
     const mappedChainValue = (chainType) => ({
@@ -153,18 +149,15 @@ const BasicInformationForm = ({
     );
 
     try {
-      await createCommunityMutation({
+      const input = buildCreateCommunityInput({
         id: communityId,
         name: values.communityName,
         chainBase: selectedCommunity.chainBase,
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
-        // @ts-expect-error StrictNullChecks
-        socialLinks: values.links,
-        // @ts-expect-error StrictNullChecks
-        nodeUrl: selectedChainNode?.nodeUrl,
-        // @ts-expect-error StrictNullChecks
-        altWalletUrl: selectedChainNode?.altWalletUrl,
+        socialLinks: values.links ?? [],
+        nodeUrl: selectedChainNode!.nodeUrl!,
+        altWalletUrl: selectedChainNode!.altWalletUrl!,
         userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
           ethChainId: values.chain.value,
@@ -175,9 +168,10 @@ const BasicInformationForm = ({
         }),
         isPWA: isAddedToHomeScreen,
       });
+      await createCommunityMutation(input);
       onSubmit(communityId, values.communityName);
     } catch (err) {
-      notifyError(err.response?.data?.error);
+      notifyError(err.message);
     }
   };
 
@@ -257,6 +251,7 @@ const BasicInformationForm = ({
         hookToForm
         label="Community Description"
         placeholder="Enter a description of your community or project"
+        charCount={250}
       />
 
       <CWCoverImageUploader

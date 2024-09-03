@@ -1,3 +1,5 @@
+import { QuillOps } from '@hicommonwealth/shared';
+
 // EmbedSanitizer returns a sanitized URL string if the input URL matches the format and is valid, otherwise null
 type EmbedSanitizer = (url: string) => string | null;
 
@@ -30,10 +32,6 @@ const embedSanitizers: EmbedSanitizer[] = [
   vimeoEmbedSanitizer,
 ];
 
-// sanitizeQuillText returns a sanitized version of the input
-type QuillOps = {
-  ops: any[];
-};
 export function sanitizeQuillText(input: string, noEncode?: boolean): string {
   if (!input) {
     return '';

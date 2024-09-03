@@ -44,6 +44,8 @@ describe('userMentioned Event Handler', () => {
     [author] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
+      lifetime_thread_count: 0,
+      profile_count: 2,
       Addresses: [
         {
           role: 'member',
@@ -106,7 +108,6 @@ describe('userMentioned Event Handler', () => {
         // @ts-expect-error StrictNullChecks
         authorAddress: community!.Addresses[0].address,
         mentionedUserId: user!.id,
-        // @ts-expect-error StrictNullChecks
         communityId: community!.id,
         thread,
       },
@@ -152,7 +153,6 @@ describe('userMentioned Event Handler', () => {
           // @ts-expect-error StrictNullChecks
           authorAddress: community!.Addresses[0].address,
           mentionedUserId: user!.id,
-          // @ts-expect-error StrictNullChecks
           communityId: community!.id,
           thread,
         },

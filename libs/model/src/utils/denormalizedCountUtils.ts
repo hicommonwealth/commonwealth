@@ -1,6 +1,7 @@
 import { Transaction } from 'sequelize';
 
 export const incrementProfileCount = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   models: any,
   community_id: string,
   user_id: number,
@@ -25,6 +26,7 @@ export const incrementProfileCount = async (
 };
 
 export const decrementProfileCount = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   models: any,
   community_id: string,
   user_id: number,

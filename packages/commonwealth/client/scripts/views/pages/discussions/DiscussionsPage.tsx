@@ -7,7 +7,6 @@ import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { canPerformAction } from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -29,6 +28,7 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
@@ -44,7 +44,6 @@ type DiscussionsPageProps = {
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
-  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
@@ -81,6 +80,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     address: user.activeAccount?.address || '',
   });
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const { contestsData } = useCommunityContests();
 
   const { dateCursor } = useDateCursor({
@@ -89,7 +90,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isOnArchivePage =
     location.pathname ===
-    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
+    (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -133,7 +134,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
-    if (!isLoadingTopics && topicNameFromURL) {
+    if (
+      !isLoadingTopics &&
+      topicNameFromURL &&
+      topicNameFromURL !== 'archived'
+    ) {
       const validTopics = topics?.some(
         (topic) => topic?.name === topicNameFromURL,
       );
@@ -246,8 +251,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                    ? totalThreadsInCommunity
-                    : 0
+                      ? app?.chain?.meta?.lifetimeThreadCount
+                      : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}

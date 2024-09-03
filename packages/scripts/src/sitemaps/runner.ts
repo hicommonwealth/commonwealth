@@ -11,6 +11,7 @@ blobStorage(S3BlobStorage());
 async function doExec() {
   if (process.env.SITEMAP_ENV !== 'production') {
     throw new Error(
+      // eslint-disable-next-line max-len
       'Define SITEMAP_ENV to signify you understand that this should only run in production to avoid breaking sitemaps.',
     );
   }
