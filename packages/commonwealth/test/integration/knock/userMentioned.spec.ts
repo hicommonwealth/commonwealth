@@ -108,7 +108,6 @@ describe('userMentioned Event Handler', () => {
         // @ts-expect-error StrictNullChecks
         authorAddress: community!.Addresses[0].address,
         mentionedUserId: user!.id,
-        // @ts-expect-error StrictNullChecks
         communityId: community!.id,
         thread,
       },
@@ -154,7 +153,6 @@ describe('userMentioned Event Handler', () => {
           // @ts-expect-error StrictNullChecks
           authorAddress: community!.Addresses[0].address,
           mentionedUserId: user!.id,
-          // @ts-expect-error StrictNullChecks
           communityId: community!.id,
           thread,
         },

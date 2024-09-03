@@ -22,6 +22,7 @@ export type Aggregates = Extract<
   | 'ThreadSubscription'
   | 'Contract'
   | 'CommunityContract'
+  | 'Wallets'
   | 'GroupPermission'
   | 'Tags'
   | 'CommunityTags'

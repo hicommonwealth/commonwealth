@@ -5,11 +5,6 @@ import {
   __createChainNode,
 } from './server_communities_methods/create_chain_node';
 import {
-  CreateCommunityOptions,
-  CreateCommunityResult,
-  __createCommunity,
-} from './server_communities_methods/create_community';
-import {
   PostCommunityStakeOptions,
   __createCommunityStake,
 } from './server_communities_methods/create_community_stake';
@@ -18,11 +13,6 @@ import {
   DeleteCommunityResult,
   __deleteCommunity,
 } from './server_communities_methods/delete_community';
-import {
-  GetActiveCommunitiesOptions,
-  GetActiveCommunitiesResult,
-  __getActiveCommunities,
-} from './server_communities_methods/get_active_communities';
 import {
   GetChainNodesOptions,
   GetChainNodesResult,
@@ -80,18 +70,6 @@ export class ServerCommunitiesController {
     options: GetCommunitiesOptions,
   ): Promise<GetCommunitiesResult> {
     return __getCommunities.call(this, options);
-  }
-
-  async getActiveCommunities(
-    options: GetActiveCommunitiesOptions,
-  ): Promise<GetActiveCommunitiesResult> {
-    return __getActiveCommunities.call(this, options);
-  }
-
-  async createCommunity(
-    options: CreateCommunityOptions,
-  ): Promise<CreateCommunityResult> {
-    return __createCommunity.call(this, options);
   }
 
   async updateCommunity(
