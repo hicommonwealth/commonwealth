@@ -175,7 +175,9 @@ export const CreateTopicSectionOld = () => {
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
             disabled={isSaving || !!nameErrorMsg || !!descErrorMsg}
             type="submit"
-            onClick={handleSubmit}
+            onClick={() => {
+              handleSubmit().catch(console.log);
+            }}
           />
         </div>
       </CWForm>

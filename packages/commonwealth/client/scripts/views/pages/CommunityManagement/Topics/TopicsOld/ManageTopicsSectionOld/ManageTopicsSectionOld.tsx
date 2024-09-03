@@ -138,7 +138,7 @@ export const ManageTopicsSectionOld = () => {
                     <CWIconButton
                       iconName="pencil"
                       buttonSize="sm"
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.stopPropagation();
                         setTopicSelectedToEdit(regTopic);
                       }}
@@ -167,6 +167,7 @@ export const ManageTopicsSectionOld = () => {
           buttonType="primary"
           buttonHeight="med"
           buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={handleSave}
           label="Save Changes"
         />

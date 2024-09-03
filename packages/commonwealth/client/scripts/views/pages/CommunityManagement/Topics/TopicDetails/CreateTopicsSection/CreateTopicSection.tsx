@@ -81,7 +81,7 @@ export const CreateTopicSection = ({
     }
   }, [descriptionDelta]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     onStepChange?.(CreateTopicStep.WVConsent);
   };
 
