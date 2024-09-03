@@ -4,10 +4,10 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import { dispose } from '@hicommonwealth/core';
+import { Thread } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
 import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
@@ -17,7 +17,6 @@ import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { markdownComment } from '../../util/fixtures/markdownComment';
-import type { CommunityArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -120,7 +119,7 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.UnsupportedKind);
+      expect(tRes.error).to.be.equal(Thread.CreateThreadErrors.UnsupportedKind);
     });
 
     test('should fail to create a forum thread with an empty title', async () => {
@@ -138,7 +137,9 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.DiscussionMissingTitle);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.DiscussionMissingTitle,
+      );
     });
 
     test('should fail to create a link thread with an empty title', async () => {
@@ -157,7 +158,9 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.LinkMissingTitleOrUrl);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.LinkMissingTitleOrUrl,
+      );
     });
 
     test('should fail to create a link thread with an empty URL', async () => {
@@ -177,7 +180,9 @@ describe.skip('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(CreateThreadErrors.LinkMissingTitleOrUrl);
+      expect(tRes.error).to.be.equal(
+        Thread.CreateThreadErrors.LinkMissingTitleOrUrl,
+      );
     });
 
     test('should fail to create a comment on a readOnly thread', async () => {
@@ -311,21 +316,22 @@ describe.skip('Thread Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
     });
-    test.skip('should pass as admin of private community', async () => {
-      const communityArgs: CommunityArgs = {
-        jwt: userJWT,
-        isAuthenticatedForum: 'false',
-        privacyEnabled: 'true',
-        id: 'test',
-        name: 'test community',
-        creator_address: userAddress,
-        creator_chain: chain,
-        description: 'test enabled community',
-        default_chain: chain,
-      };
 
-      await server.seeder.createCommunity(communityArgs);
-    });
+    // test.skip('should pass as admin of private community', async () => {
+    //   const communityArgs: CommunityArgs = {
+    //     jwt: userJWT,
+    //     isAuthenticatedForum: 'false',
+    //     privacyEnabled: 'true',
+    //     id: 'test',
+    //     name: 'test community',
+    //     creator_address: userAddress,
+    //     creator_chain: chain,
+    //     description: 'test enabled community',
+    //     default_chain: chain,
+    //   };
+
+    //   await server.seeder.createCommunity(communityArgs);
+    // });
   });
 
   describe('/thread/:id/comments', () => {

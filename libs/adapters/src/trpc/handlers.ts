@@ -60,6 +60,7 @@ export enum Tag {
   Integration = 'Integration',
   Subscription = 'Subscription',
   LoadTest = 'LoadTest',
+  Wallet = 'Wallet',
   Webhook = 'Webhook',
 }
 

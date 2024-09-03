@@ -1,10 +1,10 @@
+import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -52,7 +52,7 @@ export const NewThreadForm = () => {
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
-  const { isAddedToHomeScreen } = useAppStatus();
+  useAppStatus();
 
   const communityId = app.activeChainId() || '';
   const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
@@ -174,7 +174,7 @@ export const NewThreadForm = () => {
     setIsSaving(true);
 
     try {
-      const thread = await createThread({
+      const input = await buildCreateThreadInput({
         address: user.activeAccount?.address || '',
         kind: threadKind,
         stage: app.chain.meta?.custom_stages
@@ -185,9 +185,8 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        authorProfile: user.activeAccount?.profile as MinimumProfile,
-        isPWA: isAddedToHomeScreen,
       });
+      const thread = await createThread(input);
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
@@ -205,7 +204,7 @@ export const NewThreadForm = () => {
         return;
       }
 
-      console.error(err.response.data.error || err?.message);
+      console.error(err?.message);
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
