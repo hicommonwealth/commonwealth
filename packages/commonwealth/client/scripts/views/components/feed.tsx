@@ -19,7 +19,7 @@ import {
   useFetchUserActivityQuery,
 } from 'state/api/feeds';
 import useUserStore from 'state/ui/user';
-import Permissions, { canPerformAction } from 'utils/Permissions';
+import Permissions from 'utils/Permissions';
 import { DashboardViews } from 'views/pages/user_dashboard';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
@@ -53,17 +53,12 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   const isAdmin =
     Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community);
 
-  const allowedActions = useForumActionGated({
+  const { canCreateComment, canReactToThread } = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
     topicId: thread?.topic?.id,
-  });
-
-  const { canCreateComment, canReactToThread } = canPerformAction(
-    allowedActions,
     isAdmin,
-    thread?.topic?.id,
-  );
+  });
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: Permissions.isCommunityMember(thread.communityId),

@@ -37,7 +37,7 @@ import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
-import Permissions, { canPerformAction } from '../../../utils/Permissions';
+import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import MetaTags from '../../components/MetaTags';
 import { Select } from '../../components/Select';
@@ -139,10 +139,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const allowedActions = useForumActionGated({
+  const { canCreateComment, canReactToComment } = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
     topicId: thread?.topic?.id,
+    isAdmin,
   });
 
   const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
@@ -270,12 +271,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
-
-  const { canCreateComment, canReactToComment } = canPerformAction(
-    allowedActions,
-    isAdmin,
-    thread?.topic?.id,
-  );
 
   const isRestrictedMembership = !canCreateComment || !canReactToComment;
 

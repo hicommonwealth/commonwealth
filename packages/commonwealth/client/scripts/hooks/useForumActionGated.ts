@@ -1,19 +1,35 @@
-import { ForumActions } from '@hicommonwealth/schemas';
+import { ForumActions, ForumActionsEnum } from '@hicommonwealth/schemas';
 import { useRefreshMembershipQuery } from '../state/api/groups';
 
 type UseAllowedGroupsParams = {
   communityId: string;
   address: string;
   topicId?: number;
+  isAdmin: boolean;
 };
 
-export type UseForumActionGatedResponse = Map<number, ForumActions[]>;
+export type UseForumActionGatedResponse = {
+  canCreateThread: boolean;
+  canCreateComment: boolean;
+  canReactToThread: boolean;
+  canReactToComment: boolean;
+  canUpdatePoll: boolean;
+};
 
 export const useForumActionGated = ({
   communityId,
   address,
   topicId,
+  isAdmin,
 }: UseAllowedGroupsParams): UseForumActionGatedResponse => {
+  const allowEverything = {
+    canCreateThread: true,
+    canCreateComment: true,
+    canReactToThread: true,
+    canReactToComment: true,
+    canUpdatePoll: true,
+  };
+
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId,
     address,
@@ -22,7 +38,7 @@ export const useForumActionGated = ({
   });
 
   if (memberships.length === 0) {
-    return new Map();
+    return allowEverything;
   }
 
   const flatMemberships = memberships
@@ -54,5 +70,26 @@ export const useForumActionGated = ({
     );
   });
 
-  return topicIdToIsAllowedMap;
+  const allowedActionsForTopic = topicIdToIsAllowedMap.get(topicId ?? 0);
+  if (isAdmin || !topicId || !allowedActionsForTopic) {
+    return allowEverything;
+  }
+
+  return {
+    canCreateThread: allowedActionsForTopic.includes(
+      ForumActionsEnum.CREATE_THREAD,
+    ),
+    canCreateComment: allowedActionsForTopic.includes(
+      ForumActionsEnum.CREATE_COMMENT,
+    ),
+    canReactToThread: allowedActionsForTopic.includes(
+      ForumActionsEnum.CREATE_THREAD_REACTION,
+    ),
+    canReactToComment: allowedActionsForTopic.includes(
+      ForumActionsEnum.CREATE_COMMENT_REACTION,
+    ),
+    canUpdatePoll: allowedActionsForTopic.includes(
+      ForumActionsEnum.UPDATE_POLL,
+    ),
+  };
 };

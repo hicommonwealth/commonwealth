@@ -9,11 +9,11 @@ import {
   type CommandInput,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
+import { Address, ForumActions } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodObject, ZodSchema, ZodString, z } from 'zod';
-import { models } from '..';
+import { GroupInstance, models } from '..';
 
 export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
 export type ThreadMiddleware = CommandHandler<
@@ -36,7 +36,7 @@ export class NonMember extends InvalidActor {
   constructor(
     public actor: Actor,
     public topic: string,
-    public action: GroupPermissionAction,
+    public action: ForumActions,
   ) {
     super(
       actor,
@@ -110,44 +110,40 @@ const authorizeAddress = async (
  */
 async function isTopicMember(
   { actor, payload }: CommandContext<CommandInput>,
-  action: GroupPermissionAction,
+  action: ForumActions,
 ): Promise<void> {
   // By convention, topic_id must by part of the body
   const topic_id = 'topic_id' in payload && payload.topic_id;
   if (!topic_id) throw new InvalidInput('Must provide a topic id');
 
-  const topic = await models.Topic.findOne({ where: { id: topic_id } });
-  if (!topic) throw new InvalidInput('Topic not found');
-  if (topic.group_ids?.length === 0) return;
-
-  const groups = await models.sequelize.query<
-    z.infer<typeof Group> & {
-      allowed_actions?: GroupPermissionAction[];
-    }
-  >(
+  const groups: (GroupInstance & {
+    allowed_actions?: ForumActions[];
+  })[] = await models.sequelize.query(
     `
-    SELECT g.*, gp.allowed_actions
-    FROM "Groups" as g 
-    LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
-    WHERE g.community_id = :community_id AND g.id IN (:group_ids);
-    `,
+        SELECT g.*, gp.allowed_actions FROM "Groups" as g LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
+        WHERE gp.topic_id = :topicId;
+      `,
     {
       type: QueryTypes.SELECT,
       raw: true,
-      replacements: {
-        community_id: topic.community_id,
-        group_ids: topic.group_ids,
-      },
+      replacements: { topicId: topic_id },
     },
   );
 
-  // There are 2 cases here. We either have the old group permission system where the group doesn't have
-  // any allowed_actions, or we have the new fine-grained permission system where the action must be in
-  // the allowed_actions list.
+  // if there are no permissions for this topic, then anyone can perform any action on it (default behaviour).
+  if (groups.length === 0) {
+    return;
+  }
+
   const allowed = groups.filter(
     (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
-  if (!allowed.length!) throw new NonMember(actor, topic.name, action);
+
+  // if no group allows the specified action for the given topic, then reject because regardless of membership the user
+  // will not be allowed.
+  if (allowed?.length === 0) {
+    throw new NonMember(actor, groups[0]?.id.toString(), action);
+  }
 
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
@@ -162,7 +158,9 @@ async function isTopicMember(
       },
     ],
   });
-  if (!memberships.length) throw new NonMember(actor, topic.name, action);
+
+  if (!memberships.length)
+    throw new NonMember(actor, groups[0]?.id.toString(), action);
 
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
@@ -209,7 +207,7 @@ export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
 };
 
 export function isCommunityAdminOrTopicMember(
-  action: GroupPermissionAction,
+  action: ForumActions,
 ): CommunityMiddleware {
   return async (ctx) => {
     // super admin is always allowed

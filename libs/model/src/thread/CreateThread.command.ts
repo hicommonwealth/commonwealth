@@ -99,7 +99,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
     auth: [
-      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD),
+      isCommunityAdminOrTopicMember(schemas.ForumActionsEnum.CREATE_THREAD),
       verifyThreadSignature,
     ],
     body: async ({ actor, payload }) => {

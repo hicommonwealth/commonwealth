@@ -26,7 +26,7 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import { useGetUserEthBalanceQuery } from '../../../state/api/communityStake/index';
-import Permissions, { canPerformAction } from '../../../utils/Permissions';
+import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -105,10 +105,11 @@ export const NewThreadForm = () => {
     includeTopics: true,
   });
 
-  const allowedActions = useForumActionGated({
+  const { canCreateThread } = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
     topicId: threadTopic?.id,
+    isAdmin,
   });
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
@@ -133,12 +134,6 @@ export const NewThreadForm = () => {
   const isPopulated = useMemo(() => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
-
-  const { canCreateThread } = canPerformAction(
-    allowedActions,
-    isAdmin,
-    threadTopic?.id,
-  );
 
   const gatedGroupNames = groups
     .filter((group) =>

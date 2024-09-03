@@ -1,8 +1,7 @@
-import { ExtendedCommunity, ForumActionsEnum } from '@hicommonwealth/schemas';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import app from 'state';
 import { z } from 'zod';
-import { UseForumActionGatedResponse } from '../hooks/useForumActionGated';
 import Thread from '../models/Thread';
 import { userStore } from '../state/ui/user';
 
@@ -76,51 +75,6 @@ const isThreadAuthor = (thread: Thread) => {
     userStore.getState().activeAccount?.address === thread?.author &&
     userStore.getState().activeAccount?.community.id === thread?.authorCommunity
   );
-};
-
-type AllowedPermissions = {
-  canCreateThread: boolean;
-  canCreateComment: boolean;
-  canReactToThread: boolean;
-  canReactToComment: boolean;
-  canUpdatePoll: boolean;
-};
-
-// The idea here is that we pass in the response from useForumActionGated. This returns a map of
-// topic_id -> allowed permissions. If the topic_id is not included then all permissions are valid (true)
-export const canPerformAction = (
-  allowedActions: UseForumActionGatedResponse,
-  isAdmin: boolean,
-  topicId?: number,
-): AllowedPermissions => {
-  const allowedActionsForTopic = allowedActions.get(topicId ?? 0);
-  if (isAdmin || !topicId || !allowedActionsForTopic) {
-    return {
-      canCreateThread: true,
-      canCreateComment: true,
-      canReactToThread: true,
-      canReactToComment: true,
-      canUpdatePoll: true,
-    };
-  }
-
-  return {
-    canCreateThread: allowedActionsForTopic.includes(
-      ForumActionsEnum.CREATE_THREAD,
-    ),
-    canCreateComment: allowedActionsForTopic.includes(
-      ForumActionsEnum.CREATE_COMMENT,
-    ),
-    canReactToThread: allowedActionsForTopic.includes(
-      ForumActionsEnum.CREATE_THREAD_REACTION,
-    ),
-    canReactToComment: allowedActionsForTopic.includes(
-      ForumActionsEnum.CREATE_COMMENT_REACTION,
-    ),
-    canUpdatePoll: allowedActionsForTopic.includes(
-      ForumActionsEnum.UPDATE_POLL,
-    ),
-  };
 };
 
 export default {

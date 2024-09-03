@@ -7,7 +7,6 @@ import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import { canPerformAction } from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
@@ -75,9 +74,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const user = useUserStore();
 
-  const allowedActions = useForumActionGated({
+  const { canCreateComment, canReactToThread } = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
+    isAdmin,
   });
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -176,12 +176,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`,
-          );
-
-          const { canCreateComment, canReactToThread } = canPerformAction(
-            allowedActions,
-            isAdmin,
-            thread?.topic?.id,
           );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
