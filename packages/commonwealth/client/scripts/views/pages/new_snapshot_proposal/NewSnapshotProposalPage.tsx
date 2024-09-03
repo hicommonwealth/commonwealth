@@ -9,6 +9,7 @@ type NewSnapshotProposalPageProps = {
   snapshotId: string;
 };
 
+// TODO
 export const NewSnapshotProposalPage = ({
   snapshotId,
 }: NewSnapshotProposalPageProps) => {

@@ -9,6 +9,7 @@ type SnapshotProposalLinkRedirectProps = {
   scope: string;
 };
 
+// TODO
 export default function SnapshotProposalLinkRedirect({
   identifier,
 }: SnapshotProposalLinkRedirectProps) {
