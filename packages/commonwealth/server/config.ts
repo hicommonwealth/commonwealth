@@ -214,7 +214,7 @@ export const config = configure(
                 model_config.APP_ENV,
               ) && !data
             ),
-          'DISCORD_BOT_TOKEN is required in production, frick, beta (QA), and demo',
+          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
         ),
     }),
     CLOUDFLARE: z.object({
