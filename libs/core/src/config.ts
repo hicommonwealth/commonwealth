@@ -21,8 +21,8 @@ const AppEnvironments = [
   'discobot',
   'snapshot',
 ] as const;
-type Environment = typeof Environments[number];
-type AppEnvironment = typeof AppEnvironments[number];
+type Environment = (typeof Environments)[number];
+type AppEnvironment = (typeof AppEnvironments)[number];
 
 /**
  * Extends target config with payload after validating schema
