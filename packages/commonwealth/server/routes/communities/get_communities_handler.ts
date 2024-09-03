@@ -1,4 +1,3 @@
-import { GetActiveCommunitiesResult } from 'server/controllers/server_communities_methods/get_active_communities';
 import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
 import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
 import { ServerControllers } from '../../routing/router';
@@ -15,10 +14,7 @@ type GetCommunitiesRequestQuery = {
   search?: string;
 } & PaginationQueryParams;
 
-type GetCommunitiesResponse =
-  | GetActiveCommunitiesResult
-  | GetCommunitiesResult
-  | SearchCommunitiesResult;
+type GetCommunitiesResponse = GetCommunitiesResult | SearchCommunitiesResult;
 
 export const getCommunitiesHandler = async (
   controllers: ServerControllers,
@@ -26,14 +22,6 @@ export const getCommunitiesHandler = async (
   res: TypedResponse<GetCommunitiesResponse>,
 ) => {
   const options = req.query;
-
-  // get active communities
-  if (options.active === 'true') {
-    const results = await controllers.communities.getActiveCommunities({
-      cacheEnabled: true,
-    });
-    return success(res, results);
-  }
 
   // search communities
   if (options.search) {
