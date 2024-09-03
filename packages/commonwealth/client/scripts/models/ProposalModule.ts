@@ -78,6 +78,7 @@ export abstract class ProposalModule<
   */
   public abstract init(
     ChainInfo: IChainModule<any, any>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Accounts: IAccountsModule<any>,
   ): Promise<void>;
 

@@ -1,5 +1,6 @@
 export default async function getFetch(
   url: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   queryParams?: { [key: string]: any },
 ) {
   let queryUrl;
