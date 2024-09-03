@@ -5,7 +5,6 @@ import {
   command as coreCommand,
   query as coreQuery,
   handleEvent,
-  type CommandInput,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
@@ -46,7 +45,7 @@ const trpcerror = (error: unknown): TRPCError => {
  * @param track analytics tracking metadata as tuple of [event, output mapper]
  * @returns tRPC mutation procedure
  */
-export const command = <Input extends CommandInput, Output extends ZodSchema>(
+export const command = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
   track?: Track<Output>,
