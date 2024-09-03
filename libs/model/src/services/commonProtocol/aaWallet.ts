@@ -26,7 +26,10 @@ export const verifySignature = (
   }
 };
 
-const createSmartAccountClient = async (owners?: `0x${string}`[]) => {
+const createSmartAccountClient = async (
+  owners?: `0x${string}`[],
+  accountAddress?: `0x${string}`,
+) => {
   //Figure out specific chain for this at later time
   const chain = sepolia;
 
@@ -39,6 +42,7 @@ const createSmartAccountClient = async (owners?: `0x${string}`[]) => {
     chain,
     signer,
     owners,
+    accountAddress,
     gasManagerConfig: {
       policyId: config.ALCHEMY.AA.GAS_POLICY!,
     },
@@ -73,4 +77,27 @@ export const newSmartAccount = async (owners: string[]) => {
     walletAddress: client.account.address,
     relayAddress: accountClient.signerAddress,
   };
+};
+
+export const sendUserOp = async (
+  from: string,
+  to: string,
+  value: number,
+  data: string,
+): Promise<string> => {
+  const accountClient = await createSmartAccountClient(
+    undefined,
+    from as `0x${string}`,
+  );
+  const client = accountClient.client;
+  const uo = await client.sendUserOperation({
+    uo: {
+      target: `0x${to.replace('0x', '')}`,
+      data: `0x${data.replace('0x', '')}`,
+      value: Web3.utils.toBigInt(value),
+    },
+    account: client.account,
+  });
+  const txHash = await client.waitForUserOperationTransaction(uo);
+  return txHash;
 };

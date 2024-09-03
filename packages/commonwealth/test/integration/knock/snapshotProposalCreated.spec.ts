@@ -141,7 +141,6 @@ describe('snapshotProposalCreated Event Handler', () => {
         community_id: community!.id,
         community_name: community!.name,
         space_name: space,
-        // @ts-expect-error StrictNullChecks
         snapshot_proposal_url: getSnapshotUrl(community!.id, space, proposalId),
       },
     });

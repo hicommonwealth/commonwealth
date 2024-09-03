@@ -1,6 +1,6 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
+import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import z from 'zod';
-import { VALIDATION_MESSAGES } from '../../../../../helpers/formValidations/messages';
 
 export const topicCreationValidationSchema = z.object({
   topicName: z

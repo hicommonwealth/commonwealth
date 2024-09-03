@@ -70,6 +70,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTopicsOld = lazy(
+  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -104,7 +107,10 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
-const CommonDomainRoutes = ({ contestEnabled }: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({
+  contestEnabled,
+  farcasterContestEnabled,
+}: RouteFeatureFlags) => [
   <Route
     key="/"
     path="/"
@@ -357,9 +363,12 @@ const CommonDomainRoutes = ({ contestEnabled }: RouteFeatureFlags) => [
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
-    element={withLayout(CommunityTopics, {
-      scoped: true,
-    })}
+    element={withLayout(
+      farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+      {
+        scoped: true,
+      },
+    )}
   />,
   <Route
     key="/:scope/manage/moderators"
