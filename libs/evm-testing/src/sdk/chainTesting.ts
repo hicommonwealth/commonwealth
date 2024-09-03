@@ -1,7 +1,7 @@
+import { config } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { RegisteredSubscription } from 'web3-eth';
 import { AbiItem } from 'web3-utils';
-import { config } from '../config';
 import erc_1155_abi from '../utils/abi/erc1155';
 import erc_721_abi from '../utils/abi/erc721';
 import { advanceTime, mineBlocks } from '../utils/chainUtil';
@@ -244,7 +244,9 @@ export class ChainTesting extends SdkBase {
   }
 
   public async getChainSnapshot() {
-    const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+    const provider = new Web3.providers.HttpProvider(
+      config.TEST_EVM.PROVIDER_URL,
+    );
     const res = await provider.request({
       jsonrpc: '2.0',
       id: 1,
@@ -265,7 +267,9 @@ export class ChainTesting extends SdkBase {
       throw new Error(`Cannot re-use chain snapshot: ${snapshotId}`);
     }
 
-    const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+    const provider = new Web3.providers.HttpProvider(
+      config.TEST_EVM.PROVIDER_URL,
+    );
     const res = await provider.request({
       jsonrpc: '2.0',
       id: 1,

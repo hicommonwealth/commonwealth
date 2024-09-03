@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { discordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const Thread = z.object({
   id: PG_INT.optional(),
-  Address: Address.nullish(),
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
@@ -34,7 +34,7 @@ export const Thread = z.object({
   marked_as_spam_at: z.coerce.date().nullish(),
   archived_at: z.coerce.date().nullish(),
   locked_at: z.coerce.date().nullish(),
-  discord_meta: z.object(discordMetaSchema).nullish(),
+  discord_meta: DiscordMetaSchema.nullish(),
 
   //counts
   reaction_count: PG_INT,
@@ -48,6 +48,10 @@ export const Thread = z.object({
 
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
+
+  // associations
+  Address: Address.nullish(),
+  topic: Topic.nullish(),
 });
 
 export const ThreadVersionHistory = z.object({

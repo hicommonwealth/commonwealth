@@ -1,10 +1,4 @@
-import z, {
-  ZodNumber,
-  ZodObject,
-  ZodSchema,
-  ZodString,
-  ZodUndefined,
-} from 'zod';
+import z, { ZodSchema, ZodUndefined } from 'zod';
 import { Events, events } from '../integration/events';
 
 /**
@@ -56,14 +50,15 @@ export type User = {
  * - Authorization is typically granted based on group membership, role association, or ownership of the targeted entity.
  * - Unique identification is established through the `user.id`
  * - Extends users with additional (optional) attributes that may include:
- *   - `address_id` for the active web wallet address
+ *   - `address` for the active web wallet address
  *
  * Authorization for actors is facilitated through {@link CommandHandler} or {@link QueryHandler} middleware within the context of the invoked command or query.
  * - When executing a command, the `aggregate` may need loading before completing the authorization process.
  */
 export type Actor = {
   readonly user: Readonly<User>;
-  readonly address_id?: string;
+  readonly address?: string;
+  readonly addressId?: number;
 };
 
 /**
@@ -107,21 +102,11 @@ export class InvalidState extends Error {
 }
 
 /**
- * Command input schemas must include the aggregate id (by definition)
- * - We are currently violating this rule with some creation commands by
- * relying on the DB/ORM layer for the generation of new ids.
- * - Future refactoring to support other DB technologies (for scalability) might solve this
- */
-export type CommandInput = ZodObject<{
-  id: ZodString | ZodNumber;
-}>;
-
-/**
  * Command execution context
  * - `actor`: user actor
  * - `payload`: validated command payload
  */
-export type CommandContext<Input extends CommandInput> = {
+export type CommandContext<Input extends ZodSchema> = {
   readonly actor: Actor;
   readonly payload: z.infer<Input>;
 };
@@ -156,7 +141,7 @@ export type EventContext<Name extends Events> = {
  * @throws {@link InvalidActor} when unauthorized
  */
 export type CommandHandler<
-  Input extends CommandInput,
+  Input extends ZodSchema,
   Output extends ZodSchema,
 > = (
   context: CommandContext<Input>,
@@ -192,7 +177,7 @@ export type EventHandler<
  * - `secure`: true when user requires authentication
  */
 export type CommandMetadata<
-  Input extends CommandInput,
+  Input extends ZodSchema,
   Output extends ZodSchema,
 > = {
   readonly input: Input;
@@ -245,7 +230,7 @@ export type EventsHandlerMetadata<
 
 // =========== PUBLIC ARTIFACT FACTORY INTERFACE ===========
 export type CommandSchemas<
-  Input extends CommandInput,
+  Input extends ZodSchema,
   Output extends ZodSchema,
 > = {
   input: Input;

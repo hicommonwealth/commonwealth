@@ -9,7 +9,10 @@ import {
 } from '@hicommonwealth/core';
 import { Knock, Schedule } from '@knocklabs/node';
 import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
+import _ from 'lodash';
 import { config } from '../config';
+
+const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 
 const log = logger(import.meta);
 
@@ -71,14 +74,28 @@ export function KnockProvider(): NotificationsProvider {
     async triggerWorkflow(
       options: NotificationsProviderTriggerOptions,
     ): Promise<boolean> {
-      const runId = await knock.workflows.trigger(options.key, {
-        recipients: options.users,
-        data: options.data,
-        // TODO: disabled pending Knock support - UPDATE: PR merged in Knock SDK repo but await new release
-        // actor: options.actor,
+      // disable webhook workflow in all environments except production
+      // this is to prevent sending webhooks to real endpoints in all other env
+      if (options.key === 'webhooks' && !config.NOTIFICATIONS.WEBHOOKS.SEND) {
+        log.warn('Webhooks disabled');
+        return true;
+      }
+
+      const recipientChunks = _.chunk(
+        options.users,
+        MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER,
+      );
+      const triggerPromises = recipientChunks.map((chunk) => {
+        return knock.workflows.trigger(options.key, {
+          recipients: chunk,
+          data: options.data,
+          // TODO: disabled pending Knock support - UPDATE: PR merged in Knock SDK repo but await new release
+          // actor: options.actor,
+        });
       });
 
-      return !!runId;
+      await Promise.all(triggerPromises);
+      return true;
     },
     async getMessages(
       options: NotificationsProviderGetMessagesOptions,

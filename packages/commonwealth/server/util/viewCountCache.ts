@@ -3,7 +3,10 @@ import { JobRunner } from '@hicommonwealth/adapters';
 type CacheT = { [viewerId: string]: { [objectId: string]: number } };
 
 export default class ViewCountCache extends JobRunner<CacheT> {
-  constructor(private _ttlS: number, _pruningJobTimeS: number) {
+  constructor(
+    private _ttlS: number,
+    _pruningJobTimeS: number,
+  ) {
     super({}, _pruningJobTimeS);
     this.start();
   }

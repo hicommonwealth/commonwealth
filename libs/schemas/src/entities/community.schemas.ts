@@ -17,7 +17,7 @@ import { Address } from './user.schemas';
 
 export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional
-  id: z.string().optional(),
+  id: z.string(),
   name: z.string(),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
@@ -55,7 +55,8 @@ export const Community = z.object({
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
   profile_count: PG_INT.nullish(),
-  lifetime_thread_count: PG_INT.nullish(),
+  lifetime_thread_count: PG_INT.optional(),
+  banner_text: z.string().nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
@@ -69,7 +70,7 @@ export const Community = z.object({
     url: z.string().max(255).nullish(),
     balance_type: z.nativeEnum(BalanceType).nullish(),
     name: z.string().max(255).nullish(),
-  }).optional(),
+  }).nullish(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),

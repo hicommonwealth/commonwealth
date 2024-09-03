@@ -1,10 +1,10 @@
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
 import {
   findMentionDiff,
   parseUserMentions,
   uniqueMentions,
-} from '../../../server/util/parseUserMentions';
+} from '@hicommonwealth/model';
+import { expect } from 'chai';
+import { describe, test } from 'vitest';
 
 describe('User mention utils', () => {
   test('parseUserMentions', () => {

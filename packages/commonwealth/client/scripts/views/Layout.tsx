@@ -6,7 +6,10 @@ import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
+import {
+  useFetchConfigurationQuery,
+  useFetchCustomDomainQuery,
+} from 'state/api/configuration';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
 import { PageNotFound } from 'views/pages/404';
@@ -41,7 +44,10 @@ const LayoutComponent = ({
 }: LayoutAttrs) => {
   const navigate = useCommonNavigate();
   const routerParams = useParams();
-  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
+
+  const { data: domain } = useFetchCustomDomainQuery();
+
+  const pathScope = routerParams?.scope?.toString() || domain?.customDomainId;
   const providedCommunityScope = scoped ? pathScope : null;
   const user = useUserStore();
   const appError = useErrorStore();
@@ -113,7 +119,7 @@ const LayoutComponent = ({
   // with deinitChainOrCommunity(), then set loadingScope to null and render a LoadingLayout.
   const shouldDeInitChain =
     !providedCommunityScope &&
-    !app.isCustomDomain() &&
+    !domain?.isCustomDomain &&
     app.chain &&
     app.chain.network;
 
