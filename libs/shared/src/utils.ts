@@ -5,8 +5,6 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 
-export function foo() {}
-
 /**
  * Decamelizes a string
  * @param value camelized string
@@ -33,6 +31,17 @@ export const slugify = (str: string): string => {
     .replace(/ +/g, '-');
 };
 /* eslint-disable */
+
+export const splitAndDecodeURL = (locationPathname: string) => {
+  //checks if a url is custom or not and decodes the url after splitting it
+  //this is to check for malformed urls on a topics page in /discussions
+  const splitURLPath = locationPathname.split('/');
+  if (splitURLPath[2] === 'discussions') {
+    return decodeURIComponent(splitURLPath[3]);
+  }
+  splitURLPath[1] === 'discussions';
+  return decodeURIComponent(splitURLPath[2]);
+};
 
 export const getThreadUrl = (
   thread: {
@@ -188,4 +197,114 @@ export function safeTruncateBody(body: string, length: number = 500): string {
   } else {
     return body.substring(0, result.startIndex);
   }
+}
+
+export const preprocessQuillDeltaForRendering = (nodes: any[]) => {
+  // split up nodes at line boundaries
+  const lines = [];
+  for (const node of nodes) {
+    if (typeof node.insert === 'string') {
+      const matches = node.insert.match(/[^\n]+\n?|\n/g);
+      (matches || []).forEach((line: string) => {
+        lines.push({ attributes: node.attributes, insert: line });
+      });
+    } else {
+      lines.push(node);
+    }
+  }
+  // group nodes under parents
+  const result = [];
+  let parent = { children: [] as any[], attributes: undefined };
+  for (const node of lines) {
+    if (typeof node.insert === 'string' && node.insert.endsWith('\n')) {
+      parent.attributes = node.attributes;
+      // concatenate code-block node parents together, keeping newlines
+      if (
+        result.length > 0 &&
+        result[result.length - 1].attributes &&
+        parent.attributes &&
+        parent.attributes['code-block'] &&
+        result[result.length - 1]!.attributes!['code-block']
+      ) {
+        parent.children.push({ insert: node.insert });
+        result[result.length - 1].children = result[
+          result.length - 1
+        ].children.concat(parent.children);
+      } else {
+        parent.children.push({ insert: node.insert });
+        result.push(parent);
+      }
+      parent = { children: [], attributes: undefined };
+    } else {
+      parent.children.push(node);
+    }
+  }
+  // If there was no \n at the end of the document, we need to push whatever remains in `parent`
+  // onto the result. This may happen if we are rendering a truncated Quill document
+  if (parent.children.length > 0) {
+    result.push(parent);
+  }
+
+  // trim empty newlines at end of document
+  while (
+    result.length &&
+    result[result.length - 1].children.length === 1 &&
+    typeof result[result.length - 1].children[0].insert === 'string' &&
+    result[result.length - 1].children[0].insert === '\n' &&
+    result[result.length - 1].children[0].attributes === undefined
+  ) {
+    result.pop();
+  }
+
+  return result;
+};
+
+// sanitizeQuillText returns a sanitized version of the input
+export type QuillOps = {
+  ops: any[];
+};
+
+export const renderQuillDeltaToText = (
+  delta: QuillOps,
+  paragraphSeparator = '\n\n',
+) => {
+  return preprocessQuillDeltaForRendering(delta.ops)
+    .map((parent) => {
+      return parent.children
+        .map((child) => {
+          if (typeof child.insert === 'string')
+            return child.insert.trimRight('\n');
+          if (child.insert?.image) return '(image)';
+          if (child.insert?.twitter) return '(tweet)';
+          if (child.insert?.video) return '(video)';
+          return '';
+        })
+        .filter((child) => !!child)
+        .join(' ')
+        .replace(/  +/g, ' '); // remove multiple spaces
+    })
+    .filter((parent) => !!parent)
+    .join(paragraphSeparator);
+};
+
+export function getWebhookDestination(webhookUrl = ''): string {
+  if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
+
+  let destination = 'unknown';
+  if (
+    webhookUrl.startsWith('https://discord.com/api/webhooks/') ||
+    webhookUrl.startsWith('https://discordapp.com/api/webhooks/')
+  )
+    destination = 'discord';
+  else if (webhookUrl.startsWith('https://hooks.slack.com/'))
+    destination = 'slack';
+  else if (webhookUrl.startsWith('https://hooks.zapier.com/'))
+    destination = 'zapier';
+  else if (webhookUrl.startsWith('https://api.telegram.org/@')) {
+    const [, channelId] = webhookUrl.split('/@');
+    if (!channelId) destination = 'unknown';
+    else destination = 'telegram';
+  }
+
+  return destination;
 }

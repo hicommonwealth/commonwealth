@@ -1,12 +1,11 @@
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -18,11 +17,12 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { slugify } from '@hicommonwealth/shared';
+import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -42,7 +42,6 @@ type DiscussionsPageProps = {
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
-  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
@@ -58,7 +57,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
   });
   const contestAddress = searchParams.get('contest');
@@ -80,6 +79,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     apiEnabled: !!user.activeAccount?.address,
   });
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const { contestsData } = useCommunityContests();
 
   const { dateCursor } = useDateCursor({
@@ -88,7 +89,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isOnArchivePage =
     location.pathname ===
-    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
+    (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -126,6 +127,26 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     return t;
   });
+
+  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
+  const topicNameFromURL = splitAndDecodeURL(location.pathname);
+
+  //checks for malformed url in topics and redirects if the topic does not exist
+  useEffect(() => {
+    if (
+      !isLoadingTopics &&
+      topicNameFromURL &&
+      topicNameFromURL !== 'archived'
+    ) {
+      const validTopics = topics?.some(
+        (topic) => topic?.name === topicNameFromURL,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics, topicNameFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
@@ -236,8 +257,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                    ? totalThreadsInCommunity
-                    : 0
+                      ? app?.chain?.meta?.lifetimeThreadCount
+                      : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}

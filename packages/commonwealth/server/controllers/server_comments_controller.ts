@@ -1,6 +1,4 @@
 import { DB, GlobalActivityCache } from '@hicommonwealth/model';
-import BanCache from '../util/banCheckCache';
-
 import {
   CreateCommentReactionOptions,
   CreateCommentReactionResult,
@@ -29,7 +27,6 @@ import {
 export class ServerCommentsController {
   constructor(
     public models: DB,
-    public banCache: BanCache,
     public globalActivityCache?: GlobalActivityCache,
   ) {}
 

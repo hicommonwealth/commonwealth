@@ -131,8 +131,7 @@ const createMockedGroupsController = () => {
       transaction: async (callback) => callback(),
     },
   };
-  const banCache: any = {};
-  const controller = new ServerGroupsController(db, banCache);
+  const controller = new ServerGroupsController(db);
   return controller;
 };
 
@@ -168,7 +167,6 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
-      // @ts-expect-error StrictNullChecks
       communityId: chain.id,
     });
     expect(result).to.have.length(1);

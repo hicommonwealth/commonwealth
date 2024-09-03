@@ -127,8 +127,8 @@ describe('createReaction Integration Tests', () => {
 
     chai.assert.equal(createReactionResponse.status, 'Success');
 
-    await comment.reload();
-    chai.assert.equal(comment.reaction_count, beforeReactionCount + 1);
+    await comment!.reload();
+    chai.assert.equal(comment!.reaction_count, beforeReactionCount + 1);
 
     const reactionId = createReactionResponse.result.id;
     const deleteReactionResponse = await deleteReaction(
@@ -138,8 +138,8 @@ describe('createReaction Integration Tests', () => {
     );
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
-    await comment.reload();
-    chai.assert.equal(comment.reaction_count, beforeReactionCount);
+    await comment!.reload();
+    chai.assert.equal(comment!.reaction_count, beforeReactionCount);
   });
 
   test('should create thread reactions and verify thread reaction count', async () => {
@@ -147,14 +147,14 @@ describe('createReaction Integration Tests', () => {
       where: { id: threadId },
     });
     chai.assert.isNotNull(thread);
-    const beforeReactionCount = thread.reaction_count;
+    const beforeReactionCount = thread!.reaction_count;
 
     const createReactionResponse = await server.seeder.createThreadReaction({
       chain: 'ethereum',
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
-      thread_id: thread.id,
+      thread_id: thread!.id,
       author_chain: 'ethereum',
       session: userSession.session,
       sign: userSession.sign,
@@ -162,8 +162,8 @@ describe('createReaction Integration Tests', () => {
 
     chai.assert.equal(createReactionResponse.status, 'Success');
 
-    await thread.reload();
-    chai.assert.equal(thread.reaction_count, beforeReactionCount + 1);
+    await thread!.reload();
+    chai.assert.equal(thread!.reaction_count, beforeReactionCount + 1);
 
     const reactionId = createReactionResponse.result.id;
     const deleteReactionResponse = await deleteReaction(
@@ -174,7 +174,7 @@ describe('createReaction Integration Tests', () => {
 
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
-    await thread.reload();
-    chai.assert.equal(thread.reaction_count, beforeReactionCount);
+    await thread!.reload();
+    chai.assert.equal(thread!.reaction_count, beforeReactionCount);
   });
 });

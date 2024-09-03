@@ -1,16 +1,9 @@
 import { DB, GlobalActivityCache } from '@hicommonwealth/model';
-import BanCache from '../util/banCheckCache';
-
 import {
   CountThreadsOptions,
   CountThreadsResult,
   __countThreads,
 } from './server_threads_methods/count_threads';
-import {
-  CreateThreadOptions,
-  CreateThreadResult,
-  __createThread,
-} from './server_threads_methods/create_thread';
 import {
   CreateThreadCommentOptions,
   CreateThreadCommentResult,
@@ -68,7 +61,6 @@ import {
 export class ServerThreadsController {
   constructor(
     public models: DB,
-    public banCache: BanCache,
     public globalActivityCache?: GlobalActivityCache,
   ) {}
 
@@ -95,13 +87,6 @@ export class ServerThreadsController {
     options: UpdateThreadOptions,
   ): Promise<UpdateThreadResult> {
     return __updateThread.call(this, options);
-  }
-
-  async createThread(
-    this: ServerThreadsController,
-    options: CreateThreadOptions,
-  ): Promise<CreateThreadResult> {
-    return __createThread.call(this, options);
   }
 
   async getThreadsByIds(
