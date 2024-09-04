@@ -1,15 +1,6 @@
-import { Group } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import z from 'zod';
-import type { CommunityAttributes } from './community';
-import type { MembershipAttributes } from './membership';
+import { GroupAttributes } from './GroupAttributes';
 import type { ModelInstance } from './types';
-
-export type GroupAttributes = z.infer<typeof Group> & {
-  // associations
-  community?: CommunityAttributes;
-  memberships?: MembershipAttributes[];
-};
 
 export type GroupInstance = ModelInstance<GroupAttributes>;
 

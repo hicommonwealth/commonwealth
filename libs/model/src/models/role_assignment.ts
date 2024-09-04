@@ -1,4 +1,4 @@
-import type { AddressAttributes } from './address';
+import { AddressAttributes } from './AddressAttributes';
 import type { CommunityRoleAttributes } from './community_role';
 
 export type RoleAssignmentAttributes = {

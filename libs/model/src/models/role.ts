@@ -1,5 +1,5 @@
 import { Role } from '@hicommonwealth/shared';
-import type { AddressAttributes } from './address';
+import { AddressAttributes } from './AddressAttributes';
 import type { CommunityAttributes } from './community';
 
 export function isRole(role: Role): boolean {

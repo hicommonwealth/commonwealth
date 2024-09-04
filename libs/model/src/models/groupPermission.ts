@@ -1,7 +1,7 @@
 import { GroupPermission } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
-import { GroupAttributes } from './group';
+import { GroupAttributes } from './GroupAttributes';
 import type { ModelInstance } from './types';
 
 export type GroupPermissionAttributes = z.infer<typeof GroupPermission> & {

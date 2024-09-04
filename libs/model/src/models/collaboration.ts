@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
-import type { AddressAttributes, AddressInstance } from './address';
+import { AddressAttributes } from './AddressAttributes';
+import type { AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
 import type { ModelInstance } from './types';
 

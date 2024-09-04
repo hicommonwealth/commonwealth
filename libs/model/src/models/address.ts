@@ -1,18 +1,10 @@
-import { Address } from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
-import type { CommunityAttributes, CommunityInstance } from './community';
-import { MembershipAttributes } from './membership';
+import { AddressAttributes } from './AddressAttributes';
+import type { CommunityInstance } from './community';
 import type { SsoTokenInstance } from './sso_token';
 import type { ModelInstance } from './types';
 import type { UserInstance } from './user';
-
-export type AddressAttributes = z.infer<typeof Address> & {
-  // associations
-  Community?: CommunityAttributes;
-  Memberships?: MembershipAttributes[];
-};
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
   getCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;

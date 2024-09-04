@@ -3,7 +3,7 @@ import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
-import type { AddressAttributes } from './address';
+import { AddressAttributes } from './AddressAttributes';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';

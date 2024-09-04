@@ -1,7 +1,8 @@
 import { User } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { AddressAttributes, AddressInstance } from './address';
+import { AddressAttributes } from './AddressAttributes';
+import type { AddressInstance } from './address';
 import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { CommunityAlertAttributes } from './community_alerts';

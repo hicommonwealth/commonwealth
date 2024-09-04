@@ -1,28 +1,6 @@
 import Sequelize from 'sequelize';
-import { AddressAttributes } from './address';
-import { GroupAttributes } from './group';
+import { MembershipAttributes } from './MembershipAttributes';
 import { ModelInstance } from './types';
-
-export type MembershipRejectReason =
-  | {
-      message: string;
-      requirement: {
-        data: any;
-        rule: string;
-      };
-    }[]
-  | null;
-
-export type MembershipAttributes = {
-  group_id: number;
-  address_id: number;
-  reject_reason?: MembershipRejectReason;
-  last_checked: Date;
-
-  // associations
-  group?: GroupAttributes;
-  address?: AddressAttributes;
-};
 
 export type MembershipInstance = ModelInstance<MembershipAttributes>;
 

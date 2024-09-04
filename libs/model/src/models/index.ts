@@ -43,6 +43,10 @@ export const buildDb = (sequelize: Sequelize): DB => {
 };
 
 // TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
+export { AddressAttributes } from './AddressAttributes';
+export { GroupAttributes } from './GroupAttributes';
+export { MembershipAttributes } from './MembershipAttributes';
+export { MembershipRejectReason } from './MembershipRejectReason';
 export * from './address';
 export * from './chain_node';
 export * from './collaboration';
