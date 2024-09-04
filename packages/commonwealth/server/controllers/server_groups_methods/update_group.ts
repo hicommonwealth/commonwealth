@@ -139,7 +139,7 @@ export async function __updateGroup(
       group.groupPermissions = await updateGroupPermissions(
         topics,
         allowedActions ?? Object.values(ForumActionsEnum),
-        group.id,
+        group!.id!,
         this.models,
         transaction,
       );

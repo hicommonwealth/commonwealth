@@ -26,7 +26,6 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import useUserStore from 'state/ui/user';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
@@ -68,8 +67,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const topicId: number = (topics || []).find(
     ({ name }) => name === topicName,
   )?.id;
-
-  const user = useUserStore();
 
   const { data: domain } = useFetchCustomDomainQuery();
 

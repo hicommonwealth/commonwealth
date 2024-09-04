@@ -66,7 +66,7 @@ export async function __getGroups(
       }, {});
     groupsResult = groupsResult.map((group) => ({
       ...group,
-      memberships: groupIdMembersMap[group.id] || [],
+      memberships: groupIdMembersMap[group.id!] || [],
     }));
   }
 
