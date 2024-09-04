@@ -1,4 +1,5 @@
 import moment from 'moment';
+// eslint-disable-next-line import/no-cycle
 import { Contest } from './ContestsList';
 
 // checks if contest has ended or if it is cancelled

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
 import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+// eslint-disable-next-line import/no-cycle
 import { userStore } from '../../ui/user';
 
 const PROFILES_STALE_TIME = 30 * 1_000; // 3 minutes

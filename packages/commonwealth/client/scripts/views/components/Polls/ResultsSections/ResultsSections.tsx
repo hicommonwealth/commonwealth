@@ -2,6 +2,7 @@ import React from 'react';
 import { CWProgressBar } from 'views/components/component_kit/cw_progress_bar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+// eslint-disable-next-line import/no-cycle
 import { VoteInformation } from 'views/components/Polls';
 
 import './ResultsSections.scss';

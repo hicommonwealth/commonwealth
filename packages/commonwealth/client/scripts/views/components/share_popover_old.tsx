@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
+// eslint-disable-next-line import/no-cycle
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type SharePopoverProps = {

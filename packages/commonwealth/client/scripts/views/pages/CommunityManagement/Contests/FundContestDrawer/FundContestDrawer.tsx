@@ -6,6 +6,7 @@ import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
 
+// eslint-disable-next-line import/no-cycle
 import {
   FundContestFailure,
   FundContestForm,

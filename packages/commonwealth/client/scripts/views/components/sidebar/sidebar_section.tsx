@@ -4,6 +4,7 @@ import React from 'react';
 import 'components/sidebar/sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
+// eslint-disable-next-line import/no-cycle
 import useSidebarStore from 'state/ui/sidebar';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';

@@ -17,6 +17,7 @@ import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+// eslint-disable-next-line import/no-cycle
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
