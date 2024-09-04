@@ -11,11 +11,7 @@ import {
   findMentionDiff,
   parseUserMentions,
 } from '@hicommonwealth/model';
-import {
-  NotificationCategories,
-  ProposalType,
-  renderQuillDeltaToText,
-} from '@hicommonwealth/shared';
+import { renderQuillDeltaToText } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import {
   Op,
@@ -28,7 +24,6 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { validURL } from '../../../shared/utils';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -70,11 +65,7 @@ export type UpdateThreadOptions = {
   discordMeta?: any;
 };
 
-export type UpdateThreadResult = [
-  ThreadAttributes,
-  EmitOptions[],
-  TrackOptions[],
-];
+export type UpdateThreadResult = [ThreadAttributes, TrackOptions[]];
 
 export async function __updateThread(
   this: ServerThreadsController,
@@ -389,31 +380,6 @@ export async function __updateThread(
     ],
   });
 
-  const now = new Date();
-  // build notifications
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.ThreadEdit,
-      data: {
-        created_at: now,
-        // @ts-expect-error StrictNullChecks
-        thread_id: +finalThread.id,
-        root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
-        root_title: finalThread.title,
-        // @ts-expect-error StrictNullChecks
-        community_id: finalThread.community_id,
-        // @ts-expect-error StrictNullChecks
-        author_address: finalThread.Address.address,
-        // @ts-expect-error StrictNullChecks
-        author_community_id: finalThread.Address.community_id,
-      },
-    },
-    excludeAddresses: [address.address],
-  });
-
   const updatedThreadWithComments = {
     // @ts-expect-error StrictNullChecks
     ...finalThread.toJSON(),
@@ -436,11 +402,7 @@ export async function __updateThread(
 
   delete updatedThreadWithComments.Comments;
 
-  return [
-    updatedThreadWithComments,
-    allNotificationOptions,
-    allAnalyticsOptions,
-  ];
+  return [updatedThreadWithComments, allAnalyticsOptions];
 }
 
 // -----

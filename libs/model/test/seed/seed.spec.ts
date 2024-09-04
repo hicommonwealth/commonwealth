@@ -21,9 +21,9 @@ chai.use(chaiAsPromised);
 // then attempts to find the entity and validate it
 async function testSeed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas[T]>>,
+  values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<z.infer<typeof schemas[T]>> {
+): Promise<z.infer<(typeof schemas)[T]>> {
   const [record, records] = await seed(name, values, options);
   expect(records.length, 'failed to create entity').to.be.gt(0);
 

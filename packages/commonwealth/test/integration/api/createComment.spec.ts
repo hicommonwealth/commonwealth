@@ -150,7 +150,7 @@ describe('createComment Integration Tests', () => {
     chai.assert.isNotNull(comment);
     chai.assert.equal(response.status, 200);
 
-    const deleteResponse = await deleteComment(comment.id, jwtTokenUser1);
+    const deleteResponse = await deleteComment(comment!.id, jwtTokenUser1);
     comment = await server.models.Comment.findOne({
       where: { text },
     });

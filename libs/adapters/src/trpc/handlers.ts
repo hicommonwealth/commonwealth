@@ -5,7 +5,6 @@ import {
   command as coreCommand,
   query as coreQuery,
   handleEvent,
-  type CommandInput,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
@@ -60,10 +59,11 @@ export enum Tag {
   Integration = 'Integration',
   Subscription = 'Subscription',
   LoadTest = 'LoadTest',
+  Wallet = 'Wallet',
   Webhook = 'Webhook',
 }
 
-export const command = <Input extends CommandInput, Output extends ZodSchema>(
+export const command = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
   outputMiddleware?: OutputMiddleware<z.infer<Output>>,
@@ -73,7 +73,7 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
     .meta({
       openapi: {
         method: 'POST',
-        path: `/${factory.name}/{id}`,
+        path: `/${factory.name}`,
         tags: [tag],
         headers: [
           {
