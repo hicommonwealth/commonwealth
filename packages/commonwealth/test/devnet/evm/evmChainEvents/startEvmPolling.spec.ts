@@ -88,6 +88,7 @@ describe('EVM Chain Events End to End Tests', () => {
       console.log(
         `Proposal created at block ${propCreatedResult.block} with id ${propCreatedResult.proposalId}`,
       );
+      await sdk.mineBlocks(10);
 
       expect(await models.Outbox.count()).to.equal(0);
       await verifyBlockNumber(contract.chain_node_id, null);
