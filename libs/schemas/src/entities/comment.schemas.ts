@@ -11,8 +11,6 @@ export const Comment = z.object({
   text: z.string(),
   plaintext: z.string(),
   parent_id: z.string().nullish(),
-  version_history: z.array(z.string()).optional(),
-  version_history_updated: z.boolean().optional(),
 
   canvas_signed_data: z.string().nullish(),
   canvas_msg_id: z.string().nullish(),

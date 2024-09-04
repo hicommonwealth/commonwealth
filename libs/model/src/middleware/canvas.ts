@@ -7,7 +7,6 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../config';
-import { ThreadMiddleware } from './authorization';
 
 const ThreadSignature = z.object({
   title: z.string(),

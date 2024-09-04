@@ -40,7 +40,6 @@ export const buildCreateThreadInput = async ({
   });
   const canvas_args = toCanvasSignedDataApiArgs(canvasSignedData);
   return {
-    id: 0,
     community_id: communityId,
     topic_id: topic.id,
     title: encodeURIComponent(title),
