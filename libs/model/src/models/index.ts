@@ -1,5 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
+// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import/no-cycle
 import { Factories, type DB } from './factories';
 import { createFk, dropFk, manyToMany, oneToMany, oneToOne } from './utils';
 

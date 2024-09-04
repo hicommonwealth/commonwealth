@@ -1,5 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { GlobalActivityCache } from '../globalActivityCache';
 

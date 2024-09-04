@@ -2,6 +2,7 @@ import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 
 const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {

@@ -1,4 +1,5 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { models } from '@hicommonwealth/model';
 import { commonProtocol } from '@hicommonwealth/shared';
 import Web3, { AbiFunctionFragment } from 'web3';

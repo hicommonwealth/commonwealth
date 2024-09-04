@@ -1,6 +1,7 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
 import { models, sequelize } from '../database';
 import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';

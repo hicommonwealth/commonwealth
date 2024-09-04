@@ -17,6 +17,8 @@ import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
 import ContestTopic from './contest_topic';
 import Contract from './contract';
+// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import/no-cycle
 import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';

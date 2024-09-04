@@ -2,6 +2,7 @@ import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 
 // GetActiveContestManagers returns all contest managers which are active

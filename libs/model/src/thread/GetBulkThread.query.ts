@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { CommentAttributes } from '../models/index';
 

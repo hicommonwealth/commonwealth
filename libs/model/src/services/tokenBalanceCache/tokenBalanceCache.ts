@@ -1,5 +1,6 @@
 import { logger, stats } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import { getCosmosBalances, getEvmBalances } from './providers';
 import { getSolanaBalances } from './providers/getSolanaBalances';
 import {

@@ -1,6 +1,7 @@
 import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { rollOverContest } from '../services/commonProtocol/contestHelper';
 

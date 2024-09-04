@@ -16,6 +16,7 @@ import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { config } from '../config';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import {
   mustBeSuperAdmin,

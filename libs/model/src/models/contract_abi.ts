@@ -1,5 +1,6 @@
 import type { AbiType } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+// eslint-disable-next-line import/no-cycle
 import { hashAbi } from '../utils';
 import type { ModelInstance } from './types';
 

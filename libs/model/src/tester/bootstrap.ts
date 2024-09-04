@@ -3,6 +3,7 @@ import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { config } from '../config';
+// eslint-disable-next-line import/no-cycle
 import { buildDb, type DB } from '../models';
 
 /**

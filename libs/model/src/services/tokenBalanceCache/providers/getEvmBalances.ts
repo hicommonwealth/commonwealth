@@ -1,6 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import Web3 from 'web3';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../../../database';
 import { Balances, GetEvmBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';

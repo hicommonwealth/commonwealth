@@ -1,5 +1,6 @@
 import { Actor, events, logger, Policy } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
 import { config, Contest } from '..';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';

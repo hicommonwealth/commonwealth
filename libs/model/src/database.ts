@@ -1,6 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { Sequelize } from 'sequelize';
 import { config } from './config';
+// eslint-disable-next-line import/no-cycle
 import { buildDb } from './models';
 
 const log = logger(import.meta);
@@ -13,9 +14,9 @@ export const sequelize = new Sequelize(config.DB.URI, {
     config.NODE_ENV !== 'production' || config.DB.NO_SSL
       ? { requestTimeout: 40000 }
       : config.DB.URI ===
-        'postgresql://commonwealth:edgeware@localhost/commonwealth'
-      ? { requestTimeout: 40000, ssl: false }
-      : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
+          'postgresql://commonwealth:edgeware@localhost/commonwealth'
+        ? { requestTimeout: 40000, ssl: false }
+        : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
     max: 10,
     min: 0,

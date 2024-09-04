@@ -1,6 +1,7 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 
 export function GetChainActivity(): Query<typeof schemas.ChainFeed> {

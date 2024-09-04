@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+// eslint-disable-next-line import/no-cycle
 import { AddressAttributes } from './address';
 import { GroupAttributes } from './group';
 import { ModelInstance } from './types';

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 export * as newNamespaceValidator from './newNamespaceValidator';
 
 import * as wallet from './aaWallet';

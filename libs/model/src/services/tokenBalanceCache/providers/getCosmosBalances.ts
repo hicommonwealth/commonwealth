@@ -1,6 +1,7 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { logger } from '@hicommonwealth/core';
 import { BalanceSourceType, DISCORD_BOT_ADDRESS } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { RoutingKey } from '@hicommonwealth/core';
 
 export const successfulInMemoryBroker = {

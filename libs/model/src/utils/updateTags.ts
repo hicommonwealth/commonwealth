@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { DB } from '@hicommonwealth/model';
 import { Op, Transaction } from 'sequelize';
 

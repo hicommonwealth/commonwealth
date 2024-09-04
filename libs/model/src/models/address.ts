@@ -3,6 +3,7 @@ import { WalletId } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { CommunityAttributes, CommunityInstance } from './community';
+// eslint-disable-next-line import/no-cycle
 import { MembershipAttributes } from './membership';
 import type { SsoTokenInstance } from './sso_token';
 import type { ModelInstance } from './types';

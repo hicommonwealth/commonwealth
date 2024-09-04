@@ -8,6 +8,7 @@ import {
   Role,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import { bootstrap_testing } from './bootstrap';
 
 /**

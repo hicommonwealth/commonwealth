@@ -1,6 +1,8 @@
 import Sequelize from 'sequelize';
 import { ChainNodeAttributes } from './chain_node';
 import { ContractAttributes } from './contract';
+// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import/no-cycle
 import { ContractAbiAttributes } from './contract_abi';
 import { ModelInstance } from './types';
 

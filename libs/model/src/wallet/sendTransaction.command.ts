@@ -1,5 +1,6 @@
 import { AppError, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { commonProtocol } from '../services';
 

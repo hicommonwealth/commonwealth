@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { config } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import z from 'zod';

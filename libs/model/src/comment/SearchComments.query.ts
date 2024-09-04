@@ -1,6 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 
 export function SearchComments(): Query<typeof schemas.SearchComments> {

@@ -2,6 +2,7 @@ import type { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 

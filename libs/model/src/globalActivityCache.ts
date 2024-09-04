@@ -1,6 +1,7 @@
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
+// eslint-disable-next-line import/no-cycle
 import { DB } from './models/index';
 
 export async function getActivityFeed(models: DB, id = 0) {

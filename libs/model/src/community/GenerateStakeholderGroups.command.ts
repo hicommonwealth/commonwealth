@@ -5,6 +5,7 @@ import {
   ContractSource,
   ThresholdData,
 } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { GroupAttributes } from '../models';
 

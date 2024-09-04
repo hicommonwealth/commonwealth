@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { config } from '@hicommonwealth/core';
 import Rollbar from 'rollbar';
 

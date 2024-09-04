@@ -1,4 +1,5 @@
 import { ExternalServiceUserIds, type Command } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import jwt from 'jsonwebtoken';
