@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUpdateCustomDomainMutation from 'state/api/communities/updateCustomDomain';
 import { useDebounce } from 'usehooks-ts';
@@ -28,7 +27,7 @@ const UpdateCustomDomainTask = () => {
           onClick: () => {
             void (async () => {
               await updateCustomDomain.mutateAsync({
-                id: communityId,
+                community_id: communityId,
                 custom_domain: customDomain,
               });
               notifySuccess('Custom domain updated');
@@ -66,19 +65,6 @@ const UpdateCustomDomainTask = () => {
     // TODO: enhance this validation to ensure a tighter format (no dangling paths)
     if (!validCustomDomainUrl.test(customDomain)) {
       return 'Invalid URL (try removing the http prefix)';
-    }
-
-    // there's probably a better way to remove prefixes for duplicate finding purposes
-    const existingCustomDomain = app.config.chains
-      .getAll()
-      .find(
-        (c) =>
-          c.customDomain &&
-          c.customDomain.replace('https://', '').replace('http://', '') ===
-            customDomain,
-      );
-    if (existingCustomDomain) {
-      return `Custom domain in use by community '${existingCustomDomain.id}'`;
     }
   })();
 

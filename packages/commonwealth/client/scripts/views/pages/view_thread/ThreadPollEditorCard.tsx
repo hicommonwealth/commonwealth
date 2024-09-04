@@ -9,13 +9,11 @@ import { PollEditorModal } from '../../modals/poll_editor_modal';
 type ThreadPollEditorCardProps = {
   thread: Thread;
   threadAlreadyHasPolling: boolean;
-  onPollCreate: () => void;
 };
 
 export const ThreadPollEditorCard = ({
   thread,
   threadAlreadyHasPolling,
-  onPollCreate,
 }: ThreadPollEditorCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -46,7 +44,6 @@ export const ThreadPollEditorCard = ({
           <PollEditorModal
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
-            onPollCreate={onPollCreate}
           />
         }
         onClose={() => setIsModalOpen(false)}

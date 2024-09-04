@@ -13,7 +13,6 @@ import {
 import {
   CANVAS_TOPIC,
   ChainBase,
-  NotificationCategories,
   WalletId,
   WalletSsoSource,
   deserializeCanvas,
@@ -74,6 +73,7 @@ async function createMagicAddressInstances(
         role: 'member',
         is_user_default: false,
         ghost_address: false,
+        is_banned: false,
       },
       transaction: t,
     });
@@ -155,28 +155,6 @@ async function createNewMagicUser({
         decodedMagicToken,
         transaction,
       );
-
-    // Automatically create subscription to their own mentions
-    await models.Subscription.create(
-      {
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      },
-      { transaction },
-    );
-
-    // Automatically create a subscription to collaborations
-    await models.Subscription.create(
-      {
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
-      },
-      { transaction },
-    );
 
     // create token with provided user/address
     const canonicalAddressInstance = addressInstances.find(
@@ -512,7 +490,6 @@ async function magicLoginRoute(
         generatedAddresses.push({
           // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
-          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else if (
@@ -522,7 +499,6 @@ async function magicLoginRoute(
         generatedAddresses.push({
           // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
-          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else {

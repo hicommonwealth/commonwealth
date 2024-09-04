@@ -120,8 +120,7 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );
@@ -137,10 +136,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: true,
       },
     });
@@ -182,8 +178,7 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );
@@ -217,8 +212,7 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
-      user_id: String(user.id!),
+      user_id: String(user!.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
   });
@@ -230,8 +224,7 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );
@@ -268,8 +261,7 @@ describe('subscriptionPreferencesUpdated', () => {
     expect(
       (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
-      // @ts-expect-error StrictNullChecks
-      user_id: String(user.id!),
+      user_id: String(user!.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
     expect(
@@ -286,8 +278,7 @@ describe('subscriptionPreferencesUpdated', () => {
       },
       {
         where: {
-          // @ts-expect-error StrictNullChecks
-          id: subPreferences.id!,
+          user_id: user!.id!,
         },
       },
     );

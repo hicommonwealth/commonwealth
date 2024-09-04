@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   CANVAS_TOPIC,
@@ -8,6 +8,7 @@ import {
   getSessionSigners,
 } from '@hicommonwealth/shared';
 import app from 'state';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import useUserStore from 'state/ui/user';
 
 interface UseCheckAuthenticatedAddressesProps {
@@ -22,27 +23,36 @@ const useCheckAuthenticatedAddresses = ({
   const idOrPrefix =
     chainBase === ChainBase.CosmosSDK
       ? app.chain?.meta.bech32Prefix
-      : app.chain?.meta.node?.ethChainId || 1;
+      : app.chain?.meta?.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
 
   const [authenticatedAddresses, setAuthenticatedAddresses] = useState<{
     [address: string]: boolean;
   }>({});
 
-  useEffect(() => {
+  const updateAuthenticatedAddresses = useCallback(async () => {
     const sessionSigners = getSessionSigners();
 
     const newAuthenticatedAddresses: Record<string, boolean> = {};
 
     for (const account of user.accounts) {
-      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+      // making a fresh query to get chain and community info for this address
+      // as all the necessary fields don't exist on user.address, these should come
+      // from api in the user address response, and the extra api call here removed
+      const community = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        account.community.id,
+        true,
+      );
+      if (!community) continue;
+
+      const communityCaip2Prefix = chainBaseToCaip2(community.base);
 
       const communityIdOrPrefix =
-        account.community.base === ChainBase.CosmosSDK
-          ? account.community.ChainNode?.bech32
-          : account.community.ChainNode?.ethChainId;
+        community.base === ChainBase.CosmosSDK
+          ? community?.ChainNode?.bech32
+          : community?.ChainNode?.eth_chain_id;
       const communityCanvasChainId = chainBaseToCanvasChainId(
-        account.community.base,
+        community.base,
         // @ts-expect-error <StrictNullChecks>
         communityIdOrPrefix,
       );
@@ -64,7 +74,11 @@ const useCheckAuthenticatedAddresses = ({
     }
 
     setAuthenticatedAddresses(newAuthenticatedAddresses);
-  }, [canvasChainId, chainBase, user.accounts, recheck]);
+  }, [user.accounts]);
+
+  useEffect(() => {
+    updateAuthenticatedAddresses().catch(console.error);
+  }, [updateAuthenticatedAddresses, canvasChainId, chainBase, recheck]);
 
   return { authenticatedAddresses };
 };

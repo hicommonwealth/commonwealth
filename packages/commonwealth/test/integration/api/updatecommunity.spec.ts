@@ -3,11 +3,11 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { CommunityArgs } from 'test/util/modelUtils';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
-import type { CommunityArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
