@@ -84,7 +84,6 @@ export async function handleCommunityStakeTrades(
 
   await models.StakeTransaction.create({
     transaction_hash: event.rawLog.transactionHash,
-    // @ts-expect-error StrictNullChecks
     community_id: community.id,
     stake_id: parseInt(stakeId as string),
     stake_amount: parseInt(stakeAmount as string),
