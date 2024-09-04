@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { buildCreateCommentInput } from 'client/scripts/state/api/comments/createComment';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -72,6 +73,7 @@ export const CreateComment = ({
   const author = user.activeAccount;
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
+    profile: user.activeAccount!.profile!.toUserProfile(),
     threadId: rootThread.id,
     communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -86,7 +88,7 @@ export const CreateComment = ({
     const communityId = app.activeChainId();
     const asyncHandle = async () => {
       try {
-        const newComment = await createComment({
+        const input = await buildCreateCommentInput({
           communityId,
           profile: user.activeAccount!.profile!.toUserProfile(),
           threadId: rootThread.id,
@@ -95,6 +97,7 @@ export const CreateComment = ({
           existingNumberOfComments: rootThread.numberOfComments || 0,
           isPWA: isAddedToHomeScreen,
         });
+        const newComment = await createComment(input);
 
         setErrorMsg(null);
         setContentDelta(createDeltaFromText(''));
