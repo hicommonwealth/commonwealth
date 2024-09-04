@@ -2,7 +2,7 @@ import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { FindAndCountOptions } from 'sequelize';
 import { models } from '../database';
-import { TopicAttributes } from '../models';
+import { TopicAttributes } from '../models/index';
 import { removeUndefined } from '../utils';
 import { formatSequelizePagination } from '../utils/paginationUtils';
 
@@ -22,14 +22,19 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
         });
       }
 
-      const { count, rows: threads } = await models.Topic.findAndCountAll({
+      const { count, rows: topics } = await models.Topic.findAndCountAll({
         where: removeUndefined({ community_id, id: topic_id }),
         include: includeArray,
         ...formatSequelizePagination(payload),
         paranoid: false,
       } as unknown as FindAndCountOptions<TopicAttributes>);
 
-      return schemas.buildPaginatedResponse(threads, count as number, payload);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return schemas.buildPaginatedResponse(
+        topics,
+        count as number,
+        payload,
+      ) as any;
     },
   };
 }
