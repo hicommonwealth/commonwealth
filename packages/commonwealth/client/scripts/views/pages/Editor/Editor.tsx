@@ -31,7 +31,7 @@ import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
 import { useImageUploadHandlerLocal } from 'views/pages/Editor/useImageUploadHandlerLocal';
-import supported from './supported.md?raw';
+import supported from './markdown/supported.md?raw';
 
 export type ImageURL = string;
 
