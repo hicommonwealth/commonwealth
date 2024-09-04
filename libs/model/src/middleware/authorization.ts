@@ -190,7 +190,7 @@ export const isCommunityAdmin: CommunityAuth = async (ctx) => {
 };
 
 export const isSuperAdmin: QueryHandler<ZodSchema, ZodSchema> &
-  CommandHandler<CommandInput, ZodSchema> = async (ctx) => {
+  CommandHandler<ZodSchema, ZodSchema> = async (ctx) => {
   if (!ctx.actor.user.isAdmin) {
     await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
   }
