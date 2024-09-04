@@ -1,7 +1,8 @@
 import { ThresholdData } from './protocol';
 
 export const Roles = ['admin', 'moderator', 'member'] as const;
-export type Role = typeof Roles[number];
+// eslint-disable-next-line import/no-cycle
+export type Role = (typeof Roles)[number];
 
 export type AddressRole = {
   address: string;
