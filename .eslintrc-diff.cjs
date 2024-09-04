@@ -23,7 +23,7 @@ module.exports = {
       version: 'detect',
     },
   },
-  plugins: ['@tanstack/query'],
+  plugins: ['@tanstack/query', 'import'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: `./tsconfig.json`,
@@ -35,7 +35,7 @@ module.exports = {
     '@typescript-eslint/ban-types': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
-    'import/no-cycle': 'off',
+    'import/no-cycle': 'error',
     'import/named': 'off',
     'no-underscore-dangle': 0,
     'no-console': 0,
