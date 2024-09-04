@@ -24,7 +24,7 @@ export const EXCEPTION_CASE_threadCountersStore =
 // IMPORTANT: as the name suggests, this zustand store is an exception.
 // --
 // WHAT THIS STORE DOES? -- This store store's the counts of total thread in a chain and total thread that are in
-// voting in a chain. These counters come from the /bulkOffChain api and it made sense to
+// voting in a chain. These counters come from the GetBulkThreads query and it made sense to
 // store those counts here. Ideally we should be store thread state or any other api response state in react query.
 // Storing in zustand also makes the state 'reactive' (it will update without us having to trigger a force re-render)
 // --

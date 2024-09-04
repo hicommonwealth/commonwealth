@@ -45,7 +45,6 @@ import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
-import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -436,14 +435,6 @@ function setupRouter(
     searchProfilesHandler.bind(this, serverControllers),
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
-
-  registerRoute(
-    router,
-    'get',
-    '/bulkOffchain',
-    databaseValidationService.validateCommunity,
-    bulkOffchain.bind(this, models),
-  );
 
   // comments
   registerRoute(

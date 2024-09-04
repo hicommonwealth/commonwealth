@@ -52,7 +52,7 @@ The goal of this document is to describe the current state of the app initializa
         - If ChainBase is Solana, import the Solana adapter.
         - If ChainBase is Ethereum and ChainType is Offchain, import the “generic” Ethereum adapter.
         - Otherwise, throw an “invalid chain” error.
-    5. `initServer()` is called the returned `IChainAdapter` instance, which clears local storage and makes a call to `/bulkOffchain`, whose data is used to initialize community content.
+    5. `initServer()` is called the returned `IChainAdapter` instance, which clears local storage and makes a call to the `GetBulkThreads` query, whose data is used to initialize community content.
     6. Dark mode preferences are set, and forum data (e.g. threads, admins, banners, recent activity) is populated. The `app.chain` state variable is set globally to the now-server-initialized `IChainAdapter` instance.
     7. If the `initChain` argument is `true`, we then proceed to `initChain()`.
         1. If `selectChain` has not been called, or if chain is already loaded, immediately exit the function.

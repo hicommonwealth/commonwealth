@@ -9,7 +9,7 @@ Providing a solution to improve existing thread workflows is a non-goal of this 
 ## Threads Init
 
 1. In `state.ts`, the `/status` endpoint responds with recent threads (`recentThreads`) that are stored in `recent_activity.ts` and then used in different parts of the app to sort the communities/chains based on threads count.
-2. In `IChainAdapter.ts`, the `/bulkOffChain` api responds with `numTotalThreads` (used on the `/:community/discussions` page to show the total threads count) and `numVotingThreads` (used on the `/:community/discussions` page on the stages menu filter).
+2. In `IChainAdapter.ts`, the `GetBulkThreads` query responds with `numTotalThreads` (used on the `/:community/discussions` page to show the total threads count) and `numVotingThreads` (used on the `/:community/discussions` page on the stages menu filter).
 3. `IChainAdapter.ts` calls a method in `recent_activity.ts` and the `/activeThreads` api responds with threads that get stored in the `threads.ts` store in the `overviewStore` sub store key and get used in the `/:community/overview` page to show monthly threads count.
 4. `IChainAdapter.ts` hits the `/threadsUsersCountAndAvatars` endpoint which, if provided threads as payload, will respond with unique users for list of threads(thread_id), first 2 avatars for each group of users and lastly some latest comments.
 
