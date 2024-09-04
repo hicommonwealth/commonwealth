@@ -1,5 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Comment } from '@hicommonwealth/schemas';
 import { FindAndCountOptions } from 'sequelize';
 import { models } from '../database';
 import { ThreadAttributes } from '../models';
@@ -8,7 +9,8 @@ import { formatSequelizePagination } from '../utils/paginationUtils';
 
 export function GetThreads(): Query<typeof schemas.GetThreads> {
   return {
-    ...schemas.GetThreads,
+    input: schemas.GetThreads.input,
+    output: schemas.GetThreads.output.extend({ Comment: Comment.nullish() }),
     auth: [],
     secure: false,
     body: async ({ payload }) => {
