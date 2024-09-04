@@ -18,16 +18,24 @@ const ENABLE_ESLINT_DIFF_PLUGIN =
   process.env.ENABLE_ESLINT_DIFF_PLUGIN || 'true';
 
 module.exports = {
-  settings: {
-    react: {
-      version: 'detect',
-    },
-  },
+  extends: [
+    'eslint:recommended',
+    'plugin:@tanstack/eslint-plugin-query/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
+    ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
+  ].filter((current) => current !== null),
   plugins: ['@tanstack/query'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: `./tsconfig.json`,
     suppressDeprecatedPropertyWarnings: true,
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
   },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
@@ -149,12 +157,4 @@ module.exports = {
     // "functional/prefer-readonly-type": "error"
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@tanstack/eslint-plugin-query/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:react/recommended',
-    'plugin:@typescript-eslint/recommended',
-    ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
-  ].filter((current) => current !== null),
 };
