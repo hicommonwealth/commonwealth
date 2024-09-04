@@ -14,10 +14,11 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CommentVersionHistory } from '../../../../../models/Comment';
 import { UserProfile } from '../../../../../models/MinimumProfile';
 import {
   IThreadCollaborator,
-  VersionHistory,
+  ThreadVersionHistory,
 } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { CWSelectList } from '../../../../components/component_kit/new_designs/CWSelectList/index';
@@ -53,7 +54,7 @@ export type AuthorAndPublishInfoProps = {
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
-  versionHistory?: VersionHistory[];
+  versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
   changeContentText?: (text: string) => void;
 };
 
@@ -99,13 +100,12 @@ export const AuthorAndPublishInfo = ({
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
   const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.body,
+    value: v.body || v.text,
     label: formatVersionText(
-      v.timestamp,
-      // @ts-expect-error <StrictNullChecks>
-      v.author?.address,
-      profile,
+      moment(v.timestamp),
+      v.address,
       collaboratorLookupInfo,
+      profile?.name,
     ),
   }));
 
