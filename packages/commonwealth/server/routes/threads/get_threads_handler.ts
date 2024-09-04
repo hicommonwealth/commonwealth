@@ -34,18 +34,6 @@ export type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
 } & PaginationQueryParams;
-export type BulkThreadsRequestQuery = {
-  topic_id: string;
-  stage?: string;
-  includePinnedThreads?: string;
-  limit?: string;
-  page?: string;
-  orderBy?: string;
-  from_date?: string;
-  to_date?: string;
-  archived?: string;
-  withXRecentComments?: number;
-};
 export type CountThreadsRequestQuery = {
   limit?: number;
 };
@@ -60,7 +48,6 @@ export const getThreadsHandler = async (
       (
         | ActiveThreadsRequestQuery
         | SearchThreadsRequestQuery
-        | BulkThreadsRequestQuery
         | CountThreadsRequestQuery
       )
   >,
@@ -74,15 +61,8 @@ export const getThreadsHandler = async (
     throw new AppError(formatErrorPretty(queryValidationResult));
   }
 
-  const {
-    thread_ids,
-    bulk,
-    active,
-    search,
-    count,
-    community_id,
-    include_count,
-  } = queryValidationResult.data;
+  const { thread_ids, active, search, count, community_id, include_count } =
+    queryValidationResult.data;
 
   // get threads by IDs
   if (thread_ids) {
@@ -90,59 +70,6 @@ export const getThreadsHandler = async (
       threadIds: thread_ids,
     });
     return success(res, threads);
-  }
-
-  // get bulk threads
-  if (bulk) {
-    const bulkQueryValidationResult =
-      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
-
-    if (bulkQueryValidationResult.success === false) {
-      throw new AppError(formatErrorPretty(bulkQueryValidationResult));
-    }
-
-    const {
-      stage,
-      topic_id,
-      includePinnedThreads,
-      limit,
-      page,
-      orderBy,
-      from_date,
-      to_date,
-      archived,
-      contestAddress,
-      status,
-      withXRecentComments,
-    } = bulkQueryValidationResult.data;
-
-    const bulkThreads = await controllers.threads.getBulkThreads({
-      communityId: community_id,
-      // @ts-expect-error StrictNullChecks
-      stage,
-      // @ts-expect-error StrictNullChecks
-      topicId: topic_id,
-      // @ts-expect-error StrictNullChecks
-      includePinnedThreads,
-      // @ts-expect-error StrictNullChecks
-      page,
-      // @ts-expect-error StrictNullChecks
-      limit,
-      // @ts-expect-error StrictNullChecks
-      orderBy,
-      // @ts-expect-error StrictNullChecks
-      fromDate: from_date,
-      // @ts-expect-error StrictNullChecks
-      toDate: to_date,
-      // @ts-expect-error StrictNullChecks
-      archived: archived,
-      // @ts-expect-error StrictNullChecks
-      contestAddress,
-      // @ts-expect-error StrictNullChecks
-      status,
-      withXRecentComments,
-    });
-    return success(res, bulkThreads);
   }
 
   // get active threads
