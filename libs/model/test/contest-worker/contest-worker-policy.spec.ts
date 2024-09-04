@@ -67,7 +67,6 @@ describe('Contest Worker Policy', () => {
       deleted_at: undefined,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
   });
 
@@ -105,7 +104,6 @@ describe('Contest Worker Policy', () => {
             deleted_at: undefined,
             pinned: false,
             read_only: false,
-            version_history: [],
             topic_id: topicId,
           },
         },

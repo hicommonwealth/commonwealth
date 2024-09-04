@@ -83,7 +83,6 @@ const linkExistingAddressToCommunity = async (
         verification_token_expires: verificationTokenExpires,
       },
       {
-        // @ts-expect-error StrictNullChecks
         where: {
           user_id: originalAddress.user_id,
           address: req.body.address,

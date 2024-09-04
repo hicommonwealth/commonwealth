@@ -3,12 +3,8 @@ import { Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
 export const trpcRouter = trpc.router({
-  createThread: trpc.command(
-    Thread.CreateThread,
-    trpc.Tag.Thread,
-    trpc.track(
-      MixpanelCommunityInteractionEvent.CREATE_THREAD,
-      ({ community_id }) => ({ community: community_id }),
-    ),
-  ),
+  createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
+    MixpanelCommunityInteractionEvent.CREATE_THREAD,
+    ({ community_id }) => ({ community: community_id }),
+  ]),
 });
