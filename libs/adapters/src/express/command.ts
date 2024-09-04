@@ -12,7 +12,7 @@ import { ZodSchema } from 'zod';
  * @returns express command handler
  */
 export const command =
-  <Input extends core.CommandInput, Output extends ZodSchema>(
+  <Input extends ZodSchema, Output extends ZodSchema>(
     md: CommandMetadata<Input, Output>,
   ): RequestHandler =>
   async (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +20,7 @@ export const command =
       const { address, ...body } = req.body;
       const results = await core.command(md, {
         actor: { user: req.user as User, address },
-        payload: { ...body, id: req.params.id ?? body.id },
+        payload: body,
       });
       return res.json(results);
     } catch (error) {

@@ -45,7 +45,7 @@ export async function __getGroups(
     // optionally include members with groups
     const where: WhereOptions<MembershipAttributes> = {
       group_id: {
-        [Op.in]: groupsResult.map(({ id }) => id),
+        [Op.in]: groupsResult.map(({ id }) => id!),
       },
     };
     const members = await this.models.Membership.findAll({
@@ -66,7 +66,24 @@ export async function __getGroups(
       }, {});
     groupsResult = groupsResult.map((group) => ({
       ...group,
-      memberships: groupIdMembersMap[group.id] || [],
+      memberships: groupIdMembersMap[group.id!] || [],
+    }));
+  }
+
+  if (includeTopics) {
+    const topics = await this.models.Topic.findAll({
+      where: {
+        community_id: communityId,
+        group_ids: {
+          [Op.overlap]: groupsResult.map(({ id }) => id!),
+        },
+      },
+    });
+    groupsResult = groupsResult.map((group) => ({
+      ...group,
+      topics: topics
+        .map((t) => t.toJSON())
+        .filter((t) => t.group_ids!.includes(group.id!)),
     }));
   }
 
