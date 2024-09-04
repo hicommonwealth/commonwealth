@@ -73,7 +73,6 @@ export const CreateComment = ({
   const author = user.activeAccount;
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
-    profile: user.activeAccount!.profile!.toUserProfile(),
     threadId: rootThread.id,
     communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,

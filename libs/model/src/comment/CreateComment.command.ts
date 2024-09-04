@@ -14,10 +14,9 @@ import {
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
 
-const MAX_COMMENT_DEPTH = 8;
+export const MAX_COMMENT_DEPTH = 8;
 
 export const CreateCommentErrors = {
-  InvalidParent: 'Invalid parent',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
   ThreadArchived: 'Thread is archived',
@@ -50,16 +49,13 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       if (!mustExist('Community address', address)) return;
 
       if (parent_id) {
-        const parentComment = await models.Comment.findOne({
+        const parent = await models.Comment.findOne({
           where: { id: parent_id, thread_id },
           include: [models.Address],
         });
-        if (!mustExist('Parent Comment', parentComment)) return;
-        const [commentDepthExceeded] = await getCommentDepth(
-          parentComment,
-          MAX_COMMENT_DEPTH,
-        );
-        if (commentDepthExceeded)
+        if (!mustExist('Parent Comment', parent)) return;
+        const [, depth] = await getCommentDepth(parent, MAX_COMMENT_DEPTH);
+        if (depth === MAX_COMMENT_DEPTH)
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
 

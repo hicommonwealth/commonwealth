@@ -88,10 +88,9 @@ const authorizeAddress = async (
   if (!payload.community_id) {
     const thread_id = 'thread_id' in payload && payload.thread_id;
     if (!thread_id)
-      throw new InvalidActor(actor, 'Must provide community or thread id');
+      throw new InvalidInput('Must provide community or thread id');
     const thread = await models.Thread.findOne({ where: { id: thread_id } });
-    if (!thread)
-      throw new InvalidActor(actor, 'Must provide a valid thread id');
+    if (!thread) throw new InvalidInput('Must provide a valid thread id');
     payload.community_id = thread.community_id;
     payload.topic_id = thread.topic_id;
   }

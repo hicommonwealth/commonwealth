@@ -42,7 +42,6 @@ export const buildCreateCommentInput = async ({
 };
 
 const useCreateCommentMutation = ({
-  profile,
   communityId,
   threadId,
   existingNumberOfComments = 0,
