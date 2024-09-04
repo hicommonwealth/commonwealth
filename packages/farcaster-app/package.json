@@ -1,0 +1,16 @@
+{
+  "name": "farcaster-app",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
+    "start": "tsx watch --max-old-space-size=4096 src/server.ts"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "frames.js": "^0.19.0",
+    "moment": "^2.30.1",
+    "react": "^18.3.1",
+    "tsx": "^4.9.3"
+  }
+}

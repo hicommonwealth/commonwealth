@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "build",
+    "jsx": "react",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "types": ["vite/client"]
+  }
+}
