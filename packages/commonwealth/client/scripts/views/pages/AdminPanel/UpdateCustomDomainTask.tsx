@@ -5,6 +5,7 @@ import useUpdateCustomDomainMutation from 'state/api/communities/updateCustomDom
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { notifySuccess } from '../../../controllers/app/notifications';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
@@ -30,6 +31,7 @@ const UpdateCustomDomainTask = () => {
                 id: communityId,
                 custom_domain: customDomain,
               });
+              notifySuccess('Custom domain updated');
             })();
           },
         },

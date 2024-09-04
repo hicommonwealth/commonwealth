@@ -13,7 +13,7 @@ export function RefreshCustomDomain(): Query<
   return {
     ...schemas.RefreshCustomDomain,
     auth: [isSuperAdmin],
-    secure: false,
+    secure: true,
     body: async ({ payload }) => {
       const { custom_domain } = payload;
 
