@@ -13,11 +13,11 @@ module.exports = {
     suppressDeprecatedPropertyWarnings: true,
   },
   settings: {
-    'import/resolver': {
-      webpack: {
-        config: path.resolve(__dirname, 'webpack/webpack.base.config.js'),
-      },
-    },
+    // 'import/resolver': {
+    //   webpack: {
+    //     config: path.resolve(__dirname, 'webpack/webpack.base.config.js'),
+    //   },
+    // },
     react: {
       version: 'detect',
     },

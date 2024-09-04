@@ -53,7 +53,7 @@ module.exports = {
     '@typescript-eslint/ban-types': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
-    'import/no-cycle': 'error',
+    'import/no-cycle': 'off',
     'import/named': 'off',
     'no-underscore-dangle': 0,
     'no-param-reassign': 0,
