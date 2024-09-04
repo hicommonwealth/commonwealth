@@ -96,10 +96,10 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
 
           // update timestamps
           address.last_active = new Date();
-          address.save({ transaction });
+          await address.save({ transaction });
 
           thread.last_commented_on = new Date();
-          thread.save({ transaction });
+          await thread.save({ transaction });
 
           await models.CommentSubscription.create(
             {
