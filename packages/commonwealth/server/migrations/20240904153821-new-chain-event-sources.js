@@ -15,13 +15,31 @@ module.exports = {
         },
       );
 
+      const contractAbis = await queryInterface.sequelize.query(
+        'SELECT id, nickname FROM "ContractAbis" WHERE nickname IN (:nicknames)',
+        {
+          replacements: { nicknames: ['NamespaceFactory', 'CommunityStakes'] },
+          type: Sequelize.QueryTypes.SELECT,
+          transaction,
+        },
+      );
+
+      const abiIds = {
+        NamespaceFactory: contractAbis.find(
+          (abi) => abi.nickname === 'NamespaceFactory',
+        ).id,
+        CommunityStakes: contractAbis.find(
+          (abi) => abi.nickname === 'CommunityStakes',
+        ).id,
+      };
+
       const hardCodedValueSetsL2 = [
         {
           contract_address: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
           event_signature:
             '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
           kind: 'DeployedNamespace',
-          abi_id: 53,
+          abi_id: abiIds.NamespaceFactory,
           active: true,
         },
         {
@@ -29,7 +47,7 @@ module.exports = {
           event_signature:
             '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
           kind: 'Trade',
-          abi_id: 52,
+          abi_id: abiIds.CommunityStakes,
           active: true,
         },
         {
@@ -37,7 +55,7 @@ module.exports = {
           event_signature:
             '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
           kind: 'NewContest',
-          abi_id: 53,
+          abi_id: abiIds.NamespaceFactory,
           active: true,
         },
       ];
@@ -48,7 +66,7 @@ module.exports = {
           event_signature:
             '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
           kind: 'DeployedNamespace',
-          abi_id: 53,
+          abi_id: abiIds.NamespaceFactory,
           active: true,
         },
         {
@@ -56,7 +74,7 @@ module.exports = {
           event_signature:
             '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
           kind: 'Trade',
-          abi_id: 52,
+          abi_id: abiIds.CommunityStakes,
           active: true,
         },
         {
@@ -64,7 +82,7 @@ module.exports = {
           event_signature:
             '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
           kind: 'NewContest',
-          abi_id: 53,
+          abi_id: abiIds.NamespaceFactory,
           active: true,
         },
       ];
