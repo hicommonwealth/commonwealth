@@ -64,6 +64,7 @@ export const processCommentUpvoted: EventHandler<
     include: [
       {
         model: models.Community,
+        as: 'Community',
         required: true,
       },
     ],
@@ -88,7 +89,10 @@ export const processCommentUpvoted: EventHandler<
       community_name: thread.Community.name,
       reaction: payload.reaction,
       comment_id: payload.comment_id,
-      comment_body: safeTruncateBody(commentAndAuthor.text),
+      comment_body: safeTruncateBody(
+        decodeURIComponent(commentAndAuthor.text),
+        255,
+      ),
       created_at: payload.created_at!.toISOString(),
       object_url: getCommentUrl(
         thread.Community.id!,

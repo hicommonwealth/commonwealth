@@ -74,7 +74,7 @@ export const processThreadUpvoted: EventHandler<
       community_name: community.name,
       reaction: payload.reaction,
       thread_id: payload.thread_id,
-      thread_title: safeTruncateBody(threadAndAuthor.title),
+      thread_title: safeTruncateBody(decodeURIComponent(threadAndAuthor.title)),
       created_at: payload.created_at!.toISOString(),
       object_url: getThreadUrl(
         payload.community_id,
