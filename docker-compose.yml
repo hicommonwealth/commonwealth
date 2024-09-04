@@ -1,4 +1,3 @@
-version: '3'
 services:
   cw_postgres:
     container_name: cw_postgres
