@@ -66,7 +66,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const topicId: number | undefined = (topics || []).find(
     ({ name }) => name === topicName,
-  ).id;
+  )?.id;
 
   const { data: domain } = useFetchCustomDomainQuery();
 
