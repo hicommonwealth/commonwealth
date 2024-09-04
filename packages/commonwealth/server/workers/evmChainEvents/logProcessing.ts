@@ -45,7 +45,7 @@ export async function getLogs({
   let startBlock = startingBlockNum;
   let endBlock = endingBlockNum;
   const provider = getProvider(rpc);
-  if (!endBlock) endBlock = await provider.getBlockNumber();
+  if (!endBlock) endBlock = (await provider.getBlockNumber()) - 1;
 
   if (startBlock > endBlock) {
     logger.error(
