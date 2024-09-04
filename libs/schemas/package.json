@@ -19,8 +19,7 @@
     "check-types": "tsc --noEmit",
     "test": "echo No tests for @hicommonwealth/schemas",
     "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
-    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'",
-    "lint-diff-v2": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff-v2.cjs './src/**/*.{ts,tsx}'"
+    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
     "@hicommonwealth/shared": "workspace:*",
