@@ -32,7 +32,7 @@ export function createAltGovAminoConverters(): AminoConverters {
         assertDefinedAndNotNull(content);
         let proposal: any;
         switch (content.typeUrl) {
-          case '/cosmos.gßov.v1beta1.TextProposal': {
+          case '/cosmos.gov.v1beta1.TextProposal': {
             const textProposal = TextProposal.decode(content.value);
             proposal = {
               type: 'cosmos-sdk/TextProposal',
