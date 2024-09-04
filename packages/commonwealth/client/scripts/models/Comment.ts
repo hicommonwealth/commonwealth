@@ -76,8 +76,8 @@ export class Comment<T extends IUniqueId> {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
-      : null;
+        ? versionHistory[0].timestamp
+        : null;
     // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.length > 0 ? true : false;
