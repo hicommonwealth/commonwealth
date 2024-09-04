@@ -47,8 +47,6 @@ describe('Thread lifecycle', () => {
         is_banned: role === 'banned',
       })),
       groups: [{ id: groupId }],
-      topics: [],
-      GroupPermissions: [],
     });
     await seed('GroupPermission', {
       group_id: groupId,
