@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { ChainNodeInstance } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 import { Balances } from '../types';

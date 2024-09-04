@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 export * from './CreateCommentSubscription.command';
 export * from './CreateCommunityAlert.command';
 export * from './CreateThreadSubscription.command';

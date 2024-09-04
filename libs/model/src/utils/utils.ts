@@ -10,6 +10,7 @@ import {
 } from 'sequelize';
 import { isAddress } from 'web3-validator';
 import { config } from '../config';
+// eslint-disable-next-line import/no-cycle
 import { OutboxAttributes } from '../models';
 
 const log = logger(import.meta);

@@ -1,6 +1,7 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { getDelta, sanitizeQuillText, updateTags } from '../utils';

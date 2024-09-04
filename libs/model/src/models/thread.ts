@@ -2,6 +2,7 @@ import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { EventNames, EventPairs } from '@hicommonwealth/core';
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
 import ethers from 'ethers';
@@ -260,17 +261,17 @@ export const EvmEventAbis = {
 type AbiTypeToTS<T> = T extends 'address'
   ? z.infer<typeof EVM_ADDRESS>
   : T extends 'uint256'
-  ? z.infer<typeof ETHERS_BIG_NUMBER>
-  : T extends 'bool'
-  ? boolean
-  : never;
+    ? z.infer<typeof ETHERS_BIG_NUMBER>
+    : T extends 'bool'
+      ? boolean
+      : never;
 
 type Transform<T extends ReadonlyArray<{ name: string; type: string }>> = {
   [K in T[number] as K['name']]: AbiTypeToTS<K['type']>;
 };
 
 type DecodedEvmEvent<Signature extends EvmEventSignature> = Transform<
-  typeof EvmEventAbis[Signature]
+  (typeof EvmEventAbis)[Signature]
 >;
 
 // EvmMapper maps chain event args as input to a zod event schema type as output

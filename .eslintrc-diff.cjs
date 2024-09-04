@@ -35,8 +35,6 @@ module.exports = {
     '@typescript-eslint/ban-types': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
-    'import/no-cycle': 'error',
-    'import/named': 'off',
     'no-underscore-dangle': 0,
     'no-console': 0,
     camelcase: 0,
@@ -147,6 +145,15 @@ module.exports = {
     // "functional/no-let": "error",
     // "functional/no-method-signature": "error",
     // "functional/prefer-readonly-type": "error"
+
+    'import/no-cycle': 2,
+    'import/named': 0,
+    'import/export': 0,
+    'import/namespace': 0,
+    'import/default': 0, // TODO should this be on?
+    'import/no-duplicates': 0, // TODO should this be on?
+    'import/no-named-as-default': 0,
+    'import/no-named-as-default-member': 0,
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
@@ -155,6 +162,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:import/recommended',
     ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
   ].filter((current) => current !== null),
 };

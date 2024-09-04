@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../../../database';
 import { Balances, GetSPLBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';

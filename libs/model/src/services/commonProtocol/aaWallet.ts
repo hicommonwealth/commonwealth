@@ -5,6 +5,7 @@ import {
   sepolia,
 } from '@alchemy/aa-core';
 import { AppError } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import Web3 from 'web3';
 

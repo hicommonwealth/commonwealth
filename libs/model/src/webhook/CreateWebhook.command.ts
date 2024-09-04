@@ -7,6 +7,7 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { getWebhookDestination } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 

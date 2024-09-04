@@ -1,4 +1,5 @@
 export * from './chain-event.schemas';
+// eslint-disable-next-line import/no-cycle
 export * from './chain-event.utils';
 export * from './email.schemas';
 export * from './events';
