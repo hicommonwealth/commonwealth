@@ -26,7 +26,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
   ].filter((current) => current !== null),
-  plugins: ['@tanstack/query'],
+  plugins: ['@tanstack/query', 'import'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: `./tsconfig.json`,
