@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { Thread } from '../entities';
+import { Comment, Thread } from '../entities';
 import {
   DiscordMetaSchema,
+  PG_INT,
   linksSchema,
   paginationSchema,
-  PG_INT,
 } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -104,7 +104,7 @@ export const GetThreads = {
     include_reactions: z.coerce.boolean(),
   }),
   output: PaginatedResultSchema.extend({
-    results: Thread.array(),
+    results: Thread.extend({ Comment: Comment.nullish() }).array(),
   }),
 };
 
