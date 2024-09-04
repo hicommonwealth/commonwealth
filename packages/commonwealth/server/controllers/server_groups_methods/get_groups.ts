@@ -66,24 +66,7 @@ export async function __getGroups(
       }, {});
     groupsResult = groupsResult.map((group) => ({
       ...group,
-      memberships: groupIdMembersMap[group.id!] || [],
-    }));
-  }
-
-  if (includeTopics) {
-    const topics = await this.models.Topic.findAll({
-      where: {
-        community_id: communityId,
-        group_ids: {
-          [Op.overlap]: groupsResult.map(({ id }) => id!),
-        },
-      },
-    });
-    groupsResult = groupsResult.map((group) => ({
-      ...group,
-      topics: topics
-        .map((t) => t.toJSON())
-        .filter((t) => t.group_ids!.includes(group.id!)),
+      memberships: groupIdMembersMap[group.id] || [],
     }));
   }
 

@@ -2,13 +2,13 @@ import React from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
+import app from 'state';
 import { useForumActionGated } from '../../hooks/useForumActionGated';
 
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -50,21 +50,12 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     enabled: !!thread.communityId,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community);
-
   const { canCreateComment, canReactToThread } = useForumActionGated({
     communityId: app.activeChainId(),
     address: user.activeAccount?.address || '',
     topicId: thread?.topic?.id,
-    isAdmin,
-  });
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: !(canCreateComment || canReactToThread),
+    isAdmin:
+      Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community),
   });
 
   // edge case for deleted communities with orphaned posts
@@ -89,7 +80,6 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={disabledActionsTooltipText}
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer

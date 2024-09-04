@@ -16,20 +16,28 @@ export type UseForumActionGatedResponse = {
   canUpdatePoll: boolean;
 };
 
+const allowEverything = {
+  canCreateThread: true,
+  canCreateComment: true,
+  canReactToThread: true,
+  canReactToComment: true,
+  canUpdatePoll: true,
+};
+
+const notInGroup = {
+  canCreateThread: false,
+  canCreateComment: false,
+  canReactToThread: false,
+  canReactToComment: false,
+  canUpdatePoll: false,
+};
+
 export const useForumActionGated = ({
   communityId,
   address,
   topicId,
   isAdmin,
 }: UseAllowedGroupsParams): UseForumActionGatedResponse => {
-  const allowEverything = {
-    canCreateThread: true,
-    canCreateComment: true,
-    canReactToThread: true,
-    canReactToComment: true,
-    canUpdatePoll: true,
-  };
-
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId,
     address,
@@ -37,11 +45,15 @@ export const useForumActionGated = ({
     apiEnabled: !!address,
   });
 
-  if (memberships.length === 0) {
+  if (memberships.length === 0 || isAdmin || !topicId) {
     return allowEverything;
   }
 
-  const flatMemberships = memberships
+  const validGroups = (memberships || []).filter(
+    (membership) => membership.rejectReason.length === 0,
+  );
+
+  const flatMemberships = validGroups
     .flatMap((m) =>
       m.topicIds.map((t) => ({
         topic_id: t,
@@ -71,8 +83,9 @@ export const useForumActionGated = ({
   });
 
   const allowedActionsForTopic = topicIdToIsAllowedMap.get(topicId ?? 0);
-  if (isAdmin || !topicId || !allowedActionsForTopic) {
-    return allowEverything;
+
+  if (!allowedActionsForTopic) {
+    return notInGroup;
   }
 
   return {

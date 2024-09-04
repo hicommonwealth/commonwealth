@@ -10,7 +10,6 @@ import useFetchThreadsQuery, {
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
-import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -23,13 +22,11 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
@@ -68,17 +65,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useBrowserWindow({});
 
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-
-  const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
+  const topicId: number = (topics || []).find(
+    ({ name }) => name === topicName,
+  )?.id;
 
   const user = useUserStore();
-
-  const { canCreateComment, canReactToThread } = useForumActionGated({
-    communityId: app.activeChainId(),
-    address: user.activeAccount?.address || '',
-    isAdmin,
-  });
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -178,13 +169,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: !!user.activeAccount,
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: !canReactToThread || !canCreateComment,
-          });
-
           const isThreadTopicInContest = checkIsTopicInContest(
             contestsData,
             thread?.topic?.id,
@@ -194,8 +178,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={canReactToThread}
-              canComment={canCreateComment}
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -210,7 +192,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onCommentBtnClick={() =>
                 navigate(`${discussionLink}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
               hideRecentComments
               editingDisabled={isThreadTopicInContest}
             />

@@ -135,7 +135,7 @@ async function isTopicMember(
   // if no group allows the specified action for the given topic, then reject because regardless of membership the user
   // will not be allowed.
   if (allowed?.length === 0) {
-    throw new NonMember(actor, groups[0]?.id.toString(), action);
+    throw new NonMember(actor, groups[0]?.metadata?.name, action);
   }
 
   // check membership for all groups of topic
@@ -153,7 +153,7 @@ async function isTopicMember(
   });
 
   if (!memberships.length)
-    throw new NonMember(actor, groups[0]?.id.toString(), action);
+    throw new NonMember(actor, groups[0]?.metadata?.name, action);
 
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)

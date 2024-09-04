@@ -1,5 +1,4 @@
 import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
@@ -88,34 +87,10 @@ export const TopicSummaryRow = ({
             true,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
-          );
-
-          const isActionAllowedInGatedTopic = !!(memberships || []).find(
-            (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
-              membership.allowedActions,
-          );
-
-          const isRestrictedMembership =
-            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
-          const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: Permissions.isCommunityMember(
-              thread.communityId,
-            ),
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isRestrictedMembership,
-          });
-
           return (
             <ThreadCard
               key={thread.id}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
               canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -124,7 +99,6 @@ export const TopicSummaryRow = ({
               onCommentBtnClick={() =>
                 navigate(`${discussionLinkWithoutChain}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
               hideReactionButton
               hideUpvotesDrawer
             />
