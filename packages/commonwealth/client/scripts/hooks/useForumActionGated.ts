@@ -50,7 +50,7 @@ export const useForumActionGated = ({
   }
 
   const validGroups = (memberships || []).filter(
-    (membership) => membership.rejectReason.length === 0,
+    (membership) => membership?.rejectReason?.length === 0,
   );
 
   const flatMemberships = validGroups

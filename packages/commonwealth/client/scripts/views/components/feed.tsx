@@ -2,8 +2,6 @@ import React from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
-import app from 'state';
-import { useForumActionGated } from '../../hooks/useForumActionGated';
 
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
@@ -18,8 +16,6 @@ import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
 } from 'state/api/feeds';
-import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { DashboardViews } from 'views/pages/user_dashboard';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
@@ -34,7 +30,6 @@ const DEFAULT_COUNT = 10;
 
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -50,14 +45,6 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     enabled: !!thread.communityId,
   });
 
-  const { canCreateComment, canReactToThread } = useForumActionGated({
-    communityId: app.activeChainId(),
-    address: user.activeAccount?.address || '',
-    topicId: thread?.topic?.id,
-    isAdmin:
-      Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community),
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
@@ -68,8 +55,6 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   return (
     <ThreadCard
       thread={thread}
-      canReact={!canReactToThread}
-      canComment={!canCreateComment}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(

@@ -64,9 +64,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useBrowserWindow({});
 
-  const topicId: number = (topics || []).find(
+  const topicId: number | undefined = (topics || []).find(
     ({ name }) => name === topicName,
-  )?.id;
+  ).id;
 
   const { data: domain } = useFetchCustomDomainQuery();
 
