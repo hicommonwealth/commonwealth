@@ -3,18 +3,18 @@ import {
   logger,
   type AuthStrategies,
   type CommandContext,
-  type CommandInput,
   type User,
 } from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { Request } from 'express';
 import passport from 'passport';
+import { ZodSchema } from 'zod';
 import { config } from '../config';
 
 const log = logger(import.meta);
 
 export type OutputMiddleware<Output> = (
-  ctx: CommandContext<CommandInput>,
+  ctx: CommandContext<ZodSchema>,
   result: Partial<Output>,
 ) => Promise<void>;
 

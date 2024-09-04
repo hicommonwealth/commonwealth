@@ -24,7 +24,6 @@ describe('Thread lifecycle', () => {
     body,
     stage,
     url: 'http://blah',
-    id: 0,
     canvas_hash: '',
     canvas_signed_data: '',
     read_only: false,

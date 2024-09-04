@@ -13,13 +13,13 @@ import CWIconButton from 'views/components/component_kit/new_designs/CWIconButto
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import DraggableTopicsList from 'views/modals/order_topics_modal/draggable_topics_list';
-import './ManageTopicsSection.scss';
+import './ManageTopicsSectionOld.scss';
 
-export const ManageTopicsSection = () => {
+export const ManageTopicsSectionOld = () => {
   const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => topic.featuredInSidebar)
-      .map((topic) => ({ ...topic } as Topic));
+      .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
 
@@ -38,7 +38,7 @@ export const ManageTopicsSection = () => {
   const getRegularTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => !topic.featuredInSidebar)
-      .map((topic) => ({ ...topic } as Topic));
+      .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
 
@@ -100,7 +100,7 @@ export const ManageTopicsSection = () => {
   }, [rawTopics]);
 
   return (
-    <div className="ManageTopicsSection">
+    <div className="ManageTopicsSectionOld">
       <div className="content">
         <div className="featured-topic-list">
           <div className="header">
@@ -138,7 +138,7 @@ export const ManageTopicsSection = () => {
                     <CWIconButton
                       iconName="pencil"
                       buttonSize="sm"
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.stopPropagation();
                         setTopicSelectedToEdit(regTopic);
                       }}
@@ -167,6 +167,7 @@ export const ManageTopicsSection = () => {
           buttonType="primary"
           buttonHeight="med"
           buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={handleSave}
           label="Save Changes"
         />

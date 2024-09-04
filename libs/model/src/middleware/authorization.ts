@@ -6,7 +6,6 @@ import {
   QueryHandler,
   type CommandContext,
   type CommandHandler,
-  type CommandInput,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
@@ -16,15 +15,9 @@ import { ZodObject, ZodSchema, ZodString, z } from 'zod';
 // eslint-disable-next-line import/no-cycle
 import { models } from '..';
 
-export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
-export type ThreadMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Thread
->;
-export type CommentMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Comment
->;
+export type CommunityAuth = CommandHandler<ZodSchema, ZodSchema>;
+export type ThreadAuth = CommandHandler<ZodSchema, typeof schemas.Thread>;
+export type CommentAuth = CommandHandler<ZodSchema, typeof schemas.Comment>;
 
 export class BannedActor extends InvalidActor {
   constructor(public actor: Actor) {
@@ -110,7 +103,7 @@ const authorizeAddress = async (
  * Checks if actor passes a set of requirements and grants access for all groups of the given topic
  */
 async function isTopicMember(
-  { actor, payload }: CommandContext<CommandInput>,
+  { actor, payload }: CommandContext<ZodSchema>,
   action: GroupPermissionAction,
 ): Promise<void> {
   // By convention, topic_id must by part of the body
@@ -153,7 +146,7 @@ async function isTopicMember(
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
     where: {
-      group_id: { [Op.in]: allowed.map((g) => g.id) },
+      group_id: { [Op.in]: allowed.map((g) => g.id!) },
       address_id: actor.addressId,
     },
     include: [
@@ -191,19 +184,19 @@ export const isCommunityAdminQuery: CommunityQueryMiddleware = async (ctx) => {
 /**
  * Community middleware
  */
-export const isCommunityAdmin: CommunityMiddleware = async (ctx) => {
+export const isCommunityAdmin: CommunityAuth = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin']);
 };
 
-export const isCommunityModerator: CommunityMiddleware = async (ctx) => {
+export const isCommunityModerator: CommunityAuth = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['moderator']);
 };
 
-export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
+export const isCommunityAdminOrModerator: CommunityAuth = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin', 'moderator']);
@@ -211,7 +204,7 @@ export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
 
 export function isCommunityAdminOrTopicMember(
   action: GroupPermissionAction,
-): CommunityMiddleware {
+): CommunityAuth {
   return async (ctx) => {
     // super admin is always allowed
     if (ctx.actor.user.isAdmin) return;
@@ -226,7 +219,7 @@ export function isCommunityAdminOrTopicMember(
 /**
  * Thread middleware
  */
-export const loadThread: ThreadMiddleware = async ({ payload }) => {
+export const loadThread: ThreadAuth = async ({ payload }) => {
   if (!payload.id) throw new InvalidInput('Must provide a thread id');
   const thread = (
     await models.Thread.findOne({
@@ -242,7 +235,7 @@ export const loadThread: ThreadMiddleware = async ({ payload }) => {
   return thread;
 };
 
-export const isThreadAuthor: ThreadMiddleware = ({ actor }, state) => {
+export const isThreadAuthor: ThreadAuth = ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address) throw new InvalidActor(actor, 'Must provide an address');
@@ -255,7 +248,7 @@ export const isThreadAuthor: ThreadMiddleware = ({ actor }, state) => {
 /**
  * Comment middleware
  */
-export const loadComment: CommentMiddleware = async ({ payload }) => {
+export const loadComment: CommentAuth = async ({ payload }) => {
   if (!payload.id) throw new InvalidInput('Must provide a comment id');
   const comment = (
     await models.Comment.findOne({
@@ -271,7 +264,7 @@ export const loadComment: CommentMiddleware = async ({ payload }) => {
   return comment;
 };
 
-export const isCommentAuthor: CommentMiddleware = ({ actor }, state) => {
+export const isCommentAuthor: CommentAuth = ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address) throw new InvalidActor(actor, 'Must provide an address');

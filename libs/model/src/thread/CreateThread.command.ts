@@ -104,8 +104,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       verifyThreadSignature,
     ],
     body: async ({ actor, payload }) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { id, community_id, topic_id, kind, url, ...rest } = payload;
+      const { community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
