@@ -78,7 +78,7 @@ All redirect URLs that the bot should support need to be inserted/
 - `DISCORD_CLIENT_ID`: this is the client ID of the Discord app.
   - For local test we use the staging Discord app/bot. The client ID can therefore be found on the [developer dashboard](https://discord.com/developers/applications/1027997517964644453/oauth2/general)
   or by contacting Jake or Timothee.
-- `DISCORD_BOT_TOKEN`: this is the same as the `DISCORD_TOKEN` in `/discord-bot/.env`
+- `DISCORD_TOKEN`: this is the same as the `DISCORD_TOKEN` in `/discord-bot/.env`
 - `CW_BOT_KEY`: this is the same as the `CW_BOT_KEY` in `/discord-bot/.env`
 
 ### Startup
@@ -119,7 +119,7 @@ the `CLOUDAMQP_URL` environment variable in the [`commonwealthapp` Heroku app](h
   - The client ID can be found on the developer dashboard for the [staging bot](https://discord.com/developers/applications/1027997517964644453/oauth2/general)
       or the [production bot](https://discord.com/developers/applications/1133050809412763719/oauth2/general).
   The client ID can also be retrieved by contacting Jake or Timothee.
-- `DISCORD_BOT_TOKEN`: this is the same as the `DISCORD_TOKEN` in the associated `Discobot app` above.
+- `DISCORD_TOKEN`: this is the same as the `DISCORD_TOKEN` in the associated `Discobot app` above.
 - `CW_BOT_KEY`: this is the same as the `CW_BOT_KEY` in the associated `Discobot app` above.
 
 ## Testing

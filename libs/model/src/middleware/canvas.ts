@@ -6,12 +6,9 @@ import {
   verifyThread,
 } from '@hicommonwealth/shared';
 import { config } from '../config';
-import { ThreadMiddleware } from './authorization';
+import { ThreadAuth } from './authorization';
 
-export const verifyThreadSignature: ThreadMiddleware = async ({
-  actor,
-  payload,
-}) => {
+export const verifyThreadSignature: ThreadAuth = async ({ actor, payload }) => {
   if (config.ENFORCE_SESSION_KEYS) {
     if (hasCanvasSignedDataApiArgs(payload)) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
