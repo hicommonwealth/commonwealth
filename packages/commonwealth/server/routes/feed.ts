@@ -48,7 +48,7 @@ export const getFeedHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const queryValidationResult = schemas.DEPRECATED_GetBulkThreads.safeParse(
+  const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
   );
 
