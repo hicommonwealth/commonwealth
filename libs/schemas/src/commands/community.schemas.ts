@@ -97,7 +97,7 @@ export const RefreshCustomDomain = {
 
 export const UpdateCustomDomain = {
   input: z.object({
-    id: z.string().min(1),
+    community_id: z.string().min(1),
     custom_domain: z.string(),
   }),
   output: z.object({
