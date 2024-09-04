@@ -76,7 +76,7 @@ export class CosmosVote implements IVote<CosmosToken> {
   }
 }
 
-export class CosmosProposal extends Proposal<
+export class CosmosProposalGovgen extends Proposal<
   CosmosApiType,
   CosmosToken,
   ICosmosProposal,

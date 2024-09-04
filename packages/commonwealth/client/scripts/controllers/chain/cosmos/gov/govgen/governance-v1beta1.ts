@@ -8,7 +8,7 @@ import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
 import type { CosmosApiType } from '../../chain';
-import { CosmosProposal } from './proposal-v1beta1';
+import { CosmosProposalGovgen } from './proposal-v1beta1';
 import { encodeMsgSubmitProposal, msgToIProposal } from './utils-v1beta1';
 
 /* CosmosGovernance v1beta1 */
@@ -40,7 +40,7 @@ class CosmosGovernance extends ProposalModule<
     this._initialized = true;
   }
 
-  public async getProposal(proposalId: number): Promise<CosmosProposal> {
+  public async getProposal(proposalId: number): Promise<CosmosProposalGovgen> {
     const existingProposal = this.store.getByIdentifier(proposalId);
     if (existingProposal) return existingProposal;
     return this._initProposal(proposalId);
@@ -52,7 +52,7 @@ class CosmosGovernance extends ProposalModule<
       // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
       const { proposal } = await this._Chain.api.govgen.proposal(proposalId);
-      const cosmosProposal = new CosmosProposal(
+      const cosmosProposal = new CosmosProposalGovgen(
         this._Chain,
         this._Accounts,
         this,
