@@ -15,7 +15,7 @@ export function UpdateCustomDomain(): Command<
     ...schemas.UpdateCustomDomain,
     auth: [isSuperAdmin],
     body: async ({ payload }) => {
-      const { id: community_id, custom_domain } = payload;
+      const { community_id, custom_domain } = payload;
 
       const url = `https://api.heroku.com/apps/${config.HEROKU.HEROKU_APP_NAME}/domains`;
       const headers = {
