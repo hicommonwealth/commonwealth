@@ -15,7 +15,6 @@ module.exports = {
         },
       );
 
-      // Define three sets of hard-coded values
       const hardCodedValueSetsL2 = [
         {
           contract_address: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
@@ -70,7 +69,6 @@ module.exports = {
         },
       ];
 
-      // Prepare records for insertion
       const records = chainNodes.flatMap((node) => {
         if (node.eth_chain_id == 1) {
           return hardCodedValueSetsETH.map((valueSet) => ({
@@ -84,7 +82,7 @@ module.exports = {
           }));
         }
       });
-      // Insert records into EvmEventSource table
+
       await queryInterface.bulkInsert('EvmEventSources', records, {
         transaction,
       });
@@ -93,7 +91,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      // Fetch the chain_node_ids that were inserted
       const chainNodes = await queryInterface.sequelize.query(
         'SELECT id, eth_chain_id FROM "ChainNodes" WHERE eth_chain_id IN (:evmChainIds)',
         {
@@ -117,7 +114,6 @@ module.exports = {
         '0x90aa47bf6e754f69ee53f05b5187b320e3118b0f',
       ];
 
-      // Remove inserted records
       await queryInterface.bulkDelete(
         'EvmEventSources',
         {
