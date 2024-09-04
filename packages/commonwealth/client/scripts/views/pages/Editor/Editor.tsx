@@ -31,19 +31,48 @@ import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
 import { useImageUploadHandlerLocal } from 'views/pages/Editor/useImageUploadHandlerLocal';
+import { useImageUploadHandlerS3 } from 'views/pages/Editor/useImageUploadHandlerS3';
 import supported from './markdown/supported.md?raw';
 
 export type ImageURL = string;
 
-type EditorMode = 'desktop' | 'mobile';
+export type EditorMode = 'desktop' | 'mobile';
+
+export type ImageHandler = 'S3' | 'local';
 
 type EditorProps = {
   readonly mode?: EditorMode;
   readonly placeholder?: string;
+  readonly imageHandler?: ImageHandler;
 };
 
+/**
+ * Handles supporting either of our image handlers.
+ */
+function useImageHandler(imageHandler: ImageHandler) {
+  const imageUploadHandlerDelegateLocal = useImageUploadHandlerLocal();
+  const imageUploadHandlerDelegateS3 = useImageUploadHandlerS3();
+
+  return useCallback(
+    async (file: File): Promise<ImageURL> => {
+      switch (imageHandler) {
+        case 'S3':
+          return await imageUploadHandlerDelegateS3(file);
+        case 'local':
+          return await imageUploadHandlerDelegateLocal(file);
+      }
+
+      throw new Error('Unknown image handler: ' + imageHandler);
+    },
+    [
+      imageHandler,
+      imageUploadHandlerDelegateLocal,
+      imageUploadHandlerDelegateS3,
+    ],
+  );
+}
+
 export const Editor = memo(function Editor(props: EditorProps) {
-  const imageUploadHandlerDelegate = useImageUploadHandlerLocal();
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -51,11 +80,13 @@ export const Editor = memo(function Editor(props: EditorProps) {
   const dragCounterRef = useRef(0);
 
   const mode = props.mode ?? 'desktop';
-  // const mode = props.mode ?? 'mobile';
+  const imageHandler: ImageHandler = props.imageHandler ?? 'S3';
 
   const placeholder = props.placeholder ?? 'Share your thoughts...';
 
   const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
+
+  const imageUploadHandlerDelegate = useImageHandler(imageHandler);
 
   const imageUploadHandler = useCallback(
     async (file: File) => {

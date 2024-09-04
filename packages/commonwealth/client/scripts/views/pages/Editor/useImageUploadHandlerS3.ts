@@ -4,6 +4,9 @@ import useUserStore from 'state/ui/user';
 import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
 import { ImageURL } from 'views/pages/Editor/Editor';
 
+/**
+ * This is the main/default image handler for S3.
+ */
 export function useImageUploadHandlerS3() {
   const user = useUserStore();
 

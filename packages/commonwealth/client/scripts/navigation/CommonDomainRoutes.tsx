@@ -113,7 +113,11 @@ const CommonDomainRoutes = ({
   contestEnabled,
   farcasterContestEnabled,
 }: RouteFeatureFlags) => [
-  <Route key="/editor" path="/editor" element={<EditorPage />} />,
+  <Route
+    key="/editor"
+    path="/editor"
+    element={<EditorPage imageHandler="local" />}
+  />,
 
   <Route
     key="/"
