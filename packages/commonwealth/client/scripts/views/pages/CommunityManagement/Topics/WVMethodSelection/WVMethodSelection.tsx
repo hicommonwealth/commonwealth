@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWRadioPanel, {
+  CWRadioPanelGroup,
+} from 'views/components/component_kit/new_designs/CWRadioPanel';
 
 import { CreateTopicStep } from '../utils';
 
@@ -12,7 +15,16 @@ interface WVMethodSelectionProps {
   onStepChange: (step: CreateTopicStep) => void;
 }
 
+enum WVMethod {
+  ERC20 = 'ERC20',
+  Stake = 'Stake',
+}
+
 const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
+  const [selectedWVMethod, setSelectedWVMethod] = useState<WVMethod | null>(
+    null,
+  );
+
   return (
     <div className="WVMethodSelection">
       <section className="header">
@@ -24,6 +36,26 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
         </CWText>
 
         <CWText type="h4">Choose weight voting method</CWText>
+
+        <CWRadioPanelGroup>
+          <CWRadioPanel
+            value={WVMethod.ERC20}
+            onSelect={setSelectedWVMethod}
+            label="Connect ERC20 token"
+            description="Only ERC20s"
+            popover={{ title: 'Example', body: <>lorem ipsum</> }}
+            isSelected={selectedWVMethod === WVMethod.ERC20}
+          />
+
+          <CWRadioPanel
+            value={WVMethod.Stake}
+            onSelect={setSelectedWVMethod}
+            label="Use Community stake"
+            description="Use non-transferable tokens"
+            popover={{ title: 'Example', body: <>lorem ipsum</> }}
+            isSelected={selectedWVMethod === WVMethod.Stake}
+          />
+        </CWRadioPanelGroup>
 
         <CWDivider />
 
