@@ -29,11 +29,11 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
         paranoid: false,
       } as unknown as FindAndCountOptions<TopicAttributes>);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return schemas.buildPaginatedResponse(
         topics,
         count as number,
         payload,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as any;
     },
   };
