@@ -60,7 +60,7 @@ export async function __deleteGroup(
       {
         where: {
           group_ids: {
-            [Op.contains]: [group.id],
+            [Op.contains]: [group.id!],
           },
         },
         transaction,
