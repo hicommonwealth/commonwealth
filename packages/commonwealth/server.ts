@@ -22,17 +22,16 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 // handle exceptions thrown in express routes
 import 'express-async-errors';
 
-// bootstrap production adapters
-
-const log = logger(import.meta);
+// bootstrap adapters
 stats(HotShotsStats());
-analytics(MixpanelAnalytics());
 blobStorage(S3BlobStorage());
+(config.ANALYTICS.MIXPANEL_DEV_TOKEN || config.ANALYTICS.MIXPANEL_PROD_TOKEN) &&
+  analytics(MixpanelAnalytics());
+config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED &&
+  notificationsProvider(KnockProvider());
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
-if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
-  notificationsProvider(KnockProvider());
-else notificationsProvider();
+const log = logger(import.meta);
 
 let isServiceHealthy = false;
 startHealthCheckLoop({
