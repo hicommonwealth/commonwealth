@@ -1,4 +1,4 @@
-import { express, trpc } from '@hicommonwealth/adapters';
+import { trpc } from '@hicommonwealth/adapters';
 import cors from 'cors';
 import { Router } from 'express';
 import { config } from '../config';
@@ -39,7 +39,7 @@ const router = Router();
 const trpcRouter = trpc.router(api);
 export type API = typeof trpcRouter;
 
-router.use('/trpc', express.statsMiddleware, trpc.toExpress(trpcRouter));
+router.use('/trpc', trpc.toExpress(trpcRouter));
 
 if (config.NODE_ENV !== 'production') {
   router.use(cors());
