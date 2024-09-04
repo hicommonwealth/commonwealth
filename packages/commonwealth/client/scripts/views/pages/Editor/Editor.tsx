@@ -22,16 +22,16 @@ import './Editor.scss';
 
 import clsx from 'clsx';
 import 'commonwealth-mdxeditor/style.css';
-import { codeBlockLanguages } from 'views/pages/Editor/codeBlockLanguages';
 import { DesktopEditorFooter } from 'views/pages/Editor/DesktopEditorFooter';
 import { DragIndicator } from 'views/pages/Editor/DragIndicator';
-import { fileToText } from 'views/pages/Editor/fileToText';
-import { iconComponentFor } from 'views/pages/Editor/iconComponentFor';
 import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
 import { useImageUploadHandlerLocal } from 'views/pages/Editor/useImageUploadHandlerLocal';
 import { useImageUploadHandlerS3 } from 'views/pages/Editor/useImageUploadHandlerS3';
+import { codeBlockLanguages } from 'views/pages/Editor/utils/codeBlockLanguages';
+import { fileToText } from 'views/pages/Editor/utils/fileToText';
+import { iconComponentFor } from 'views/pages/Editor/utils/iconComponentFor';
 import supported from './markdown/supported.md?raw';
 
 export type ImageURL = string;
