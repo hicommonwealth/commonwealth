@@ -160,7 +160,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
       event.preventDefault();
       handleDropAsync(event).catch(console.error);
     },
-    [handleFile, handleDropAsync],
+    [handleDropAsync],
   );
 
   const handleDragEnter = useCallback((event: React.DragEvent) => {
