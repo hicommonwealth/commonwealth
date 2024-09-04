@@ -10,6 +10,7 @@ import { ed25519 } from '@canvas-js/signatures';
 
 import assert from 'assert';
 
+// eslint-disable-next-line import/no-cycle
 import { CosmosSignerCW, SubstrateSignerCW } from './sessionSigners';
 import { CanvasSignedData } from './types';
 import { CANVAS_TOPIC, assertMatches, caip2AddressEquals } from './utils';
