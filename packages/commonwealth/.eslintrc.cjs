@@ -22,7 +22,7 @@ module.exports = {
       version: 'detect',
     },
   },
-  plugins: ['@tanstack/query', 'prettier'],
+  plugins: ['@tanstack/query', 'prettier', 'import'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
