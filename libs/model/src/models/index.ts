@@ -82,4 +82,5 @@ export * from './topic';
 export * from './types';
 export * from './user';
 export * from './vote';
+export * from './wallets';
 export * from './webhook';

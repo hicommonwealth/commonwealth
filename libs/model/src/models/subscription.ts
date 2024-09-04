@@ -1,7 +1,4 @@
-import {
-  EmitNotification,
-  NotificationCategories,
-} from '@hicommonwealth/shared';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import type { CommentAttributes } from './comment';
 import type { CommunityAttributes } from './community';
@@ -45,7 +42,6 @@ export type SubscriptionAttributes = {
 
 export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
-  emitNotification?: EmitNotification<SubscriptionInstance>;
 };
 
 export default (

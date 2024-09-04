@@ -1,8 +1,22 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
-import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityInteractionEvent,
+} from '../../shared/analytics/types';
 
 export const trpcRouter = trpc.router({
+  createCommunity: trpc.command(
+    Community.CreateCommunity,
+    trpc.Tag.Community,
+    trpc.track(
+      MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+      (result) => ({
+        chainBase: result.community?.base,
+        community: result.community?.id,
+      }),
+    ),
+  ),
   getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community),
   getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community),
   getStake: trpc.query(Community.GetCommunityStake, trpc.Tag.Community),

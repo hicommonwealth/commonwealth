@@ -59,7 +59,6 @@ export async function __createTopic(
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
