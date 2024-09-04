@@ -121,7 +121,7 @@ const WVDetails = ({ onStepChange }: WVConsentProps) => {
           label="Back"
           buttonWidth="wide"
           buttonType="secondary"
-          onClick={() => onStepChange(CreateTopicStep.WVConsent)}
+          onClick={() => onStepChange(CreateTopicStep.WVMethodSelection)}
         />
         <CWButton
           type="button"
