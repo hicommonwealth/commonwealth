@@ -20,12 +20,8 @@ import React, { memo, useCallback, useRef, useState } from 'react';
 
 import './Editor.scss';
 
-import { delay } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import 'commonwealth-mdxeditor/style.css';
-import { SERVER_URL } from 'state/api/config';
-import useUserStore from 'state/ui/user';
-import { uploadFileToS3 } from 'views/components/react_quill_editor/utils';
 import { codeBlockLanguages } from 'views/pages/Editor/codeBlockLanguages';
 import { DesktopEditorFooter } from 'views/pages/Editor/DesktopEditorFooter';
 import { DragIndicator } from 'views/pages/Editor/DragIndicator';
@@ -34,35 +30,10 @@ import { iconComponentFor } from 'views/pages/Editor/iconComponentFor';
 import { ToolbarForDesktop } from 'views/pages/Editor/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
+import { useImageUploadHandlerLocal } from 'views/pages/Editor/useImageUploadHandlerLocal';
 import supported from './supported.md?raw';
 
-type ImageURL = string;
-
-function useImageUploadHandlerS3() {
-  const user = useUserStore();
-
-  return useCallback(
-    async (file: File): Promise<ImageURL> => {
-      const uploadedFileUrl = await uploadFileToS3(
-        file,
-        SERVER_URL,
-        user.jwt || '',
-      );
-      return uploadedFileUrl;
-    },
-    [user.jwt],
-  );
-}
-
-/**
- * Just a basic local image handler that uses a file URL.
- */
-function useImageUploadHandlerLocal() {
-  return useCallback(async (file: File) => {
-    await delay(1000);
-    return URL.createObjectURL(file);
-  }, []);
-}
+export type ImageURL = string;
 
 type EditorMode = 'desktop' | 'mobile';
 
