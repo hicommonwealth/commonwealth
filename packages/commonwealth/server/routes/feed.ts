@@ -2,13 +2,11 @@ import { AppError } from '@hicommonwealth/core';
 import { Thread, ThreadAttributes, type DB } from '@hicommonwealth/model';
 import { slugify } from '@hicommonwealth/shared';
 import { Feed } from 'feed';
-import { GetBulkThreadsResult } from '../controllers/server_threads_methods/get_bulk_threads';
-import { ServerControllers } from '../routing/router';
+import { GetBulkThreads } from 'node_modules/@hicommonwealth/model/src/thread';
 import { TypedRequestQuery, TypedResponse } from '../types';
 import { formatErrorPretty } from '../util/errorFormat';
 import {
   ActiveThreadsRequestQuery,
-  BulkThreadsRequestQuery,
   GetThreadsRequestQuery,
   GetThreadsResponse,
   SearchThreadsRequestQuery,
@@ -36,14 +34,9 @@ function computeUpdated(bulkThreads: GetBulkThreadsResult): Date {
 }
 export const getFeedHandler = async (
   models: DB,
-  controllers: ServerControllers,
   req: TypedRequestQuery<
     GetThreadsRequestQuery &
-      (
-        | ActiveThreadsRequestQuery
-        | SearchThreadsRequestQuery
-        | BulkThreadsRequestQuery
-      )
+      (ActiveThreadsRequestQuery | SearchThreadsRequestQuery)
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
@@ -85,30 +78,18 @@ export const getFeedHandler = async (
       status,
     } = bulkQueryValidationResult.data;
 
-    const bulkThreads = await controllers.threads.getBulkThreads({
-      communityId: community_id,
-      // @ts-expect-error StrictNullChecks
-      stage,
-      // @ts-expect-error StrictNullChecks
-      topicId: topic_id,
-      // @ts-expect-error StrictNullChecks
-      includePinnedThreads,
-      // @ts-expect-error StrictNullChecks
-      page,
-      // @ts-expect-error StrictNullChecks
-      limit,
-      // @ts-expect-error StrictNullChecks
-      orderBy,
-      // @ts-expect-error StrictNullChecks
-      fromDate: from_date,
-      // @ts-expect-error StrictNullChecks
-      toDate: to_date,
-      // @ts-expect-error StrictNullChecks
-      archived: archived,
-      // @ts-expect-error StrictNullChecks
-      contestAddress,
-      // @ts-expect-error StrictNullChecks
-      status,
+    const bulkThreads = await GetBulkThreads().body({
+      actor: {
+        user: { email: '' },
+      },
+      payload: {
+        includePinnedThreads,
+        limit,
+        page,
+        archived,
+        orderBy,
+        offset: 0,
+      },
     });
 
     const community = await models.Community.findOne({

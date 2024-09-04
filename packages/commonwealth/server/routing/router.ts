@@ -424,7 +424,7 @@ function setupRouter(
     'get',
     '/feed',
     databaseValidationService.validateCommunity,
-    getFeedHandler.bind(this, models, serverControllers),
+    getFeedHandler.bind(this, models),
   );
 
   registerRoute(

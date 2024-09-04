@@ -73,7 +73,7 @@ export const BulkThread = z.object({
 
 export const GetBulkThreads = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z.string().optional(),
     fromDate: z.coerce.date().optional(),
     toDate: z.coerce.date().optional(),
     archived: z.coerce.boolean().default(false),
