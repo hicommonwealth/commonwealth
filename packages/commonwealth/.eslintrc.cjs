@@ -111,5 +111,6 @@ module.exports = {
     'plugin:@tanstack/eslint-plugin-query/recommended',
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
+    'plugin:storybook/recommended',
   ],
 };
