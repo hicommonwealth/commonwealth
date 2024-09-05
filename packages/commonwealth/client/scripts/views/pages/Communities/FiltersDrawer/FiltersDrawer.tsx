@@ -25,6 +25,36 @@ export const FiltersDrawer = ({
 }: FiltersDrawerProps) => {
   const { data: tags } = useFetchTagsQuery();
 
+  const onStakeFilterChange = () => {
+    onFiltersChange({
+      ...filters,
+      withStakeEnabled: !filters.withStakeEnabled,
+    });
+  };
+
+  const onTagOptionChange = (tagId: number) => {
+    onFiltersChange({
+      ...filters,
+      withTagsIds: (filters.withTagsIds || []).includes(tagId)
+        ? [...(filters.withTagsIds || [])].filter((id) => id !== tagId)
+        : [...(filters.withTagsIds || []), tagId],
+    });
+  };
+
+  const onChainBaseOptionChange = (base: ChainBase) => {
+    onFiltersChange({
+      ...filters,
+      withChainBase: filters.withChainBase === base ? undefined : base,
+    });
+  };
+
+  const onChainNetworkFilterChange = (network: ChainNetwork) => {
+    onFiltersChange({
+      ...filters,
+      withNetwork: filters.withNetwork === network ? undefined : network,
+    });
+  };
+
   return (
     <div className="FiltersDrawer">
       <CWDrawer
@@ -45,12 +75,7 @@ export const FiltersDrawer = ({
               <CWToggle
                 size="small"
                 checked={filters.withStakeEnabled}
-                onChange={() => {
-                  onFiltersChange({
-                    ...filters,
-                    withStakeEnabled: !filters.withStakeEnabled,
-                  });
-                }}
+                onChange={() => onStakeFilterChange()}
               />
             </div>
 
@@ -63,18 +88,7 @@ export const FiltersDrawer = ({
                       key={t.id}
                       label={t.name}
                       checked={(filters.withTagsIds || []).includes(t.id)}
-                      onChange={() => {
-                        onFiltersChange({
-                          ...filters,
-                          withTagsIds: (filters.withTagsIds || []).includes(
-                            t.id,
-                          )
-                            ? [...(filters.withTagsIds || [])].filter(
-                                (id) => id !== t.id,
-                              )
-                            : [...(filters.withTagsIds || []), t.id],
-                        });
-                      }}
+                      onChange={() => onTagOptionChange(t.id)}
                     />
                   ))}
                 </div>
@@ -89,13 +103,7 @@ export const FiltersDrawer = ({
                     <button
                       className="chainbase-filter-btn"
                       key={base}
-                      onClick={() => {
-                        onFiltersChange({
-                          ...filters,
-                          withChainBase:
-                            filters.withChainBase === base ? undefined : base,
-                        });
-                      }}
+                      onClick={() => onChainBaseOptionChange(base)}
                     >
                       <CWText
                         fontWeight={
@@ -119,15 +127,7 @@ export const FiltersDrawer = ({
                       key={network}
                       label={network}
                       checked={filters.withNetwork === network}
-                      onChange={() => {
-                        onFiltersChange({
-                          ...filters,
-                          withNetwork:
-                            filters.withNetwork === network
-                              ? undefined
-                              : network,
-                        });
-                      }}
+                      onChange={() => onChainNetworkFilterChange(network)}
                     />
                   ))}
                 </div>

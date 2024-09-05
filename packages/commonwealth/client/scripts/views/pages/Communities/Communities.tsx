@@ -104,6 +104,36 @@ const CommunitiesPage = () => {
     return twoCommunitiesPerEntry;
   }, [communities?.pages]);
 
+  const removeStakeFilter = () => {
+    setFilters({
+      ...filters,
+      withStakeEnabled: false,
+    });
+  };
+
+  const removeTagFilter = (tagId: number) => {
+    setFilters({
+      ...filters,
+      withTagsIds: [...(filters.withTagsIds || [])].filter(
+        (id) => tagId !== id,
+      ),
+    });
+  };
+
+  const removeChainBaseFilter = () => {
+    setFilters({
+      ...filters,
+      withChainBase: undefined,
+    });
+  };
+
+  const removeChainNetworkFilter = () => {
+    setFilters({
+      ...filters,
+      withNetwork: undefined,
+    });
+  };
+
   return (
     // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
@@ -132,36 +162,21 @@ const CommunitiesPage = () => {
               <CWTag
                 label={filters.withNetwork}
                 type="filter"
-                onClick={() =>
-                  setFilters({
-                    ...filters,
-                    withNetwork: undefined,
-                  })
-                }
+                onClick={() => removeChainNetworkFilter()}
               />
             )}
             {filters.withChainBase && (
               <CWTag
                 label={filters.withChainBase}
                 type="filter"
-                onClick={() =>
-                  setFilters({
-                    ...filters,
-                    withChainBase: undefined,
-                  })
-                }
+                onClick={() => removeChainBaseFilter()}
               />
             )}
             {filters.withStakeEnabled && (
               <CWTag
                 label="Stake"
                 type="filter"
-                onClick={() =>
-                  setFilters({
-                    ...filters,
-                    withStakeEnabled: !filters.withStakeEnabled,
-                  })
-                }
+                onClick={() => removeStakeFilter()}
               />
             )}
             {filters.withTagsIds &&
@@ -170,14 +185,7 @@ const CommunitiesPage = () => {
                   key={id}
                   type="filter"
                   label={(tags || []).find((t) => t.id === id)?.name || ''}
-                  onClick={() =>
-                    setFilters({
-                      ...filters,
-                      withTagsIds: [...(filters.withTagsIds || [])].filter(
-                        (tid) => id !== tid,
-                      ),
-                    })
-                  }
+                  onClick={() => removeTagFilter(id)}
                 />
               ))}
             <FiltersDrawer
