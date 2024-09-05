@@ -91,6 +91,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
   const imageUploadHandler = useCallback(
     async (file: File) => {
       try {
+        // TODO:
         setUploading(true);
         return await imageUploadHandlerDelegate(file);
       } finally {
