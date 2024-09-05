@@ -31,7 +31,11 @@ class CosmosGovernanceGovgen extends ProposalModule<
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
-  public init(ChainInfo: CosmosChain, Accounts: CosmosAccounts): void {
+  // @ts-expect-error  @typescript-eslint/require-await
+  public async init(
+    ChainInfo: CosmosChain,
+    Accounts: CosmosAccounts,
+  ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._initialized = true;

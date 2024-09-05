@@ -77,9 +77,11 @@ export abstract class ProposalModule<
     TODO: create a helper function that encapsulates this boilerplate
   */
   public abstract init(
+    // @ts-expect-error  @typescript-eslint/no-explicit-any
     ChainInfo: IChainModule<any, any>,
+    // @ts-expect-error  @typescript-eslint/no-explicit-any
     Accounts: IAccountsModule<any>,
-  ): void;
+  ): Promise<void>;
 
   public deinit() {
     this._initialized = false;
