@@ -58,6 +58,7 @@ export function CreateThreadReaction(): Command<
               address_id: address.id!,
               calculated_voting_weight,
             },
+            transaction,
           });
 
           address.last_active = new Date();
