@@ -26,7 +26,6 @@ import { notifyError } from 'controllers/app/notifications';
 import { DesktopEditorFooter } from './DesktopEditorFooter';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
-import supported from './markdown/supported.md?raw';
 import { ToolbarForDesktop } from './toolbars/ToolbarForDesktop';
 import { ToolbarForMobile } from './toolbars/ToolbarForMobile';
 import { useEditorErrorHandler } from './useEditorErrorHandler';
@@ -49,6 +48,7 @@ export type ImageHandler = 'S3' | 'local' | 'failure';
 export type MarkdownStr = string;
 
 type EditorProps = {
+  readonly markdown?: MarkdownStr;
   readonly mode?: EditorMode;
   readonly placeholder?: string;
   readonly imageHandler?: ImageHandler;
@@ -216,7 +216,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
       <MDXEditor
         onError={errorHandler}
         ref={mdxEditorRef}
-        markdown={supported}
+        markdown={props.markdown ?? ''}
         placeholder={placeholder}
         iconComponentFor={iconComponentFor}
         translation={editorTranslator}

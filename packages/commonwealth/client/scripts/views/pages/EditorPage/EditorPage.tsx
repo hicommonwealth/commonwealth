@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import Editor from 'views/components/Editor';
 import { EditorMode } from 'views/components/Editor/Editor';
 
+import supported from 'views/components/Editor/markdown/supported.md?raw';
+
 function useParams() {
   const [searchParams] = useSearchParams();
   const mode = searchParams.get('mode') ?? 'desktop';
@@ -19,6 +21,7 @@ export const EditorPage = () => {
 
   return (
     <Editor
+      markdown={supported}
       mode={mode}
       imageHandler="local"
       onSubmit={(markdown) => console.log('markdown: \n' + markdown)}
