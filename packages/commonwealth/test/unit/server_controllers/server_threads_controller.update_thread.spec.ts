@@ -102,7 +102,6 @@ describe('ServerThreadsController', () => {
           findOne: async () => ({
             Address: address,
             address_id: address.id,
-            version_history: ['{"body": ""}'],
             update: () => ({ id: 1, created_at: Date.now() }),
             toJSON: () => ({}),
           }),
@@ -110,6 +109,7 @@ describe('ServerThreadsController', () => {
         },
         ThreadVersionHistory: {
           create: () => null,
+          findOne: () => null,
         },
         Topic: {
           findOne: async () => ({
@@ -131,16 +131,12 @@ describe('ServerThreadsController', () => {
           query: () => new Promise((resolve) => resolve([])),
         },
       };
-      const banCache: any = {
-        checkBan: () => [true, null],
-      };
 
-      const serverThreadsController = new ServerThreadsController(db, banCache);
-      const [updatedThread, notificationOptions, analyticsOptions] =
+      const serverThreadsController = new ServerThreadsController(db);
+      const [updatedThread, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
 
       expect(updatedThread).to.be.ok;
-      expect(notificationOptions).to.have.length(1);
       expect(analyticsOptions).to.have.length(0);
     });
   });

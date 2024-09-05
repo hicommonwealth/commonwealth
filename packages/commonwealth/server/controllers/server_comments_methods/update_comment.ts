@@ -3,19 +3,14 @@ import {
   AddressInstance,
   CommentAttributes,
   UserInstance,
-} from '@hicommonwealth/model';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import { WhereOptions } from 'sequelize';
-import { validateOwner } from 'server/util/validateOwner';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import {
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-} from '../../util/parseUserMentions';
-import { addVersionHistory } from '../../util/versioning';
+} from '@hicommonwealth/model';
+import { renderQuillDeltaToText } from '@hicommonwealth/shared';
+import { WhereOptions } from 'sequelize';
+import { validateOwner } from 'server/util/validateOwner';
 import { ServerCommentsController } from '../server_comments_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -34,7 +29,7 @@ export type UpdateCommentOptions = {
   discordMeta?: any;
 };
 
-export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
+export type UpdateCommentResult = [CommentAttributes];
 
 export async function __updateComment(
   this: ServerCommentsController,
@@ -69,14 +64,7 @@ export async function __updateComment(
     throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: thread.community_id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   const isAuthor = await validateOwner({
     models: this.models,
@@ -89,13 +77,6 @@ export async function __updateComment(
     throw new AppError(Errors.NotAuthor);
   }
 
-  const { latestVersion, versionHistory } = addVersionHistory(
-    // @ts-expect-error StrictNullChecks
-    comment.version_history,
-    commentBody,
-    address,
-  );
-
   const text = commentBody;
   const plaintext = (() => {
     try {
@@ -107,19 +88,11 @@ export async function __updateComment(
     }
   })();
 
-  const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(
-    decodeURIComponent(commentBody),
-  );
-
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-
   await this.models.sequelize.transaction(async (transaction) => {
     await this.models.Comment.update(
       {
         text,
         plaintext,
-        version_history: versionHistory ?? undefined,
       },
       {
         where: { id: comment.id },
@@ -127,7 +100,16 @@ export async function __updateComment(
       },
     );
 
-    if (versionHistory) {
+    const latestVersionHistory =
+      await this.models.CommentVersionHistory.findOne({
+        where: {
+          comment_id: comment.id,
+        },
+        order: [['timestamp', 'DESC']],
+        transaction,
+      });
+
+    if (latestVersionHistory?.text !== text) {
       await this.models.CommentVersionHistory.create(
         {
           comment_id: comment.id!,
@@ -139,6 +121,16 @@ export async function __updateComment(
         },
       );
     }
+
+    const previousDraftMentions = parseUserMentions(latestVersionHistory?.text);
+    const currentDraftMentions = parseUserMentions(
+      decodeURIComponent(commentBody),
+    );
+
+    const mentions = findMentionDiff(
+      previousDraftMentions,
+      currentDraftMentions,
+    );
 
     await emitMentions(this.models, transaction, {
       authorAddressId: address.id!,
@@ -152,35 +144,7 @@ export async function __updateComment(
 
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
-    include: [this.models.Address],
-  });
-
-  const root_title = thread.title || '';
-
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.CommentEdit,
-      data: {
-        created_at: new Date(),
-        thread_id: comment.thread_id,
-        root_title,
-        root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
-        comment_id: +finalComment.id,
-        // @ts-expect-error StrictNullChecks
-        comment_text: finalComment.text,
-        // @ts-expect-error StrictNullChecks
-        community_id: finalComment.community_id,
-        // @ts-expect-error StrictNullChecks
-        author_address: finalComment.Address.address,
-        // @ts-expect-error StrictNullChecks
-        author_community_id: finalComment.Address.community_id,
-      },
-    },
-    // @ts-expect-error StrictNullChecks
-    excludeAddresses: [finalComment.Address.address],
+    include: [this.models.Address, this.models.CommentVersionHistory],
   });
 
   // update address last active
@@ -188,5 +152,5 @@ export async function __updateComment(
   address.save();
 
   // @ts-expect-error StrictNullChecks
-  return [finalComment.toJSON(), allNotificationOptions];
+  return [finalComment.toJSON()];
 }

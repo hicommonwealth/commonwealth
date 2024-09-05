@@ -1,76 +1,18 @@
 import {
-  AuthStrategies,
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   command as coreCommand,
   query as coreQuery,
   handleEvent,
-  type CommandInput,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
   type QueryMetadata,
-  type User,
 } from '@hicommonwealth/core';
-import { TRPCError, initTRPC } from '@trpc/server';
-import { Request } from 'express';
-import passport from 'passport';
-import { type OpenApiMeta } from 'trpc-swagger';
+import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { config } from '../config';
-
-export interface Context {
-  req: Request;
-}
-
-const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
-
-const isSecure = (md: { secure?: boolean; auth: unknown[] }) =>
-  md.secure !== false || md.auth.length > 0;
-
-const authenticate = async (
-  req: Request,
-  authStrategy: AuthStrategies = { name: 'jwt' },
-) => {
-  try {
-    if (authStrategy.name === 'authtoken') {
-      switch (req.headers['authorization']) {
-        case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
-          req.user = {
-            id: authStrategy.userId,
-            email: 'hello@knock.app',
-          };
-          break;
-        case config.LOAD_TESTING.AUTH_TOKEN:
-          req.user = {
-            id: authStrategy.userId,
-            email: 'info@grafana.com',
-          };
-          break;
-        default:
-          throw new Error('Not authenticated');
-      }
-    } else if (authStrategy.name === 'custom') {
-      authStrategy.customStrategyFn(req);
-      req.user = {
-        id: authStrategy.userId,
-      };
-    } else {
-      await passport.authenticate(authStrategy.name, { session: false });
-    }
-
-    if (!req.user) throw new Error('Not authenticated');
-    if (authStrategy.userId && (req.user as User).id !== authStrategy.userId) {
-      throw new Error('Not authenticated');
-    }
-  } catch (error) {
-    throw new TRPCError({
-      message: error instanceof Error ? error.message : (error as string),
-      code: 'UNAUTHORIZED',
-    });
-  }
-};
+import { Tag, Track, buildproc, procedure } from './middleware';
 
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
@@ -96,54 +38,26 @@ const trpcerror = (error: unknown): TRPCError => {
   });
 };
 
-export enum Tag {
-  User = 'User',
-  Community = 'Community',
-  Thread = 'Thread',
-  Comment = 'Comment',
-  Reaction = 'Reaction',
-  Integration = 'Integration',
-  Subscription = 'Subscription',
-  LoadTest = 'LoadTest',
-}
-
-export const command = <Input extends CommandInput, Output extends ZodSchema>(
+/**
+ * Builds tRPC command POST endpoint
+ * @param factory command factory
+ * @param tag command tag used for OpenAPI spec grouping
+ * @param track analytics tracking metadata as tuple of [event, output mapper]
+ * @returns tRPC mutation procedure
+ */
+export const command = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
+  track?: Track<Output>,
 ) => {
   const md = factory();
-  return trpc.procedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: `/${factory.name}/{id}`,
-        tags: [tag],
-        headers: [
-          {
-            in: 'header',
-            name: 'address_id',
-            required: true,
-            schema: { type: 'string' },
-          },
-        ],
-        protect: isSecure(md),
-      },
-    })
-    .input(md.input)
-    .output(md.output)
-    .mutation(async ({ ctx, input }) => {
-      // md.secure must explicitly be false if the route requires no authentication
-      // if we provide any authorization method we force authentication as well
-      if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
+  return buildproc('POST', factory.name, md, tag, track).mutation(
+    async ({ ctx, input }) => {
       try {
         return await coreCommand(
           md,
           {
-            actor: {
-              user: ctx.req.user as User,
-              // TODO: get from JWT?
-              address_id: ctx.req.headers['address_id'] as string,
-            },
+            actor: ctx.actor,
             payload: input!,
           },
           false,
@@ -151,7 +65,37 @@ export const command = <Input extends CommandInput, Output extends ZodSchema>(
       } catch (error) {
         throw trpcerror(error);
       }
-    });
+    },
+  );
+};
+
+/**
+ * Builds tRPC query GET endpoint
+ * @param factory query factory
+ * @param tag query tag used for OpenAPI spec grouping
+ * @returns tRPC query procedure
+ */
+export const query = <Input extends ZodSchema, Output extends ZodSchema>(
+  factory: () => QueryMetadata<Input, Output>,
+  tag: Tag,
+) => {
+  const md = factory();
+  return buildproc('GET', factory.name, md, tag).query(
+    async ({ ctx, input }) => {
+      try {
+        return await coreQuery(
+          md,
+          {
+            actor: ctx.actor,
+            payload: input!,
+          },
+          false,
+        );
+      } catch (error) {
+        throw trpcerror(error);
+      }
+    },
+  );
 };
 
 // TODO: add security options (API key, IP range, internal, etc)
@@ -163,7 +107,7 @@ export const event = <
   tag: Tag.Integration,
 ) => {
   const md = factory();
-  return trpc.procedure
+  return procedure
     .meta({
       openapi: {
         method: 'POST',
@@ -182,50 +126,3 @@ export const event = <
       }
     });
 };
-
-export const query = <Input extends ZodSchema, Output extends ZodSchema>(
-  factory: () => QueryMetadata<Input, Output>,
-  tag: Tag,
-) => {
-  const md = factory();
-  return trpc.procedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: `/${factory.name}`,
-        tags: [tag],
-        headers: [
-          {
-            in: 'header',
-            name: 'address_id',
-            required: false,
-            schema: { type: 'string' },
-          },
-        ],
-      },
-      protect: isSecure(md),
-    })
-    .input(md.input)
-    .output(md.output)
-    .query(async ({ ctx, input }) => {
-      // enable secure by default
-      if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
-      try {
-        return await coreQuery(
-          md,
-          {
-            actor: {
-              user: ctx.req.user as User,
-              address_id: ctx.req.headers['address_id'] as string,
-            },
-            payload: input!,
-          },
-          false,
-        );
-      } catch (error) {
-        throw trpcerror(error);
-      }
-    });
-};
-
-export const router = trpc.router;

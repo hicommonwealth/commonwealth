@@ -41,7 +41,7 @@ describe('New Content lifecycle', () => {
         email: user1!.email!,
         isAdmin: user1?.isAdmin || false,
       },
-      address_id: community!.Addresses!.at(0)!.address!,
+      address: community!.Addresses!.at(0)!.address!,
     };
     address1 = community!.Addresses!.at(0)!;
     actor2 = {
@@ -50,7 +50,7 @@ describe('New Content lifecycle', () => {
         email: user2!.email!,
         isAdmin: user2?.isAdmin || false,
       },
-      address_id: community!.Addresses!.at(1)!.address!,
+      address: community!.Addresses!.at(1)!.address!,
     };
   });
 
@@ -73,7 +73,6 @@ describe('New Content lifecycle', () => {
       community_id: address1.community_id,
       pinned: false,
       read_only: false,
-      version_history: [],
       body: 'Sample 1',
     });
     await seed('Thread', {
@@ -81,7 +80,6 @@ describe('New Content lifecycle', () => {
       community_id: address1.community_id,
       pinned: false,
       read_only: false,
-      version_history: [],
       body: 'Sample 2',
     });
 

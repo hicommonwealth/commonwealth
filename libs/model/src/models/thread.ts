@@ -8,15 +8,12 @@ import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
-import type { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
-  version_history_updated?: boolean;
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
-  topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
   reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
@@ -61,11 +58,6 @@ export default (
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
-      },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
-        allowNull: false,
       },
       links: { type: Sequelize.JSONB, allowNull: true },
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
@@ -114,12 +106,6 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
-      },
-
-      version_history_updated: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
       },
     },
     {

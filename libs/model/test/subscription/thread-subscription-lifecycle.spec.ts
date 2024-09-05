@@ -46,7 +46,6 @@ describe('Thread subscription lifecycle', () => {
       topic_id: community!.topics![0].id,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
     [threadTwo] = await seed('Thread', {
       address_id: community!.Addresses![0].id!,
@@ -54,11 +53,10 @@ describe('Thread subscription lifecycle', () => {
       topic_id: community!.topics![0].id,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: '0x',
+      address: '0x',
     };
   });
 

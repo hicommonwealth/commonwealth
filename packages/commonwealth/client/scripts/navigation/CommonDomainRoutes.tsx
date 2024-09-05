@@ -29,9 +29,6 @@ const FinishSocialLoginPage = lazy(
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 
-const NotificationSettingsOld = lazy(
-  () => import('views/pages/NotificationSettingsOld'),
-);
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
@@ -73,6 +70,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTopicsOld = lazy(
+  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -109,7 +109,7 @@ const CommunityNotFoundPage = lazy(
 
 const CommonDomainRoutes = ({
   contestEnabled,
-  knockInAppNotifications,
+  farcasterContestEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -213,10 +213,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(
-      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
-      { type: 'common' },
-    )}
+    element={withLayout(NotificationSettings, { type: 'common' })}
   />,
   <Route
     key="/:scope/notification-settings"
@@ -366,9 +363,12 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
-    element={withLayout(CommunityTopics, {
-      scoped: true,
-    })}
+    element={withLayout(
+      farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+      {
+        scoped: true,
+      },
+    )}
   />,
   <Route
     key="/:scope/manage/moderators"

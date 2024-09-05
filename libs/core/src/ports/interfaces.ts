@@ -13,6 +13,7 @@ import {
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
+  WebhookNotification,
 } from '../integration/notifications.schemas';
 import { ILogger } from '../logging/interfaces';
 
@@ -139,6 +140,7 @@ export interface Cache extends Disposable {
   ): Promise<boolean>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnalyticsOptions = Record<string, any>;
 
 /**
@@ -232,7 +234,9 @@ export interface Broker extends Disposable {
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
@@ -274,6 +278,7 @@ export enum WorkflowKeys {
   ChainProposals = 'chain-event-proposals',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
+  Webhooks = 'webhooks',
 }
 
 export enum KnockChannelIds {
@@ -290,33 +295,41 @@ export type NotificationsProviderRecipient =
     };
 
 type BaseNotifProviderOptions = {
-  users: { id: string; email?: string }[];
+  users: { id: string; email?: string; webhook_url?: string }[];
   actor?: { id: string; email?: string };
 };
 
-export type NotificationsProviderTriggerOptions = BaseNotifProviderOptions &
-  (
-    | {
-        data: z.infer<typeof CommentCreatedNotification>;
-        key: WorkflowKeys.CommentCreation;
-      }
-    | {
-        data: z.infer<typeof SnapshotProposalCreatedNotification>;
-        key: WorkflowKeys.SnapshotProposals;
-      }
-    | {
-        data: z.infer<typeof UserMentionedNotification>;
-        key: WorkflowKeys.UserMentioned;
-      }
-    | {
-        data: z.infer<typeof CommunityStakeNotification>;
-        key: WorkflowKeys.CommunityStake;
-      }
-    | {
-        data: z.infer<typeof ChainProposalsNotification>;
-        key: WorkflowKeys.ChainProposals;
-      }
-  );
+type WebhookProviderOptions = {
+  key: WorkflowKeys.Webhooks;
+  users: { id: string; webhook_url: string; destination: string }[];
+  data: z.infer<typeof WebhookNotification>;
+};
+
+export type NotificationsProviderTriggerOptions =
+  | (BaseNotifProviderOptions &
+      (
+        | {
+            data: z.infer<typeof CommentCreatedNotification>;
+            key: WorkflowKeys.CommentCreation;
+          }
+        | {
+            data: z.infer<typeof SnapshotProposalCreatedNotification>;
+            key: WorkflowKeys.SnapshotProposals;
+          }
+        | {
+            data: z.infer<typeof UserMentionedNotification>;
+            key: WorkflowKeys.UserMentioned;
+          }
+        | {
+            data: z.infer<typeof CommunityStakeNotification>;
+            key: WorkflowKeys.CommunityStake;
+          }
+        | {
+            data: z.infer<typeof ChainProposalsNotification>;
+            key: WorkflowKeys.ChainProposals;
+          }
+      ))
+  | WebhookProviderOptions;
 
 export type NotificationsProviderGetMessagesOptions = {
   user_id: string;
@@ -340,6 +353,7 @@ export type NotificationsProviderGetMessagesReturn = Array<{
     version_id: string;
     key: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   __cursor?: string;
 }>;

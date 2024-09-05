@@ -45,11 +45,14 @@ export function getDelta<T extends object>(
     if (typeof source_field !== 'undefined') {
       if (Array.isArray(source_field)) {
         JSON.stringify(target_field) !== JSON.stringify(source_field) &&
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (delta[key] = source_field as any);
       } else if (typeof source_field === 'object') {
         const key_delta = getDelta(target_field ?? {}, source_field as object);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.keys(key_delta).length && (delta[key] = key_delta as any);
       } else if (target_field !== source_field)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         delta[key] = source_field as any;
     }
 

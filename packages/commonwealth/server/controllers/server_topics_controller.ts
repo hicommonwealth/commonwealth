@@ -1,5 +1,4 @@
 import { DB } from '@hicommonwealth/model';
-import BanCache from '../util/banCheckCache';
 import {
   CreateTopicOptions,
   CreateTopicResult,
@@ -35,7 +34,7 @@ import {
  * Implements methods related to topics
  */
 export class ServerTopicsController {
-  constructor(public models: DB, public banCache: BanCache) {}
+  constructor(public models: DB) {}
 
   async getTopics(options: GetTopicsOptions): Promise<GetTopicsResult> {
     return __getTopics.call(this, options);

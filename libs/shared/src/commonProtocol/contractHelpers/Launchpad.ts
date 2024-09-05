@@ -1,6 +1,7 @@
 const lpHook = '';
 
 export const launchToken = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
   name: string,
   symbol: string,
@@ -26,6 +27,7 @@ export const launchToken = async (
 };
 
 export const buyToken = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
   tokenAddress: string,
   walletAddress: string,
@@ -39,6 +41,7 @@ export const buyToken = async (
 };
 
 export const sellToken = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
   tokenAddress: string,
   amount: number,
@@ -51,6 +54,7 @@ export const sellToken = async (
 };
 
 export const getPrice = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
   tokenAddress: string,
   amountIn: number,
@@ -61,6 +65,7 @@ export const getPrice = async (
 };
 
 export const getAmountIn = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
   tokenAddress: string,
   amountOut: number,
@@ -77,6 +82,7 @@ export const getAmountIn = async (
 };
 
 export const transferLiquidity = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
   tokenAddress: string,
   walletAddress: string,

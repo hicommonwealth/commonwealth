@@ -4,20 +4,6 @@ import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
-import { CommentAttributes } from '../models/index';
-
-const getLastEdited = (post: CommentAttributes) => {
-  let lastEdited;
-  if (post.version_history && post.version_history?.length > 1) {
-    try {
-      const latestVersion = JSON.parse(post.version_history[0]);
-      lastEdited = latestVersion ? latestVersion.timestamp : null;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  return lastEdited;
-};
 
 // TODO: improve type safety (avoid using any)
 export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
@@ -73,6 +59,7 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
       };
 
       // get response threads from query
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let responseThreads: any;
       try {
         responseThreads = await models.sequelize.query(
@@ -108,6 +95,7 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
           t.marked_as_spam_at,
           t.archived_at,
           t.updated_at AS thread_updated,
+          t.last_edited AS last_edited,
           t.locked_at AS thread_locked,
           t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
           reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
@@ -191,17 +179,16 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let threads = responseThreads.map((t: any) => {
         const collaborators = JSON.parse(t.collaborators[0]).address?.length
-          ? t.collaborators.map((c: any) => JSON.parse(c))
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            t.collaborators.map((c: any) => JSON.parse(c))
           : [];
-
-        const last_edited = getLastEdited(t);
 
         const data: z.infer<typeof schemas.BulkThread> = {
           id: t.thread_id,
           title: t.thread_title,
           url: t.url,
           body: t.body,
-          last_edited,
+          last_edited: t.last_edited,
           kind: t.kind,
           stage: t.stage,
           read_only: t.read_only,
@@ -227,7 +214,8 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
             ? t.reaction_timestamps.split(',')
             : [],
           reactionWeights: t.reaction_weights
-            ? t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
             : [],
           reaction_weights_sum: t.reaction_weights_sum,
           addressesReacted: t.addresses_reacted
