@@ -11,9 +11,11 @@ import {
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 
+import './ToolbarForDesktop.scss';
+
 export const ToolbarForDesktop = () => {
   return (
-    <>
+    <div className="ToolbarForDesktop">
       <div className="mdxeditor-block-type-select">
         <BlockTypeSelect />
       </div>
@@ -28,6 +30,6 @@ export const ToolbarForDesktop = () => {
       <InsertImage />
       <InsertCodeBlock />
       <InsertTable />
-    </>
+    </div>
   );
 };

@@ -6,4 +6,8 @@
     flex-grow: 1;
     display: flex;
   }
+
+  .mdxeditor-toolbar {
+    height: inherit !important;
+  }
 }
