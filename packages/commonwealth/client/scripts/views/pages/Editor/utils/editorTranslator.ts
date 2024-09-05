@@ -1,6 +1,8 @@
 export function editorTranslator(
   key: string,
   defaultValue: string,
+  // this 'any' type is taken from MDXEditor so we can't control it.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interpolations: Record<string, any> | undefined,
 ): string {
   switch (key) {
