@@ -22,6 +22,9 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
 
   const handleImportMarkdown = useCallback(() => {
     if (fileInputRef.current) {
+      // this is needed to clear the current file input ref or else you won't
+      // be able to import the same file multiple times.
+      fileInputRef.current.value = '';
       fileInputRef.current.click();
     }
   }, []);
