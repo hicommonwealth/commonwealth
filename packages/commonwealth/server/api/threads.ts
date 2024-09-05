@@ -7,5 +7,4 @@ export const trpcRouter = trpc.router({
     MixpanelCommunityInteractionEvent.CREATE_THREAD,
     ({ community_id }) => ({ community: community_id }),
   ]),
-  getBulkThreads: trpc.query(Thread.GetBulkThreads, trpc.Tag.Thread),
 });

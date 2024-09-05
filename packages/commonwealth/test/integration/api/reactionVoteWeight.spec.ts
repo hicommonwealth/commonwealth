@@ -52,7 +52,6 @@ describe('Reaction vote weight', () => {
         comment_count: 0,
         reaction_count: 0,
         reaction_weights_sum: 0,
-        max_notif_id: 0,
       });
 
     createComment = async (threadId: number) =>
