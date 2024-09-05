@@ -13,11 +13,11 @@ import { encodeMsgSubmitProposal, msgToIProposal } from './utils-v1beta1';
 
 /* CosmosGovernance v1beta1 */
 
-class CosmosGovernance extends ProposalModule<
+class CosmosGovernanceGovgen extends ProposalModule<
   CosmosApiType,
   ICosmosProposal,
   // @ts-expect-error StrictNullChecks
-  CosmosProposal
+  CosmosProposalGovgen
 > {
   private _minDeposit: CosmosToken;
   public get minDeposit() {
@@ -46,8 +46,10 @@ class CosmosGovernance extends ProposalModule<
     return this._initProposal(proposalId);
   }
 
-  // @ts-expect-error StrictNullChecks
-  private async _initProposal(proposalId: number): Promise<CosmosProposal> {
+  private async _initProposal(
+    proposalId: number,
+    // @ts-expect-error StrictNullChecks
+  ): Promise<CosmosProposalGovgen> {
     try {
       // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
@@ -105,4 +107,4 @@ class CosmosGovernance extends ProposalModule<
   }
 }
 
-export default CosmosGovernance;
+export default CosmosGovernanceGovgen;

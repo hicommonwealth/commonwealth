@@ -1,4 +1,3 @@
-import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import { ProposalType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import type {
@@ -13,6 +12,7 @@ import type {
   QueryVotesResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
+import { EncodeObject } from '@cosmjs/proto-signing';
 import moment from 'moment';
 import Proposal from '../../../../../models/Proposal';
 import { ITXModalData, IVote } from '../../../../../models/interfaces';
@@ -27,7 +27,7 @@ import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
 import type { CosmosApiType } from '../../chain';
-import type CosmosGovernance from './governance-v1beta1';
+import CosmosGovernanceGovgen from './governance-v1beta1';
 import { encodeMsgVote, marshalTally } from './utils-v1beta1';
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
@@ -130,12 +130,12 @@ export class CosmosProposalGovgen extends Proposal<
 
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
-  private _Governance: CosmosGovernance;
+  private _Governance: CosmosGovernanceGovgen;
 
   constructor(
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
-    Governance: CosmosGovernance,
+    Governance: CosmosGovernanceGovgen,
     data: ICosmosProposal,
   ) {
     super(ProposalType.CosmosProposal, data);
@@ -311,8 +311,8 @@ export class CosmosProposalGovgen extends Proposal<
       throw new Error('proposal not in deposit period');
     }
     const cosm = await import('@cosmjs/stargate/build/queryclient');
-    const msg: MsgDepositEncodeObject = {
-      typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
+    const msg: EncodeObject = {
+      typeUrl: '/govgen.gov.v1beta1.MsgDeposit',
       value: {
         proposalId: cosm.longify(this.data.identifier),
         depositor: depositor.address,

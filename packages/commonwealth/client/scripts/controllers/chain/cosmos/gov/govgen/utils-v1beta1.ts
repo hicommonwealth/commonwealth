@@ -24,7 +24,7 @@ import { CosmosToken } from 'controllers/chain/cosmos/types';
 import Long from 'long';
 import Cosmos from '../../adapter';
 import { CosmosApiType } from '../../chain';
-import CosmosGovernance from './governance-v1beta1';
+import CosmosGovernanceGovgen from './governance-v1beta1';
 
 /* -- v1beta1-specific methods: -- */
 
@@ -253,7 +253,7 @@ export const getDepositParams = async (
   cosmosChain: Cosmos,
   stakingDenom?: string,
 ): Promise<CosmosDepositParams> => {
-  const govController = cosmosChain.governance as CosmosGovernance;
+  const govController = cosmosChain.governance as CosmosGovernanceGovgen;
   let minDeposit;
   const { depositParams } = await cosmosChain.chain.api.gov.params('deposit');
 

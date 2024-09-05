@@ -15,6 +15,7 @@ import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
+import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
@@ -59,7 +60,8 @@ export const VotingActions = ({
 
   if (
     proposal instanceof CosmosProposal ||
-    proposal instanceof CosmosProposalV1
+    proposal instanceof CosmosProposalV1 ||
+    proposal instanceof CosmosProposalGovgen
   ) {
     user = userData.activeAccount as CosmosAccount;
   } else {
