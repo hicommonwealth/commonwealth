@@ -68,7 +68,6 @@ export const Editor = memo(function Editor(props: EditorProps) {
   const imageUploadHandler = useCallback(
     async (file: File) => {
       try {
-        // TODO:
         setUploading(true);
         return await imageUploadHandlerDelegate(file);
       } finally {
@@ -136,9 +135,6 @@ export const Editor = memo(function Editor(props: EditorProps) {
     [handleFiles],
   );
 
-  // TODO: handle html files but I'm not sure about the correct way to handle it
-  // because I have to convert to markdown.  This isn't really a typical use
-  // case though
   const handleDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
