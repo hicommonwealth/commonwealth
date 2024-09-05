@@ -22,7 +22,6 @@ const {
   MEMBERSHIP_REFRESH_TTL_SECONDS,
   DISCORD_CLIENT_ID,
   DISCORD_TOKEN,
-  REACTION_WEIGHT_OVERRIDE,
   CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
@@ -68,9 +67,6 @@ export const config = configure(
       MEMBERSHIP_REFRESH_TTL_SECONDS ?? DEFAULTS.MEMBERSHIP_REFRESH_TTL_SECONDS,
       10,
     ),
-    REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
-      ? parseInt(REACTION_WEIGHT_OVERRIDE, 10)
-      : null,
     CW_BOT_KEY,
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: parseInt(
       ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS ??
@@ -137,7 +133,6 @@ export const config = configure(
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
-    REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
     CW_BOT_KEY: z
       .string()
       .optional()

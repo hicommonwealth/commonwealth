@@ -3,13 +3,10 @@ import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
-  commonProtocol as commonProtocolService,
+  commonProtocol,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
-import { BigNumber } from 'ethers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
@@ -96,52 +93,6 @@ export async function __createCommentReaction(
     }
   }
 
-  let calculatedVotingWeight: number | null = null;
-  if (config.REACTION_WEIGHT_OVERRIDE) {
-    calculatedVotingWeight = config.REACTION_WEIGHT_OVERRIDE;
-  } else {
-    // calculate voting weight
-    const stake = await this.models.CommunityStake.findOne({
-      where: { community_id: thread.community_id },
-    });
-    if (stake) {
-      const voteWeight = stake.vote_weight;
-      const community = await this.models.Community.findByPk(
-        thread.community_id,
-      );
-      if (!community) {
-        throw new AppError(Errors.CommunityNotFound);
-      }
-
-      if (!community.chain_node_id) {
-        throw new ServerError(`Invalid chain node`);
-      }
-      const node = await this.models.ChainNode.findByPk(
-        community.chain_node_id!,
-      );
-
-      if (!node || !node.eth_chain_id) {
-        throw new ServerError(`Invalid chain node ${node ? node.id : ''}`);
-      }
-      const stakeBalances =
-        await commonProtocolService.contractHelpers.getNamespaceBalance(
-          community.namespace_address!,
-          stake.stake_id,
-          node.eth_chain_id,
-          [address.address],
-        );
-      const stakeBalance = stakeBalances[address.address];
-      if (BigNumber.from(stakeBalance).lte(0)) {
-        // stake is enabled but user has no stake
-        throw new AppError(Errors.MustHaveStake);
-      }
-      calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalance,
-        voteWeight,
-      );
-    }
-  }
-
   // create the reaction
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
@@ -150,7 +101,11 @@ export async function __createCommentReaction(
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    calculated_voting_weight: calculatedVotingWeight,
+    calculated_voting_weight:
+      await commonProtocol.contractHelpers.getVotingWeight(
+        thread.community_id,
+        address.address,
+      ),
     canvas_hash: canvasHash,
     canvas_signed_data: canvasSignedData,
   };
