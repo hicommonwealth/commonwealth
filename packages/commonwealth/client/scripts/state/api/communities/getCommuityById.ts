@@ -102,7 +102,7 @@ export const updateCommunityThreadCount = (
   });
 
   // invalidate all communities cache (as updating multiple filters cache would be messy)
-  trpcUtils.community.getCommunities.invalidate();
+  trpcUtils.community.getCommunities.invalidate().catch(console.error);
 };
 
 export const invalidateAllQueriesForCommunity = async (communityId: string) => {
