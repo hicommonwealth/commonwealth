@@ -14,7 +14,6 @@ const {
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
-  MAGIC_API_KEY,
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
   ADDRESS_TOKEN_EXPIRES_IN,
@@ -75,7 +74,6 @@ export const config = configure(
     ),
     AUTH: {
       SESSION_SECRET: SESSION_SECRET || DEFAULTS.SESSION_SECRET,
-      MAGIC_API_KEY,
       MAGIC_SUPPORTED_BASES:
         (MAGIC_SUPPORTED_BASES?.split(',') as ChainBase[]) ||
         DEFAULTS.MAGIC_SUPPORTED_BASES,
@@ -156,13 +154,6 @@ export const config = configure(
               data === DEFAULTS.SESSION_SECRET
             ),
           'SESSION_SECRET must be a non-default value in production',
-        ),
-      MAGIC_API_KEY: z
-        .string()
-        .optional()
-        .refine(
-          (data) => !(model_config.APP_ENV === 'production' && !data),
-          'MAGIC_API_KEY is required in production',
         ),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),

@@ -197,6 +197,13 @@ export const isCommunityAdmin: AuthHandler = async (ctx) => {
   await authorizeAddress(ctx, ['admin']);
 };
 
+export const isSuperAdmin: QueryHandler<ZodSchema, ZodSchema> &
+  CommandHandler<ZodSchema, ZodSchema> = async (ctx) => {
+  if (!ctx.actor.user.isAdmin) {
+    await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
+  }
+};
+
 export const isCommunityModerator: AuthHandler = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;

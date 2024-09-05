@@ -21,8 +21,8 @@ const AppEnvironments = [
   'discobot',
   'snapshot',
 ] as const;
-type Environment = typeof Environments[number];
-type AppEnvironment = typeof AppEnvironments[number];
+type Environment = (typeof Environments)[number];
+type AppEnvironment = (typeof AppEnvironments)[number];
 
 /**
  * Extends target config with payload after validating schema
@@ -42,6 +42,8 @@ export const configure = <T, E extends Record<string, unknown>>(
 const {
   APP_ENV,
   APP_ENV_PASSWORD,
+  MAGIC_API_KEY,
+  MAGIC_CLIENT_ID,
   NODE_ENV,
   IS_CI,
   SERVER_URL,
@@ -50,6 +52,8 @@ const {
   ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN,
   ROLLBAR_ENV: _ROLLBAR_ENV,
   TEST_WITHOUT_LOGS,
+  HEROKU_APP_NAME,
+  HEROKU_API_TOKEN,
 } = process.env;
 
 const DEFAULTS = {
@@ -67,10 +71,16 @@ export const config = configure(
   {
     APP_ENV: APP_ENV as AppEnvironment,
     APP_ENV_PASSWORD: APP_ENV_PASSWORD,
+    MAGIC_API_KEY,
+    MAGIC_CLIENT_ID,
     NODE_ENV: (NODE_ENV || DEFAULTS.NODE_ENV) as Environment,
     IS_CI: IS_CI === 'true',
     SERVER_URL: SERVER_URL ?? DEFAULTS.SERVER_URL,
     PORT: _PORT ? parseInt(_PORT, 10) : DEFAULTS.PORT,
+    HEROKU: {
+      HEROKU_APP_NAME,
+      HEROKU_API_TOKEN,
+    },
     LOGGING: {
       LOG_LEVEL:
         (LOG_LEVEL as LogLevel) ||
@@ -111,6 +121,24 @@ export const config = configure(
         'SERVER_URL cannot be set to a default value in non-local or CI environments (i.e. Heroku apps).',
       ),
     PORT: z.number().int().min(1000).max(65535),
+    MAGIC_API_KEY: z
+      .string()
+      .optional()
+      .refine(
+        (data) => !(APP_ENV === 'production' && !data),
+        'MAGIC_API_KEY is required in production',
+      ),
+    MAGIC_CLIENT_ID: z
+      .string()
+      .optional()
+      .refine(
+        (data) => !(APP_ENV === 'production' && !data),
+        'MAGIC_CLIENT_ID is required in production',
+      ),
+    HEROKU: z.object({
+      HEROKU_APP_NAME: z.string().optional(),
+      HEROKU_API_TOKEN: z.string().optional(),
+    }),
     LOGGING: z
       .object({
         LOG_LEVEL: z
