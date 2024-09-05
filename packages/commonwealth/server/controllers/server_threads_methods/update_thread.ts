@@ -23,7 +23,6 @@ import {
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validURL } from '../../../shared/utils';
 import { findAllRoles } from '../../util/roles';
-import { addVersionHistory } from '../../util/versioning';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -154,7 +153,7 @@ export async function __updateThread(
   const isAdmin = !!roles.find(
     (r) => r.community_id === thread.community_id && r.permission === 'admin',
   );
-  const isSuperAdmin = user.isAdmin;
+  const isSuperAdmin = user.isAdmin ?? false;
   if (
     !isThreadOwner &&
     !isMod &&
@@ -164,36 +163,25 @@ export async function __updateThread(
   ) {
     throw new AppError(Errors.Unauthorized);
   }
-  const permissions: UpdateThreadPermissions = {
-    isThreadOwner,
-    isMod,
-    isAdmin,
-    isSuperAdmin: isSuperAdmin!,
-    isCollaborator,
-  };
-
-  const { latestVersion, versionHistory } = addVersionHistory(
-    // @ts-expect-error StrictNullChecks
-    thread.version_history,
-    body,
-    address,
-  );
 
   // build analytics
   const allAnalyticsOptions: TrackOptions[] = [];
 
   const community = await this.models.Community.findByPk(thread.community_id);
 
-  const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
 
   try {
     const toUpdate: Partial<ThreadAttributes> = {};
+
+    const permissions = {
+      isThreadOwner,
+      isMod,
+      isAdmin,
+      isSuperAdmin,
+      isCollaborator,
+    };
 
     await setThreadAttributes(
       permissions,
@@ -242,18 +230,18 @@ export async function __updateThread(
       { transaction },
     );
 
-    if (versionHistory && body) {
-      // The update above doesn't work because it can't detect array changes so doesn't write it to db
-      await this.models.Thread.update(
-        {
-          version_history: versionHistory,
+    const latestVersionHistory = await this.models.ThreadVersionHistory.findOne(
+      {
+        where: {
+          thread_id: thread.id,
         },
-        {
-          where: { id: threadId },
-          transaction,
-        },
-      );
+        order: [['timestamp', 'DESC']],
+        transaction,
+      },
+    );
 
+    // if the modification was different from the original body, create a version history for it
+    if (body && latestVersionHistory?.body !== body) {
       await this.models.ThreadVersionHistory.create(
         {
           thread_id: threadId!,
@@ -276,11 +264,19 @@ export async function __updateThread(
       transaction,
     );
 
+    const previousDraftMentions = parseUserMentions(latestVersionHistory?.body);
+    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
+
+    const mentions = findMentionDiff(
+      previousDraftMentions,
+      currentDraftMentions,
+    );
+
     await emitMentions(this.models, transaction, {
       authorAddressId: address.id!,
       authorUserId: user.id!,
       authorAddress: address.address,
-      mentions: mentions,
+      mentions,
       thread,
       community_id: thread.community_id,
     });
@@ -377,6 +373,9 @@ export async function __updateThread(
             ],
           },
         ],
+      },
+      {
+        model: this.models.ThreadVersionHistory,
       },
     ],
   });

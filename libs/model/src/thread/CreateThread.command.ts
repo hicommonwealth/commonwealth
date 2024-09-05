@@ -10,7 +10,6 @@ import {
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
-import moment from 'moment';
 import { z } from 'zod';
 import { config } from '../config';
 import { GetActiveContestManagers } from '../contest';
@@ -103,8 +102,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       verifyThreadSignature,
     ],
     body: async ({ actor, payload }) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { id, community_id, topic_id, kind, url, ...rest } = payload;
+      const { community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
@@ -124,16 +122,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         await checkAddressBalance(activeContestManagers, actor.address!);
         checkContestLimits(activeContestManagers, actor.address!);
       }
-
-      // New threads get an empty version history initialized, which is passed
-      // the thread's first version, formatted on the frontend with timestamps
-      const version_history = [
-        JSON.stringify({
-          timestamp: moment(),
-          author: { id: actor.addressId, address: actor.address },
-          body,
-        }),
-      ];
 
       // Loading to update last_active
       const address = await models.Address.findOne({
@@ -159,7 +147,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               kind,
               body,
               plaintext,
-              version_history,
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,

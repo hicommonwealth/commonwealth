@@ -140,7 +140,7 @@ export const ManageTopicsSection = () => {
                     <CWIconButton
                       iconName="pencil"
                       buttonSize="sm"
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.stopPropagation();
                         setTopicSelectedToEdit(regTopic);
                       }}
@@ -169,7 +169,9 @@ export const ManageTopicsSection = () => {
           buttonType="primary"
           buttonHeight="med"
           buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
-          onClick={handleSave}
+          onClick={() => {
+            handleSave().catch(console.error);
+          }}
           label="Save Changes"
         />
       </div>

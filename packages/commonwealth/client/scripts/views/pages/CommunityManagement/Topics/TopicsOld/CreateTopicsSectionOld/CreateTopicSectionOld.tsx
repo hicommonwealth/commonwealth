@@ -16,18 +16,16 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
-import useAppStatus from '../../../../../hooks/useAppStatus';
-import './CreateTopicSection.scss';
+import useAppStatus from '../../../../../../hooks/useAppStatus';
+import './CreateTopicSectionOld.scss';
 import { FormSubmitValues } from './types';
 import { topicCreationValidationSchema } from './validation';
 
-export const CreateTopicSection = () => {
+export const CreateTopicSectionOld = () => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
-  const communityId = app.activeChainId() || '';
   const { data: topics } = useFetchTopicsQuery({
-    communityId,
-    apiEnabled: !!communityId,
+    communityId: app.activeChainId(),
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
@@ -102,11 +100,18 @@ export const CreateTopicSection = () => {
     }
   }, [descriptionDelta]);
 
+  const handleSubmit = async () => {
+    await handleCreateTopic({
+      topicName: name,
+      topicDescription: getTextFromDelta(descriptionDelta),
+    });
+  };
+
   return (
-    <div className="CreateTopicSection">
+    <div className="CreateTopicSectionOld">
       <CWForm
         validationSchema={topicCreationValidationSchema}
-        onSubmit={handleCreateTopic}
+        onSubmit={handleSubmit}
       >
         <div className="form-inputs">
           <CWTextInput
@@ -170,12 +175,9 @@ export const CreateTopicSection = () => {
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
             disabled={isSaving || !!nameErrorMsg || !!descErrorMsg}
             type="submit"
-            onClick={async () =>
-              await handleCreateTopic({
-                topicName: name,
-                topicDescription: getTextFromDelta(descriptionDelta),
-              })
-            }
+            onClick={() => {
+              handleSubmit().catch(console.log);
+            }}
           />
         </div>
       </CWForm>

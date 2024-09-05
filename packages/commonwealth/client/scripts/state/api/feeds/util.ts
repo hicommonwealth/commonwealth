@@ -66,7 +66,6 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         },
         topic: x?.thread?.topic,
         // filler values
-        // @ts-expect-error <StrictNullChecks/>
         version_history: null,
         last_commented_on: '',
         address_last_active: '',
