@@ -27,8 +27,7 @@ import { DragIndicator } from 'views/pages/Editor/DragIndicator';
 import { ToolbarForDesktop } from 'views/pages/Editor/toolbars/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/toolbars/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
-import { useImageUploadHandlerLocal } from 'views/pages/Editor/useImageUploadHandlerLocal';
-import { useImageUploadHandlerS3 } from 'views/pages/Editor/useImageUploadHandlerS3';
+import { useImageUploadHandler } from 'views/pages/Editor/useImageUploadHandler';
 import { codeBlockLanguages } from 'views/pages/Editor/utils/codeBlockLanguages';
 import { fileToText } from 'views/pages/Editor/utils/fileToText';
 import { iconComponentFor } from 'views/pages/Editor/utils/iconComponentFor';
@@ -46,32 +45,6 @@ type EditorProps = {
   readonly imageHandler?: ImageHandler;
 };
 
-/**
- * Handles supporting either of our image handlers.
- */
-function useImageHandler(imageHandler: ImageHandler) {
-  const imageUploadHandlerDelegateLocal = useImageUploadHandlerLocal();
-  const imageUploadHandlerDelegateS3 = useImageUploadHandlerS3();
-
-  return useCallback(
-    async (file: File): Promise<ImageURL> => {
-      switch (imageHandler) {
-        case 'S3':
-          return await imageUploadHandlerDelegateS3(file);
-        case 'local':
-          return await imageUploadHandlerDelegateLocal(file);
-      }
-
-      throw new Error('Unknown image handler: ' + imageHandler);
-    },
-    [
-      imageHandler,
-      imageUploadHandlerDelegateLocal,
-      imageUploadHandlerDelegateS3,
-    ],
-  );
-}
-
 export const Editor = memo(function Editor(props: EditorProps) {
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
@@ -86,7 +59,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
 
   const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
 
-  const imageUploadHandlerDelegate = useImageHandler(imageHandler);
+  const imageUploadHandlerDelegate = useImageUploadHandler(imageHandler);
 
   const imageUploadHandler = useCallback(
     async (file: File) => {
