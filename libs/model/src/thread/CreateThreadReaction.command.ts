@@ -4,7 +4,7 @@ import { models } from '../database';
 import { isCommunityAdminOrTopicMember } from '../middleware';
 import { verifyReactionSignature } from '../middleware/canvas';
 import { mustExist } from '../middleware/guards';
-import { getVotingWeight } from '../services/commonProtocol/contractHelpers';
+import { getVotingWeight } from '../utils/stakeHelper';
 
 export const CreateThreadReactionErrors = {
   ThreadArchived: 'Thread is archived',

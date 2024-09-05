@@ -52,7 +52,7 @@ const useCreateThreadReactionMutation = ({
   const user = useUserStore();
 
   return trpc.thread.createThreadReaction.useMutation({
-    onSuccess: async (newReaction) => {
+    onSuccess: (newReaction) => {
       const reaction: any = {
         id: newReaction.id,
         address: newReaction.Address!.address,
