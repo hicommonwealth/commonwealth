@@ -47,7 +47,6 @@ class ChainInfo {
   public directoryPageChainNodeId?: number;
   public namespace?: string;
   public redirect?: string;
-  public numTotalThreads?: number;
   public numVotingThreads?: number;
 
   public get node() {
@@ -282,7 +281,7 @@ class ChainInfo {
       snapshot_spaces: community.snapshot_spaces,
       stages_enabled: community.stages_enabled,
       terms: community.terms,
-      lifetime_thread_count: community.numTotalThreads,
+      lifetime_thread_count: community.lifetime_thread_count,
       social_links: community.social_links,
       ss58_prefix: community.ss58_prefix,
       type: community.type,
