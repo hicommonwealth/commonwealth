@@ -108,7 +108,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
             await handleFile(event.dataTransfer.files[0]);
           } else {
             // TODO: use a snackbar
-            console.log('File not markdown');
+            console.log('File not markdown. Has invalid type: ' + type);
           }
         }
 
