@@ -21,11 +21,11 @@ export const iconComponentFor = (name: IconKey) => {
     case 'subscript':
       return <CWIcon iconName="subscript" iconSize={DEFAULT_ICON_SIZE} />;
     case 'format_list_bulleted':
-      return <CWIcon iconName="list_dashes" iconSize={DEFAULT_ICON_SIZE} />;
+      return <CWIcon iconName="listDashes" iconSize={DEFAULT_ICON_SIZE} />;
     case 'format_list_numbered':
-      return <CWIcon iconName="list_numbers" iconSize={DEFAULT_ICON_SIZE} />;
+      return <CWIcon iconName="listNumbers" iconSize={DEFAULT_ICON_SIZE} />;
     case 'format_list_checked':
-      return <CWIcon iconName="list_checks" iconSize={DEFAULT_ICON_SIZE} />;
+      return <CWIcon iconName="listChecks" iconSize={DEFAULT_ICON_SIZE} />;
     case 'frame_source':
     case 'code':
       return <CWIcon iconName="code" iconSize={DEFAULT_ICON_SIZE} />;
