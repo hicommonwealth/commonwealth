@@ -53,7 +53,8 @@ export function CreateThreadReaction(): Command<
               reaction: payload.reaction,
             },
             defaults: {
-              ...payload,
+              thread_id: thread.id,
+              reaction: payload.reaction,
               address_id: address.id!,
               calculated_voting_weight,
             },
