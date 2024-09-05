@@ -1,10 +1,7 @@
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { getBrowserInfo } from 'helpers/browser';
-import {
-  GetThreadActionTooltipTextResponse,
-  filterLinks,
-} from 'helpers/threads';
+import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -20,7 +17,9 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
+import { useForumActionGated } from '../../../../hooks/useForumActionGated';
 import { ThreadStage } from '../../../../models/types';
+import app from '../../../../state/index';
 import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { isHot } from '../helpers';
@@ -36,10 +35,7 @@ type CardProps = AdminActionsProps & {
   onStageTagClick?: (stage: ThreadStage) => any;
   threadHref?: string;
   showSkeleton?: boolean;
-  canReact?: boolean;
-  canComment?: boolean;
   canUpdateThread?: boolean;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
   hideRecentComments?: boolean;
   hideReactionButton?: boolean;
@@ -67,10 +63,7 @@ export const ThreadCard = ({
   onStageTagClick,
   threadHref,
   showSkeleton,
-  canReact = true,
-  canComment = true,
   canUpdateThread = true,
-  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   hideRecentComments = false,
   hideReactionButton = false,
@@ -81,9 +74,23 @@ export const ThreadCard = ({
   editingDisabled,
 }: CardProps) => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
+
+  const user = useUserStore();
+  const { canCreateComment, canReactToThread } = useForumActionGated({
+    communityId: app.activeChainId(),
+    address: user.activeAccount?.address || '',
+    topicId: thread?.topic?.id,
+    isAdmin: Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(),
+  });
+
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!user.activeAccount,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: !canReactToThread || !canCreateComment,
+  });
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -144,7 +151,7 @@ export const ThreadCard = ({
           <ReactionButton
             thread={thread}
             size="big"
-            disabled={!canReact}
+            disabled={!canReactToThread}
             undoUpvoteDisabled={editingDisabled}
             tooltipText={
               typeof disabledActionsTooltipText === 'function'
@@ -269,8 +276,8 @@ export const ThreadCard = ({
                 user.isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }
-              canReact={canReact}
-              canComment={canComment}
+              canReact={canReactToThread}
+              canComment={canCreateComment}
               onDelete={onDelete}
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}

@@ -1,6 +1,6 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
 import { BannedActor, NonMember, RejectedMember } from 'model/src/middleware';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -47,11 +47,10 @@ describe('Thread lifecycle', () => {
         is_banned: role === 'banned',
       })),
       groups: [{ id: groupId }],
-      topics: [{ group_ids: [groupId] }],
     });
     await seed('GroupPermission', {
       group_id: groupId,
-      allowed_actions: [PermissionEnum.CREATE_THREAD],
+      allowed_actions: [ForumActionsEnum.CREATE_THREAD],
     });
 
     roles.forEach((role) => {

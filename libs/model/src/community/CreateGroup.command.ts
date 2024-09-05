@@ -1,10 +1,11 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
-import { models, sequelize } from '../database';
+import { models } from '../database';
 import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
-import { GroupAttributes } from '../models';
+import { GroupAttributes, GroupPermissionAttributes } from '../models';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
 export const Errors = {
@@ -55,21 +56,19 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
             { transaction },
           );
           if (topicsToAssociate.length > 0) {
-            // add group to all specified topics
-            await models.Topic.update(
+            const permissions = topicsToAssociate.map((topic) => ({
+              group_id: group.id,
+              topic_id: topic.id,
+              allowed_actions: models.sequelize.literal(
+                `ARRAY[${Object.values(ForumActionsEnum)
+                  .map((value) => `'${value}'`)
+                  .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
+              ),
+            }));
+
+            await models.GroupPermission.bulkCreate(
+              permissions as unknown as GroupPermissionAttributes[],
               {
-                group_ids: sequelize.fn(
-                  'array_append',
-                  sequelize.col('group_ids'),
-                  group.id,
-                ),
-              },
-              {
-                where: {
-                  id: {
-                    [Op.in]: topicsToAssociate.map(({ id }) => id!),
-                  },
-                },
                 transaction,
               },
             );

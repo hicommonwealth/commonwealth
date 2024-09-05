@@ -4,7 +4,7 @@ import {
   GroupInstance,
   MembershipRejectReason,
 } from '@hicommonwealth/model';
-import { GroupPermissionAction } from '@hicommonwealth/schemas';
+import { ForumActions } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
@@ -23,47 +23,34 @@ export async function validateTopicGroupsMembership(
   topicId: number,
   communityId: string,
   address: AddressAttributes,
-  action: GroupPermissionAction,
+  action: ForumActions,
 ): Promise<{ isValid: boolean; message?: string }> {
-  // check via new TBC with groups
-
-  // get all groups of topic
-  const topic = await models.Topic.findOne({
-    where: {
-      community_id: communityId,
-      id: topicId,
-    },
-  });
-  if (!topic) {
-    return { isValid: false, message: 'Topic not found' };
-  }
-
-  if (topic?.group_ids?.length === 0) {
-    return { isValid: true };
-  }
-
   const groups: (GroupInstance & {
-    allowed_actions?: GroupPermissionAction[];
+    allowed_actions?: ForumActions[];
   })[] = await models.sequelize.query(
     `
         SELECT g.*, gp.allowed_actions FROM "Groups" as g LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
-        WHERE g.community_id = :communityId AND g.id IN(:groupIds);
+        WHERE g.community_id = :communityId AND gp.topic_id = :topicId;
       `,
     {
       type: QueryTypes.SELECT,
       raw: true,
-      replacements: { communityId, groupIds: topic.group_ids },
+      replacements: { communityId, topicId: topicId },
     },
   );
 
-  // There are 2 cases here. We either have the old group permission system where the group doesn't have
-  // any allowed_actions, or we have the new fine-grained permission system where the action must be in
-  // the allowed_actions list.
-  const permissionedGroups = groups.filter(
+  // if there are no groups for this topic, then anyone can perform any action on it (default behaviour).
+  if (groups.length === 0) {
+    return { isValid: true };
+  }
+
+  const groupsMatchingAction = groups.filter(
     (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
 
-  if (permissionedGroups.length === 0) {
+  // if no group allows the specified action for the given topic, then reject because regardless of membership the user
+  // will not be allowed.
+  if (groupsMatchingAction.length === 0) {
     return {
       isValid: false,
       message: `User does not have permission to perform action ${action}`,
@@ -77,7 +64,7 @@ export async function validateTopicGroupsMembership(
   const memberships = await refreshMembershipsForAddress(
     models,
     address,
-    permissionedGroups,
+    groupsMatchingAction,
     false, // use cached balances
   );
 

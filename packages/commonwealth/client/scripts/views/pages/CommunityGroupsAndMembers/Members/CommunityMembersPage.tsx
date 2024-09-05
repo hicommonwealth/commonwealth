@@ -216,9 +216,12 @@ const CommunityMembersPage = () => {
     const clonedMembersPages = [...members.pages];
 
     const results = clonedMembersPages
-      .reduce((acc, page) => {
-        return [...acc, ...page.results];
-      }, [] as SearchProfilesResponse['results'])
+      .reduce(
+        (acc, page) => {
+          return [...acc, ...page.results];
+        },
+        [] as SearchProfilesResponse['results'],
+      )
       .map((p) => ({
         userId: p.user_id,
         avatarUrl: p.avatar_url,
@@ -243,9 +246,9 @@ const CommunityMembersPage = () => {
     const modifiedGroupsArr = (groups || []).map((group) => ({
       ...group,
       // add is group joined flag based on membership
-      isJoined: (memberships || []).find(
+      isJoined: !!(memberships || []).find(
         (membership) => membership.groupId === group.id,
-      )?.isAllowed,
+      )?.groupId,
     }));
 
     const filteredGroupsArr = (modifiedGroupsArr || [])

@@ -16,10 +16,7 @@ import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
@@ -35,6 +32,7 @@ import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
+import { useForumActionGated } from '../../../hooks/useForumActionGated';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
@@ -141,10 +139,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { canCreateComment, canReactToComment } = useForumActionGated({
     communityId: app.activeChainId(),
-    address: user?.activeAccount?.address || '',
-    apiEnabled: !!user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    topicId: thread?.topic?.id,
+    isAdmin,
   });
 
   const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
@@ -152,20 +151,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     objectId: thread?.id || '',
     apiCallEnabled: !!thread?.id,
   });
-
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -287,7 +272,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!user.activeAccount && !isRestrictedMembership;
+  const isRestrictedMembership = !canCreateComment || !canReactToComment;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -556,6 +541,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           }}
           hasPendingEdits={!!editsToSave}
           setThreadBody={setThreadBody}
+          topicId={thread?.topic?.id}
           body={(threadOptionsComp) => (
             <div className="thread-content">
               {isEditingBody ? (
@@ -621,7 +607,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <CreateComment
                         // @ts-expect-error <StrictNullChecks/>
                         rootThread={thread}
-                        canComment={canComment}
+                        canComment={canCreateComment}
                         tooltipText={
                           typeof disabledActionsTooltipText === 'function'
                             ? disabledActionsTooltipText?.('comment')
@@ -630,7 +616,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       />
                       {foundGatedTopic &&
                         !hideGatingBanner &&
-                        isRestrictedMembership && (
+                        (!canCreateComment || !canReactToComment) && (
                           <CWGatedTopicBanner
                             groupNames={gatedGroupsMatchingTopic.map(
                               (g) => g.name,
@@ -694,9 +680,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 setIsReplying={setIsReplying}
                 parentCommentId={parentCommentId}
                 setParentCommentId={setParentCommentId}
-                canComment={canComment}
-                canReact={!isRestrictedMembership}
-                canReply={!isRestrictedMembership}
+                canComment={canCreateComment}
+                canReact={canReactToComment}
+                canReply={canCreateComment}
                 fromDiscordBot={fromDiscordBot}
                 commentSortType={commentSortType}
                 disabledActionsTooltipText={disabledActionsTooltipText}

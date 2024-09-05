@@ -4,6 +4,7 @@ import {
   TopicAttributes,
 } from '@hicommonwealth/model';
 import { Op, WhereOptions } from 'sequelize';
+import { Includeable } from 'sequelize/types/model';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
@@ -22,10 +23,20 @@ export async function __getGroups(
   this: ServerGroupsController,
   { communityId, includeMembers, includeTopics }: GetGroupsOptions,
 ): Promise<GetGroupsResult> {
+  const include = includeTopics
+    ? {
+        model: this.models.GroupPermission,
+        include: {
+          model: this.models.Topic,
+        },
+      }
+    : undefined;
+
   const groups = await this.models.Group.findAll({
     where: {
       community_id: communityId,
     },
+    include: include as unknown as Includeable,
   });
 
   let groupsResult = groups.map((group) => group.toJSON() as GroupWithExtras);
@@ -56,23 +67,6 @@ export async function __getGroups(
     groupsResult = groupsResult.map((group) => ({
       ...group,
       memberships: groupIdMembersMap[group.id!] || [],
-    }));
-  }
-
-  if (includeTopics) {
-    const topics = await this.models.Topic.findAll({
-      where: {
-        community_id: communityId,
-        group_ids: {
-          [Op.overlap]: groupsResult.map(({ id }) => id!),
-        },
-      },
-    });
-    groupsResult = groupsResult.map((group) => ({
-      ...group,
-      topics: topics
-        .map((t) => t.toJSON())
-        .filter((t) => t.group_ids!.includes(group.id!)),
     }));
   }
 

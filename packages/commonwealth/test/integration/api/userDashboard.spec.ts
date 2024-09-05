@@ -44,7 +44,6 @@ describe('User Dashboard API', () => {
     const topic = await server.models.Topic.findOne({
       where: {
         community_id: chain,
-        group_ids: [],
       },
     });
     // @ts-expect-error StrictNullChecks

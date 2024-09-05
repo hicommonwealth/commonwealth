@@ -1,10 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
+  GroupAttributes,
   MembershipRejectReason,
-  UserInstance,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { ForumActions, ForumActionsEnum } from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -13,13 +14,12 @@ const Errors = {
 };
 
 export type RefreshMembershipOptions = {
-  user: UserInstance;
   address: AddressInstance;
   topicId: number;
 };
 export type RefreshMembershipResult = {
   topicId?: number;
-  allowed: boolean;
+  allowed: ForumActions[];
   rejectReason?: MembershipRejectReason;
 }[];
 
@@ -27,48 +27,52 @@ export async function __refreshMembership(
   this: ServerGroupsController,
   { address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  // get all groups in the community
-  let groups = await this.models.Group.findAll({
-    where: {
-      community_id: address.community_id,
-    },
-  });
+  type QueryResult = GroupAttributes & {
+    allowed_actions: ForumActions[];
+    topic_id: number;
+  };
 
-  // optionally filter to only groups associated with topic
-  if (topicId) {
-    const topic = await this.models.Topic.findByPk(topicId);
-    if (!topic) {
-      throw new AppError(Errors.TopicNotFound);
-    }
-    // @ts-expect-error StrictNullChecks
-    groups = groups.filter((g) => topic.group_ids.includes(g.id));
+  const groups = await this.models.sequelize.query<QueryResult>(
+    `
+    SELECT G.*, GP.allowed_actions, GP.topic_id FROM "Groups" G
+    LEFT JOIN "GroupPermissions" GP ON G.id = GP.group_id 
+    WHERE community_id = :communityId AND (:topicId IS NULL OR GP.topic_id = :topicId)
+    `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: {
+        communityId: address.community_id,
+        topicId: topicId ?? null,
+      },
+    },
+  );
+
+  if (groups.length === 0 && topicId) {
+    throw new AppError(Errors.TopicNotFound);
   }
 
   const memberships = await refreshMembershipsForAddress(
     this.models,
     address,
-    groups,
+    groups as GroupAttributes[],
     true, // use fresh balances
   );
 
-  const topics = await this.models.Topic.findAll({
-    where: {
-      group_ids: {
-        [Op.overlap]: groups.map((g) => g.id!),
-      },
-    },
-    attributes: ['id', 'group_ids'],
-  });
-
   // transform memberships to result shape
-  const results = memberships.map((membership) => ({
-    groupId: membership.group_id,
-    topicIds: topics
-      .filter((t) => t.group_ids!.includes(membership.group_id))
-      .map((t) => t.id),
-    allowed: !membership.reject_reason,
-    rejectReason: membership.reject_reason,
-  }));
+  const results = memberships.map((membership) => {
+    const specifiedGroup = groups.find((g) => g.id === membership.group_id);
+
+    return {
+      groupId: membership.group_id,
+      topicIds: groups
+        .filter((g) => g.id === membership.group_id)
+        .map((g) => g.topic_id),
+      allowed:
+        specifiedGroup?.allowed_actions ?? Object.values(ForumActionsEnum),
+      rejectReason: membership.reject_reason,
+    };
+  });
 
   return results;
 }

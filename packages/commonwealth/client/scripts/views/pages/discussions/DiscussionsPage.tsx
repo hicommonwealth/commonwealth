@@ -1,11 +1,15 @@
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
+import 'pages/discussions/index.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -18,18 +22,11 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { useRefreshMembershipQuery } from 'state/api/groups';
-import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
-import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -67,17 +64,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useBrowserWindow({});
 
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-
-  const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
-
-  const user = useUserStore();
-
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: communityId,
-    address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
-  });
+  const topicId: number | undefined = (topics || []).find(
+    ({ name }) => name === topicName,
+  )?.id;
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -177,26 +166,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
-          );
-
-          const isActionAllowedInGatedTopic = !!(memberships || []).find(
-            (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
-              membership.isAllowed,
-          );
-
-          const isRestrictedMembership =
-            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
-          const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: !!user.activeAccount,
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isRestrictedMembership,
-          });
-
           const isThreadTopicInContest = checkIsTopicInContest(
             contestsData,
             thread?.topic?.id,
@@ -206,8 +175,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -222,7 +189,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onCommentBtnClick={() =>
                 navigate(`${discussionLink}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
               hideRecentComments
               editingDisabled={isThreadTopicInContest}
             />

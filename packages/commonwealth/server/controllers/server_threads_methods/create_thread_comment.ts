@@ -10,7 +10,7 @@ import {
   sanitizeQuillText,
   uniqueMentions,
 } from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { ForumActionsEnum } from '@hicommonwealth/schemas';
 import { renderQuillDeltaToText } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -124,7 +124,7 @@ export async function __createThreadComment(
       thread.topic_id,
       thread.community_id,
       address,
-      PermissionEnum.CREATE_COMMENT,
+      ForumActionsEnum.CREATE_COMMENT,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateComment}: ${message}`);

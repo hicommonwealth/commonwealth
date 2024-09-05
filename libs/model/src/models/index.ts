@@ -60,6 +60,7 @@ export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';
 export * from './group';
+export * from './groupPermission';
 export * from './lastProcessedEvmBlock';
 export * from './membership';
 export * from './notification';

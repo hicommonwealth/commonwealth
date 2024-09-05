@@ -1,13 +1,8 @@
 import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
-import app from 'state';
-import { useRefreshMembershipQuery } from 'state/api/groups';
-import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -28,17 +23,8 @@ export const TopicSummaryRow = ({
   isLoading,
 }: TopicSummaryRowProps) => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
-
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
-    address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
-  });
 
   if (isLoading) return <TopicSummaryRowSkeleton />;
-
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topSortedThreads = monthlyThreads
     .sort((a, b) => {
@@ -88,34 +74,10 @@ export const TopicSummaryRow = ({
             true,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
-          );
-
-          const isActionAllowedInGatedTopic = !!(memberships || []).find(
-            (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
-              membership.isAllowed,
-          );
-
-          const isRestrictedMembership =
-            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
-          const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: Permissions.isCommunityMember(
-              thread.communityId,
-            ),
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isRestrictedMembership,
-          });
-
           return (
             <ThreadCard
               key={thread.id}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
               canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -124,7 +86,6 @@ export const TopicSummaryRow = ({
               onCommentBtnClick={() =>
                 navigate(`${discussionLinkWithoutChain}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
               hideReactionButton
               hideUpvotesDrawer
             />

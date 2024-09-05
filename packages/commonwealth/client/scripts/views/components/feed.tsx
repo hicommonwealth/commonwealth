@@ -7,7 +7,6 @@ import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -17,9 +16,6 @@ import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
 } from 'state/api/feeds';
-import { useRefreshMembershipQuery } from 'state/api/groups';
-import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { DashboardViews } from 'views/pages/user_dashboard';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
@@ -34,7 +30,6 @@ const DEFAULT_COUNT = 10;
 
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -50,39 +45,6 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     enabled: !!thread.communityId,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community);
-
-  const account = user.addresses?.find(
-    (a) => a?.community?.id === thread?.communityId,
-  );
-
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: thread.communityId,
-    // @ts-expect-error <StrictNullChecks/>
-    address: account?.address,
-    apiEnabled: !!account?.address,
-  });
-
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
@@ -93,8 +55,6 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   return (
     <ThreadCard
       thread={thread}
-      canReact={!disabledActionsTooltipText}
-      canComment={!disabledActionsTooltipText}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
@@ -105,7 +65,6 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={disabledActionsTooltipText}
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
