@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
 
 import TopicDetails from './TopicDetails';
 import WVConsent from './WVConsent';
@@ -33,6 +34,13 @@ export const Topics = () => {
         return <WVMethodSelection onStepChange={setCreateCommunityStep} />;
       case CreateTopicStep.WVERC20Details:
         return <WVERC20Details onStepChange={setCreateCommunityStep} />;
+      case CreateTopicStep.WVStake:
+        return (
+          <StakeIntegration
+            isTopicFlow
+            onTopicFlowStepChange={setCreateCommunityStep}
+          />
+        );
     }
   };
 

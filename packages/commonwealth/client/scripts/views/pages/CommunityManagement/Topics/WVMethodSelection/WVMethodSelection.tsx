@@ -31,8 +31,7 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
       return;
     }
 
-    // TODO go to stake enablement
-    // onStepChange(CreateTopicStep.WVERC20Details);
+    onStepChange(CreateTopicStep.WVStake);
   };
 
   return (
