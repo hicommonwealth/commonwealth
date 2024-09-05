@@ -43,13 +43,20 @@ export type EditorMode = 'desktop' | 'mobile';
 
 export type ImageHandler = 'S3' | 'local' | 'failure';
 
+/**
+ * A string that contains markdown.
+ */
+export type MarkdownStr = string;
+
 type EditorProps = {
   readonly mode?: EditorMode;
   readonly placeholder?: string;
   readonly imageHandler?: ImageHandler;
+  readonly onSubmit?: (markdown: MarkdownStr) => void;
 };
 
 export const Editor = memo(function Editor(props: EditorProps) {
+  const { onSubmit } = props;
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -187,6 +194,13 @@ export const Editor = memo(function Editor(props: EditorProps) {
     [handleFiles],
   );
 
+  const handleSubmit = useCallback(() => {
+    if (mdxEditorRef.current) {
+      const markdown = mdxEditorRef.current.getMarkdown();
+      onSubmit?.(markdown);
+    }
+  }, [onSubmit]);
+
   return (
     <div
       className={clsx(
@@ -210,7 +224,11 @@ export const Editor = memo(function Editor(props: EditorProps) {
           toolbarPlugin({
             location: mode === 'mobile' ? 'bottom' : 'top',
             toolbarContents: () =>
-              mode === 'mobile' ? <ToolbarForMobile /> : <ToolbarForDesktop />,
+              mode === 'mobile' ? (
+                <ToolbarForMobile onSubmit={handleSubmit} />
+              ) : (
+                <ToolbarForDesktop />
+              ),
           }),
           listsPlugin(),
           quotePlugin(),
@@ -231,7 +249,10 @@ export const Editor = memo(function Editor(props: EditorProps) {
       />
 
       {mode === 'desktop' && (
-        <DesktopEditorFooter onImportMarkdown={handleImportMarkdown} />
+        <DesktopEditorFooter
+          onImportMarkdown={handleImportMarkdown}
+          onSubmit={handleSubmit}
+        />
       )}
 
       {dragging && <DragIndicator />}

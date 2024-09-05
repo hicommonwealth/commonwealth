@@ -10,7 +10,11 @@ import React from 'react';
 
 import './ToolbarForMobile.scss';
 
-export const ToolbarForMobile = () => {
+type ToolbarForMobileProps = Readonly<{
+  onSubmit?: () => void;
+}>;
+
+export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
   return (
     <div className="ToolbarForMobile">
       <div className="mdxeditor-block-type-select">
@@ -23,7 +27,7 @@ export const ToolbarForMobile = () => {
       <Separator />
       <InsertImage />
       <div className="end">
-        <button>➤</button>
+        <button onClick={() => props.onSubmit?.()}>➤</button>
       </div>
     </div>
   );
