@@ -12,8 +12,8 @@ import './ToolbarForMobile.scss';
 
 export const ToolbarForMobile = () => {
   return (
-    <>
-      <div className="mdxeditor-block-type-select ToolbarForMobile">
+    <div className="ToolbarForMobile">
+      <div className="mdxeditor-block-type-select">
         <BlockTypeSelect />
       </div>
       {/*<UndoRedo />*/}
@@ -25,6 +25,6 @@ export const ToolbarForMobile = () => {
       <div className="end">
         <button>➤</button>
       </div>
-    </>
+    </div>
   );
 };
