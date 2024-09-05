@@ -426,8 +426,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${thread_id}/comments`)
+      .post(`/api/v1/CreateComment`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         author_chain: chain,
         chain,

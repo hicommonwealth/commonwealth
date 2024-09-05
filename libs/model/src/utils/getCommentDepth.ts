@@ -1,10 +1,10 @@
-import { CommentInstance, DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { models } from '../database';
+import { CommentInstance } from '../models/comment';
 
 // getCommentDepth recursively calculates the depth of a comment,
 // then returns if the depth exceeds max, and the depth level
 export const getCommentDepth = async (
-  models: DB,
   comment: CommentInstance,
   maxIterations: number,
 ): Promise<[exceeded: boolean, depth: number]> => {

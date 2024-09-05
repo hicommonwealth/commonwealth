@@ -184,7 +184,6 @@ describe('DatabaseCleaner Tests', async () => {
         stage: 'discussion',
         view_count: 0,
         comment_count: 0,
-        max_notif_id: 0,
       });
 
       const comment = await models.Comment.create({
