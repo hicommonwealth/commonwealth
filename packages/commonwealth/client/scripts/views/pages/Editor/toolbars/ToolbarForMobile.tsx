@@ -8,10 +8,12 @@ import {
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 
+import './ToolbarForMobile.scss';
+
 export const ToolbarForMobile = () => {
   return (
     <>
-      <div className="mdxeditor-block-type-select">
+      <div className="mdxeditor-block-type-select ToolbarForMobile">
         <BlockTypeSelect />
       </div>
       {/*<UndoRedo />*/}
@@ -20,13 +22,7 @@ export const ToolbarForMobile = () => {
       <ListsToggle />
       <Separator />
       <InsertImage />
-      <div
-        style={{
-          justifyContent: 'flex-end',
-          flexGrow: 1,
-          display: 'flex',
-        }}
-      >
+      <div className="end">
         <button>➤</button>
       </div>
     </>
