@@ -34,7 +34,6 @@ type StatusResp = {
     knockJwtToken: string;
     addresses: AddressInstance[];
     selectedCommunity: CommunityInstance;
-    k;
     isAdmin: boolean;
     disableRichText: boolean;
     communities: StarredCommunityResponse[];

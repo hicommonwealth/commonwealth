@@ -26,7 +26,6 @@ export async function handleThreadMessages(
     case 'thread-create':
       await axios.post(`${bot_path}/threads`, {
         ...sharedReqData,
-        id: 0, // TODO: to be removed
         community_id: topic.community_id,
         topic_id: topic.id,
         // topic_name: topic.name,
