@@ -1,5 +1,7 @@
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import Cosmos from '../adapter';
+import CosmosGovernanceGovgen from './govgen/governance-v1beta1';
+import { CosmosProposalGovgen } from './govgen/proposal-v1beta1';
 import {
   getActiveProposalsV1Beta1 as getActiveProposalsGovgen,
   getCompletedProposalsV1Beta1 as getCompletedProposalsGovgen,
@@ -37,7 +39,12 @@ export const getCompletedProposals = async (
     // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Beta1Proposals.map(
       (p) =>
-        new CosmosProposal(chain, accounts, governance as CosmosGovernance, p),
+        new CosmosProposalGovgen(
+          chain,
+          accounts,
+          governance as CosmosGovernanceGovgen,
+          p,
+        ),
     );
   } else if (!isGovgen && (isV1 || betaAttemptFailed)) {
     const v1Proposals = await getCompletedProposalsV1(chain.lcd);
