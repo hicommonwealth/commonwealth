@@ -1,6 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { FindAndCountOptions } from 'sequelize';
+import z from 'zod';
 import { models } from '../database';
 import { TopicAttributes } from '../models/index';
 import { removeUndefined } from '../utils';
@@ -33,8 +34,7 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
         topics,
         count as number,
         payload,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ) as any;
+      ) as unknown as z.infer<typeof schemas.GetTopics.output>;
     },
   };
 }
