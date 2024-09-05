@@ -12,7 +12,6 @@ const VALID_DIGEST_INTERVALS = [
 
 export const Errors = {
   InvalidUser: 'Invalid user',
-  NoKeyValue: 'Must provide key and value',
   InvalidSetting: 'Invalid setting',
 };
 
@@ -22,38 +21,39 @@ const writeUserSetting = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { key, value } = req.body;
+  const {
+    disable_rich_text,
+    promotional_emails_enabled,
+    email_notification_interval,
+  } = req.body;
 
   if (!req.user) {
     return next(new AppError(Errors.InvalidUser));
   }
-  if (!key || !value) {
-    return next(new AppError(Errors.NoKeyValue));
-  }
 
-  if (key === 'disableRichText' && value === 'true') {
-    req.user.disableRichText = true;
-    await req.user.save();
-  } else if (key === 'disableRichText' && value === 'false') {
-    req.user.disableRichText = false;
-    await req.user.save();
-  } else if (
-    key === 'updateEmailInterval' &&
-    VALID_DIGEST_INTERVALS.indexOf(value) !== -1
+  if (
+    !(
+      typeof disable_rich_text !== 'boolean' ||
+      typeof promotional_emails_enabled !== 'boolean' ||
+      email_notification_interval
+    )
   ) {
-    req.user.emailNotificationInterval = value;
-    await req.user.save();
-  } else if (
-    key === 'promotional_emails_enabled' &&
-    ['true', 'false'].includes(value)
-  ) {
-    req.user.promotional_emails_enabled = value === 'true' ? true : false;
-    await req.user.save();
-  } else {
     return next(new AppError(Errors.InvalidSetting));
   }
 
-  return res.json({ status: 'Success', result: { key, value } });
+  if (typeof disable_rich_text === 'boolean') {
+    req.user.disableRichText = disable_rich_text;
+  }
+  if (typeof promotional_emails_enabled === 'boolean') {
+    req.user.promotional_emails_enabled = promotional_emails_enabled;
+  }
+  if (VALID_DIGEST_INTERVALS.includes(email_notification_interval)) {
+    req.user.emailNotificationInterval = email_notification_interval;
+  }
+
+  await req.user.save();
+
+  return res.json({ status: 'Success', result: { user: req.user } });
 };
 
 export default writeUserSetting;
