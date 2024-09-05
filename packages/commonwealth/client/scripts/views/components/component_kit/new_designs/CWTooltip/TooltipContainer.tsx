@@ -1,5 +1,6 @@
 import { Placement } from '@popperjs/core/lib';
 import React, { FC } from 'react';
+// eslint-disable-next-line import/no-cycle
 import useSidebarStore from 'state/ui/sidebar';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { ComponentType } from 'views/components/component_kit/types';

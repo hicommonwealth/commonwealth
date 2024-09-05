@@ -1,4 +1,5 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+// eslint-disable-next-line import/no-cycle
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
 import z from 'zod';
 

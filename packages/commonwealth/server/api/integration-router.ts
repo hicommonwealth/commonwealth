@@ -4,6 +4,7 @@ import { RequestHandler, Router, raw } from 'express';
 
 // TODO: remove as we migrate to tRPC commands
 import DatabaseValidationService from 'server/middleware/databaseValidationService';
+// eslint-disable-next-line import/no-cycle
 import { deleteBotCommentHandler } from 'server/routes/comments/delete_comment_bot_handler';
 import { updateCommentHandler } from 'server/routes/comments/update_comment_handler';
 import { createThreadCommentHandler } from 'server/routes/threads/create_thread_comment_handler';

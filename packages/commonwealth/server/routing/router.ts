@@ -2,6 +2,7 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+// eslint-disable-next-line import/no-cycle
 import * as api from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
@@ -115,6 +116,7 @@ import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+// eslint-disable-next-line import/no-cycle
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';

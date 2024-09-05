@@ -1,4 +1,5 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { models } from '@hicommonwealth/model';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';

@@ -12,6 +12,7 @@ import {
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
 import { config } from '../config';
+// eslint-disable-next-line import/no-cycle
 import { GetActiveContestManagers } from '../contest';
 import { models } from '../database';
 import { isCommunityAdminOrTopicMember } from '../middleware';

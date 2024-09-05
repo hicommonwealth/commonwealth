@@ -2,6 +2,7 @@ import { EventNames, events } from '@hicommonwealth/core';
 import { Comment, Thread } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { DB } from '../models';
 import { emitEvent } from './utils';
 

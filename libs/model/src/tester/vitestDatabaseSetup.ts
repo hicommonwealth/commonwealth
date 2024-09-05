@@ -13,6 +13,7 @@ export async function setup(): Promise<void> {
   }
 
   const { Sequelize } = await import('sequelize');
+  // eslint-disable-next-line import/no-cycle
   const { buildDb, syncDb } = await import('../models');
   const { verify_db } = await import('./bootstrap');
 

@@ -6,6 +6,7 @@ import {
   verifyThread,
 } from '@hicommonwealth/shared';
 import { config } from '../config';
+// eslint-disable-next-line import/no-cycle
 import { ThreadAuth } from './authorization';
 
 export const verifyThreadSignature: ThreadAuth = async ({ actor, payload }) => {

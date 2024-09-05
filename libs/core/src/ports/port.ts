@@ -1,5 +1,6 @@
 import { delay } from '@hicommonwealth/shared';
 import { config } from '../config';
+// eslint-disable-next-line import/no-cycle
 import { logger, rollbar } from '../logging';
 import { ExitCode } from './enums';
 import { inMemoryBlobStorage } from './in-memory-blob-storage';

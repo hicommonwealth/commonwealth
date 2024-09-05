@@ -8,6 +8,7 @@ import type {
   ModelInstance,
   ThreadInstance,
 } from '.';
+// eslint-disable-next-line import/no-cycle
 import { emitEvent, getThreadContestManagers } from '../utils';
 
 export type ReactionAttributes = z.infer<typeof Reaction> & {

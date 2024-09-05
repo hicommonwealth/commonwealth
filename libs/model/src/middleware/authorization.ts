@@ -12,6 +12,7 @@ import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodObject, ZodSchema, ZodString, z } from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { models } from '..';
 
 export type CommunityAuth = CommandHandler<ZodSchema, ZodSchema>;

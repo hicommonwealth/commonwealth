@@ -1,5 +1,6 @@
 import app from 'state';
 import { useGetContestsQuery } from 'state/api/contests';
+// eslint-disable-next-line import/no-cycle
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import { useFlag } from '../../../../hooks/useFlag';

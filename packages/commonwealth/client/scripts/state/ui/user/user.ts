@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import ChainInfo from 'models/ChainInfo';

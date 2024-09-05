@@ -1,6 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { FindAndCountOptions } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { CommentAttributes } from '../models/index';
 import { removeUndefined } from '../utils/index';

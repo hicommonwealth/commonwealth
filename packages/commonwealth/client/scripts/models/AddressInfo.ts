@@ -1,5 +1,6 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import moment from 'moment';
+// eslint-disable-next-line import/no-cycle
 import Account, { AccountCommunity } from './Account';
 
 class AddressInfo extends Account {

@@ -4,6 +4,7 @@ import React from 'react';
 import 'components/sidebar/sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
+// eslint-disable-next-line import/no-cycle
 import useSidebarStore from 'state/ui/sidebar';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
@@ -49,6 +50,7 @@ const SubSection = (props: SubSectionAttrs) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SubSectionGroup = (props: SectionGroupAttrs) => {
   const {
     containsChildren,
@@ -153,6 +155,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
   const {
     displayData,

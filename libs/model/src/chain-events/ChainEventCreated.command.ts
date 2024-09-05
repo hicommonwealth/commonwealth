@@ -4,6 +4,7 @@ import {
   parseEvmEvent,
   type Command,
 } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import {
   config,
   emitEvent,

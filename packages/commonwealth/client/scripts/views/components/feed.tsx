@@ -20,6 +20,7 @@ import {
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+// eslint-disable-next-line import/no-cycle
 import { DashboardViews } from 'views/pages/user_dashboard';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 

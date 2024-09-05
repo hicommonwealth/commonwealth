@@ -1,6 +1,7 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
 import { sequelize } from '../database';
 
 export function GetNewContent(): Query<typeof schemas.GetNewContent> {

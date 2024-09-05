@@ -8,6 +8,7 @@ import {
 import { ContestScore } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';

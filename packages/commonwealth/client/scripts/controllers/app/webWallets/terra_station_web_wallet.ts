@@ -3,6 +3,7 @@ import type IWebWallet from '../../../models/IWebWallet';
 
 import { toBase64 } from '@cosmjs/encoding';
 import { CosmosSignerCW } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 

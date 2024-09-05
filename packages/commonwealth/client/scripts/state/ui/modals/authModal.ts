@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { SessionKeyError } from 'controllers/server/sessions';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { AuthModalType } from 'views/modals/AuthModal/types';

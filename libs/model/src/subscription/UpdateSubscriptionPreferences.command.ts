@@ -1,4 +1,5 @@
 import { EventNames, type Command } from '@hicommonwealth/core';
+// eslint-disable-next-line import/no-cycle
 import { emitEvent } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { SubscriptionPreference } from '@hicommonwealth/schemas';

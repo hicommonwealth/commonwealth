@@ -9,6 +9,7 @@ import {
   CosmosSignerCW,
   WalletId,
 } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 import IWebWallet from '../../../models/IWebWallet';

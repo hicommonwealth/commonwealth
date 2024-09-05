@@ -1,6 +1,7 @@
 import { ThreadVersionHistory } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+// eslint-disable-next-line import/no-cycle
 import { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 

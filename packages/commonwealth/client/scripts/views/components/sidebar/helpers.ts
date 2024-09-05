@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import app from 'state';
+// eslint-disable-next-line import/no-cycle
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import type { ToggleTree } from './types';

@@ -199,6 +199,7 @@ const createAddress = async (
       user_id = existingAddressWithHex.user_id;
     }
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     const newObj = await models.sequelize.transaction(async (transaction) => {
       return models.Address.create(
         {

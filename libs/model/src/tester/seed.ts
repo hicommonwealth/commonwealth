@@ -97,7 +97,8 @@ async function _seed(
   records: State[],
   level: number,
 ) {
-  const schema = schemas[model.name as schemas.Entities];
+  const schema =
+    schemas[model.name as schemas.Entities]; // eslint-disable-next-line import/no-cycle
   if (schema && options.mock && schema instanceof ZodObject) {
     const mocked = generateMock(schema, {});
     // force undefined associations

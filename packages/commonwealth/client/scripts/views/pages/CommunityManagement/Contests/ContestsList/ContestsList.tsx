@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 import { Skeleton } from 'views/components/Skeleton';
 
+// eslint-disable-next-line import/no-cycle
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
 import ContestCard from './ContestCard';

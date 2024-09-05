@@ -1,4 +1,5 @@
 import { CosmosSignerCW, WalletId } from '@hicommonwealth/shared';
+// eslint-disable-next-line import/no-cycle
 import app from 'state';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 

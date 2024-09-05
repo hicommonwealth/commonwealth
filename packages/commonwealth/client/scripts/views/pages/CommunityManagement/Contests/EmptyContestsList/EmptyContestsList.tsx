@@ -4,6 +4,7 @@ import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape2Url from 'assets/img/shapes/shape2.svg';
 import { useCommonNavigate } from 'navigation/helpers';
 
+// eslint-disable-next-line import/no-cycle
 import EmptyCard from './EmptyCard';
 
 import { useFlag } from 'hooks/useFlag';

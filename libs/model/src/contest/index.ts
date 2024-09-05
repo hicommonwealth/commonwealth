@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 export * from './CancelContestManagerMetadata.command';
 export * from './Contests.projection';
 export * from './CreateContestManagerMetadata.command';

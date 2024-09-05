@@ -4,7 +4,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
-  plugins: ['@typescript-eslint', 'n'],
+  plugins: ['@typescript-eslint', 'n', 'import'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     suppressDeprecatedPropertyWarnings: true,
@@ -33,5 +33,16 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'n/no-process-exit': 'error',
+
+    // **** cycle rules are disabled here and enabled in diff mode.
+
+    'import/no-cycle': 0,
+    'import/named': 0,
+    'import/export': 0,
+    'import/namespace': 0,
+    'import/default': 0,
+    'import/no-duplicates': 0,
+    'import/no-named-as-default': 0,
+    'import/no-named-as-default-member': 0,
   },
 };

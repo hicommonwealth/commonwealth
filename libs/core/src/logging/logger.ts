@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'url';
 import { config } from '../config';
 import { GetLogger, ILogger, LoggerIds } from './interfaces';
+// eslint-disable-next-line import/no-cycle
 import { getPinoLogger } from './pinoLogger';
 import { testLogger } from './testLogger';
 

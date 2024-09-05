@@ -8,6 +8,7 @@ import {
   chainBaseToCanvasChainId,
 } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
+// eslint-disable-next-line import/no-cycle
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 

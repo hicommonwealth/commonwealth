@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { NotificationsProvider } from '@hicommonwealth/core';
 import sinon from 'sinon';
 

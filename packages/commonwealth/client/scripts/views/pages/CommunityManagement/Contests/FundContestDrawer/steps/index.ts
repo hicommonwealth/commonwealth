@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import FundContestFailure from './FundContestFailure';
 import FundContestForm from './FundContestForm';
 import FundContestLoading from './FundContestLoading';
