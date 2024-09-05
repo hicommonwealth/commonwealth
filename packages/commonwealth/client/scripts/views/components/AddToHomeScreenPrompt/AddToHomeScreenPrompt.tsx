@@ -10,7 +10,7 @@ interface AddToHomeScreenPromptProps {
 }
 
 function isDev() {
-  return document.location.host === 'localhost:8080';
+  return ['localhost:8080', '127.0.0.1:8080'].includes(document.location.host);
 }
 
 export const AddToHomeScreenPrompt = ({
