@@ -22,6 +22,7 @@ import './Editor.scss';
 
 import clsx from 'clsx';
 import 'commonwealth-mdxeditor/style.css';
+import { notifyError } from 'controllers/app/notifications';
 import { DesktopEditorFooter } from 'views/pages/Editor/DesktopEditorFooter';
 import { DragIndicator } from 'views/pages/Editor/DragIndicator';
 import { ToolbarForDesktop } from 'views/pages/Editor/toolbars/ToolbarForDesktop';
@@ -76,8 +77,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.name.endsWith('.md')) {
-      // TODO: migrate to snackbar.
-      console.warn('Not a markdown file.');
+      notifyError('Not a markdown file.');
       return;
     }
 
@@ -107,20 +107,17 @@ export const Editor = memo(function Editor(props: EditorProps) {
           if (['text/markdown', 'text/plain'].includes(type)) {
             await handleFile(event.dataTransfer.files[0]);
           } else {
-            // TODO: use a snackbar
-            console.log('File not markdown. Has invalid type: ' + type);
+            notifyError('File not markdown. Has invalid type: ' + type);
           }
         }
 
         if (nrFiles <= 0) {
-          // TODO: use a snackbar
-          console.log('No files given');
+          notifyError('No files given');
           return;
         }
 
         if (nrFiles > 1) {
-          // TODO: use a snackbar
-          console.log('Too many files given');
+          notifyError('Too many files given');
           return;
         }
       } finally {
