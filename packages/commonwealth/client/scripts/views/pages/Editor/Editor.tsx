@@ -129,6 +129,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
         await handleFiles(files);
       } finally {
         setDragging(false);
+        dragCounterRef.current = 0;
       }
     },
     [handleFiles],
