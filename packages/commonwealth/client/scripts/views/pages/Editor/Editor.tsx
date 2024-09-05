@@ -30,6 +30,7 @@ import { ToolbarForMobile } from 'views/pages/Editor/toolbars/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
 import { useImageUploadHandler } from 'views/pages/Editor/useImageUploadHandler';
 import { codeBlockLanguages } from 'views/pages/Editor/utils/codeBlockLanguages';
+import { editorTranslator } from 'views/pages/Editor/utils/editorTranslator';
 import { fileToText } from 'views/pages/Editor/utils/fileToText';
 import { iconComponentFor } from 'views/pages/Editor/utils/iconComponentFor';
 import supported from './markdown/supported.md?raw';
@@ -179,24 +180,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
         markdown={supported}
         placeholder={placeholder}
         iconComponentFor={iconComponentFor}
-        translation={(key, defaultValue, interpolations) => {
-          switch (key) {
-            case 'toolbar.blockTypeSelect.placeholder':
-              // show the default placeholder that's active here.
-              return 'H1';
-            case 'toolbar.blockTypes.heading':
-              if (interpolations?.level) {
-                return `H${interpolations.level}`;
-              }
-              return 'H1';
-            case 'toolbar.blockTypes.quote':
-              return 'Q';
-            case 'toolbar.blockTypes.paragraph':
-              return 'P';
-            default:
-              return defaultValue;
-          }
-        }}
+        translation={editorTranslator}
         plugins={[
           toolbarPlugin({
             location: mode === 'mobile' ? 'bottom' : 'top',
