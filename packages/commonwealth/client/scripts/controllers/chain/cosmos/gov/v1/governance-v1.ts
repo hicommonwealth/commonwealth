@@ -39,10 +39,7 @@ class CosmosGovernanceV1 extends ProposalModule<
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
-  public async init(
-    ChainInfo: CosmosChain,
-    Accounts: CosmosAccounts,
-  ): Promise<void> {
+  public init(ChainInfo: CosmosChain, Accounts: CosmosAccounts): void {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._initialized = true;
