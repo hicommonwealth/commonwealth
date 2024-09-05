@@ -11,13 +11,13 @@ import TokenBanner from 'views/components/TokenBanner';
 
 import { CreateTopicStep } from '../utils';
 
-import './WVDetails.scss';
+import './WVERC20Details.scss';
 
 interface WVConsentProps {
   onStepChange: (step: CreateTopicStep) => void;
 }
 
-const WVDetails = ({ onStepChange }: WVConsentProps) => {
+const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
   const navigate = useCommonNavigate();
   const [multiplier, setMultiplier] = useState(1);
   const [token, setToken] = useState('');
@@ -34,7 +34,7 @@ const WVDetails = ({ onStepChange }: WVConsentProps) => {
   };
 
   return (
-    <div className="WVDetails">
+    <div className="WVERC20Details">
       <CWText type="h2">Weighted voting</CWText>
       <CWText type="b1" className="description">
         Activate weighted voting to allow members to cast votes proportional to
@@ -133,4 +133,4 @@ const WVDetails = ({ onStepChange }: WVConsentProps) => {
     </div>
   );
 };
-export default WVDetails;
+export default WVERC20Details;

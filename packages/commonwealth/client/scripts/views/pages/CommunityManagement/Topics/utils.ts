@@ -4,7 +4,7 @@ export enum CreateTopicStep {
   TopicDetails = 'TopicDetails',
   WVMethodSelection = 'WVMethodSelection',
   WVConsent = 'WVConsent',
-  WVDetails = 'WVDetails',
+  WVERC20Details = 'WVERC20Details',
 }
 
 export const getCreateTopicSteps = (
@@ -23,7 +23,7 @@ export const getCreateTopicSteps = (
       state:
         createTopicStep === CreateTopicStep.WVConsent ||
         createTopicStep === CreateTopicStep.WVMethodSelection ||
-        createTopicStep === CreateTopicStep.WVDetails
+        createTopicStep === CreateTopicStep.WVERC20Details
           ? 'active'
           : 'inactive',
     },

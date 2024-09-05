@@ -25,6 +25,16 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
     null,
   );
 
+  const handleContinue = () => {
+    if (selectedWVMethod === WVMethod.ERC20) {
+      onStepChange(CreateTopicStep.WVERC20Details);
+      return;
+    }
+
+    // TODO go to stake enablement
+    // onStepChange(CreateTopicStep.WVERC20Details);
+  };
+
   return (
     <div className="WVMethodSelection">
       <section className="header">
@@ -68,10 +78,11 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
             onClick={() => onStepChange(CreateTopicStep.WVConsent)}
           />
           <CWButton
+            disabled={!selectedWVMethod}
             type="button"
             buttonWidth="wide"
             label="Continue"
-            onClick={() => onStepChange(CreateTopicStep.WVDetails)}
+            onClick={handleContinue}
           />
         </section>
       </section>
