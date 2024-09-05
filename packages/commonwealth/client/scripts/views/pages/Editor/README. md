@@ -5,3 +5,14 @@ This is just temporary as I plan on merging this into the main MDXEditor when
 we are done.
 
 Then we can switch over to the real one.
+
+# Testing
+
+
+
+- success: copy a .md file to the clipboard, try to paste it into the editor. It
+  should replace the editor contents.
+
+- failure: copy multiple .md files ot the clipboard, try to paste into the editor.
+  It should fail because we can't handle multiple .md files
+- success: drag a
