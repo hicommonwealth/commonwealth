@@ -1,9 +1,9 @@
 import { notifyError } from 'controllers/app/notifications';
 import { useCallback } from 'react';
-import { ImageHandler, ImageURL } from 'views/pages/Editor/Editor';
-import { useImageUploadHandlerLocal } from 'views/pages/Editor/useImageUploadHandlerLocal';
-import { useImageUploadHandlerS3 } from 'views/pages/Editor/useImageUploadHandlerS3';
-import { useImageUploadHandlerWithFailure } from 'views/pages/Editor/useImageUploadHandlerWithFailure';
+import { ImageHandler, ImageURL } from './Editor';
+import { useImageUploadHandlerLocal } from './useImageUploadHandlerLocal';
+import { useImageUploadHandlerS3 } from './useImageUploadHandlerS3';
+import { useImageUploadHandlerWithFailure } from './useImageUploadHandlerWithFailure';
 
 /**
  * Handles supporting either of our image handlers.
