@@ -97,35 +97,40 @@ export const Editor = memo(function Editor(props: EditorProps) {
     [handleFile],
   );
 
+  const handleFiles = useCallback(async (files: FileList) => {
+    if (files.length === 1) {
+      const type = files[0].type;
+
+      if (['text/markdown', 'text/plain'].includes(type)) {
+        await handleFile(files[0]);
+      } else {
+        notifyError('File not markdown. Has invalid type: ' + type);
+      }
+    }
+
+    if (files.length > 1) {
+      notifyError('Too many files given');
+      return;
+    }
+  }, []);
+
   const handleDropAsync = useCallback(
     async (event: React.DragEvent) => {
-      const nrFiles = event.dataTransfer.files.length;
-
       try {
-        if (nrFiles === 1) {
-          const type = event.dataTransfer.files[0].type;
+        const files = event.dataTransfer.files;
 
-          if (['text/markdown', 'text/plain'].includes(type)) {
-            await handleFile(event.dataTransfer.files[0]);
-          } else {
-            notifyError('File not markdown. Has invalid type: ' + type);
-          }
-        }
-
-        if (nrFiles <= 0) {
+        if (files.length <= 0) {
+          // for drag and drop... no files is an error.
           notifyError('No files given');
           return;
         }
 
-        if (nrFiles > 1) {
-          notifyError('Too many files given');
-          return;
-        }
+        await handleFiles(files);
       } finally {
         setDragging(false);
       }
     },
-    [handleFile],
+    [handleFiles],
   );
 
   // TODO: handle html files but I'm not sure about the correct way to handle it
@@ -163,6 +168,23 @@ export const Editor = memo(function Editor(props: EditorProps) {
     }
   }, []);
 
+  const handlePaste = useCallback(
+    (event: React.ClipboardEvent<HTMLDivElement>) => {
+      const files = event.clipboardData.files;
+
+      if (files.length === 0) {
+        // now files here is acceptable because this could be a paste of other
+        // data like text/markdown, and we're relying on the MDXEditor paste
+        // handler to work
+        return;
+      }
+
+      event.preventDefault();
+      handleFiles(files).catch(console.error);
+    },
+    [handleFiles],
+  );
+
   return (
     <div
       className={clsx(
@@ -173,6 +195,7 @@ export const Editor = memo(function Editor(props: EditorProps) {
       onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
+      onPaste={(event) => handlePaste(event)}
     >
       <MDXEditor
         onError={errorHandler}
