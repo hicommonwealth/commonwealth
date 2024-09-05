@@ -6,7 +6,6 @@ import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -43,7 +42,6 @@ type DiscussionsPageProps = {
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
-  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
@@ -108,7 +106,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       toDate: dateCursor.toDate,
       // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
-      isOnArchivePage: isOnArchivePage,
+      includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
       // @ts-expect-error <StrictNullChecks/>
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
@@ -259,7 +257,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                      ? totalThreadsInCommunity
+                      ? app?.chain?.meta?.lifetimeThreadCount
                       : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}

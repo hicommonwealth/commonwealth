@@ -261,6 +261,36 @@ jobs:
       - name: Run linter
         run: pnpm lint-branch
 
+
+#  detect-broken-ts-expect-error:
+#    name: Detect Broken TS expect errors
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 10
+#    strategy:
+#      matrix:
+#        node: [ 20 ]
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#      - uses: ./.github/actions/setup
+#        with:
+#          node-version: ${{ matrix.node }}
+#
+#      - name: Assert pnpm-lock.yaml is correct
+#        run: |
+#          if ! git diff --quiet; then
+#            echo 'You need to update the pnpm-lock.yaml file (potentially after installing node-gyp)'
+#            exit 1
+#          fi
+#
+#      - name: build
+#        run: pnpm -r build
+#
+#      - name: run detect-broken-ts-expect-error.sh
+#        run: cd packages/commonwealth && ./scripts/detect-broken-ts-expect-error.sh
+
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
     name: Commonwealth Unit And Integration Tests

@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 import 'components/Profile/ProfileHeader.scss';
 
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, renderQuillDeltaToText } from '@hicommonwealth/shared';
 import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { renderQuillDeltaToText } from '../../../../../shared/utils';
 import type NewProfile from '../../../models/NewProfile';
 import { CWText } from '../component_kit/cw_text';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';

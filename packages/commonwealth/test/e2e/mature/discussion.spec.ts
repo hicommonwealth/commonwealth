@@ -25,7 +25,6 @@ test.describe('Discussion Page Tests', () => {
     await page.goto(
       `${config.SERVER_URL}/${seeder.testChains[0].id}/discussion/${threadId}`,
     );
-    // @ts-expect-error StrictNullChecks
     await seeder.addAddressIfNone(seeder.testChains[0].id);
     await login(page);
   });

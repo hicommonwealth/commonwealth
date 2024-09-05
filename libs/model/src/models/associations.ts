@@ -11,7 +11,8 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
-    });
+    })
+    .withMany(db.Wallets);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -60,7 +61,6 @@ export const buildAssociations = (db: DB) => {
     })
     .withMany(db.Notification)
     .withMany(db.Webhook)
-    .withMany(db.CommunityBanner)
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })

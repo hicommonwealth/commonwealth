@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { Reaction } from './reaction.schemas';
 import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
 
@@ -10,8 +11,6 @@ export const Comment = z.object({
   text: z.string(),
   plaintext: z.string(),
   parent_id: z.string().nullish(),
-  version_history: z.array(z.string()).optional(),
-  version_history_updated: z.boolean().optional(),
 
   canvas_signed_data: z.string().nullish(),
   canvas_hash: z.string().nullish(),
@@ -38,6 +37,7 @@ export const Comment = z.object({
 
   Address: Address.nullish(),
   Thread: Thread.nullish(),
+  Reaction: Reaction.nullish(),
 });
 
 export const CommentVersionHistory = z.object({

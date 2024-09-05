@@ -9,7 +9,6 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
-import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
@@ -45,6 +44,7 @@ import ThreadVersionHistory from './thread_version_history';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
+import Wallets from './wallets';
 import Webhook from './webhook';
 
 export const Factories = {
@@ -56,7 +56,6 @@ export const Factories = {
   CommentSubscription,
   Community,
   CommunityAlert,
-  CommunityBanner,
   CommunityContract,
   CommunityStake,
   CommunityTags,
@@ -93,6 +92,7 @@ export const Factories = {
   User,
   Vote,
   Webhook,
+  Wallets,
 };
 
 export type DB = {

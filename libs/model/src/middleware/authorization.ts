@@ -3,30 +3,48 @@ import {
   INVALID_ACTOR_ERROR,
   InvalidActor,
   InvalidInput,
+  QueryHandler,
   type CommandContext,
   type CommandHandler,
-  type CommandInput,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodSchema, z } from 'zod';
+import { ZodObject, ZodSchema, ZodString, z } from 'zod';
 import { models } from '..';
 
-export type CommunityMiddleware = CommandHandler<CommandInput, ZodSchema>;
-export type ThreadMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Thread
->;
-export type CommentMiddleware = CommandHandler<
-  CommandInput,
-  typeof schemas.Comment
->;
+export type CommunityAuth = CommandHandler<ZodSchema, ZodSchema>;
+export type ThreadAuth = CommandHandler<ZodSchema, typeof schemas.Thread>;
+export type CommentAuth = CommandHandler<ZodSchema, typeof schemas.Comment>;
 
 export class BannedActor extends InvalidActor {
   constructor(public actor: Actor) {
     super(actor, 'Banned User');
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
+export class NonMember extends InvalidActor {
+  constructor(
+    public actor: Actor,
+    public topic: string,
+    public action: GroupPermissionAction,
+  ) {
+    super(
+      actor,
+      `User does not have permission to perform action ${action} in topic ${topic}`,
+    );
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
+export class RejectedMember extends InvalidActor {
+  constructor(
+    public actor: Actor,
+    public reasons: string[],
+  ) {
+    super(actor, reasons.join(', '));
     this.name = INVALID_ACTOR_ERROR;
   }
 }
@@ -46,7 +64,12 @@ export class BannedActor extends InvalidActor {
  * @param roles roles filter
  */
 const authorizeAddress = async (
-  { actor, payload }: CommandContext<CommandInput>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // `CommandContext<CommandInput>` prevents use of this function in Query middleware
+  // due to `id` being required in the core command framework.
+  // This issue can be resolved with https://github.com/hicommonwealth/commonwealth/issues/9009
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { actor, payload }: CommandContext<any>,
   roles: Role[],
 ): Promise<z.infer<typeof Address>> => {
   // By convention, secure requests must provide community_id/id + address arguments
@@ -79,7 +102,7 @@ const authorizeAddress = async (
  * Checks if actor passes a set of requirements and grants access for all groups of the given topic
  */
 async function isTopicMember(
-  { actor, payload }: CommandContext<CommandInput>,
+  { actor, payload }: CommandContext<ZodSchema>,
   action: GroupPermissionAction,
 ): Promise<void> {
   // By convention, topic_id must by part of the body
@@ -117,16 +140,12 @@ async function isTopicMember(
   const allowed = groups.filter(
     (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
-  if (!allowed.length!)
-    throw new InvalidActor(
-      actor,
-      `User does not have permission to perform action ${action} in topic ${topic.name}`,
-    );
+  if (!allowed.length!) throw new NonMember(actor, topic.name, action);
 
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
     where: {
-      group_id: { [Op.in]: allowed.map((g) => g.id) },
+      group_id: { [Op.in]: allowed.map((g) => g.id!) },
       address_id: actor.addressId,
     },
     include: [
@@ -136,27 +155,47 @@ async function isTopicMember(
       },
     ],
   });
+  if (!memberships.length) throw new NonMember(actor, topic.name, action);
+
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
-    throw new InvalidActor(actor, rejects.join('\n'));
+    throw new RejectedMember(
+      actor,
+      rejects.flatMap((reject) =>
+        reject.reject_reason!.map((reason) => reason.message),
+      ),
+    );
 }
+
+type CommunityQueryMiddleware = QueryHandler<
+  ZodObject<{
+    community_id: ZodString;
+  }>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any
+>;
+
+export const isCommunityAdminQuery: CommunityQueryMiddleware = async (ctx) => {
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin']);
+};
 
 /**
  * Community middleware
  */
-export const isCommunityAdmin: CommunityMiddleware = async (ctx) => {
+export const isCommunityAdmin: CommunityAuth = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin']);
 };
 
-export const isCommunityModerator: CommunityMiddleware = async (ctx) => {
+export const isCommunityModerator: CommunityAuth = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['moderator']);
 };
 
-export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
+export const isCommunityAdminOrModerator: CommunityAuth = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin', 'moderator']);
@@ -164,7 +203,7 @@ export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
 
 export function isCommunityAdminOrTopicMember(
   action: GroupPermissionAction,
-): CommunityMiddleware {
+): CommunityAuth {
   return async (ctx) => {
     // super admin is always allowed
     if (ctx.actor.user.isAdmin) return;
@@ -179,7 +218,7 @@ export function isCommunityAdminOrTopicMember(
 /**
  * Thread middleware
  */
-export const loadThread: ThreadMiddleware = async ({ payload }) => {
+export const loadThread: ThreadAuth = async ({ payload }) => {
   if (!payload.id) throw new InvalidInput('Must provide a thread id');
   const thread = (
     await models.Thread.findOne({
@@ -195,7 +234,7 @@ export const loadThread: ThreadMiddleware = async ({ payload }) => {
   return thread;
 };
 
-export const isThreadAuthor: ThreadMiddleware = ({ actor }, state) => {
+export const isThreadAuthor: ThreadAuth = ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address) throw new InvalidActor(actor, 'Must provide an address');
@@ -208,7 +247,7 @@ export const isThreadAuthor: ThreadMiddleware = ({ actor }, state) => {
 /**
  * Comment middleware
  */
-export const loadComment: CommentMiddleware = async ({ payload }) => {
+export const loadComment: CommentAuth = async ({ payload }) => {
   if (!payload.id) throw new InvalidInput('Must provide a comment id');
   const comment = (
     await models.Comment.findOne({
@@ -224,7 +263,7 @@ export const loadComment: CommentMiddleware = async ({ payload }) => {
   return comment;
 };
 
-export const isCommentAuthor: CommentMiddleware = ({ actor }, state) => {
+export const isCommentAuthor: CommentAuth = ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address) throw new InvalidActor(actor, 'Must provide an address');

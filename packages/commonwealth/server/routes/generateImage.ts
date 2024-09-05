@@ -15,13 +15,20 @@ let openai: OpenAI | undefined = undefined;
 
 const log = logger(import.meta);
 
-try {
-  openai = new OpenAI({
-    organization: 'org-D0ty00TJDApqHYlrn1gge2Ql',
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-} catch (e) {
-  log.error('OpenAI initialization failed.', e);
+if (process.env.OPENAI_API_KEY) {
+  try {
+    openai = new OpenAI({
+      organization:
+        process.env.OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  } catch (e) {
+    log.error('OpenAI initialization failed.', e);
+  }
+} else {
+  log.warn(
+    'OpenAI key not configured. You will be unable to generate images on client.',
+  );
 }
 
 type generateImageReq = {
