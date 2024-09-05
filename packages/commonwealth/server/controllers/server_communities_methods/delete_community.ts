@@ -118,21 +118,35 @@ export async function __deleteCommunity(
           );
 
           const models: ModelStatic<
-            | ModelInstance<{ community_id: string }>
-            | ModelInstance<{ community_id?: string }>
+            ModelInstance<{ community_id?: string }>
           >[] = [
+            // @ts-expect-error StrictNullChecks
             this.models.CommunityStake,
+            // @ts-expect-error StrictNullChecks
             this.models.DiscordBotConfig,
+            // @ts-expect-error StrictNullChecks
+            this.models.Reaction,
+            // @ts-expect-error StrictNullChecks
+            this.models.Comment,
+            // @ts-expect-error StrictNullChecks
             this.models.Topic,
             this.models.Subscription,
+            // @ts-expect-error StrictNullChecks
             this.models.CommunityContract,
+            // @ts-expect-error StrictNullChecks
             this.models.Webhook,
+            // @ts-expect-error StrictNullChecks
             this.models.Vote,
+            // @ts-expect-error StrictNullChecks
             this.models.Poll,
+            // @ts-expect-error StrictNullChecks
             this.models.Thread,
+            // @ts-expect-error StrictNullChecks
             this.models.StarredCommunity,
             this.models.Notification,
+            // @ts-expect-error StrictNullChecks
             this.models.Group,
+            // @ts-expect-error StrictNullChecks
             this.models.Address,
           ];
 
