@@ -1,4 +1,74 @@
-import { AppError, ServerError } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+import { models } from '../database';
+import { isCommunityAdminOrTopicMember } from '../middleware';
+import { verifyReactionSignature } from '../middleware/canvas';
+import { mustExist } from '../middleware/guards';
+
+export const CreateCommentReactionErrors = {
+  // CommentNotFound: 'Comment not found',
+  // ThreadNotFoundForComment: 'Thread not found for comment',
+  // BanError: 'Ban error',
+  // InsufficientTokenBalance: 'Insufficient token balance',
+  // BalanceCheckFailed: 'Could not verify user token balance',
+  // FailedCreateReaction: 'Failed to create reaction',
+  // CommunityNotFound: 'Community not found',
+  // MustHaveStake: 'Must have stake to upvote',
+};
+
+export function CreateCommentReaction(): Command<
+  typeof schemas.CreateCommentReaction
+> {
+  return {
+    ...schemas.CreateCommentReaction,
+    auth: [
+      isCommunityAdminOrTopicMember(
+        schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+      ),
+      verifyReactionSignature,
+    ],
+    body: async ({ actor, payload }) => {
+      const { comment_id } = payload;
+      const comment = await models.Comment.findOne({
+        where: { id: comment_id },
+        include: [models.Thread],
+      });
+      if (!mustExist('Comment', comment)) return;
+
+      const address = await models.Address.findOne({
+        where: {
+          community_id: comment.Thread?.community_id,
+          user_id: actor.user.id,
+          address: actor.address,
+        },
+      });
+      if (!mustExist('Community address', address)) return;
+
+      // == mutation transaction boundary ==
+      const new_reaction_id = await models.sequelize.transaction(
+        async (transaction) => {
+          // update timestamps
+          address.last_active = new Date();
+          await address.save({ transaction });
+
+          return 1;
+        },
+      );
+      // == end of transaction boundary ==
+
+      const reaction = await models.Reaction.findOne({
+        where: { id: new_reaction_id! },
+        include: [{ model: models.Address, include: [models.User] }],
+      });
+      return {
+        ...reaction!.toJSON(),
+        community_id: comment.Thread?.community_id,
+      };
+    },
+  };
+}
+
+/*
 import {
   AddressInstance,
   ReactionAttributes,
@@ -12,39 +82,8 @@ import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommentsController } from '../server_comments_controller';
 
-const Errors = {
-  CommentNotFound: 'Comment not found',
-  ThreadNotFoundForComment: 'Thread not found for comment',
-  BanError: 'Ban error',
-  InsufficientTokenBalance: 'Insufficient token balance',
-  BalanceCheckFailed: 'Could not verify user token balance',
-  FailedCreateReaction: 'Failed to create reaction',
-  CommunityNotFound: 'Community not found',
-  MustHaveStake: 'Must have stake to upvote',
-};
-
-export type CreateCommentReactionOptions = {
-  user: UserInstance;
-  address: AddressInstance;
-  reaction: 'like';
-  commentId: number;
-  canvasSignedData?: string;
-  canvasHash?: string;
-};
-
-export type CreateCommentReactionResult = [ReactionAttributes, TrackOptions[]];
-
-export async function __createCommentReaction(
-  this: ServerCommentsController,
-  {
-    user,
-    address,
-    reaction,
-    commentId,
-    canvasSignedData,
-    canvasHash,
-  }: CreateCommentReactionOptions,
-): Promise<CreateCommentReactionResult> {
+ 
+ 
   const comment = await this.models.Comment.findOne({
     where: { id: commentId },
     include: [
@@ -111,12 +150,9 @@ export async function __createCommentReaction(
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({
     where: reactionWhere,
-    // @ts-expect-error StrictNullChecks
     defaults: reactionData,
   });
-
-  // build analytics options
-  const allAnalyticsOptions: TrackOptions[] = [];
+ 
 
   allAnalyticsOptions.push({
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
@@ -133,5 +169,5 @@ export async function __createCommentReaction(
     Address: address,
   };
 
-  return [finalReactionWithAddress, allAnalyticsOptions];
-}
+ 
+*/

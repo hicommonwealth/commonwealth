@@ -134,14 +134,6 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               community_id: thread.community_id,
             }));
 
-          // @timolegros is this used somewhere?
-          // const excludedAddrs: string[] = [];
-          // excludedAddrs.push(address.address);
-          // const rootNotifExcludeAddresses = [...excludedAddrs];
-          // if (parentComment && parentComment.Address) {
-          //   rootNotifExcludeAddresses.push(parentComment.Address.address);
-          // }
-
           return comment.id;
         },
       );

@@ -93,7 +93,6 @@ import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_me
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
-import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
@@ -522,14 +521,6 @@ function setupRouter(
   );
 
   // reactions
-  registerRoute(
-    router,
-    'post',
-    '/comments/:id/reactions',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createCommentReactionHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',
