@@ -5,7 +5,6 @@ import {
   type CommunityInstance,
   type DB,
   type EmailNotificationInterval,
-  type StarredCommunityAttributes,
   type UserInstance,
 } from '@hicommonwealth/model';
 import { Knock } from '@knocklabs/node';
@@ -16,6 +15,13 @@ import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
 type CommunityWithRedirects = { id: string; redirect: string };
+
+type StarredCommunityResponse = {
+  id: number;
+  icon_url?: string;
+  name: string;
+  isStarred: boolean;
+};
 
 type StatusResp = {
   loggedIn?: boolean;
@@ -31,7 +37,7 @@ type StatusResp = {
     k;
     isAdmin: boolean;
     disableRichText: boolean;
-    communities: StarredCommunityAttributes[];
+    communities: StarredCommunityResponse[];
   };
   communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
