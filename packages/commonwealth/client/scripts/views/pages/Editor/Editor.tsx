@@ -41,7 +41,7 @@ export type ImageURL = string;
 
 export type EditorMode = 'desktop' | 'mobile';
 
-export type ImageHandler = 'S3' | 'local';
+export type ImageHandler = 'S3' | 'local' | 'failure';
 
 type EditorProps = {
   readonly mode?: EditorMode;
