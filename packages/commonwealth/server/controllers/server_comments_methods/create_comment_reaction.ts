@@ -3,7 +3,7 @@ import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
-  commonProtocol,
+  getVotingWeight,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -101,11 +101,10 @@ export async function __createCommentReaction(
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
-    calculated_voting_weight:
-      await commonProtocol.contractHelpers.getVotingWeight(
-        thread.community_id,
-        address.address,
-      ),
+    calculated_voting_weight: await getVotingWeight(
+      thread.community_id,
+      address.address,
+    ),
     canvas_hash: canvasHash,
     canvas_signed_data: canvasSignedData,
   };
