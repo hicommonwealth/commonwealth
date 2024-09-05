@@ -38,8 +38,8 @@ describe('Reaction vote weight', () => {
       'Alice',
     );
 
-    createThread = async () => {
-      const t = await server.models.Thread.create({
+    createThread = async () =>
+      await server.models.Thread.create({
         community_id: community!.id!,
         address_id: address!.id!,
         topic_id: topic!.id,
@@ -53,19 +53,15 @@ describe('Reaction vote weight', () => {
         reaction_count: 0,
         reaction_weights_sum: 0,
       });
-      return t;
-    };
 
-    createComment = async (threadId: number) => {
-      const c = await threadsController.createThreadComment({
-        user,
-        address,
-        parentId: 0,
-        threadId,
+    createComment = async (threadId: number) =>
+      await server.models.Comment.create({
+        address_id: address!.id!,
+        thread_id: threadId,
         text: 'hello',
+        plaintext: 'hello',
+        reaction_count: 0,
       });
-      return c[0];
-    };
 
     user = await server.models.User.findByPk(userRes.user_id);
     address = await server.models.Address.findByPk(userRes.address_id);

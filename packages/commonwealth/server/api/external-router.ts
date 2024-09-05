@@ -10,7 +10,7 @@ import * as thread from './threads';
 const { createCommunity, getCommunities, getCommunity, getMembers } =
   community.trpcRouter;
 const { createThread } = thread.trpcRouter;
-const { getComments } = comment.trpcRouter;
+const { createComment, getComments } = comment.trpcRouter;
 //const { getBulkThreads } = thread.trpcRouter;
 
 const api = {
@@ -21,6 +21,7 @@ const api = {
   getComments,
   createThread,
   //getBulkThreads,
+  createComment,
 };
 
 const PATH = '/api/v1';

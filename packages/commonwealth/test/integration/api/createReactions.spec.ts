@@ -112,14 +112,13 @@ describe('createReaction Integration Tests', () => {
     const beforeReactionCount = comment.reaction_count;
 
     chai.assert.isNotNull(comment);
-    chai.assert.equal(createCommentResponse.status, 'Success');
 
     const createReactionResponse = await server.seeder.createReaction({
       chain: communityId,
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
-      comment_id: createCommentResponse.result.id,
+      comment_id: createCommentResponse.id,
       author_chain: communityId,
       session: userSession.session,
       sign: userSession.sign,
