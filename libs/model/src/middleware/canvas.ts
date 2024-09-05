@@ -40,3 +40,27 @@ export const verifyThreadSignature: ThreadAuth = async ({ actor, payload }) => {
     }
   }
 };
+
+// if (hasCanvasSignedDataApiArgs(req.body)) {
+//   // Only save the canvas fields if they are given and they are strings
+//   reactionFields.canvasSignedData = req.body.canvas_signed_data;
+//   reactionFields.canvasHash = req.body.canvas_hash;
+
+//   if (config.ENFORCE_SESSION_KEYS) {
+//     const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+//     await verifyReaction(canvasSignedData, {
+//       thread_id: threadId,
+//       address:
+//         canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+//         'polkadot'
+//           ? addressSwapper({
+//               currentPrefix: 42,
+//               // @ts-expect-error <StrictNullChecks>
+//               address: address.address,
+//             })
+//           : // @ts-expect-error <StrictNullChecks>
+//             address.address,
+//       value: reaction,
+//     });
+//   }
+// }

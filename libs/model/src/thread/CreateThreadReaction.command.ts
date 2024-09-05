@@ -1,3 +1,68 @@
+import { type Command } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+import { models } from '../database';
+import { isCommunityAdminOrTopicMember } from '../middleware';
+import { verifyThreadSignature } from '../middleware/canvas';
+import { mustExist } from '../middleware/guards';
+
+export const CreateThreadErrors = {
+  InsufficientTokenBalance: 'Insufficient token balance',
+  BalanceCheckFailed: 'Could not verify user token balance',
+  ParseMentionsFailed: 'Failed to parse mentions',
+  LinkMissingTitleOrUrl: 'Links must include a title and URL',
+  UnsupportedKind: 'Only discussion and link posts supported',
+  FailedCreateThread: 'Failed to create thread',
+  DiscussionMissingTitle: 'Discussion posts must include a title',
+  NoBody: 'Thread body cannot be blank',
+  PostLimitReached: 'Post limit reached',
+};
+
+export function CreateThreadReaction(): Command<
+  typeof schemas.CreateThreadReaction
+> {
+  return {
+    ...schemas.CreateThreadReaction,
+    auth: [
+      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD),
+      verifyThreadSignature,
+    ],
+    body: async ({ actor, payload }) => {
+      const thread = await models.Thread.findOne({
+        where: { id: payload.thread_id },
+      });
+      if (!mustExist('Thread', thread)) return;
+
+      // Loading to update last_active
+      const address = await models.Address.findOne({
+        where: {
+          user_id: actor.user.id,
+          community_id: thread.community_id,
+          address: actor.address,
+        },
+      });
+      if (!mustExist('Community address', address)) return;
+
+      // == mutation transaction boundary ==
+      const new_reaction_id = await models.sequelize.transaction(
+        async (transaction) => {
+          address.last_active = new Date();
+          await address.save({ transaction });
+
+          return 1;
+        },
+      );
+      // == end of transaction boundary ==
+
+      const reaction = await models.Reaction.findOne({
+        where: { id: new_reaction_id },
+        include: [{ model: models.Address, as: 'Address' }],
+      });
+      return reaction!.toJSON();
+    },
+  };
+}
+
+/*
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
@@ -163,3 +228,5 @@ export async function __createThreadReaction(
 
   return [finalReactionWithAddress, analyticsOptions];
 }
+
+*/
