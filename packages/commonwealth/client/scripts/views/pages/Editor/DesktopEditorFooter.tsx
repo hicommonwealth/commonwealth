@@ -14,7 +14,6 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
   const fileHandler = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.files) {
-        console.log('nr files: ' + event.target.files.length);
         onImportMarkdown?.(event.target.files[0]);
       }
     },

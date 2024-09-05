@@ -119,8 +119,6 @@ export const Editor = memo(function Editor(props: EditorProps) {
 
   const handleDropAsync = useCallback(
     async (event: React.DragEvent) => {
-      console.log(event.dataTransfer.files.length);
-
       const nrFiles = event.dataTransfer.files.length;
 
       try {
@@ -165,7 +163,6 @@ export const Editor = memo(function Editor(props: EditorProps) {
   );
 
   const handleDragEnter = useCallback((event: React.DragEvent) => {
-    console.log('handleDragStart');
     event.preventDefault();
     dragCounterRef.current = dragCounterRef.current + 1;
 
@@ -175,15 +172,12 @@ export const Editor = memo(function Editor(props: EditorProps) {
   }, []);
 
   const handleDragOver = useCallback((event: React.DragEvent) => {
-    console.log('handleDragOver');
-
     event.preventDefault();
     // This is necessary to allow a drop
     event.dataTransfer!.dropEffect = 'copy'; // Shows a copy cursor when dragging files
   }, []);
 
   const handleDragLeave = useCallback((event: React.DragEvent) => {
-    console.log('handleDragLeave');
     event.preventDefault();
     dragCounterRef.current = dragCounterRef.current - 1;
 
