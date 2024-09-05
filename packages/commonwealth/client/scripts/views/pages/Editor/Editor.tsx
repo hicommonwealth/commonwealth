@@ -30,6 +30,7 @@ import { ToolbarForDesktop } from 'views/pages/Editor/toolbars/ToolbarForDesktop
 import { ToolbarForMobile } from 'views/pages/Editor/toolbars/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
 import { useImageUploadHandler } from 'views/pages/Editor/useImageUploadHandler';
+import { canAcceptFileForImport } from 'views/pages/Editor/utils/canAcceptFileForImport';
 import { codeBlockLanguages } from 'views/pages/Editor/utils/codeBlockLanguages';
 import { editorTranslator } from 'views/pages/Editor/utils/editorTranslator';
 import { fileToText } from 'views/pages/Editor/utils/fileToText';
@@ -100,12 +101,12 @@ export const Editor = memo(function Editor(props: EditorProps) {
 
   const handleFiles = useCallback(async (files: FileList) => {
     if (files.length === 1) {
-      const type = files[0].type;
+      const file = files[0];
 
-      if (['text/markdown', 'text/plain'].includes(type)) {
-        await handleFile(files[0]);
+      if (canAcceptFileForImport(file)) {
+        await handleFile(file);
       } else {
-        notifyError('File not markdown. Has invalid type: ' + type);
+        notifyError('File not markdown. Has invalid type: ' + file.type);
       }
     }
 
@@ -181,8 +182,11 @@ export const Editor = memo(function Editor(props: EditorProps) {
         return;
       }
 
-      event.preventDefault();
-      handleFiles(files).catch(console.error);
+      if (canAcceptFileForImport(files[0])) {
+        // if we can accept this file for import, go ahead and do so...
+        event.preventDefault();
+        handleFiles(files).catch(console.error);
+      }
     },
     [handleFiles],
   );
