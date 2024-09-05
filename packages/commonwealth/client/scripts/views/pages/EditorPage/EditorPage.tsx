@@ -11,6 +11,9 @@ function useParams() {
   };
 }
 
+/**
+ * Basic demo page that allows us to use either mode and to log the markdown.
+ */
 export const EditorPage = () => {
   const { mode } = useParams();
 
