@@ -1,4 +1,4 @@
-import { dispose } from '@hicommonwealth/core';
+import { User, command, dispose } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -8,6 +8,7 @@ import type {
 import { commonProtocol } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
+import { CreateThreadReaction } from 'node_modules/@hicommonwealth/model/src/thread';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
@@ -27,6 +28,23 @@ describe('Reaction vote weight', () => {
   let threadsController, commentsController;
   let createThread, createComment;
 
+  const createThreadReaction = async (
+    user: User,
+    address: AddressInstance,
+    threadId: number,
+  ) =>
+    await command(CreateThreadReaction(), {
+      actor: {
+        user,
+        address: address?.address,
+        addressId: address!.id!,
+      },
+      payload: {
+        thread_id: threadId,
+        reaction: 'like',
+      },
+    });
+
   beforeAll(async () => {
     server = await testServer();
 
@@ -38,8 +56,8 @@ describe('Reaction vote weight', () => {
       'Alice',
     );
 
-    createThread = async () => {
-      const t = await server.models.Thread.create({
+    createThread = async () =>
+      await server.models.Thread.create({
         community_id: community!.id!,
         address_id: address!.id!,
         topic_id: topic!.id,
@@ -54,19 +72,15 @@ describe('Reaction vote weight', () => {
         reaction_weights_sum: 0,
         max_notif_id: 0,
       });
-      return t;
-    };
 
-    createComment = async (threadId: number) => {
-      const c = await threadsController.createThreadComment({
-        user,
-        address,
-        parentId: 0,
-        threadId,
+    createComment = async (threadId: number) =>
+      await server.models.Comment.create({
+        address_id: address!.id!,
+        thread_id: threadId,
         text: 'hello',
+        plaintext: 'hello',
+        reaction_count: 0,
       });
-      return c[0];
-    };
 
     user = await server.models.User.findByPk(userRes.user_id);
     address = await server.models.Address.findByPk(userRes.address_id);
@@ -110,14 +124,13 @@ describe('Reaction vote weight', () => {
       [address.address]: '50',
     });
     const thread = await createThread();
-    const [reaction] = await threadsController.createThreadReaction({
-      user,
-      address,
-      reaction: 'like',
-      threadId: thread.id,
-    });
+    const reaction = await createThreadReaction(
+      user as User,
+      address!,
+      thread.id,
+    );
     const expectedWeight = 50 * 200;
-    expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
+    expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
     const t = await server.models.Thread.findByPk(thread.id);
     // @ts-expect-error StrictNullChecks
     expect(t.reaction_weights_sum).to.eq(expectedWeight);
@@ -149,14 +162,13 @@ describe('Reaction vote weight', () => {
       [address.address]: '17',
     });
     const thread = await createThread();
-    const [reaction] = await threadsController.createThreadReaction({
-      user,
-      address,
-      reaction: 'like',
-      threadId: thread.id,
-    });
+    const reaction = await createThreadReaction(
+      user as User,
+      address!,
+      thread.id,
+    );
     const expectedWeight = 17 * 200;
-    expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
+    expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
   });
 
   test('should set comment reaction vote weight to min 1', async () => {

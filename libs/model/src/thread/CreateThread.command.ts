@@ -5,10 +5,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  renderQuillDeltaToText,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
 import { config } from '../config';
@@ -21,6 +18,7 @@ import { tokenBalanceCache } from '../services';
 import {
   emitMentions,
   parseUserMentions,
+  quillToPlain,
   sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
@@ -38,18 +36,6 @@ export const CreateThreadErrors = {
 };
 
 const getActiveContestManagersQuery = GetActiveContestManagers();
-
-function toPlainString(decodedBody: string) {
-  try {
-    const quillDoc = JSON.parse(decodedBody);
-    if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '')
-      throw new InvalidInput(CreateThreadErrors.NoBody);
-    return renderQuillDeltaToText(quillDoc);
-  } catch {
-    // check always passes if the body isn't a Quill document
-  }
-  return decodedBody;
-}
 
 /**
  * Ensure that user has non-dust ETH value
@@ -107,9 +93,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
 
-      const body = sanitizeQuillText(payload.body);
-      const plaintext = kind === 'discussion' ? toPlainString(body) : body;
-
       // check contest invariants
       const activeContestManagers = await getActiveContestManagersQuery.body({
         actor: {} as Actor,
@@ -133,6 +116,8 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       });
       if (!mustExist('Community address', address)) return;
 
+      const body = sanitizeQuillText(payload.body);
+      const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
       const mentions = uniqueMentions(parseUserMentions(body));
 
       // == mutation transaction boundary ==
@@ -173,7 +158,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           address.last_active = new Date();
           await address.save({ transaction });
 
-          // subscribe author (@timolegros this is the user aggregate leak we are discussing)
           await models.ThreadSubscription.create(
             {
               user_id: actor.user.id!,
@@ -182,7 +166,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
             { transaction },
           );
 
-          // emit mention events = transactional outbox
           mentions.length &&
             (await emitMentions(models, transaction, {
               authorAddressId: address.id!,
