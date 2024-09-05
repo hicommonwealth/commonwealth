@@ -239,8 +239,27 @@ jobs:
             exit 1
           fi
 
-      - name: Lint and Check types
-        run: pnpm check-all
+      - name: build
+        run: pnpm -r build
+        if: success() || failure()
+
+      - name: check-types
+        run: pnpm -r check-types
+        if: success() || failure()
+
+      # To disable eslint-diff just comment the following two lines
+      - name: Run eslint-diff
+        run: pnpm -r run lint-diff
+        if: success() || failure()
+
+      - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
+        run: pnpm -F commonwealth run lint-diff-canary
+
+      # fun the *old* linter last because I want to try to migrate away from
+      # this and JUST to eslint-diff but if this fails we still might be able
+      # to salvage the branch
+      - name: Run linter
+        run: pnpm lint-branch
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
