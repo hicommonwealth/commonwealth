@@ -102,6 +102,12 @@ export const Editor = memo(function Editor(props: EditorProps) {
   );
 
   const handleFile = useCallback(async (file: File) => {
+    if (!file.name.endsWith('.md')) {
+      // TODO: migrate to snackbar.
+      console.warn('Not a markdown file.');
+      return;
+    }
+
     const text = await fileToText(file);
     mdxEditorRef.current?.setMarkdown(text);
   }, []);
@@ -206,12 +212,11 @@ export const Editor = memo(function Editor(props: EditorProps) {
         translation={(key, defaultValue, interpolations) => {
           switch (key) {
             case 'toolbar.blockTypeSelect.placeholder':
-              // show the default placeholder that's active here..
+              // show the default placeholder that's active here.
               return 'H1';
             case 'toolbar.blockTypes.heading':
               if (interpolations?.level) {
-                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                return 'H' + interpolations.level;
+                return `H${interpolations.level}`;
               }
               return 'H1';
             case 'toolbar.blockTypes.quote':
