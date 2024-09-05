@@ -4,7 +4,7 @@ html,
 body,
 #root {
   max-height: 100vh;
-  overflow: auto;
+  //overflow: auto;
 }
 
 #root {
@@ -21,6 +21,11 @@ body,
 .mdxeditor-container-mode-mobile {
   .mdxeditor {
     flex-grow: 1;
+    overflow: auto;
+  }
+
+  .mdxeditor-toolbar {
+    min-height: 45px !important;
   }
 }
 
