@@ -175,8 +175,8 @@ function setupRouter(
   router.use(useragent.express());
 
   // API routes
-  app.use(api.internal.PATH, api.internal.router);
-  app.use(api.external.PATH, api.external.router);
+  app.use(api.internal.PATH, useragent.express(), api.internal.router);
+  app.use(api.external.PATH, useragent.express(), api.external.router);
   app.use(
     api.integration.PATH,
     api.integration.build(serverControllers, databaseValidationService),
