@@ -32,7 +32,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [DD_LOG_LEVEL](#dd_log_level)
 - [DD_SITE](#dd_site)
 - [DISABLE_CACHE](#disable_cache)
-- [DISCORD_BOT_TOKEN](#discord_bot_token)
+- [DISCORD_TOKEN](#discord_token)
 - [DISCORD_BOT_URL](#discord_bot_url)
 - [DISCORD_CLIENT_ID](#discord_client_id)
 - [DISCORD_WEBHOOK_URL_DEV](#discord_webhook_url_dev)
@@ -183,7 +183,7 @@ DataDog configuration token in our Heroku pipeline, specifying our DataDog site 
 
 If `true`, disables Redis caching middleware.
 
-## DISCORD_BOT_TOKEN
+## DISCORD_TOKEN
 
 This value should mirror the value of `DISCORD_TOKEN` in the Discobot .env file.
 
@@ -226,7 +226,6 @@ Owner: Ian Rowan
 Optional. Defaults to 5 minutes (300 seconds).
 This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
 After this time, the server will try the original DB endpoint again.
-
 
 ## FLAG_NEW_CREATE_COMMUNITY
 
