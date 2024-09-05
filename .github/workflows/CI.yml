@@ -254,12 +254,14 @@ jobs:
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: pnpm -F commonwealth run lint-diff-canary
+        if: success() || failure()
 
       # fun the *old* linter last because I want to try to migrate away from
       # this and JUST to eslint-diff but if this fails we still might be able
       # to salvage the branch
       - name: Run linter
         run: pnpm lint-branch
+        if: success() || failure()
 
 
 #  detect-broken-ts-expect-error:
