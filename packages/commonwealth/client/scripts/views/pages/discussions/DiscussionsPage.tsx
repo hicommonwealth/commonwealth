@@ -49,8 +49,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
 
-  const removeMe;
-
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
   ) as ThreadFeaturedFilterTypes;
