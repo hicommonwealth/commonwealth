@@ -40,10 +40,7 @@ class AddressInfo extends Account {
 
         // if this is auth user, use already fetched address/profile data
         const foundAddress = authUser.addresses.find(
-          (a) =>
-            a.address === address &&
-            a.community.id === community.id &&
-            a.profile,
+          (a) => a.address === address && a.community.id === community.id,
         );
         const profile = new MinimumProfile(address, community.id);
         profile.initialize(
