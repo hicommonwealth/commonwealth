@@ -39,6 +39,11 @@ body,
     top: initial;
     height: 65px;
   }
+
+  .cm-gutters {
+    // necessary because otherwise code mirror line numbers are too small.
+    font-size: inherit !important;
+  }
 }
 
 .mdxeditor-diff-source-wrapper {
