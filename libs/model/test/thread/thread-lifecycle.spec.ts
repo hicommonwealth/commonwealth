@@ -286,6 +286,40 @@ describe('Thread lifecycle', () => {
         }),
       ).rejects.toThrowError(CreateCommentErrors.NestingTooDeep);
     });
+
+    it('should set comment reaction vote weight and comment vote sum correctly', async () => {
+      // Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      //   [address.address]: '50',
+      // });
+      // const thread = await createThread();
+      // const comment = await createComment(thread.id);
+      // const [reaction] = await commentsController.createCommentReaction({
+      //   user,
+      //   address,
+      //   reaction: 'like',
+      //   commentId: comment.id,
+      // });
+      // const expectedWeight = 50 * 200;
+      // expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
+      // const c = await server.models.Comment.findByPk(comment.id);
+      // expect(c.reaction_weights_sum).to.eq(expectedWeight);
+    });
+
+    it('should set comment reaction vote weight to min 1', async () => {
+      // Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      //   [address.address]: '7',
+      // });
+      // const thread = await createThread();
+      // const comment = await createComment(thread.id);
+      // const [reaction] = await commentsController.createCommentReaction({
+      //   user,
+      //   address,
+      //   reaction: 'like',
+      //   commentId: comment.id,
+      // });
+      // const expectedWeight = 7 * 200;
+      // expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
+    });
   });
 
   describe('reaction', () => {
@@ -365,6 +399,36 @@ describe('Thread lifecycle', () => {
       // ).to.be.rejectedWith(
       //   `Failed to create reaction: ${fakeMembershipReject}`,
       // );
+    });
+
+    it('should set thread reaction vote weight and thread vote sum correctly', async () => {
+      // Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      //   [address.address]: '50',
+      // });
+      // const thread = await createThread();
+      // const reaction = await createThreadReaction(
+      //   user as User,
+      //   address!,
+      //   thread.id,
+      // );
+      // const expectedWeight = 50 * 200;
+      // expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      // const t = await server.models.Thread.findByPk(thread.id);
+      // expect(t.reaction_weights_sum).to.eq(expectedWeight);
+    });
+
+    it('should set thread reaction vote weight to min 1', async () => {
+      // Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      //   [address.address]: '17',
+      // });
+      // const thread = await createThread();
+      // const reaction = await createThreadReaction(
+      //   user as User,
+      //   address!,
+      //   thread.id,
+      // );
+      // const expectedWeight = 17 * 200;
+      // expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
     });
   });
 
