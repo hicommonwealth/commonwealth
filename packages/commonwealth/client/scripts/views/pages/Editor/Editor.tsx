@@ -24,7 +24,7 @@ import clsx from 'clsx';
 import 'commonwealth-mdxeditor/style.css';
 import { notifyError } from 'controllers/app/notifications';
 import { DesktopEditorFooter } from 'views/pages/Editor/DesktopEditorFooter';
-import { DragIndicator } from 'views/pages/Editor/DragIndicator';
+import { DragIndicator } from 'views/pages/Editor/indicators/DragIndicator';
 import { ToolbarForDesktop } from 'views/pages/Editor/toolbars/ToolbarForDesktop';
 import { ToolbarForMobile } from 'views/pages/Editor/toolbars/ToolbarForMobile';
 import { useEditorErrorHandler } from 'views/pages/Editor/useEditorErrorHandler';
