@@ -2,6 +2,7 @@ import { trpc } from '@hicommonwealth/adapters';
 import cors from 'cors';
 import { Router } from 'express';
 import { config } from '../config';
+import * as comment from './comment';
 import * as community from './community';
 import * as contest from './contest';
 import * as email from './emails';
@@ -18,6 +19,7 @@ const api = {
   user: user.trpcRouter,
   community: community.trpcRouter,
   thread: thread.trpcRouter,
+  comment: comment.trpcRouter,
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,

@@ -1,33 +1,48 @@
-import { InvalidInput } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   addressSwapper,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
+  verifyComment,
   verifyThread,
 } from '@hicommonwealth/shared';
 import { config } from '../config';
-import { ThreadAuth } from './authorization';
+import { CommentAuth, ThreadAuth } from './authorization';
 
-export const verifyThreadSignature: ThreadAuth = async ({ actor, payload }) => {
+export const verifyThreadSignature: ThreadAuth<
+  typeof schemas.CanvasThread
+> = async ({ actor, payload }) => {
   if (config.ENFORCE_SESSION_KEYS) {
     if (hasCanvasSignedDataApiArgs(payload)) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
-
-      if (
-        !(
-          'community_id' in payload &&
-          'topic_id' in payload &&
-          'title' in payload &&
-          'body' in payload
-        )
-      )
-        throw new InvalidInput('Missing thread arguments');
-
       await verifyThread(canvasSignedData, {
         community: payload.community_id,
         topic: payload.topic_id,
         title: payload.title,
         body: payload.body,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                address: actor.address!,
+              })
+            : actor.address,
+      });
+    }
+  }
+};
+
+export const verifyCommentSignature: CommentAuth<
+  typeof schemas.CanvasComment
+> = async ({ actor, payload }) => {
+  if (config.ENFORCE_SESSION_KEYS) {
+    if (hasCanvasSignedDataApiArgs(payload)) {
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
+      await verifyComment(canvasSignedData, {
+        thread_id: payload.thread_id,
+        parent_comment_id: payload.parent_id,
+        text: payload.text,
         address:
           canvasSignedData.actionMessage.payload.address.split(':')[0] ==
           'polkadot'

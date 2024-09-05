@@ -116,7 +116,6 @@ import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler'
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
-import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
@@ -446,15 +445,6 @@ function setupRouter(
   );
 
   // comments
-  registerRoute(
-    router,
-    'post',
-    '/threads/:id/comments',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadCommentHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'patch',

@@ -1,10 +1,8 @@
 import { dispose } from '@hicommonwealth/core';
-import { CommentInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { getCommentDepth } from 'server/util/getCommentDepth';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-
-4;
+import { CommentInstance, models, tester } from '../../src';
+import { getCommentDepth } from '../../src/utils/getCommentDepth';
 
 describe('getCommentDepth', () => {
   const community_id = 'ethereum';
@@ -49,11 +47,7 @@ describe('getCommentDepth', () => {
 
   test('should correctly calculate comment depth (recursion terminated naturally)', async () => {
     for (let i = 0; i < maxDepth; i++) {
-      const [exceeded, depth] = await getCommentDepth(
-        models,
-        comments[i],
-        maxDepth,
-      );
+      const [exceeded, depth] = await getCommentDepth(comments[i], maxDepth);
       expect(exceeded).to.be.false;
       expect(depth).to.equal(i);
     }
@@ -62,7 +56,6 @@ describe('getCommentDepth', () => {
   test('should correctly calculate comment depth (recursion depth exceeded)', async () => {
     const maxIterations = 2;
     const [exceeded, depth] = await getCommentDepth(
-      models,
       comments[comments.length - 1],
       maxIterations,
     );
