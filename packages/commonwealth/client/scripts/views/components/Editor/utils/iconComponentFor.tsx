@@ -1,6 +1,6 @@
 import { defaultSvgIcons, IconKey } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 
 const DEFAULT_ICON_SIZE = 'regular';
 
