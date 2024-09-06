@@ -19,8 +19,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   CreateComment,
   CreateCommentErrors,
+  CreateCommentReaction,
   MAX_COMMENT_DEPTH,
-} from '../../src/comment/CreateComment.command';
+} from '../../src/comment';
 import { models } from '../../src/database';
 import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
 import { seed, seedRecord } from '../../src/tester';
@@ -34,7 +35,7 @@ import { getCommentDepth } from '../../src/utils/getCommentDepth';
 const chance = Chance();
 
 describe('Thread lifecycle', () => {
-  let thread, archived, read_only;
+  let thread, archived, read_only, comment;
   const roles = ['admin', 'member', 'nonmember', 'banned', 'rejected'] as const;
   const actors = {} as Record<(typeof roles)[number], Actor>;
   const vote_weight = 200;
@@ -89,6 +90,7 @@ describe('Thread lifecycle', () => {
       allowed_actions: [
         PermissionEnum.CREATE_THREAD,
         PermissionEnum.CREATE_THREAD_REACTION,
+        PermissionEnum.CREATE_COMMENT_REACTION,
       ],
     });
     await seed('GroupPermission', {
@@ -203,7 +205,7 @@ describe('Thread lifecycle', () => {
   describe('comments', () => {
     it('should create a thread comment as member of group with permissions', async () => {
       const text = 'hello';
-      const comment = await command(CreateComment(), {
+      comment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           thread_id: thread!.id,
@@ -312,7 +314,7 @@ describe('Thread lifecycle', () => {
     });
   });
 
-  describe('reaction', () => {
+  describe('thread reaction', () => {
     afterEach(() => {
       getNamespaceBalanceStub.restore();
     });
@@ -396,370 +398,81 @@ describe('Thread lifecycle', () => {
       const t = await models.Thread.findByPk(thread!.id);
       expect(t!.reaction_weights_sum).to.eq(expectedWeight);
     });
+  });
 
-    // TODO: implement after CreateCommentReaction command
+  describe('comment reaction', () => {
+    afterEach(() => {
+      getNamespaceBalanceStub.restore();
+    });
+
+    it('should create a comment reaction as a member of a group with permissions', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      const reaction = await command(CreateCommentReaction(), {
+        actor: actors.member,
+        payload: {
+          comment_id: comment!.id,
+          reaction: 'like',
+        },
+      });
+      expect(reaction).to.include({
+        comment_id: comment!.id,
+        reaction: 'like',
+        community_id: thread!.community_id,
+      });
+    });
+
     it('should set comment reaction vote weight and comment vote sum correctly', async () => {
-      // Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
-      //   [address.address]: '50',
-      // });
-      // const thread = await createThread();
-      // const comment = await createComment(thread.id);
-      // const [reaction] = await commentsController.createCommentReaction({
-      //   user,
-      //   address,
-      //   reaction: 'like',
-      //   commentId: comment.id,
-      // });
-      // const expectedWeight = 50 * 200;
-      // expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
-      // const c = await server.models.Comment.findByPk(comment.id);
-      // expect(c.reaction_weights_sum).to.eq(expectedWeight);
+      getNamespaceBalanceStub.resolves({ [actors.admin.address!]: '50' });
+      const reaction = await command(CreateCommentReaction(), {
+        actor: actors.admin,
+        payload: {
+          comment_id: comment!.id,
+          reaction: 'like',
+        },
+      });
+      const expectedWeight = 50 * vote_weight;
+      expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      const c = await models.Comment.findByPk(comment!.id);
+      expect(c!.reaction_weights_sum).to.eq(expectedWeight * 2); // *2 to account for first member reaction
+    });
+
+    it('should throw error when comment not found', async () => {
+      await expect(
+        command(CreateCommentReaction(), {
+          actor: actors.member,
+          payload: {
+            comment_id: 99999999,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(InvalidInput);
+    });
+
+    it('should throw error when actor does not have stake', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '0' });
+      await expect(
+        command(CreateCommentReaction(), {
+          actor: actors.member,
+          payload: {
+            comment_id: comment!.id,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(InvalidState);
+    });
+
+    it('should throw error when actor is not member of group with permission', async () => {
+      await expect(
+        command(CreateCommentReaction(), {
+          actor: actors.nonmember,
+          payload: {
+            comment_id: comment!.id,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(NonMember);
     });
   });
 
   // @rbennettcw do we have contest validation tests to include here?
 });
-
-/*
-  describe('#createCommentReaction', () => {
-    test('should create a comment reaction (new reaction)', async () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-          transaction: async (callback) => {
-            return callback();
-          },
-        },
-        Address: {
-          findAll: async () => [{}], // used in findOneRole
-        },
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            community_id: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              community_id: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Comment: {
-          update: sandbox.stub().resolves(null),
-          findOne: sandbox.stub().resolves({
-            id: 3,
-            text: 'my comment body',
-            Thread: {
-              id: 4,
-              title: 'Big Thread!',
-              community_id: 'ethereum',
-            },
-          }),
-        },
-        CommunityStake: {
-          findOne: sandbox.stub().resolves(null),
-        },
-        Community: {
-          findByPk: async () => ({
-            id: 'ethereum',
-            namespace: 'cake',
-          }),
-        },
-        ChainNode: {
-          findByPk: async () => ({
-            eth_chain_id: 8453,
-            url: 'test.com',
-          }),
-        },
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {
-        address: '0x123',
-        community_id: 'ethereum',
-        save: async () => {},
-      };
-      const reaction = {};
-      const commentId = 123;
-
-      const serverCommentsController = new ServerCommentsController(db);
-
-      const [newReaction, allAnalyticsOptions] =
-        await serverCommentsController.createCommentReaction({
-          user,
-          address,
-          reaction,
-          commentId,
-        });
-
-      expect(newReaction).to.be.ok;
-      expect(allAnalyticsOptions[0]).to.include({
-        event: 'Create New Reaction',
-        community: 'ethereum',
-      });
-    });
-
-    test('should throw error (comment not found)', () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-          transaction: (callback) => Promise.resolve(callback()),
-        },
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            chain: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              chain: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Comment: {
-          findOne: sandbox.stub().resolves(null),
-          update: sandbox.stub().resolves(null),
-        },
-        Thread: {
-          findOne: sandbox.stub().resolves({
-            id: 4,
-            title: 'Big Thread!',
-            community_id: 'ethereum',
-          }),
-        },
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {};
-      const reaction = {};
-
-      const serverCommentsController = new ServerCommentsController(db);
-      expect(
-        serverCommentsController.createCommentReaction({
-          user,
-          address,
-          reaction,
-          commentId: 123,
-        }),
-      ).to.be.rejectedWith('Comment not found: 123');
-    });
-
-    test('should throw error (thread not found)', () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-          transaction: (callback) => Promise.resolve(callback()),
-        },
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            chain: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              chain: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Comment: {
-          findOne: sandbox.stub().resolves({
-            id: 3,
-            text: 'my comment body',
-          }),
-          update: sandbox.stub().resolves(null),
-        },
-        Thread: {
-          findOne: sandbox.stub().resolves(null),
-        },
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {};
-      const reaction = {};
-
-      const serverCommentsController = new ServerCommentsController(db);
-      expect(
-        serverCommentsController.createCommentReaction({
-          user,
-          address,
-          reaction,
-          commentId: 123,
-        }),
-      ).to.be.rejectedWith('Thread not found for comment');
-    });
-
-    test('should throw error (token balance)', () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        sequelize: {
-          query: sandbox.stub().resolves([]),
-          transaction: (callback) => Promise.resolve(callback()),
-        },
-        Reaction: {
-          findOne: sandbox.stub().resolves({
-            id: 2,
-            chain: 'ethereum',
-            Address: {
-              address: '0x123',
-              community_id: 'ethereum',
-            },
-            destroy: sandbox.stub(),
-            toJSON: () => ({}),
-          }),
-          findOrCreate: sandbox.stub().resolves([
-            {
-              id: 2,
-              chain: 'ethereum',
-              Address: {
-                address: '0x123',
-                community_id: 'ethereum',
-              },
-              destroy: sandbox.stub(),
-              toJSON: () => ({}),
-            },
-            false,
-          ]),
-        },
-        Comment: {
-          findOne: sandbox.stub().resolves({
-            id: 3,
-            text: 'my comment body',
-            Thread: {
-              id: 4,
-              title: 'Big Thread!',
-              community_id: 'ethereum',
-              topic_id: 77,
-            },
-          }),
-          update: sandbox.stub().resolves(null),
-        },
-        // for validateTopicThreshold
-        Topic: {
-          findOne: sandbox.stub().resolves({
-            community: {
-              ChainNode: {
-                id: 99,
-              },
-            },
-            group_ids: [1],
-          }),
-        },
-        CommunityContract: {
-          findOne: sandbox.stub().resolves({}),
-        },
-        // for findAllRoles
-        Address: {
-          findAll: sandbox.stub().resolves([]),
-        },
-        Group: {
-          findAll: sandbox.stub().resolves([
-            {
-              id: 1,
-              community_id: 'community-trial',
-              metadata: {
-                name: 'TRIAL Holders',
-                description: 'Autogenerated',
-                required_requirements: 1,
-              },
-              requirements: [
-                {
-                  rule: 'threshold',
-                  data: {
-                    threshold: '1',
-                    source: {
-                      source_type: 'erc721',
-                      evm_chain_id: 1,
-                      contract_address:
-                        '0x301A373beBF0160c0583394855D5b10d00a4168a',
-                    },
-                  },
-                },
-              ],
-              created_at: new Date(),
-              updated_at: new Date(),
-            },
-          ]),
-        },
-        Membership: {
-          findOne: sandbox.stub().resolves({
-            group_id: 1,
-            last_checked: new Date(),
-            reject_reason: 'filler',
-          }),
-          findAll: sandbox.stub().resolves([]),
-          bulkCreate: sandbox.stub().resolves([]),
-        },
-      };
-
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
-      const address = {
-        address: '0x123',
-      };
-      const reaction = {};
-      const commentId = 123;
-
-      const serverCommentsController = new ServerCommentsController(db);
-      expect(
-        serverCommentsController.createCommentReaction({
-          user,
-          address,
-          reaction,
-          commentId,
-        }),
-      ).to.be.rejectedWith('Insufficient token balance');
-    });
-  });
-*/
