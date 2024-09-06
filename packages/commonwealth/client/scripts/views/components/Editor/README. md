@@ -1,14 +1,26 @@
-This is currently using the commonwealth-mdxeditor which is a fork of the
-mdeditor package.
+# Overview
+
+Markdown Editor based on MDXEditor customized for our usage.
+
+It supports desktop and mobile mode.
+
+In desktop mode the UI is responsive and uses a static layout so it can
+operate within the flow of a regular document.
+
+In mobile mode it docks the toolbar above the keyboard.
+
+# Fork
+
+This is currently using the commonwealth-mdxeditor, which is a fork of the
+mdx-editor package.
 
 This is just temporary as I plan on merging this into the main MDXEditor when
 we are done.
 
-Then we can switch over to the real one.
+Right now the only change is a 'location' property added to the toolbar code
+so that we can place the toolbar below the editor.
 
 # Testing
-
-
 
 - success: copy a .md file to the clipboard, try to paste it into the editor. It
   should replace the editor contents.
