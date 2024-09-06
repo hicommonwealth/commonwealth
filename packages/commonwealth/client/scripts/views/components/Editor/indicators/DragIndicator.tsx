@@ -1,7 +1,12 @@
 import React from 'react';
 
-import './DragIndicator.scss';
+import { Indicator } from 'views/components/Editor/indicators/Indicator';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 export const DragIndicator = () => {
-  return <div className="DragIndicator"></div>;
+  return (
+    <Indicator>
+      <CWIcon iconName="cloudArrowUp" iconSize="xxl" />
+    </Indicator>
+  );
 };
