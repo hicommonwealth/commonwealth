@@ -168,12 +168,11 @@ export const status = async (
 
       return success(res, {
         loggedIn: true,
-        // @ts-expect-error StrictNullChecks
         user,
         communityWithRedirects: communityWithRedirects || [],
         evmTestEnv: config.TEST_EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
-      });
+      } as StatusResp);
     }
   } catch (error) {
     console.log(error);

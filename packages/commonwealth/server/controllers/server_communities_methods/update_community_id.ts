@@ -133,6 +133,5 @@ export async function __updateCommunityId(
     });
   });
 
-  // @ts-expect-error StrictNullChecks
-  return newCommunity.toJSON();
+  return newCommunity!.toJSON();
 }

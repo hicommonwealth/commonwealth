@@ -173,9 +173,8 @@ export async function __deleteCommunity(
           }
 
           await this.models.Collaboration.destroy({
-            // @ts-expect-error StrictNullChecks
             where: {
-              thread_id: { [Op.in]: threads.map((thread) => thread.id) },
+              thread_id: { [Op.in]: threads.map((thread) => thread.id!) },
             },
             transaction: t,
           });
