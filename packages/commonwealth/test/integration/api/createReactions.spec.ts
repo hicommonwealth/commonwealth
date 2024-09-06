@@ -159,12 +159,12 @@ describe('createReaction Integration Tests', () => {
       sign: userSession.sign,
     });
 
-    chai.assert.equal(createReactionResponse.status, 'Success');
+    chai.assert.isNotNull(createReactionResponse);
 
     await thread!.reload();
     chai.assert.equal(thread!.reaction_count, beforeReactionCount + 1);
 
-    const reactionId = createReactionResponse.result.id;
+    const reactionId = createReactionResponse.id;
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,

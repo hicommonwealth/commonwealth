@@ -491,6 +491,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .agent(app)
       .post(`/api/comments/${comment_id}/reactions`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address: walletAddress,
@@ -532,8 +533,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${thread_id}/reactions`)
+      .post(`/api/v1/CreateThreadReaction`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address: walletAddress,

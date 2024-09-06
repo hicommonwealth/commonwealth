@@ -7,24 +7,15 @@ import {
   type CommandContext,
   type CommandHandler,
 } from '@hicommonwealth/core';
-import * as schemas from '@hicommonwealth/schemas';
 import { Address, Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodObject, ZodSchema, ZodString, z } from 'zod';
 import { models } from '..';
 
-export type CommunityAuth<Input extends ZodSchema = ZodSchema> = CommandHandler<
+export type AuthHandler<Input extends ZodSchema = ZodSchema> = CommandHandler<
   Input,
   ZodSchema
->;
-export type ThreadAuth<Input extends ZodSchema = ZodSchema> = CommandHandler<
-  Input,
-  typeof schemas.Thread
->;
-export type CommentAuth<Input extends ZodSchema = ZodSchema> = CommandHandler<
-  Input,
-  typeof schemas.Comment
 >;
 
 export class BannedActor extends InvalidActor {
@@ -200,7 +191,7 @@ export const isCommunityAdminQuery: CommunityQueryMiddleware = async (ctx) => {
 /**
  * Community middleware
  */
-export const isCommunityAdmin: CommunityAuth = async (ctx) => {
+export const isCommunityAdmin: AuthHandler = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin']);
@@ -213,13 +204,13 @@ export const isSuperAdmin: QueryHandler<ZodSchema, ZodSchema> &
   }
 };
 
-export const isCommunityModerator: CommunityAuth = async (ctx) => {
+export const isCommunityModerator: AuthHandler = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['moderator']);
 };
 
-export const isCommunityAdminOrModerator: CommunityAuth = async (ctx) => {
+export const isCommunityAdminOrModerator: AuthHandler = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin', 'moderator']);
@@ -227,7 +218,7 @@ export const isCommunityAdminOrModerator: CommunityAuth = async (ctx) => {
 
 export function isCommunityAdminOrTopicMember(
   action: GroupPermissionAction,
-): CommunityAuth {
+): AuthHandler {
   return async (ctx) => {
     // super admin is always allowed
     if (ctx.actor.user.isAdmin) return;
@@ -242,7 +233,7 @@ export function isCommunityAdminOrTopicMember(
 /**
  * Thread middleware
  */
-export const loadThread: ThreadAuth = async ({ payload }) => {
+export const loadThread: AuthHandler = async ({ payload }) => {
   if (!payload.id) throw new InvalidInput('Must provide a thread id');
   const thread = (
     await models.Thread.findOne({
@@ -258,7 +249,7 @@ export const loadThread: ThreadAuth = async ({ payload }) => {
   return thread;
 };
 
-export const isThreadAuthor: ThreadAuth = ({ actor }, state) => {
+export const isThreadAuthor: AuthHandler = ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address) throw new InvalidActor(actor, 'Must provide an address');
@@ -271,7 +262,7 @@ export const isThreadAuthor: ThreadAuth = ({ actor }, state) => {
 /**
  * Comment middleware
  */
-export const loadComment: CommentAuth = async ({ payload }) => {
+export const loadComment: AuthHandler = async ({ payload }) => {
   if (!payload.id) throw new InvalidInput('Must provide a comment id');
   const comment = (
     await models.Comment.findOne({
@@ -287,7 +278,7 @@ export const loadComment: CommentAuth = async ({ payload }) => {
   return comment;
 };
 
-export const isCommentAuthor: CommentAuth = ({ actor }, state) => {
+export const isCommentAuthor: AuthHandler = ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return Promise.resolve();
   if (!actor.address) throw new InvalidActor(actor, 'Must provide an address');

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Thread } from '../entities';
+import { Reaction, Thread } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasThread = z.object({
@@ -20,4 +20,16 @@ export const CreateThread = {
     discord_meta: DiscordMetaSchema.optional(),
   }),
   output: Thread,
+};
+
+export const CanvasReaction = z.object({
+  thread_id: PG_INT,
+  reaction: z.enum(['like']),
+  canvas_signed_data: z.string().optional(),
+  canvas_hash: z.string().optional(),
+});
+
+export const CreateThreadReaction = {
+  input: CanvasReaction,
+  output: Reaction.extend({ community_id: z.string() }),
 };

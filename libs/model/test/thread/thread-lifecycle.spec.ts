@@ -1,3 +1,10 @@
+import sinon from 'sinon';
+import { contractHelpers } from '../../src/services/commonProtocol';
+const getNamespaceBalanceStub = sinon.stub(
+  contractHelpers,
+  'getNamespaceBalance',
+);
+
 import {
   Actor,
   InvalidInput,
@@ -5,19 +12,24 @@ import {
   command,
   dispose,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
-import { BannedActor, NonMember, RejectedMember } from 'model/src/middleware';
-import { getCommentDepth } from 'model/src/utils/getCommentDepth';
+import { afterEach } from 'node:test';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   CreateComment,
   CreateCommentErrors,
   MAX_COMMENT_DEPTH,
 } from '../../src/comment/CreateComment.command';
+import { models } from '../../src/database';
+import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
 import { seed, seedRecord } from '../../src/tester';
-import { CreateThread } from '../../src/thread/CreateThread.command';
+import {
+  CreateThread,
+  CreateThreadReaction,
+  CreateThreadReactionErrors,
+} from '../../src/thread';
+import { getCommentDepth } from '../../src/utils/getCommentDepth';
 
 const chance = Chance();
 
@@ -25,6 +37,7 @@ describe('Thread lifecycle', () => {
   let thread, archived, read_only;
   const roles = ['admin', 'member', 'nonmember', 'banned', 'rejected'] as const;
   const actors = {} as Record<(typeof roles)[number], Actor>;
+  const vote_weight = 200;
 
   const body = chance.paragraph();
   const title = chance.sentence();
@@ -45,7 +58,7 @@ describe('Thread lifecycle', () => {
   beforeAll(async () => {
     const threadGroupId = 123456;
     const commentGroupId = 654321;
-    const [node] = await seed('ChainNode', {});
+    const [node] = await seed('ChainNode', { eth_chain_id: 1 });
     const users = await seedRecord('User', roles, (role) => ({
       profile: { name: role },
       isAdmin: role === 'admin',
@@ -62,10 +75,21 @@ describe('Thread lifecycle', () => {
       })),
       groups: [{ id: threadGroupId }, { id: commentGroupId }],
       topics: [{ group_ids: [threadGroupId, commentGroupId] }],
+      CommunityStakes: [
+        {
+          stake_id: 1,
+          stake_token: 'stake',
+          stake_enabled: true,
+          vote_weight,
+        },
+      ],
     });
     await seed('GroupPermission', {
       group_id: threadGroupId,
-      allowed_actions: [PermissionEnum.CREATE_THREAD],
+      allowed_actions: [
+        PermissionEnum.CREATE_THREAD,
+        PermissionEnum.CREATE_THREAD_REACTION,
+      ],
     });
     await seed('GroupPermission', {
       group_id: commentGroupId,
@@ -285,6 +309,111 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.NestingTooDeep);
+    });
+  });
+
+  describe('reaction', () => {
+    afterEach(() => {
+      getNamespaceBalanceStub.restore();
+    });
+
+    it('should create a thread reaction as a member of a group with permissions', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      const reaction = await command(CreateThreadReaction(), {
+        actor: actors.member,
+        payload: {
+          thread_id: thread!.id,
+          reaction: 'like',
+        },
+      });
+      expect(reaction).to.include({
+        thread_id: thread!.id,
+        reaction: 'like',
+        community_id: thread!.community_id,
+      });
+    });
+
+    it('should throw error when actor does not have stake', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '0' });
+      await expect(
+        command(CreateThreadReaction(), {
+          actor: actors.member,
+          payload: {
+            thread_id: thread!.id,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(InvalidState);
+    });
+
+    it('should throw error when thread not found', async () => {
+      await expect(
+        command(CreateThreadReaction(), {
+          actor: actors.member,
+          payload: {
+            thread_id: thread!.id + 5,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(InvalidInput);
+    });
+
+    it('should throw error when actor is not member of group with permission', async () => {
+      await expect(
+        command(CreateThreadReaction(), {
+          actor: actors.nonmember,
+          payload: {
+            thread_id: thread!.id,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(NonMember);
+    });
+
+    it('should throw an error when thread is archived', async () => {
+      await expect(
+        command(CreateThreadReaction(), {
+          actor: actors.member,
+          payload: {
+            thread_id: archived!.id,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(CreateThreadReactionErrors.ThreadArchived);
+    });
+
+    it('should set thread reaction vote weight and thread vote sum correctly', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.admin.address!]: '50' });
+      const reaction = await command(CreateThreadReaction(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: read_only!.id,
+          reaction: 'like',
+        },
+      });
+      const expectedWeight = 50 * vote_weight;
+      expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      const t = await models.Thread.findByPk(thread!.id);
+      expect(t!.reaction_weights_sum).to.eq(expectedWeight);
+    });
+
+    // TODO: implement after CreateCommentReaction command
+    it('should set comment reaction vote weight and comment vote sum correctly', async () => {
+      // Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      //   [address.address]: '50',
+      // });
+      // const thread = await createThread();
+      // const comment = await createComment(thread.id);
+      // const [reaction] = await commentsController.createCommentReaction({
+      //   user,
+      //   address,
+      //   reaction: 'like',
+      //   commentId: comment.id,
+      // });
+      // const expectedWeight = 50 * 200;
+      // expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
+      // const c = await server.models.Comment.findByPk(comment.id);
+      // expect(c.reaction_weights_sum).to.eq(expectedWeight);
     });
   });
 
