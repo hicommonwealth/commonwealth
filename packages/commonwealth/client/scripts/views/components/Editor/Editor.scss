@@ -40,13 +40,18 @@ body,
   }
 }
 
-.mdxeditor {
-  display: flex;
-  flex-direction: column;
+.mdxeditor-parent {
+}
 
+.mdxeditor-container {
   // this is needed so that we can have a progress indicator on top of the main
   // content.
   position: relative;
+}
+
+.mdxeditor {
+  display: flex;
+  flex-direction: column;
 
   .mdxeditor-toolbar {
     // TODO this only shows up properly for the *mobile* editor not the desktop
