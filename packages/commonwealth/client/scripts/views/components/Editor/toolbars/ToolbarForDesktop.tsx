@@ -1,6 +1,8 @@
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
+  ChangeCodeMirrorLanguage,
+  ConditionalContents,
   CreateLink,
   InsertCodeBlock,
   InsertImage,
@@ -16,19 +18,33 @@ import './ToolbarForDesktop.scss';
 export const ToolbarForDesktop = () => {
   return (
     <div className="ToolbarForDesktop">
-      <div className="mdxeditor-block-type-select">
-        <BlockTypeSelect />
-      </div>
-      <BoldItalicUnderlineToggles />
-      <Separator />
-      <StrikeThroughSupSubToggles />
-      <Separator />
-      <ListsToggle />
-      <Separator />
-      <CreateLink />
-      <InsertImage />
-      <InsertCodeBlock />
-      <InsertTable />
+      <ConditionalContents
+        options={[
+          {
+            when: (editor) => editor?.editorType === 'codeblock',
+            contents: () => <ChangeCodeMirrorLanguage />,
+          },
+          {
+            fallback: () => (
+              <>
+                <div className="mdxeditor-block-type-select">
+                  <BlockTypeSelect />
+                </div>
+                <BoldItalicUnderlineToggles />
+                <Separator />
+                <StrikeThroughSupSubToggles />
+                <Separator />
+                <ListsToggle />
+                <Separator />
+                <CreateLink />
+                <InsertImage />
+                <InsertCodeBlock />
+                <InsertTable />
+              </>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 };
