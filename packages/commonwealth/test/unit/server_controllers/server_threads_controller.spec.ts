@@ -33,15 +33,15 @@ describe('ServerThreadsController', () => {
           }),
           destroy: async () => ({}),
         },
+        ThreadSubscription: {
+          destroy: () => Promise.resolve({}),
+        },
         CommunityRole: {
           findAll: async () => [
             {
               toJSON: () => ({}),
             },
           ],
-        },
-        Subscription: {
-          destroy: async () => ({}),
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
