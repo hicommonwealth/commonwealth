@@ -46,7 +46,7 @@ export type ImageHandler = 'S3' | 'local' | 'failure';
  */
 export type MarkdownStr = string;
 
-export type UpdateContentStrategy = 'insert' | 'replace'
+export type UpdateContentStrategy = 'insert' | 'replace';
 
 export let DEFAULT_UPDATE_CONTENT_STRATEGY: UpdateContentStrategy = 'insert';
 
@@ -96,17 +96,14 @@ export const Editor = memo(function Editor(props: EditorProps) {
     const text = await fileToText(file);
 
     switch (DEFAULT_UPDATE_CONTENT_STRATEGY) {
-
-      case "insert":
+      case 'insert':
         mdxEditorRef.current?.insertMarkdown(text);
         break;
 
-      case "replace":
+      case 'replace':
         mdxEditorRef.current?.setMarkdown(text);
         break;
-
     }
-
   }, []);
 
   const handleImportMarkdown = useCallback(
