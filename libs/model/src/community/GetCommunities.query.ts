@@ -59,7 +59,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."block_explorer_ids",
                   "Community"."collapsed_on_homepage",
                   "Community"."type",
-                  "Community"."has_chain_events_listener",
                   "Community"."default_summary_view",
                   "Community"."default_page",
                   "Community"."has_homepage",
@@ -233,7 +232,10 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         ${
           relevance_by === 'membership' && replacements.user_id
             ? // eslint-disable-next-line max-len
-              `LEFT OUTER JOIN "Addresses" authUserAddresses ON "community_CTE"."id" = authUserAddresses.community_id AND authUserAddresses.user_id = :user_id`
+              `LEFT OUTER JOIN 
+              (SELECT DISTINCT ON (community_id) * FROM "Addresses" WHERE user_id = :user_id) authUserAddresses 
+              ON "community_CTE"."id" = authUserAddresses.community_id 
+              AND authUserAddresses.user_id = :user_id`
             : ``
         }
         ${

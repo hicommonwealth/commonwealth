@@ -92,14 +92,12 @@ import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
-import farcasterRouter from '../farcaster/router';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
-import { createCommunityHandler } from '../routes/communities/create_community_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
@@ -118,7 +116,6 @@ import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler'
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
-import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
@@ -255,13 +252,6 @@ function setupRouter(
   );
 
   // communities
-  registerRoute(
-    router,
-    'post',
-    '/communities',
-    passport.authenticate('jwt', { session: false }),
-    createCommunityHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',
@@ -455,15 +445,6 @@ function setupRouter(
   );
 
   // comments
-  registerRoute(
-    router,
-    'post',
-    '/threads/:id/comments',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadCommentHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'patch',
@@ -791,7 +772,6 @@ function setupRouter(
     router,
     'post',
     '/linking/getLinks',
-    passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models),
   );
 
@@ -889,8 +869,6 @@ function setupRouter(
   app.use(endpoint, router);
 
   app.use(methodNotAllowedMiddleware());
-
-  app.use('/api/farcaster', farcasterRouter);
 
   app.use('/api/*', function (_req, res) {
     res.status(404);

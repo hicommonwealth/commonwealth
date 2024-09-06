@@ -5,7 +5,6 @@ import {
   type CommunityInstance,
   type DB,
   type EmailNotificationInterval,
-  type StarredCommunityAttributes,
   type UserInstance,
 } from '@hicommonwealth/model';
 import { Knock } from '@knocklabs/node';
@@ -16,6 +15,13 @@ import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
 type CommunityWithRedirects = { id: string; redirect: string };
+
+type StarredCommunityResponse = {
+  id: number;
+  icon_url?: string;
+  name: string;
+  isStarred: boolean;
+};
 
 type StatusResp = {
   loggedIn?: boolean;
@@ -30,7 +36,7 @@ type StatusResp = {
     selectedCommunity: CommunityInstance;
     isAdmin: boolean;
     disableRichText: boolean;
-    starredCommunities: StarredCommunityAttributes[];
+    communities: StarredCommunityResponse[];
   };
   communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
@@ -133,7 +139,7 @@ export const status = async (
     const { user: reqUser } = req;
     if (!reqUser) {
       return success(res, {
-        evmTestEnv: config.EVM.ETH_RPC,
+        evmTestEnv: config.TEST_EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     } else {
@@ -165,7 +171,7 @@ export const status = async (
         // @ts-expect-error StrictNullChecks
         user,
         communityWithRedirects: communityWithRedirects || [],
-        evmTestEnv: config.EVM.ETH_RPC,
+        evmTestEnv: config.TEST_EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     }

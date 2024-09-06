@@ -164,12 +164,10 @@ describe('Contests projection lifecycle', () => {
           reaction_count: 1,
           reaction_weights_sum: 1,
           comment_count: 1,
-          max_notif_id: 1,
           discord_meta: undefined,
           deleted_at: undefined, // so we can find it!
           pinned: false,
           read_only: false,
-          version_history: [],
         },
         //{ mock: true, log: true },
       );

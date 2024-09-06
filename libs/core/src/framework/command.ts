@@ -1,6 +1,5 @@
 import { z, ZodError, ZodSchema } from 'zod';
 import {
-  CommandInput,
   InvalidInput,
   type CommandContext,
   type CommandMetadata,
@@ -18,7 +17,7 @@ import {
  * @throws {@link InvalidInput} when user invokes command with invalid payload or attributes, or rethrows internal domain errors
  */
 export const command = async <
-  Input extends CommandInput,
+  Input extends ZodSchema,
   Output extends ZodSchema,
 >(
   { input, auth, body }: CommandMetadata<Input, Output>,
