@@ -214,61 +214,63 @@ export const Editor = memo(function Editor(props: EditorProps) {
   }, [onSubmit]);
 
   return (
-    <div
-      className={clsx(
-        'mdxeditor-container',
-        'mdxeditor-container-mode-' + mode,
-      )}
-      onDrop={handleDrop}
-      onDragEnter={handleDragEnter}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onPaste={(event) => handlePaste(event)}
-    >
-      <MDXEditor
-        onError={errorHandler}
-        ref={mdxEditorRef}
-        markdown={props.markdown ?? ''}
-        placeholder={placeholder}
-        iconComponentFor={iconComponentFor}
-        translation={editorTranslator}
-        plugins={[
-          toolbarPlugin({
-            location: mode === 'mobile' ? 'bottom' : 'top',
-            toolbarContents: () =>
-              mode === 'mobile' ? (
-                <ToolbarForMobile onSubmit={handleSubmit} />
-              ) : (
-                <ToolbarForDesktop />
-              ),
-          }),
-          listsPlugin(),
-          quotePlugin(),
-          headingsPlugin(),
-          linkPlugin(),
-          linkDialogPlugin(),
-          codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-          codeMirrorPlugin({
-            codeBlockLanguages,
-          }),
-          imagePlugin({ imageUploadHandler }),
-          tablePlugin(),
-          thematicBreakPlugin(),
-          frontmatterPlugin(),
-          diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
-          markdownShortcutPlugin(),
-        ]}
-      />
-
-      {mode === 'desktop' && (
-        <DesktopEditorFooter
-          onImportMarkdown={handleImportMarkdown}
-          onSubmit={handleSubmit}
+    <div className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}>
+      <div
+        className={clsx(
+          'mdxeditor-container',
+          'mdxeditor-container-mode-' + mode,
+        )}
+        onDrop={handleDrop}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onPaste={(event) => handlePaste(event)}
+      >
+        <MDXEditor
+          onError={errorHandler}
+          ref={mdxEditorRef}
+          markdown={props.markdown ?? ''}
+          placeholder={placeholder}
+          iconComponentFor={iconComponentFor}
+          translation={editorTranslator}
+          plugins={[
+            toolbarPlugin({
+              location: mode === 'mobile' ? 'bottom' : 'top',
+              toolbarContents: () =>
+                mode === 'mobile' ? (
+                  <ToolbarForMobile onSubmit={handleSubmit} />
+                ) : (
+                  <ToolbarForDesktop />
+                ),
+            }),
+            listsPlugin(),
+            quotePlugin(),
+            headingsPlugin(),
+            linkPlugin(),
+            linkDialogPlugin(),
+            codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+            codeMirrorPlugin({
+              codeBlockLanguages,
+            }),
+            imagePlugin({ imageUploadHandler }),
+            tablePlugin(),
+            thematicBreakPlugin(),
+            frontmatterPlugin(),
+            diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+            markdownShortcutPlugin(),
+          ]}
         />
-      )}
 
-      {dragging && <DragIndicator />}
-      {uploading && <UploadIndicator />}
+        {mode === 'desktop' && (
+          <DesktopEditorFooter
+            onImportMarkdown={handleImportMarkdown}
+            onSubmit={handleSubmit}
+          />
+        )}
+
+        {dragging && <DragIndicator />}
+        {uploading && <UploadIndicator />}
+      </div>
     </div>
   );
 });
