@@ -62,7 +62,7 @@ const useCreateCommentReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.comment.createCommentReaction.useMutation({
-    onSuccess: async (newReaction) => {
+    onSuccess: (newReaction) => {
       // update fetch comments query state
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
