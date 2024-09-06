@@ -58,13 +58,14 @@ export const verifyCommentSignature: AuthHandler<
 };
 
 export const verifyReactionSignature: AuthHandler<
-  typeof schemas.CanvasReaction
+  typeof schemas.ThreadCanvasReaction | typeof schemas.CommentCanvasReaction
 > = async ({ actor, payload }) => {
   if (config.ENFORCE_SESSION_KEYS) {
     if (hasCanvasSignedDataApiArgs(payload)) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
       await verifyReaction(canvasSignedData, {
-        thread_id: payload.thread_id,
+        thread_id: 'thread_id' in payload ? payload.thread_id : undefined,
+        comment_id: 'comment_id' in payload ? payload.comment_id : undefined,
         value: payload.reaction,
         address:
           canvasSignedData.actionMessage.payload.address.split(':')[0] ==

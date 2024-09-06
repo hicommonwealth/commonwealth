@@ -19,8 +19,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   CreateComment,
   CreateCommentErrors,
+  CreateCommentReaction,
   MAX_COMMENT_DEPTH,
-} from '../../src/comment/CreateComment.command';
+} from '../../src/comment';
 import { models } from '../../src/database';
 import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
 import { seed, seedRecord } from '../../src/tester';
@@ -34,7 +35,7 @@ import { getCommentDepth } from '../../src/utils/getCommentDepth';
 const chance = Chance();
 
 describe('Thread lifecycle', () => {
-  let thread, archived, read_only;
+  let thread, archived, read_only, comment;
   const roles = ['admin', 'member', 'nonmember', 'banned', 'rejected'] as const;
   const actors = {} as Record<(typeof roles)[number], Actor>;
   const vote_weight = 200;
@@ -89,6 +90,7 @@ describe('Thread lifecycle', () => {
       allowed_actions: [
         PermissionEnum.CREATE_THREAD,
         PermissionEnum.CREATE_THREAD_REACTION,
+        PermissionEnum.CREATE_COMMENT_REACTION,
       ],
     });
     await seed('GroupPermission', {
@@ -203,7 +205,7 @@ describe('Thread lifecycle', () => {
   describe('comments', () => {
     it('should create a thread comment as member of group with permissions', async () => {
       const text = 'hello';
-      const comment = await command(CreateComment(), {
+      comment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           thread_id: thread!.id,
@@ -312,7 +314,7 @@ describe('Thread lifecycle', () => {
     });
   });
 
-  describe('reaction', () => {
+  describe('thread reaction', () => {
     afterEach(() => {
       getNamespaceBalanceStub.restore();
     });
@@ -396,24 +398,79 @@ describe('Thread lifecycle', () => {
       const t = await models.Thread.findByPk(thread!.id);
       expect(t!.reaction_weights_sum).to.eq(expectedWeight);
     });
+  });
 
-    // TODO: implement after CreateCommentReaction command
+  describe('comment reaction', () => {
+    afterEach(() => {
+      getNamespaceBalanceStub.restore();
+    });
+
+    it('should create a comment reaction as a member of a group with permissions', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      const reaction = await command(CreateCommentReaction(), {
+        actor: actors.member,
+        payload: {
+          comment_id: comment!.id,
+          reaction: 'like',
+        },
+      });
+      expect(reaction).to.include({
+        comment_id: comment!.id,
+        reaction: 'like',
+        community_id: thread!.community_id,
+      });
+    });
+
     it('should set comment reaction vote weight and comment vote sum correctly', async () => {
-      // Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
-      //   [address.address]: '50',
-      // });
-      // const thread = await createThread();
-      // const comment = await createComment(thread.id);
-      // const [reaction] = await commentsController.createCommentReaction({
-      //   user,
-      //   address,
-      //   reaction: 'like',
-      //   commentId: comment.id,
-      // });
-      // const expectedWeight = 50 * 200;
-      // expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
-      // const c = await server.models.Comment.findByPk(comment.id);
-      // expect(c.reaction_weights_sum).to.eq(expectedWeight);
+      getNamespaceBalanceStub.resolves({ [actors.admin.address!]: '50' });
+      const reaction = await command(CreateCommentReaction(), {
+        actor: actors.admin,
+        payload: {
+          comment_id: comment!.id,
+          reaction: 'like',
+        },
+      });
+      const expectedWeight = 50 * vote_weight;
+      expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      const c = await models.Comment.findByPk(comment!.id);
+      expect(c!.reaction_weights_sum).to.eq(expectedWeight * 2); // *2 to account for first member reaction
+    });
+
+    it('should throw error when comment not found', async () => {
+      await expect(
+        command(CreateCommentReaction(), {
+          actor: actors.member,
+          payload: {
+            comment_id: 99999999,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(InvalidInput);
+    });
+
+    it('should throw error when actor does not have stake', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '0' });
+      await expect(
+        command(CreateCommentReaction(), {
+          actor: actors.member,
+          payload: {
+            comment_id: comment!.id,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(InvalidState);
+    });
+
+    it('should throw error when actor is not member of group with permission', async () => {
+      await expect(
+        command(CreateCommentReaction(), {
+          actor: actors.nonmember,
+          payload: {
+            comment_id: comment!.id,
+            reaction: 'like',
+          },
+        }),
+      ).rejects.toThrowError(NonMember);
     });
   });
 

@@ -94,10 +94,15 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
       }
       if (track && result.ok) {
         try {
-          analytics().track(track[0], {
-            userId: ctx.actor.user.id,
+          const host = ctx.req.headers.host;
+          const payload = {
             ...(track[1] ? track[1](result.data) : {}),
-          });
+            ...getRequestBrowserInfo(ctx.req),
+            ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
+            userId: ctx.actor.user.id,
+            isPWA: ctx.req.headers?.['isPWA'] === 'true',
+          };
+          analytics().track(track[0], payload);
         } catch (err) {
           err instanceof Error && log.error(err.message, err);
         }
@@ -165,4 +170,26 @@ const authenticate = async (
       code: 'UNAUTHORIZED',
     });
   }
+};
+
+/**
+ * Returns a record containing condensed browser info.
+ * Expects the 'express-useragent' middleware to be applied to the route.
+ * Includes 'is...' boolean entries if the value is true, and all string values
+ */
+const getRequestBrowserInfo = (
+  req: Request & { useragent?: Record<string, unknown> },
+) => {
+  const info: Record<string, unknown> = req.useragent
+    ? Object.entries(req.useragent)
+        .filter(([k, v]) => typeof v === 'string' || (k.startsWith('is') && v))
+        .reduce((p, [k, v]) => Object.assign(p, { [k]: v }), {})
+    : {};
+  const brand = req.headers['sec-ch-ua'];
+  if (typeof brand === 'string' && brand.includes('Brave')) {
+    delete info['isChrome'];
+    info['isBrave'] = true;
+    info['browser'] = 'Brave';
+  }
+  return info;
 };

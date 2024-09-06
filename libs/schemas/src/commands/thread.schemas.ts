@@ -22,7 +22,7 @@ export const CreateThread = {
   output: Thread,
 };
 
-export const CanvasReaction = z.object({
+export const ThreadCanvasReaction = z.object({
   thread_id: PG_INT,
   reaction: z.enum(['like']),
   canvas_signed_data: z.string().optional(),
@@ -30,6 +30,6 @@ export const CanvasReaction = z.object({
 });
 
 export const CreateThreadReaction = {
-  input: CanvasReaction,
+  input: ThreadCanvasReaction,
   output: Reaction.extend({ community_id: z.string() }),
 };

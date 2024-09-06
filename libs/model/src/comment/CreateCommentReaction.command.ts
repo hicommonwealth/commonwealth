@@ -1,4 +1,4 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isCommunityAdminOrTopicMember } from '../middleware';
@@ -6,33 +6,34 @@ import { verifyReactionSignature } from '../middleware/canvas';
 import { mustExist } from '../middleware/guards';
 import { getVotingWeight } from '../services/stakeHelper';
 
-export const CreateThreadReactionErrors = {
-  ThreadArchived: 'Thread is archived',
-};
-
-export function CreateThreadReaction(): Command<
-  typeof schemas.CreateThreadReaction
+export function CreateCommentReaction(): Command<
+  typeof schemas.CreateCommentReaction
 > {
   return {
-    ...schemas.CreateThreadReaction,
+    ...schemas.CreateCommentReaction,
     auth: [
       isCommunityAdminOrTopicMember(
-        schemas.PermissionEnum.CREATE_THREAD_REACTION,
+        schemas.PermissionEnum.CREATE_COMMENT_REACTION,
       ),
       verifyReactionSignature,
     ],
     body: async ({ actor, payload }) => {
-      const thread = await models.Thread.findOne({
-        where: { id: payload.thread_id },
+      const comment = await models.Comment.findOne({
+        where: { id: payload.comment_id },
+        include: [
+          {
+            model: models.Thread,
+            required: true,
+          },
+        ],
       });
-      mustExist('Thread', thread);
-      if (thread.archived_at)
-        throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);
+      mustExist('Comment', comment);
 
+      const thread = comment.Thread!;
       const address = await models.Address.findOne({
         where: {
-          user_id: actor.user.id,
           community_id: thread.community_id,
+          user_id: actor.user.id,
           address: actor.address,
         },
       });
@@ -49,12 +50,12 @@ export function CreateThreadReaction(): Command<
           const [reaction] = await models.Reaction.findOrCreate({
             where: {
               address_id: address.id,
-              thread_id: thread.id,
+              comment_id: comment.id,
               reaction: payload.reaction,
             },
             defaults: {
               address_id: address.id!,
-              thread_id: thread.id,
+              comment_id: comment.id,
               reaction: payload.reaction,
               calculated_voting_weight,
               canvas_hash: payload.canvas_hash,
@@ -72,7 +73,7 @@ export function CreateThreadReaction(): Command<
       // == end of transaction boundary ==
 
       const reaction = await models.Reaction.findOne({
-        where: { id: new_reaction_id },
+        where: { id: new_reaction_id! },
         include: [{ model: models.Address, include: [models.User] }],
       });
       return {
