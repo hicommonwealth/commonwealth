@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   codeBlockPlugin,
   codeMirrorPlugin,
@@ -16,13 +17,9 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { memo, useCallback, useRef, useState } from 'react';
-
-import './Editor.scss';
-
-import clsx from 'clsx';
 import 'commonwealth-mdxeditor/style.css';
 import { notifyError } from 'controllers/app/notifications';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { DesktopEditorFooter } from './DesktopEditorFooter';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
@@ -35,6 +32,8 @@ import { codeBlockLanguages } from './utils/codeBlockLanguages';
 import { editorTranslator } from './utils/editorTranslator';
 import { fileToText } from './utils/fileToText';
 import { iconComponentFor } from './utils/iconComponentFor';
+
+import './Editor.scss';
 
 export type ImageURL = string;
 

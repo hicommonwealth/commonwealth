@@ -19,7 +19,6 @@ export const ToolbarForDesktop = () => {
       <div className="mdxeditor-block-type-select">
         <BlockTypeSelect />
       </div>
-      {/*<UndoRedo />*/}
       <BoldItalicUnderlineToggles />
       <Separator />
       <StrikeThroughSupSubToggles />
