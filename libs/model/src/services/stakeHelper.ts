@@ -25,12 +25,12 @@ export async function getVotingWeight(
   if (!stake) return null;
 
   const community = await models.Community.findByPk(community_id);
-  if (!mustExist('Community', community)) return null;
-  if (!mustExist('Chain Node Id', community.chain_node_id)) return null;
+  mustExist('Community', community);
+  mustExist('Chain Node Id', community.chain_node_id);
 
   const node = await models.ChainNode.findByPk(community.chain_node_id!);
-  if (!mustExist('Chain Node', node)) return null;
-  if (!mustExist('Eth Chain Id', node.eth_chain_id)) return null;
+  mustExist('Chain Node', node);
+  mustExist('Eth Chain Id', node.eth_chain_id);
 
   const stakeBalances = await contractHelpers.getNamespaceBalance(
     community.namespace_address!,

@@ -27,7 +27,7 @@ export function CreateCommentReaction(): Command<
           },
         ],
       });
-      if (!mustExist('Comment', comment)) return;
+      mustExist('Comment', comment);
 
       const thread = comment.Thread!;
       const address = await models.Address.findOne({
@@ -37,7 +37,7 @@ export function CreateCommentReaction(): Command<
           address: actor.address,
         },
       });
-      if (!mustExist('Community address', address)) return;
+      mustExist('Community address', address);
 
       const calculated_voting_weight = await getVotingWeight(
         thread.community_id,

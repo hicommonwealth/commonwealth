@@ -25,7 +25,7 @@ export function CreateThreadReaction(): Command<
       const thread = await models.Thread.findOne({
         where: { id: payload.thread_id },
       });
-      if (!mustExist('Thread', thread)) return;
+      mustExist('Thread', thread);
       if (thread.archived_at)
         throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);
 
@@ -36,7 +36,7 @@ export function CreateThreadReaction(): Command<
           address: actor.address,
         },
       });
-      if (!mustExist('Community address', address)) return;
+      mustExist('Community address', address);
 
       const calculated_voting_weight = await getVotingWeight(
         thread.community_id,

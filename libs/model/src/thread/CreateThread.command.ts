@@ -114,7 +114,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           address: actor.address,
         },
       });
-      if (!mustExist('Community address', address)) return;
+      mustExist('Community address', address);
 
       const body = sanitizeQuillText(payload.body);
       const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
