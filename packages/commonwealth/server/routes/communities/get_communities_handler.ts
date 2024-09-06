@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/core';
 import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
 import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
 import { ServerControllers } from '../../routing/router';
@@ -7,6 +8,10 @@ import {
   TypedResponse,
   success,
 } from '../../types';
+
+const Errors = {
+  QueryRequired: 'query is required',
+};
 
 type GetCommunitiesRequestQuery = {
   active?: string;
@@ -23,21 +28,19 @@ export const getCommunitiesHandler = async (
 ) => {
   const options = req.query;
 
-  // search communities
-  if (options.search) {
-    const results = await controllers.communities.searchCommunities({
-      search: options.search,
-      // @ts-expect-error StrictNullChecks
-      limit: parseInt(options.limit, 10) || 0,
-      // @ts-expect-error StrictNullChecks
-      page: parseInt(options.page, 10) || 0,
-      orderBy: options.order_by,
-      orderDirection: options.order_direction as any,
-    });
-    return success(res, results);
+  if (!options.search) {
+    throw new AppError(Errors.QueryRequired);
   }
 
-  // TODO: throw error here -- route no longer accessible
-  const results = await controllers.communities.getCommunities({});
+  // search communities
+  const results = await controllers.communities.searchCommunities({
+    search: options.search,
+    // @ts-expect-error StrictNullChecks
+    limit: parseInt(options.limit, 10) || 0,
+    // @ts-expect-error StrictNullChecks
+    page: parseInt(options.page, 10) || 0,
+    orderBy: options.order_by,
+    orderDirection: options.order_direction as any,
+  });
   return success(res, results);
 };
