@@ -36,17 +36,17 @@ const GET_SPACE_QUERY = gql`
   }
 `;
 
-interface UseGetContestsQueryProps {
+interface UseGetSnapshotSpaceQueryProps {
   space: string;
 }
 
-const getSpace = async ({ space }: UseGetContestsQueryProps) => {
+const getSpace = async ({ space }: UseGetSnapshotSpaceQueryProps) => {
   return await request(ExternalEndpoints.snapshotHub.graphql, GET_SPACE_QUERY, {
     space,
   });
 };
 
-const useGetSnapshotSpaceQuery = ({ space }: UseGetContestsQueryProps) => {
+const useGetSnapshotSpaceQuery = ({ space }: UseGetSnapshotSpaceQueryProps) => {
   return useQuery({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'space', space],
     queryFn: () => getSpace({ space }),

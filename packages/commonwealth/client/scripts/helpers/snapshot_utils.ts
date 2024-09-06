@@ -71,6 +71,7 @@ class GqlLazyLoader {
 `;
   }
 
+  // TODO ✅
   public static async PROPOSAL_QUERY() {
     await this.init();
     return this.gql`
@@ -255,6 +256,7 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
   return spaceObj.data.space;
 }
 
+// TODO ✅
 export async function getProposal(
   id: string,
 ): Promise<{ title: string; space: string }> {

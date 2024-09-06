@@ -1,3 +1,4 @@
+import useGetSnapshotProposalQuery from './getProposal';
 import useGetSnapshotSpaceQuery from './getSpace';
 
-export { useGetSnapshotSpaceQuery };
+export { useGetSnapshotProposalQuery, useGetSnapshotSpaceQuery };
