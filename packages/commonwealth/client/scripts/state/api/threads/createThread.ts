@@ -38,7 +38,6 @@ export const buildCreateThreadInput = async ({
     link: url,
     topic: topic.id,
   });
-  const canvas_args = toCanvasSignedDataApiArgs(canvasSignedData);
   return {
     community_id: communityId,
     topic_id: topic.id,
@@ -48,8 +47,7 @@ export const buildCreateThreadInput = async ({
     stage,
     url,
     read_only: false,
-    canvas_signed_data: canvas_args?.canvas_signed_data ?? '',
-    canvas_hash: canvas_args?.canvas_hash ?? '',
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
 };
 

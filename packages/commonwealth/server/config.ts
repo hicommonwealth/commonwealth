@@ -14,7 +14,6 @@ const {
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
-  MAGIC_API_KEY,
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
   ADDRESS_TOKEN_EXPIRES_IN,
@@ -22,7 +21,6 @@ const {
   MEMBERSHIP_REFRESH_TTL_SECONDS,
   DISCORD_CLIENT_ID,
   DISCORD_TOKEN,
-  REACTION_WEIGHT_OVERRIDE,
   CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
@@ -68,9 +66,6 @@ export const config = configure(
       MEMBERSHIP_REFRESH_TTL_SECONDS ?? DEFAULTS.MEMBERSHIP_REFRESH_TTL_SECONDS,
       10,
     ),
-    REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
-      ? parseInt(REACTION_WEIGHT_OVERRIDE, 10)
-      : null,
     CW_BOT_KEY,
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: parseInt(
       ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS ??
@@ -79,7 +74,6 @@ export const config = configure(
     ),
     AUTH: {
       SESSION_SECRET: SESSION_SECRET || DEFAULTS.SESSION_SECRET,
-      MAGIC_API_KEY,
       MAGIC_SUPPORTED_BASES:
         (MAGIC_SUPPORTED_BASES?.split(',') as ChainBase[]) ||
         DEFAULTS.MAGIC_SUPPORTED_BASES,
@@ -137,7 +131,6 @@ export const config = configure(
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
-    REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
     CW_BOT_KEY: z
       .string()
       .optional()
@@ -161,13 +154,6 @@ export const config = configure(
               data === DEFAULTS.SESSION_SECRET
             ),
           'SESSION_SECRET must be a non-default value in production',
-        ),
-      MAGIC_API_KEY: z
-        .string()
-        .optional()
-        .refine(
-          (data) => !(model_config.APP_ENV === 'production' && !data),
-          'MAGIC_API_KEY is required in production',
         ),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
