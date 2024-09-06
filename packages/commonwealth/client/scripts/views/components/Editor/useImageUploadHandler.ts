@@ -23,7 +23,7 @@ export function useImageUploadHandler(imageHandler: ImageHandler) {
           case 'local':
             return await imageUploadHandlerDelegateLocal(file);
           case 'failure':
-            return await imageUploadHandlerDelegateWithFailure(file);
+            return await imageUploadHandlerDelegateWithFailure();
         }
       } catch (e) {
         notifyError('Failed to upload image: ' + e.message);
