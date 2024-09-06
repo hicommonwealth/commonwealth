@@ -40,6 +40,10 @@ body,
   }
 }
 
+.mdxeditor-parent {
+  flex-grow: 1;
+}
+
 .mdxeditor-parent-mode-mobile {
   display: flex;
 }
