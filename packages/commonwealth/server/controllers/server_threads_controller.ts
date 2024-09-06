@@ -5,20 +5,10 @@ import {
   __countThreads,
 } from './server_threads_methods/count_threads';
 import {
-  CreateThreadCommentOptions,
-  CreateThreadCommentResult,
-  __createThreadComment,
-} from './server_threads_methods/create_thread_comment';
-import {
   CreateThreadPollOptions,
   CreateThreadPollResult,
   __createThreadPoll,
 } from './server_threads_methods/create_thread_poll';
-import {
-  CreateThreadReactionOptions,
-  CreateThreadReactionResult,
-  __createThreadReaction,
-} from './server_threads_methods/create_thread_reaction';
 import {
   DeleteThreadOptions,
   DeleteThreadResult,
@@ -58,18 +48,6 @@ export class ServerThreadsController {
     public models: DB,
     public globalActivityCache?: GlobalActivityCache,
   ) {}
-
-  async createThreadReaction(
-    options: CreateThreadReactionOptions,
-  ): Promise<CreateThreadReactionResult> {
-    return __createThreadReaction.call(this, options);
-  }
-
-  async createThreadComment(
-    options: CreateThreadCommentOptions,
-  ): Promise<CreateThreadCommentResult> {
-    return __createThreadComment.call(this, options);
-  }
 
   async deleteThread(
     options: DeleteThreadOptions,

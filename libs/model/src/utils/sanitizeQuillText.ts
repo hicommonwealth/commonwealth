@@ -1,4 +1,5 @@
-import { QuillOps } from '@hicommonwealth/shared';
+import { InvalidInput } from '@hicommonwealth/core';
+import { QuillOps, renderQuillDeltaToText } from '@hicommonwealth/shared';
 
 // EmbedSanitizer returns a sanitized URL string if the input URL matches the format and is valid, otherwise null
 type EmbedSanitizer = (url: string) => string | null;
@@ -74,4 +75,21 @@ export function sanitizeQuillText(input: string, noEncode?: boolean): string {
     return JSON.stringify(parsedObject);
   }
   return encodeURIComponent(JSON.stringify(parsedObject));
+}
+
+/**
+ * Converts a URL decoded quill text into plain text
+ * @param decoded decoded quill text
+ * @returns plain text
+ */
+export function quillToPlain(decoded: string) {
+  try {
+    const quillDoc = JSON.parse(decoded);
+    if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '')
+      throw new InvalidInput('Missing content');
+    return renderQuillDeltaToText(quillDoc);
+  } catch {
+    // check always passes if the body isn't a Quill document
+  }
+  return decoded;
 }
