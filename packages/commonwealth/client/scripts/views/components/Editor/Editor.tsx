@@ -48,6 +48,11 @@ export type MarkdownStr = string;
 
 export type UpdateContentStrategy = 'insert' | 'replace';
 
+/**
+ * Allows us to easily set the strategy back to replace but I suspect we will
+ * have insert used for some things and replace used for others.  File uploads
+ * seem like they should be 'replace'
+ */
 export const DEFAULT_UPDATE_CONTENT_STRATEGY =
   'insert' as UpdateContentStrategy;
 
