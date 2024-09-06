@@ -7,9 +7,10 @@ export type IndicatorProps = Readonly<{
 }>;
 
 export const Indicator = (props: IndicatorProps) => {
+  const { children } = props;
   return (
     <div className="Indicator">
-      <div className="inner">{props.children}</div>
+      <div className="inner">{children}</div>
     </div>
   );
 };

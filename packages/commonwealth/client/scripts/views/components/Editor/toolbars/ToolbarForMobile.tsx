@@ -15,6 +15,8 @@ type ToolbarForMobileProps = Readonly<{
 }>;
 
 export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
+  const { onSubmit } = props;
+
   return (
     <div className="ToolbarForMobile">
       <div className="mdxeditor-block-type-select">
@@ -27,7 +29,7 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <Separator />
       <InsertImage />
       <div className="end">
-        <button onClick={() => props.onSubmit?.()}>➤</button>
+        <button onClick={() => onSubmit?.()}>➤</button>
       </div>
     </div>
   );

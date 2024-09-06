@@ -48,7 +48,8 @@ export type MarkdownStr = string;
 
 export type UpdateContentStrategy = 'insert' | 'replace';
 
-export let DEFAULT_UPDATE_CONTENT_STRATEGY: UpdateContentStrategy = 'insert';
+export const DEFAULT_UPDATE_CONTENT_STRATEGY =
+  'insert' as UpdateContentStrategy;
 
 type EditorProps = {
   readonly markdown?: MarkdownStr;
@@ -117,22 +118,25 @@ export const Editor = memo(function Editor(props: EditorProps) {
     [handleFile],
   );
 
-  const handleFiles = useCallback(async (files: FileList) => {
-    if (files.length === 1) {
-      const file = files[0];
+  const handleFiles = useCallback(
+    async (files: FileList) => {
+      if (files.length === 1) {
+        const file = files[0];
 
-      if (canAcceptFileForImport(file)) {
-        await handleFile(file);
-      } else {
-        notifyError('File not markdown. Has invalid type: ' + file.type);
+        if (canAcceptFileForImport(file)) {
+          await handleFile(file);
+        } else {
+          notifyError('File not markdown. Has invalid type: ' + file.type);
+        }
       }
-    }
 
-    if (files.length > 1) {
-      notifyError('Too many files given');
-      return;
-    }
-  }, []);
+      if (files.length > 1) {
+        notifyError('Too many files given');
+        return;
+      }
+    },
+    [handleFile],
+  );
 
   const handleDropAsync = useCallback(
     async (event: React.DragEvent) => {
