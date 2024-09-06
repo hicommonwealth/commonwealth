@@ -22,9 +22,29 @@ so that we can place the toolbar below the editor.
 
 # Testing
 
+## Desktop
+
 - success: copy a .md file to the clipboard, try to paste it into the editor. It
-  should replace the editor contents.
+  should insert the content at the editor's cursor
+
+- success: drag a .md file on top of the editor.  The drag indicator should show
+  up and cover the editor while you're dragging.
+
+- success: use the 'Import markdown' button to upload a file.
 
 - failure: copy multiple .md files ot the clipboard, try to paste into the editor.
   It should fail because we can't handle multiple .md files
-- success: drag a
+
+- success: right click on an image in the browser, try to paste it into the editor.
+
+- success: take a screenshot, try to paste it into the editor. The upload
+  indicator should show up.
+
+- success: use the image button at the top to manually upload an image. The
+  upload indicator should show up while this is happening.
+
+## Mobile
+
+- The toolbar should be present at the bottom of the UI.
+
+
