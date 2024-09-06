@@ -1,10 +1,9 @@
 import React from 'react';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
-  CWModalFooter,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 
 type SnapshotSpaceSelectorModalProps = {
   snapshotSpacesArray: string[];
@@ -33,7 +32,6 @@ const SnapshotSpaceSelectorModal = ({
           ))}
         </div>
       </CWModalBody>
-      <CWModalFooter> </CWModalFooter>
     </div>
   );
 };

@@ -1,28 +1,30 @@
+import _ from 'lodash';
+import moment from 'moment';
+import { DeltaStatic } from 'quill';
+import React, { useEffect, useState } from 'react';
+
+import { MixpanelSnapshotEvents } from 'analytics/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
+import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import _ from 'lodash';
 import Thread from 'models/Thread';
-import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/new_snapshot_proposal.scss';
-import { DeltaStatic } from 'quill';
-import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
-import useAppStatus from '../../../hooks/useAppStatus';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
-  ReactQuillEditor,
   createDeltaFromText,
-} from '../../components/react_quill_editor';
-import { createNewProposal } from './helpers';
-import type { ThreadForm } from './types';
+  ReactQuillEditor,
+} from 'views/components/react_quill_editor';
+
+import { createNewProposal, ThreadForm } from '../helpers';
+
+import './NewSnapshotProposalForm.scss';
 
 type NewSnapshotProposalFormProps = {
   snapshotId: string;
@@ -327,4 +329,5 @@ export const NewSnapshotProposalForm = ({
     </div>
   );
 };
+
 export default NewSnapshotProposalForm;

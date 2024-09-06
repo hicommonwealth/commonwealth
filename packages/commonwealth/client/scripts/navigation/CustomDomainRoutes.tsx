@@ -93,7 +93,7 @@ const ViewSnapshotsProposalPage = lazy(
   () => import('views/pages/Snapshots/ViewSnapshotProposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal'),
+  () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));

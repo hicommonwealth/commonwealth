@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import SnapshotSpaceSelectorModal from './SnapshotSpaceSelectorModal';
-import { NewSnapshotProposalForm } from './index';
 
-type NewSnapshotProposalPageProps = {
+import NewSnapshotProposalForm from './NewSnapshotProposalForm';
+import SnapshotSpaceSelectorModal from './SnapshotSpaceSelectorModal';
+
+import './NewSnapshotProposal.scss';
+
+type NewSnapshotProposalProps = {
   snapshotId: string;
 };
 
-// TODO
-export const NewSnapshotProposalPage = ({
+export const NewSnapshotProposal = ({
   snapshotId,
-}: NewSnapshotProposalPageProps) => {
+}: NewSnapshotProposalProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [snapshotSpace, setSnapshotSpace] = useState('');
 
@@ -34,7 +36,7 @@ export const NewSnapshotProposalPage = ({
 
   return (
     <CWPageLayout>
-      <div className="NewSnapshotProposalPage">
+      <div className="NewSnapshotProposal">
         <CWText type="h3" fontWeight="medium">
           New Snapshot Proposal
         </CWText>
@@ -60,4 +62,4 @@ export const NewSnapshotProposalPage = ({
   );
 };
 
-export default NewSnapshotProposalPage;
+export default NewSnapshotProposal;
