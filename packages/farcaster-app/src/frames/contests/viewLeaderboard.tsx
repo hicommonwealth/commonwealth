@@ -1,5 +1,6 @@
 import { error } from 'frames.js/core';
 import { Button } from 'frames.js/express';
+import React from 'react';
 import { frames } from '../../config';
 import { getInvertedColor, getLeaderboard, getRandomColor } from '../../utils';
 

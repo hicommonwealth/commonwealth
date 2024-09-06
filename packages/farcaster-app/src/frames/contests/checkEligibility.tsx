@@ -1,4 +1,5 @@
 import { Button } from 'frames.js/express';
+import React from 'react';
 import { frames } from '../../config';
 import { circleCheckIcon, circleXIcon, fakeApiCall } from '../../utils';
 

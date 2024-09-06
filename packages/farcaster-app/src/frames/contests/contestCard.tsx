@@ -1,5 +1,6 @@
 import { Button } from 'frames.js/express';
 import moment from 'moment';
+import React from 'react';
 import { frames } from '../../config';
 
 const PrizeRow = ({ index, prize }: { index: number; prize: number }) => {
