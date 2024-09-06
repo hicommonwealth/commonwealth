@@ -324,8 +324,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             active: true,
             chain_node_id: node.id,
             token_name,
-            has_chain_events_listener:
-              network === 'aave' || network === 'compound',
             default_page: DefaultPage.Discussions,
             has_homepage: 'true',
             collapsed_on_homepage: false,
