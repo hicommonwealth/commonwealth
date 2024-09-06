@@ -174,7 +174,6 @@ const RPCEndpointTask = () => {
       //   Object.keys(communityLookupData || {}).length > 0 &&
       //   communityInfoValueValidated
       // ) {
-      //   console.log('inside if statement)');
       //   await updateCommunity({
       //     communityId: communityLookupData?.id,
       //     chainNodeId: nodeId ?? communityChainNode?.id?.toString(),
@@ -190,7 +189,6 @@ const RPCEndpointTask = () => {
       setRpcName('');
       setErrorMsg(null);
       notifySuccess('RPC Endpoint Updated');
-      console.log('from the bottom');
     } catch (e) {
       notifyError('Error updating RPC Endpoint');
       console.error(e);
@@ -236,7 +234,7 @@ const RPCEndpointTask = () => {
 
   return (
     <div className="TaskGroup">
-      <CWText type="h4">Switch/Add RPC Endpoint</CWText>
+      <CWText type="h4">Add RPC Endpoint/Create Chain Node</CWText>
       <CWText type="caption">
         Adds a Chain Node for a specific chain community
       </CWText>

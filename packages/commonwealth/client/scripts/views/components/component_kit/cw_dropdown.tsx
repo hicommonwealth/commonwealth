@@ -29,7 +29,7 @@ export const CWDropdown = ({
 }: DropdownProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedValue, setSelectedValue] = useState<DropdownItemType>(
-    initialValue ?? options[0]
+    initialValue ?? options[0],
   );
 
   return (
