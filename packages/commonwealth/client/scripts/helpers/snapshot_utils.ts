@@ -36,6 +36,7 @@ class GqlLazyLoader {
     }
   }
 
+  // todo ✅
   public static async SPACE_QUERY() {
     await this.init();
     return this.gql`
@@ -65,37 +66,6 @@ class GqlLazyLoader {
         params
       }
       members
-    }
-  }
-`;
-  }
-
-  public static async MULTIPLE_SPACE_QUERY() {
-    await this.init();
-    return this.gql`
- query Spaces($id_in: [String!]) {
-    spaces(
-      where: {
-        id_in: $id_in
-      }
-    ) {
-      id
-      name
-      about
-      network
-      symbol
-      strategies {
-        name
-        params
-      }
-      avatar
-      admins
-      members
-      filters {
-        minScore
-        onlyMembers
-      }
-      plugins
     }
   }
 `;
@@ -272,10 +242,7 @@ export type SnapshotProposalVote = {
   balance: number;
 };
 
-export async function getVersion(): Promise<string> {
-  return '0.1.3';
-}
-
+// TODO ✅
 export async function getSpace(space: string): Promise<SnapshotSpace> {
   await getApolloClient();
   // @ts-expect-error StrictNullChecks
@@ -286,34 +253,6 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
     },
   });
   return spaceObj.data.space;
-}
-
-export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const spaceObj = await apolloClient.query({
-    query: await GqlLazyLoader.SPACE_QUERY(),
-    variables: {
-      space,
-    },
-  });
-
-  return spaceObj.data.space;
-}
-
-export async function getMultipleSpacesById(
-  id_in: Array<string>,
-): Promise<Array<SnapshotSpace>> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const spaceObj = await apolloClient.query({
-    query: await GqlLazyLoader.MULTIPLE_SPACE_QUERY(),
-    variables: {
-      id_in,
-    },
-  });
-
-  return spaceObj.data.spaces;
 }
 
 export async function getProposal(

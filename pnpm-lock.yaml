@@ -504,7 +504,7 @@ importers:
         version: 6.11.4
       web3:
         specifier: ^4.7.0
-        version: 4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+        version: 4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
       web3-core:
         specifier: ^4.3.2
         version: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -843,7 +843,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.3.18
-        version: 3.10.2(@types/react@18.3.1)(graphql@15.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 3.10.2(@types/react@18.3.1)(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@brillout/import':
         specifier: ^0.2.2
         version: 0.2.3
@@ -1157,11 +1157,14 @@ importers:
         specifier: ^10.12.1
         version: 10.12.2
       graphql:
-        specifier: ^15.5.0
-        version: 15.8.0
+        specifier: ^16.9.0
+        version: 16.9.0
+      graphql-request:
+        specifier: ^7.1.0
+        version: 7.1.0(graphql@16.9.0)
       graphql-tag:
         specifier: ^2.12.4
-        version: 2.12.6(graphql@15.8.0)
+        version: 2.12.6(graphql@16.9.0)
       highlight-words-core:
         specifier: ^1.2.2
         version: 1.2.2
@@ -5174,6 +5177,18 @@ packages:
       }
     engines: { node: '>=16.0.0' }
 
+  '@molt/command@0.9.0':
+    resolution:
+      {
+        integrity: sha512-1JI8dAlpqlZoXyKWVQggX7geFNPxBpocHIXQCsnxDjKy+3WX4SGyZVJXuLlqRRrX7FmQCuuMAfx642ovXmPA9g==,
+      }
+
+  '@molt/types@0.2.0':
+    resolution:
+      {
+        integrity: sha512-p6ChnEZDGjg9PYPec9BK6Yp5/DdSrYQvXTBAtgrnqX6N36cZy37ql1c8Tc5LclfIYBNG7EZp8NBcRTYJwyi84g==,
+      }
+
   '@motionone/animation@10.17.0':
     resolution:
       {
@@ -7964,12 +7979,14 @@ packages:
       {
         integrity: sha512-DIyQ13DDlXqVFnLV+S6/JDgiGowVRRrh18kahieJxhgvzcWicw5eLc6jpfQ0moVVLBYkO7rctB5Wreldwpva8w==,
       }
+    deprecated: versions below 1.x are no longer maintained
 
   '@substrate/connect@0.8.8':
     resolution:
       {
         integrity: sha512-zwaxuNEVI9bGt0rT8PEJiXOyebLIo6QN1SyiAHRPBOl6g3Sy0KKdSN8Jmyn++oXhVRD8aIe75/V8ZkS81T+BPQ==,
       }
+    deprecated: versions below 1.x are no longer maintained
 
   '@substrate/light-client-extension-helpers@0.0.4':
     resolution:
@@ -9882,6 +9899,12 @@ packages:
     resolution:
       {
         integrity: sha512-GeL8J6VIiE7tIgXevkcm0VqdZnhO0EpOXQQCzUMsoMrj92hBKj9ZmUjyPxXF8tUdsHYixQApng2eJXoRWmv5lw==,
+      }
+
+  alge@0.8.1:
+    resolution:
+      {
+        integrity: sha512-kiV9nTt+XIauAXsowVygDxMZLplZxDWt0W8plE/nB32/V2ziM/P/TxDbSVK7FYIUt2Xo16h3/htDh199LNPCKQ==,
       }
 
   amqplib@0.10.4:
@@ -14066,6 +14089,25 @@ packages:
         integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==,
       }
 
+  graphql-request@7.1.0:
+    resolution:
+      {
+        integrity: sha512-Ouu/lYVFhARS1aXeZoVJWnGT6grFJXTLwXJuK4mUGGRo0EUk1JkyYp43mdGmRgUVezpRm6V5Sq3t8jBDQcajng==,
+      }
+    hasBin: true
+    peerDependencies:
+      '@dprint/formatter': ^0.3.0
+      '@dprint/typescript': ^0.91.1
+      dprint: ^0.46.2
+      graphql: 14 - 16
+    peerDependenciesMeta:
+      '@dprint/formatter':
+        optional: true
+      '@dprint/typescript':
+        optional: true
+      dprint:
+        optional: true
+
   graphql-tag@2.12.6:
     resolution:
       {
@@ -14075,12 +14117,12 @@ packages:
     peerDependencies:
       graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
 
-  graphql@15.8.0:
+  graphql@16.9.0:
     resolution:
       {
-        integrity: sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==,
+        integrity: sha512-GGTKBX4SD7Wdb8mqeDLni2oaRGYQWjWHGKPQ24ZMnUtKfcsVoiv4uX8+LJr1K6U5VW2Lu1BwJnj7uiori0YtRw==,
       }
-    engines: { node: '>= 10.x' }
+    engines: { node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0 }
 
   h3@1.11.1:
     resolution:
@@ -16073,6 +16115,12 @@ packages:
     resolution:
       {
         integrity: sha512-DBwtEWN2caHQ9/imiNeEA5ys1JoRtRfY3d7V9wkqtbycnAmTvRRmbHKDV4a0EYc678/dia0jrte4tjYwVBaZUA==,
+      }
+
+  lodash.ismatch@4.4.0:
+    resolution:
+      {
+        integrity: sha512-fPMfXjGQEV9Xsq/8MTSgUf255gawYRbjwMyDbcvDhXgV7enSZA0hynz6vMPnpAb5iONEzBHBPsT+0zes5Z301g==,
       }
 
   lodash.isnumber@3.0.3:
@@ -19423,6 +19471,12 @@ packages:
       }
     engines: { node: '>=4' }
 
+  remeda@1.61.0:
+    resolution:
+      {
+        integrity: sha512-caKfSz9rDeSKBQQnlJnVW3mbVdFgxgGWQKq1XlFokqjf+hQD5gxutLGTTY2A/x24UxVyJe9gH5fAkFI63ULw4A==,
+      }
+
   remove-accents@0.5.0:
     resolution:
       {
@@ -20479,6 +20533,13 @@ packages:
       }
     engines: { node: '>=0.6.19' }
 
+  string-length@6.0.0:
+    resolution:
+      {
+        integrity: sha512-1U361pxZHEQ+FeSjzqRpV+cu2vTzYeWeafXFLykiFlv4Vc0n3njgU8HrMbyik5uwm77naWMuVG8fhEF+Ovb1Kg==,
+      }
+    engines: { node: '>=16' }
+
   string-width@4.2.3:
     resolution:
       {
@@ -21255,6 +21316,12 @@ packages:
         optional: true
       '@swc/wasm':
         optional: true
+
+  ts-toolbelt@9.6.0:
+    resolution:
+      {
+        integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==,
+      }
 
   tsc-alias@1.8.8:
     resolution:
@@ -23095,6 +23162,12 @@ packages:
         integrity: sha512-RTHJlZhsRbuA8Hmp/iNL7jnfc4nZishjsanDAfEY1QpDQZCahUp3xDzl+zfweE9BklxMUcgBgS1b7Lvie/ZVwA==,
       }
 
+  zod@3.23.8:
+    resolution:
+      {
+        integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==,
+      }
+
   zustand@3.7.2:
     resolution:
       {
@@ -23241,14 +23314,14 @@ snapshots:
       randexp: 0.5.3
       zod: 3.23.6
 
-  '@apollo/client@3.10.2(@types/react@18.3.1)(graphql@15.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@apollo/client@3.10.2(@types/react@18.3.1)(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@15.8.0)
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
       '@wry/caches': 1.0.1
       '@wry/equality': 0.5.7
       '@wry/trie': 0.5.0
-      graphql: 15.8.0
-      graphql-tag: 2.12.6(graphql@15.8.0)
+      graphql: 16.9.0
+      graphql-tag: 2.12.6(graphql@16.9.0)
       hoist-non-react-statics: 3.3.2
       optimism: 0.18.0
       prop-types: 15.8.1
@@ -26022,9 +26095,9 @@ snapshots:
 
   '@glidejs/glide@3.6.0': {}
 
-  '@graphql-typed-document-node/core@3.2.0(graphql@15.8.0)':
+  '@graphql-typed-document-node/core@3.2.0(graphql@16.9.0)':
     dependencies:
-      graphql: 15.8.0
+      graphql: 16.9.0
 
   '@grpc/grpc-js@1.9.14':
     dependencies:
@@ -26619,6 +26692,24 @@ snapshots:
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
+
+  '@molt/command@0.9.0':
+    dependencies:
+      '@molt/types': 0.2.0
+      alge: 0.8.1
+      chalk: 5.3.0
+      lodash.camelcase: 4.3.0
+      lodash.snakecase: 4.1.1
+      readline-sync: 1.4.10
+      string-length: 6.0.0
+      strip-ansi: 7.1.0
+      ts-toolbelt: 9.6.0
+      type-fest: 4.18.2
+      zod: 3.23.8
+
+  '@molt/types@0.2.0':
+    dependencies:
+      ts-toolbelt: 9.6.0
 
   '@motionone/animation@10.17.0':
     dependencies:
@@ -27378,7 +27469,7 @@ snapshots:
       bn.js: 4.12.0
       create-hash: 1.2.0
       ed2curve: 0.3.0
-      elliptic: 6.5.5
+      elliptic: 6.5.7
       hash.js: 1.1.7
       js-sha3: 0.8.0
       micro-base: 0.9.0
@@ -30842,6 +30933,12 @@ snapshots:
     optionalDependencies:
       zod: 3.23.6
 
+  abitype@0.7.1(typescript@5.4.5)(zod@3.23.8):
+    dependencies:
+      typescript: 5.4.5
+    optionalDependencies:
+      zod: 3.23.8
+
   abitype@0.8.11(typescript@5.4.5)(zod@3.23.6):
     dependencies:
       typescript: 5.4.5
@@ -30968,6 +31065,13 @@ snapshots:
       - supports-color
       - utf-8-validate
     optional: true
+
+  alge@0.8.1:
+    dependencies:
+      lodash.ismatch: 4.4.0
+      remeda: 1.61.0
+      ts-toolbelt: 9.6.0
+      zod: 3.23.8
 
   amqplib@0.10.4:
     dependencies:
@@ -33903,12 +34007,19 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphql-tag@2.12.6(graphql@15.8.0):
+  graphql-request@7.1.0(graphql@16.9.0):
     dependencies:
-      graphql: 15.8.0
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
+      '@molt/command': 0.9.0
+      graphql: 16.9.0
+      zod: 3.23.8
+
+  graphql-tag@2.12.6(graphql@16.9.0):
+    dependencies:
+      graphql: 16.9.0
       tslib: 2.6.2
 
-  graphql@15.8.0: {}
+  graphql@16.9.0: {}
 
   h3@1.11.1:
     dependencies:
@@ -35175,6 +35286,8 @@ snapshots:
   lodash.isequal@4.5.0: {}
 
   lodash.isinteger@4.0.4: {}
+
+  lodash.ismatch@4.4.0: {}
 
   lodash.isnumber@3.0.3: {}
 
@@ -37518,6 +37631,8 @@ snapshots:
     dependencies:
       es6-error: 4.1.1
 
+  remeda@1.61.0: {}
+
   remove-accents@0.5.0: {}
 
   remove-markdown@0.5.0: {}
@@ -38215,6 +38330,10 @@ snapshots:
 
   string-argv@0.3.2: {}
 
+  string-length@6.0.0:
+    dependencies:
+      strip-ansi: 7.1.0
+
   string-width@4.2.3:
     dependencies:
       emoji-regex: 8.0.0
@@ -38774,6 +38893,8 @@ snapshots:
       yn: 3.1.1
     optionalDependencies:
       '@swc/core': 1.5.25(@swc/helpers@0.5.5)
+
+  ts-toolbelt@9.6.0: {}
 
   tsc-alias@1.8.8:
     dependencies:
@@ -39535,6 +39656,17 @@ snapshots:
       - typescript
       - zod
 
+  web3-eth-abi@4.2.1(typescript@5.4.5)(zod@3.23.8):
+    dependencies:
+      abitype: 0.7.1(typescript@5.4.5)(zod@3.23.8)
+      web3-errors: 1.1.4
+      web3-types: 1.6.0
+      web3-utils: 4.2.3
+      web3-validator: 2.0.5
+    transitivePeerDependencies:
+      - typescript
+      - zod
+
   web3-eth-accounts@4.1.2:
     dependencies:
       '@ethereumjs/rlp': 4.0.1
@@ -39551,6 +39683,22 @@ snapshots:
       web3-errors: 1.1.4
       web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
+      web3-types: 1.6.0
+      web3-utils: 4.2.3
+      web3-validator: 2.0.5
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+      - zod
+
+  web3-eth-contract@4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+    dependencies:
+      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-errors: 1.1.4
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
       web3-types: 1.6.0
       web3-utils: 4.2.3
       web3-validator: 2.0.5
@@ -39584,6 +39732,24 @@ snapshots:
       web3-errors: 1.1.4
       web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-types: 1.6.0
+      web3-utils: 4.2.3
+      web3-validator: 2.0.5
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+      - zod
+
+  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+    dependencies:
+      '@adraffy/ens-normalize': 1.10.1
+      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-errors: 1.1.4
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-types: 1.6.0
       web3-utils: 4.2.3
@@ -39640,6 +39806,21 @@ snapshots:
       - utf-8-validate
       - zod
 
+  web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+    dependencies:
+      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-rpc-methods: 1.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-types: 1.6.0
+      web3-utils: 4.2.3
+      web3-validator: 2.0.5
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+      - zod
+
   web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@6.0.3)(zod@3.23.6):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -39661,6 +39842,26 @@ snapshots:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
       web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
+      web3-eth-accounts: 4.1.2
+      web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-rpc-methods: 1.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-types: 1.6.0
+      web3-utils: 4.2.3
+      web3-validator: 2.0.5
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+      - zod
+
+  web3-eth@4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+    dependencies:
+      setimmediate: 1.0.5
+      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-errors: 1.1.4
+      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
       web3-eth-accounts: 4.1.2
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -39834,6 +40035,31 @@ snapshots:
       web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-eth-iban: 4.0.7
       web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-providers-http: 4.1.0
+      web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-rpc-methods: 1.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-types: 1.6.0
+      web3-utils: 4.2.3
+      web3-validator: 2.0.5
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+      - zod
+
+  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+    dependencies:
+      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      web3-errors: 1.1.4
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
+      web3-eth-accounts: 4.1.2
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-iban: 4.0.7
+      web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-providers-http: 4.1.0
       web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -40237,6 +40463,8 @@ snapshots:
       zod: 3.23.6
 
   zod@3.23.6: {}
+
+  zod@3.23.8: {}
 
   zustand@3.7.2(react@18.3.1):
     optionalDependencies:
