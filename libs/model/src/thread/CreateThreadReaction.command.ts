@@ -53,10 +53,12 @@ export function CreateThreadReaction(): Command<
               reaction: payload.reaction,
             },
             defaults: {
+              address_id: address.id!,
               thread_id: thread.id,
               reaction: payload.reaction,
-              address_id: address.id!,
               calculated_voting_weight,
+              canvas_hash: payload.canvas_hash,
+              canvas_signed_data: payload.canvas_signed_data,
             },
             transaction,
           });
