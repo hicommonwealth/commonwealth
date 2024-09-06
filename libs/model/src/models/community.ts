@@ -94,11 +94,6 @@ export default (
         defaultValue: false,
       },
       type: { type: Sequelize.STRING, allowNull: false, defaultValue: 'chain' },
-      has_chain_events_listener: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       default_summary_view: { type: Sequelize.BOOLEAN, allowNull: true },
       default_page: { type: Sequelize.STRING, allowNull: true },
       has_homepage: {
