@@ -1,6 +1,12 @@
 {
   "name": "farcaster-app",
   "version": "0.0.0",
+  "private": true,
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hicommonwealth/commonwealth.git"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
