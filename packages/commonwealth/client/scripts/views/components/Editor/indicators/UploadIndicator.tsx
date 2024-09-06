@@ -7,7 +7,7 @@ export const UploadIndicator = () => {
   return (
     <div className="UploadIndicator">
       <div className="inner">
-        <CWCircleRingSpinner />
+        <CWCircleRingSpinner size="xxl" />
       </div>
     </div>
   );
