@@ -17,13 +17,12 @@ export function CancelContestManagerMetadata(): Command<
           contest_address: payload.contest_address,
         },
       });
-      if (mustExist('Contest Manager', contestManager)) {
-        contestManager.cancelled = true;
-        await contestManager.save();
-        return {
-          contest_managers: [contestManager.get({ plain: true })],
-        };
-      }
+      mustExist('Contest Manager', contestManager);
+      contestManager.cancelled = true;
+      await contestManager.save();
+      return {
+        contest_managers: [contestManager.get({ plain: true })],
+      };
     },
   };
 }

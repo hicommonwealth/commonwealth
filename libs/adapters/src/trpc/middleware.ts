@@ -1,42 +1,135 @@
 import {
   analytics,
   logger,
+  stats,
+  type Actor,
   type AuthStrategies,
-  type CommandContext,
   type User,
 } from '@hicommonwealth/core';
-import { TRPCError } from '@trpc/server';
-import { Request } from 'express';
+import { TRPCError, initTRPC } from '@trpc/server';
+import { Request, Response } from 'express';
 import passport from 'passport';
-import { ZodSchema } from 'zod';
+import { OpenApiMeta } from 'trpc-swagger';
+import { ZodSchema, z } from 'zod';
 import { config } from '../config';
 
 const log = logger(import.meta);
 
-export type OutputMiddleware<Output> = (
-  ctx: CommandContext<ZodSchema>,
-  result: Partial<Output>,
-) => Promise<void>;
+type Metadata<Input extends ZodSchema, Output extends ZodSchema> = {
+  readonly input: Input;
+  readonly output: Output;
+  auth: unknown[];
+  secure?: boolean;
+  authStrategy?: AuthStrategies;
+};
 
-export function track<Output>(
-  event: string,
-  mapper?: (result: Partial<Output>) => Record<string, unknown>,
-): OutputMiddleware<Output> {
-  return ({ actor, payload }, result) => {
-    try {
-      analytics().track(event, {
-        userId: actor.user.id,
-        aggregateId: payload.id,
-        ...(mapper ? mapper(result) : {}),
-      });
-    } catch (err) {
-      err instanceof Error && log.error(err.message, err);
-    }
-    return Promise.resolve();
-  };
+const isSecure = (md: Metadata<ZodSchema, ZodSchema>) =>
+  md.secure !== false || (md.auth ?? []).length > 0;
+
+export interface Context {
+  req: Request;
+  res: Response;
+  actor: Actor;
 }
 
-export const authenticate = async (
+const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
+export const router = trpc.router;
+export const procedure = trpc.procedure;
+
+export enum Tag {
+  User = 'User',
+  Community = 'Community',
+  Thread = 'Thread',
+  Comment = 'Comment',
+  Reaction = 'Reaction',
+  Integration = 'Integration',
+  Subscription = 'Subscription',
+  LoadTest = 'LoadTest',
+  Wallet = 'Wallet',
+  Webhook = 'Webhook',
+}
+
+export type Track<Output extends ZodSchema> = [
+  string,
+  mapper?: (result: z.infer<Output>) => Record<string, unknown>,
+];
+
+/**
+ * tRPC procedure factory with authentication, traffic stats, and analytics middleware
+ */
+export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
+  method: 'GET' | 'POST',
+  name: string,
+  md: Metadata<Input, Output>,
+  tag: Tag,
+  track?: Track<Output>,
+) => {
+  const secure = isSecure(md);
+  return trpc.procedure
+    .use(async ({ ctx, next }) => {
+      if (secure) await authenticate(ctx.req, md.authStrategy);
+      return next({
+        ctx: {
+          ...ctx,
+          actor: {
+            user: ctx.req.user as User,
+            address: ctx.req.headers['address'] as string,
+          },
+        },
+      });
+    })
+    .use(async ({ ctx, next }) => {
+      const start = Date.now();
+      const result = await next();
+      const latency = Date.now() - start;
+      try {
+        const path = `${ctx.req.method.toUpperCase()} ${ctx.req.path}`;
+        stats().increment('cw.path.called', { path });
+        stats().histogram(`cw.path.latency`, latency, {
+          path,
+          statusCode: ctx.res.statusCode.toString(),
+        });
+      } catch (err) {
+        err instanceof Error && log.error(err.message, err);
+      }
+      if (track && result.ok) {
+        try {
+          const host = ctx.req.headers.host;
+          const payload = {
+            ...(track[1] ? track[1](result.data) : {}),
+            ...getRequestBrowserInfo(ctx.req),
+            ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
+            userId: ctx.actor.user.id,
+            isPWA: ctx.req.headers?.['isPWA'] === 'true',
+          };
+          analytics().track(track[0], payload);
+        } catch (err) {
+          err instanceof Error && log.error(err.message, err);
+        }
+      }
+      return result;
+    })
+    .meta({
+      openapi: {
+        method,
+        path: `/${name}`,
+        tags: [tag],
+        headers: [
+          {
+            in: 'header',
+            name: 'address',
+            required: false,
+            schema: { type: 'string' },
+          },
+        ],
+        protect: secure,
+      },
+    })
+    .input(md.input)
+    .output(md.output);
+};
+
+const authenticate = async (
   req: Request,
   authStrategy: AuthStrategies = { name: 'jwt' },
 ) => {
@@ -77,4 +170,26 @@ export const authenticate = async (
       code: 'UNAUTHORIZED',
     });
   }
+};
+
+/**
+ * Returns a record containing condensed browser info.
+ * Expects the 'express-useragent' middleware to be applied to the route.
+ * Includes 'is...' boolean entries if the value is true, and all string values
+ */
+const getRequestBrowserInfo = (
+  req: Request & { useragent?: Record<string, unknown> },
+) => {
+  const info: Record<string, unknown> = req.useragent
+    ? Object.entries(req.useragent)
+        .filter(([k, v]) => typeof v === 'string' || (k.startsWith('is') && v))
+        .reduce((p, [k, v]) => Object.assign(p, { [k]: v }), {})
+    : {};
+  const brand = req.headers['sec-ch-ua'];
+  if (typeof brand === 'string' && brand.includes('Brave')) {
+    delete info['isChrome'];
+    info['isBrave'] = true;
+    info['browser'] = 'Brave';
+  }
+  return info;
 };

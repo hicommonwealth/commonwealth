@@ -1,10 +1,5 @@
 import { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import {
-  CreateCommentReactionOptions,
-  CreateCommentReactionResult,
-  __createCommentReaction,
-} from './server_comments_methods/create_comment_reaction';
-import {
   DeleteCommentOptions,
   DeleteCommentResult,
   __deleteComment,
@@ -29,16 +24,6 @@ export class ServerCommentsController {
     public models: DB,
     public globalActivityCache?: GlobalActivityCache,
   ) {}
-
-  /**
-   * Creates a comment reaction with the given options.
-   *
-   */
-  async createCommentReaction(
-    options: CreateCommentReactionOptions,
-  ): Promise<CreateCommentReactionResult> {
-    return __createCommentReaction.call(this, options);
-  }
 
   /**
    * Returns comment search results.

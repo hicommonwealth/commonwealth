@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { Request, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import { OpenAPIV3 } from 'openapi-types';
 import swaggerUi from 'swagger-ui-express';
 import {
@@ -26,7 +26,10 @@ const logError = (path: string | undefined, error: TRPCError) => {
 export const toExpress = (router: OpenApiRouter) =>
   createExpressMiddleware({
     router,
-    createContext: ({ req }: { req: Request }) => ({ req }),
+    createContext: ({ req, res }: { req: Request; res: Response }) => ({
+      req,
+      res,
+    }),
     onError: ({ path, error }) => logError(path, error),
   });
 
@@ -34,7 +37,10 @@ export const toExpress = (router: OpenApiRouter) =>
 const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
-    createContext: ({ req }: { req: Request }) => ({ req }),
+    createContext: ({ req, res }: { req: Request; res: Response }) => ({
+      req,
+      res,
+    }),
     onError: ({ path, error }: { path: string; error: TRPCError }) =>
       logError(path, error),
     responseMeta: undefined,

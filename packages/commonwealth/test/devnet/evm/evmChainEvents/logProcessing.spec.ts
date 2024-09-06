@@ -152,7 +152,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         expectAbi();
 
         expect(propQueuedResult.block).to.not.be.undefined;
-        await sdk.mineBlocks(501);
+        await sdk.mineBlocks(502);
 
         const { logs } = await getLogs({
           rpc: localRpc,
