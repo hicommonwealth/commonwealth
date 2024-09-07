@@ -114,7 +114,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           address: actor.address,
         },
       });
-      if (!mustExist('Community address', address)) return;
+      mustExist('Community address', address);
 
       const body = sanitizeQuillText(payload.body);
       const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
@@ -136,7 +136,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               comment_count: 0,
               reaction_count: 0,
               reaction_weights_sum: 0,
-              max_notif_id: 0,
             },
             {
               transaction,
