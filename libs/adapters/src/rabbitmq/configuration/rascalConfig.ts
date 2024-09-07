@@ -162,6 +162,8 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.NotificationsProviderChainEventCreated,
         RascalRoutingKeys.NotificationsProviderSnapshotProposalCreated,
         RascalRoutingKeys.NotificationsProviderUserMentioned,
+        RascalRoutingKeys.NotificationsProviderCommentUpvoted,
+        RascalRoutingKeys.NotificationsProviderThreadUpvoted,
       ],
     },
     [RascalBindings.NotificationsSettings]: {

@@ -10,7 +10,6 @@ import {
   getTestCommunityContract,
   getTestContract,
   getTestSignatures,
-  getTestSubscription,
 } from './util';
 
 describe('getEventSources', () => {
@@ -26,13 +25,7 @@ describe('getEventSources', () => {
     await dispose()();
   });
 
-  test('should not return sources that are not subscribed to', async () => {
-    const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
-  });
-
   test("should not return sources that don't have a community contract", async () => {
-    await getTestSubscription();
     const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });

@@ -14,7 +14,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         where: { id: payload.id },
       });
 
-      if (!mustExist('Community', community)) return;
+      mustExist('Community', community);
 
       const namespaceAddress =
         await commonProtocol.newNamespaceValidator.validateNamespace(

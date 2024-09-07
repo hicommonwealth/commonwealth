@@ -48,6 +48,8 @@ export enum RascalBindings {
 
 export enum RascalRoutingKeys {
   NotificationsProviderCommentCreated = EventNames.CommentCreated,
+  NotificationsProviderCommentUpvoted = EventNames.CommentUpvoted,
+  NotificationsProviderThreadUpvoted = `${EventNames.ThreadUpvoted}.#`,
   NotificationsProviderChainEventCreated = EventNames.ChainEventCreated,
   NotificationsProviderSnapshotProposalCreated = EventNames.SnapshotProposalCreated,
   NotificationsProviderUserMentioned = EventNames.UserMentioned,

@@ -51,7 +51,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     // TODO: cleanup EXCEPTION_CASE_threadCountersStore in 8812
     EXCEPTION_CASE_threadCountersStore.setState({
-      totalThreadsInCommunity: this.meta.numTotalThreads,
+      totalThreadsInCommunity: this.meta.lifetimeThreadCount,
       totalThreadsInCommunityForVoting: this.meta.numVotingThreads,
     });
 

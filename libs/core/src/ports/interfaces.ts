@@ -12,6 +12,7 @@ import {
   CommentCreatedNotification,
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
+  UpvoteNotification,
   UserMentionedNotification,
   WebhookNotification,
 } from '../integration/notifications.schemas';
@@ -279,6 +280,7 @@ export enum WorkflowKeys {
   UserMentioned = 'user-mentioned',
   CommunityStake = 'community-stake',
   ChainProposals = 'chain-event-proposals',
+  NewUpvotes = 'new-upvote',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
@@ -298,7 +300,7 @@ export type NotificationsProviderRecipient =
     };
 
 type BaseNotifProviderOptions = {
-  users: { id: string; email?: string; webhook_url?: string }[];
+  users: { id: string; email?: string }[];
   actor?: { id: string; email?: string };
 };
 
@@ -330,6 +332,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof ChainProposalsNotification>;
             key: WorkflowKeys.ChainProposals;
+          }
+        | {
+            data: z.infer<typeof UpvoteNotification>;
+            key: WorkflowKeys.NewUpvotes;
           }
       ))
   | WebhookProviderOptions;
