@@ -28,6 +28,7 @@ const {
   LOAD_TESTING_AUTH_TOKEN,
   SEND_WEBHOOKS,
   SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP,
+  SEND_EMAILS,
 } = process.env;
 
 export const config = configure(
@@ -56,6 +57,7 @@ export const config = configure(
           SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP ?? '0',
         ),
       },
+      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -131,6 +133,7 @@ export const config = configure(
           .describe(
             'A flag indicating whether the Knock integration is enabled or disabled',
           ),
+        SEND_EMAILS: z.boolean(),
         WEBHOOKS: z
           .object({
             SEND: z

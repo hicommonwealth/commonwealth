@@ -73,12 +73,14 @@ export function getRabbitMQConfig(
     copyConfigs(allQueues, vhostConfig.queues, [
       RascalQueues.ChainEvent,
       RascalQueues.NotificationsProvider,
+      RascalQueues.NotificationsSettings,
       RascalQueues.ContestWorkerPolicy,
       RascalQueues.ContestProjection,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
       RascalBindings.NotificationsProvider,
+      RascalBindings.NotificationsSettings,
       RascalBindings.ContestWorkerPolicy,
       RascalBindings.ContestProjection,
     ]);
@@ -88,6 +90,7 @@ export function getRabbitMQConfig(
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.ChainEvent,
       RascalSubscriptions.NotificationsProvider,
+      RascalSubscriptions.NotificationsSettings,
       RascalSubscriptions.ContestWorkerPolicy,
       RascalSubscriptions.ContestProjection,
     ]);

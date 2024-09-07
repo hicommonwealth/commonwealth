@@ -203,6 +203,7 @@ export enum BrokerSubscriptions {
   DiscordListener = 'DiscordMessage',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
+  NotificationsSettings = 'NotificationsSettings',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
 }
@@ -408,6 +409,20 @@ export type NotificationsProviderSchedulesReturn = Array<{
   updated_at: string;
 }>;
 
+export type IdentifyUserOptions = {
+  user_id: string;
+  user_properties: {
+    email?: string;
+    avatar?: string;
+    phone_number?: string;
+    locale?: string;
+    timezone?: string;
+    mobile_push_notifications_enabled?: boolean;
+    mobile_push_discussion_activity_enabled?: boolean;
+    mobile_push_admin_alerts_enabled?: boolean;
+  };
+};
+
 /**
  * Notifications Provider Port
  */
@@ -437,6 +452,18 @@ export interface NotificationsProvider extends Disposable {
    * @returns A set containing the ids of the schedules that were successfully deleted
    */
   deleteSchedules(options: { schedule_ids: string[] }): Promise<Set<string>>;
+
+  identifyUser(options: IdentifyUserOptions): Promise<{
+    id: string;
+    name?: string;
+    email?: string;
+    phone_number?: string;
+    avatar?: string;
+    created_at?: string;
+    updated_at?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  }>;
 
   registerClientRegistrationToken(
     userId: number,
