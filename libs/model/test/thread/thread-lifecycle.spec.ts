@@ -476,3 +476,142 @@ describe('Thread lifecycle', () => {
 
   // @rbennettcw do we have contest validation tests to include here?
 });
+
+/*
+  describe('#updateComment', () => {
+    test('should update a comment', async () => {
+      const data = {
+        id: 123,
+        thread_id: 2,
+        address_id: 1,
+        text: 'Wasup',
+        community_id: 'ethereum',
+        Address: {
+          id: 1,
+          address: '0x123',
+          community_id: 'ethereum',
+          save: async () => ({}),
+        },
+        Thread: {
+          id: 2,
+          address_id: 1,
+          address: '0x123',
+          community_id: 'ethereum',
+          title: 'Big Thread!',
+        },
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+      const db = {
+        Address: {
+          findAll: async () => [{ id: 1 }], // used in findOneRole
+        },
+        Comment: {
+          findOne: async () => data,
+          update: () => (data.text = 'Hello'),
+        },
+        CommentVersionHistory: {
+          create: () => null,
+          findOne: () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
+          query: () => Promise.resolve([]),
+        },
+      };
+
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
+      const user = {
+        getAddresses: async () => [{ id: 1, verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const commentId = 123;
+      const commentBody = 'Hello';
+      const [updatedComment] = await serverCommentsController.updateComment({
+        // @ts-expect-error ignore type
+        user,
+        // @ts-expect-error ignore type
+        address,
+        commentId,
+        commentBody,
+      });
+      expect(updatedComment).to.include({
+        id: 123,
+        text: 'Hello',
+      });
+    });
+
+    test('should throw error (thread not found)', () => {
+      const data = {
+        id: 123,
+        thread_id: 2,
+        text: 'Wasup',
+        community_id: 'ethereum',
+        Address: {
+          address: '0x123',
+          community_id: 'ethereum',
+          save: async () => ({}),
+        },
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+      const db = {
+        Comment: {
+          findOne: async () => data,
+          update: () => null,
+        },
+        Thread: {
+          findOne: async () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
+          query: Promise.resolve([]),
+        },
+      };
+
+      // @ts-expect-error ignore type
+      const serverCommentsController = new ServerCommentsController(db);
+      const user = {
+        getAddresses: async () => [{ id: 1, verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const commentId = 123;
+      const commentBody = 'Hello';
+      expect(
+        serverCommentsController.updateComment({
+          // @ts-expect-error ignore type
+          user,
+          // @ts-expect-error ignore type
+          address,
+          commentId,
+          commentBody,
+        }),
+      ).to.be.rejectedWith('Thread not found for comment');
+    });
+  });
+  */
