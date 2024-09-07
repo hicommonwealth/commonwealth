@@ -10,11 +10,6 @@ import {
   __createThreadPoll,
 } from './server_threads_methods/create_thread_poll';
 import {
-  CreateThreadReactionOptions,
-  CreateThreadReactionResult,
-  __createThreadReaction,
-} from './server_threads_methods/create_thread_reaction';
-import {
   DeleteThreadOptions,
   DeleteThreadResult,
   __deleteThread,
@@ -58,12 +53,6 @@ export class ServerThreadsController {
     public models: DB,
     public globalActivityCache?: GlobalActivityCache,
   ) {}
-
-  async createThreadReaction(
-    options: CreateThreadReactionOptions,
-  ): Promise<CreateThreadReactionResult> {
-    return __createThreadReaction.call(this, options);
-  }
 
   async deleteThread(
     options: DeleteThreadOptions,

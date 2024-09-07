@@ -33,7 +33,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       const { thread_id, parent_id, ...rest } = payload;
 
       const thread = await models.Thread.findOne({ where: { id: thread_id } });
-      if (!mustExist('Thread', thread)) return;
+      mustExist('Thread', thread);
       if (thread.read_only)
         throw new InvalidState(CreateCommentErrors.CantCommentOnReadOnly);
       if (thread.archived_at)
@@ -46,14 +46,14 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
           address: actor.address,
         },
       });
-      if (!mustExist('Community address', address)) return;
+      mustExist('Community address', address);
 
       if (parent_id) {
         const parent = await models.Comment.findOne({
           where: { id: parent_id, thread_id },
           include: [models.Address],
         });
-        if (!mustExist('Parent Comment', parent)) return;
+        mustExist('Parent Comment', parent);
         const [, depth] = await getCommentDepth(parent, MAX_COMMENT_DEPTH);
         if (depth === MAX_COMMENT_DEPTH)
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
@@ -133,14 +133,6 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               comment,
               community_id: thread.community_id,
             }));
-
-          // @timolegros is this used somewhere?
-          // const excludedAddrs: string[] = [];
-          // excludedAddrs.push(address.address);
-          // const rootNotifExcludeAddresses = [...excludedAddrs];
-          // if (parentComment && parentComment.Address) {
-          //   rootNotifExcludeAddresses.push(parentComment.Address.address);
-          // }
 
           return comment.id;
         },
