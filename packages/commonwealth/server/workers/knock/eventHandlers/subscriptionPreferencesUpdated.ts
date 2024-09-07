@@ -181,7 +181,7 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
     throw new Error('Failed to find user subscription preferences');
   }
 
-  if (config.NOTIFICATIONS.SEND_EMAILS) {
+  if (config.NOTIFICATIONS.SEND_EMAILS || config.NODE_ENV === 'test') {
     await handleEmailPreferenceUpdates(payload, subPreferences);
   }
 

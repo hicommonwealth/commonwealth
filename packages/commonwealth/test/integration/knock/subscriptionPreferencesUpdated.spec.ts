@@ -87,10 +87,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         email_notifications_enabled: false,
         recap_email_enabled: true,
         digest_email_enabled: false,
@@ -198,10 +195,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: true,
       },
     });
@@ -247,10 +241,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: false,
       },
     });
@@ -297,10 +288,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: false,
       },
     });
