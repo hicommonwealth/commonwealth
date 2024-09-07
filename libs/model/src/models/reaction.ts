@@ -2,18 +2,10 @@ import { EventNames, stats } from '@hicommonwealth/core';
 import { Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type {
-  AddressAttributes,
-  CommentInstance,
-  ModelInstance,
-  ThreadInstance,
-} from '.';
+import type { CommentInstance, ModelInstance, ThreadInstance } from '.';
 import { emitEvent, getThreadContestManagers } from '../utils';
 
-export type ReactionAttributes = z.infer<typeof Reaction> & {
-  Address?: AddressAttributes;
-};
-
+export type ReactionAttributes = z.infer<typeof Reaction>;
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
 export default (
