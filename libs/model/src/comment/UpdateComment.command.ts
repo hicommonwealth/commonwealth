@@ -1,6 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import {
   emitMentions,
@@ -11,25 +12,13 @@ import {
   uniqueMentions,
 } from '../utils';
 
-export function UpdateComment(): Command<typeof schemas.UpdateComment> {
+export function UpdateComment(): Command<
+  typeof schemas.UpdateComment,
+  AuthContext
+> {
   return {
     ...schemas.UpdateComment,
-    auth: [
-      /*
-  if (address.is_banned) throw new AppError('Banned User');
-
-  const isAuthor = await validateOwner({
-    models: this.models,
-    user,
-    communityId: thread.community_id,
-    entity: comment,
-    allowSuperAdmin: true,
-  });
-  if (!isAuthor) {
-    throw new AppError(Errors.NotAuthor);
-  }
-*/
-    ],
+    auth: [isAuthorized({})],
     body: async ({ actor, payload }) => {
       const { comment_id, discord_meta, text } = payload;
 

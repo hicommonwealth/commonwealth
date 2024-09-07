@@ -1,7 +1,7 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isCommunityAdminOrTopicMember } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyReactionSignature } from '../middleware/canvas';
 import { mustExist } from '../middleware/guards';
 import { getVotingWeight } from '../services/stakeHelper';
@@ -11,14 +11,15 @@ export const CreateThreadReactionErrors = {
 };
 
 export function CreateThreadReaction(): Command<
-  typeof schemas.CreateThreadReaction
+  typeof schemas.CreateThreadReaction,
+  AuthContext
 > {
   return {
     ...schemas.CreateThreadReaction,
     auth: [
-      isCommunityAdminOrTopicMember(
-        schemas.PermissionEnum.CREATE_THREAD_REACTION,
-      ),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_THREAD_REACTION,
+      }),
       verifyReactionSignature,
     ],
     body: async ({ actor, payload }) => {
