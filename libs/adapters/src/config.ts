@@ -29,6 +29,7 @@ const {
   SEND_WEBHOOKS,
   SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP,
   SEND_EMAILS,
+  DISABLE_LOCAL_QUEUE_PURGE,
 } = process.env;
 
 export const config = configure(
@@ -42,6 +43,7 @@ export const config = configure(
     },
     BROKER: {
       RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
+      DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -95,6 +97,11 @@ export const config = configure(
           data === DEFAULTS.RABBITMQ_URI
         );
       }, 'RABBITMQ_URI is require in production, beta (QA), demo, and frick Heroku apps'),
+      DISABLE_LOCAL_QUEUE_PURGE: z
+        .boolean()
+        .describe(
+          'Disable purging all messages in queues when a consumer starts up',
+        ),
     }),
     NOTIFICATIONS: z
       .object({
