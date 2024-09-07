@@ -20,7 +20,7 @@ export function UpdateComment(): Command<
     ...schemas.UpdateComment,
     auth: [isAuthorized({})],
     body: async ({ actor, payload }) => {
-      const { comment_id, discord_meta, text } = payload;
+      const { comment_id, discord_meta } = payload;
 
       const comment = await models.Comment.findOne({
         where: comment_id ? { id: comment_id } : { discord_meta },
@@ -34,7 +34,7 @@ export function UpdateComment(): Command<
         order: [['timestamp', 'DESC']],
       });
 
-      if (currentVersion?.text !== text) {
+      if (currentVersion?.text !== payload.text) {
         const address = await models.Address.findOne({
           where: {
             community_id: thread.community_id,
