@@ -157,6 +157,8 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.NotificationsProviderSnapshotProposalCreated,
         RascalRoutingKeys.NotificationsProviderUserMentioned,
         RascalRoutingKeys.NotificationsProviderPreferencesUpdated,
+        RascalRoutingKeys.NotificationsProviderCommentUpvoted,
+        RascalRoutingKeys.NotificationsProviderThreadUpvoted,
       ],
     },
     [RascalBindings.ContestWorkerPolicy]: {
