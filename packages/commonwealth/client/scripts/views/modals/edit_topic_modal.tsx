@@ -1,5 +1,5 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Topic, { TopicAttributes } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -19,8 +19,12 @@ import {
 import { openConfirmation } from './confirmation_modal';
 
 import { notifySuccess } from 'controllers/app/notifications';
+import { DeltaStatic } from 'quill';
 import '../../../styles/modals/edit_topic_modal.scss';
 import useAppStatus from '../../hooks/useAppStatus';
+import { ReactQuillEditor } from '../components/react_quill_editor';
+import { createDeltaFromText } from '../components/react_quill_editor/utils';
+import { checkForImageInDescription, removeImageMarkdown } from './utils';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -45,7 +49,9 @@ export const EditTopicModal = ({
   const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [description, setDescription] = useState<string>(descriptionProp);
+  const [description, setDescription] = useState<DeltaStatic>(
+    createDeltaFromText(descriptionProp),
+  );
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
     // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
@@ -55,20 +61,18 @@ export const EditTopicModal = ({
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const markdownImageRegex = useMemo(() => /!\[image\]\((.*?)\)/, []);
+  const descriptionInsertString = description.ops?.[0].insert;
 
-  //checks if there is an image in the description to show/delete separately in the modal
-  useMemo(() => {
-    const match = description.match(markdownImageRegex);
-    setImage(match ? match[1] : null);
-  }, [description, markdownImageRegex]);
+  useEffect(() => {
+    checkForImageInDescription(descriptionInsertString, setImage);
+  }, [description, descriptionInsertString]);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
 
     const topicInfo: TopicAttributes = {
       id,
-      description: description,
+      description: descriptionInsertString,
       name: name,
       community_id: app.activeChainId(),
       // @ts-expect-error <StrictNullChecks/>
@@ -128,14 +132,12 @@ export const EditTopicModal = ({
     });
   };
 
-  function removeImageMarkdown(desc: string): string {
-    return desc.replace(markdownImageRegex, '').trim();
-  }
-
-  function onDeleteImageClick() {
-    setDescription(removeImageMarkdown(description));
-    setImage(null);
-  }
+  const onDeleteImageClick = () => {
+    if (description) {
+      setDescription(removeImageMarkdown(descriptionInsertString));
+      setImage(null);
+    }
+  };
 
   return (
     <div className="EditTopicModal">
@@ -168,18 +170,13 @@ export const EditTopicModal = ({
             return ['success', 'Valid topic name'];
           }}
         />
-        <CWTextInput
-          label="Description"
-          name="description"
-          tabIndex={2}
-          value={description}
-          onInput={(e) => {
-            setDescription(e.target.value);
-          }}
+        <ReactQuillEditor
+          className="editor"
+          placeholder="Enter a description (Limit of 250 characters)"
+          contentDelta={description}
+          setContentDelta={setDescription}
+          fromManageTopic
         />
-        {image && (
-          <img src={image} className="topic-image" alt="Image-description" />
-        )}
         <CWCheckbox
           label="Featured in Sidebar"
           checked={featuredInSidebar}
