@@ -10,7 +10,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 
 const TriggerNotificationsWorkflow = () => {
   const [workflowKey, setWorkflowKey] = useState<string>('');
-  const [workflowData, setWorkflowData] = useState<Record<string, unknown>>({});
+  const [workflowData, setWorkflowData] = useState<string>('{}');
   const [inputsValidated, setInputsValidated] = useState<boolean>(false);
 
   const onKeyInput = (e) => {
@@ -41,9 +41,11 @@ const TriggerNotificationsWorkflow = () => {
       title: `Trigger Workflow`,
       description:
         `Are you sure you want to trigger the ${workflowKey} ` +
-        `workflow? This could cost several hundred dollars depending on the ` +
+        `workflow?\n\nThis could cost several hundred dollars depending on the ` +
         `number of subscribed users. Run a test using the input data from ` +
-        `the Knock dashboard to ensure the notification looks correct!`,
+        `the Knock dashboard to ensure the notification looks correct!\n\n` +
+        `WARNING: If this is the first time using this form please contact ` +
+        `engineering first (we need to upgrade our Knock plan)!`,
       buttons: [
         {
           label: 'Trigger',
@@ -53,7 +55,7 @@ const TriggerNotificationsWorkflow = () => {
             try {
               const result = await triggerNotificationsWorkflow({
                 workflow_key: workflowKey,
-                data: workflowData,
+                data: JSON.parse(workflowData),
               });
               notifySuccess(
                 `Workflow triggered for ${result.numSucceeded} users`,
@@ -83,7 +85,7 @@ const TriggerNotificationsWorkflow = () => {
       <CWText type="caption">
         Triggers the given Knock workflow for ALL Common users. WARNING: could
         cost hundreds of dollars if every single Common user receives a
-        notification
+        notification.
       </CWText>
       <div className="TaskRow">
         <CWTextInput
@@ -94,7 +96,7 @@ const TriggerNotificationsWorkflow = () => {
       </div>
       <div className="TaskRow">
         <CWTextInput
-          value={JSON.stringify(workflowData)}
+          value={workflowData}
           onInput={onDataInput}
           inputValidationFn={dataValidationFn}
           placeholder="Enter valid JSON data for triggering your workflow"
