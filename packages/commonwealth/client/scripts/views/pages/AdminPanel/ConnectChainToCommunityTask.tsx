@@ -13,6 +13,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import { alphabetizeChains } from './utils';
 
 const ConnectChainToCommunityTask = () => {
   const [rpcEndpointCommunityId, setRpcEndpointCommunityId] =
@@ -25,18 +26,8 @@ const ConnectChainToCommunityTask = () => {
   });
 
   const { data: chainTypes } = useFetchNodesQuery();
-  console.log('chainTypes', chainTypes);
-  //move the below into a function inside utils
-  const chains =
-    chainTypes
-      ?.map((chain) => ({
-        label: chain.name,
-        value: chain.name,
-      }))
-      .sort((a, b) =>
-        (a?.label || '').toLowerCase().localeCompare(b?.label || ''),
-      ) || [];
-  console.log('chains', chains);
+
+  const chains = alphabetizeChains(chainTypes);
 
   const debouncedCommunityLookupId = useDebounce<string | undefined>(
     rpcEndpointCommunityId,
@@ -55,7 +46,7 @@ const ConnectChainToCommunityTask = () => {
       Object.keys(communityLookupData || {})?.length === 0);
 
   const communityNotChain = communityLookupData?.type !== ChainType.Chain;
-  console.log('communityLookupData: ', communityLookupData);
+
   const buttonEnabled = rpcEndpointCommunityId.length !== 0;
 
   const setCommunityIdInput = (e) => {

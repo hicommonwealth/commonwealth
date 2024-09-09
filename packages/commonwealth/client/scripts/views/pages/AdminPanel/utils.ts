@@ -1,5 +1,6 @@
 import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
+import NodeInfo from 'client/scripts/models/NodeInfo';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 
@@ -143,3 +144,16 @@ export function downloadCSV(rows: CSVRow[], filename: string) {
   link.click();
   document.body.removeChild(link);
 }
+
+export const alphabetizeChains = (chainTypes: NodeInfo[] | undefined) => {
+  return (
+    chainTypes
+      ?.map((chain) => ({
+        label: chain.name,
+        value: chain.name,
+      }))
+      .sort((a, b) =>
+        (a?.label || '').toLowerCase().localeCompare(b?.label || ''),
+      ) || []
+  );
+};
