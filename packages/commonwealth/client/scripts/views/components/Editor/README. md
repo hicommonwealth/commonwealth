@@ -27,15 +27,17 @@ so that we can place the toolbar below the editor.
 - success: copy a .md file to the clipboard, try to paste it into the editor. It
   should insert the content at the editor's cursor
 
+    - this works via a File object (not text) so it's important to test this path.
+
 - success: drag a .md file on top of the editor.  The drag indicator should show
-  up and cover the editor while you're dragging.
+  up and cover the editor while you're dragging.  Then the file should be inserted
+  at the cursor.
 
 - success: use the 'Import markdown' button to upload a file.
 
-- failure: copy multiple .md files ot the clipboard, try to paste into the editor.
-  It should fail because we can't handle multiple .md files
-
-- success: right click on an image in the browser, try to paste it into the editor.
+- success: right click and copy an image in the browser, this should upload it
+to the editor and insert it at the current point (I use msnbc.com for this as
+their images are copyable and not CSS background images)
 
 - success: take a screenshot, try to paste it into the editor. The upload
   indicator should show up.
@@ -46,8 +48,14 @@ so that we can place the toolbar below the editor.
 - success: drop an image file.  Should upload it for us and not handle it as
   markdown.
 
+- failure: copy multiple .md files ot the clipboard, try to paste into the editor.
+  It should fail because we can't handle multiple .md files
+
 ## Mobile
+
+It's probably best to test this on a REAL mobile browser (not on a desktop).
 
 - The toolbar should be present at the bottom of the UI.
 
+- They keyboard should stay on top of the keyboard.
 
