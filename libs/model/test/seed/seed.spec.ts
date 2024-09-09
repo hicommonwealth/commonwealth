@@ -5,7 +5,6 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
-  NotificationCategories,
 } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -21,9 +20,9 @@ chai.use(chaiAsPromised);
 // then attempts to find the entity and validate it
 async function testSeed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas[T]>>,
+  values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<z.infer<typeof schemas[T]>> {
+): Promise<z.infer<(typeof schemas)[T]>> {
   const [record, records] = await seed(name, values, options);
   expect(records.length, 'failed to create entity').to.be.gt(0);
 
@@ -121,7 +120,6 @@ describe('Seed functions', () => {
         active: true,
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
-        has_chain_events_listener: false,
         chain_node_id: node!.id,
         lifetime_thread_count: 1,
         profile_count: 1,
@@ -139,7 +137,7 @@ describe('Seed functions', () => {
         ],
       });
 
-      const community = await testSeed('Community', {
+      await testSeed('Community', {
         id: 'superEth',
         network: ChainNetwork.Ethereum,
         default_symbol: 'SETH',
@@ -148,7 +146,6 @@ describe('Seed functions', () => {
         active: true,
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
-        has_chain_events_listener: false,
         chain_node_id: node!.id,
         lifetime_thread_count: 1,
         profile_count: 1,
@@ -173,20 +170,6 @@ describe('Seed functions', () => {
           },
         ],
         topics: [{}, {}],
-      });
-
-      await testSeed('NotificationCategory', {
-        name: NotificationCategories.NewThread,
-        description: 'someone makes a new thread',
-      });
-
-      await testSeed('Subscription', {
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewThread,
-        is_active: true,
-        community_id: community!.id,
-        thread_id: undefined,
-        comment_id: undefined,
       });
       shouldExit = false;
     });

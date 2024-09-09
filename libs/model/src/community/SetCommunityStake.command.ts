@@ -30,7 +30,7 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
       )?.toJSON();
 
       // !domain logic - invariants on loaded state & payload
-      if (!mustExist('Community', community)) return;
+      mustExist('Community', community);
       if (
         community.CommunityStakes &&
         community.CommunityStakes.find((s) => s.stake_id === rest.stake_id)

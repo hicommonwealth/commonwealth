@@ -256,9 +256,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       throw new Error(`invalid chain ${chain}`);
     }
 
-    const { payload: session, signer } = await sessionSigner.newSession(
-      CANVAS_TOPIC,
-    );
+    const { payload: session, signer } =
+      await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = session.address.split(':')[2];
 
     let res = await chai.request
@@ -427,8 +426,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${thread_id}/comments`)
+      .post(`/api/v1/CreateComment`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         author_chain: chain,
         chain,
@@ -489,8 +489,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
-      .post(`/api/comments/${comment_id}/reactions`)
+      .post(`/api/v1/CreateCommentReaction`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address: walletAddress,
@@ -532,8 +533,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${thread_id}/reactions`)
+      .post(`/api/v1/CreateThreadReaction`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address: walletAddress,

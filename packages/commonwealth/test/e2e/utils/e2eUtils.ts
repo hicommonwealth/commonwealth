@@ -129,12 +129,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       if (userExists[0].length === 0) return;
 
       const removeQuery = `
-    DELETE FROM "Subscriptions"
-    WHERE subscriber_id in (
-    SELECT user_id
-        FROM "Addresses"
-        WHERE address = '${testAddress}'
-    );
     DELETE FROM "Users"
     WHERE id IN (
         SELECT user_id

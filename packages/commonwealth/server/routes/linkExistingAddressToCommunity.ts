@@ -164,7 +164,6 @@ const linkExistingAddressToCommunity = async (
           verification_token_expires: verificationTokenExpires,
           verified: originalAddress.verified,
           wallet_id: originalAddress.wallet_id,
-          wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),
           role: 'member',
           is_user_default: false,

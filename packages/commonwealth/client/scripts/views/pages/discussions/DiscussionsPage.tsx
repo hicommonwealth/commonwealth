@@ -106,7 +106,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       toDate: dateCursor.toDate,
       // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
-      isOnArchivePage: isOnArchivePage,
+      includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
       // @ts-expect-error <StrictNullChecks/>
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
@@ -257,8 +257,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                    ? app?.chain?.meta?.lifetimeThreadCount
-                    : 0
+                      ? app?.chain?.meta?.lifetimeThreadCount
+                      : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}

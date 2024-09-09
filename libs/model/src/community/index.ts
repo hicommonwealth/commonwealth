@@ -8,4 +8,6 @@ export * from './GetCommunityStake.query';
 export * from './GetMembers.query';
 export * from './GetStakeHistoricalPrice.query';
 export * from './GetStakeTransaction.query';
+export * from './RefreshCustomDomain.query';
 export * from './SetCommunityStake.command';
+export * from './UpdateCustomDomain.command';
