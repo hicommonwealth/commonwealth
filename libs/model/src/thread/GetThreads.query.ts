@@ -1,8 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { FindAndCountOptions } from 'sequelize';
 import { models } from '../database';
-import { ThreadAttributes } from '../models';
 import { removeUndefined } from '../utils';
 import { formatSequelizePagination } from '../utils/paginationUtils';
 
@@ -84,7 +82,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         include: includeArray,
         ...formatSequelizePagination(payload),
         paranoid: false,
-      } as unknown as FindAndCountOptions<ThreadAttributes>);
+      });
 
       return schemas.buildPaginatedResponse(threads, count as number, payload);
     },

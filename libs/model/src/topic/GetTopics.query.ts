@@ -1,9 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { FindAndCountOptions } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
-import { TopicAttributes } from '../models/index';
 import { removeUndefined } from '../utils';
 import { formatSequelizePagination } from '../utils/paginationUtils';
 
@@ -28,7 +26,7 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
         include: includeArray,
         ...formatSequelizePagination(payload),
         paranoid: false,
-      } as unknown as FindAndCountOptions<TopicAttributes>);
+      });
 
       return schemas.buildPaginatedResponse(
         topics,

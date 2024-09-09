@@ -5,6 +5,7 @@ import {
   PG_INT,
   linksSchema,
   paginationSchema,
+  zBoolean,
 } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -99,9 +100,9 @@ export const GetThreads = {
     community_id: z.string(),
     topic_id: PG_INT.optional(),
     thread_id: PG_INT.optional(),
-    include_comments: z.coerce.boolean(),
-    include_user: z.coerce.boolean(),
-    include_reactions: z.coerce.boolean(),
+    include_comments: zBoolean.default(false),
+    include_user: zBoolean.default(false),
+    include_reactions: zBoolean.default(false),
   }),
   output: PaginatedResultSchema.extend({
     results: Thread.extend({ Comment: Comment.nullish() }).array(),
