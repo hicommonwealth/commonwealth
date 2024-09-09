@@ -289,6 +289,7 @@ export async function getProposals(space: string): Promise<SnapshotProposal[]> {
   return proposalsObj.data.proposals;
 }
 
+// TODO ✅
 export async function getVotes(
   proposalHash: string,
 ): Promise<SnapshotProposalVote[]> {
