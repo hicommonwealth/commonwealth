@@ -118,12 +118,14 @@ export const UpdateCustomDomain = {
   }),
 };
 
+const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
+
 export const UpdateCommunity = {
-  input: z.object({
+  input: Community.partial().extend({
     id: z.string(),
-    namespace: z.string(),
-    txHash: z.string(),
-    address: z.string(),
+    featuredTopics: z.array(z.string()).optional(),
+    snapshot: Snapshot.or(z.array(Snapshot)).optional(),
+    transactionHash: z.string().optional(),
   }),
   output: Community,
 };

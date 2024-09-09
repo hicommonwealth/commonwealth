@@ -44,11 +44,6 @@ import {
   __updateChainNode,
 } from './server_communities_methods/update_chain_node';
 import {
-  UpdateCommunityOptions,
-  UpdateCommunityResult,
-  __updateCommunity,
-} from './server_communities_methods/update_community';
-import {
   UpdateCommunityIdOptions,
   UpdateCommunityIdResult,
   __updateCommunityId,
@@ -70,12 +65,6 @@ export class ServerCommunitiesController {
     options: GetCommunitiesOptions,
   ): Promise<GetCommunitiesResult> {
     return __getCommunities.call(this, options);
-  }
-
-  async updateCommunity(
-    options: UpdateCommunityOptions,
-  ): Promise<UpdateCommunityResult> {
-    return __updateCommunity.call(this, options);
   }
 
   async deleteCommunity(

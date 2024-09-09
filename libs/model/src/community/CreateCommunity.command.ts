@@ -266,7 +266,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const uniqueLinksArray = [
         ...new Set(
           [...social_links, website, telegram, discord, element, github].filter(
-            (a) => a,
+            (a): a is string => typeof a === 'string' && a.length > 0,
           ),
         ),
       ];

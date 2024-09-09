@@ -26,7 +26,7 @@ const trpcerror = (error: unknown): TRPCError => {
       default:
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message,
+          message: `[${name}] ${message}`,
           cause: error,
         });
     }

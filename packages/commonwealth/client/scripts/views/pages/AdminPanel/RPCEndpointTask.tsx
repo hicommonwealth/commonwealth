@@ -1,5 +1,6 @@
 import { BalanceType, ChainType } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import NodeInfo from 'models/NodeInfo';
@@ -197,11 +198,13 @@ const RPCEndpointTask = () => {
         Object.keys(communityLookupData || {}).length > 0 &&
         communityInfoValueValidated
       ) {
-        await updateCommunity({
-          communityId: communityLookupData?.id,
-          chainNodeId: nodeId ?? communityChainNode?.id?.toString(),
-          type: ChainType.Chain,
-        });
+        await updateCommunity(
+          buildUpdateCommunityInput({
+            communityId: communityLookupData?.id,
+            chainNodeId: nodeId ?? communityChainNode?.id?.toString(),
+            type: ChainType.Chain,
+          }),
+        );
       }
 
       setRpcEndpointCommunityId('');

@@ -1,3 +1,4 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -130,10 +131,12 @@ const Discord = () => {
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
 
     try {
-      await updateCommunity({
-        communityId: community?.id,
-        discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
+        }),
+      );
       setIsDiscordWebhooksEnabled(!isDiscordWebhooksEnabled);
 
       notifySuccess(`Discord webhooks ${toggleMsgType}d!`);

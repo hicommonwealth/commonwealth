@@ -1,3 +1,4 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -61,10 +62,12 @@ const CustomTOS = () => {
     setIsSaving(true);
 
     try {
-      await updateCommunity({
-        communityId: community?.id,
-        terms: terms.value || '',
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          terms: terms.value || '',
+        }),
+      );
 
       notifySuccess('TOS link updated!');
     } catch {
