@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { buildUpdateCommentInput } from 'client/scripts/state/api/comments/editComment';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
@@ -343,7 +344,7 @@ export const CommentTree = ({
     }));
 
     try {
-      await editComment({
+      const input = await buildUpdateCommentInput({
         commentId: comment.id,
         updatedBody: serializeDelta(newDelta) || comment.text,
         threadId: thread.id,
@@ -357,6 +358,7 @@ export const CommentTree = ({
           lastActive: user.activeAccount?.profile?.lastActive?.toString() || '',
         },
       });
+      await editComment(input);
       setEdits((p) => ({
         ...p,
         [comment.id]: {

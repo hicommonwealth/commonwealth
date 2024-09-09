@@ -34,7 +34,7 @@ export const CreateCommunity = {
 
     // hidden optional params
     alt_wallet_url: z.string().url().optional(),
-    eth_chain_id: z.number().optional(),
+    eth_chain_id: PG_INT.optional(),
     cosmos_chain_id: z.string().optional(),
     address: z.string().optional(), // address for the contract of the chain
     decimals: PG_INT.optional(),
@@ -82,6 +82,42 @@ export const CreateStakeTransaction = {
   output: StakeTransaction,
 };
 
+export const RefreshCustomDomain = {
+  input: z.object({
+    custom_domain: z.string(),
+  }),
+  output: z.object({
+    hostname: z.string(),
+    cname: z.string(),
+    cert_status: z.string(),
+    status: z.string(),
+    reason: z.string().optional(),
+  }),
+};
+
+export const UpdateCustomDomain = {
+  input: z.object({
+    community_id: z.string().min(1),
+    custom_domain: z.string(),
+  }),
+  output: z.object({
+    acm_status: z.null(),
+    acm_status_reason: z.null(),
+    app: z.object({
+      id: z.string().uuid(),
+      name: z.string(),
+    }),
+    cname: z.string(),
+    created_at: z.string().datetime(),
+    hostname: z.string(),
+    id: z.string().uuid(),
+    kind: z.string(),
+    status: z.string(),
+    updated_at: z.string().datetime(),
+    sni_endpoint: z.null(),
+  }),
+};
+
 export const UpdateCommunity = {
   input: z.object({
     id: z.string(),
@@ -96,8 +132,10 @@ export const GenerateStakeholderGroups = {
   input: z.object({
     id: z.string(),
   }),
-  output: z.object({
-    groups: z.array(Group),
-    created: z.boolean(),
-  }),
+  output: z
+    .object({
+      groups: z.array(Group),
+      created: z.boolean(),
+    })
+    .partial(),
 };

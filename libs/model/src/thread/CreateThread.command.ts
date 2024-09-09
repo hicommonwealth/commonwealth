@@ -5,22 +5,20 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  renderQuillDeltaToText,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
 import { config } from '../config';
 import { GetActiveContestManagers } from '../contest';
 import { models } from '../database';
-import { isCommunityAdminOrTopicMember } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
 import { mustExist } from '../middleware/guards';
 import { tokenBalanceCache } from '../services';
 import {
   emitMentions,
   parseUserMentions,
+  quillToPlain,
   sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
@@ -38,18 +36,6 @@ export const CreateThreadErrors = {
 };
 
 const getActiveContestManagersQuery = GetActiveContestManagers();
-
-function toPlainString(decodedBody: string) {
-  try {
-    const quillDoc = JSON.parse(decodedBody);
-    if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '')
-      throw new InvalidInput(CreateThreadErrors.NoBody);
-    return renderQuillDeltaToText(quillDoc);
-  } catch {
-    // check always passes if the body isn't a Quill document
-  }
-  return decodedBody;
-}
 
 /**
  * Ensure that user has non-dust ETH value
@@ -94,11 +80,14 @@ function checkContestLimits(
     throw new AppError(CreateThreadErrors.PostLimitReached);
 }
 
-export function CreateThread(): Command<typeof schemas.CreateThread> {
+export function CreateThread(): Command<
+  typeof schemas.CreateThread,
+  AuthContext
+> {
   return {
     ...schemas.CreateThread,
     auth: [
-      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD),
+      isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
     ],
     body: async ({ actor, payload }) => {
@@ -106,9 +95,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
-
-      const body = sanitizeQuillText(payload.body);
-      const plaintext = kind === 'discussion' ? toPlainString(body) : body;
 
       // check contest invariants
       const activeContestManagers = await getActiveContestManagersQuery.body({
@@ -131,8 +117,10 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           address: actor.address,
         },
       });
-      if (!mustExist('Community address', address)) return;
+      mustExist('Community address', address);
 
+      const body = sanitizeQuillText(payload.body);
+      const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
       const mentions = uniqueMentions(parseUserMentions(body));
 
       // == mutation transaction boundary ==
@@ -151,7 +139,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               comment_count: 0,
               reaction_count: 0,
               reaction_weights_sum: 0,
-              max_notif_id: 0,
             },
             {
               transaction,
@@ -173,7 +160,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           address.last_active = new Date();
           await address.save({ transaction });
 
-          // subscribe author (@timolegros this is the user aggregate leak we are discussing)
           await models.ThreadSubscription.create(
             {
               user_id: actor.user.id!,
@@ -182,7 +168,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
             { transaction },
           );
 
-          // emit mention events = transactional outbox
           mentions.length &&
             (await emitMentions(models, transaction, {
               authorAddressId: address.id!,

@@ -1,3 +1,3 @@
 export * from './CreateThread.command';
-export * from './GetBulkThread.query';
+export * from './CreateThreadReaction.command';
 export * from './GetThreads.query';

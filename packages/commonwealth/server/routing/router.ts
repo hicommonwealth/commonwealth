@@ -93,10 +93,8 @@ import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_me
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
-import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
-import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
@@ -116,9 +114,7 @@ import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler'
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
-import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
@@ -177,8 +173,8 @@ function setupRouter(
   router.use(useragent.express());
 
   // API routes
-  app.use(api.internal.PATH, api.internal.router);
-  app.use(api.external.PATH, api.external.router);
+  app.use(api.internal.PATH, useragent.express(), api.internal.router);
+  app.use(api.external.PATH, useragent.express(), api.external.router);
   app.use(
     api.integration.PATH,
     api.integration.build(serverControllers, databaseValidationService),
@@ -448,23 +444,6 @@ function setupRouter(
   // comments
   registerRoute(
     router,
-    'post',
-    '/threads/:id/comments',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadCommentHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'patch',
-    '/comments/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateCommentHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'delete',
     '/comments/:id',
     passport.authenticate('jwt', { session: false }),
@@ -533,22 +512,6 @@ function setupRouter(
   );
 
   // reactions
-  registerRoute(
-    router,
-    'post',
-    '/threads/:id/reactions',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadReactionHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/comments/:id/reactions',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createCommentReactionHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',

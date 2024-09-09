@@ -5,10 +5,9 @@ import {
   command as coreCommand,
   query as coreQuery,
   handleEvent,
-  type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
-  type QueryMetadata,
+  type Metadata,
 } from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
@@ -45,8 +44,12 @@ const trpcerror = (error: unknown): TRPCError => {
  * @param track analytics tracking metadata as tuple of [event, output mapper]
  * @returns tRPC mutation procedure
  */
-export const command = <Input extends ZodSchema, Output extends ZodSchema>(
-  factory: () => CommandMetadata<Input, Output>,
+export const command = <
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+  AuthContext,
+>(
+  factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
   track?: Track<Output>,
 ) => {
@@ -75,8 +78,12 @@ export const command = <Input extends ZodSchema, Output extends ZodSchema>(
  * @param tag query tag used for OpenAPI spec grouping
  * @returns tRPC query procedure
  */
-export const query = <Input extends ZodSchema, Output extends ZodSchema>(
-  factory: () => QueryMetadata<Input, Output>,
+export const query = <
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+  AuthContext,
+>(
+  factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
 ) => {
   const md = factory();

@@ -5,13 +5,15 @@ import passport from 'passport';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
+import * as thread from './threads';
 import * as thread from './thread';
 import * as topic from './topic';
 
 const { createCommunity, getCommunities, getCommunity, getMembers } =
   community.trpcRouter;
-const { createThread } = thread.trpcRouter;
-const { getComments } = comment.trpcRouter;
+const { createThread, createThreadReaction } = thread.trpcRouter;
+const { createComment, createCommentReaction, updateComment, getComments } =
+  comment.trpcRouter;
 const { getThreads } = thread.trpcRouter;
 const { getTopics } = topic.trpcRouter;
 //const { getBulkThreads } = thread.trpcRouter;
@@ -23,9 +25,13 @@ const api = {
   getMembers,
   getComments,
   createThread,
+  createThreadReaction,
   getThreads,
   getTopics,
   //getBulkThreads,
+  createComment,
+  updateComment,
+  createCommentReaction,
 };
 
 const PATH = '/api/v1';
