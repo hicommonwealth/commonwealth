@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { config } from '../config';
 import { GetActiveContestManagers } from '../contest';
 import { models } from '../database';
-import { isCommunityAdminOrTopicMember } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
 import { mustExist } from '../middleware/guards';
 import { tokenBalanceCache } from '../services';
@@ -80,11 +80,14 @@ function checkContestLimits(
     throw new AppError(CreateThreadErrors.PostLimitReached);
 }
 
-export function CreateThread(): Command<typeof schemas.CreateThread> {
+export function CreateThread(): Command<
+  typeof schemas.CreateThread,
+  AuthContext
+> {
   return {
     ...schemas.CreateThread,
     auth: [
-      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD),
+      isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
     ],
     body: async ({ actor, payload }) => {
