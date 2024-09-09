@@ -140,10 +140,9 @@ const linkExistingAddressToCommunity = async (
           verified: originalAddress.verified,
           hex,
         },
-        { where: { id: existingAddress.id }, transaction },
+        { where: { id: existingAddress.id }, transaction, returning: true },
       );
-      // @ts-expect-error StrictNullChecks
-      addressId = updatedObj.id;
+      addressId = updatedObj[1][0].id!;
     });
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
