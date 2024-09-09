@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyReactionSignature } from '../middleware/canvas';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorizedComment } from '../middleware/guards';
 import { getVotingWeight } from '../services/stakeHelper';
 
 export function CreateCommentReaction(): Command<
@@ -16,27 +16,9 @@ export function CreateCommentReaction(): Command<
       isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT_REACTION }),
       verifyReactionSignature,
     ],
-    body: async ({ actor, payload }) => {
-      const comment = await models.Comment.findOne({
-        where: { id: payload.comment_id },
-        include: [
-          {
-            model: models.Thread,
-            required: true,
-          },
-        ],
-      });
-      mustExist('Comment', comment);
-
+    body: async ({ payload, actor, auth }) => {
+      const { address, comment } = mustBeAuthorizedComment(actor, auth);
       const thread = comment.Thread!;
-      const address = await models.Address.findOne({
-        where: {
-          community_id: thread.community_id,
-          user_id: actor.user.id,
-          address: actor.address,
-        },
-      });
-      mustExist('Community address', address);
 
       const calculated_voting_weight = await getVotingWeight(
         thread.community_id,
