@@ -7,12 +7,11 @@ import {
   NotificationsProviderSchedulesReturn,
   NotificationsProviderTriggerOptions,
 } from '@hicommonwealth/core';
+import { MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER } from '@hicommonwealth/shared';
 import { Knock, Schedule } from '@knocklabs/node';
 import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
 import _ from 'lodash';
 import { config } from '../config';
-
-const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 
 const log = logger(import.meta);
 

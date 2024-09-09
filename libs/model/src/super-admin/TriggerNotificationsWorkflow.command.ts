@@ -6,6 +6,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import { Op } from 'sequelize';
 import { config } from '../config';
@@ -20,7 +21,6 @@ export function TriggerNotificationsWorkflow(): Command<
 > {
   return {
     ...schemas.TriggerNotificationsWorkflow,
-    // TODO: Super admins only
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
@@ -68,8 +68,7 @@ export function TriggerNotificationsWorkflow(): Command<
             data: payload.data as any,
           });
 
-          // TODO: centralize chunk size i.e. MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER in adapters
-          const chunks = _.chunk(users, 1_000);
+          const chunks = _.chunk(users, MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER);
           res.forEach((r, i) => {
             if (r.status === 'fulfilled')
               successfulTriggers += chunks[i].length;
