@@ -1,4 +1,5 @@
 import {
+  InvalidInput,
   logger,
   notificationsProvider,
   type Command,
@@ -64,9 +65,14 @@ export function TriggerNotificationsWorkflow(): Command<
           // TODO: centralize chunk size i.e. MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER in adapters
           const chunks = _.chunk(users, 1_000);
           res.forEach((r, i) => {
-            if (r.status === 'fulfilled') successfulTriggers += 1_000;
+            if (r.status === 'fulfilled')
+              successfulTriggers += chunks[i].length;
             else {
-              failedTriggers += 1_000;
+              if ('status' in r.reason && r.reason.status === 404) {
+                throw new InvalidInput('Invalid workspace key!');
+              }
+
+              failedTriggers += chunks[i].length;
               errors.push({
                 reason: JSON.stringify(r.reason),
                 first_user_id: chunks[i][0].id!,
@@ -75,6 +81,8 @@ export function TriggerNotificationsWorkflow(): Command<
             }
           });
         } catch (e) {
+          if (e instanceof InvalidInput) throw e;
+
           log.error(
             `SUPER_ADMIN NOTIFICATION TRIGGER: Failed to trigger workflows`,
             e as Error,

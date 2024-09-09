@@ -66,7 +66,7 @@ const TriggerNotificationsWorkflow = () => {
                 );
             } catch (e) {
               console.error(e);
-              notifyError('Failed to trigger workflow');
+              notifyError(`Failed to trigger workflow: ${e.message}`);
             }
           },
         },
