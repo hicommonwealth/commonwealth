@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyReactionSignature } from '../middleware/canvas';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorizedThread } from '../middleware/guards';
 import { getVotingWeight } from '../services/stakeHelper';
 
 export const CreateThreadReactionErrors = {
@@ -22,22 +22,11 @@ export function CreateThreadReaction(): Command<
       }),
       verifyReactionSignature,
     ],
-    body: async ({ actor, payload }) => {
-      const thread = await models.Thread.findOne({
-        where: { id: payload.thread_id },
-      });
-      mustExist('Thread', thread);
+    body: async ({ payload, actor, auth }) => {
+      const { address, thread } = mustBeAuthorizedThread(actor, auth);
+
       if (thread.archived_at)
         throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);
-
-      const address = await models.Address.findOne({
-        where: {
-          user_id: actor.user.id,
-          community_id: thread.community_id,
-          address: actor.address,
-        },
-      });
-      mustExist('Community address', address);
 
       const calculated_voting_weight = await getVotingWeight(
         thread.community_id,

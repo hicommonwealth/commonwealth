@@ -27,6 +27,7 @@ const featureFlags = {
     process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   ),
   farcasterContest: buildFlag(process.env.FLAG_FARCASTER_CONTEST),
+  newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

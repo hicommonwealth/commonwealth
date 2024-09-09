@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyCommentSignature } from '../middleware/canvas';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import {
   emitEvent,
   emitMentions,
@@ -32,25 +32,15 @@ export function CreateComment(): Command<
       isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT }),
       verifyCommentSignature,
     ],
-    body: async ({ actor, payload }) => {
-      const { thread_id, parent_id, ...rest } = payload;
+    body: async ({ actor, payload, auth }) => {
+      const { address, thread } = mustBeAuthorizedThread(actor, auth);
 
-      const thread = await models.Thread.findOne({ where: { id: thread_id } });
-      mustExist('Thread', thread);
       if (thread.read_only)
         throw new InvalidState(CreateCommentErrors.CantCommentOnReadOnly);
       if (thread.archived_at)
         throw new InvalidState(CreateCommentErrors.ThreadArchived);
 
-      const address = await models.Address.findOne({
-        where: {
-          community_id: thread.community_id,
-          user_id: actor.user.id,
-          address: actor.address,
-        },
-      });
-      mustExist('Community address', address);
-
+      const { thread_id, parent_id, ...rest } = payload;
       if (parent_id) {
         const parent = await models.Comment.findOne({
           where: { id: parent_id, thread_id },
