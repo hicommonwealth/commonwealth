@@ -4,7 +4,6 @@ html,
 body,
 #root {
   max-height: 100vh;
-  overflow: auto;
 }
 
 #root {
@@ -18,14 +17,45 @@ body,
   display: none;
 }
 
-.mdxeditor {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+.mdxeditor-container-mode-mobile {
+  .mdxeditor {
+    flex-grow: 1;
+    overflow: auto;
+  }
 
+  .mdxeditor-toolbar {
+    min-height: 45px !important;
+  }
+}
+
+.mdxeditor-container-mode-desktop {
+  .mdxeditor-root-contenteditable {
+    min-height: 150px;
+    max-height: 450px;
+  }
+
+  .mdxeditor-toolbar {
+    height: 45px !important;
+  }
+}
+
+.mdxeditor-parent {
+  flex-grow: 1;
+}
+
+.mdxeditor-parent-mode-mobile {
+  display: flex;
+}
+
+.mdxeditor-container {
   // this is needed so that we can have a progress indicator on top of the main
   // content.
   position: relative;
+}
+
+.mdxeditor {
+  display: flex;
+  flex-direction: column;
 
   .mdxeditor-toolbar {
     // TODO this only shows up properly for the *mobile* editor not the desktop
@@ -37,7 +67,11 @@ body,
 
     position: initial;
     top: initial;
-    height: 65px;
+  }
+
+  .cm-gutters {
+    // necessary because otherwise code mirror line numbers are too small.
+    font-size: inherit !important;
   }
 }
 
