@@ -1,4 +1,4 @@
-import { $createHeadingNode } from '@lexical/rich-text';
+import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import {
   ToggleSingleGroupWithItem,
   convertSelectionToNode$,
@@ -33,6 +33,7 @@ export const BlockButton = (props: BlockButtonProps) => {
           convertSelectionToNode(() => $createHeadingNode(blockType));
           break;
         case 'q':
+          convertSelectionToNode(() => $createQuoteNode());
           break;
       }
     } else {
