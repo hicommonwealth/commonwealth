@@ -5,7 +5,6 @@ import passport from 'passport';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
-import * as thread from './threads';
 import * as thread from './thread';
 import * as topic from './topic';
 
