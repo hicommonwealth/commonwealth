@@ -7,6 +7,7 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../config';
+import { ThreadAuth } from './authorization';
 
 const ThreadSignature = z.object({
   title: z.string(),
@@ -16,10 +17,7 @@ const ThreadSignature = z.object({
   topic_id: z.union([z.number(), z.null()]),
 });
 
-export const verifyThreadSignature: ThreadMiddleware = async ({
-  actor,
-  payload,
-}) => {
+export const verifyThreadSignature: ThreadAuth = async ({ actor, payload }) => {
   if (config.ENFORCE_SESSION_KEYS) {
     if (hasCanvasSignedDataApiArgs(payload)) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
