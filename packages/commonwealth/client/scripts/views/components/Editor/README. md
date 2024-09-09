@@ -43,6 +43,9 @@ so that we can place the toolbar below the editor.
 - success: use the image button at the top to manually upload an image. The
   upload indicator should show up while this is happening.
 
+- success: drop an image file.  Should upload it for us and not handle it as
+  markdown.
+
 ## Mobile
 
 - The toolbar should be present at the bottom of the UI.

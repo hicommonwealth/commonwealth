@@ -81,16 +81,25 @@ export const Editor = memo(function Editor(props: EditorProps) {
 
   const imageUploadHandlerDelegate = useImageUploadHandler(imageHandler);
 
+  /**
+   * When we've stopped dragging, we also need to decrement the drag counter.
+   */
+  const terminateDragging = useCallback(() => {
+    setDragging(false);
+    dragCounterRef.current = 0;
+  }, []);
+
   const imageUploadHandler = useCallback(
     async (file: File) => {
       try {
+        terminateDragging();
         setUploading(true);
         return await imageUploadHandlerDelegate(file);
       } finally {
         setUploading(false);
       }
     },
-    [imageUploadHandlerDelegate],
+    [imageUploadHandlerDelegate, terminateDragging],
   );
 
   const handleFile = useCallback(async (file: File) => {
@@ -148,25 +157,27 @@ export const Editor = memo(function Editor(props: EditorProps) {
       try {
         const files = event.dataTransfer.files;
 
-        if (files.length <= 0) {
-          // for drag and drop... no files is an error.
-          notifyError('No files given');
-          return;
-        }
-
         await handleFiles(files);
       } finally {
-        setDragging(false);
-        dragCounterRef.current = 0;
+        terminateDragging();
       }
     },
-    [handleFiles],
+    [handleFiles, terminateDragging],
   );
 
   const handleDrop = useCallback(
     (event: React.DragEvent) => {
-      event.preventDefault();
-      handleDropAsync(event).catch(console.error);
+      // ONLY handle this if it is markdown, else, allow the default paste
+      // handler to work
+
+      const files = event.dataTransfer.files;
+
+      if (files.length === 1) {
+        if (canAcceptFileForImport(files[0])) {
+          handleDropAsync(event).catch(console.error);
+          event.preventDefault();
+        }
+      }
     },
     [handleDropAsync],
   );
