@@ -78,13 +78,12 @@ module.exports = {
       );
 
       // ensure no duplicate ContestTopics by contest_address from now on
-      await queryInterface.sequelize.query(
-        `
-        ALTER TABLE "ContestTopics"
-        ADD CONSTRAINT contest_address_unique UNIQUE (contest_address);
-      `,
-        { transaction },
-      );
+      await queryInterface.addConstraint('ContestTopics', {
+        fields: ['contest_address'],
+        type: 'unique',
+        name: 'contest_topics_address_unique',
+        transaction,
+      });
     });
   },
 
