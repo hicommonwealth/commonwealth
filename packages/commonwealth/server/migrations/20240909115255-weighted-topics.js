@@ -6,6 +6,16 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.addColumn(
         'Topics',
+        'weighted_voting',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
+
+      await queryInterface.addColumn(
+        'Topics',
         'chain_node_id',
         {
           type: Sequelize.INTEGER,
@@ -91,6 +101,9 @@ module.exports = {
 
       // cannot restore deleted ContestTopics
 
+      await queryInterface.removeColumn('Topics', 'weighted_voting', {
+        transaction,
+      });
       await queryInterface.removeColumn('Topics', 'chain_node_id', {
         transaction,
       });
