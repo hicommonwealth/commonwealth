@@ -67,10 +67,10 @@ export default (
         defaultValue: [],
       },
       telegram: { type: Sequelize.STRING, allowNull: true },
-      chain_node_id: { type: Sequelize.NUMBER, allowNull: true },
+      chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
-      vote_weight_multiplier: { type: Sequelize.NUMBER, allowNull: true },
+      vote_weight_multiplier: { type: Sequelize.INTEGER, allowNull: true },
     },
     {
       timestamps: true,

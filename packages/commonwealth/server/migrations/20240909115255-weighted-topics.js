@@ -53,7 +53,7 @@ module.exports = {
         'Topics',
         'vote_weight_multiplier',
         {
-          type: Sequelize.FLOAT,
+          type: Sequelize.INTEGER,
           allowNull: true,
         },
         { transaction },
