@@ -24,6 +24,8 @@ export function TriggerNotificationsWorkflow(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
+      // eslint-disable-next-line max-len
+      // TODO: temporary until https://github.com/hicommonwealth/commonwealth/pull/9149/files#diff-202572644b13676ddc020d6a289ef1f2a22af01e984702b3b378514537eac8f6R223
       if (!actor.user.isAdmin)
         throw new InvalidActor(actor, 'Must be super admin');
 
