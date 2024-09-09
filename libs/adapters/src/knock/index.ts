@@ -68,17 +68,18 @@ export function KnockProvider(): NotificationsProvider {
         return config.PUSH_NOTIFICATIONS.KNOCK_APNS_CHANNEL_ID;
     }
   }
+
   return {
     name: 'KnockProvider',
     dispose: () => Promise.resolve(),
     async triggerWorkflow(
       options: NotificationsProviderTriggerOptions,
-    ): Promise<boolean> {
+    ): Promise<PromiseSettledResult<{ workflow_run_id: string }>[]> {
       // disable webhook workflow in all environments except production
       // this is to prevent sending webhooks to real endpoints in all other env
       if (options.key === 'webhooks' && !config.NOTIFICATIONS.WEBHOOKS.SEND) {
         log.warn('Webhooks disabled');
-        return true;
+        return [];
       }
 
       const recipientChunks = _.chunk(
@@ -94,8 +95,7 @@ export function KnockProvider(): NotificationsProvider {
         });
       });
 
-      await Promise.all(triggerPromises);
-      return true;
+      return await Promise.allSettled(triggerPromises);
     },
     async getMessages(
       options: NotificationsProviderGetMessagesOptions,
