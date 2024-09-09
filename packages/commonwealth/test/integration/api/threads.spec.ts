@@ -4,12 +4,11 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import { dispose } from '@hicommonwealth/core';
-import { Thread } from '@hicommonwealth/model';
+import { Comment, Thread } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
-import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
 import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
@@ -458,7 +457,6 @@ describe.skip('Thread Tests', () => {
       });
 
       expect(cRes.error).to.not.be.null;
-      expect(cRes.error).to.be.equal(CreateCommentErrors.MissingThreadId);
     });
 
     test('should fail to create a comment without text', async () => {
@@ -474,7 +472,6 @@ describe.skip('Thread Tests', () => {
       });
 
       expect(cRes.error).to.not.be.null;
-      expect(cRes.error).to.be.equal(CreateCommentErrors.MissingText);
     });
 
     test('should fail to create a comment on a non-existent thread', async () => {
@@ -490,7 +487,6 @@ describe.skip('Thread Tests', () => {
       });
 
       expect(cRes.error).to.not.be.null;
-      expect(cRes.error).to.be.equal(CreateCommentErrors.MissingThreadId);
     });
   });
 
@@ -697,7 +693,9 @@ describe.skip('Thread Tests', () => {
         sign: res.sign,
       });
       expect(cRes.result).to.be.undefined;
-      expect(cRes.error).to.be.equal(CreateCommentErrors.CantCommentOnReadOnly);
+      expect(cRes.error).to.be.equal(
+        Comment.CreateCommentErrors.CantCommentOnReadOnly,
+      );
     });
 
     test('should turn off readonly as an admin of community', async () => {

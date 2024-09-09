@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
@@ -14,7 +13,6 @@ export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
-  Notifications?: NotificationAttributes[];
   reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
 };
@@ -99,13 +97,6 @@ export default (
         type: Sequelize.DATE,
         allowNull: true,
         defaultValue: new Date(),
-      },
-
-      //notifications
-      max_notif_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
       },
     },
     {

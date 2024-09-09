@@ -450,8 +450,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${threadId}/comments`)
+      .post(`/api/v1/CreateComment`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         author_chain: chain,
         chain,
@@ -513,8 +514,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post(`/api/comments/${comment_id}/reactions`)
+      .post(`/api/v1/CreateCommentReaction`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address,
@@ -559,8 +561,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${thread_id}/reactions`)
+      .post(`/api/v1/CreateThreadReaction`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address,

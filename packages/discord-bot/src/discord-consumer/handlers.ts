@@ -81,6 +81,7 @@ export async function handleCommentMessages(
     case 'comment-create':
       await axios.post(`${bot_path}/threads/${thread.id}/comments`, {
         ...sharedReqData,
+        thread_id: thread.id,
         text: encodeURIComponent(message.content),
       });
       break;

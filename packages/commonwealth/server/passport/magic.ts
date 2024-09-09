@@ -649,9 +649,9 @@ async function magicLoginRoute(
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
-  if (config.AUTH.MAGIC_API_KEY) {
+  if (config.MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
-    const magic = new Magic(config.AUTH.MAGIC_API_KEY);
+    const magic = new Magic(config.MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         try {

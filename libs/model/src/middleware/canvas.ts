@@ -1,13 +1,15 @@
-import { InvalidInput } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   addressSwapper,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
+  verifyComment,
+  verifyReaction,
   verifyThread,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../config';
-import { ThreadAuth } from './authorization';
+import type { AuthHandler } from './authorization';
 
 const ThreadSignature = z.object({
   title: z.string(),
@@ -17,7 +19,9 @@ const ThreadSignature = z.object({
   topic_id: z.union([z.number(), z.null()]),
 });
 
-export const verifyThreadSignature: ThreadAuth = async ({ actor, payload }) => {
+export const verifyThreadSignature: AuthHandler<
+  typeof schemas.CanvasThread
+> = async ({ actor, payload }) => {
   if (config.ENFORCE_SESSION_KEYS) {
     if (hasCanvasSignedDataApiArgs(payload)) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
@@ -47,6 +51,52 @@ export const verifyThreadSignature: ThreadAuth = async ({ actor, payload }) => {
                 address: actor.address!,
               })
             : actor.address!,
+      });
+    }
+  }
+};
+
+export const verifyCommentSignature: AuthHandler<
+  typeof schemas.CanvasComment
+> = async ({ actor, payload }) => {
+  if (config.ENFORCE_SESSION_KEYS) {
+    if (hasCanvasSignedDataApiArgs(payload)) {
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
+      await verifyComment(canvasSignedData, {
+        thread_id: payload.thread_id,
+        parent_comment_id: payload.parent_id,
+        text: payload.text,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                address: actor.address!,
+              })
+            : actor.address,
+      });
+    }
+  }
+};
+
+export const verifyReactionSignature: AuthHandler<
+  typeof schemas.ThreadCanvasReaction | typeof schemas.CommentCanvasReaction
+> = async ({ actor, payload }) => {
+  if (config.ENFORCE_SESSION_KEYS) {
+    if (hasCanvasSignedDataApiArgs(payload)) {
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
+      await verifyReaction(canvasSignedData, {
+        thread_id: 'thread_id' in payload ? payload.thread_id : undefined,
+        comment_id: 'comment_id' in payload ? payload.comment_id : undefined,
+        value: payload.reaction,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                address: actor.address!,
+              })
+            : actor.address,
       });
     }
   }

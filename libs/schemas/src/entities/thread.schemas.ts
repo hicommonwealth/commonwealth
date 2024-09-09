@@ -42,9 +42,6 @@ export const Thread = z.object({
 
   activity_rank_date: z.coerce.date().nullish(),
 
-  //notifications
-  max_notif_id: PG_INT,
-
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
 

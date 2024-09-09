@@ -420,9 +420,3 @@ Definition: `node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh
 Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
 
 Contributor: Timothee Legros
-
-### send-notification-digest-emails
-
-Definition: `SEND_EMAILS=true tsx  server.ts`
-
-Description: Schedules a daily task for sending notification email digests.

@@ -126,7 +126,6 @@ export const e2eTestEntities = async function (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           has_homepage: 'false' as any,
           collapsed_on_homepage: false,
-          has_chain_events_listener: false,
           directory_page_enabled: false,
         })),
       )),
@@ -315,33 +314,6 @@ export const e2eTestEntities = async function (
         ),
       )),
     );
-
-    const notificationCategories: [string, string][] = [
-      ['new-thread-creation', 'someone makes a new thread'],
-      ['new-comment-creation', 'someone makes a new comment'],
-      ['new-mention', 'someone @ mentions a user'],
-      ['new-reaction', 'someone reacts to a post'],
-      ['chain-event', 'a chain event occurs'],
-      ['new-collaboration', 'someone collaborates with a user'],
-      ['thread-edit', 'A thread is edited'],
-      ['comment-edit', 'A comment is edited'],
-      ['snapshot-proposal', 'Snapshot proposal notifications'],
-    ];
-
-    try {
-      await Promise.all(
-        notificationCategories.map(async (n) => {
-          await testDb.NotificationCategory.findOrCreate({
-            where: {
-              name: n[0],
-              description: n[1],
-            },
-          });
-        }),
-      );
-    } catch (e) {
-      console.log(e);
-    }
 
     return {
       testThreads,

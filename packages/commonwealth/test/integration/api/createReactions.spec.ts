@@ -119,7 +119,6 @@ describe('createReaction Integration Tests', () => {
     const beforeReactionCount = comment.reaction_count;
 
     chai.assert.isNotNull(comment);
-    chai.assert.equal(createCommentResponse.status, 'Success');
 
     const createReactionResponse = await server.seeder.createReaction({
       chain: communityId,
@@ -127,19 +126,19 @@ describe('createReaction Integration Tests', () => {
       did: userDid,
       jwt: userJWT,
       reaction: 'like',
-      comment_id: createCommentResponse.result.id,
-      comment_msg_id: createCommentResponse.result.canvas_msg_id,
+      comment_id: createCommentResponse.id,
+      comment_msg_id: createCommentResponse.canvas_msg_id,
       author_chain: communityId,
       session: userSession.session,
       sign: userSession.sign,
     });
 
-    chai.assert.equal(createReactionResponse.status, 'Success');
+    chai.assert.isNotNull(createReactionResponse);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount + 1);
 
-    const reactionId = createReactionResponse.result.id;
+    const reactionId = createReactionResponse.id;
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,
@@ -171,12 +170,12 @@ describe('createReaction Integration Tests', () => {
       sign: userSession.sign,
     });
 
-    chai.assert.equal(createReactionResponse.status, 'Success');
+    chai.assert.isNotNull(createReactionResponse);
 
     await thread!.reload();
     chai.assert.equal(thread!.reaction_count, beforeReactionCount + 1);
 
-    const reactionId = createReactionResponse.result.id;
+    const reactionId = createReactionResponse.id;
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,

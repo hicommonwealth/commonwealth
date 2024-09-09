@@ -1,3 +1,4 @@
+import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useAppStatus from 'hooks/useAppStatus';
@@ -101,14 +102,15 @@ export const ReactionButton = ({
         console.error(e.response.data.error || e?.message);
       });
     } else {
-      createThreadReaction({
+      const input = await buildCreateThreadReactionInput({
         communityId: app.activeChainId(),
         address: activeAddress || '',
         threadId: thread.id,
         threadMsgId: thread.canvasMsgId,
         reactionType: 'like',
         isPWA: isAddedToHomeScreen,
-      }).catch((e) => {
+      });
+      createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;
         }
