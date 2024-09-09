@@ -306,7 +306,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         rpc: localRpc,
         maxBlockRange: 500,
         contracts: {
-          [sdk.contractAddrs.compound.governance]: {
+          [sdk.contractAddrs.compound.governance.toLowerCase()]: {
             abi,
             sources: [
               {
@@ -327,7 +327,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       ]);
       expect(events.length).to.equal(1);
       expect(web3.utils.toChecksumAddress(events[0].rawLog.address)).to.equal(
-        sdk.contractAddrs.compound.governance,
+        sdk.contractAddrs.compound.governance.toLowerCase(),
       );
       expect(events[0].eventSource.kind).to.equal('proposal-queued');
       expect(events[0].rawLog.blockNumber).to.equal(propQueuedLog.blockNumber);
