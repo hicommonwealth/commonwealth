@@ -29,9 +29,6 @@ chai.use(chaiAsPromised);
 describe('subscriptionPreferencesUpdated', () => {
   let sandbox: sinon.SinonSandbox;
   let user: z.infer<typeof schemas.User> | undefined;
-  let subPreferences:
-    | z.infer<typeof schemas.SubscriptionPreference>
-    | undefined;
 
   beforeAll(async () => {
     [user] = await tester.seed('User', {
@@ -41,7 +38,7 @@ describe('subscriptionPreferencesUpdated', () => {
   });
 
   beforeEach(async () => {
-    [subPreferences] = await tester.seed('SubscriptionPreference', {
+    await tester.seed('SubscriptionPreference', {
       // @ts-expect-error StrictNullChecks
       user_id: user.id,
       email_notifications_enabled: false,
@@ -87,10 +84,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         email_notifications_enabled: false,
         recap_email_enabled: true,
         digest_email_enabled: false,
@@ -198,10 +192,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: true,
       },
     });
@@ -247,10 +238,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: false,
       },
     });
@@ -297,10 +285,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: false,
       },
     });

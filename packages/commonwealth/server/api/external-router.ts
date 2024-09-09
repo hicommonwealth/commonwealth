@@ -9,8 +9,9 @@ import * as thread from './threads';
 
 const { createCommunity, getCommunities, getCommunity, getMembers } =
   community.trpcRouter;
-const { createThread } = thread.trpcRouter;
-const { getComments } = comment.trpcRouter;
+const { createThread, createThreadReaction } = thread.trpcRouter;
+const { createComment, createCommentReaction, getComments } =
+  comment.trpcRouter;
 //const { getBulkThreads } = thread.trpcRouter;
 
 const api = {
@@ -20,7 +21,10 @@ const api = {
   getMembers,
   getComments,
   createThread,
+  createThreadReaction,
   //getBulkThreads,
+  createComment,
+  createCommentReaction,
 };
 
 const PATH = '/api/v1';
@@ -32,7 +36,7 @@ router.use(cors(), express.statsMiddleware);
  * TODO: Fix and check integration tests
  * Hack router until we figure out why the integration test server fails to authenticate
  * Found when calling createThread in test/util/modelUtils.ts
- * .post('/api/v1/CreateThread/0')
+ * .post('/api/v1/CreateThread')
  */
 if (config.NODE_ENV === 'test')
   router.use(passport.authenticate('jwt', { session: false }));

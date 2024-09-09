@@ -12,6 +12,7 @@ import {
   Cache,
   Disposable,
   Disposer,
+  IdentifyUserOptions,
   NotificationsProvider,
   NotificationsProviderSchedulesReturn,
   Stats,
@@ -129,16 +130,34 @@ export const stats = port(function stats(stats?: Stats) {
     stats || {
       name: 'in-memory-stats',
       dispose: () => Promise.resolve(),
-      histogram: () => {},
+      histogram: (key, value, tags) => {
+        log.trace('stats.histogram', { key, value, tags });
+      },
       set: () => {},
-      increment: () => {},
-      incrementBy: () => {},
-      decrement: () => {},
-      decrementBy: () => {},
-      on: () => {},
-      off: () => {},
-      gauge: () => {},
-      timing: () => {},
+      increment: (key, tags) => {
+        log.trace('stats.increment', { key, tags });
+      },
+      incrementBy: (key, value, tags) => {
+        log.trace('stats.incrementBy', { key, value, tags });
+      },
+      decrement: (key, tags) => {
+        log.trace('stats.decrement', { key, tags });
+      },
+      decrementBy: (key, value, tags) => {
+        log.trace('stats.decrementBy', { key, value, tags });
+      },
+      on: (key) => {
+        log.trace('stats.on', { key });
+      },
+      off: (key) => {
+        log.trace('stats.off', { key });
+      },
+      gauge: (key, value) => {
+        log.trace('stats.gauge', { key, value });
+      },
+      timing: (key, duration, time) => {
+        log.trace('stats.timing', { key, duration, time });
+      },
     }
   );
 });
@@ -177,7 +196,9 @@ export const analytics = port(function analytics(analytics?: Analytics) {
     analytics || {
       name: 'in-memory-analytics',
       dispose: () => Promise.resolve(),
-      track: () => {},
+      track: (event, payload) => {
+        log.trace('analytics.track', { event, payload });
+      },
     }
   );
 });
@@ -218,6 +239,8 @@ export const notificationsProvider = port(function notificationsProvider(
         Promise.resolve([] as NotificationsProviderSchedulesReturn),
       deleteSchedules: ({ schedule_ids }) =>
         Promise.resolve(new Set(schedule_ids)),
+      identifyUser: (options: IdentifyUserOptions) =>
+        Promise.resolve({ id: options.user_id }),
       registerClientRegistrationToken: () => Promise.resolve(false),
       unregisterClientRegistrationToken: () => Promise.resolve(false),
     }

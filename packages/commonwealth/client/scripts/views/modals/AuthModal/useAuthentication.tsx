@@ -43,13 +43,8 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import {
-  DISCOURAGED_NONREACTIVE_fetchProfilesByAddress,
-  fetchProfilesByAddress,
-} from '../../../state/api/profiles/fetchProfilesByAddress';
-import useAuthModalStore, {
-  authModal,
-} from '../../../state/ui/modals/authModal';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../../../state/api/profiles/fetchProfilesByAddress';
+import useAuthModalStore from '../../../state/ui/modals/authModal';
 import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
@@ -58,7 +53,6 @@ type UseAuthenticationProps = {
     isNewlyCreated?: boolean,
   ) => void;
   onModalClose: () => void;
-  onUnrecognizedAddressReceived?: () => boolean;
   withSessionKeyLoginFlow?: boolean;
 };
 
@@ -226,33 +220,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
-      const isAttemptingToConnectAddressToCommunity =
-        user.isLoggedIn && app.activeChainId();
-      const { address: magicAddress, isAddressNew } =
-        await startLoginWithMagicLink({
-          email: tempEmailToUse,
-          isCosmos,
-          redirectTo: document.location.pathname + document.location.search,
-          chain: app.chain?.id,
-          isLoggedIn: user.isLoggedIn,
-        });
+      const { address: magicAddress } = await startLoginWithMagicLink({
+        email: tempEmailToUse,
+        isCosmos,
+        redirectTo: document.location.pathname + document.location.search,
+        chain: app.chain?.id,
+      });
       setIsMagicLoading(false);
-
-      // if SSO account address is not already present in db,
-      // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
-      // and the user isn't trying to link address to community,
-      // then open the user auth type guidance modal
-      // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-      if (
-        isAddressNew &&
-        !isAttemptingToConnectAddressToCommunity &&
-        !user.isLoggedIn
-      ) {
-        authModal
-          .getState()
-          .validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
-        return;
-      }
 
       await handleSuccess(magicAddress, isNewlyCreated);
       props?.onModalClose?.();
@@ -276,7 +250,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
-        isLoggedIn: user.isLoggedIn,
       });
       setIsMagicLoading(false);
 
@@ -485,35 +458,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       return;
     }
 
-    // check if address exists
-    const profileAddresses = await fetchProfilesByAddress({
-      currentChainId: '',
-      profileAddresses: [
-        wallet.chain === ChainBase.Substrate
-          ? addressSwapper({
-              address: selectedAddress,
-              currentPrefix: parseInt(
-                (app.chain as Substrate)?.meta.ss58Prefix,
-                10,
-              ),
-            })
-          : selectedAddress,
-      ],
-      profileChainIds: [],
-      initiateProfilesAfterFetch: false,
-    });
-    const addressExists = profileAddresses?.length > 0;
-    const isAttemptingToConnectAddressToCommunity =
-      user.isLoggedIn && app.activeChainId();
-    if (
-      !addressExists &&
-      !isAttemptingToConnectAddressToCommunity &&
-      props.onUnrecognizedAddressReceived
-    ) {
-      const shouldContinue = props.onUnrecognizedAddressReceived();
-      if (!shouldContinue) return;
-    }
-
     if (props.withSessionKeyLoginFlow) {
       await onSessionKeyRevalidation(wallet, selectedAddress);
     } else {
@@ -592,8 +536,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       } = await createUserWithAddress(
         address,
         wallet.name,
-        // @ts-expect-error <StrictNullChecks>
-        null, // no sso source
         chainIdentifier,
         session.publicKey,
         validationBlockInfo,
@@ -634,8 +576,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const { account } = await createUserWithAddress(
       address,
       wallet.name,
-      // @ts-expect-error <StrictNullChecks>
-      null, // no sso source?
       chainIdentifier,
       // TODO: I don't think we need this field in Account at all
       session.publicKey,

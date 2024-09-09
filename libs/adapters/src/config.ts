@@ -28,6 +28,8 @@ const {
   LOAD_TESTING_AUTH_TOKEN,
   SEND_WEBHOOKS,
   SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP,
+  SEND_EMAILS,
+  DISABLE_LOCAL_QUEUE_PURGE,
 } = process.env;
 
 export const config = configure(
@@ -41,6 +43,7 @@ export const config = configure(
     },
     BROKER: {
       RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
+      DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -56,6 +59,7 @@ export const config = configure(
           SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP ?? '0',
         ),
       },
+      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -93,6 +97,11 @@ export const config = configure(
           data === DEFAULTS.RABBITMQ_URI
         );
       }, 'RABBITMQ_URI is require in production, beta (QA), demo, and frick Heroku apps'),
+      DISABLE_LOCAL_QUEUE_PURGE: z
+        .boolean()
+        .describe(
+          'Disable purging all messages in queues when a consumer starts up',
+        ),
     }),
     NOTIFICATIONS: z
       .object({
@@ -131,6 +140,7 @@ export const config = configure(
           .describe(
             'A flag indicating whether the Knock integration is enabled or disabled',
           ),
+        SEND_EMAILS: z.boolean(),
         WEBHOOKS: z
           .object({
             SEND: z

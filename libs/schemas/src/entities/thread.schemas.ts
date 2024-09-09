@@ -19,7 +19,6 @@ export const Thread = z.object({
   links: z.object(linksSchema).array().nullish(),
 
   read_only: z.boolean().nullish(),
-  version_history: z.array(z.string()).nullish(),
 
   has_poll: z.boolean().nullish(),
 
@@ -42,9 +41,6 @@ export const Thread = z.object({
   comment_count: PG_INT,
 
   activity_rank_date: z.coerce.date().nullish(),
-
-  //notifications
-  max_notif_id: PG_INT,
 
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),

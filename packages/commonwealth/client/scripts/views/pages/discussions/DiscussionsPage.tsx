@@ -113,7 +113,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       toDate: dateCursor.toDate,
       // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
-      isOnArchivePage: isOnArchivePage,
+      includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
       // @ts-expect-error <StrictNullChecks/>
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
