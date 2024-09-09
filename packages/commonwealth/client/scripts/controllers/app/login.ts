@@ -101,7 +101,6 @@ export async function completeClientLogin(account: Account) {
         address: account.address,
         community: account.community,
         walletId: account.walletId,
-        walletSsoSource: account.walletSsoSource,
       });
       user.addresses.push(addressInfo);
     }
@@ -224,7 +223,6 @@ export function updateActiveUser(data) {
             ss58Prefix: a.Community.ss58_prefix,
           },
           walletId: a.wallet_id,
-          walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,
           lastActive: a.last_active,
         }),
@@ -256,10 +254,9 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
-  validationBlockInfo?: BlockInfo,
+  validationBlockInfo?: BlockInfo | null,
 ): Promise<{
   account: Account;
   newlyCreated: boolean;
@@ -270,7 +267,6 @@ export async function createUserWithAddress(
     community_id: chain,
     jwt: userStore.getState().jwt,
     wallet_id: walletId,
-    wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
       ? JSON.stringify(validationBlockInfo)
       : null,
