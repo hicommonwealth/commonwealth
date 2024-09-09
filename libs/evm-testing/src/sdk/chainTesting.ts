@@ -25,12 +25,12 @@ const testErc1155Bytecode =
 export class ChainTesting extends SdkBase {
   public contractAddrs = {
     compound: {
-      governance: '0xc0Da02939E1441F497fd74F78cE7Decb17B66529',
-      token: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
+      governance: '0xc0Da02939E1441F497fd74F78cE7Decb17B66529'.toLowerCase(),
+      token: '0xc00e94Cb662C3520282E6f5717214004A7f26888'.toLowerCase(),
     },
     aave: {
-      governance: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
-      token: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
+      governance: '0xEC568fffba86c094cf06b22134B23074DFE2252c'.toLowerCase(),
+      token: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9'.toLowerCase(),
     },
   };
 
