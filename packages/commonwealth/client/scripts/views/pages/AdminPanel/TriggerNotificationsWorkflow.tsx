@@ -51,23 +51,26 @@ const TriggerNotificationsWorkflow = () => {
           label: 'Trigger',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          onClick: async () => {
-            try {
-              const result = await triggerNotificationsWorkflow({
-                workflow_key: workflowKey,
-                data: JSON.parse(workflowData),
-              });
-              notifySuccess(
-                `Workflow triggered for ${result.numSucceeded} users`,
-              );
-              if (result.numFailed > 0)
-                notifyError(
-                  `Failed to trigger workflow for ${result.numFailed} users`,
+          onClick: () => {
+            triggerNotificationsWorkflow({
+              workflow_key: workflowKey,
+              data: JSON.parse(workflowData),
+            })
+              .then((result) => {
+                notifySuccess(
+                  result.numSucceeded > 0
+                    ? `Workflow triggered for ${result.numSucceeded} users`
+                    : 'Success',
                 );
-            } catch (e) {
-              console.error(e);
-              notifyError(`Failed to trigger workflow: ${e.message}`);
-            }
+                if (result.numFailed > 0)
+                  notifyError(
+                    `Failed to trigger workflow for ${result.numFailed} users`,
+                  );
+              })
+              .catch((e) => {
+                console.error(e);
+                notifyError(`Failed to trigger workflow: ${e.message}`);
+              });
           },
         },
         {
