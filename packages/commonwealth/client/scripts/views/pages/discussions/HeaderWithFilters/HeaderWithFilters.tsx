@@ -6,9 +6,9 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
@@ -29,7 +29,6 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
-
 import './HeaderWithFilters.scss';
 
 type HeaderWithFiltersProps = {
@@ -62,8 +61,9 @@ export const HeaderWithFilters = ({
   const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
   const location = useLocation();
-  // @ts-expect-error <StrictNullChecks/>
-  const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
+  const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<
+    Topic | undefined
+  >();
 
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
@@ -75,14 +75,17 @@ export const HeaderWithFilters = ({
   const { isContestAvailable, contestsData, stakeEnabled } =
     useCommunityContests();
 
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId(),
+    enabled: !!app.activeChainId(),
+    includeNodeInfo: true,
+  });
+
   const { data: feeManagerBalance } = useGetFeeManagerBalanceQuery({
     ethChainId: ethChainId!,
     namespace,
     apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
   });
-
-  const { totalThreadsInCommunityForVoting } =
-    useEXCEPTION_CASE_threadCountersStore();
 
   const user = useUserStore();
 
@@ -360,7 +363,6 @@ export const HeaderWithFilters = ({
                   canEditOption={Permissions.isCommunityAdmin()}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
-                      // @ts-expect-error <StrictNullChecks/>
                       [...featuredTopics, ...otherTopics].find(
                         (x) => x.id === item.id,
                       ),
@@ -422,7 +424,7 @@ export const HeaderWithFilters = ({
                         value: s,
                         label: `${threadStageToLabel(s)} ${
                           s === ThreadStage.Voting
-                            ? totalThreadsInCommunityForVoting
+                            ? community?.numVotingThreads || 0
                             : ''
                         }`,
                       })),
@@ -518,14 +520,16 @@ export const HeaderWithFilters = ({
       <CWModal
         size="medium"
         content={
-          <EditTopicModal
-            topic={topicSelectedToEdit}
-            // @ts-expect-error <StrictNullChecks/>
-            onModalClose={() => setTopicSelectedToEdit(null)}
-          />
+          topicSelectedToEdit ? (
+            <EditTopicModal
+              topic={topicSelectedToEdit}
+              onModalClose={() => setTopicSelectedToEdit(undefined)}
+            />
+          ) : (
+            <></>
+          )
         }
-        // @ts-expect-error <StrictNullChecks/>
-        onClose={() => setTopicSelectedToEdit(null)}
+        onClose={() => setTopicSelectedToEdit(undefined)}
         open={!!topicSelectedToEdit}
       />
     </div>
