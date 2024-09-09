@@ -95,7 +95,17 @@ export function KnockProvider(): NotificationsProvider {
         });
       });
 
-      return await Promise.allSettled(triggerPromises);
+      const res = await Promise.allSettled(triggerPromises);
+      res.forEach((r) => {
+        if (r.status === 'rejected') {
+          log.error('KNOCK PROVIDER: Failed to trigger workflow', undefined, {
+            workflow_key: options.key,
+            data: options.data,
+            reason: JSON.stringify(r.reason),
+          });
+        }
+      });
+      return res;
     },
     async getMessages(
       options: NotificationsProviderGetMessagesOptions,

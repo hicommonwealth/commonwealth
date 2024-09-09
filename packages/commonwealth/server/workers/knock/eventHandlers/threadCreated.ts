@@ -69,7 +69,7 @@ export const processThreadCreated: EventHandler<
 
     const provider = notificationsProvider();
 
-    return await provider.triggerWorkflow({
+    const res = await provider.triggerWorkflow({
       key: WorkflowKeys.Webhooks,
       users: webhooks.map((w) => ({
         id: `webhook-${w.id}`,
@@ -92,6 +92,8 @@ export const processThreadCreated: EventHandler<
         object_summary: threadSummary,
       },
     });
+
+    return !res.some((r) => r.status === 'rejected');
   }
 
   return true;
