@@ -25,17 +25,6 @@ export const verifyThreadSignature: AuthHandler<
   if (config.ENFORCE_SESSION_KEYS) {
     if (hasCanvasSignedDataApiArgs(payload)) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
-
-      if (
-        !(
-          'community_id' in payload &&
-          'topic_id' in payload &&
-          'title' in payload &&
-          'body' in payload
-        )
-      )
-        throw new InvalidInput('Missing thread arguments');
-
       const thread = ThreadSignature.parse(payload);
 
       await verifyThread(canvasSignedData, {
@@ -64,16 +53,16 @@ export const verifyCommentSignature: AuthHandler<
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
       await verifyComment(canvasSignedData, {
         thread_id: payload.thread_id,
-        parent_comment_id: payload.parent_id,
+        parent_comment_id: payload.parent_msg_id,
         text: payload.text,
         address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          canvasSignedData.actionMessage.payload.did.split(':')[2] ===
           'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
                 address: actor.address!,
               })
-            : actor.address,
+            : actor.address!,
       });
     }
   }
@@ -85,19 +74,32 @@ export const verifyReactionSignature: AuthHandler<
   if (config.ENFORCE_SESSION_KEYS) {
     if (hasCanvasSignedDataApiArgs(payload)) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
-      await verifyReaction(canvasSignedData, {
-        thread_id: 'thread_id' in payload ? payload.thread_id : undefined,
-        comment_id: 'comment_id' in payload ? payload.comment_id : undefined,
-        value: payload.reaction,
-        address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                address: actor.address!,
-              })
-            : actor.address,
-      });
+      const address =
+        canvasSignedData.actionMessage.payload.did.split(':')[2] === 'polkadot'
+          ? addressSwapper({
+              currentPrefix: 42,
+              address: actor.address!,
+            })
+          : actor.address!;
+
+      const reaction =
+        'thread_msg_id' in payload
+          ? {
+              thread_id: payload.thread_msg_id,
+              value: payload.reaction,
+              address,
+            }
+          : 'comment_msg_id' in payload
+            ? {
+                comment_id: payload.comment_msg_id,
+                value: payload.reaction,
+                address,
+              }
+            : null;
+
+      if (reaction === null) throw new Error('Invalid reaction');
+
+      await verifyReaction(canvasSignedData, reaction);
     }
   }
 };
