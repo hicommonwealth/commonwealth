@@ -39,7 +39,6 @@ export const CommentEditor = ({
   shouldFocus,
   tooltipText,
 }: CommentEditorProps) => {
-  console.log('contetentDelta', contentDelta);
   return (
     <div className="CommentEditor">
       <div className="attribution-row">
