@@ -12,7 +12,7 @@ import {
   StrikeThroughSupSubToggles,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-
+import { HeadingButton } from 'views/components/Editor/toolbars/HeadingButton';
 import './ToolbarForDesktop.scss';
 
 export const ToolbarForDesktop = () => {
@@ -30,6 +30,8 @@ export const ToolbarForDesktop = () => {
                 <div className="mdxeditor-block-type-select">
                   <BlockTypeSelect />
                 </div>
+
+                <HeadingButton headingTag="h1" />
                 <BoldItalicUnderlineToggles />
                 <Separator />
                 <StrikeThroughSupSubToggles />
