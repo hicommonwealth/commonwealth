@@ -1,4 +1,5 @@
 import {
+  InvalidActor,
   InvalidInput,
   logger,
   notificationsProvider,
@@ -23,6 +24,9 @@ export function TriggerNotificationsWorkflow(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
+      if (!actor.user.isAdmin)
+        throw new InvalidActor(actor, 'Must be super admin');
+
       let successfulTriggers = 0;
       let failedTriggers = 0;
       const errors: {
