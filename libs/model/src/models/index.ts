@@ -71,6 +71,7 @@ export * from './role_assignment';
 export * from './sso_token';
 export * from './stake_transaction';
 export * from './starred_community';
+export * from './subscription_preference';
 export * from './tags';
 export * from './thread';
 export * from './thread_version_history';

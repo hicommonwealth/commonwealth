@@ -12,6 +12,7 @@ import {
   Cache,
   Disposable,
   Disposer,
+  IdentifyUserOptions,
   NotificationsProvider,
   NotificationsProviderSchedulesReturn,
   Stats,
@@ -238,6 +239,8 @@ export const notificationsProvider = port(function notificationsProvider(
         Promise.resolve([] as NotificationsProviderSchedulesReturn),
       deleteSchedules: ({ schedule_ids }) =>
         Promise.resolve(new Set(schedule_ids)),
+      identifyUser: (options: IdentifyUserOptions) =>
+        Promise.resolve({ id: options.user_id }),
       registerClientRegistrationToken: () => Promise.resolve(false),
       unregisterClientRegistrationToken: () => Promise.resolve(false),
     }
