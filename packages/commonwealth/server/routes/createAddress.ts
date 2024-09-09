@@ -1,12 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { AddressAttributes, DB } from '@hicommonwealth/model';
 import { AddressInstance } from '@hicommonwealth/model';
-import {
-  ChainBase,
-  WalletId,
-  addressSwapper,
-  type WalletSsoSource,
-} from '@hicommonwealth/shared';
+import { ChainBase, WalletId, addressSwapper } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
@@ -29,7 +24,6 @@ export type CreateAddressReq = {
   address: string;
   community_id?: string;
   wallet_id: WalletId;
-  wallet_sso_source: WalletSsoSource;
   block_info?: string;
 };
 
@@ -175,7 +169,6 @@ const createAddress = async (
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.body.wallet_id;
-    existingAddress.wallet_sso_source = req.body.wallet_sso_source;
 
     const updatedObj = await existingAddress.save();
 
@@ -211,7 +204,6 @@ const createAddress = async (
           block_info: req.body.block_info,
           last_active,
           wallet_id: req.body.wallet_id,
-          wallet_sso_source: req.body.wallet_sso_source,
           role: 'member',
           is_user_default: false,
           ghost_address: false,
