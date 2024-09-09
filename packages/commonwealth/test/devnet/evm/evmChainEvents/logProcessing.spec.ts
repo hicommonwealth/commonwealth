@@ -8,7 +8,6 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import Web3 from 'web3';
 import {
   getEvents,
   getLogs,
@@ -28,8 +27,6 @@ import {
 } from './util';
 
 chai.use(chaiAsPromised);
-
-const web3 = new Web3();
 
 const compoundVotingDelayBlocks = 13140;
 const compoundVotingPeriodBlocks = 19710;
