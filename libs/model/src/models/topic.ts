@@ -18,6 +18,8 @@ export type TopicAttributes = {
   default_offchain_template?: string;
   group_ids?: number[];
   telegram?: string;
+
+  weighted_voting?: string;
   chain_node_id?: number;
   token_address?: string;
   token_symbol?: string;
@@ -67,6 +69,7 @@ export default (
         defaultValue: [],
       },
       telegram: { type: Sequelize.STRING, allowNull: true },
+      weighted_voting: { type: Sequelize.STRING, allowNull: true },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
