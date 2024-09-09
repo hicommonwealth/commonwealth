@@ -119,8 +119,8 @@ const useJoinCommunity = () => {
               ...user.communities,
               {
                 id: community.id,
-                iconUrl: activeChainInfo.iconUrl || '',
-                name: activeChainInfo.name || '',
+                iconUrl: activeChainInfo?.iconUrl || community.iconUrl || '',
+                name: activeChainInfo?.name || community.name || '',
                 isStarred: false,
               },
             ],
