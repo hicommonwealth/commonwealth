@@ -91,6 +91,7 @@ class GqlLazyLoader {
 `;
   }
 
+  // TODO ✅
   public static async PROPOSALS_QUERY() {
     await this.init();
     return this.gql`
@@ -271,6 +272,7 @@ export async function getProposal(
   return proposalObj.data?.proposals[0];
 }
 
+// TODO ✅
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
   await getApolloClient();
   // @ts-expect-error StrictNullChecks
