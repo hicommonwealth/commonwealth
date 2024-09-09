@@ -1186,6 +1186,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.2
+      lexical:
+        specifier: ^0.17.0
+        version: 0.17.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21

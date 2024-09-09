@@ -32,6 +32,9 @@ export const ToolbarForDesktop = () => {
                 </div>
 
                 <HeadingButton headingTag="h1" />
+                <HeadingButton headingTag="h2" />
+                <HeadingButton headingTag="h3" />
+                <Separator />
                 <BoldItalicUnderlineToggles />
                 <Separator />
                 <StrikeThroughSupSubToggles />

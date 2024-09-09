@@ -1,31 +1,50 @@
+import { $createHeadingNode } from '@lexical/rich-text';
 import {
-  BlockType,
   ToggleSingleGroupWithItem,
+  convertSelectionToNode$,
   currentBlockType$,
   useCellValue,
+  usePublisher,
 } from 'commonwealth-mdxeditor';
-import React, { ReactNode } from 'react';
+import { $createParagraphNode } from 'lexical';
+import React, { ReactNode, useCallback } from 'react';
 
 export type BlockButtonProps = Readonly<{
-  blockType: BlockType;
+  blockType: 'h1' | 'h2' | 'h3' | 'q';
   addTitle: string;
   removeTitle: string;
-  onClick: () => void;
   children: ReactNode;
 }>;
 
 export const BlockButton = (props: BlockButtonProps) => {
-  const { blockType, removeTitle, addTitle, onClick } = props;
+  const { blockType, removeTitle, addTitle } = props;
 
   const currentBlockType = useCellValue(currentBlockType$);
+  const convertSelectionToNode = usePublisher(convertSelectionToNode$);
 
   const active = currentBlockType === blockType;
+
+  const toggleFormat = useCallback(() => {
+    if (!active) {
+      switch (blockType) {
+        case 'h1':
+        case 'h2':
+        case 'h3':
+          convertSelectionToNode(() => $createHeadingNode(blockType));
+          break;
+        case 'q':
+          break;
+      }
+    } else {
+      convertSelectionToNode(() => $createParagraphNode());
+    }
+  }, [active, blockType, convertSelectionToNode]);
 
   return (
     <ToggleSingleGroupWithItem
       title={active ? removeTitle : addTitle}
       on={active}
-      onValueChange={onClick}
+      onValueChange={toggleFormat}
     >
       {props.children}
     </ToggleSingleGroupWithItem>
