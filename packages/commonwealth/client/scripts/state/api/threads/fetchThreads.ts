@@ -37,7 +37,7 @@ interface FetchBulkThreadsProps extends CommonProps {
   topicId?: number;
   stage?: string;
   includePinnedThreads?: boolean;
-  isOnArchivePage?: boolean;
+  includeArchivedThreads?: boolean;
   contestAddress?: string;
   contestStatus?: string;
   orderBy?:
@@ -165,7 +165,7 @@ const fetchBulkThreads = (props) => {
         ...(props.fromDate && { from_date: props.fromDate }),
         to_date: props.toDate,
         orderBy: props.orderBy || 'newest',
-        ...(props.isOnArchivePage && { archived: true }),
+        ...(props.includeArchivedThreads && { archived: true }),
         ...(props.contestAddress && {
           contestAddress: props.contestAddress,
         }),

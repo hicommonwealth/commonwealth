@@ -64,16 +64,15 @@ export function CreateContestManagerMetadata(): Command<
         },
       );
 
-      if (mustExist('Contest Manager', contestManager)) {
-        return {
-          contest_managers: [
-            {
-              ...contestManager.get({ plain: true }),
-              topics: contestTopics as Required<TopicAttributes>[],
-            },
-          ],
-        };
-      }
+      mustExist('Contest Manager', contestManager);
+      return {
+        contest_managers: [
+          {
+            ...contestManager.get({ plain: true }),
+            topics: contestTopics as Required<TopicAttributes>[],
+          },
+        ],
+      };
     },
   };
 }

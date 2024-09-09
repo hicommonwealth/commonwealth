@@ -7,5 +7,12 @@ export const trpcRouter = trpc.router({
     MixpanelCommunityInteractionEvent.CREATE_THREAD,
     ({ community_id }) => ({ community: community_id }),
   ]),
-  getBulkThreads: trpc.query(Thread.GetBulkThreads, trpc.Tag.Thread),
+  createThreadReaction: trpc.command(
+    Thread.CreateThreadReaction,
+    trpc.Tag.Thread,
+    [
+      MixpanelCommunityInteractionEvent.CREATE_REACTION,
+      ({ community_id }) => ({ community: community_id }),
+    ],
+  ),
 });

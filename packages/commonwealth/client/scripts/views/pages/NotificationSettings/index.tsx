@@ -30,9 +30,7 @@ const NotificationSettings = () => {
   const user = useUserStore();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
-    (communityAlerts.data as unknown as ReadonlyArray<
-      z.infer<typeof CommunityAlert>
-    >) || [],
+    communityAlerts.data || [],
   );
 
   const [section, setSection] =

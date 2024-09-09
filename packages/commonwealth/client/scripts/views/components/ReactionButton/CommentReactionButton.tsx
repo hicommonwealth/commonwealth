@@ -1,3 +1,4 @@
+import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import React, { useState } from 'react';
@@ -83,12 +84,13 @@ export const CommentReactionButton = ({
         notifyError('Failed to update reaction count');
       });
     } else {
-      createCommentReaction({
+      const input = await buildCreateCommentReactionInput({
         address: activeAddress,
         commentId: comment.id,
         communityId,
         threadId: comment.threadId,
-      }).catch((err) => {
+      });
+      createCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
           return;
         }

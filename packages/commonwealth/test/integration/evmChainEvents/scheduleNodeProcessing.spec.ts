@@ -16,7 +16,6 @@ import {
   getTestCommunityContract,
   getTestContract,
   getTestSignatures,
-  getTestSubscription,
 } from './util';
 
 describe('scheduleNodeProcessing', () => {
@@ -53,7 +52,6 @@ describe('scheduleNodeProcessing', () => {
 
   test('should schedule processing for a single source', async () => {
     await getTestCommunityContract();
-    await getTestSubscription();
     const abi = await getTestAbi();
     const contract = await getTestContract();
     await contract.update({ abi_id: abi.id });
@@ -72,7 +70,6 @@ describe('scheduleNodeProcessing', () => {
   test('should evenly schedule 2 sources per interval', async () => {
     expect(singleSourceSuccess).to.be.true;
     await getTestCommunityContract('v2');
-    await getTestSubscription('v2');
     const abi = await getTestAbi('v2');
     const contract = await getTestContract('v2');
     await contract.update({ abi_id: abi.id });

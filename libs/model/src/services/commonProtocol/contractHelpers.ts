@@ -1,12 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   BalanceSourceType,
-  commonProtocol,
   ZERO_ADDRESS,
+  commonProtocol,
 } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { Balances, getBalances, TokenAttributes } from '../tokenBalanceCache';
+import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
 import { contestABI } from './abi/contestAbi';
 
 /**

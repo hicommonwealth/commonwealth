@@ -1,0 +1,7 @@
+This is currently using the commonwealth-mdxeditor which is a fork of the
+mdeditor package.
+
+This is just temporary as I plan on merging this into the main MDXEditor when
+we are done.
+
+Then we can switch over to the real one.

@@ -47,7 +47,6 @@
     "refresh-all-memberships": "tsx ./scripts/refresh-all-memberships.ts",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "resize-large-images": "tsx ./scripts/resizeImages.ts",
-    "send-notification-digest-emails": "SEND_EMAILS=true tsx server.ts",
     "set-super-admin": "chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh",
     "start": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start-api' 'pnpm run vite'",
     "start-api": "tsx watch --max-old-space-size=4096 server.ts",
@@ -260,7 +259,8 @@
     "web3-validator": "2.0.5",
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
-    "zustand": "^4.3.8"
+    "zustand": "^4.3.8",
+    "commonwealth-mdxeditor": "^0.0.3"
   },
   "devDependencies": {
     "@ethersproject/keccak256": "5.7.0",

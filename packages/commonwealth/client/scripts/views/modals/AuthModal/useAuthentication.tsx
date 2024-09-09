@@ -536,8 +536,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       } = await createUserWithAddress(
         address,
         wallet.name,
-        // @ts-expect-error <StrictNullChecks>
-        null, // no sso source
         chainIdentifier,
         session.publicKey,
         validationBlockInfo,
@@ -578,8 +576,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const { account } = await createUserWithAddress(
       address,
       wallet.name,
-      // @ts-expect-error <StrictNullChecks>
-      null, // no sso source?
       chainIdentifier,
       // TODO: I don't think we need this field in Account at all
       session.publicKey,

@@ -28,6 +28,7 @@ const {
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
+  REACTION_WEIGHT_OVERRIDE,
 } = process.env;
 
 const NAME =
@@ -65,6 +66,11 @@ export const config = configure(
     },
     OUTBOX: {
       ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
+    },
+    STAKE: {
+      REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
+        ? parseInt(REACTION_WEIGHT_OVERRIDE, 10)
+        : null,
     },
     CONTESTS: {
       MIN_USER_ETH: 0.0005,
@@ -143,6 +149,9 @@ export const config = configure(
     }),
     OUTBOX: z.object({
       ALLOWED_EVENTS: z.array(z.string()),
+    }),
+    STAKE: z.object({
+      REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
     }),
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
