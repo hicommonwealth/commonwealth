@@ -40,7 +40,7 @@ export function CreateCommentReaction(): Command<
       mustExist('Community address', address);
 
       const calculated_voting_weight = await getVotingWeight(
-        thread.community_id,
+        thread.topic_id!,
         address.address,
       );
 

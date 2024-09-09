@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { TopicAttributes } from '@hicommonwealth/model';
+import { PG_INT, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -26,6 +27,21 @@ export const createTopicHandler = async (
     featured_in_sidebar: z.coerce.boolean().optional(),
     featured_in_new_post: z.coerce.boolean().optional(),
     default_offchain_template: z.string().optional(),
+    weighted_voting: z.nativeEnum(TopicWeightedVoting).optional(),
+    chain_node_id: PG_INT.optional().describe(
+      'token chain node ID, used for ERC20 topics',
+    ),
+    token_address: z
+      .string()
+      .optional()
+      .describe('token address, used for ERC20 topics'),
+    token_symbol: z
+      .string()
+      .optional()
+      .describe('token symbol, used for ERC20 topics'),
+    vote_weight_multiplier: PG_INT.optional().describe(
+      'vote weight multiplier, used for ERC20 topics',
+    ),
   });
 
   const validationResult = validationSchema.safeParse(body);
