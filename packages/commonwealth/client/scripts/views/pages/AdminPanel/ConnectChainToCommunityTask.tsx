@@ -8,7 +8,10 @@ import {
 } from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { useDebounce } from 'usehooks-ts';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import {
+  CWDropdown,
+  DropdownItemType,
+} from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
@@ -16,21 +19,23 @@ import { openConfirmation } from '../../modals/confirmation_modal';
 import { alphabetizeChains } from './utils';
 
 const ConnectChainToCommunityTask = () => {
-  const [rpcEndpointCommunityId, setRpcEndpointCommunityId] =
-    useState<string>('');
-  const [communityInfoValueValidated, setCommunityInfoValueValidated] =
-    useState<boolean>(false);
+  const [communityId, setCommunityId] = useState<string>('');
 
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
-    communityId: rpcEndpointCommunityId,
+  const [chainNameAndId, setChainNameAndId] = useState<DropdownItemType>({
+    label: '',
+    value: 0,
   });
 
-  const { data: chainTypes } = useFetchNodesQuery();
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: communityId,
+  });
 
-  const chains = alphabetizeChains(chainTypes);
+  const { data: chainNodes } = useFetchNodesQuery();
+
+  const chains = alphabetizeChains(chainNodes);
 
   const debouncedCommunityLookupId = useDebounce<string | undefined>(
-    rpcEndpointCommunityId,
+    communityId,
     500,
   );
 
@@ -40,38 +45,37 @@ const ConnectChainToCommunityTask = () => {
       enabled: !!debouncedCommunityLookupId,
     });
 
+  const chainNotCommunity = communityLookupData?.type === ChainType.Chain;
+
+  const buttonEnabled =
+    !isLoadingCommunityLookupData &&
+    !chainNotCommunity &&
+    chainNameAndId.label.length > 0;
+
+  const setCommunityIdInput = (e) => {
+    setCommunityId(e?.target?.value?.trim() || '');
+  };
+
   const communityNotFound =
     !isLoadingCommunityLookupData &&
     (!communityLookupData ||
       Object.keys(communityLookupData || {})?.length === 0);
 
-  const communityNotChain = communityLookupData?.type !== ChainType.Chain;
-
-  const buttonEnabled = rpcEndpointCommunityId.length !== 0;
-
-  const setCommunityIdInput = (e) => {
-    setRpcEndpointCommunityId(e?.target?.value?.trim() || '');
-    if (e?.target?.value?.trim()?.length === 0)
-      setCommunityInfoValueValidated(false);
-  };
-
   const communityIdInputError = (() => {
     if (communityNotFound) return 'Community not found';
-    if (communityNotChain) return 'Community is not a chain';
+    if (chainNotCommunity) return 'This is a chain';
     return '';
   })();
 
   const update = async () => {
-    if (
-      Object.keys(communityLookupData || {}).length > 0 &&
-      communityInfoValueValidated
-    ) {
+    if (Object.keys(communityLookupData || {}).length > 0) {
       try {
-        // await updateCommunity({
-        //   communityId: communityLookupData?.id,
-        //   chainNodeId: nodeId ?? communityChainNode?.id?.toString(),
-        //   type: ChainType.Chain,
-        // });
+        await updateCommunity({
+          communityId: communityId,
+          chainNodeId: chainNameAndId?.value.toString(),
+        });
+        setCommunityIdInput('');
+        setChainNameAndId({ label: '', value: 0 });
         notifySuccess('Chain connected to community');
       } catch (error) {
         notifyError('Error connecting chain to community');
@@ -82,7 +86,7 @@ const ConnectChainToCommunityTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Connect Chain to Community',
-      description: `Are you sure you want to connect this chain to this community?`,
+      description: `Are you sure you want to connect ${communityLookupData?.name} to ${chainNameAndId.label}?`,
       buttons: [
         {
           label: 'Update',
@@ -106,7 +110,7 @@ const ConnectChainToCommunityTask = () => {
       <div className="TaskRow">
         <CWTextInput
           label="Community Id"
-          value={rpcEndpointCommunityId}
+          value={communityId}
           onInput={setCommunityIdInput}
           customError={communityIdInputError}
           placeholder="Enter a community id"
@@ -114,7 +118,9 @@ const ConnectChainToCommunityTask = () => {
         <CWDropdown
           label="Select chain"
           options={chains}
-          onSelect={(item) => console.log(item)}
+          onSelect={(item) => {
+            setChainNameAndId(item);
+          }}
         />
         <CWButton
           label="Connect"

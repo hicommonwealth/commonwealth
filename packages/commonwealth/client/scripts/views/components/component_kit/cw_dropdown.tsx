@@ -7,7 +7,7 @@ import { CWTextInput } from './cw_text_input';
 
 export type DropdownItemType = {
   label: string;
-  value: string;
+  value: string | number;
 };
 
 type DropdownProps = {

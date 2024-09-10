@@ -145,12 +145,12 @@ export function downloadCSV(rows: CSVRow[], filename: string) {
   document.body.removeChild(link);
 }
 
-export const alphabetizeChains = (chainTypes: NodeInfo[] | undefined) => {
+export const alphabetizeChains = (chainNodes: NodeInfo[] | undefined) => {
   return (
-    chainTypes
+    chainNodes
       ?.map((chain) => ({
         label: chain.name,
-        value: chain.name,
+        value: chain.id,
       }))
       .sort((a, b) =>
         (a?.label || '').toLowerCase().localeCompare(b?.label || ''),
