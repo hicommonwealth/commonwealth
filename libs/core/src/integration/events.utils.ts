@@ -16,10 +16,10 @@ import {
 type ParseType<T> = T extends 'address'
   ? z.infer<typeof EVM_ADDRESS>
   : T extends 'uint256'
-  ? z.infer<typeof ETHERS_BIG_NUMBER>
-  : T extends 'bool'
-  ? boolean
-  : never;
+    ? z.infer<typeof ETHERS_BIG_NUMBER>
+    : T extends 'bool'
+      ? boolean
+      : never;
 
 // RemoveIndexed removes "indexed" arg name
 type RemoveIndexed<T extends string> = T extends `indexed ${infer Suffix}`
@@ -31,9 +31,9 @@ type ParseSignature<S extends string> =
   S extends `${infer Type} ${infer Name}, ${infer Rest}`
     ? { [K in RemoveIndexed<Name>]: ParseType<Type> } & ParseSignature<Rest>
     : S extends `${infer Type} ${infer Name}`
-    ? { [K in RemoveIndexed<Name>]: ParseType<Type> }
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any;
+      ? { [K in RemoveIndexed<Name>]: ParseType<Type> }
+      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        any;
 
 // EvmMapper maps chain event args as input to a zod event schema type as output
 type EvmMapper<Input extends string, Output extends ZodSchema> = {
@@ -235,14 +235,14 @@ const parseEthersResult = (
 // the event. If output is an array, returns a union of all schemas in the array.
 type ParserReturnType<Event extends keyof typeof ChainEventSigs> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  typeof EvmMappers[Event] extends EvmMapper<any, any>
-    ? z.infer<typeof EvmMappers[Event]['output']>
-    : typeof EvmMappers[Event] extends (infer U)[]
-    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      U extends EvmMapper<any, any>
-      ? z.infer<U['output']>
-      : never
-    : never;
+  (typeof EvmMappers)[Event] extends EvmMapper<any, any>
+    ? z.infer<(typeof EvmMappers)[Event]['output']>
+    : (typeof EvmMappers)[Event] extends (infer U)[]
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        U extends EvmMapper<any, any>
+        ? z.infer<U['output']>
+        : never
+      : never;
 
 // ContestOutboxEvent is the outbox shape
 type ContestOutboxEvent<Event extends keyof typeof ChainEventSigs> = {
