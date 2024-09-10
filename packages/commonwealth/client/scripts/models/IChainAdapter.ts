@@ -7,7 +7,6 @@ import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { z } from 'zod';
 import { setDarkMode } from '../helpers/darkMode';
-import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
@@ -50,22 +49,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    // TODO: cleanup EXCEPTION_CASE_threadCountersStore in 8812
-    EXCEPTION_CASE_threadCountersStore.setState({
-      totalThreadsInCommunity: this.meta.lifetime_thread_count,
-      totalThreadsInCommunityForVoting: this.meta.numVotingThreads,
-    });
-
     this._serverLoaded = true;
     return true;
   }
 
   public deinitServer() {
     this._serverLoaded = false;
-    EXCEPTION_CASE_threadCountersStore.setState({
-      totalThreadsInCommunity: 0,
-      totalThreadsInCommunityForVoting: 0,
-    });
     console.log(`${this.meta.name} stopped`);
   }
 

@@ -12,6 +12,7 @@ import {
   command,
   dispose,
 } from '@hicommonwealth/core';
+import { AddressAttributes } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
 import { afterEach } from 'node:test';
@@ -21,6 +22,7 @@ import {
   CreateCommentErrors,
   CreateCommentReaction,
   MAX_COMMENT_DEPTH,
+  UpdateComment,
 } from '../../src/comment';
 import { models } from '../../src/database';
 import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
@@ -37,6 +39,7 @@ const chance = Chance();
 describe('Thread lifecycle', () => {
   let thread, archived, read_only, comment;
   const roles = ['admin', 'member', 'nonmember', 'banned', 'rejected'] as const;
+  const addresses = {} as Record<(typeof roles)[number], AddressAttributes>;
   const actors = {} as Record<(typeof roles)[number], Actor>;
   const vote_weight = 200;
 
@@ -107,24 +110,24 @@ describe('Thread lifecycle', () => {
           email: user.profile.email!,
         },
         address: address!.address,
-        addressId: address!.id,
       };
+      addresses[role] = address!;
     });
 
     await models.Membership.bulkCreate([
       {
         group_id: threadGroupId,
-        address_id: actors['member'].addressId!,
+        address_id: addresses['member'].id!,
         last_checked: new Date(),
       },
       {
         group_id: commentGroupId,
-        address_id: actors['member'].addressId!,
+        address_id: addresses['member'].id!,
         last_checked: new Date(),
       },
       {
         group_id: threadGroupId,
-        address_id: actors['rejected'].addressId!,
+        address_id: addresses['rejected'].id!,
         reject_reason: [
           {
             message: 'User Balance of 0 below threshold 1',
@@ -311,6 +314,34 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.NestingTooDeep);
+    });
+
+    it('should update comment', async () => {
+      const text = 'hello updated';
+      const updated = await command(UpdateComment(), {
+        actor: actors.member,
+        payload: {
+          comment_id: comment!.id,
+          text,
+        },
+      });
+      expect(updated).to.include({
+        thread_id: thread!.id,
+        text,
+        community_id: thread!.community_id,
+      });
+    });
+
+    it('should throw not found when trying to update', async () => {
+      await expect(
+        command(UpdateComment(), {
+          actor: actors.member,
+          payload: {
+            comment_id: 1234567890,
+            text: 'hi',
+          },
+        }),
+      ).rejects.toThrowError(InvalidInput);
     });
   });
 

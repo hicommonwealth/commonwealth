@@ -14,6 +14,7 @@ import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
 import RefreshCustomDomainTask from './RefreshCustomDomainTask';
 import TopUsers from './TopUsers';
+import TriggerNotificationsWorkflow from './TriggerNotificationsWorkflow';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -40,6 +41,7 @@ const AdminPanelPage = () => {
         <RPCEndpointTask />
         <MakeSiteAdminTask />
         <TopUsers />
+        <TriggerNotificationsWorkflow />
       </div>
     </CWPageLayout>
   );
