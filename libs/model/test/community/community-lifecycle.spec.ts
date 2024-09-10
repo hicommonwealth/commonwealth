@@ -198,7 +198,6 @@ describe('Community lifecycle', () => {
           type: ChainType.Offchain,
         },
       });
-      console.log(updated);
 
       assert.equal(updated?.directory_page_enabled, true);
       assert.equal(updated?.directory_page_chain_node_id, ethNode.id);

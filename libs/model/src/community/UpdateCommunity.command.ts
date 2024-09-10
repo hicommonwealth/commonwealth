@@ -151,10 +151,11 @@ export function UpdateCommunity(): Command<
 
       // Suggested solution for serializing BigInts
       // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
-      (BigInt.prototype as any).toJSON = function () {
-        return this.toString();
-      };
-      return (await models.Community.findOne({ where: { id } }))!.toJSON();
+      (BigInt.prototype as unknown as { toJSON: () => string }).toJSON =
+        function () {
+          return this.toString();
+        };
+      return community.toJSON();
     },
   };
 }

@@ -1,34 +1,9 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { Community } from '@hicommonwealth/model';
+import { Community, models } from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
 } from '../../shared/analytics/types';
-
-// TODO: mixpanel events for update community
-/*
-let mixpanelEvent: MixpanelCommunityInteractionEvent;
-let communitySelected = null;
-
-if (community.directory_page_enabled !== directory_page_enabled) {
-  mixpanelEvent = directory_page_enabled
-    ? MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_ENABLED
-    : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
-
-  if (directory_page_enabled) {
-    communitySelected = await this.models.Community.findOne({
-      where: { chain_node_id: directory_page_chain_node_id! },
-    });
-  }
-}
-const analyticsOptions = {
-  event: mixpanelEvent,
-  community: community.id,
-  userId: user.id,
-  isCustomDomain: null,
-  ...(communitySelected && { communitySelected: communitySelected.id }),
-};
-*/
 
 export const trpcRouter = trpc.router({
   createCommunity: trpc.command(Community.CreateCommunity, trpc.Tag.Community, [
@@ -38,7 +13,32 @@ export const trpcRouter = trpc.router({
       community: result.community?.id,
     }),
   ]),
-  updateCommunity: trpc.command(Community.UpdateCommunity, trpc.Tag.Community),
+  updateCommunity: trpc.command(
+    Community.UpdateCommunity,
+    trpc.Tag.Community,
+    async (input, output) => {
+      const { directory_page_enabled } = input;
+      if (directory_page_enabled === undefined) return undefined;
+      // track directory page enabled/disabled events
+      const event = directory_page_enabled
+        ? MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_ENABLED
+        : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
+      // TODO: @timolegros is this a random selection?
+      const dirnode = directory_page_enabled
+        ? await models.Community.findOne({
+            where: { chain_node_id: output.directory_page_chain_node_id },
+          })
+        : undefined;
+      return [
+        event,
+        {
+          community: output.id,
+          isCustomDomain: null,
+          communitySelected: dirnode?.id,
+        },
+      ];
+    },
+  ),
   getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community),
   getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community),
   getStake: trpc.query(Community.GetCommunityStake, trpc.Tag.Community),
