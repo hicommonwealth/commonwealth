@@ -57,15 +57,16 @@ export const ReactionButton = ({
     thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
   const popoverProps = usePopover();
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
     useCreateThreadReactionMutation({
-      communityId: app.activeChainId(),
+      communityId,
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
-      communityId: app.activeChainId(),
+      communityId,
       address: user.activeAccount?.address || '',
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId,
@@ -90,7 +91,7 @@ export const ReactionButton = ({
       }
 
       deleteThreadReaction({
-        communityId: app.activeChainId(),
+        communityId,
         address: user.activeAccount?.address,
         threadId: thread.id,
         threadMsgId: thread.canvasMsgId,
@@ -103,7 +104,7 @@ export const ReactionButton = ({
       });
     } else {
       const input = await buildCreateThreadReactionInput({
-        communityId: app.activeChainId(),
+        communityId,
         address: activeAddress || '',
         threadId: thread.id,
         threadMsgId: thread.canvasMsgId,

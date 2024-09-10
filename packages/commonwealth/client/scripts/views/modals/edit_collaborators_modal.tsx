@@ -49,7 +49,7 @@ export const EditCollaboratorsModal = ({
   >(thread.collaborators as IThreadCollaboratorWithId[]);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
@@ -58,9 +58,9 @@ export const EditCollaboratorsModal = ({
 
   const { data: profiles } = useSearchProfilesQuery({
     searchTerm: debouncedSearchTerm,
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     limit: 30,
-    enabled: debouncedSearchTerm.length >= 3,
+    enabled: debouncedSearchTerm.length >= 3 && !!app.activeChainId(),
   });
 
   const searchResults = profiles?.pages?.[0]?.results
@@ -181,7 +181,7 @@ export const EditCollaboratorsModal = ({
                 const updatedThread = await editThread({
                   threadId: thread.id,
                   threadMsgId: thread.canvasMsgId,
-                  communityId: app.activeChainId(),
+                  communityId: app.activeChainId() || '',
                   address: user.activeAccount?.address || '',
                   collaborators: {
                     ...(newCollaborators.length > 0 && {

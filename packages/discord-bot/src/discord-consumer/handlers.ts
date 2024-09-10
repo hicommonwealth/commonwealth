@@ -88,7 +88,9 @@ export async function handleCommentMessages(
     case 'comment-update':
       await axios.patch(`${bot_path}/threads/${thread.id}/comments`, {
         ...sharedReqData,
-        body: encodeURIComponent(message.content),
+        comment_id: 0, // required in command
+        thread_id: thread.id, // to auth command
+        text: encodeURIComponent(message.content),
       });
       break;
     case 'comment-delete':

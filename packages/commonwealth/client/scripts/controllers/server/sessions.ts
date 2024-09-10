@@ -21,11 +21,10 @@ export class SessionKeyError extends Error {
   readonly address: string;
   readonly ssoSource: WalletSsoSource;
 
-  constructor({ name, message, address, ssoSource }) {
+  constructor({ name, message, address }) {
     super(message);
     this.name = name;
     this.address = address;
-    this.ssoSource = ssoSource;
   }
 }
 
@@ -91,8 +90,8 @@ function getDidForCurrentAddress(address: string) {
 
   const idOrPrefix =
     app.chain.base === ChainBase.CosmosSDK
-      ? app.chain?.meta.bech32Prefix || 'cosmos'
-      : app.chain?.meta?.node?.ethChainId || 1;
+      ? app.chain?.meta.bech32_prefix || 'cosmos'
+      : app.chain?.meta?.ChainNode?.eth_chain_id || 1;
   const canvasChainId = chainBaseToCanvasChainId(app.chain.base, idOrPrefix);
 
   return `did:pkh:${caip2Prefix}:${canvasChainId}:${address}`;
@@ -137,7 +136,6 @@ async function sign(
           name: 'Authentication Error',
           message: `No session found for ${did}`,
           address: walletAddress,
-          ssoSource: WalletSsoSource.Unknown,
         });
       }
       const { payload: session, signer: messageSigner } = savedSessionMessage;
@@ -151,7 +149,6 @@ async function sign(
             name: 'Authentication Error',
             message: `Session expired for ${did}`,
             address: walletAddress,
-            ssoSource: WalletSsoSource.Unknown,
           });
         }
       }

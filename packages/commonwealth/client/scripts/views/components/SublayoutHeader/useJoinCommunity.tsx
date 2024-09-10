@@ -119,8 +119,8 @@ const useJoinCommunity = () => {
               ...user.communities,
               {
                 id: community.id,
-                iconUrl: activeChainInfo.iconUrl || '',
-                name: activeChainInfo.name || '',
+                iconUrl: activeChainInfo?.icon_url || community.iconUrl || '',
+                name: activeChainInfo?.name || community.name || '',
                 isStarred: false,
               },
             ],
@@ -185,13 +185,13 @@ const useJoinCommunity = () => {
             id: targetCommunity,
             name: activeChainInfo.name,
             base: activeChainInfo.base,
-            iconUrl: activeChainInfo.iconUrl || '',
+            iconUrl: activeChainInfo.icon_url || '',
           },
           activeChainId: activeCommunityId,
         });
 
         await toggleCommunityStar({
-          community: activeCommunityId,
+          community: activeCommunityId || '',
         });
       } catch (err) {
         console.error(err);

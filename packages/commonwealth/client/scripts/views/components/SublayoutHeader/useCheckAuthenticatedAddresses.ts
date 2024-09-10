@@ -22,8 +22,8 @@ const useCheckAuthenticatedAddresses = ({
   const chainBase = app.chain?.base;
   const idOrPrefix =
     chainBase === ChainBase.CosmosSDK
-      ? app.chain?.meta.bech32Prefix
-      : app.chain?.meta?.node?.ethChainId || 1;
+      ? app.chain?.meta.bech32_prefix || 0
+      : app.chain?.meta?.ChainNode?.eth_chain_id || 1;
   const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
 
   const [authenticatedAddresses, setAuthenticatedAddresses] = useState<{

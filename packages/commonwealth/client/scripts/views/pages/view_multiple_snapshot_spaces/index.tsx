@@ -10,8 +10,10 @@ import { CardsCollection } from '../../components/cards_collection';
 import { SnapshotSpaceCard } from './SnapshotSpaceCard';
 
 const MultipleSnapshotsPage = () => {
+  const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
+    id: communityId,
+    enabled: !!communityId,
   });
   const snapshotSpaces: string[] = community?.snapshot_spaces || [];
 

@@ -25,7 +25,7 @@ export const CreateTopicSectionOld = () => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);

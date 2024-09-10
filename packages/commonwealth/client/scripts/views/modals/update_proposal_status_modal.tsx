@@ -65,8 +65,8 @@ export const UpdateProposalStatusModal = ({
   snapshotProposalConnected,
   initialSnapshotLinks,
 }: UpdateProposalStatusModalProps) => {
-  const { customStages } = app.chain.meta;
-  const stages = parseCustomStages(customStages);
+  const { custom_stages } = app.chain.meta;
+  const stages = parseCustomStages(custom_stages);
   const user = useUserStore();
 
   const [tempStage, setTempStage] = useState(
@@ -83,11 +83,11 @@ export const UpdateProposalStatusModal = ({
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const showSnapshot = !!app.chain.meta?.snapshot?.length;
+  const showSnapshot = !!app.chain.meta?.snapshot_spaces?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
@@ -95,12 +95,12 @@ export const UpdateProposalStatusModal = ({
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
   });
 
@@ -113,7 +113,7 @@ export const UpdateProposalStatusModal = ({
     // set stage
     editThread({
       address: user.activeAccount?.address || '',
-      communityId: app.activeChainId(),
+      communityId: app.activeChainId() || '',
       threadId: thread.id,
       // @ts-expect-error <StrictNullChecks/>
       stage: tempStage,
@@ -126,13 +126,13 @@ export const UpdateProposalStatusModal = ({
         );
 
         if (toAdd.length > 0) {
-          if (app.chain.meta?.snapshot?.length === 1) {
+          if (app.chain.meta?.snapshot_spaces?.length === 1) {
             const enrichedSnapshot = {
-              id: `${app.chain.meta?.snapshot?.[0]}/${toAdd[0].id}`,
+              id: `${app.chain.meta?.snapshot_spaces?.[0]}/${toAdd[0].id}`,
               title: toAdd[0].title,
             };
             return addThreadLinks({
-              communityId: app.activeChainId(),
+              communityId: app.activeChainId() || '',
               threadId: thread.id,
               links: [
                 {
@@ -147,7 +147,7 @@ export const UpdateProposalStatusModal = ({
               return { toDelete, links };
             });
           } else {
-            return loadMultipleSpacesData(app.chain.meta?.snapshot)
+            return loadMultipleSpacesData(app.chain.meta?.snapshot_spaces)
               .then((data) => {
                 let enrichedSnapshot;
                 for (const { space: _space, proposals } of data) {
@@ -163,7 +163,7 @@ export const UpdateProposalStatusModal = ({
                   }
                 }
                 return addThreadLinks({
-                  communityId: app.activeChainId(),
+                  communityId: app.activeChainId() || '',
                   threadId: thread.id,
                   links: [
                     {
@@ -187,7 +187,7 @@ export const UpdateProposalStatusModal = ({
       .then(({ toDelete, links }) => {
         if (toDelete.length > 0) {
           return deleteThreadLinks({
-            communityId: app.activeChainId(),
+            communityId: app.activeChainId() || '',
             threadId: thread.id,
             links: toDelete.map((sn) => ({
               source: LinkSource.Snapshot,
@@ -218,7 +218,7 @@ export const UpdateProposalStatusModal = ({
 
         if (toAdd.length > 0) {
           return addThreadLinks({
-            communityId: app.activeChainId(),
+            communityId: app.activeChainId() || '',
             threadId: thread.id,
             links: toAdd.map(({ identifier, title }) => ({
               source: LinkSource.Proposal,
@@ -238,7 +238,7 @@ export const UpdateProposalStatusModal = ({
       .then(({ toDelete, links }) => {
         if (toDelete.length > 0) {
           return deleteThreadLinks({
-            communityId: app.activeChainId(),
+            communityId: app.activeChainId() || '',
             threadId: thread.id,
             links: toDelete.map(({ identifier }) => ({
               source: LinkSource.Proposal,
@@ -276,7 +276,7 @@ export const UpdateProposalStatusModal = ({
   const handleRemoveProposal = async () => {
     try {
       await deleteThreadLinks({
-        communityId: app.activeChainId(),
+        communityId: app.activeChainId() || '',
         threadId: thread.id,
         links: [
           {

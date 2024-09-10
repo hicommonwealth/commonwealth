@@ -18,8 +18,7 @@ export function SpyNotificationsProvider(
     name: 'SpyNotificationsProvider',
     dispose: sandbox.stub().returns(Promise.resolve()),
     triggerWorkflow:
-      stubs?.triggerWorkflowStub ||
-      sandbox.stub().returns(Promise.resolve(true)),
+      stubs?.triggerWorkflowStub || sandbox.stub().returns(Promise.resolve([])),
     getMessages:
       stubs?.getMessagesStub || sandbox.stub().returns(Promise.resolve([])),
     getSchedules:

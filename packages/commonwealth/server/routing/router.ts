@@ -94,7 +94,6 @@ import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
-import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
@@ -442,14 +441,6 @@ function setupRouter(
   );
 
   // comments
-  registerRoute(
-    router,
-    'patch',
-    '/comments/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateCommentHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',

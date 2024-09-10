@@ -6,13 +6,25 @@ export const CanvasComment = z.object({
   thread_id: PG_INT,
   text: z.string().trim().min(1),
   parent_id: PG_INT.optional(),
-  parent_msg_id: z.string(),
+  parent_msg_id: z.string().nullish(),
   canvas_signed_data: z.string().optional(),
   canvas_msg_id: z.string().optional(),
 });
 
 export const CreateComment = {
   input: CanvasComment.extend({
+    discord_meta: DiscordMetaSchema.optional(),
+  }),
+  output: Comment.extend({ community_id: z.string() }),
+};
+
+export const UpdateComment = {
+  input: z.object({
+    comment_id: PG_INT,
+    text: z.string().trim().min(1),
+
+    // discord integration
+    thread_id: PG_INT.optional(),
     discord_meta: DiscordMetaSchema.optional(),
   }),
   output: Comment.extend({ community_id: z.string() }),

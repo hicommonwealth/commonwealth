@@ -1,9 +1,9 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { signUpdateComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
@@ -18,7 +18,7 @@ interface EditCommentProps {
   updatedBody: string;
 }
 
-const editComment = async ({
+export const buildUpdateCommentInput = async ({
   profile,
   communityId,
   commentId,
@@ -30,21 +30,15 @@ const editComment = async ({
     body: updatedBody,
   });
 
-  const response = await axios.patch(`${SERVER_URL}/comments/${commentId}`, {
+  return {
     address: profile.address,
     author_community_id: communityId,
-    id: commentId,
+    comment_id: commentId,
     community_id: communityId,
-    body: encodeURIComponent(updatedBody),
+    text: encodeURIComponent(updatedBody),
     jwt: userStore.getState().jwt,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
-  });
-
-  response.data.result.Address.User = {
-    profile,
   };
-
-  return new Comment({ community_id: undefined, ...response.data.result });
 };
 
 interface UseEditCommentMutationProps {
@@ -64,27 +58,28 @@ const useEditCommentMutation = ({
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: editComment,
+  return trpc.comment.updateComment.useMutation({
     onSuccess: async (updatedComment) => {
+      // @ts-expect-error StrictNullChecks
+      const comment = new Comment(updatedComment);
+      console.log({ comment, updatedComment });
+
       // update fetch comments query state with updated comment
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData([...key], () => {
         // find the existing comment index, and return updated comment in its place
-        return comments.map((x) =>
-          x.id === updatedComment.id ? updatedComment : x,
-        );
+        return comments.map((x) => (x.id === comment.id ? comment : x));
       });
 
       updateThreadInAllCaches(
         communityId,
         threadId,
-        { recentComments: [updatedComment] },
+        { recentComments: [comment] },
         'combineAndRemoveDups',
       );
 
-      return updatedComment;
+      return comment;
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

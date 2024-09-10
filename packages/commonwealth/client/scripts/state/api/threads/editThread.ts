@@ -6,13 +6,14 @@ import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
+import { updateThreadCountsByStageChange } from '../communities/getCommuityById';
 import {
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
 } from './helpers/cache';
-import { updateThreadCountsByStageChange } from './helpers/counts';
 
 interface EditThreadProps {
   address: string;
@@ -124,6 +125,7 @@ const useEditThreadMutation = ({
   currentStage,
   currentTopicId,
 }: UseEditThreadMutationProps) => {
+  const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
@@ -131,7 +133,12 @@ const useEditThreadMutation = ({
     onSuccess: async (updatedThread) => {
       // Update community level thread counters variables
       if (currentStage !== updatedThread.stage) {
-        updateThreadCountsByStageChange(currentStage, updatedThread.stage);
+        updateThreadCountsByStageChange(
+          communityId,
+          currentStage,
+          updatedThread.stage,
+          utils,
+        );
       }
 
       // add/remove thread from different caches if the topic id was changed

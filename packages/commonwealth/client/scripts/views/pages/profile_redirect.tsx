@@ -20,7 +20,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
 
   const { address, scope } = props;
   const profileAddress = address || user.activeAccount?.address;
-  const communityId = scope || app.activeChainId();
+  const communityId = scope || app.activeChainId() || '';
   const {
     data: users,
     isError,

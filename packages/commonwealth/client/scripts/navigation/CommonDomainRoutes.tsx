@@ -4,7 +4,7 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
-const EditorPage = lazy(() => import('views/pages/Editor'));
+const EditorPage = lazy(() => import('views/pages/EditorPage'));
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
@@ -113,11 +113,7 @@ const CommonDomainRoutes = ({
   contestEnabled,
   farcasterContestEnabled,
 }: RouteFeatureFlags) => [
-  <Route
-    key="/editor"
-    path="/editor"
-    element={<EditorPage imageHandler="local" />}
-  />,
+  <Route key="/editor" path="/editor" element={<EditorPage />} />,
 
   <Route
     key="/"

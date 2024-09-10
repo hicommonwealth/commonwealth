@@ -17,7 +17,6 @@ interface CreateCommentProps {
   profile: UserProfile;
   threadId: number;
   threadMsgId: string;
-  communityId: string;
   unescapedText: string;
   parentCommentId: number | null;
   parentCommentMsgId: string | null;
@@ -41,6 +40,7 @@ export const buildCreateCommentInput = async ({
   return {
     thread_id: threadId,
     thread_msg_id: threadMsgId,
+    parent_msg_id: parentCommentMsgId,
     parent_id: parentCommentId ?? undefined,
     text: encodeURIComponent(unescapedText),
     ...toCanvasSignedDataApiArgs(canvasSignedData),

@@ -14,7 +14,6 @@ import {
   CANVAS_TOPIC,
   ChainBase,
   WalletId,
-  WalletSsoSource,
   deserializeCanvas,
   getSessionSignerForDid,
 } from '@hicommonwealth/shared';
@@ -37,7 +36,6 @@ type MagicLoginContext = {
   existingUserInstance?: UserInstance;
   loggedInUser?: UserInstance;
   profileMetadata?: { username?: string; avatarUrl?: string };
-  walletSsoSource: WalletSsoSource;
 };
 
 const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
@@ -47,7 +45,6 @@ async function createMagicAddressInstances(
   models: DB,
   generatedAddresses: Array<{ address: string; community_id: string }>,
   user: UserAttributes,
-  walletSsoSource: WalletSsoSource,
   decodedMagicToken: MagicUser,
   t?: Transaction,
 ): Promise<AddressInstance[]> {
@@ -91,16 +88,6 @@ async function createMagicAddressInstances(
     if (!created) {
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
-
-      if (
-        addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
-        // set wallet_sso_source if it was unknown before
-        addressInstance.wallet_sso_source === undefined ||
-        addressInstance.wallet_sso_source === null
-      ) {
-        addressInstance.wallet_sso_source = walletSsoSource;
-      }
-
       await addressInstance.save({ transaction: t });
     }
     addressInstances.push(addressInstance);
@@ -115,7 +102,6 @@ async function createNewMagicUser({
   magicUserMetadata,
   generatedAddresses,
   profileMetadata,
-  walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
@@ -151,7 +137,6 @@ async function createNewMagicUser({
         models,
         generatedAddresses,
         newUser,
-        walletSsoSource,
         decodedMagicToken,
         transaction,
       );
@@ -235,7 +220,6 @@ async function loginExistingMagicUser({
   existingUserInstance,
   decodedMagicToken,
   generatedAddresses,
-  walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   if (!existingUserInstance) {
     throw new Error('No user provided to sign in');
@@ -273,7 +257,6 @@ async function loginExistingMagicUser({
         models,
         generatedAddresses,
         existingUserInstance,
-        walletSsoSource,
         decodedMagicToken,
         transaction,
       );
@@ -346,15 +329,12 @@ async function addMagicToUser({
   generatedAddresses,
   loggedInUser,
   decodedMagicToken,
-  walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   // create new address on logged-in user
   const addressInstances = await createMagicAddressInstances(
     models,
     generatedAddresses,
-    // @ts-expect-error StrictNullChecks
-    loggedInUser,
-    walletSsoSource,
+    loggedInUser!,
     decodedMagicToken,
   );
 
@@ -386,7 +366,6 @@ async function magicLoginRoute(
     signature: string;
     session?: string;
     magicAddress?: string; // optional because session keys are feature-flagged
-    walletSsoSource: WalletSsoSource;
   }>,
   decodedMagicToken: MagicUser,
   cb: DoneFunc,
@@ -394,7 +373,6 @@ async function magicLoginRoute(
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let communityToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
-  const walletSsoSource = req.body.walletSsoSource;
   const generatedAddresses = [
     {
       address: decodedMagicToken.publicAddress,
@@ -594,7 +572,6 @@ async function magicLoginRoute(
       models,
       generatedAddresses,
       loggedInUser,
-      walletSsoSource,
       decodedMagicToken,
     );
     return cb(null, existingUserInstance);
@@ -614,7 +591,6 @@ async function magicLoginRoute(
       username: req.body.username,
       avatarUrl: req.body.avatarUrl,
     },
-    walletSsoSource,
   };
   try {
     // @ts-expect-error StrictNullChecks

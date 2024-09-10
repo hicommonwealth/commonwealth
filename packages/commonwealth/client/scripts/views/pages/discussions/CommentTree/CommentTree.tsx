@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { buildUpdateCommentInput } from 'client/scripts/state/api/comments/editComment';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
@@ -89,25 +90,28 @@ export const CommentTree = ({
 
   const [highlightedComment, setHighlightedComment] = useState(false);
 
+  const communityId = app.activeChainId() || '';
+
   const { data: allComments = [] } = useFetchCommentsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: parseInt(`${thread.id}`),
+    apiEnabled: !!communityId,
   });
 
   const { mutateAsync: deleteComment } = useDeleteCommentMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
     existingNumberOfComments: thread.numberOfComments,
   });
 
   const { mutateAsync: editComment } = useEditCommentMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
 
   const { mutateAsync: toggleCommentSpamStatus } =
     useToggleCommentSpamStatusMutation({
-      communityId: app.activeChainId(),
+      communityId,
       threadId: thread.id,
     });
 
@@ -190,9 +194,9 @@ export const CommentTree = ({
           onClick: async () => {
             try {
               await deleteComment({
+                communityId,
                 commentId: comment.id,
                 commentMsgId: comment.canvasMsgId,
-                communityId: app.activeChainId(),
                 address: user.activeAccount?.address || '',
                 existingNumberOfComments: thread.numberOfComments,
               });
@@ -343,11 +347,11 @@ export const CommentTree = ({
     }));
 
     try {
-      await editComment({
+      const input = await buildUpdateCommentInput({
         commentId: comment.id,
         updatedBody: serializeDelta(newDelta) || comment.text,
-        communityId: app.activeChainId(),
         commentMsgId: comment.canvasMsgId,
+        communityId,
         profile: {
           userId: user.activeAccount?.profile?.userId || 0,
           address: user.activeAccount?.address || '',
@@ -356,6 +360,7 @@ export const CommentTree = ({
           lastActive: user.activeAccount?.profile?.lastActive?.toString() || '',
         },
       });
+      await editComment(input);
       setEdits((p) => ({
         ...p,
         [comment.id]: {
@@ -432,9 +437,9 @@ export const CommentTree = ({
           onClick: async () => {
             try {
               await toggleCommentSpamStatus({
+                communityId,
                 commentId: comment.id,
                 isSpam: !comment.markedAsSpamAt,
-                communityId: app.activeChainId(),
                 address: user.activeAccount?.address || '',
               });
             } catch (err) {

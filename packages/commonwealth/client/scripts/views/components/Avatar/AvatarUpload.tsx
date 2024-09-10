@@ -103,7 +103,9 @@ export const AvatarUpload = ({
 
   const avatarSize = size === 'small' ? 60 : 108;
   const forUser = scope === 'user';
-  const avatarUrl = forUser ? account?.avatarUrl : app.chain?.meta?.iconUrl;
+  const avatarUrl = forUser
+    ? account?.avatarUrl || ''
+    : app.chain?.meta?.icon_url || '';
   const address = forUser ? account?.userId : undefined;
   const showAvatar = avatarUrl || address;
 
@@ -142,7 +144,6 @@ export const AvatarUpload = ({
           />
         ) : (
           showAvatar && (
-            // @ts-expect-error StrictNullChecks
             <Avatar address={address} url={avatarUrl} size={avatarSize} />
           )
         )}

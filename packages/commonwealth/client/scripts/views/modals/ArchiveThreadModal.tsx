@@ -22,7 +22,7 @@ export const ArchiveThreadModal = ({
   thread,
 }: ArchiveThreadModalProps) => {
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
@@ -34,7 +34,7 @@ export const ArchiveThreadModal = ({
     editThread({
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId,
-      communityId: app.activeChainId(),
+      communityId: app.activeChainId() || '',
       archived: !thread.archivedAt,
       address: user.activeAccount?.address || '',
       pinned: false,

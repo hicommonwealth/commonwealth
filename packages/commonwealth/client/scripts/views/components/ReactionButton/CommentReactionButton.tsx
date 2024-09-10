@@ -36,10 +36,11 @@ export const CommentReactionButton = ({
       communityId: app.activeChainId(),
     });
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: deleteCommentReaction } =
     useDeleteCommentReactionMutation({
       commentId: comment.id,
-      communityId: app.activeChainId(),
+      communityId,
       threadId: comment.threadId,
     });
 
@@ -74,7 +75,7 @@ export const CommentReactionButton = ({
         return;
       }
       deleteCommentReaction({
-        communityId: app.activeChainId(),
+        communityId,
         address: user.activeAccount?.address,
         commentMsgId: comment.canvasMsgId,
         reactionId: foundReaction.id,
@@ -89,7 +90,7 @@ export const CommentReactionButton = ({
       const input = await buildCreateCommentReactionInput({
         address: activeAddress,
         commentId: comment.id,
-        communityId: app.activeChainId(),
+        communityId,
         threadId: comment.threadId,
         commentMsgId: comment.canvasMsgId,
       });

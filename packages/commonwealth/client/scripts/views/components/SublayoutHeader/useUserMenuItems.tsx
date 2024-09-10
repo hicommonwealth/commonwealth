@@ -166,9 +166,6 @@ const useUserMenuItems = ({
   const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
     const signed = canvasSignedAddresses.includes(account.address);
     const isActive = userData.activeAccount?.address === account.address;
-    const walletSsoSource = userData.addresses.find(
-      (address) => address.address === account.address,
-    )?.walletSsoSource;
 
     return {
       type: 'default',
@@ -191,7 +188,6 @@ const useUserMenuItems = ({
           new SessionKeyError({
             name: 'SessionKeyError',
             message: 'Session Key Expired',
-            ssoSource: walletSsoSource,
             address: account.address,
           }),
         );
