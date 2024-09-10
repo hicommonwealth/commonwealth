@@ -8,7 +8,7 @@ export async function getEventSources(models: DB): Promise<EvmSources> {
   const result = await models.sequelize.query<{ aggregate: EvmSources }>(
     `
         WITH EventSourcesAgg AS (SELECT ESS.chain_node_id,
-                                        ESS.contract_address,
+                                        LOWER(ESS.contract_address) as contract_address,
                                         ESS.abi_id,
                                         -- Aggregate event sources for each contract address
                                         json_agg(row_to_json(ESS)) AS sources 

@@ -63,11 +63,13 @@ describe('Contests metadata commands lifecycle', () => {
             community_id,
             user_id: communityAdminUser!.id,
             role: 'admin',
+            is_banned: false,
           },
           {
             community_id,
             user_id: memberUser!.id,
             role: 'member',
+            is_banned: false,
           },
         ],
         topics: [{}, {}, {}],
