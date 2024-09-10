@@ -97,7 +97,7 @@ const ConnectChainToCommunityTask = () => {
           label: 'Update',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          onClick: void update,
+          onClick: update,
         },
         {
           label: 'Cancel',
@@ -131,7 +131,7 @@ const ConnectChainToCommunityTask = () => {
           label="Connect"
           className="TaskButton"
           disabled={!buttonEnabled}
-          onClick={openConfirmationModal}
+          onClick={() => void openConfirmationModal()}
         />
       </div>
     </div>
