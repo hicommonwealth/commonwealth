@@ -43,7 +43,7 @@ export const processUserMentioned: EventHandler<
     return false;
   }
 
-  return await provider.triggerWorkflow({
+  const res = await provider.triggerWorkflow({
     key: WorkflowKeys.UserMentioned,
     users: [{ id: String(payload.mentionedUserId) }],
     data: {
@@ -74,4 +74,6 @@ export const processUserMentioned: EventHandler<
             ),
     },
   });
+
+  return !res.some((r) => r.status === 'rejected');
 };

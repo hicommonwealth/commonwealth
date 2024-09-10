@@ -73,30 +73,30 @@ export const CWRelatedCommunityCard = ({
         isPWA: isAddedToHomeScreen,
       });
 
-      if (!community.id) return;
+      if (!community?.id) return;
 
       if (isCommandClick(e)) {
-        window.open(`/${community.id}`, '_blank');
+        window.open(`/${community?.id}`, '_blank');
         return;
       }
-      navigateToCommunity({ navigate, path: '', chain: community.id });
+      navigateToCommunity({ navigate, path: '', chain: community?.id });
     },
-    [navigate, trackAnalytics, community.id, isAddedToHomeScreen],
+    [navigate, trackAnalytics, community?.id, isAddedToHomeScreen],
   );
 
   const handleBuyStakeClick = () => {
     onStakeBtnClick?.();
     setModeOfManageCommunityStakeModal('buy');
-    if (community.id && community.namespace && community.ChainNode) {
+    if (community?.id && community?.namespace && community?.ChainNode) {
       setSelectedCommunity({
-        id: community.id,
-        name: community.name,
-        base: community.base,
-        namespace: community.namespace,
-        iconUrl: community.icon_url || '',
+        id: community?.id,
+        name: community?.name,
+        base: community?.base,
+        namespace: community?.namespace,
+        iconUrl: community?.icon_url || '',
         ChainNode: {
-          url: community.ChainNode.url || '',
-          ethChainId: community.ChainNode.eth_chain_id || 0,
+          url: community?.ChainNode?.url || '',
+          ethChainId: community?.ChainNode?.eth_chain_id || 0,
         },
       });
     }
@@ -133,13 +133,13 @@ export const CWRelatedCommunityCard = ({
               <div className="community-name">
                 <CWCommunityAvatar
                   community={{
-                    iconUrl: community.icon_url || '',
-                    name: community.name,
+                    iconUrl: community?.icon_url || '',
+                    name: community?.name,
                   }}
                   size="large"
                 />
-                <CWText type="h5" title={community.name} fontWeight="medium">
-                  {community.name}
+                <CWText type="h5" title={community?.name} fontWeight="medium">
+                  {community?.name}
                 </CWText>
               </div>
 
@@ -162,9 +162,9 @@ export const CWRelatedCommunityCard = ({
                 </div>
               )}
             </div>
-            {community.description && (
+            {community?.description && (
               <CWText className="description" type="b2">
-                {addPeriodToText(community.description)}
+                {addPeriodToText(community?.description)}
               </CWText>
             )}
           </div>
@@ -202,7 +202,7 @@ export const CWRelatedCommunityCard = ({
                 placement="right"
                 content={disabledStakeButtonTooltipText({
                   isLoggedIn: user.isLoggedIn,
-                  connectBaseChainToBuy: community.base,
+                  connectBaseChainToBuy: community?.base,
                 })}
                 renderTrigger={(handleInteraction) => (
                   <span

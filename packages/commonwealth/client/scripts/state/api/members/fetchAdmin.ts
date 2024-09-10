@@ -7,6 +7,7 @@ const ADMINS_STALE_TIME = 30 * 1_000; // 30 s
 
 interface FetchAdminProps {
   communityId: string;
+  apiEnabled?: boolean;
 }
 
 // admins/mods are Address objects
@@ -31,11 +32,15 @@ const fetchAdmin = async ({ communityId }: FetchAdminProps) => {
   return { admins: memberAdmins, mods: memberMods };
 };
 
-const useFetchAdminQuery = ({ communityId }: FetchAdminProps) => {
+const useFetchAdminQuery = ({
+  communityId,
+  apiEnabled = true,
+}: FetchAdminProps) => {
   return useQuery({
     queryKey: [ApiEndpoints.FETCH_ADMIN, communityId],
     queryFn: () => fetchAdmin({ communityId }),
     staleTime: ADMINS_STALE_TIME,
+    enabled: apiEnabled,
   });
 };
 

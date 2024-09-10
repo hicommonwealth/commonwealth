@@ -82,7 +82,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain.meta.bech32Prefix,
+      bech32Prefix: `${app.chain.meta.bech32_prefix || 0}`,
       signer: {
         type: 'ethereum',
         signEthereum: async (
@@ -135,14 +135,14 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
+        const bech32Prefix = app.chain.meta.bech32_prefix?.toLowerCase();
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,
           rpc: url,
           // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
           // use the RPC url as hack, which will break some querying functionality but not signing.
-          rest: app?.chain?.meta?.node?.altWalletUrl || url,
+          rest: app?.chain?.meta?.ChainNode?.alt_wallet_url || url,
           bip44: {
             coinType: 60,
           },

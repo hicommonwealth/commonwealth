@@ -8,7 +8,7 @@ import { openConfirmation } from '../../../../modals/confirmation_modal';
 type DiscordChannels = {
   channelName: string;
   channelId: string;
-  onConnect: (topicId: string) => void;
+  onConnect: (topicId: string | number) => void;
 };
 
 export const DiscordConnections = ({

@@ -1,15 +1,16 @@
 import type { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isCommunityAdmin } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
 export function CancelContestManagerMetadata(): Command<
-  typeof schemas.CancelContestManagerMetadata
+  typeof schemas.CancelContestManagerMetadata,
+  AuthContext
 > {
   return {
     ...schemas.CancelContestManagerMetadata,
-    auth: [isCommunityAdmin],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ payload }) => {
       const contestManager = await models.ContestManager.findOne({
         where: {

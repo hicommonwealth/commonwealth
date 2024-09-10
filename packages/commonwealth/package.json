@@ -47,7 +47,6 @@
     "refresh-all-memberships": "tsx ./scripts/refresh-all-memberships.ts",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "resize-large-images": "tsx ./scripts/resizeImages.ts",
-    "send-notification-digest-emails": "SEND_EMAILS=true tsx server.ts",
     "set-super-admin": "chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh",
     "start": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start-api' 'pnpm run vite'",
     "start-api": "tsx watch --max-old-space-size=4096 server.ts",

@@ -8,6 +8,7 @@ import type {
   StdFee,
 } from '@cosmjs/stargate';
 import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import {
   ChainNetwork,
   CosmosGovernanceVersion,
@@ -21,7 +22,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
-import ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import {
   IChainModule,
   ITXData,
@@ -97,7 +98,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _tmClient: Tendermint34Client;
 
-  public async init(chain: ChainInfo, reset = false) {
+  public async init(chain: z.infer<typeof ExtendedCommunity>, reset = false) {
     const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chain.id}`;
 
     // TODO: configure broadcast mode
@@ -120,9 +121,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
 
     if (
-      chain?.ChainNode?.cosmosGovernanceVersion ===
-        CosmosGovernanceVersion.v1 ||
-      chain?.ChainNode?.cosmosGovernanceVersion ===
+      chain?.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1 ||
+      chain?.ChainNode?.cosmos_gov_version ===
         CosmosGovernanceVersion.v1beta1Failed
     ) {
       try {
@@ -242,7 +242,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       );
     } else {
       client = await getSigningClient(
-        chain?.meta?.node?.url,
+        chain?.meta?.ChainNode?.url || '',
         wallet.offlineSigner,
       );
     }
