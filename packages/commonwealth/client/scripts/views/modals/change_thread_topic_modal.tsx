@@ -26,7 +26,8 @@ export const ChangeThreadTopicModal = ({
 }: ChangeThreadTopicModalProps) => {
   const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
+    apiEnabled: !!app.activeChainId(),
   });
   const user = useUserStore();
 
@@ -40,7 +41,7 @@ export const ChangeThreadTopicModal = ({
   );
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,

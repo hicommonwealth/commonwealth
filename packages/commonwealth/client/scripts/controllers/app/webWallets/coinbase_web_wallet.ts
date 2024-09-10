@@ -55,7 +55,7 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return app.chain?.meta?.node?.ethChainId?.toString() || '1';
+    return app.chain?.meta?.ChainNode?.eth_chain_id?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,9 +132,10 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
       } catch (switchError) {
         // This error code indicates that the chain has not been added to coinbase.
         if (switchError.code === 4902) {
-          const wsRpcUrl = new URL(app.chain?.meta?.node?.url);
+          const wsRpcUrl = new URL(app.chain?.meta?.ChainNode?.url || '');
           const rpcUrl =
-            app.chain?.meta?.node?.altWalletUrl || `https://${wsRpcUrl.host}`;
+            app.chain?.meta?.ChainNode?.alt_wallet_url ||
+            `https://${wsRpcUrl.host}`;
 
           const chains = await axios.get('https://chainid.network/chains.json');
           const baseChain = chains.data.find((c) => c.chainId === chainId);
@@ -173,7 +174,7 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     } catch (error) {
       let errorMsg = `Failed to enable coinbase: ${error.message}`;
       if (error.code === 4902) {
-        errorMsg = `Failed to enable coinbase: Please add chain ID ${app?.chain?.meta?.node?.ethChainId}`;
+        errorMsg = `Failed to enable coinbase: Please add chain ID ${app?.chain?.meta?.ChainNode?.eth_chain_id || 0}`;
       }
       console.error(errorMsg);
       this._enabling = false;
@@ -215,7 +216,7 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
           const url =
             rpcUrl.length > 0
               ? rpcUrl[0]
-              : app?.chain?.meta?.node?.altWalletUrl;
+              : app?.chain?.meta?.ChainNode?.alt_wallet_url || '';
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [

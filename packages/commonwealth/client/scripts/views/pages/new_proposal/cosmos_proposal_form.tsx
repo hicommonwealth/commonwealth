@@ -1,3 +1,4 @@
+import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -73,10 +74,9 @@ export const CosmosProposalForm = () => {
 
     let prop: ProtobufAny;
 
-    const depositInMinimalDenom = naturalDenomToMinimal(
-      deposit,
-      meta?.decimals,
-    );
+    const decimals = getChainDecimals(meta.id || '', meta.base);
+
+    const depositInMinimalDenom = naturalDenomToMinimal(deposit, decimals);
     const description = getTextFromDelta(descriptionDelta);
 
     const _deposit = deposit
@@ -93,7 +93,7 @@ export const CosmosProposalForm = () => {
     } else if (cosmosProposalType === 'communitySpend') {
       const spendAmountInMinimalDenom = naturalDenomToMinimal(
         payoutAmount,
-        meta?.decimals,
+        decimals,
       );
       prop = encodeCommunitySpend(
         title,

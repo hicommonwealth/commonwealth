@@ -44,7 +44,7 @@ export const EditBody = (props: EditBodyProps) => {
   const user = useUserStore();
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -99,7 +99,7 @@ export const EditBody = (props: EditBodyProps) => {
           threadId: thread.id,
           authorProfile: user.activeAccount?.profile,
           address: user.activeAccount?.address || '',
-          communityId: app.activeChainId(),
+          communityId: app.activeChainId() || '',
         });
         await editThread(input);
         clearEditingLocalStorage(thread.id, ContentType.Thread);

@@ -28,6 +28,7 @@ export const useMemberData = ({
   isStakedEnabled,
 }: UseMemberDataProps) => {
   const user = useUserStore();
+  const communityId = app.activeChainId() || '';
   const membershipsFilter = (() => {
     if (!groupFilter || groupFilter === 'all-community') return undefined;
     return (
@@ -44,7 +45,7 @@ export const useMemberData = ({
     // @ts-expect-error StrictNullChecks
     order_direction: tableState.orderDirection as 'ASC' | 'DESC',
     search: debouncedSearchTerm,
-    community_id: app.activeChainId(),
+    community_id: communityId,
     include_roles: true,
     ...(membershipsFilter && {
       memberships: membershipsFilter,
@@ -57,9 +58,10 @@ export const useMemberData = ({
   });
 
   const { data: groups } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeTopics: true,
-    enabled: user.activeAccount?.address ? !!memberships : true,
+    enabled:
+      (user.activeAccount?.address ? !!memberships : true) && !!communityId,
   });
 
   return {

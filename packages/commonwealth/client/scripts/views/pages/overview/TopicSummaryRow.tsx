@@ -30,10 +30,11 @@ export const TopicSummaryRow = ({
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
+  const communityId = app.activeChainId() || '';
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
+    communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    apiEnabled: !!user.activeAccount?.address || !!communityId,
   });
 
   if (isLoading) return <TopicSummaryRowSkeleton />;

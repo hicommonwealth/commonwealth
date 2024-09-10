@@ -15,7 +15,14 @@ export class NearAccount extends Account {
     Accounts: NearAccounts,
     address: string,
   ) {
-    super({ community: app.chain.meta, address });
+    super({
+      community: {
+        id: app.chain.meta.id || '',
+        base: app.chain.meta.base,
+        ss58Prefix: app.chain.meta.ss58_prefix || 0,
+      },
+      address,
+    });
     this._Chain = Chain;
     this._Accounts = Accounts;
     this._Accounts.store.add(this);

@@ -15,10 +15,11 @@ import { snapshotValidationSchema } from './validation';
 
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 const Snapshots = () => {
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   useRunOnceOnCondition({
