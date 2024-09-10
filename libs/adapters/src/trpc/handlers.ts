@@ -51,7 +51,7 @@ export const command = <
 >(
   factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
-  track?: Track<Output>,
+  track?: Track<Input, Output>,
 ) => {
   const md = factory();
   return buildproc('POST', factory.name, md, tag, track).mutation(
