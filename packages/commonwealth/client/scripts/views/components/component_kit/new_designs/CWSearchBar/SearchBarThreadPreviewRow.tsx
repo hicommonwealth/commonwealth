@@ -24,7 +24,7 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   const navigate = useCommonNavigate();
 
   const title = decodeURIComponent(searchResult.title);
-  const content = decodeURIComponent(searchResult.body);
+  const content = searchResult.body;
 
   const handleClick = () => {
     const path = `/${searchResult.community_id}/discussion/${searchResult.id}`;
