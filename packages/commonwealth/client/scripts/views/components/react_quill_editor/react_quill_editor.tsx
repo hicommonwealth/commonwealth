@@ -92,8 +92,11 @@ const ReactQuillEditor = ({
   const formFieldErrorMessage =
     hookToForm &&
     name &&
-    (formContext?.formState?.errors?.[name] as SerializableDeltaStatic)
-      ?.ops?.[0]?.insert?.message;
+    (
+      formContext?.formState?.errors?.[
+        name
+      ] as unknown as SerializableDeltaStatic
+    )?.ops?.[0]?.insert?.message;
 
   const isHookedToFormProper = hookToForm && name && formContext;
 
