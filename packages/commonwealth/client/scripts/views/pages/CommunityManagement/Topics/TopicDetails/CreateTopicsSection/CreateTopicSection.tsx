@@ -26,7 +26,7 @@ export const CreateTopicSection = ({
   onStepChange,
 }: CreateTopicSectionProps) => {
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);

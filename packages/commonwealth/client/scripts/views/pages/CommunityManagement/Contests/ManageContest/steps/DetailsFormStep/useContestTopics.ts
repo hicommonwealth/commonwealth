@@ -19,8 +19,10 @@ const useContestTopics = ({
     ContestFormData['toggledTopicList']
   >(initialToggledTopicList || []);
 
+  const communityId = app.activeChainId() || '';
   const { data: topicsData } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   // @ts-expect-error StrictNullChecks
