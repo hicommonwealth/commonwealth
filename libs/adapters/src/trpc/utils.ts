@@ -14,12 +14,20 @@ import {
 const log = logger(import.meta);
 
 const logError = (path: string | undefined, error: TRPCError) => {
-  const msg = `${error.code}: [${error.cause?.name ?? error.name}] ${path}: ${
-    error.cause?.message ?? error.message
-  }`;
+  const errorName = error.cause?.name ?? error.name;
+  const errorMessage = error.cause?.message ?? error.message;
+  const msg = `${error.code}: [${errorName}] ${path}: ${errorMessage}`;
+  let fingerprint = `${error.code}-${errorName}-${path}`;
+  if (
+    error.cause &&
+    'issues' in error.cause &&
+    Array.isArray(error.cause.issues)
+  ) {
+    error.cause.issues.forEach((e) => (fingerprint += `-${e.code}`));
+  }
   error.code === 'INTERNAL_SERVER_ERROR'
-    ? log.error(msg, error.cause)
-    : log.warn(msg);
+    ? log.error(msg, error.cause, { fingerprint })
+    : log.warn(msg, { fingerprint });
 };
 
 // used for TRPC like routes (Internal)
