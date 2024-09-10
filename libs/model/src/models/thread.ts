@@ -98,6 +98,10 @@ export default (
         allowNull: true,
         defaultValue: new Date(),
       },
+      search: {
+        type: Sequelize.TSVECTOR,
+        allowNull: false,
+      },
     },
     {
       timestamps: true,
@@ -164,3 +168,9 @@ export default (
       },
     },
   );
+
+export function getThreadSearchVector(title: string, body: string) {
+  return Sequelize.literal(
+    `to_tsvector('english',  '${title}' || ' ' || '${body}')`,
+  );
+}
