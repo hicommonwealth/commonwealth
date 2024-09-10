@@ -1,14 +1,15 @@
 import {
   ALL_COMMUNITIES,
+  COMMUNITY_NAME_ERROR,
+  COMMUNITY_NAME_REGEX,
   ChainBase,
   ChainType,
-  COMMUNITY_NAME_REGEX,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Community, Group, StakeTransaction } from '../entities';
-import { checkIconSize, PG_INT } from '../utils';
+import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({
@@ -17,7 +18,7 @@ export const CreateCommunity = {
       .string()
       .max(255)
       .regex(COMMUNITY_NAME_REGEX, {
-        message: `Invalid name, only a-z, A-Z, 0-9, !, @, #, &, (, ), :, _, $, /, \\, |, . and single spaces are allowed`,
+        message: COMMUNITY_NAME_ERROR,
       })
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,

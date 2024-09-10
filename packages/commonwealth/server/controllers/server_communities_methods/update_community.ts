@@ -6,7 +6,11 @@ import {
   CommunityAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { ChainBase, COMMUNITY_NAME_REGEX } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  COMMUNITY_NAME_ERROR,
+  COMMUNITY_NAME_REGEX,
+} from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
@@ -14,8 +18,7 @@ import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
-  InvalidCommunityName:
-    'Invalid name, only a-z, A-Z, 0-9, !, @, #, &, (, ), :, _, $, /, \\, |, . and single spaces are allowed',
+  InvalidCommunityName: COMMUNITY_NAME_ERROR,
   NotLoggedIn: 'Not signed in',
   NoCommunityId: 'Must provide community ID',
   ReservedId: 'The id is reserved and cannot be used',

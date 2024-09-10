@@ -1,4 +1,7 @@
-import { COMMUNITY_NAME_REGEX } from '@hicommonwealth/shared';
+import {
+  COMMUNITY_NAME_ERROR,
+  COMMUNITY_NAME_REGEX,
+} from '@hicommonwealth/shared';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import z from 'zod';
 
@@ -8,7 +11,7 @@ export const basicInformationFormValidationSchema = z.object({
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
     .max(255, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
     .regex(COMMUNITY_NAME_REGEX, {
-      message: `Invalid name, only a-z, A-Z, 0-9, !, @, #, &, (, ), :, _, $, /, \\, |, . and single spaces are allowed`,
+      message: COMMUNITY_NAME_ERROR,
     }),
   communityDescription: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
