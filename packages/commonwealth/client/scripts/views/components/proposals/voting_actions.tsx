@@ -15,8 +15,8 @@ import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
-import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
+import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
