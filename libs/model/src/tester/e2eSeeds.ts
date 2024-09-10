@@ -1,5 +1,5 @@
+import { getThreadSearchVector } from '@hicommonwealth/model';
 import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
-import { getThreadSearchVector } from '../../build';
 import type {
   AddressInstance,
   ChainNodeAttributes,
