@@ -19,7 +19,7 @@ export const makeGroupDataBaseAPIPayload = (
   // @ts-expect-error StrictNullChecks
   const extraRequrirements = allowedAddresses?.length > 0 ? 1 : 0;
   const payload = {
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     address: userStore.getState().activeAccount?.address || '',
     groupName: formSubmitValues.groupName.trim(),
     groupDescription: (formSubmitValues.groupDescription || '').trim(),

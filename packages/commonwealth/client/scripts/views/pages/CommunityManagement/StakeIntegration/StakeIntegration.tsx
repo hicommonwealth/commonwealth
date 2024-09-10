@@ -46,7 +46,7 @@ const StakeIntegration = ({
 
   const community = app.chain.meta;
   const communityChainId = `${
-    community?.ChainNode?.ethChainId || community?.ChainNode?.cosmosChainId
+    community?.ChainNode?.eth_chain_id || community?.ChainNode?.cosmos_chain_id
   }`;
   const selectedAddress = user.addresses.find(
     (x) =>
@@ -64,7 +64,10 @@ const StakeIntegration = ({
     <CWPageLayout className={clsx({ 'topic-stake': isTopicFlow })}>
       <section className="StakeIntegration">
         <CWText type="h2">Stake</CWText>
-        <Status communityName={app.activeChainId()} isEnabled={stakeEnabled} />
+        <Status
+          communityName={app.activeChainId() || ''}
+          isEnabled={stakeEnabled}
+        />
         <CWDivider />
         {stakeEnabled ? (
           <>
@@ -104,7 +107,7 @@ const StakeIntegration = ({
             goToSuccessStep={handleStepChange}
             onTopicFlowStepChange={onTopicFlowStepChange}
             createdCommunityName={community?.name}
-            createdCommunityId={community?.id}
+            createdCommunityId={community?.id || ''}
             // @ts-expect-error <StrictNullChecks/>
             selectedAddress={selectedAddress}
             chainId={communityChainId}

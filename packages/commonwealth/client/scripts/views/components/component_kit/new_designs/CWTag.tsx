@@ -1,7 +1,5 @@
 import { X } from '@phosphor-icons/react';
 import React from 'react';
-
-import ChainInfo from '../../../../models/ChainInfo';
 import { CWCommunityAvatar } from '../cw_community_avatar';
 import { CWIcon } from '../cw_icons/cw_icon';
 import type { IconName } from '../cw_icons/cw_icon_lookup';
@@ -37,7 +35,10 @@ export type TagProps = {
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   trimAt?: number;
   classNames?: string;
-  community?: Pick<ChainInfo, 'iconUrl' | 'name'>;
+  community?: {
+    name: string;
+    iconUrl: string;
+  };
   onMouseEnter?: (e?: React.MouseEvent<HTMLElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
 };

@@ -15,6 +15,7 @@ import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
+import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
@@ -81,7 +82,10 @@ export const VotingActions = ({
       if (proposal.status === 'DepositPeriod') {
         const chain = app.chain as Cosmos;
         const depositAmountInMinimalDenom = parseInt(
-          naturalDenomToMinimal(amount, chain.meta?.decimals),
+          naturalDenomToMinimal(
+            amount,
+            getChainDecimals(chain.meta.id || '', chain.base),
+          ),
           10,
         );
 

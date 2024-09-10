@@ -1,12 +1,13 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import type { ChainBase } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
+import { z } from 'zod';
 import { setDarkMode } from '../helpers/darkMode';
 import Account from './Account';
-import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -88,12 +89,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
 
-  public readonly meta: ChainInfo;
+  public readonly meta: z.infer<typeof ExtendedCommunity>;
   public readonly block: IBlockInfo;
 
   public app: IApp;
 
-  constructor(meta: ChainInfo, app: IApp) {
+  constructor(meta: z.infer<typeof ExtendedCommunity>, app: IApp) {
     this.meta = meta;
     this.app = app;
     this.block = {

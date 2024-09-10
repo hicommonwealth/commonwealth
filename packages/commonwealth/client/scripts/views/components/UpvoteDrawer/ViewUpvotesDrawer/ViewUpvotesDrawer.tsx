@@ -160,7 +160,7 @@ export const ViewUpvotesDrawer = ({
                       <User
                         avatarSize={20}
                         userAddress={reactor.avatars.name.address}
-                        userCommunityId={app?.chain?.id}
+                        userCommunityId={app?.chain?.id || ''}
                         shouldShowAsDeleted={
                           !reactor?.avatars?.name?.address && !app?.chain?.id
                         }
