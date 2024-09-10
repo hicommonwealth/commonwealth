@@ -26,13 +26,11 @@ import axios from 'axios';
 import app from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
-import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import {
   onUpdateEmailError,
   onUpdateEmailSuccess,
   updateEmail,
 } from 'state/api/user/updateEmail';
-import { authModal } from 'state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
 import { z } from 'zod';
@@ -101,9 +99,8 @@ export async function completeClientLogin(account: Account) {
         userId: user.id,
         id: account.addressId,
         address: account.address,
-        communityId: account.community.id,
+        community: account.community,
         walletId: account.walletId,
-        walletSsoSource: account.walletSsoSource,
       });
       user.addresses.push(addressInfo);
     }
@@ -203,8 +200,7 @@ export function updateActiveUser(data) {
       emailNotificationInterval: '',
       knockJWT: '',
       addresses: [],
-      starredCommunities: [],
-      joinedCommunitiesWithNewContent: [],
+      communities: [],
       accounts: [],
       activeAccount: null,
       jwt: null,
@@ -221,28 +217,16 @@ export function updateActiveUser(data) {
           userId: user.id,
           id: a.id,
           address: a.address,
-          communityId: a.community_id,
+          community: {
+            id: a.community_id,
+            base: a.Community.base,
+            ss58Prefix: a.Community.ss58_prefix,
+          },
           walletId: a.wallet_id,
-          walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,
           lastActive: a.last_active,
         }),
     );
-
-    const joinedCommunitiesWithNewContent = (() => {
-      if (!data.unseenPosts) return [];
-
-      const communityIds: string[] = [];
-
-      // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8391
-      Object.keys(data.unseenPosts).map(
-        (c) =>
-          (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
-          communityIds.push(c),
-      );
-
-      return communityIds;
-    })();
 
     user.setData({
       id: data.id || 0,
@@ -250,13 +234,18 @@ export function updateActiveUser(data) {
       emailNotificationInterval: data.emailInterval || '',
       knockJWT: data.knockJwtToken || '',
       addresses,
-      joinedCommunitiesWithNewContent,
       jwt: data.jwt || null,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+      communities: (data?.communities || []).map((c) => ({
+        id: c.id || '',
+        iconUrl: c.icon_url || '',
+        name: c.name || '',
+        isStarred: c.is_starred || false,
+      })),
       isLoggedIn: true,
     });
   }
@@ -265,10 +254,9 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
-  validationBlockInfo?: BlockInfo,
+  validationBlockInfo?: BlockInfo | null,
 ): Promise<{
   account: Account;
   newlyCreated: boolean;
@@ -279,7 +267,6 @@ export async function createUserWithAddress(
     community_id: chain,
     jwt: userStore.getState().jwt,
     wallet_id: walletId,
-    wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
       ? JSON.stringify(validationBlockInfo)
       : null,
@@ -298,7 +285,11 @@ export async function createUserWithAddress(
   const account = new Account({
     addressId: id,
     address,
-    community: chainInfo,
+    community: {
+      id: chainInfo.id,
+      base: chainInfo.base,
+      ss58Prefix: chainInfo.ss58Prefix,
+    },
     validationToken: response.data.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
@@ -337,32 +328,26 @@ export async function startLoginWithMagicLink({
   redirectTo,
   chain,
   isCosmos,
-  isLoggedIn,
 }: {
   email?: string;
   provider?: WalletSsoSource;
   redirectTo?: string;
   chain?: string;
   isCosmos: boolean;
-  isLoggedIn: boolean;
 }) {
   if (!email && !provider)
     throw new Error('Must provide email or SSO provider');
   const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
-    const authModalState = authModal.getState();
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const { address, isAddressNew } = await handleSocialLoginCallback({
+    const { address } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Email,
-      returnEarlyIfNewAddress:
-        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
-      isLoggedIn,
     });
 
-    return { bearer, address, isAddressNew };
+    return { bearer, address };
   } else {
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
@@ -416,15 +401,11 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
-  returnEarlyIfNewAddress = false,
-  isLoggedIn,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
-  returnEarlyIfNewAddress?: boolean;
-  isLoggedIn?: boolean;
-}): Promise<{ address: string; isAddressNew: boolean }> {
+}): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   let desiredChain = app.chain?.meta;
@@ -472,26 +453,6 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let isAddressNew = false;
-  // check if this address exists in db
-  const profileAddresses = await fetchProfilesByAddress({
-    currentChainId: '',
-    profileAddresses: [magicAddress],
-    profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
-    initiateProfilesAfterFetch: false,
-  });
-
-  isAddressNew = profileAddresses?.length === 0;
-  const isAttemptingToConnectAddressToCommunity =
-    isLoggedIn && app.activeChainId();
-  if (
-    isAddressNew &&
-    !isAttemptingToConnectAddressToCommunity &&
-    returnEarlyIfNewAddress
-  ) {
-    return { address: magicAddress, isAddressNew };
-  }
-
   let session: Session | null = null;
   try {
     // Sign a session
@@ -527,7 +488,7 @@ export async function handleSocialLoginCallback({
 
       const sessionSigner = new SIWESigner({
         signer,
-        chainId: app.chain?.meta.node?.ethChainId || 1,
+        chainId: app.chain?.meta?.node?.ethChainId || 1,
       });
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {
@@ -605,7 +566,7 @@ export async function handleSocialLoginCallback({
       }, 1000);
     }
 
-    return { address: magicAddress, isAddressNew };
+    return { address: magicAddress };
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }

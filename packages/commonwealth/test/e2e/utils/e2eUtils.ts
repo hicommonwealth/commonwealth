@@ -62,7 +62,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
     ...e2eEntities,
 
     addAlchemyKey: async function () {
-      const apiKey = config.EVM.ETH_ALCHEMY_API_KEY;
+      const apiKey = config.TEST_EVM.ETH_ALCHEMY_API_KEY;
       if (!apiKey) {
         throw Error('ETH_ALCHEMY_API_KEY not found');
       }
@@ -129,12 +129,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       if (userExists[0].length === 0) return;
 
       const removeQuery = `
-    DELETE FROM "Subscriptions"
-    WHERE subscriber_id in (
-    SELECT user_id
-        FROM "Addresses"
-        WHERE address = '${testAddress}'
-    );
     DELETE FROM "Users"
     WHERE id IN (
         SELECT user_id

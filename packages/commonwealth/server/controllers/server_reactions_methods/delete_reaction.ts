@@ -23,7 +23,7 @@ export type DeleteReactionResult = void;
 
 export async function __deleteReaction(
   this: ServerReactionsController,
-  { user, address, community, reactionId }: DeleteReactionOptions,
+  { user, address, reactionId }: DeleteReactionOptions,
 ): Promise<DeleteReactionResult> {
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -42,14 +42,7 @@ export async function __deleteReaction(
     throw new AppError(`${Errors.ReactionNotFound}: ${reactionId}`);
   }
 
-  // check if author is banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: community.id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  if (address.is_banned) throw new AppError('Banned User');
 
   await reaction.destroy();
 }

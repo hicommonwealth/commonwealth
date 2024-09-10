@@ -36,8 +36,8 @@
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "lint-all": "eslint client/\\**/*.{ts,tsx} server/\\**/*.ts",
     "lint-branch": "./scripts/lint-branch.sh",
-    "lint-diff": "NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.cjs client/\\**/*.{ts,tsx} server/\\**/*.ts scripts/\\**/*.ts shared/\\**/*.ts test/\\**/*.ts",
-    "lint-diff-canary": "cp test/canary/eslint_canary.ts.disabled test/canary/eslint_canary.ts && (NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.cjs test/canary/eslint_canary.ts | tail +2; true) > test/canary/eslint_canary.log ; diff -w -u test/canary/eslint_canary.log test/canary/eslint_canary.snap",
+    "lint-diff": "NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c ../../.eslintrc-diff.cjs client/\\**/*.{ts,tsx} server/\\**/*.ts scripts/\\**/*.ts shared/\\**/*.ts test/\\**/*.ts",
+    "lint-diff-canary": "cp test/canary/eslint_canary.ts.disabled test/canary/eslint_canary.ts && (NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c ../../.eslintrc-diff.cjs test/canary/eslint_canary.ts | tail +2; true) > test/canary/eslint_canary.log ; diff -w -u test/canary/eslint_canary.log test/canary/eslint_canary.snap",
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
@@ -47,7 +47,6 @@
     "refresh-all-memberships": "tsx ./scripts/refresh-all-memberships.ts",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "resize-large-images": "tsx ./scripts/resizeImages.ts",
-    "send-notification-digest-emails": "SEND_EMAILS=true tsx server.ts",
     "set-super-admin": "chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh",
     "start": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start-api' 'pnpm run vite'",
     "start-api": "tsx watch --max-old-space-size=4096 server.ts",
@@ -178,7 +177,6 @@
     "express-validator": "^6.14.2",
     "feed": "^4.2.2",
     "firebase": "^10.12.1",
-    "frames.js": "^0.18.1",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.12.4",
     "highlight-words-core": "^1.2.2",
@@ -261,7 +259,8 @@
     "web3-validator": "2.0.5",
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
-    "zustand": "^4.3.8"
+    "zustand": "^4.3.8",
+    "commonwealth-mdxeditor": "^0.0.3"
   },
   "devDependencies": {
     "@ethersproject/keccak256": "5.7.0",

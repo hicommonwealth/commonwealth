@@ -4,8 +4,10 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
+const EditorPage = lazy(() => import('views/pages/EditorPage'));
+
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/communities'));
+const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
@@ -29,9 +31,6 @@ const FinishSocialLoginPage = lazy(
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 
-const NotificationSettingsOld = lazy(
-  () => import('views/pages/NotificationSettingsOld'),
-);
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
@@ -73,6 +72,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTopicsOld = lazy(
+  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -109,8 +111,10 @@ const CommunityNotFoundPage = lazy(
 
 const CommonDomainRoutes = ({
   contestEnabled,
-  knockInAppNotifications,
+  farcasterContestEnabled,
 }: RouteFeatureFlags) => [
+  <Route key="/editor" path="/editor" element={<EditorPage />} />,
+
   <Route
     key="/"
     path="/"
@@ -213,10 +217,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(
-      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
-      { type: 'common' },
-    )}
+    element={withLayout(NotificationSettings, { type: 'common' })}
   />,
   <Route
     key="/:scope/notification-settings"
@@ -366,9 +367,12 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
-    element={withLayout(CommunityTopics, {
-      scoped: true,
-    })}
+    element={withLayout(
+      farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+      {
+        scoped: true,
+      },
+    )}
   />,
   <Route
     key="/:scope/manage/moderators"

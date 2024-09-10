@@ -1,14 +1,17 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isCommunityAdmin } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { commonProtocol } from '../services';
 
-export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
+export function SetCommunityStake(): Command<
+  typeof schemas.SetCommunityStake,
+  AuthContext
+> {
   return {
     ...schemas.SetCommunityStake,
-    auth: [isCommunityAdmin],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ payload }) => {
       const { id, ...rest } = payload;
 
@@ -30,7 +33,7 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
       )?.toJSON();
 
       // !domain logic - invariants on loaded state & payload
-      if (!mustExist('Community', community)) return;
+      mustExist('Community', community);
       if (
         community.CommunityStakes &&
         community.CommunityStakes.find((s) => s.stake_id === rest.stake_id)

@@ -23,7 +23,7 @@ export type CommunityAttributes = z.infer<typeof Community> & {
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
-  thread_count?: number;
+  lifetime_thread_count?: number;
   profile_count?: number;
   count_updated?: boolean;
   communityAlerts?: CommunityAlertAttributes[];
@@ -94,11 +94,6 @@ export default (
         defaultValue: false,
       },
       type: { type: Sequelize.STRING, allowNull: false, defaultValue: 'chain' },
-      has_chain_events_listener: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       default_summary_view: { type: Sequelize.BOOLEAN, allowNull: true },
       default_page: { type: Sequelize.STRING, allowNull: true },
       has_homepage: {
@@ -124,7 +119,7 @@ export default (
         allowNull: true,
         defaultValue: null,
       },
-      thread_count: {
+      lifetime_thread_count: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
@@ -149,6 +144,10 @@ export default (
       },
       include_in_digest_email: {
         type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      banner_text: {
+        type: Sequelize.TEXT,
         allowNull: true,
       },
     },

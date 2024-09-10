@@ -2,6 +2,7 @@ import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { GlobalActivityCache } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -26,7 +27,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
-import BanCache from './server/util/banCheckCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -57,6 +57,9 @@ export async function main(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  // @ts-expect-error StrictNullChecks
+  sgMail.setApiKey(config.SENDGRID.API_KEY);
 
   const cacheDecorator = new CacheDecorator();
 
@@ -133,7 +136,7 @@ export async function main(
       );
 
     app.use((req, res, next) => {
-      if (req.path.startsWith(`${api.internal.PATH}/chainevent/`)) next();
+      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
       else parseJson(req, res, next);
     });
 
@@ -150,8 +153,6 @@ export async function main(
   setupMiddleware();
   setupPassport(db);
 
-  const banCache = new BanCache(db);
-
   // TODO: decouple as global singleton
   const globalActivityCache = GlobalActivityCache.getInstance(db);
   // initialize async to avoid blocking startup
@@ -167,7 +168,6 @@ export async function main(
     app,
     db,
     viewCountCache,
-    banCache,
     globalActivityCache,
     dbValidationService,
     cacheDecorator,

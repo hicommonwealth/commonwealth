@@ -41,16 +41,18 @@ export const processSnapshotProposalCreated: EventHandler<
   const communityAlerts = await models.sequelize.query<{
     community_id: string;
     community_name: string;
+    custom_domain: string | null;
     users: { id: string }[];
   }>(
     `
         SELECT C.id                                                      as community_id,
                C.name                                                    as community_name,
+               C.custom_domain                                           as custom_domain,
                array_agg(JSON_BUILD_OBJECT('id', CA.user_id::TEXT)) as users
         FROM "Communities" C
                  JOIN "CommunityAlerts" CA ON C.id = CA.community_id
         WHERE :snapshotSpace = ANY (C.snapshot_spaces)
-        GROUP BY C.id, C.name;
+        GROUP BY C.id, C.name, C.custom_domain;
     `,
     {
       raw: true,
@@ -61,22 +63,33 @@ export const processSnapshotProposalCreated: EventHandler<
     },
   );
 
-  for (const { community_id, community_name, users } of communityAlerts) {
+  let returnValue = true;
+  for (const {
+    community_id,
+    community_name,
+    users,
+    custom_domain,
+  } of communityAlerts) {
     if (users.length) {
       const provider = notificationsProvider();
-      // TODO: retries + error handling
-      return await provider.triggerWorkflow({
+      const res = await provider.triggerWorkflow({
         key: WorkflowKeys.SnapshotProposals,
         users,
         data: {
           community_id,
           community_name,
           space_name: space,
-          snapshot_proposal_url: getSnapshotUrl(community_id, space, id),
+          snapshot_proposal_url: getSnapshotUrl(
+            community_id,
+            space,
+            id,
+            custom_domain,
+          ),
         },
       });
+      returnValue = !res.some((r) => r.status === 'rejected');
     }
   }
 
-  return true;
+  return returnValue;
 };

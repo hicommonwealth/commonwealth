@@ -26,6 +26,8 @@ describe('Reactions lifecycle', () => {
         id: communityId,
         chain_node_id: chain!.id,
         discord_config_id: undefined,
+        lifetime_thread_count: 0,
+        profile_count: 1,
         Addresses: [
           {
             id: addressId,
@@ -51,7 +53,6 @@ describe('Reactions lifecycle', () => {
         deleted_at: undefined, // so we can find it!
         pinned: false,
         read_only: false,
-        version_history: [],
       },
       //{ mock: true, log: true },
     );

@@ -358,7 +358,7 @@ export const GetCommunities200ResponseResultsInnerBaseEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerBaseEnum =
-  typeof GetCommunities200ResponseResultsInnerBaseEnum[keyof typeof GetCommunities200ResponseResultsInnerBaseEnum];
+  (typeof GetCommunities200ResponseResultsInnerBaseEnum)[keyof typeof GetCommunities200ResponseResultsInnerBaseEnum];
 export const GetCommunities200ResponseResultsInnerTypeEnum = {
   Chain: 'chain',
   Dao: 'dao',
@@ -367,7 +367,7 @@ export const GetCommunities200ResponseResultsInnerTypeEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerTypeEnum];
 export const GetCommunities200ResponseResultsInnerDefaultPageEnum = {
   DefaultAllDiscussionsView: 'default_all_discussions_view',
   DefaultSummaryView: 'default_summary_view',
@@ -375,14 +375,14 @@ export const GetCommunities200ResponseResultsInnerDefaultPageEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerDefaultPageEnum =
-  typeof GetCommunities200ResponseResultsInnerDefaultPageEnum[keyof typeof GetCommunities200ResponseResultsInnerDefaultPageEnum];
+  (typeof GetCommunities200ResponseResultsInnerDefaultPageEnum)[keyof typeof GetCommunities200ResponseResultsInnerDefaultPageEnum];
 export const GetCommunities200ResponseResultsInnerHasHomepageEnum = {
   True: 'true',
   False: 'false',
 } as const;
 
 export type GetCommunities200ResponseResultsInnerHasHomepageEnum =
-  typeof GetCommunities200ResponseResultsInnerHasHomepageEnum[keyof typeof GetCommunities200ResponseResultsInnerHasHomepageEnum];
+  (typeof GetCommunities200ResponseResultsInnerHasHomepageEnum)[keyof typeof GetCommunities200ResponseResultsInnerHasHomepageEnum];
 
 /**
  *
@@ -517,7 +517,7 @@ export const GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum];
+  (typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum)[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum];
 export const GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum = {
   Admin: 'admin',
   Moderator: 'moderator',
@@ -525,7 +525,7 @@ export const GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum];
+  (typeof GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum)[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum];
 export const GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum =
   {
     Google: 'google',
@@ -538,7 +538,7 @@ export const GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceE
   } as const;
 
 export type GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum];
+  (typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum)[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum];
 
 /**
  *
@@ -633,7 +633,7 @@ export const GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotific
   } as const;
 
 export type GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum];
+  (typeof GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum)[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum];
 
 /**
  *
@@ -872,7 +872,7 @@ export const GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum];
 export const GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum =
   {
     V1: 'v1',
@@ -882,14 +882,14 @@ export const GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum 
   } as const;
 
 export type GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum =
-  typeof GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum[keyof typeof GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum];
+  (typeof GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum)[keyof typeof GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum];
 export const GetCommunities200ResponseResultsInnerChainNodeHealthEnum = {
   Failed: 'failed',
   Healthy: 'healthy',
 } as const;
 
 export type GetCommunities200ResponseResultsInnerChainNodeHealthEnum =
-  typeof GetCommunities200ResponseResultsInnerChainNodeHealthEnum[keyof typeof GetCommunities200ResponseResultsInnerChainNodeHealthEnum];
+  (typeof GetCommunities200ResponseResultsInnerChainNodeHealthEnum)[keyof typeof GetCommunities200ResponseResultsInnerChainNodeHealthEnum];
 
 /**
  *
@@ -1094,7 +1094,7 @@ export const GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTrans
   } as const;
 
 export type GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
-  typeof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum[keyof typeof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum];
+  (typeof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum)[keyof typeof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum];
 
 /**
  *
@@ -1361,7 +1361,7 @@ export const GetCommunities200ResponseResultsInnerContestManagersInnerContestsIn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum =
-  typeof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum[keyof typeof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum];
+  (typeof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum)[keyof typeof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum];
 
 /**
  *
@@ -1506,7 +1506,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRu
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum];
 
 /**
  *
@@ -1534,7 +1534,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum];
 
 /**
  *
@@ -1562,7 +1562,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum];
 
 /**
  *
@@ -1647,7 +1647,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum];
 
 /**
  *
@@ -1690,7 +1690,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum];
 
 /**
  *
@@ -1718,7 +1718,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum];
 
 /**
  *
@@ -1752,7 +1752,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum];
 
 /**
  *
@@ -1787,7 +1787,7 @@ export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAn
   } as const;
 
 export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum];
 
 /**
  *
@@ -2196,12 +2196,6 @@ export interface GetCommunity200Response {
   numVotingThreads: number;
   /**
    *
-   * @type {number}
-   * @memberof GetCommunity200Response
-   */
-  numTotalThreads: number;
-  /**
-   *
    * @type {Array<GetCommunity200ResponseAdminsAndModsInner>}
    * @memberof GetCommunity200Response
    */
@@ -2223,7 +2217,7 @@ export const GetCommunity200ResponseBaseEnum = {
 } as const;
 
 export type GetCommunity200ResponseBaseEnum =
-  typeof GetCommunity200ResponseBaseEnum[keyof typeof GetCommunity200ResponseBaseEnum];
+  (typeof GetCommunity200ResponseBaseEnum)[keyof typeof GetCommunity200ResponseBaseEnum];
 export const GetCommunity200ResponseTypeEnum = {
   Chain: 'chain',
   Dao: 'dao',
@@ -2232,7 +2226,7 @@ export const GetCommunity200ResponseTypeEnum = {
 } as const;
 
 export type GetCommunity200ResponseTypeEnum =
-  typeof GetCommunity200ResponseTypeEnum[keyof typeof GetCommunity200ResponseTypeEnum];
+  (typeof GetCommunity200ResponseTypeEnum)[keyof typeof GetCommunity200ResponseTypeEnum];
 export const GetCommunity200ResponseDefaultPageEnum = {
   DefaultAllDiscussionsView: 'default_all_discussions_view',
   DefaultSummaryView: 'default_summary_view',
@@ -2240,14 +2234,14 @@ export const GetCommunity200ResponseDefaultPageEnum = {
 } as const;
 
 export type GetCommunity200ResponseDefaultPageEnum =
-  typeof GetCommunity200ResponseDefaultPageEnum[keyof typeof GetCommunity200ResponseDefaultPageEnum];
+  (typeof GetCommunity200ResponseDefaultPageEnum)[keyof typeof GetCommunity200ResponseDefaultPageEnum];
 export const GetCommunity200ResponseHasHomepageEnum = {
   True: 'true',
   False: 'false',
 } as const;
 
 export type GetCommunity200ResponseHasHomepageEnum =
-  typeof GetCommunity200ResponseHasHomepageEnum[keyof typeof GetCommunity200ResponseHasHomepageEnum];
+  (typeof GetCommunity200ResponseHasHomepageEnum)[keyof typeof GetCommunity200ResponseHasHomepageEnum];
 
 /**
  *
@@ -2275,7 +2269,7 @@ export const GetCommunity200ResponseAdminsAndModsInnerRoleEnum = {
 } as const;
 
 export type GetCommunity200ResponseAdminsAndModsInnerRoleEnum =
-  typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum[keyof typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum];
+  (typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum)[keyof typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum];
 
 /**
  *
@@ -3112,10 +3106,10 @@ export class CommunityApi extends BaseAPI {
  */
 export const GetCommunitiesOrderByEnum = {
   ProfileCount: 'profile_count',
-  ThreadCount: 'thread_count',
+  ThreadCount: 'lifetime_thread_count',
 } as const;
 export type GetCommunitiesOrderByEnum =
-  typeof GetCommunitiesOrderByEnum[keyof typeof GetCommunitiesOrderByEnum];
+  (typeof GetCommunitiesOrderByEnum)[keyof typeof GetCommunitiesOrderByEnum];
 /**
  * @export
  */
@@ -3124,7 +3118,7 @@ export const GetCommunitiesOrderDirectionEnum = {
   Desc: 'DESC',
 } as const;
 export type GetCommunitiesOrderDirectionEnum =
-  typeof GetCommunitiesOrderDirectionEnum[keyof typeof GetCommunitiesOrderDirectionEnum];
+  (typeof GetCommunitiesOrderDirectionEnum)[keyof typeof GetCommunitiesOrderDirectionEnum];
 /**
  * @export
  */
@@ -3136,7 +3130,7 @@ export const GetCommunitiesBaseEnum = {
   Solana: 'solana',
 } as const;
 export type GetCommunitiesBaseEnum =
-  typeof GetCommunitiesBaseEnum[keyof typeof GetCommunitiesBaseEnum];
+  (typeof GetCommunitiesBaseEnum)[keyof typeof GetCommunitiesBaseEnum];
 /**
  * @export
  */
@@ -3145,7 +3139,7 @@ export const GetMembersOrderByEnum = {
   Name: 'name',
 } as const;
 export type GetMembersOrderByEnum =
-  typeof GetMembersOrderByEnum[keyof typeof GetMembersOrderByEnum];
+  (typeof GetMembersOrderByEnum)[keyof typeof GetMembersOrderByEnum];
 /**
  * @export
  */
@@ -3154,4 +3148,4 @@ export const GetMembersOrderDirectionEnum = {
   Desc: 'DESC',
 } as const;
 export type GetMembersOrderDirectionEnum =
-  typeof GetMembersOrderDirectionEnum[keyof typeof GetMembersOrderDirectionEnum];
+  (typeof GetMembersOrderDirectionEnum)[keyof typeof GetMembersOrderDirectionEnum];

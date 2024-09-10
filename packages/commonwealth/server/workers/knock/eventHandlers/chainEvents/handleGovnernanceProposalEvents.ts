@@ -70,11 +70,10 @@ export async function handleGovernanceProposalEvents(
   if (users.length) {
     const provider = notificationsProvider();
 
-    return await provider.triggerWorkflow({
+    const res = await provider.triggerWorkflow({
       key: WorkflowKeys.ChainProposals,
       users,
       data: {
-        // @ts-expect-error StrictNullChecks
         community_id: community[0].id,
         community_name: community[0].name,
         proposal_kind: event.eventSource.kind as
@@ -83,12 +82,13 @@ export async function handleGovernanceProposalEvents(
           | 'proposal-executed'
           | 'proposal-queued',
         proposal_url: getChainProposalUrl(
-          // @ts-expect-error StrictNullChecks
           community[0].id,
           String(event.parsedArgs[0] as z.infer<typeof ETHERS_BIG_NUMBER>),
         ),
       },
     });
+
+    return !res.some((r) => r.status === 'rejected');
   }
 
   return true;

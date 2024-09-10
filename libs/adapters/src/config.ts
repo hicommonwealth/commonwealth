@@ -1,5 +1,7 @@
-import { configure, config as target } from '@hicommonwealth/core';
+import { configure, logger, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
+
+const log = logger(import.meta);
 
 const DEFAULTS = {
   LOAD_TESTING_AUTH_TOKEN: 'testing',
@@ -24,6 +26,10 @@ const {
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
   LOAD_TESTING_AUTH_TOKEN,
+  SEND_WEBHOOKS,
+  SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP,
+  SEND_EMAILS,
+  DISABLE_LOCAL_QUEUE_PURGE,
 } = process.env;
 
 export const config = configure(
@@ -37,6 +43,7 @@ export const config = configure(
     },
     BROKER: {
       RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
+      DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -46,6 +53,13 @@ export const config = configure(
       KNOCK_SIGNING_KEY,
       KNOCK_IN_APP_FEED_ID,
       KNOCK_PUBLIC_API_KEY,
+      WEBHOOKS: {
+        SEND: SEND_WEBHOOKS === 'true',
+        CONFIRMATION_TIMESTAMP: parseInt(
+          SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP ?? '0',
+        ),
+      },
+      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -83,6 +97,11 @@ export const config = configure(
           data === DEFAULTS.RABBITMQ_URI
         );
       }, 'RABBITMQ_URI is require in production, beta (QA), demo, and frick Heroku apps'),
+      DISABLE_LOCAL_QUEUE_PURGE: z
+        .boolean()
+        .describe(
+          'Disable purging all messages in queues when a consumer starts up',
+        ),
     }),
     NOTIFICATIONS: z
       .object({
@@ -121,6 +140,46 @@ export const config = configure(
           .describe(
             'A flag indicating whether the Knock integration is enabled or disabled',
           ),
+        SEND_EMAILS: z.boolean(),
+        WEBHOOKS: z
+          .object({
+            SEND: z
+              .boolean()
+              .describe(
+                'Boolean indicating whether webhook workflows should be triggered',
+              ),
+            CONFIRMATION_TIMESTAMP: z.number().optional(),
+          })
+          .refine((data) => {
+            if (target.APP_ENV === 'production') return data.SEND;
+            if (!data.SEND) return true;
+
+            // This logic ensures that SEND_WEBHOOKS is always reverted to false in non-production environments.
+            // SEND_WEBHOOKS may be temporarily required for testing locally but it should always be reverted to
+            // ensure webhooks are not accidentally sent to real/non-test endpoints.
+            if (!data.CONFIRMATION_TIMESTAMP) {
+              log.error(
+                'If SEND_WEBHOOKS=true in non-production environment, ' +
+                  'it must be accompanied by SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP.',
+              );
+              return false;
+            }
+            const now = new Date();
+            const timestamp = new Date(data.CONFIRMATION_TIMESTAMP);
+            if (now.getTime() < timestamp.getTime()) {
+              log.error(
+                'SEND_WEBHOOK_CONFIRMATION_TIMESTAMP is incorrectly set to some time in the future',
+              );
+              return false;
+            }
+            // if confirmation is more than 3 hours old reject
+            if (now.getTime() > timestamp.getTime() + 1_000 * 60 * 60 * 3) {
+              log.error('SEND_WEBHOOK_CONFIRMATION_TIMESTAMP has expired');
+              return false;
+            }
+
+            return true;
+          }),
       })
       .refine(
         (data) => {

@@ -1,4 +1,5 @@
-import { useGetCommunityByIdQuery } from '../state/api/communities';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { useGetBuyPriceQuery } from '../state/api/communityStake/index';
 import { convertEthToUsd } from '../views/modals/ManageCommunityStakeModal/utils';
 
@@ -11,23 +12,16 @@ function fromWei(value: string | null): number | null {
 }
 
 export const useCommunityCardPrice = ({
-  communityId,
+  community,
   stakeId,
   ethUsdRate,
   historicalPrice,
 }: {
-  communityId: string;
+  community: z.infer<typeof ExtendedCommunity>;
   stakeId: number;
   ethUsdRate: string;
   historicalPrice: string;
 }) => {
-  const { data: community, isLoading: isCommunityLoading } =
-    useGetCommunityByIdQuery({
-      id: communityId,
-      enabled: !!communityId,
-      includeNodeInfo: true,
-    });
-
   const communityStake = (community?.CommunityStakes || [])?.find(
     (s) => s.stake_id === stakeId,
   );
@@ -38,7 +32,7 @@ export const useCommunityCardPrice = ({
     namespace: community?.namespace || '',
     stakeId: stakeId,
     amount: 1,
-    apiEnabled: stakeEnabled && !isCommunityLoading,
+    apiEnabled: stakeEnabled && !!community,
     chainRpc: community?.ChainNode?.url || '',
     ethChainId: community?.ChainNode?.eth_chain_id || 0,
   });

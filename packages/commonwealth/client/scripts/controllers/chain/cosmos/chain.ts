@@ -242,7 +242,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       );
     } else {
       client = await getSigningClient(
-        chain.meta.node.url,
+        chain?.meta?.node?.url,
         wallet.offlineSigner,
       );
     }

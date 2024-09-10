@@ -30,6 +30,8 @@ describe('Contest Worker Policy', () => {
     const [community] = await seed('Community', {
       id: communityId,
       chain_node_id: chainNode!.id,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           id: addressId,
@@ -65,7 +67,6 @@ describe('Contest Worker Policy', () => {
       deleted_at: undefined,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
   });
 
@@ -100,11 +101,9 @@ describe('Contest Worker Policy', () => {
             reaction_count: 0,
             reaction_weights_sum: 0,
             comment_count: 0,
-            max_notif_id: 0,
             deleted_at: undefined,
             pinned: false,
             read_only: false,
-            version_history: [],
             topic_id: topicId,
           },
         },
@@ -164,7 +163,6 @@ describe('Contest Worker Policy', () => {
           address_id: addressId,
           reaction: 'like',
           thread_id: threadId,
-          comment_id: 0,
         },
       });
 

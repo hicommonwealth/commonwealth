@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import {
-  discordMetaSchema,
+  DiscordMetaSchema,
   linksSchema,
   paginationSchema,
   PG_INT,
@@ -26,7 +26,7 @@ export const BulkThread = z.object({
   kind: z.string(),
   stage: z.string(),
   read_only: z.boolean(),
-  discord_meta: z.object(discordMetaSchema).nullable().optional(),
+  discord_meta: DiscordMetaSchema.nullish(),
   pinned: z.boolean(),
   chain: z.string(),
   locked_at: z.date().nullable().optional(),

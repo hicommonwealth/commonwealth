@@ -1,17 +1,18 @@
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
-import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import useUpdateCustomDomainMutation from 'state/api/communities/updateCustomDomain';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { updateCommunityCustomDomain } from 'views/pages/AdminPanel/utils';
+import { notifySuccess } from '../../../controllers/app/notifications';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
 const UpdateCustomDomainTask = () => {
   const [communityId, setCommunityId] = useState<string>('');
   const [customDomain, setCustomDomain] = useState<string>('');
+
+  const updateCustomDomain = useUpdateCustomDomainMutation();
 
   const openConfirmationModal = () => {
     openConfirmation({
@@ -25,18 +26,11 @@ const UpdateCustomDomainTask = () => {
           buttonHeight: 'sm',
           onClick: () => {
             void (async () => {
-              try {
-                await updateCommunityCustomDomain({
-                  community_id: communityId,
-                  custom_domain: customDomain,
-                });
-                setCommunityId('');
-                setCustomDomain('');
-                notifySuccess('Custom domain updated');
-              } catch (e) {
-                notifyError('Error updating custom domain');
-                console.error(e);
-              }
+              await updateCustomDomain.mutateAsync({
+                community_id: communityId,
+                custom_domain: customDomain,
+              });
+              notifySuccess('Custom domain updated');
             })();
           },
         },
@@ -72,19 +66,6 @@ const UpdateCustomDomainTask = () => {
     if (!validCustomDomainUrl.test(customDomain)) {
       return 'Invalid URL (try removing the http prefix)';
     }
-
-    // there's probably a better way to remove prefixes for duplicate finding purposes
-    const existingCustomDomain = app.config.chains
-      .getAll()
-      .find(
-        (c) =>
-          c.customDomain &&
-          c.customDomain.replace('https://', '').replace('http://', '') ===
-            customDomain,
-      );
-    if (existingCustomDomain) {
-      return `Custom domain in use by community '${existingCustomDomain.id}'`;
-    }
   })();
 
   return (
@@ -118,6 +99,15 @@ const UpdateCustomDomainTask = () => {
           onClick={openConfirmationModal}
         />
       </div>
+      {updateCustomDomain.isError && (
+        <CWText>An error occurred: {updateCustomDomain.error.message}</CWText>
+      )}
+      {updateCustomDomain.isSuccess && (
+        <CWText>
+          Successfully created! Send this CNAME to the customer:{' '}
+          {updateCustomDomain.data.cname}
+        </CWText>
+      )}
     </div>
   );
 };

@@ -11,7 +11,12 @@ import {
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { tester, tokenBalanceCache, type DB } from '@hicommonwealth/model';
+import {
+  CommunityAttributes,
+  tester,
+  tokenBalanceCache,
+  type DB,
+} from '@hicommonwealth/model';
 import {
   BalanceSourceType,
   BalanceType,
@@ -33,13 +38,12 @@ const addressOneMnemonic =
   'jewel disease neglect feel mother dry hire yellow minute main tray famous';
 
 async function generateCosmosAddresses(numberOfAddresses: number) {
-  const addresses = [];
+  const addresses: string[] = [];
   for (let i = 0; i < numberOfAddresses; i++) {
     // Generate a new wallet with a random mnemonic
     const wallet = await Secp256k1HdWallet.generate(12, { prefix: 'cosmos' });
     // Get the first account from the wallet
     const [firstAccount] = await wallet.getAccounts();
-    // @ts-expect-error StrictNullChecks
     addresses.push(firstAccount.address);
   }
 
@@ -98,11 +102,15 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
         active: true,
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
-        has_chain_events_listener: true,
-        // @ts-expect-error StrictNullChecks
         chain_node_id: stargazeNode.id,
         bech32_prefix: 'stars',
-      });
+        collapsed_on_homepage: false,
+        custom_stages: [],
+        directory_page_enabled: false,
+        snapshot_spaces: [],
+        stages_enabled: true,
+        social_links: [],
+      } as unknown as CommunityAttributes);
     }
 
     if (junoChainNode) {
@@ -199,9 +207,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
     test('should correctly batch balance requests', async () => {
       const bulkAddresses = await generateCosmosAddresses(20);
-      // @ts-expect-error StrictNullChecks
       bulkAddresses.splice(4, 0, addressOne);
-      // @ts-expect-error StrictNullChecks
       bulkAddresses.splice(5, 0, addressTwo);
       const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
@@ -234,8 +240,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
               cosmos_chain_id: cosmosChainId,
             },
           });
-          // @ts-expect-error StrictNullChecks
-          const rpcEndpoint = chainNode.url;
+          const rpcEndpoint = chainNode!.url!;
           const tmClient = await Tendermint34Client.connect(rpcEndpoint);
           const api = QueryClient.withExtensions(
             tmClient,
@@ -244,8 +249,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           );
           const { params } = await api.staking.params();
           const denom = params?.bondDenom;
-          // @ts-expect-error StrictNullChecks
-          const { amount } = await api.bank.balance(addressOne, denom);
+          const { amount } = await api.bank.balance(addressOne, denom!);
           const originalAddressOneBalance = amount;
 
           const balance = await tokenBalanceCache.getBalances(
@@ -263,18 +267,15 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           expect(balance[addressOne]).to.equal(originalAddressOneBalance);
 
           // transfer tokens
-          const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
-            addressOneMnemonic,
-          );
+          const wallet =
+            await DirectSecp256k1HdWallet.fromMnemonic(addressOneMnemonic);
           const client = await SigningStargateClient.connectWithSigner(
             rpcEndpoint,
             wallet,
           );
-          // @ts-expect-error StrictNullChecks
-          const transferAmount = coins(76, denom);
+          const transferAmount = coins(76, denom!);
           await client.sendTokens(addressOne, addressTwo, transferAmount, {
-            // @ts-expect-error StrictNullChecks
-            amount: coins(500, denom),
+            amount: coins(500, denom!),
             gas: '200000',
           });
 
@@ -382,9 +383,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
     test('should correctly batch balance requests', async () => {
       const bulkAddresses = await generateCosmosAddresses(20);
-      // @ts-expect-error StrictNullChecks
       bulkAddresses.splice(4, 0, addressWithNft);
-      // @ts-expect-error StrictNullChecks
       bulkAddresses.splice(5, 0, addressWithoutNft);
       const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
@@ -418,8 +417,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
             },
           });
           const tmClient = await tokenBalanceCache.getTendermintClient({
-            // @ts-expect-error StrictNullChecks
-            chainNode,
+            chainNode: chainNode!,
           });
           const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
 
@@ -545,9 +543,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
     test('should correctly batch balance requests', async () => {
       const bulkAddresses = await generateCosmosAddresses(20);
-      // @ts-expect-error StrictNullChecks
       bulkAddresses.splice(4, 0, addressWithToken);
-      // @ts-expect-error StrictNullChecks
       bulkAddresses.splice(5, 0, addressWithoutToken);
       const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW20,
@@ -581,8 +577,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
             },
           });
           const tmClient = await tokenBalanceCache.getTendermintClient({
-            // @ts-expect-error StrictNullChecks
-            chainNode,
+            chainNode: chainNode!,
           });
           const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
 

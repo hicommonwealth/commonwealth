@@ -112,6 +112,7 @@ export const useTextInputWithValidation = () => {
   };
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTextInput = ({
   autoComplete = 'off',
   autoFocus,
@@ -194,7 +195,8 @@ export const CWTextInput = ({
             } else {
               e.stopPropagation();
               validationProps.setIsTyping(true);
-              clearTimeout(validationProps.inputTimeout);
+              validationProps.inputTimeout &&
+                clearTimeout(validationProps.inputTimeout);
               const timeout = e.currentTarget.value?.length > 3 ? 250 : 1000;
               validationProps.setInputTimeout(
                 setTimeout(() => {

@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { buildCreateCommentInput } from 'client/scripts/state/api/comments/createComment';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -86,7 +87,7 @@ export const CreateComment = ({
     const communityId = app.activeChainId();
     const asyncHandle = async () => {
       try {
-        const newComment = await createComment({
+        const input = await buildCreateCommentInput({
           communityId,
           profile: user.activeAccount!.profile!.toUserProfile(),
           threadId: rootThread.id,
@@ -95,6 +96,7 @@ export const CreateComment = ({
           existingNumberOfComments: rootThread.numberOfComments || 0,
           isPWA: isAddedToHomeScreen,
         });
+        const newComment = await createComment(input);
 
         setErrorMsg(null);
         setContentDelta(createDeltaFromText(''));
@@ -104,10 +106,6 @@ export const CreateComment = ({
           // Wait for dom to be updated before scrolling to comment
           jumpHighlightComment(newComment?.id as number);
         }, 100);
-
-        // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
-        // once we are receiving notifications from the websocket
-        await app.user.notifications.refresh();
       } catch (err) {
         if (err instanceof SessionKeyError) {
           return;

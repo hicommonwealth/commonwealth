@@ -54,18 +54,17 @@ export async function handleCommunityStakeTrades(
 
   if (users.length) {
     const provider = notificationsProvider();
-    return await provider.triggerWorkflow({
+    const res = await provider.triggerWorkflow({
       key: WorkflowKeys.CommunityStake,
       users,
       data: {
-        // @ts-expect-error StrictNullChecks
         community_id: community.id,
         transaction_type: isBuy ? 'minted' : 'burned',
         community_name: community.name,
-        // @ts-expect-error StrictNullChecks
         community_stakes_url: getCommunityUrl(community.id),
       },
     });
+    return !res.some((r) => r.status === 'rejected');
   }
 
   return true;

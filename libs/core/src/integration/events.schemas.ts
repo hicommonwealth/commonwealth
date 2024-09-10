@@ -1,5 +1,6 @@
 import {
   Comment,
+  PG_INT,
   Reaction,
   SubscriptionPreference,
   Thread,
@@ -21,12 +22,20 @@ import { EventMetadata } from './util.schemas';
 export const ThreadCreated = Thread.extend({
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
-export const ThreadUpvoted = Reaction.extend({
+export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
+  thread_id: PG_INT,
   community_id: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const CommentCreated = Comment.extend({
   community_id: z.string(),
+  users_mentioned: z
+    .array(PG_INT)
+    .optional()
+    .describe('An array of user ids that are mentioned in the comment'),
+});
+export const CommentUpvoted = Reaction.omit({ thread_id: true }).extend({
+  comment_id: PG_INT,
 });
 export const GroupCreated = z.object({
   groupId: z.string(),
@@ -231,4 +240,4 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   mobile_push_admin_alerts_enabled: true,
   created_at: true,
   updated_at: true,
-}).merge(SubscriptionPreference.pick({ id: true, user_id: true }));
+}).merge(SubscriptionPreference.pick({ user_id: true }));

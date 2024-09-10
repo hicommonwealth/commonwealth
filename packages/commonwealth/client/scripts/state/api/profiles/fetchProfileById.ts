@@ -42,9 +42,12 @@ const fetchProfileById = async ({
         userId: userStore.getState().id,
         id: a.id!,
         address: a.address,
-        communityId: a.community_id!,
+        community: {
+          id: a.community_id!,
+          base: a.Community.base,
+          ss58Prefix: a.Community.ss58_prefix || undefined,
+        },
         walletId: a.wallet_id!,
-        walletSsoSource: a.wallet_sso_source!,
         ghostAddress: a.ghost_address,
       });
     } catch (err) {
@@ -89,11 +92,14 @@ const useFetchProfileByIdQuery = ({
                 userId: user.id,
                 id: a.id!,
                 walletId: a.wallet_id!,
-                communityId: a.community_id!,
+                community: {
+                  id: a.community_id!,
+                  base: a.Community.base,
+                  ss58Prefix: a.Community.ss58_prefix || undefined,
+                },
                 address: a?.address,
                 ghostAddress: a?.ghost_address,
                 lastActive: a.last_active ? moment(a.last_active) : undefined,
-                walletSsoSource: a.wallet_sso_source!,
               }),
           ),
         });

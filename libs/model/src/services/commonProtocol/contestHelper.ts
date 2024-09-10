@@ -10,6 +10,7 @@ import { feeManagerABI } from './abi/feeManagerAbi';
 const nonceMutex = new Mutex();
 
 export type AddContentResponse = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   txReceipt: any;
   contentId: string;
 };
@@ -64,6 +65,7 @@ const addContent = async (
   nonce?: number,
 ): Promise<AddContentResponse> => {
   if (!web3) {
+    // eslint-disable-next-line no-param-reassign
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
@@ -122,8 +124,10 @@ const voteContent = async (
   contentId: string,
   web3?: Web3,
   nonce?: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> => {
   if (!web3) {
+    // eslint-disable-next-line no-param-reassign
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
@@ -192,7 +196,8 @@ export const getContestStatus = async (
  * Gets vote and more information about winners of a given contest
  * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
- * @param contestId the id of the contest for data within the contest contract. No contest id will return current winners
+ * @param contestId the id of the contest for data within the contest contract.
+ * No contest id will return current winners
  * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
@@ -222,6 +227,7 @@ export const getContestScore = async (
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const votePromises: any[] = [];
   winnerIds.forEach((w) => {
     votePromises.push(contestInstance.methods.content(w).call());
@@ -339,6 +345,7 @@ export const voteContentBatch = async (
   rpcNodeUrl: string,
   voter: string,
   entries: VoteContentBatchEntry[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<PromiseSettledResult<any>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
@@ -346,6 +353,7 @@ export const voteContentBatch = async (
       await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises: Promise<any>[] = [];
 
     entries.forEach(({ contestAddress, contentId }) => {
