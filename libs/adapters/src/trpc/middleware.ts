@@ -47,6 +47,7 @@ export enum Tag {
   LoadTest = 'LoadTest',
   Wallet = 'Wallet',
   Webhook = 'Webhook',
+  SuperAdmin = 'SuperAdmin',
 }
 
 /**
