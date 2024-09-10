@@ -67,10 +67,10 @@ const ConnectChainToCommunityTask = () => {
     return '';
   })();
 
-  const update = async () => {
+  const update = () => {
     if (Object.keys(communityLookupData || {}).length > 0) {
       try {
-        await updateCommunity({
+        updateCommunity({
           communityId: communityId,
           chainNodeId: chainNameAndId?.value.toString(),
         });
@@ -86,8 +86,6 @@ const ConnectChainToCommunityTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Connect Chain to Community',
-
-      // eslint-disable-next-line max-len
       description:
         `Are you sure you want to connect ${communityLookupData?.name} to ${chainNameAndId.label}?` +
         `This will replace the existing chain with ${chainNameAndId.label} and might affect existing` +
