@@ -87,7 +87,11 @@ const ConnectChainToCommunityTask = () => {
     openConfirmation({
       title: 'Connect Chain to Community',
 
-      description: `Are you sure you want to connect ${communityLookupData?.name} to ${chainNameAndId.label}? This will replace the existing chain with ${chainNameAndId.label} and might affect existing features of the community that depend on the existing chain node. Do you want to proceed?`,
+      // eslint-disable-next-line max-len
+      description:
+        `Are you sure you want to connect ${communityLookupData?.name} to ${chainNameAndId.label}?` +
+        `This will replace the existing chain with ${chainNameAndId.label} and might affect existing` +
+        `features of the community that depend on the existing chain node. Do you want to proceed?`,
       buttons: [
         {
           label: 'Update',
