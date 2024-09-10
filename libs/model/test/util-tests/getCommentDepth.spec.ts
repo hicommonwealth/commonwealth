@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
   CommentInstance,
+  getCommentSearchVector,
   getThreadSearchVector,
   models,
   tester,
@@ -41,6 +42,7 @@ describe('getCommentDepth', () => {
         // @ts-expect-error StrictNullChecks
         address_id: address.id,
         text: String(i),
+        search: getCommentSearchVector(String(i)),
       });
       comments.push(result);
       comment = result;
