@@ -1,5 +1,6 @@
 import { getThreadSearchVector } from '@hicommonwealth/model';
 import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
+import { getCommentSearchVector } from '../../build';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -272,10 +273,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1,
+                },
+                defaults: {
                   address_id: -1,
                   text: '',
                   thread_id: -1,
                   plaintext: '',
+                  reaction_count: 0,
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],
@@ -291,10 +296,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
+                },
+                defaults: {
                   address_id: -2,
                   text: '',
                   thread_id: -2,
                   plaintext: '',
+                  reaction_count: 0,
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],
