@@ -27,7 +27,8 @@ type TagType =
   | 'input'
   | 'address'
   | 'group'
-  | 'contest';
+  | 'contest'
+  | 'filter';
 
 export type TagProps = {
   iconName?: IconName;
@@ -64,8 +65,7 @@ export const CWTag = ({
     return label.slice(0, trimAt) + '...';
   };
 
-  // @ts-expect-error <StrictNullChecks/>
-  const handleClick = () => onClick();
+  const handleClick = () => onClick?.();
 
   return (
     <div
@@ -93,7 +93,7 @@ export const CWTag = ({
       <CWText type="caption" fontWeight="medium" noWrap>
         {displayLabel()}
       </CWText>
-      {type === 'input' && (
+      {(type === 'input' || type === 'filter') && (
         <div className="close-container" onClick={handleClick}>
           <X
             className={getClasses({ action: true }, ComponentType.Tag)}
