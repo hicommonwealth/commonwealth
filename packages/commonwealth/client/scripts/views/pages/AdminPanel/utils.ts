@@ -145,7 +145,7 @@ export function downloadCSV(rows: CSVRow[], filename: string) {
   document.body.removeChild(link);
 }
 
-export const alphabetizeChains = (chainNodes: NodeInfo[] | undefined) => {
+export const getSortedChains = (chainNodes: NodeInfo[] | undefined) => {
   return (
     chainNodes
       ?.map((chain) => ({

@@ -16,7 +16,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
-import { alphabetizeChains } from './utils';
+import { getSortedChains } from './utils';
 
 const ConnectChainToCommunityTask = () => {
   const [communityId, setCommunityId] = useState<string>('');
@@ -32,7 +32,7 @@ const ConnectChainToCommunityTask = () => {
 
   const { data: chainNodes } = useFetchNodesQuery();
 
-  const chains = alphabetizeChains(chainNodes);
+  const chains = getSortedChains(chainNodes);
 
   const debouncedCommunityLookupId = useDebounce<string | undefined>(
     communityId,
@@ -86,7 +86,7 @@ const ConnectChainToCommunityTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Connect Chain to Community',
-      description: `Are you sure you want to connect ${communityLookupData?.name} to ${chainNameAndId.label}?`,
+      description: `Are you sure you want to connect ${communityLookupData?.name} to ${chainNameAndId.label}? This will replace the existing chain of community with ${chainNameAndId.label} and might affect existing features  of the community that depend on the existing chain node. Are you sure to proceed?`,
       buttons: [
         {
           label: 'Update',

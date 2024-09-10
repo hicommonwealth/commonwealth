@@ -153,7 +153,7 @@ const RPCEndpointTask = () => {
             <CWTextInputOld
               value={rpcEndpoint}
               onInput={(e) => {
-                setRpcEndpoint(e.target.value);
+                setRpcEndpoint(e.target.value.trim());
               }}
               inputValidationFn={RPCEndpointValidationFn}
               placeholder="Enter an RPC endpoint (Required)"
@@ -186,7 +186,7 @@ const RPCEndpointTask = () => {
                 label="Chain name"
                 value={rpcName}
                 onInput={(e) => {
-                  setRpcName(e.target.value);
+                  setRpcName(e.target.value.trim());
                 }}
                 placeholder="Enter chain node name (Required)"
               />
