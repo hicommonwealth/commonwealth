@@ -170,7 +170,17 @@ export default (
   );
 
 export function getThreadSearchVector(title: string, body: string) {
+  let decodedTitle = title;
+  let decodedBody = body;
+  try {
+    decodedTitle = decodeURIComponent(title);
+  } catch (e) {}
+
+  try {
+    decodedBody = decodeURIComponent(body);
+  } catch (e) {}
+
   return Sequelize.literal(
-    `to_tsvector('english',  '${title}' || ' ' || '${body}')`,
+    `to_tsvector('english',  '${decodedTitle}' || ' ' || '${decodedBody}')`,
   );
 }

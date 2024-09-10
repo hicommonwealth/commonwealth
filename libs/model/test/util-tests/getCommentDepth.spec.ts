@@ -1,7 +1,12 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { CommentInstance, models, tester } from '../../src';
+import {
+  CommentInstance,
+  getThreadSearchVector,
+  models,
+  tester,
+} from '../../src';
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
 
 describe('getCommentDepth', () => {
@@ -23,6 +28,7 @@ describe('getCommentDepth', () => {
       title: 'Testing',
       plaintext: '',
       kind: 'discussion',
+      search: getThreadSearchVector('Testing', ''),
     });
     let comment: CommentInstance;
     for (let i = 0; i < maxDepth; i++) {

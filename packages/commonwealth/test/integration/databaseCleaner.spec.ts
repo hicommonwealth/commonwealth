@@ -1,5 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import { tester, type DB } from '@hicommonwealth/model';
+import { getThreadSearchVector, tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
@@ -184,6 +184,7 @@ describe('DatabaseCleaner Tests', async () => {
         stage: 'discussion',
         view_count: 0,
         comment_count: 0,
+        search: getThreadSearchVector('Testing', ''),
       });
 
       const comment = await models.Comment.create({
