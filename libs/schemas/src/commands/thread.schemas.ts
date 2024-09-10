@@ -22,6 +22,31 @@ export const CreateThread = {
   output: Thread,
 };
 
+export const UpdateThread = {
+  input: z.object({
+    thread_id: PG_INT,
+    body: z.string().optional(),
+    title: z.string().optional(),
+    topic_id: PG_INT.optional(),
+    stage: z.string().optional(),
+    url: z.string().url().optional(),
+    locked: z.boolean().optional(),
+    pinned: z.boolean().optional(),
+    archived: z.boolean().optional(),
+    spam: z.boolean().optional(),
+    collaborators: z
+      .object({
+        toAdd: z.array(PG_INT).optional(),
+        toRemove: z.array(PG_INT).optional(),
+      })
+      .optional(),
+    canvas_signed_data: z.string().optional(),
+    canvas_hash: z.string().optional(),
+    discord_meta: DiscordMetaSchema.optional(),
+  }),
+  output: Thread,
+};
+
 export const ThreadCanvasReaction = z.object({
   thread_id: PG_INT,
   reaction: z.enum(['like']),

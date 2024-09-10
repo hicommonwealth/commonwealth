@@ -205,6 +205,68 @@ describe('Thread lifecycle', () => {
     }
   });
 
+  describe('updates', () => {
+    it('should patch update thread attributes', async () => {
+      // const address = {
+      //   id: 1,
+      //   address: '0x1234',
+      //   role: 'admin',
+      //   community_id: 'ethereum',
+      //   verified: true,
+      //   update: async () => ({}),
+      // };
+      // const attributes: UpdateThreadOptions = {
+      //   user: {
+      //     getAddresses: async () => [address],
+      //   } as any,
+      //   address: address as any,
+      //   threadId: 1,
+      //   title: 'hello',
+      //   body: 'wasup',
+      //   url: 'https://example.com',
+      // };
+      // const db: any = {
+      //   Thread: {
+      //     findOne: async () => ({
+      //       Address: address,
+      //       address_id: address.id,
+      //       update: () => ({ id: 1, created_at: Date.now() }),
+      //       toJSON: () => ({}),
+      //     }),
+      //     update: () => ({ id: 1, created_at: Date.now() }),
+      //   },
+      //   ThreadVersionHistory: {
+      //     create: () => null,
+      //     findOne: () => null,
+      //   },
+      //   Topic: {
+      //     findOne: async () => ({
+      //       id: 1,
+      //     }),
+      //   },
+      //   // for findAllRoles
+      //   Address: {
+      //     findAll: async () => [address],
+      //   },
+      //   Community: {
+      //     findByPk: async () => ({ id: 'ethereum' }),
+      //   },
+      //   sequelize: {
+      //     transaction: async () => ({
+      //       rollback: async () => ({}),
+      //       commit: async () => ({}),
+      //     }),
+      //     query: () => new Promise((resolve) => resolve([])),
+      //   },
+      // };
+      // const serverThreadsController = new ServerThreadsController(db);
+      // const [updatedThread, analyticsOptions] =
+      //   await serverThreadsController.updateThread(attributes);
+      // expect(updatedThread).to.be.ok;
+      // expect(analyticsOptions).to.have.length(0);
+    });
+  });
+
   describe('comments', () => {
     it('should create a thread comment as member of group with permissions', async () => {
       const text = 'hello';

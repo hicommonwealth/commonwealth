@@ -14,10 +14,9 @@ const {
   getCommunity,
   getMembers,
 } = community.trpcRouter;
-const { createThread, createThreadReaction } = thread.trpcRouter;
+const { createThread, updateThread, createThreadReaction } = thread.trpcRouter;
 const { createComment, createCommentReaction, updateComment, getComments } =
   comment.trpcRouter;
-//const { getBulkThreads } = thread.trpcRouter;
 
 const api = {
   createCommunity,
@@ -27,8 +26,8 @@ const api = {
   getMembers,
   getComments,
   createThread,
+  updateThread,
   createThreadReaction,
-  //getBulkThreads,
   createComment,
   updateComment,
   createCommentReaction,

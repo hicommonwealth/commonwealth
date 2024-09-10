@@ -7,6 +7,7 @@ export const trpcRouter = trpc.router({
     MixpanelCommunityInteractionEvent.CREATE_THREAD,
     ({ community_id }) => ({ community: community_id }),
   ]),
+  updateThread: trpc.command(Thread.UpdateThread, trpc.Tag.Thread),
   createThreadReaction: trpc.command(
     Thread.CreateThreadReaction,
     trpc.Tag.Thread,

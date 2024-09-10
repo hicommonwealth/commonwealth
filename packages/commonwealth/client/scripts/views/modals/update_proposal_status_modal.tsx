@@ -8,6 +8,7 @@ import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import type Thread from '../../models/Thread';
 
 import { ChainBase } from '@hicommonwealth/shared';
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
@@ -108,15 +109,16 @@ export const UpdateProposalStatusModal = ({
       onAction: true,
     });
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     // set stage
-    editThread({
+    const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       communityId: app.activeChainId(),
       threadId: thread.id,
       // @ts-expect-error <StrictNullChecks/>
       stage: tempStage,
-    })
+    });
+    editThread(input)
       .then(() => {
         let links = thread.links;
         const { toAdd, toDelete } = getAddedAndDeleted(
