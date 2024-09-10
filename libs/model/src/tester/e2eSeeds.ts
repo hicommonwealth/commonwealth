@@ -1,6 +1,4 @@
-import { getThreadSearchVector } from '@hicommonwealth/model';
 import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
-import { getCommentSearchVector } from '../../build';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -13,6 +11,7 @@ import type {
   TopicAttributes,
   UserInstance,
 } from '../../src';
+import { getCommentSearchVector, getThreadSearchVector } from '../models';
 
 export type E2E_TestEntities = {
   testThreads: ThreadInstance[];
