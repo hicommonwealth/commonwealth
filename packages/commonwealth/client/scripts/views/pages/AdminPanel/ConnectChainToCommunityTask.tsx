@@ -70,7 +70,7 @@ const ConnectChainToCommunityTask = () => {
   const update = () => {
     if (Object.keys(communityLookupData || {}).length > 0) {
       try {
-        updateCommunity({
+        void updateCommunity({
           communityId: communityId,
           chainNodeId: chainNameAndId?.value.toString(),
         });
