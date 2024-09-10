@@ -241,7 +241,6 @@ export class Thread implements IUniqueId {
   public readonly authorCommunity: string;
   public readonly title: string;
   public readonly body: string;
-  public readonly plaintext: string;
   public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
@@ -297,7 +296,6 @@ export class Thread implements IUniqueId {
     community_id,
     read_only,
     body,
-    plaintext,
     url,
     pinned,
     collaborators,
@@ -344,7 +342,6 @@ export class Thread implements IUniqueId {
     links?: Link[];
     canvasSignedData?: string;
     canvasHash?: string;
-    plaintext?: string;
     collaborators?: any[];
     last_edited: string;
     locked_at: string;
@@ -381,10 +378,7 @@ export class Thread implements IUniqueId {
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
-    // @ts-expect-error StrictNullChecks
-    this.body = getDecodedString(body);
-    // @ts-expect-error StrictNullChecks
-    this.plaintext = plaintext;
+    this.body = body || '';
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);

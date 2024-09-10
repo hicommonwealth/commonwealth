@@ -106,7 +106,7 @@ export const NewSnapshotProposalForm = ({
 
       const initialForm: ThreadForm = {
         name: !thread ? '' : thread.title,
-        body: !thread ? '' : thread.plaintext,
+        body: !thread ? '' : thread.body,
         choices: ['Yes', 'No'],
         range: '5d',
         start: new Date().getTime(),
@@ -129,13 +129,10 @@ export const NewSnapshotProposalForm = ({
 
           const linkMarkdown = `${linkText}[here](${linkUrl})`;
 
-          const delta = createDeltaFromText(
-            thread.plaintext + linkMarkdown,
-            true,
-          );
+          const delta = createDeltaFromText(thread.body + linkMarkdown, true);
           setContentDelta(delta);
         } else {
-          const delta = createDeltaFromText(thread.plaintext);
+          const delta = createDeltaFromText(thread.body);
           setContentDelta(delta);
         }
       }

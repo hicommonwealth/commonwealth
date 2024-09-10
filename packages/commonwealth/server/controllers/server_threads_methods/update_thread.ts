@@ -11,7 +11,6 @@ import {
   findMentionDiff,
   parseUserMentions,
 } from '@hicommonwealth/model';
-import { renderQuillDeltaToText } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import {
   Op,
@@ -488,13 +487,6 @@ async function setThreadAttributes(
         throw new AppError(Errors.NoBody);
       }
       toUpdate.body = body;
-      toUpdate.plaintext = (() => {
-        try {
-          return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
-        } catch (e) {
-          return decodeURIComponent(body);
-        }
-      })();
     }
 
     // url

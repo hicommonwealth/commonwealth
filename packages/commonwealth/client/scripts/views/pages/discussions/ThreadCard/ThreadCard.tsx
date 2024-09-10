@@ -119,14 +119,14 @@ export const ThreadCard = ({
   const stageLabel = threadStageToLabel(thread.stage);
 
   // Future Ref: this fixes https://github.com/hicommonwealth/commonwealth/issues/8611 for iOS mobile
-  // where quill renders broken/cut-off/overlapping thread.plaintext in cases when there are multiple
-  // <p/> tags in the quill delta for thread.plaintext or if thread.plaintext has \n characters which
+  // where quill renders broken/cut-off/overlapping thread.body in cases when there are multiple
+  // <p/> tags in the quill delta for thread.body or if thread.body has \n characters which
   // iOS devices don't seem to render correctly.
   // Not updating it for desktop per a previous issue where markdown wasn't rendered correctly in
   // preview because of .slice()'d  content.
   const bodyText = getBrowserInfo().isMobile
-    ? thread.plaintext.replaceAll(/\n/g, '').slice(0, 150)
-    : thread.plaintext;
+    ? thread.body.replaceAll(/\n/g, '').slice(0, 150)
+    : thread.body;
 
   return (
     <>

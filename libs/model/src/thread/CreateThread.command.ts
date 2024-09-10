@@ -126,7 +126,6 @@ export function CreateThread(): Command<
               topic_id,
               kind,
               body,
-              plaintext,
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,

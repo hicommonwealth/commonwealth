@@ -61,7 +61,7 @@ export const ThreadOptions = ({
   const userStore = useUserStore();
 
   const handleDownloadMarkdown = () => {
-    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
+    downloadDataAsFile(thread.body, 'text/markdown', thread.title + '.md');
   };
 
   return (

@@ -10,7 +10,6 @@ export const Thread = z.object({
   kind: z.string(),
   stage: z.string(),
   body: z.string().nullish(),
-  plaintext: z.string().nullish(),
   url: z.string().nullish(),
   topic_id: PG_INT.nullish(),
   pinned: z.boolean().nullish(),
