@@ -78,13 +78,13 @@ export const AdminActions = ({
   const user = useUserStore();
 
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic?.id,
@@ -103,7 +103,7 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 threadId: thread.id,
-                communityId: app.activeChainId(),
+                communityId: app.activeChainId() || '',
                 address: user.activeAccount?.address || '',
               });
               onDelete?.();
@@ -172,7 +172,7 @@ export const AdminActions = ({
             const isSpam = !thread.markedAsSpamAt;
             try {
               await editThread({
-                communityId: app.activeChainId(),
+                communityId: app.activeChainId() || '',
                 threadId: thread.id,
                 spam: isSpam,
                 address: user.activeAccount?.address || '',
@@ -197,7 +197,7 @@ export const AdminActions = ({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
       readOnly: !thread.readOnly,
-      communityId: app.activeChainId(),
+      communityId: app.activeChainId() || '',
     })
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
@@ -213,7 +213,7 @@ export const AdminActions = ({
     editThread({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
-      communityId: app.activeChainId(),
+      communityId: app.activeChainId() || '',
       pinned: !thread.pinned,
     })
       .then(() => {
@@ -255,7 +255,7 @@ export const AdminActions = ({
   };
 
   const handleSnapshotProposalClick = () => {
-    const snapshotSpaces = app.chain.meta?.snapshot;
+    const snapshotSpaces = app.chain.meta?.snapshot_spaces;
     onSnapshotProposalFromThread && onSnapshotProposalFromThread();
     navigate(
       snapshotSpaces?.length > 1
@@ -270,7 +270,7 @@ export const AdminActions = ({
     } else {
       editThread({
         threadId: thread.id,
-        communityId: app.activeChainId(),
+        communityId: app.activeChainId() || '',
         archived: !thread.archivedAt,
         address: user.activeAccount?.address || '',
       })
@@ -372,7 +372,7 @@ export const AdminActions = ({
             ],
             ...(canUpdateThread && (isThreadAuthor || hasAdminPermissions)
               ? [
-                  ...(app.chain?.meta?.snapshot?.length
+                  ...(app.chain?.meta?.snapshot_spaces?.length
                     ? [
                         {
                           label: 'Snapshot proposal from thread',
@@ -389,7 +389,8 @@ export const AdminActions = ({
                           iconLeft: 'democraticProposal' as const,
                           iconLeftWeight: 'bold' as const,
                           onClick: () => {
-                            const snapshotSpaces = app?.chain?.meta?.snapshot;
+                            const snapshotSpaces =
+                              app?.chain?.meta?.snapshot_spaces;
                             // @ts-expect-error StrictNullChecks
                             onSnapshotProposalFromThread();
                             navigate(

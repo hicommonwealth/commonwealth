@@ -45,11 +45,13 @@ const CardsShowcase = () => {
       />
 
       <CWText type="h5">Related Community Card</CWText>
-      <CWRelatedCommunityCard
-        community={community as z.infer<typeof ExtendedCommunity>}
-        memberCount="123"
-        threadCount="456"
-      />
+      {community && (
+        <CWRelatedCommunityCard
+          community={community as z.infer<typeof ExtendedCommunity>}
+          memberCount="123"
+          threadCount="456"
+        />
+      )}
     </>
   );
 };

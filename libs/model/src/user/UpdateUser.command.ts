@@ -34,7 +34,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           },
         })
       )?.toJSON();
-      if (!mustExist('User', user)) return;
+      mustExist('User', user);
 
       const is_welcome_onboard_flow_complete =
         user.is_welcome_onboard_flow_complete || (name && name !== DEFAULT_NAME)

@@ -33,6 +33,7 @@ export const CreateCommunityErrors = {
   InvalidBase: 'Must provide valid chain base',
   MissingNodeUrl: 'Missing node url',
   InvalidNode: 'RPC url returned invalid response. Check your node url',
+  // eslint-disable-next-line max-len
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -275,13 +276,11 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       mustExist('Chain Base', baseCommunity);
 
       const admin_address = await findBaseAdminAddress(actor, payload);
-      if (
-        !mustExist(
-          `User address ${payload.user_address} in ${base} community`,
-          admin_address,
-        )
-      )
-        return;
+
+      mustExist(
+        `User address ${payload.user_address} in ${base} community`,
+        admin_address,
+      );
 
       // == command transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
@@ -324,8 +323,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             active: true,
             chain_node_id: node.id,
             token_name,
-            has_chain_events_listener:
-              network === 'aave' || network === 'compound',
             default_page: DefaultPage.Discussions,
             has_homepage: 'true',
             collapsed_on_homepage: false,

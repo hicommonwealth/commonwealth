@@ -6,8 +6,6 @@ import type { DB } from './factories';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.ProfileTags)
-    .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
-    .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
@@ -59,7 +57,6 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Notification)
     .withMany(db.Webhook)
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
@@ -96,7 +93,6 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.Notification)
     .withMany(db.ThreadVersionHistory);
 
   db.Comment.withMany(db.Reaction, {
@@ -127,10 +123,6 @@ export const buildAssociations = (db: DB) => {
     asMany: 'votes',
     onDelete: 'CASCADE',
   });
-
-  db.NotificationCategory.withMany(db.Subscription, {
-    foreignKey: 'category_id',
-  }).withMany(db.Notification, { foreignKey: 'category_id' });
 
   db.Group.withMany(db.GroupPermission);
 
@@ -201,24 +193,4 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     },
   );
-
-  db.NotificationsRead.withManyToMany(
-    { model: db.Subscription, onDelete: 'CASCADE' },
-    {
-      model: db.Notification,
-      onDelete: 'CASCADE',
-      hooks: true,
-    },
-  );
-
-  // subscriptions
-  db.Subscription.belongsTo(db.Community, {
-    foreignKey: 'community_id',
-  });
-  db.Subscription.belongsTo(db.Thread, {
-    foreignKey: 'thread_id',
-  });
-  db.Subscription.belongsTo(db.Comment, {
-    foreignKey: 'comment_id',
-  });
 };

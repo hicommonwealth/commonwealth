@@ -59,7 +59,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."block_explorer_ids",
                   "Community"."collapsed_on_homepage",
                   "Community"."type",
-                  "Community"."has_chain_events_listener",
                   "Community"."default_summary_view",
                   "Community"."default_page",
                   "Community"."has_homepage",
@@ -87,6 +86,17 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   }
           FROM    "Communities" AS "Community"
           WHERE  "Community"."active" = true
+                      ${
+                        relevance_by === 'membership'
+                          ? `
+                        AND name NOT LIKE '%<%'
+                        AND name NOT LIKE '%>%'
+                        AND name NOT LIKE '%\`%'
+                        AND name NOT LIKE '%"%'
+                        AND name NOT LIKE '%''%'
+                        `
+                          : ''
+                      }
                         ${
                           base
                             ? `

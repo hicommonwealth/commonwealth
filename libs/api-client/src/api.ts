@@ -2196,12 +2196,6 @@ export interface GetCommunity200Response {
   numVotingThreads: number;
   /**
    *
-   * @type {number}
-   * @memberof GetCommunity200Response
-   */
-  numTotalThreads: number;
-  /**
-   *
    * @type {Array<GetCommunity200ResponseAdminsAndModsInner>}
    * @memberof GetCommunity200Response
    */

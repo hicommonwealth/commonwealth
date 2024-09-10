@@ -4,7 +4,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
-import { isCommunityAdmin } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { TopicAttributes } from '../models';
 
@@ -13,11 +13,12 @@ const Errors = {
 };
 
 export function CreateContestManagerMetadata(): Command<
-  typeof schemas.CreateContestManagerMetadata
+  typeof schemas.CreateContestManagerMetadata,
+  AuthContext
 > {
   return {
     ...schemas.CreateContestManagerMetadata,
-    auth: [isCommunityAdmin],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ payload }) => {
       const { id, topic_ids, ...rest } = payload;
 
@@ -64,16 +65,15 @@ export function CreateContestManagerMetadata(): Command<
         },
       );
 
-      if (mustExist('Contest Manager', contestManager)) {
-        return {
-          contest_managers: [
-            {
-              ...contestManager.get({ plain: true }),
-              topics: contestTopics as Required<TopicAttributes>[],
-            },
-          ],
-        };
-      }
+      mustExist('Contest Manager', contestManager);
+      return {
+        contest_managers: [
+          {
+            ...contestManager.get({ plain: true }),
+            topics: contestTopics as Required<TopicAttributes>[],
+          },
+        ],
+      };
     },
   };
 }

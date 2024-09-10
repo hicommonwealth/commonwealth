@@ -70,7 +70,7 @@ export async function handleGovernanceProposalEvents(
   if (users.length) {
     const provider = notificationsProvider();
 
-    return await provider.triggerWorkflow({
+    const res = await provider.triggerWorkflow({
       key: WorkflowKeys.ChainProposals,
       users,
       data: {
@@ -87,6 +87,8 @@ export async function handleGovernanceProposalEvents(
         ),
       },
     });
+
+    return !res.some((r) => r.status === 'rejected');
   }
 
   return true;

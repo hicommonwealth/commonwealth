@@ -1,10 +1,7 @@
 import React, { FC } from 'react';
-
-import ChainInfo from '../../../../../models/ChainInfo';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { CommunityResult } from '../../../../pages/search/helpers';
 import { CommunityLabel } from '../../../community_label';
-
 import './SearchBarCommunityPreviewRow.scss';
 
 interface SearchBarCommunityPreviewRowProps {
@@ -23,14 +20,11 @@ export const SearchBarCommunityPreviewRow: FC<
     onSearchItemClick?.();
   };
 
-  // XXX: only fields used here from ChainInfo are name and iconUrl
-  const communityInfo = ChainInfo.fromJSON(searchResult as any);
-
   return (
     <div className="SearchBarCommunityPreviewRow" onClick={handleClick}>
       <CommunityLabel
-        name={communityInfo.name || ''}
-        iconUrl={communityInfo.iconUrl || ''}
+        name={searchResult.name || ''}
+        iconUrl={searchResult.icon_url || ''}
       />
     </div>
   );

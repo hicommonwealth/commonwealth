@@ -62,13 +62,16 @@ export async function __deleteComment(
     throw new AppError(Errors.NotOwned);
   }
 
-  // find and delete all associated subscriptions
-  await this.models.Subscription.destroy({
-    where: {
-      comment_id: comment.id!,
-    },
-  });
+  await this.models.sequelize.transaction(async (transaction) => {
+    // find and delete all associated subscriptions
+    await this.models.CommentSubscription.destroy({
+      where: {
+        comment_id: comment.id!,
+      },
+      transaction,
+    });
 
-  // actually delete
-  await comment.destroy();
+    // actually delete
+    await comment.destroy({ transaction });
+  });
 }

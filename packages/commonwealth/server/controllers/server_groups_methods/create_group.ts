@@ -107,7 +107,6 @@ export async function __createGroup(
   const createGroupWithTransaction = async (t: Transaction) => {
     const group = await this.models.Group.create(
       {
-        id: 0,
         community_id: community.id,
         metadata,
         requirements,

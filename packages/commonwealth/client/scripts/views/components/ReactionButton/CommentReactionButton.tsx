@@ -1,3 +1,4 @@
+import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import React, { useState } from 'react';
@@ -35,10 +36,11 @@ export const CommentReactionButton = ({
       communityId: app.activeChainId(),
     });
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: deleteCommentReaction } =
     useDeleteCommentReactionMutation({
       commentId: comment.id,
-      communityId: app.activeChainId(),
+      communityId,
       threadId: comment.threadId,
     });
 
@@ -68,7 +70,7 @@ export const CommentReactionButton = ({
         return r.author === activeAddress;
       });
       deleteCommentReaction({
-        communityId: app.activeChainId(),
+        communityId,
         address: user.activeAccount?.address,
         // @ts-expect-error <StrictNullChecks/>
         canvasHash: foundReaction.canvasHash,
@@ -82,12 +84,13 @@ export const CommentReactionButton = ({
         notifyError('Failed to update reaction count');
       });
     } else {
-      createCommentReaction({
+      const input = await buildCreateCommentReactionInput({
         address: activeAddress,
         commentId: comment.id,
-        communityId: app.activeChainId(),
+        communityId,
         threadId: comment.threadId,
-      }).catch((err) => {
+      });
+      createCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
           return;
         }

@@ -3,11 +3,11 @@ import { signThread } from 'controllers/server/sessions';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
-import { trpc } from '../../../utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
-import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import useUserStore from '../../ui/user';
+import { updateCommunityThreadCount } from '../communities/getCommuityById';
 import { addThreadInAllCaches } from './helpers/cache';
 
 interface CreateThreadProps {
@@ -38,9 +38,7 @@ export const buildCreateThreadInput = async ({
     link: url,
     topic: topic.id,
   });
-  const canvas_args = toCanvasSignedDataApiArgs(canvasSignedData);
   return {
-    id: 0,
     community_id: communityId,
     topic_id: topic.id,
     title: encodeURIComponent(title),
@@ -49,14 +47,15 @@ export const buildCreateThreadInput = async ({
     stage,
     url,
     read_only: false,
-    canvas_signed_data: canvas_args?.canvas_signed_data ?? '',
-    canvas_hash: canvas_args?.canvas_hash ?? '',
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
 };
 
 const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
+  const utils = trpc.useUtils();
+
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -69,16 +68,15 @@ const useCreateThreadMutation = ({
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
 
-      // Update community level thread counters variables
-      EXCEPTION_CASE_threadCountersStore.setState(
-        ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
-          totalThreadsInCommunity: totalThreadsInCommunity + 1,
-          totalThreadsInCommunityForVoting:
-            newThread.stage === ThreadStage.Voting
-              ? totalThreadsInCommunityForVoting + 1
-              : totalThreadsInCommunityForVoting,
-        }),
-      );
+      // increment communities thread count
+      if (communityId) {
+        updateCommunityThreadCount(
+          communityId,
+          'increment',
+          newThread.stage === ThreadStage.Voting,
+          utils,
+        );
+      }
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&
