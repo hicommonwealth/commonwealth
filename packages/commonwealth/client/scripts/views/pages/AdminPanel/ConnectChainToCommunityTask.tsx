@@ -97,7 +97,9 @@ const ConnectChainToCommunityTask = () => {
           label: 'Update',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          onClick: update,
+          onClick: () => {
+            update();
+          },
         },
         {
           label: 'Cancel',
