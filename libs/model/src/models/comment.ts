@@ -125,7 +125,8 @@ export function getCommentSearchVector(body: string) {
 
   try {
     decodedBody = decodeURIComponent(body);
-  } catch (e) {}
+    // eslint-disable-next-line no-empty
+  } catch {}
 
   return Sequelize.literal(
     `to_tsvector('english', ${pg.escapeLiteral(decodedBody)})`,

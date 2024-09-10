@@ -175,11 +175,13 @@ export function getThreadSearchVector(title: string, body: string) {
   let decodedBody = body;
   try {
     decodedTitle = decodeURIComponent(title);
-  } catch (e) {}
+    // eslint-disable-next-line no-empty
+  } catch {}
 
   try {
     decodedBody = decodeURIComponent(body);
-  } catch (e) {}
+    // eslint-disable-next-line no-empty
+  } catch {}
   return Sequelize.literal(
     `to_tsvector('english', ${pg.escapeLiteral(decodedTitle)} || ' ' || ${pg.escapeLiteral(decodedBody)})`,
   );

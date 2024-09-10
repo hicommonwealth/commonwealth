@@ -1,4 +1,5 @@
 import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
+import { getThreadSearchVector } from '../../build';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -196,6 +197,10 @@ export const e2eTestEntities = async function (
                   topic_id: -1,
                   kind: 'discussion',
                   plaintext: 'text',
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1}`,
+                    `testThread Body ${-i - 1}`,
+                  ),
                 },
               })
             )[0],
@@ -218,6 +223,10 @@ export const e2eTestEntities = async function (
                   topic_id: -2,
                   kind: 'discussion',
                   plaintext: 'text',
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1 - 2}`,
+                    `testThread Body ${-i - 1 - 2}`,
+                  ),
                 },
               })
             )[0],
