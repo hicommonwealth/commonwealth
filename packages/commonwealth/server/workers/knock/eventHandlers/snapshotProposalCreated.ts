@@ -63,6 +63,7 @@ export const processSnapshotProposalCreated: EventHandler<
     },
   );
 
+  let returnValue = true;
   for (const {
     community_id,
     community_name,
@@ -71,7 +72,7 @@ export const processSnapshotProposalCreated: EventHandler<
   } of communityAlerts) {
     if (users.length) {
       const provider = notificationsProvider();
-      return await provider.triggerWorkflow({
+      const res = await provider.triggerWorkflow({
         key: WorkflowKeys.SnapshotProposals,
         users,
         data: {
@@ -86,8 +87,9 @@ export const processSnapshotProposalCreated: EventHandler<
           ),
         },
       });
+      returnValue = !res.some((r) => r.status === 'rejected');
     }
   }
 
-  return true;
+  return returnValue;
 };

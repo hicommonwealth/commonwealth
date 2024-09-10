@@ -14,3 +14,5 @@ export const DISCORD_BOT_EMAIL = 'discord@common.xyz';
 export const DISCORD_BOT_ADDRESS = '0xdiscordbot';
 
 export const DEFAULT_NAME = 'Anonymous';
+
+export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
