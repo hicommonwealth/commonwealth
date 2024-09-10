@@ -66,7 +66,7 @@ const WVConsent = ({ onStepChange, topicName }: WVConsentProps) => {
             type="button"
             buttonWidth="wide"
             label="Yes"
-            onClick={() => onStepChange(CreateTopicStep.WVDetails)}
+            onClick={() => onStepChange(CreateTopicStep.WVMethodSelection)}
           />
         </section>
       </section>

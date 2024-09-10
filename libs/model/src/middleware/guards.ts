@@ -4,6 +4,8 @@ import {
   InvalidState,
   logger,
 } from '@hicommonwealth/core';
+import { AddressInstance, ThreadInstance } from '../models';
+import { AuthContext } from './authorization';
 
 const log = logger(import.meta);
 
@@ -55,4 +57,42 @@ export function shouldExist<T>(subject: string, state?: T | null) {
 export function mustBeSuperAdmin(actor: Actor) {
   if (!actor.user.isAdmin)
     throw new InvalidActor(actor, 'Must be super administrator');
+}
+
+/**
+ * Address authorization guard
+ * @param auth auth context
+ * @returns narrowed auth context
+ */
+export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
+  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
+  return auth as AuthContext & { address: AddressInstance };
+}
+
+/**
+ * Thread authorization guard
+ * @param auth auth context
+ * @returns narrowed auth context
+ */
+export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
+  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!auth?.thread) throw new InvalidActor(actor, 'Not authorized thread');
+  return auth as AuthContext & {
+    address: AddressInstance;
+    thread: ThreadInstance;
+  };
+}
+
+/**
+ * Comment authorization guard
+ * @param auth auth context
+ * @returns narrowed auth context
+ */
+export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
+  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!auth?.comment) throw new InvalidActor(actor, 'Not authorized comment');
+  return auth as AuthContext & {
+    address: AddressInstance;
+    comment: ThreadInstance;
+  };
 }

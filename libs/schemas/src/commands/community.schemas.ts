@@ -132,8 +132,10 @@ export const GenerateStakeholderGroups = {
   input: z.object({
     id: z.string(),
   }),
-  output: z.object({
-    groups: z.array(Group),
-    created: z.boolean(),
-  }),
+  output: z
+    .object({
+      groups: z.array(Group),
+      created: z.boolean(),
+    })
+    .partial(),
 };
