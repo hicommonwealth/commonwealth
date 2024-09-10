@@ -1,0 +1,103 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - staging
+      - frick
+      - frack
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Check if Docker image exists
+        id: check-image
+        run: |
+          IMAGE_EXISTS=$(aws ecr describe-images \
+            --repository-name commonwealth \
+            --image-ids imageTag=$GITHUB_SHA \
+            --query 'imageDetails[0].imageTags' \
+            --output text 2>/dev/null || echo "false")
+          if [[ "$IMAGE_EXISTS" == "false" ]]; then
+            echo "Image does not exist. Building and uploading"
+            echo "IMAGE_EXISTS=false" >> $GITHUB_ENV
+          else
+            echo "Image exists. Will skip build and upload"
+            echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
+          fi
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        if: env.IMAGE_EXISTS == 'false'
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: commonwealth
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+    env:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+    steps:
+      - name: Set Heroku app name based on branch
+        id: set-heroku-app-name
+        run: |
+          BRANCH_NAME=${GITHUB_REF##*/}
+          case $BRANCH_NAME in
+            frick)
+              APP_NAME="commonwealth-frick"
+              ;;
+            frack)
+              APP_NAME="commonwealth-frack"
+              ;;
+            staging)
+              APP_NAME="commonwealth-beta"
+              ;;
+            demo)
+              APP_NAME="commonwealth-demo"
+              ;;
+            *)
+              echo "Branch $BRANCH_NAME is not configured for deployment."
+              exit 1
+              ;;
+          esac
+          echo "HEROKU_APP_NAME=$APP_NAME" >> $GITHUB_ENV
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.extract_branch.outputs.branch }}
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      - uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          dontuseforce: 1
+          heroku_api_key: ${{secrets.HEROKU_API_TOKEN}}
+          heroku_app_name: ${{ env.HEROKU_APP_NAME }}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          branch: ${{ steps.extract_branch.outputs.branch }}
