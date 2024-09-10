@@ -76,7 +76,7 @@ export const HeaderWithFilters = ({
     useCommunityContests();
 
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
+    id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
     includeNodeInfo: true,
   });
