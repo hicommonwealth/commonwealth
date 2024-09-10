@@ -13,6 +13,10 @@ module.exports = {
       await queryInterface.renameColumn('Threads', '_search', 'search', {
         transaction,
       });
+      await queryInterface.addConstraint('Threads', {
+        allowNull: false,
+        transaction,
+      });
       await queryInterface.sequelize.query(
         `
       DROP TRIGGER IF EXISTS "OffchainComments_vector_update" ON "Comments";
@@ -20,6 +24,10 @@ module.exports = {
         { transaction },
       );
       await queryInterface.renameColumn('Comments', '_search', 'search', {
+        transaction,
+      });
+      await queryInterface.addConstraint('Comments', {
+        allowNull: false,
         transaction,
       });
     });
