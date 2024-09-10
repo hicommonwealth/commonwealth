@@ -95,7 +95,7 @@ export const buildUpdateThreadInput = async ({
     // for editing thread archived status
     ...(archived !== undefined && { archived }),
     // for editing thread topic
-    ...(topicId !== undefined && { topicId }),
+    ...(topicId !== undefined && { topic_id: topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
     ...toCanvasSignedDataApiArgs(canvasSignedData),

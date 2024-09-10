@@ -128,6 +128,11 @@ async function authorizeAddress(
     } else {
       auth.thread = await models.Thread.findOne({
         where: { id: auth.thread_id },
+        include: {
+          model: models.Address,
+          as: 'collaborators',
+          required: false,
+        },
       });
       if (!auth.thread)
         throw new InvalidInput('Must provide a valid thread id');
@@ -232,25 +237,35 @@ export const isSuperAdmin: AuthHandler = async (ctx) => {
  * - **not banned**: Reject if user is banned
  * - **author**: Allow when the user is the creator of the entity
  * - **topic group**: Allow when user has group permissions in topic
+ * - **collaborators**: Allow collaborators
  *
  * @param roles specific community roles - all by default
  * @param action specific group permission action
+ * @param collaborators authorize thread collaborators
  * @throws InvalidActor when not authorized
  */
 export function isAuthorized({
   roles = ['admin', 'moderator', 'member'],
   action,
+  collaborators = false,
 }: {
   roles?: Role[];
   action?: GroupPermissionAction;
+  collaborators?: boolean;
 }): AuthHandler {
   return async (ctx) => {
     if (ctx.actor.user.isAdmin) return;
     const auth = await authorizeAddress(ctx, roles);
+    auth.is_author = auth.address!.id === auth.author_address_id;
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
-    if (auth.author_address_id && auth.address!.id === auth.author_address_id)
-      return; // author
+    if (auth.is_author) return;
     if (action && auth.address!.role === 'member')
       await isTopicMember(ctx.actor, auth, action);
+    if (collaborators) {
+      const found = auth.thread?.collaborators?.find(
+        (a) => a.address === ctx.actor.address,
+      );
+      if (!found) throw new InvalidActor(ctx.actor, 'Not authorized');
+    }
   };
 }

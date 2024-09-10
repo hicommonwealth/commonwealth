@@ -1,25 +1,171 @@
-import { type Command } from '@hicommonwealth/core';
+import {
+  Actor,
+  InvalidActor,
+  InvalidInput,
+  type Command,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Op, QueryTypes, Sequelize } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
-import { mustBeAuthorizedThread } from '../middleware/guards';
+import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import type { ThreadAttributes, ThreadInstance } from '../models/thread';
+import {
+  emitMentions,
+  findMentionDiff,
+  parseUserMentions,
+  quillToPlain,
+  sanitizeQuillText,
+} from '../utils';
 
 export const UpdateThreadErrors = {
-  // ThreadNotFound: 'Thread not found',
-  // BanError: 'Ban error',
-  // NoTitle: 'Must provide title',
-  // NoBody: 'Must provide body',
-  // InvalidLink: 'Invalid thread URL',
-  // ParseMentionsFailed: 'Failed to parse mentions',
-  // Unauthorized: 'Unauthorized',
-  // InvalidStage: 'Please Select a Stage',
-  // FailedToParse: 'Failed to parse custom stages',
-  // InvalidTopic: 'Invalid topic',
-  // MissingCollaborators: 'Failed to find all provided collaborators',
-  // CollaboratorsOverlap:
-  //   'Cannot overlap addresses when adding/removing collaborators',
-  // ContestLock: 'Cannot edit thread that is in a contest',
+  ThreadNotFound: 'Thread not found',
+  InvalidStage: 'Please Select a Stage',
+  MissingCollaborators: 'Failed to find all provided collaborators',
+  CollaboratorsOverlap:
+    'Cannot overlap addresses when adding/removing collaborators',
+  ContestLock: 'Cannot edit thread that is in a contest',
 };
+
+function getContentPatch(
+  thread: ThreadInstance,
+  {
+    title,
+    body,
+    url,
+    canvas_hash,
+    canvas_signed_data,
+  }: z.infer<typeof schemas.UpdateThread.input>,
+) {
+  const patch: Partial<ThreadAttributes> = {};
+
+  typeof title !== 'undefined' && (patch.title = title);
+
+  if (typeof body !== 'undefined' && thread.kind === 'discussion') {
+    patch.body = sanitizeQuillText(body);
+    patch.plaintext = quillToPlain(patch.body);
+  }
+
+  typeof url !== 'undefined' && thread.kind === 'link' && (patch.url = url);
+
+  if (Object.keys(patch).length > 0) {
+    patch.canvas_hash = canvas_hash;
+    patch.canvas_signed_data = canvas_signed_data;
+  }
+  return patch;
+}
+
+async function getCollaboratorsPatch(
+  actor: Actor,
+  auth: AuthContext,
+  { collaborators }: z.infer<typeof schemas.UpdateThread.input>,
+) {
+  const removeSet = new Set(collaborators?.toRemove ?? []);
+  const add = [...new Set(collaborators?.toAdd ?? [])];
+  const remove = [...removeSet];
+  const intersection = add.filter((item) => removeSet.has(item));
+
+  if (intersection.length > 0)
+    throw new InvalidInput(UpdateThreadErrors.CollaboratorsOverlap);
+
+  if (add.length > 0) {
+    const addresses = await models.Address.findAll({
+      where: {
+        community_id: auth.community_id!,
+        id: {
+          [Op.in]: add,
+        },
+      },
+    });
+    if (addresses.length !== add.length)
+      throw new InvalidInput(UpdateThreadErrors.MissingCollaborators);
+  }
+
+  if (add.length > 0 || remove.length > 0) {
+    const authorized = actor.user.isAdmin || auth.is_author;
+    if (!authorized)
+      throw new InvalidActor(actor, 'Must be super admin or author');
+  }
+
+  return { add, remove };
+}
+
+function getAdminOrModeratorPatch(
+  actor: Actor,
+  auth: AuthContext,
+  { pinned, spam }: z.infer<typeof schemas.UpdateThread.input>,
+) {
+  const patch: Partial<ThreadAttributes> = {};
+
+  typeof pinned !== 'undefined' && (patch.pinned = pinned);
+
+  typeof spam !== 'undefined' &&
+    (patch.marked_as_spam_at = spam ? new Date() : null);
+
+  if (Object.keys(patch).length > 0) {
+    const authorized =
+      actor.user.isAdmin || ['admin', 'moderator'].includes(auth.address!.role);
+    if (!authorized)
+      throw new InvalidActor(actor, 'Must be admin or moderator');
+  }
+  return patch;
+}
+
+async function getAdminOrModeratorOrOwnerPatch(
+  actor: Actor,
+  auth: AuthContext,
+  {
+    locked,
+    archived,
+    stage,
+    topic_id,
+  }: z.infer<typeof schemas.UpdateThread.input>,
+) {
+  const patch: Partial<ThreadAttributes> = {};
+
+  if (typeof locked !== 'undefined') {
+    patch.read_only = locked;
+    patch.locked_at = locked ? new Date() : null;
+  }
+
+  typeof archived !== 'undefined' &&
+    (patch.archived_at = archived ? new Date() : null);
+
+  if (typeof stage !== 'undefined') {
+    const community = await models.Community.findByPk(auth.community_id!);
+    mustExist('Community', community);
+
+    const custom_stages =
+      community.custom_stages.length > 0
+        ? community.custom_stages
+        : ['discussion', 'proposal_in_review', 'voting', 'passed', 'failed'];
+
+    if (!custom_stages.includes(stage))
+      throw new InvalidInput(UpdateThreadErrors.InvalidStage);
+
+    patch.stage = stage;
+  }
+
+  if (typeof topic_id !== 'undefined') {
+    const topic = await models.Topic.findOne({
+      where: { id: topic_id, community_id: auth.community_id! },
+    });
+    mustExist('Topic', topic);
+
+    patch.topic_id = topic_id;
+  }
+
+  if (Object.keys(patch).length > 0) {
+    const authorized =
+      actor.user.isAdmin ||
+      ['admin', 'moderator'].includes(auth.address!.role) ||
+      auth.is_author;
+    if (!authorized)
+      throw new InvalidActor(actor, 'Must be admin, moderator, or author');
+  }
+  return patch;
+}
 
 export function UpdateThread(): Command<
   typeof schemas.UpdateThread,
@@ -27,727 +173,211 @@ export function UpdateThread(): Command<
 > {
   return {
     ...schemas.UpdateThread,
-    auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
-      //verifyThreadSignature,
-    ],
+    auth: [isAuthorized({ collaborators: true })],
     body: async ({ actor, payload, auth }) => {
-      const { thread } = mustBeAuthorizedThread(actor, auth);
+      const { address } = mustBeAuthorized(actor, auth);
+      const { thread_id, discord_meta } = payload;
 
-      //const body = sanitizeQuillText(payload.body);
-      //const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
-      //const mentions = uniqueMentions(parseUserMentions(body));
+      // find by thread_id or discord_meta
+      const thread = await models.Thread.findOne({
+        where: thread_id ? { id: thread_id } : { discord_meta },
+      });
+      if (!thread) throw new InvalidInput(UpdateThreadErrors.ThreadNotFound);
+
+      const content = getContentPatch(thread, payload);
+      const adminPatch = getAdminOrModeratorPatch(actor, auth!, payload);
+      const ownerPatch = await getAdminOrModeratorOrOwnerPatch(
+        actor,
+        auth!,
+        payload,
+      );
+      const collaboratorsPatch = await getCollaboratorsPatch(
+        actor,
+        auth!,
+        payload,
+      );
+
+      console.log({
+        content,
+        adminPatch,
+        ownerPatch,
+      });
+
+      // check if patch violates contest locks
+      if (
+        Object.keys(content).length > 0 ||
+        ownerPatch.topic_id ||
+        collaboratorsPatch.add.length > 0 ||
+        collaboratorsPatch.remove.length > 0
+      ) {
+        const contestManagers = await models.sequelize.query(
+          `
+SELECT cm.contest_address FROM "Threads" t
+JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
+JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
+WHERE t.id = :thread_id
+`,
+          {
+            type: QueryTypes.SELECT,
+            replacements: {
+              thread_id: thread!.id,
+            },
+          },
+        );
+        if (contestManagers.length > 0)
+          throw new InvalidInput(UpdateThreadErrors.ContestLock);
+      }
 
       // == mutation transaction boundary ==
-      await models.sequelize.transaction(async (transaction) => {});
-      // == end of transaction boundary ==
-
-      return thread!.toJSON();
-    },
-  };
-}
-
-/*
-import { AppError, ServerError } from '@hicommonwealth/core';
-import {
-  AddressInstance,
-  CommentAttributes,
-  CommunityInstance,
-  DB,
-  ThreadAttributes,
-  ThreadInstance,
-  UserInstance,
-  emitMentions,
-  findMentionDiff,
-  parseUserMentions,
-} from '@hicommonwealth/model';
-import { renderQuillDeltaToText } from '@hicommonwealth/shared';
-import _ from 'lodash';
-import {
-  Op,
-  QueryTypes,
-  Sequelize,
-  Transaction,
-  WhereOptions,
-} from 'sequelize';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { validURL } from '../../../shared/utils';
-import { findAllRoles } from '../../util/roles';
-import { TrackOptions } from '../server_analytics_controller';
-import { ServerThreadsController } from '../server_threads_controller';
-
-export async function __updateThread(
-  this: ServerThreadsController,
-  {
-    user,
-    address,
-    threadId,
-    title,
-    body,
-    stage,
-    url,
-    locked,
-    pinned,
-    archived,
-    spam,
-    topicId,
-    collaborators,
-    canvasHash,
-    canvasSignedData,
-    discordMeta,
-  }: UpdateThreadOptions,
-): Promise<UpdateThreadResult> {
-  // Discobot handling
-
-  const threadWhere: WhereOptions<ThreadAttributes> = {};
-  if (threadId) {
-    threadWhere.id = threadId;
-  }
-  if (discordMeta) {
-    threadWhere.discord_meta = discordMeta;
-  }
-
-  const thread = await this.models.Thread.findOne({
-    where: threadWhere,
-    include: {
-      model: this.models.Address,
-      as: 'collaborators',
-      required: false,
-    },
-  });
-
-  if (!thread) {
-    throw new AppError(Errors.ThreadNotFound);
-  }
-
-  // check if thread is part of a contest topic
-  const contestManagers = await this.models.sequelize.query(
-    `
-    SELECT cm.contest_address FROM "Threads" t
-    JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
-    JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
-    WHERE t.id = :thread_id
-  `,
-    {
-      type: QueryTypes.SELECT,
-      replacements: {
-        thread_id: thread!.id,
-      },
-    },
-  );
-  const isContestThread = contestManagers.length > 0;
-
-  if (address.is_banned) throw new AppError('Banned User');
-
-  // get various permissions
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  const roles = await findAllRoles(
-    this.models,
-    // @ts-expect-error StrictNullChecks
-    { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    thread.community_id,
-    ['moderator', 'admin'],
-  );
-
-  const isCollaborator = !!thread.collaborators?.find(
-    (a) => a.address === address.address,
-  );
-  const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
-  const isMod = !!roles.find(
-    (r) =>
-      r.community_id === thread.community_id && r.permission === 'moderator',
-  );
-  const isAdmin = !!roles.find(
-    (r) => r.community_id === thread.community_id && r.permission === 'admin',
-  );
-  const isSuperAdmin = user.isAdmin ?? false;
-  if (
-    !isThreadOwner &&
-    !isMod &&
-    !isAdmin &&
-    !isSuperAdmin &&
-    !isCollaborator
-  ) {
-    throw new AppError(Errors.Unauthorized);
-  }
-
-  // build analytics
-  const allAnalyticsOptions: TrackOptions[] = [];
-
-  const community = await this.models.Community.findByPk(thread.community_id);
-
-  //  patch thread properties
-  const transaction = await this.models.sequelize.transaction();
-
-  try {
-    const toUpdate: Partial<ThreadAttributes> = {};
-
-    const permissions = {
-      isThreadOwner,
-      isMod,
-      isAdmin,
-      isSuperAdmin,
-      isCollaborator,
-    };
-
-    await setThreadAttributes(
-      permissions,
-      thread,
-      {
-        title,
-        body,
-        url,
-        canvasHash,
-        canvasSignedData,
-      },
-      isContestThread,
-      toUpdate,
-    );
-
-    await setThreadPinned(permissions, pinned, toUpdate);
-
-    await setThreadSpam(permissions, spam, toUpdate);
-
-    await setThreadLocked(permissions, locked, toUpdate);
-
-    await setThreadArchived(permissions, archived, toUpdate);
-
-    await setThreadStage(
-      permissions,
-      stage,
-      community!,
-      allAnalyticsOptions,
-      toUpdate,
-    );
-
-    await setThreadTopic(
-      permissions,
-      community!,
-      topicId!,
-      this.models,
-      isContestThread,
-      toUpdate,
-    );
-
-    await thread.update(
-      {
-        ...toUpdate,
-        last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
-      },
-      { transaction },
-    );
-
-    const latestVersionHistory = await this.models.ThreadVersionHistory.findOne(
-      {
-        where: {
-          thread_id: thread.id,
-        },
-        order: [['timestamp', 'DESC']],
-        transaction,
-      },
-    );
-
-    // if the modification was different from the original body, create a version history for it
-    if (body && latestVersionHistory?.body !== body) {
-      await this.models.ThreadVersionHistory.create(
-        {
-          thread_id: threadId!,
-          address: address.address,
-          body,
-          timestamp: new Date(),
-        },
-        {
-          transaction,
-        },
-      );
-    }
-
-    await updateThreadCollaborators(
-      permissions,
-      thread,
-      collaborators,
-      isContestThread,
-      this.models,
-      transaction,
-    );
-
-    const previousDraftMentions = parseUserMentions(latestVersionHistory?.body);
-    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-
-    const mentions = findMentionDiff(
-      previousDraftMentions,
-      currentDraftMentions,
-    );
-
-    await emitMentions(this.models, transaction, {
-      authorAddressId: address.id!,
-      authorUserId: user.id!,
-      authorAddress: address.address,
-      mentions,
-      thread,
-      community_id: thread.community_id,
-    });
-
-    await transaction.commit();
-  } catch (err) {
-    console.error(err);
-    await transaction.rollback();
-    if (err instanceof AppError || err instanceof ServerError) {
-      throw err;
-    }
-    throw new ServerError(`transaction failed: ${err.message}`);
-  }
-
-  // ---
-
-  address
-    .update({
-      last_active: Sequelize.literal('CURRENT_TIMESTAMP'),
-    })
-    .catch(console.error);
-
-  const finalThread = await this.models.Thread.findOne({
-    where: { id: thread.id },
-    include: [
-      {
-        model: this.models.Address,
-        as: 'Address',
-        include: [
+      await models.sequelize.transaction(async (transaction) => {
+        await thread.update(
           {
-            model: this.models.User,
-            as: 'User',
-            required: true,
-            attributes: ['id', 'profile'],
+            ...content,
+            ...adminPatch,
+            ...ownerPatch,
+            last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
           },
-        ],
-      },
-      {
-        model: this.models.Address,
-        as: 'collaborators',
-        include: [
-          {
-            model: this.models.User,
-            as: 'User',
-            required: true,
-            attributes: ['id', 'profile'],
-          },
-        ],
-      },
-      { model: this.models.Topic, as: 'topic' },
-      {
-        model: this.models.Reaction,
-        as: 'reactions',
-        include: [
-          {
-            model: this.models.Address,
-            as: 'Address',
-            required: true,
-            include: [
-              {
-                model: this.models.User,
-                as: 'User',
-                required: true,
-                attributes: ['id', 'profile'],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        model: this.models.Comment,
-        limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
-        order: [['created_at', 'DESC']],
-        attributes: [
-          'id',
-          'address_id',
-          'text',
-          ['plaintext', 'plainText'],
-          'created_at',
-          'updated_at',
-          'deleted_at',
-          'marked_as_spam_at',
-          'discord_meta',
-        ],
-        include: [
-          {
-            model: this.models.Address,
-            attributes: ['address'],
-            include: [
-              {
-                model: this.models.User,
-                attributes: ['profile'],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        model: this.models.ThreadVersionHistory,
-      },
-    ],
-  });
+          { transaction },
+        );
 
-  const updatedThreadWithComments = {
-    // @ts-expect-error StrictNullChecks
-    ...finalThread.toJSON(),
-  } as ThreadAttributes & {
-    Comments?: CommentAttributes[];
-    recentComments?: CommentAttributes[];
-  };
-  updatedThreadWithComments.recentComments = (
-    updatedThreadWithComments.Comments || []
-  ).map((c) => {
-    const temp = {
-      ...c,
-      address: c?.Address?.address || '',
-    };
-
-    if (temp.Address) delete temp.Address;
-
-    return temp;
-  });
-
-  delete updatedThreadWithComments.Comments;
-
-  return [updatedThreadWithComments, allAnalyticsOptions];
-}
-
-// -----
-
-export type UpdateThreadPermissions = {
-  isThreadOwner: boolean;
-  isMod: boolean;
-  isAdmin: boolean;
-  isSuperAdmin: boolean;
-  isCollaborator: boolean;
-};
-
- 
-export function validatePermissions(
-  permissions: UpdateThreadPermissions,
-  flags: Partial<UpdateThreadPermissions>,
-) {
-  const keys = [
-    'isThreadOwner',
-    'isMod',
-    'isAdmin',
-    'isSuperAdmin',
-    'isCollaborator',
-  ];
-  for (const k of keys) {
-    if (flags[k] && permissions[k]) {
-      // at least one flag is satisfied
-      return;
-    }
-  }
-  // no flags were satisfied
-  throw new AppError(Errors.Unauthorized);
-}
-
-export type UpdatableThreadAttributes = {
-  title?: string;
-  body?: string;
-  url?: string;
-  canvasSignedData?: string;
-  canvasHash?: string;
-};
-
-async function setThreadAttributes(
-  permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
-  { title, body, url, canvasSignedData, canvasHash }: UpdatableThreadAttributes,
-  isContestThread: boolean,
-  toUpdate: Partial<ThreadAttributes>,
-) {
-  if (
-    typeof title !== 'undefined' ||
-    typeof body !== 'undefined' ||
-    typeof url !== 'undefined'
-  ) {
-    if (isContestThread) {
-      throw new AppError(Errors.ContestLock);
-    }
-    validatePermissions(permissions, {
-      isThreadOwner: true,
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-      isCollaborator: true,
-    });
-
-    // title
-    if (typeof title !== 'undefined') {
-      if (!title) {
-        throw new AppError(Errors.NoTitle);
-      }
-      toUpdate.title = title;
-    }
-
-    // body
-    if (typeof body !== 'undefined') {
-      if (thread.kind === 'discussion' && (!body || !body.trim())) {
-        throw new AppError(Errors.NoBody);
-      }
-      toUpdate.body = body;
-      toUpdate.plaintext = (() => {
-        try {
-          return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
-        } catch (e) {
-          return decodeURIComponent(body);
-        }
-      })();
-    }
-
-    // url
-    if (typeof url !== 'undefined' && thread.kind === 'link') {
-      if (!validURL(url)) {
-        throw new AppError(Errors.InvalidLink);
-      }
-      toUpdate.url = url;
-    }
-
-    toUpdate.canvas_signed_data = canvasSignedData;
-    toUpdate.canvas_hash = canvasHash;
-  }
-}
-
- 
-async function setThreadPinned(
-  permissions: UpdateThreadPermissions,
-  pinned: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>,
-) {
-  if (typeof pinned !== 'undefined') {
-    validatePermissions(permissions, {
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-    });
-
-    toUpdate.pinned = pinned;
-  }
-}
-
- 
-async function setThreadLocked(
-  permissions: UpdateThreadPermissions,
-  locked: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>,
-) {
-  if (typeof locked !== 'undefined') {
-    validatePermissions(permissions, {
-      isThreadOwner: true,
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-    });
-
-    toUpdate.read_only = locked;
-    toUpdate.locked_at = locked
-      ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
-      : null;
-  }
-}
-
- 
-async function setThreadArchived(
-  permissions: UpdateThreadPermissions,
-  archive: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>,
-) {
-  if (typeof archive !== 'undefined') {
-    validatePermissions(permissions, {
-      isThreadOwner: true,
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-    });
-
-    toUpdate.archived_at = archive
-      ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
-      : null;
-  }
-}
-
- 
-async function setThreadSpam(
-  permissions: UpdateThreadPermissions,
-  spam: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>,
-) {
-  if (typeof spam !== 'undefined') {
-    validatePermissions(permissions, {
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-    });
-
-    toUpdate.marked_as_spam_at = spam
-      ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
-      : null;
-  }
-}
-
- 
-async function setThreadStage(
-  permissions: UpdateThreadPermissions,
-  stage: string | undefined,
-  community: CommunityInstance,
-  allAnalyticsOptions: TrackOptions[],
-  toUpdate: Partial<ThreadAttributes>,
-) {
-  if (typeof stage !== 'undefined') {
-    validatePermissions(permissions, {
-      isThreadOwner: true,
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-    });
-
-    // fetch available stages
-    let customStages = [];
-    try {
-      const communityStages = community.custom_stages;
-      if (Array.isArray(communityStages)) {
-        customStages = Array.from(communityStages)
-          .map((s) => s.toString())
-          .filter((s) => s);
-      }
-      if (customStages.length === 0) {
-        customStages = [
-          'discussion',
-          'proposal_in_review',
-          'voting',
-          'passed',
-          'failed',
-        ];
-      }
-    } catch (e) {
-      throw new AppError(Errors.FailedToParse);
-    }
-
-    // validate stage
-    if (!customStages.includes(stage)) {
-      throw new AppError(Errors.InvalidStage);
-    }
-
-    toUpdate.stage = stage;
-
-    allAnalyticsOptions.push({
-      event: MixpanelCommunityInteractionEvent.UPDATE_STAGE,
-    });
-  }
-}
-
- 
-async function setThreadTopic(
-  permissions: UpdateThreadPermissions,
-  community: CommunityInstance,
-  topicId: number,
-  models: DB,
-  isContestThread: boolean,
-  toUpdate: Partial<ThreadAttributes>,
-) {
-  if (typeof topicId !== 'undefined') {
-    if (isContestThread) {
-      throw new AppError(Errors.ContestLock);
-    }
-    validatePermissions(permissions, {
-      isThreadOwner: true,
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-    });
-    const topic = await models.Topic.findOne({
-      where: {
-        id: topicId,
-        community_id: community.id,
-      },
-    });
-
-    if (!topic) {
-      throw new AppError(Errors.InvalidTopic);
-    }
-    toUpdate.topic_id = topic.id;
-  }
-}
-
- 
-async function updateThreadCollaborators(
-  permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
-  collaborators:
-    | {
-        toAdd?: number[];
-        toRemove?: number[];
-      }
-    | undefined,
-  isContestThread: boolean,
-  models: DB,
-  transaction: Transaction,
-) {
-  const { toAdd, toRemove } = collaborators || {};
-  if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
-    if (isContestThread) {
-      throw new AppError(Errors.ContestLock);
-    }
-
-    validatePermissions(permissions, {
-      isThreadOwner: true,
-      isSuperAdmin: true,
-    });
-
-    const toAddUnique = _.uniq(toAdd || []);
-    const toRemoveUnique = _.uniq(toRemove || []);
-
-    // check for overlap between toAdd and toRemove
-    for (const r of toRemoveUnique) {
-      if (toAddUnique.includes(r)) {
-        throw new AppError(Errors.CollaboratorsOverlap);
-      }
-    }
-
-    // add collaborators
-    if (toAddUnique.length > 0) {
-      const collaboratorAddresses = await models.Address.findAll({
-        where: {
-          community_id: thread.community_id,
-          id: {
-            [Op.in]: toAddUnique,
-          },
-        },
-      });
-      if (collaboratorAddresses.length !== toAddUnique.length) {
-        throw new AppError(Errors.MissingCollaborators);
-      }
-      await Promise.all(
-        collaboratorAddresses.map(async (address) => {
-          return models.Collaboration.findOrCreate({
+        if (collaboratorsPatch.add.length > 0)
+          await models.Collaboration.bulkCreate(
+            collaboratorsPatch.add.map((address_id) => ({
+              address_id,
+              thread_id,
+            })),
+            { transaction },
+          );
+        if (collaboratorsPatch.remove.length > 0) {
+          await models.Collaboration.destroy({
             where: {
-              thread_id: thread.id,
-              address_id: address.id,
+              thread_id,
+              address_id: {
+                [Op.in]: collaboratorsPatch.remove,
+              },
             },
             transaction,
           });
-        }),
-      );
-    }
+        }
 
-    // remove collaborators
-    if (toRemoveUnique.length > 0) {
-      await models.Collaboration.destroy({
-        where: {
-          thread_id: thread.id,
-          address_id: {
-            [Op.in]: toRemoveUnique,
-          },
-        },
-        transaction,
+        // TODO: we can encapsulate address activity in authorization middleware
+        address.last_active = new Date();
+        await address.save({ transaction });
+
+        if (content.body) {
+          const currentVersion = await models.ThreadVersionHistory.findOne({
+            where: { thread_id },
+            order: [['timestamp', 'DESC']],
+            transaction,
+          });
+          // if the modification was different from the original body, create a version history for it
+          if (currentVersion?.body !== content.body) {
+            await models.ThreadVersionHistory.create(
+              {
+                thread_id,
+                address: address.address,
+                body: content.body,
+                timestamp: new Date(),
+              },
+              { transaction },
+            );
+            const mentions = findMentionDiff(
+              parseUserMentions(currentVersion?.body),
+              parseUserMentions(decodeURIComponent(content.body)),
+            );
+            mentions &&
+              (await emitMentions(models, transaction, {
+                authorAddressId: address.id!,
+                authorUserId: actor.user.id!,
+                authorAddress: address.address,
+                mentions,
+                thread,
+                community_id: thread.community_id,
+              }));
+          }
+        }
       });
-    }
-  }
-}
+      // == end of transaction boundary ==
 
-*/
+      // TODO: should we make a query out of this, or do we have one already?
+      return (
+        await models.Thread.findOne({
+          where: { id: thread_id },
+          include: [
+            {
+              model: models.Address,
+              as: 'Address',
+              include: [
+                {
+                  model: models.User,
+                  required: true,
+                  attributes: ['id', 'profile'],
+                },
+              ],
+            },
+            {
+              model: models.Address,
+              as: 'collaborators',
+              include: [
+                {
+                  model: models.User,
+                  required: true,
+                  attributes: ['id', 'profile'],
+                },
+              ],
+            },
+            { model: models.Topic, as: 'topic' },
+            {
+              model: models.Reaction,
+              as: 'reactions',
+              include: [
+                {
+                  model: models.Address,
+                  required: true,
+                  include: [
+                    {
+                      model: models.User,
+                      required: true,
+                      attributes: ['id', 'profile'],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              model: models.Comment,
+              limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
+              order: [['created_at', 'DESC']],
+              attributes: [
+                'id',
+                'address_id',
+                'text',
+                ['plaintext', 'plainText'],
+                'created_at',
+                'updated_at',
+                'deleted_at',
+                'marked_as_spam_at',
+                'discord_meta',
+              ],
+              include: [
+                {
+                  model: models.Address,
+                  attributes: ['address'],
+                  include: [
+                    {
+                      model: models.User,
+                      attributes: ['profile'],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              model: models.ThreadVersionHistory,
+            },
+          ],
+        })
+      )?.toJSON();
+    },
+  };
+}

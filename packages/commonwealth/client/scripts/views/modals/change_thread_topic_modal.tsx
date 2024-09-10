@@ -50,7 +50,7 @@ export const ChangeThreadTopicModal = ({
   const handleSaveChanges = async () => {
     try {
       const input = await buildUpdateThreadInput({
-        communityId: app.activeChainId(),
+        communityId: app.activeChainId() || '',
         address: user.activeAccount?.address || '',
         threadId: thread.id,
         topicId: activeTopic.id,
