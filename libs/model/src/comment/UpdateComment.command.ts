@@ -4,11 +4,11 @@ import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustBeAuthorized } from '../middleware/guards';
 import {
+  decodeContent,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
   quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
 
@@ -37,7 +37,7 @@ export function UpdateComment(): Command<
       });
 
       if (currentVersion?.text !== payload.text) {
-        const text = sanitizeQuillText(payload.text);
+        const text = decodeContent(payload.text);
         const plaintext = quillToPlain(text);
         const mentions = findMentionDiff(
           parseUserMentions(currentVersion?.text),

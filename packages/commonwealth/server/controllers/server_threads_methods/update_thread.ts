@@ -7,6 +7,7 @@ import {
   ThreadAttributes,
   ThreadInstance,
   UserInstance,
+  decodeContent,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
@@ -246,7 +247,7 @@ export async function __updateThread(
         {
           thread_id: threadId!,
           address: address.address,
-          body,
+          body: decodeContent(body),
           timestamp: new Date(),
         },
         {
@@ -487,12 +488,12 @@ async function setThreadAttributes(
       if (thread.kind === 'discussion' && (!body || !body.trim())) {
         throw new AppError(Errors.NoBody);
       }
-      toUpdate.body = body;
+      toUpdate.body = decodeContent(body);
       toUpdate.plaintext = (() => {
         try {
-          return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
+          return renderQuillDeltaToText(JSON.parse(body));
         } catch (e) {
-          return decodeURIComponent(body);
+          return body;
         }
       })();
     }
