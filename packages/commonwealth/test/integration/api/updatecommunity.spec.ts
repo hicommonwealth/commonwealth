@@ -27,7 +27,6 @@ async function update(
 
 describe('Update Community/Chain Tests', () => {
   let jwtToken;
-  let siteAdminJwt;
   let loggedInAddr;
   const chain = 'ethereum';
 
@@ -62,10 +61,6 @@ describe('Update Community/Chain Tests', () => {
       user_id: +siteAdminResult.user_id,
     });
     expect(siteAdminSetSuccessfully).to.be.true;
-    siteAdminJwt = jwt.sign(
-      { id: siteAdminResult.user_id, email: siteAdminResult.email },
-      config.AUTH.JWT_SECRET,
-    );
 
     // create community for test
     const communityArgs: CommunityArgs = {
