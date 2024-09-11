@@ -27,7 +27,7 @@ import {
 } from '../../../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../../../../hooks/useBrowserAnalyticsTrack';
-import './BasicInformationForm.scss';
+import './CommunityInformationForm.scss';
 import {
   BASE_ID,
   BLAST_ID,
@@ -36,19 +36,19 @@ import {
   POLYGON_ETH_CHAIN_ID,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
-import { BasicInformationFormProps, FormSubmitValues } from './types';
+import { CommunityInformationFormProps, FormSubmitValues } from './types';
 import useSocialLinks from './useSocialLinks';
-import { basicInformationFormValidationSchema } from './validation';
+import { communityInformationFormValidationSchema } from './validation';
 
 const socialLinksDisplay = false; // TODO: Set this when design figures out how we will integrate the social links
 
-const BasicInformationForm = ({
+const CommunityInformationForm = ({
   selectedAddress,
   selectedCommunity,
   onSubmit,
   onCancel,
   handleSelectedChainId,
-}: BasicInformationFormProps) => {
+}: CommunityInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
@@ -206,9 +206,9 @@ const BasicInformationForm = ({
 
   return (
     <CWForm
-      validationSchema={basicInformationFormValidationSchema}
+      validationSchema={communityInformationFormValidationSchema}
       onSubmit={handleSubmit}
-      className="BasicInformationForm"
+      className="CommunityInformationForm"
       initialValues={getInitialValue()}
       onWatch={handleWatchForm}
     >
@@ -297,12 +297,16 @@ const BasicInformationForm = ({
                     )
                   }
                   onBlur={() =>
-                    // @ts-expect-error StrictNullChecks
-                    updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+                    updateAndValidateSocialLinkAtIndex(
+                      socialLink.value || '',
+                      index,
+                    )
                   }
                   onFocus={() =>
-                    // @ts-expect-error StrictNullChecks
-                    updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+                    updateAndValidateSocialLinkAtIndex(
+                      socialLink.value || '',
+                      index,
+                    )
                   }
                 />
                 <CWIconButton
@@ -342,4 +346,4 @@ const BasicInformationForm = ({
   );
 };
 
-export default BasicInformationForm;
+export default CommunityInformationForm;

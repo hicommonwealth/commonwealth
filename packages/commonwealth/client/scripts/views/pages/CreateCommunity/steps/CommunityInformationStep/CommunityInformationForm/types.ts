@@ -17,7 +17,7 @@ export type FormSubmitValues = {
   links?: string[];
 };
 
-export type BasicInformationFormProps = {
+export type CommunityInformationFormProps = {
   selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   onSubmit: (communityId: string, communityName: string) => any;

@@ -1,7 +1,7 @@
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { useState } from 'react';
-import { SocialLinkField } from 'views/pages/CreateCommunity/steps/BasicInformationStep/BasicInformationForm/types';
 import { ZodError } from 'zod';
+import { SocialLinkField } from './types';
 
 const useSocialLinks = () => {
   const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([

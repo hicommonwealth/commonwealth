@@ -4,11 +4,11 @@ import AddressInfo from 'models/AddressInfo';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
-import BasicInformationForm from './BasicInformationForm/BasicInformationForm';
+import CommunityInformationForm from './CommunityInformationForm/CommunityInformationForm';
 
-import './BasicInformationStep.scss';
+import './CommunityInformationStep.scss';
 
-interface BasicInformationStepProps {
+interface CommunityInformationStepProps {
   selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
@@ -16,19 +16,19 @@ interface BasicInformationStepProps {
   handleSelectedChainId: (chainId: string) => void;
 }
 
-const BasicInformationStep = ({
+const CommunityInformationStep = ({
   selectedAddress,
   selectedCommunity,
   handleGoBack,
   handleContinue,
   handleSelectedChainId,
-}: BasicInformationStepProps) => {
+}: CommunityInformationStepProps) => {
   return (
-    <div className="BasicInformationStep">
+    <div className="CommunityInformationStep">
       <section className="header">
         <CWText type="h2">Tell us about your community</CWText>
         <CWText type="b1" className="description">
-          Let’s start with some basic information about your community
+          Let’s start with some Community information about your community
         </CWText>
       </section>
 
@@ -38,7 +38,7 @@ const BasicInformationStep = ({
         If you’re not sure what to choose you can select the Ethereum Mainnet."
       />
 
-      <BasicInformationForm
+      <CommunityInformationForm
         selectedAddress={selectedAddress}
         selectedCommunity={selectedCommunity}
         onSubmit={handleContinue}
@@ -49,4 +49,4 @@ const BasicInformationStep = ({
   );
 };
 
-export default BasicInformationStep;
+export default CommunityInformationStep;
