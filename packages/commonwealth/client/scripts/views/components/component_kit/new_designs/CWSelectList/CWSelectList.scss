@@ -7,14 +7,17 @@
 
   .SelectList {
     @include inputStyles;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 14px;
     line-height: 20px;
     border: 1px solid $neutral-200 !important;
     border-radius: $border-radius-corners-wider;
-    min-height: 40px;
-    max-height: 40px;
+    min-height: 24px;
+    max-height: 24px;
     padding: 10px 16px;
-
+    margin: 15px;
     &.isMulti {
       max-height: initial !important;
     }
