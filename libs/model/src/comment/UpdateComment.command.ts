@@ -56,10 +56,6 @@ export function UpdateComment(): Command<
             { transaction },
           );
 
-          // update timestamps
-          address.last_active = new Date();
-          await address.save({ transaction });
-
           mentions.length &&
             (await emitMentions(models, transaction, {
               authorAddressId: address.id!,

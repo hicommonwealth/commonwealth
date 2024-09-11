@@ -153,6 +153,11 @@ async function authorizeAddress(
   });
   if (!auth.address)
     throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+  // fire and forget address activity tracking
+  auth.address.last_active = new Date();
+  void auth.address.save();
+
   return auth;
 }
 
