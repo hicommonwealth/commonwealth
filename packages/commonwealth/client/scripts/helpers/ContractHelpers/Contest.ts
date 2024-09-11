@@ -201,7 +201,7 @@ class Contest extends ContractBase {
 
   async getContestBalance(): Promise<number> {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(false);
     }
     this.reInitContract();
     const tokenAddress = await this.contract.methods.contestToken().call();

@@ -56,7 +56,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return app.chain?.meta?.node?.ethChainId?.toString() || '1';
+    return app.chain?.meta?.ChainNode?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -144,7 +144,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         if (switchError.code === 4902) {
           const wsRpcUrl = app.chain?.meta?.node?.url ?? '';
           const rpcUrl =
-            app.chain?.meta?.node?.altWalletUrl ?? wsRpcUrl
+            (app.chain?.meta?.node?.altWalletUrl ?? wsRpcUrl)
               ? new URL(wsRpcUrl).host
               : '';
 
