@@ -7,8 +7,13 @@ import * as comment from './comment';
 import * as community from './community';
 import * as thread from './threads';
 
-const { createCommunity, getCommunities, getCommunity, getMembers } =
-  community.trpcRouter;
+const {
+  createCommunity,
+  updateCommunity,
+  getCommunities,
+  getCommunity,
+  getMembers,
+} = community.trpcRouter;
 const { createThread, createThreadReaction } = thread.trpcRouter;
 const { createComment, createCommentReaction, updateComment, getComments } =
   comment.trpcRouter;
@@ -16,6 +21,7 @@ const { createComment, createCommentReaction, updateComment, getComments } =
 
 const api = {
   createCommunity,
+  updateCommunity,
   getCommunities,
   getCommunity,
   getMembers,

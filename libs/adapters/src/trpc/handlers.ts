@@ -26,7 +26,7 @@ const trpcerror = (error: unknown): TRPCError => {
       default:
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message,
+          message: `[${name}] ${message}`,
           cause: error,
         });
     }
@@ -51,7 +51,7 @@ export const command = <
 >(
   factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
-  track?: Track<Output>,
+  track?: Track<Input, Output>,
 ) => {
   const md = factory();
   return buildproc('POST', factory.name, md, tag, track).mutation(
