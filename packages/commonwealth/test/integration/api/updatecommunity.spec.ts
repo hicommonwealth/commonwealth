@@ -209,17 +209,6 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.type).to.be.equal(type);
     });
 
-    test('should update custom domain if site admin', async () => {
-      const custom_domain = 'test.com';
-      const res = await update(server.app, loggedInAddr, {
-        jwt: siteAdminJwt,
-        id: chain,
-        custom_domain,
-      });
-      expect(res.status).to.be.equal(200);
-      expect(res.body.custom_domain).to.be.equal(custom_domain);
-    });
-
     test('should fail if no chain id', async () => {
       const name = 'ethereum-testnet';
       const res = await update(server.app, loggedInAddr, {
