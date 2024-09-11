@@ -1,11 +1,11 @@
 import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { deltaToMarkdown } from 'quill-delta-to-markdown';
-import { LOCK, Op, QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 
 const log = logger(import.meta);
-const THREAD_BATCH_SIZE = 1_000;
-const queryCase = 'WHEN id = ? THEN ?';
+const BATCH_SIZE = 10;
+const queryCase = 'WHEN id = ? THEN ? ';
 
 function decodeContent(content: string) {
   // decode if URI encoded
@@ -29,7 +29,7 @@ function decodeContent(content: string) {
     rawMarkdown = decodedContent;
   }
 
-  return rawMarkdown;
+  return rawMarkdown.trim();
 }
 
 async function decodeThreads(lastId: number = 0) {
@@ -45,8 +45,8 @@ async function decodeThreads(lastId: number = 0) {
           },
         },
         order: [['id', 'ASC']],
-        limit: THREAD_BATCH_SIZE,
-        lock: LOCK.UPDATE,
+        limit: BATCH_SIZE,
+        lock: transaction.LOCK.UPDATE,
         transaction,
       });
       if (threads.length === 0) {
@@ -62,10 +62,6 @@ async function decodeThreads(lastId: number = 0) {
       const bodyReplacements: (number | string)[] = [];
       const threadIds: number[] = [];
       for (const { id, title, body } of threads) {
-        if (titleReplacements.length > 0) {
-          queryTitleCases += ',\n';
-          queryBodyCases += ',\n';
-        }
         const decodedTitle = decodeContent(title);
         queryTitleCases += queryCase;
         titleReplacements.push(id!, decodedTitle);
@@ -102,10 +98,13 @@ async function decodeThreads(lastId: number = 0) {
       }
       await transaction.commit();
       log.info(
-        `Successfully decoded comments ${threads[0].id} to ${threads.at(-1)!.id}`,
+        'Successfully decoded threads' +
+          ` ${threads[0].id} to ${threads.at(-1)!.id}`,
       );
     } catch (e) {
+      log.error('Failed to update', e);
       await transaction.rollback();
+      break;
     }
   }
 }
@@ -123,8 +122,8 @@ async function decodeThreadVersionHistory(lastId: number = 0) {
           },
         },
         order: [['id', 'ASC']],
-        limit: THREAD_BATCH_SIZE,
-        lock: LOCK.UPDATE,
+        limit: BATCH_SIZE,
+        lock: transaction.LOCK.UPDATE,
         transaction,
       });
 
@@ -141,7 +140,6 @@ async function decodeThreadVersionHistory(lastId: number = 0) {
       for (const { id, body } of threads) {
         const decodedBody = decodeContent(body);
         if (body === decodedBody) continue;
-        if (replacements.length > 0) queryCases += ',\n';
         queryCases += queryCase;
         replacements.push(id!, decodedBody);
         threadVersionIds.push(id!);
@@ -165,10 +163,13 @@ async function decodeThreadVersionHistory(lastId: number = 0) {
       }
       await transaction.commit();
       log.info(
-        `Successfully decoded comments ${threads[0].id} to ${threads.at(-1)!.id}`,
+        'Successfully decoded thread version histories ' +
+          `${threads[0].id} to ${threads.at(-1)!.id}`,
       );
     } catch (e) {
+      log.error('Failed to update', e);
       await transaction.rollback();
+      break;
     }
   }
 }
@@ -186,8 +187,8 @@ async function decodeCommentVersionHistory(lastId: number = 0) {
           },
         },
         order: [['id', 'ASC']],
-        limit: THREAD_BATCH_SIZE,
-        lock: LOCK.UPDATE,
+        limit: BATCH_SIZE,
+        lock: transaction.LOCK.UPDATE,
         transaction,
       });
 
@@ -204,7 +205,6 @@ async function decodeCommentVersionHistory(lastId: number = 0) {
       for (const { id, text } of comments) {
         const decodedBody = decodeContent(text);
         if (text === decodedBody) continue;
-        if (replacements.length > 0) queryCases += ',\n';
         queryCases += queryCase;
         replacements.push(id!, decodedBody);
         commentVersionIds.push(id!);
@@ -232,7 +232,9 @@ async function decodeCommentVersionHistory(lastId: number = 0) {
           ` ${comments[0].id} to ${comments.at(-1)!.id}`,
       );
     } catch (e) {
+      log.error('Failed to update', e);
       await transaction.rollback();
+      break;
     }
   }
 }
@@ -250,8 +252,8 @@ async function decodeComments(lastId: number = 0) {
           },
         },
         order: [['id', 'ASC']],
-        limit: THREAD_BATCH_SIZE,
-        lock: LOCK.UPDATE,
+        limit: BATCH_SIZE,
+        lock: transaction.LOCK.UPDATE,
         transaction,
       });
 
@@ -268,7 +270,6 @@ async function decodeComments(lastId: number = 0) {
       for (const { id, text } of comments) {
         const decodedBody = decodeContent(text);
         if (text === decodedBody) continue;
-        if (replacements.length > 0) queryCases += ',\n';
         queryCases += queryCase;
         replacements.push(id!, decodedBody);
         commentIds.push(id!);
@@ -292,10 +293,13 @@ async function decodeComments(lastId: number = 0) {
       }
       await transaction.commit();
       log.info(
-        `Successfully decoded comments ${comments[0].id} to ${comments.at(-1)!.id}`,
+        'Successfully decoded comments' +
+          ` ${comments[0].id} to ${comments.at(-1)!.id}`,
       );
     } catch (e) {
+      log.error('Failed to update', e);
       await transaction.rollback();
+      break;
     }
   }
 }
