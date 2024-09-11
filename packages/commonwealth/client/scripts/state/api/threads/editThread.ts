@@ -119,7 +119,7 @@ const useEditThreadMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.updateThread.useMutation({
-    onSuccess: async (updated) => {
+    onSuccess: (updated) => {
       // @ts-expect-error StrictNullChecks
       const updatedThread = new Thread(updated);
       // Update community level thread counters variables
