@@ -70,7 +70,7 @@ describe('Community lifecycle', () => {
       custom_domain,
     });
 
-    baseCommunityId = base?.id!;
+    baseCommunityId = base!.id!;
     ethNode = _ethNode!;
     edgewareNode = _edgewareNode!;
     superAdminActor = {
