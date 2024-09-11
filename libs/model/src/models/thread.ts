@@ -1,6 +1,5 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
-import pg from 'pg';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils';
@@ -182,7 +181,9 @@ export function getThreadSearchVector(title: string, body: string) {
     decodedBody = decodeURIComponent(body);
     // eslint-disable-next-line no-empty
   } catch {}
-  return Sequelize.literal(
-    `to_tsvector('english', ${pg.escapeLiteral(decodedTitle)} || ' ' || ${pg.escapeLiteral(decodedBody)})`,
+  return Sequelize.fn(
+    'to_tsvector',
+    'english',
+    decodedTitle + ' ' + decodedBody,
   );
 }

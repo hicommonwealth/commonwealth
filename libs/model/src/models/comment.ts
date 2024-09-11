@@ -1,6 +1,5 @@
 import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
-import pg from 'pg';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -128,7 +127,5 @@ export function getCommentSearchVector(body: string) {
     // eslint-disable-next-line no-empty
   } catch {}
 
-  return Sequelize.literal(
-    `to_tsvector('english', ${pg.escapeLiteral(decodedBody)})`,
-  );
+  return Sequelize.fn('to_tsvector', 'english', decodedBody);
 }
