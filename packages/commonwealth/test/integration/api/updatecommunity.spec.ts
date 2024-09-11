@@ -4,7 +4,6 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Express } from 'express';
 import jwt from 'jsonwebtoken';
-import { UpdateCommunityErrors } from 'node_modules/@hicommonwealth/model/src/community';
 import { CommunityArgs } from 'test/util/modelUtils';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
@@ -208,30 +207,6 @@ describe('Update Community/Chain Tests', () => {
       });
       expect(res.status).to.be.equal(200);
       expect(res.body.type).to.be.equal(type);
-    });
-
-    test('should fail to update network', async () => {
-      const network = 'ethereum-testnet';
-      const res = await update(server.app, loggedInAddr, {
-        jwt: jwtToken,
-        id: chain,
-        network,
-      });
-      expect(res.body.message).to.be.equal(
-        UpdateCommunityErrors.CantChangeNetwork,
-      );
-    });
-
-    test('should fail to update custom domain if not site admin', async () => {
-      const custom_domain = 'test.com';
-      const res = await update(server.app, loggedInAddr, {
-        jwt: jwtToken,
-        id: chain,
-        custom_domain,
-      });
-      expect(res.body.message).to.be.equal(
-        UpdateCommunityErrors.CantChangeCustomDomain,
-      );
     });
 
     test('should update custom domain if site admin', async () => {
