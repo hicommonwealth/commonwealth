@@ -48,6 +48,7 @@ async function decodeThreads(lastId: number = 0) {
         limit: BATCH_SIZE,
         lock: transaction.LOCK.UPDATE,
         transaction,
+        paranoid: false,
       });
       if (threads.length === 0) {
         await transaction.rollback();
@@ -255,6 +256,7 @@ async function decodeComments(lastId: number = 0) {
         limit: BATCH_SIZE,
         lock: transaction.LOCK.UPDATE,
         transaction,
+        paranoid: false,
       });
 
       if (comments.length === 0) {
