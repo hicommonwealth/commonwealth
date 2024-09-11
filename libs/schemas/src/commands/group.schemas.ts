@@ -14,5 +14,5 @@ export const CreateGroup = {
     requirements: z.array(Requirement),
     topics: z.array(PG_INT).optional(),
   }),
-  output: Community.extend({ groups: z.array(Group).optional() }),
+  output: Community.extend({ groups: z.array(Group).optional() }).partial(),
 };

@@ -40,13 +40,14 @@ export const LinkedUrlModal = ({
   const [tempLinkedUrls, setTempLinkedUrls] =
     useState<Array<Link>>(initialUrlLinks);
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
 
@@ -63,7 +64,7 @@ export const LinkedUrlModal = ({
     try {
       if (toAdd.length) {
         const updatedThread = await addThreadLinks({
-          communityId: app.activeChainId(),
+          communityId,
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Web,
@@ -77,7 +78,7 @@ export const LinkedUrlModal = ({
       }
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
-          communityId: app.activeChainId(),
+          communityId,
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Web,

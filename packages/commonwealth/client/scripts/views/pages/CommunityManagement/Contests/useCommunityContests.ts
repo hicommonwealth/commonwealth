@@ -9,7 +9,7 @@ const useCommunityContests = () => {
   const { stakeEnabled } = useCommunityStake();
 
   const { data: contestsData, isLoading: isContestDataLoading } =
-    useGetContestsQuery({ community_id: app.activeChainId(), enabled });
+    useGetContestsQuery({ community_id: app.activeChainId() || '', enabled });
 
   // @ts-expect-error StrictNullChecks
   const isContestAvailable = !isContestDataLoading && contestsData?.length > 0;

@@ -1,4 +1,4 @@
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, ChainBase } from '@hicommonwealth/shared';
 import { fetchCachedNodes } from 'state/api/nodes';
 
 export const getCosmosChains = (isEvm?: boolean): string[] => {
@@ -14,4 +14,17 @@ export const getCosmosChains = (isEvm?: boolean): string[] => {
       )
       ?.map((node) => node.cosmosChainId || '') ?? []
   );
+};
+
+export const getChainDecimals = (
+  chainId: string,
+  chainBase: ChainBase,
+): number => {
+  let decimals = chainBase === ChainBase.CosmosSDK ? 6 : 18;
+
+  if (getCosmosChains(true)?.some((c) => c === chainId)) {
+    decimals = 18;
+  }
+
+  return decimals;
 };

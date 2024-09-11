@@ -4,6 +4,10 @@ export enum ValidChains {
   SepoliaBase = 84532,
   Sepolia = 11155111,
   Blast = 81457,
+  Linea = 59144,
+  Optimism = 10,
+  Mainnet = 1,
+  Arbitrum = 42161,
 }
 
 export const STAKE_ID = 2;
@@ -38,5 +42,25 @@ export const factoryContracts: {
     factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
     communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 8453,
+  },
+  [ValidChains.Linea]: {
+    factory: '0xe3ae9569f4523161742414480f87967e991741bd',
+    communityStake: '0xcc752fd15a7dd0d5301b6a626316e7211352cf62',
+    chainId: 59144,
+  },
+  [ValidChains.Optimism]: {
+    factory: '0xe3ae9569f4523161742414480f87967e991741bd',
+    communityStake: '0xcc752fd15a7dd0d5301b6a626316e7211352cf62',
+    chainId: 10,
+  },
+  [ValidChains.Mainnet]: {
+    factory: '0x90aa47bf6e754f69ee53f05b5187b320e3118b0f',
+    communityStake: '0x9ed281e62db1b1d98af90106974891a4c1ca3a47',
+    chainId: 1,
+  },
+  [ValidChains.Arbitrum]: {
+    factory: '0xE3AE9569f4523161742414480f87967e991741bd',
+    communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
+    chainId: 42161,
   },
 };

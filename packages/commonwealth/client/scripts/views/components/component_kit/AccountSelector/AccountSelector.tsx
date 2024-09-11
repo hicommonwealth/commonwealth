@@ -25,7 +25,10 @@ const LinkAccountItem = ({
   const address = app.chain
     ? addressSwapper({
         address: account.address,
-        currentPrefix: parseInt((app.chain as Substrate)?.meta.ss58Prefix, 10),
+        currentPrefix: parseInt(
+          `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
+          10,
+        ),
       })
     : account.address;
 

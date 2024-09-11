@@ -5,7 +5,6 @@ import { RequestHandler, Router, raw } from 'express';
 // TODO: remove as we migrate to tRPC commands
 import DatabaseValidationService from 'server/middleware/databaseValidationService';
 import { deleteBotCommentHandler } from 'server/routes/comments/delete_comment_bot_handler';
-import { updateCommentHandler } from 'server/routes/comments/update_comment_handler';
 import { deleteBotThreadHandler } from 'server/routes/threads/delete_thread_bot_handler';
 import { updateThreadHandler } from 'server/routes/threads/update_thread_handler';
 import { ServerControllers } from 'server/routing/router';
@@ -72,8 +71,7 @@ function build(
   router.patch(
     '/bot/threads/:id/comments',
     isBotUser,
-    isAuthor,
-    updateCommentHandler.bind(this, controllers),
+    express.command(Comment.UpdateComment()),
   );
 
   router.delete(

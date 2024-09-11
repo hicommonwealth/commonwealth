@@ -17,7 +17,7 @@ type TOSModalProps = {
 };
 
 const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
-  const terms = app.chain?.meta?.terms;
+  const terms = app.chain?.meta?.terms || '';
 
   return (
     <div className="TOSModal">
