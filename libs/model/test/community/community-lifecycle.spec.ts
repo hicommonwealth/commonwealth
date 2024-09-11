@@ -1,11 +1,12 @@
 import {
   Actor,
+  InvalidInput,
   InvalidState,
   command,
   dispose,
   query,
 } from '@hicommonwealth/core';
-import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import { ALL_COMMUNITIES, ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
@@ -28,7 +29,9 @@ const chance = Chance();
 describe('Community lifecycle', () => {
   let ethNode: ChainNodeAttributes, edgewareNode: ChainNodeAttributes;
   let community: CommunityAttributes;
-  let actor: Actor;
+  let superAdminActor: Actor, adminActor: Actor;
+  let baseCommunityId: string;
+  const custom_domain = 'custom';
   const group_payload = {
     id: '',
     metadata: {
@@ -46,7 +49,8 @@ describe('Community lifecycle', () => {
     const [_edgewareNode] = await seed('ChainNode', {
       name: 'Edgeware Mainnet',
     });
-    const [user] = await seed('User', { isAdmin: true });
+    const [superadmin] = await seed('User', { isAdmin: true });
+    const [admin] = await seed('User', { isAdmin: false });
     const [base] = await seed('Community', {
       chain_node_id: _ethNode!.id!,
       base: ChainBase.Ethereum,
@@ -56,16 +60,30 @@ describe('Community lifecycle', () => {
       Addresses: [
         {
           role: 'member',
-          user_id: user!.id,
+          user_id: superadmin!.id,
+        },
+        {
+          role: 'admin',
+          user_id: admin!.id,
         },
       ],
+      custom_domain,
     });
 
+    baseCommunityId = base?.id!;
     ethNode = _ethNode!;
     edgewareNode = _edgewareNode!;
-    actor = {
-      user: { id: user!.id!, email: user!.email!, isAdmin: user!.isAdmin! },
+    superAdminActor = {
+      user: {
+        id: superadmin!.id!,
+        email: superadmin!.email!,
+        isAdmin: superadmin!.isAdmin!,
+      },
       address: base?.Addresses?.at(0)?.address,
+    };
+    adminActor = {
+      user: { id: admin!.id!, email: admin!.email!, isAdmin: admin!.isAdmin! },
+      address: base?.Addresses?.at(1)?.address,
     };
   });
 
@@ -76,7 +94,7 @@ describe('Community lifecycle', () => {
   test('should create community', async () => {
     const name = chance.name();
     const result = await command(CreateCommunity(), {
-      actor,
+      actor: superAdminActor,
       payload: {
         id: name,
         type: ChainType.Offchain,
@@ -86,14 +104,14 @@ describe('Community lifecycle', () => {
         base: ChainBase.Ethereum,
         eth_chain_id: ethNode.eth_chain_id!,
         social_links: [],
-        user_address: actor.address!,
+        user_address: superAdminActor.address!,
         node_url: ethNode.url,
         directory_page_enabled: false,
         tags: [],
       },
     });
     expect(result?.community?.id).toBe(name);
-    expect(result?.admin_address).toBe(actor.address);
+    expect(result?.admin_address).toBe(superAdminActor.address);
     // connect results
     community = result!.community! as CommunityAttributes;
     group_payload.id = result!.community!.id;
@@ -102,7 +120,7 @@ describe('Community lifecycle', () => {
   describe('groups', () => {
     test('should fail to query community via has_groups when none exists', async () => {
       const communityResults = await query(GetCommunities(), {
-        actor,
+        actor: superAdminActor,
         payload: { has_groups: true } as any,
       });
       expect(communityResults?.results).to.have.length(0);
@@ -110,7 +128,7 @@ describe('Community lifecycle', () => {
 
     test('should create group when none exists', async () => {
       const results = await command(CreateGroup(), {
-        actor,
+        actor: superAdminActor,
         payload: group_payload,
       });
       expect(results?.groups?.at(0)?.metadata).to.includes(
@@ -118,7 +136,7 @@ describe('Community lifecycle', () => {
       );
 
       const communityResults = await query(GetCommunities(), {
-        actor,
+        actor: superAdminActor,
         payload: { has_groups: true } as any,
       });
       expect(communityResults?.results?.at(0)?.id).to.equal(group_payload.id);
@@ -126,14 +144,17 @@ describe('Community lifecycle', () => {
 
     test('should fail group creation when group with same id found', async () => {
       await expect(() =>
-        command(CreateGroup(), { actor, payload: group_payload }),
+        command(CreateGroup(), {
+          actor: superAdminActor,
+          payload: group_payload,
+        }),
       ).rejects.toThrow(InvalidState);
     });
 
     test('should fail group creation when sending invalid topics', async () => {
       await expect(
         command(CreateGroup(), {
-          actor,
+          actor: superAdminActor,
           payload: {
             id: group_payload.id,
             metadata: {
@@ -152,7 +173,7 @@ describe('Community lifecycle', () => {
       // create max groups
       for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
         await command(CreateGroup(), {
-          actor,
+          actor: superAdminActor,
           payload: {
             id: group_payload.id,
             metadata: { name: chance.name(), description: chance.sentence() },
@@ -164,7 +185,7 @@ describe('Community lifecycle', () => {
 
       await expect(() =>
         command(CreateGroup(), {
-          actor,
+          actor: superAdminActor,
           payload: {
             id: group_payload.id,
             metadata: { name: chance.name(), description: chance.sentence() },
@@ -188,7 +209,7 @@ describe('Community lifecycle', () => {
 
     test('should update community', async () => {
       const updated = await command(UpdateCommunity(), {
-        actor,
+        actor: superAdminActor,
         payload: {
           ...baseRequest,
           id: community.id,
@@ -206,7 +227,7 @@ describe('Community lifecycle', () => {
 
     test('should remove directory', async () => {
       const updated = await command(UpdateCommunity(), {
-        actor,
+        actor: superAdminActor,
         payload: {
           ...baseRequest,
           id: community.id,
@@ -222,10 +243,89 @@ describe('Community lifecycle', () => {
       assert.equal(updated?.type, 'chain');
     });
 
+    test('should throw if trying to change network', async () => {
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: superAdminActor,
+          payload: {
+            ...baseRequest,
+            id: community.id,
+            network: 'cant-change',
+          },
+        }),
+      ).rejects.toThrow(UpdateCommunityErrors.CantChangeNetwork);
+    });
+
+    test('should throw if id is reserved', async () => {
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: superAdminActor,
+          payload: {
+            ...baseRequest,
+            id: ALL_COMMUNITIES,
+            namespace: 'tempNamespace',
+            chain_node_id: 1263,
+          },
+        }),
+      ).rejects.toThrow(UpdateCommunityErrors.ReservedId);
+    });
+
+    test('should throw if custom domain is taken', async () => {
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: superAdminActor,
+          payload: {
+            ...baseRequest,
+            id: community.id,
+            custom_domain,
+          },
+        }),
+      ).rejects.toThrow(UpdateCommunityErrors.CustomDomainIsTaken);
+    });
+
+    test('should throw if not super admin when changing custom domain', async () => {
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: adminActor,
+          payload: {
+            ...baseRequest,
+            id: baseCommunityId,
+            custom_domain: 'new-custom-domain',
+          },
+        }),
+      ).rejects.toThrow(UpdateCommunityErrors.CantChangeCustomDomain);
+    });
+
+    test('should throw if snapshot not found', async () => {
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: adminActor,
+          payload: {
+            ...baseRequest,
+            id: community.id,
+            snapshot: ['not-found'],
+          },
+        }),
+      ).rejects.toThrow(InvalidInput);
+    });
+
+    test('should throw if custom domain is invalid', async () => {
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: superAdminActor,
+          payload: {
+            ...baseRequest,
+            id: community.id,
+            custom_domain: 'commonwealth',
+          },
+        }),
+      ).rejects.toThrow(UpdateCommunityErrors.InvalidCustomDomain);
+    });
+
     test('should throw if namespace present but no transaction hash', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor,
+          actor: superAdminActor,
           payload: {
             ...baseRequest,
             id: community.id,
@@ -239,7 +339,7 @@ describe('Community lifecycle', () => {
     test('should throw if actor is not admin', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor,
+          actor: superAdminActor,
           payload: {
             ...baseRequest,
             id: community.id,
@@ -255,7 +355,7 @@ describe('Community lifecycle', () => {
     test.skip('should throw if chain node of community does not match supported chain', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor,
+          actor: superAdminActor,
           payload: {
             ...baseRequest,
             id: community.id,

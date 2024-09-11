@@ -12,11 +12,12 @@ import {
   command,
   dispose,
 } from '@hicommonwealth/core';
-import { AddressAttributes } from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import type { AddressAttributes } from '@hicommonwealth/model';
+import { Community, PermissionEnum, Thread } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
 import { afterEach } from 'node:test';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { z } from 'zod';
 import {
   CreateComment,
   CreateCommentErrors,
@@ -32,13 +33,18 @@ import {
   CreateThreadReaction,
   CreateThreadReactionErrors,
   UpdateThread,
+  UpdateThreadErrors,
 } from '../../src/thread';
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
 
 const chance = Chance();
 
 describe('Thread lifecycle', () => {
-  let thread, archived, read_only, comment;
+  let community: z.infer<typeof Community>,
+    thread: z.infer<typeof Thread>,
+    archived,
+    read_only,
+    comment;
   const roles = ['admin', 'member', 'nonmember', 'banned', 'rejected'] as const;
   const addresses = {} as Record<(typeof roles)[number], AddressAttributes>;
   const actors = {} as Record<(typeof roles)[number], Actor>;
@@ -68,7 +74,7 @@ describe('Thread lifecycle', () => {
       profile: { name: role },
       isAdmin: role === 'admin',
     }));
-    const [community] = await seed('Community', {
+    const [_community] = await seed('Community', {
       chain_node_id: node!.id!,
       active: true,
       profile_count: 1,
@@ -88,6 +94,7 @@ describe('Thread lifecycle', () => {
           vote_weight,
         },
       ],
+      custom_stages: ['one', 'two'],
     });
     await seed('GroupPermission', {
       group_id: threadGroupId,
@@ -102,6 +109,7 @@ describe('Thread lifecycle', () => {
       allowed_actions: [PermissionEnum.CREATE_COMMENT],
     });
 
+    community = _community!;
     roles.forEach((role) => {
       const user = users[role];
       const address = community!.Addresses!.find((a) => a.user_id === user.id);
@@ -186,13 +194,15 @@ describe('Thread lifecycle', () => {
   roles.forEach((role) => {
     if (!authorizationTests[role]) {
       it(`should create thread as ${role}`, async () => {
-        thread = await command(CreateThread(), {
+        const _thread = await command(CreateThread(), {
           actor: actors[role],
           payload,
         });
-        expect(thread?.title).to.equal(title);
-        expect(thread?.body).to.equal(body);
-        expect(thread?.stage).to.equal(stage);
+        expect(_thread?.title).to.equal(title);
+        expect(_thread?.body).to.equal(body);
+        expect(_thread?.stage).to.equal(stage);
+        // capture as admin author for other tests
+        if (!thread) thread = _thread!;
       });
     } else {
       it(`should reject create thread as ${role}`, async () => {
@@ -207,20 +217,191 @@ describe('Thread lifecycle', () => {
   });
 
   describe('updates', () => {
-    it('should patch update thread attributes', async () => {
+    it('should patch content', async () => {
       const body = {
         title: 'hello',
         body: 'wasup',
-        url: 'https://example.com',
+        canvas_hash: '',
+        canvas_signed_data: '',
       };
       const updated = await command(UpdateThread(), {
         actor: actors.admin,
         payload: {
-          thread_id: thread!.id,
+          thread_id: thread.id!,
           ...body,
         },
       });
       expect(updated).to.contain(body);
+    });
+
+    it('should add collaborators', async () => {
+      const body = {
+        collaborators: {
+          toAdd: [
+            addresses.member.id!,
+            addresses.rejected.id!,
+            addresses.banned.id!,
+          ],
+          toRemove: [],
+        },
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.collaborators?.length).to.eq(3);
+    });
+
+    it('should remove collaborator', async () => {
+      const body = {
+        collaborators: {
+          toRemove: [addresses.banned.id!],
+        },
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.collaborators?.length).to.eq(2);
+    });
+
+    it('should fail when thread not found by discord_meta', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.member,
+          payload: {
+            thread_id: thread.id!,
+            discord_meta: {
+              message_id: '',
+              channel_id: '',
+              user: { id: '', username: '' },
+            },
+          },
+        }),
+      ).rejects.toThrowError(UpdateThreadErrors.ThreadNotFound);
+    });
+
+    it('should fail when collaborators overlap', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.member,
+          payload: {
+            thread_id: thread.id!,
+            collaborators: {
+              toAdd: [addresses.banned.id!],
+              toRemove: [addresses.banned.id!],
+            },
+          },
+        }),
+      ).rejects.toThrowError(UpdateThreadErrors.CollaboratorsOverlap);
+    });
+
+    it('should fail when not admin or author', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.member,
+          payload: {
+            thread_id: thread.id!,
+            collaborators: {
+              toRemove: [addresses.banned.id!],
+            },
+          },
+        }),
+      ).rejects.toThrowError('Must be super admin or author');
+    });
+
+    it('should fail when collaborator not found', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.admin,
+          payload: {
+            thread_id: thread.id!,
+            collaborators: {
+              toAdd: [999999999],
+            },
+          },
+        }),
+      ).rejects.toThrowError(UpdateThreadErrors.MissingCollaborators);
+    });
+
+    it('should patch admin or moderator attributes', async () => {
+      const body = {
+        pinned: true,
+        spam: true,
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.pinned).to.eq(true);
+      expect(updated?.marked_as_spam_at).toBeDefined;
+    });
+
+    it('should fail when collaborator actor non admin/moderator', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.rejected,
+          payload: {
+            thread_id: thread.id!,
+            pinned: false,
+            spam: false,
+          },
+        }),
+      ).rejects.toThrowError('Must be admin or moderator');
+    });
+
+    it('should patch admin or moderator or owner attributes', async () => {
+      const body = {
+        locked: false,
+        archived: false,
+        stage: community.custom_stages.at(0),
+        topic_id: thread.topic_id!,
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.locked_at).toBeUndefined;
+      expect(updated?.archived_at).toBeUndefined;
+      expect(updated?.stage).to.eq(community.custom_stages.at(0));
+      expect(updated?.topic_id).to.eq(thread.topic_id);
+    });
+
+    it('should fail when invalid stage is sent', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.admin,
+          payload: {
+            thread_id: thread.id!,
+            stage: 'invalid',
+          },
+        }),
+      ).rejects.toThrowError(UpdateThreadErrors.InvalidStage);
+    });
+
+    it('should fail when collaborator actor non admin/moderator/owner', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.rejected,
+          payload: {
+            thread_id: thread.id!,
+            locked: true,
+            archived: true,
+          },
+        }),
+      ).rejects.toThrowError('Must be admin, moderator, or author');
     });
   });
 
@@ -230,7 +411,7 @@ describe('Thread lifecycle', () => {
       comment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
-          thread_id: thread!.id,
+          thread_id: thread.id!,
           text,
         },
       });
@@ -246,7 +427,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
-            thread_id: thread!.id + 5,
+            thread_id: thread.id! + 5,
             text: 'hi',
           },
         }),
@@ -258,7 +439,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.nonmember,
           payload: {
-            thread_id: thread!.id,
+            thread_id: thread.id!,
             text: 'hi',
           },
         }),
@@ -294,7 +475,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
-            thread_id: thread!.id,
+            thread_id: thread.id!,
             parent_id: 1234567890,
             text: 'hi',
           },
@@ -309,7 +490,7 @@ describe('Thread lifecycle', () => {
         comment = await command(CreateComment(), {
           actor: actors.member,
           payload: {
-            thread_id: thread!.id,
+            thread_id: thread.id!,
             parent_id,
             text: `level${i}`,
           },
@@ -327,7 +508,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
-            thread_id: thread!.id,
+            thread_id: thread.id!,
             parent_id,
             text: 'hi',
           },
@@ -374,7 +555,7 @@ describe('Thread lifecycle', () => {
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.member,
         payload: {
-          thread_id: thread!.id,
+          thread_id: thread.id!,
           reaction: 'like',
         },
       });
@@ -391,7 +572,7 @@ describe('Thread lifecycle', () => {
         command(CreateThreadReaction(), {
           actor: actors.member,
           payload: {
-            thread_id: thread!.id,
+            thread_id: thread.id!,
             reaction: 'like',
           },
         }),
@@ -403,7 +584,7 @@ describe('Thread lifecycle', () => {
         command(CreateThreadReaction(), {
           actor: actors.member,
           payload: {
-            thread_id: thread!.id + 5,
+            thread_id: thread.id! + 5,
             reaction: 'like',
           },
         }),
@@ -415,7 +596,7 @@ describe('Thread lifecycle', () => {
         command(CreateThreadReaction(), {
           actor: actors.nonmember,
           payload: {
-            thread_id: thread!.id,
+            thread_id: thread.id!,
             reaction: 'like',
           },
         }),

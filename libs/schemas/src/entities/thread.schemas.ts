@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { Reaction } from './reaction.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
@@ -48,6 +49,8 @@ export const Thread = z.object({
   // associations
   Address: Address.nullish(),
   topic: Topic.nullish(),
+  collaborators: Address.array().nullish(),
+  reactions: Reaction.array().nullish(),
 });
 
 export const ThreadVersionHistory = z.object({

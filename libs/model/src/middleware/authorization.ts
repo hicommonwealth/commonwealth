@@ -29,6 +29,7 @@ export type AuthContext = {
   comment?: CommentInstance | null;
   author_address_id?: number;
   is_author?: boolean;
+  is_collaborator?: boolean;
 };
 
 export type AuthHandler<Input extends ZodSchema = ZodSchema> = Handler<
@@ -255,17 +256,28 @@ export function isAuthorized({
 }): AuthHandler {
   return async (ctx) => {
     if (ctx.actor.user.isAdmin) return;
+
     const auth = await authorizeAddress(ctx, roles);
-    auth.is_author = auth.address!.id === auth.author_address_id;
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
+
+    auth.is_author = auth.address!.id === auth.author_address_id;
     if (auth.is_author) return;
-    if (action && auth.address!.role === 'member')
-      await isTopicMember(ctx.actor, auth, action);
-    if (collaborators) {
-      const found = auth.thread?.collaborators?.find(
-        (a) => a.address === ctx.actor.address,
-      );
-      if (!found) throw new InvalidActor(ctx.actor, 'Not authorized');
+
+    if (auth.address!.role === 'member') {
+      if (action) {
+        await isTopicMember(ctx.actor, auth, action);
+        return;
+      }
+
+      if (collaborators) {
+        const found = auth.thread?.collaborators?.find(
+          ({ address }) => address === ctx.actor.address,
+        );
+        auth.is_collaborator = !!found;
+        if (auth.is_collaborator) return;
+      }
+
+      throw new InvalidActor(ctx.actor, 'Not authorized member');
     }
   };
 }

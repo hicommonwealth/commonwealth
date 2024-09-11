@@ -178,9 +178,9 @@ export function UpdateThread(): Command<
       const { address } = mustBeAuthorized(actor, auth);
       const { thread_id, discord_meta } = payload;
 
-      // find by thread_id or discord_meta
+      // find by discord_meta first if present
       const thread = await models.Thread.findOne({
-        where: thread_id ? { id: thread_id } : { discord_meta },
+        where: discord_meta ? { discord_meta } : { id: thread_id },
       });
       if (!thread) throw new InvalidInput(UpdateThreadErrors.ThreadNotFound);
 
@@ -196,12 +196,6 @@ export function UpdateThread(): Command<
         auth!,
         payload,
       );
-
-      console.log({
-        content,
-        adminPatch,
-        ownerPatch,
-      });
 
       // check if patch violates contest locks
       if (

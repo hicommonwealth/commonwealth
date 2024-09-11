@@ -148,14 +148,14 @@ export function UpdateCommunity(): Command<
       custom_stages && (community.custom_stages = custom_stages);
 
       await community.save();
-
-      // Suggested solution for serializing BigInts
-      // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
-      (BigInt.prototype as unknown as { toJSON: () => string }).toJSON =
-        function () {
-          return this.toString();
-        };
       return community.toJSON();
     },
   };
 }
+
+// // Suggested solution for serializing BigInts
+// // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
+// (BigInt.prototype as unknown as { toJSON: () => string }).toJSON =
+//   function () {
+//     return this.toString();
+//   };
