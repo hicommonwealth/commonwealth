@@ -1,5 +1,6 @@
 import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
+import pg from 'pg';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -60,6 +61,10 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      search: {
+        type: Sequelize.TSVECTOR,
+        allowNull: false,
+      },
     },
     {
       hooks: {
@@ -114,3 +119,16 @@ export default (
       ],
     },
   );
+
+export function getCommentSearchVector(body: string) {
+  let decodedBody = body;
+
+  try {
+    decodedBody = decodeURIComponent(body);
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  return Sequelize.literal(
+    `to_tsvector('english', ${pg.escapeLiteral(decodedBody)})`,
+  );
+}
