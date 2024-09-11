@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustBeAuthorized } from '../middleware/guards';
+import { getCommentSearchVector } from '../models';
 import {
   decodeContent,
   emitMentions,
@@ -47,7 +48,7 @@ export function UpdateComment(): Command<
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
-            { text, plaintext },
+            { text, plaintext, search: getCommentSearchVector(text) },
             { where: { id: comment.id }, transaction },
           );
 
