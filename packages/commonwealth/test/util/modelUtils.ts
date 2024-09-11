@@ -452,12 +452,13 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .agent(app)
       .post(`/api/v1/CreateComment`)
       .set('Accept', 'application/json')
-      .set('address', address.split(':')[2])
+      .set('address', address)
       .send({
         author_chain: chain,
         chain,
         address,
         parent_id: parentCommentId || null,
+        thread_id: threadId,
         thread_msg_id: threadMsgId,
         text,
         jwt,
@@ -518,7 +519,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .agent(app)
       .post(`/api/v1/CreateCommentReaction`)
       .set('Accept', 'application/json')
-      .set('address', address.split(':')[2])
+      .set('address', address)
       .send({
         chain,
         address,
@@ -565,7 +566,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .agent(app)
       .post(`/api/v1/CreateThreadReaction`)
       .set('Accept', 'application/json')
-      .set('address', address.split(':')[2])
+      .set('address', address)
       .send({
         chain,
         address,
@@ -642,7 +643,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
-      //.set('address', address.split(':')[2])
+      //.set('address', address)
       .send({
         ...args,
         type: 'offchain',

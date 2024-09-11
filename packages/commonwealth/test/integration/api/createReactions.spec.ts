@@ -115,10 +115,9 @@ describe('createReaction Integration Tests', () => {
       where: { text },
     });
 
-    // @ts-expect-error StrictNullChecks
-    const beforeReactionCount = comment.reaction_count;
-
     chai.assert.isNotNull(comment);
+
+    const beforeReactionCount = comment.reaction_count;
 
     const createReactionResponse = await server.seeder.createReaction({
       chain: communityId,
