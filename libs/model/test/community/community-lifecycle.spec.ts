@@ -30,7 +30,6 @@ describe('Community lifecycle', () => {
   let ethNode: ChainNodeAttributes, edgewareNode: ChainNodeAttributes;
   let community: CommunityAttributes;
   let superAdminActor: Actor, adminActor: Actor;
-  let baseCommunityId: string;
   const custom_domain = 'custom';
   const group_payload = {
     id: '',
@@ -70,7 +69,6 @@ describe('Community lifecycle', () => {
       custom_domain,
     });
 
-    baseCommunityId = base!.id!;
     ethNode = _ethNode!;
     edgewareNode = _edgewareNode!;
     superAdminActor = {
