@@ -11,7 +11,10 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Thread from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
-import { deserializeDelta } from '../../components/react_quill_editor/utils';
+import {
+  deserializeDelta,
+  serializeDelta,
+} from '../../components/react_quill_editor/utils';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 
 type EditBodyProps = {
@@ -93,7 +96,7 @@ export const EditBody = (props: EditBodyProps) => {
       try {
         const newBody = JSON.stringify(contentDelta);
         await editThread({
-          newBody: JSON.stringify(contentDelta) || thread.body,
+          newBody: serializeDelta(contentDelta) || thread.body,
           newTitle: title || thread.title,
           threadId: thread.id,
           authorProfile: user.activeAccount?.profile,

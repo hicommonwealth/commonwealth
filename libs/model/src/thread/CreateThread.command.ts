@@ -16,13 +16,7 @@ import { verifyThreadSignature } from '../middleware/canvas';
 import { mustBeAuthorized } from '../middleware/guards';
 import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
-import {
-  emitMentions,
-  parseUserMentions,
-  quillToPlain,
-  sanitizeQuillText,
-  uniqueMentions,
-} from '../utils';
+import { emitMentions, parseUserMentions, uniqueMentions } from '../utils';
 
 export const CreateThreadErrors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -112,8 +106,7 @@ export function CreateThread(): Command<
         checkContestLimits(activeContestManagers, actor.address!);
       }
 
-      const body = sanitizeQuillText(payload.body);
-      const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
+      const body = payload.body;
       const mentions = uniqueMentions(parseUserMentions(body));
 
       // == mutation transaction boundary ==
