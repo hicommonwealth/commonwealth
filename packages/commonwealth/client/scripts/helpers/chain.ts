@@ -4,7 +4,6 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import { z } from 'zod';
-import ChainInfo from '../models/ChainInfo';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
 
@@ -32,7 +31,7 @@ export const deinitChainOrCommunity = async () => {
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
 export const loadCommunityChainInfo = async (
-  chain?: ChainInfo,
+  chain?: z.infer<typeof ExtendedCommunity>,
 ): Promise<boolean> => {
   let tempChain = chain;
 
@@ -46,9 +45,7 @@ export const loadCommunityChainInfo = async (
         DEFAULT_CHAIN,
         true,
       );
-      tempChain = ChainInfo.fromTRPCResponse(
-        communityInfo as z.infer<typeof ExtendedCommunity>,
-      );
+      tempChain = communityInfo;
     }
 
     if (!tempChain) {

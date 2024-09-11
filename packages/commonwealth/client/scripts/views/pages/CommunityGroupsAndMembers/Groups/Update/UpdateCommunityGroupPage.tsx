@@ -28,12 +28,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const user = useUserStore();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: editGroup } = useEditGroupMutation({
-    communityId: app.activeChainId(),
+    communityId,
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeTopics: true,
+    enabled: !!communityId,
   });
   // @ts-expect-error <StrictNullChecks/>
   const foundGroup: Group = groups.find(

@@ -57,10 +57,11 @@ const CommunityProfileForm = () => {
     }[]
   >([]);
 
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isCommunityLoading } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();

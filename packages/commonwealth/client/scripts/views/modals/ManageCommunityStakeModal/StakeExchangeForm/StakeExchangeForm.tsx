@@ -79,9 +79,11 @@ const StakeExchangeForm = ({
   const { selectedCommunity: community } = useManageCommunityStakeModalStore();
 
   const chainRpc =
-    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
   const ethChainId =
-    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
+    community?.ChainNode?.ethChainId ||
+    app?.chain?.meta?.ChainNode?.eth_chain_id ||
+    0;
   // Use the `selectedAddress.value` if buying stake in a non active community (i.e app.activeChainId() != community.id)
   const activeAccountAddress =
     (community ? selectedAddress?.value : user.activeAccount?.address) || '';
@@ -122,7 +124,7 @@ const StakeExchangeForm = ({
 
   const isBuyMode = mode === 'buy';
 
-  const communityId = community?.id || app.activeChainId();
+  const communityId = community?.id || app.activeChainId() || '';
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -140,7 +142,6 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
         ...(community?.ChainNode?.ethChainId && {
           chainId: `${community.ChainNode.ethChainId}`,
@@ -167,7 +168,7 @@ const StakeExchangeForm = ({
             id: communityId,
             name: community?.name || app?.chain?.meta?.name,
             base: community?.base || app?.chain?.base,
-            iconUrl: community?.iconUrl || app?.chain?.meta?.iconUrl,
+            iconUrl: community?.iconUrl || app?.chain?.meta?.icon_url || '',
           },
           ...(app.activeChainId() && { activeChainId: app.activeChainId() }),
         });
@@ -196,7 +197,6 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
       });
 
