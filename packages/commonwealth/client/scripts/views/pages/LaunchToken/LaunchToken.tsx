@@ -5,11 +5,12 @@ import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './LaunchToken.scss';
+import CommunityInformationStep from './steps/CommunityInformationStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateTokenCommunityStep, getFormSteps } from './utils';
 
 const LaunchToken = () => {
-  const { createTokenCommunityStep } = useCreateCommunity();
+  const { createTokenCommunityStep, onChangeStep } = useCreateCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -29,7 +30,12 @@ const LaunchToken = () => {
         // TODO: https://github.com/hicommonwealth/commonwealth/issues/8705
         return <>Not Implemented</>;
       case CreateTokenCommunityStep.CommunityInformation:
-        // TODO: https://github.com/hicommonwealth/commonwealth/issues/8706
+        return (
+          <CommunityInformationStep
+            handleGoBack={() => onChangeStep(false)}
+            handleContinue={() => onChangeStep(true)}
+          />
+        );
         return <>Not Implemented</>;
       case CreateTokenCommunityStep.SignatureLaunch:
         // TODO: https://github.com/hicommonwealth/commonwealth/issues/8707
