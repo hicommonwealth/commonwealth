@@ -126,10 +126,3 @@ export function UpdateCommunity(): Command<
     },
   };
 }
-
-// // Suggested solution for serializing BigInts
-// // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
-// (BigInt.prototype as unknown as { toJSON: () => string }).toJSON =
-//   function () {
-//     return this.toString();
-//   };
