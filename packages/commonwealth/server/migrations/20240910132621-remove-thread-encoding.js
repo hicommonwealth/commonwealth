@@ -54,15 +54,68 @@ module.exports = {
         );
       }
 
-      await queryInterface.removeColumn('Comments', 'body_backup', {
+      await queryInterface.removeColumn('Comments', 'text_backup', {
         transaction,
       });
-      await queryInterface.renameColumn('Comments', 'text', 'body_backup', {
+      await queryInterface.renameColumn('Comments', 'text', 'text_backup', {
         transaction,
       });
       await queryInterface.renameColumn('Comments', 'plaintext', 'text', {
         transaction,
       });
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Comments"
+        ALTER COLUMN text SET NOT NULL;
+      `,
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE OR REPLACE FUNCTION copy_text_to_backup()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.text_backup := NEW.text;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+      `,
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE TRIGGER copy_text_to_backup_trigger
+        BEFORE INSERT ON "Comments"
+        FOR EACH ROW
+        EXECUTE FUNCTION copy_text_to_backup();
+      `,
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE OR REPLACE FUNCTION copy_body_to_backup()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.body_backup := NEW.body;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+      `,
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE TRIGGER copy_body_to_backup_trigger
+        BEFORE INSERT ON "Threads"
+        FOR EACH ROW
+        EXECUTE FUNCTION copy_body_to_backup();
+      `,
+        { transaction },
+      );
     });
   },
 
@@ -87,7 +140,7 @@ module.exports = {
       await queryInterface.renameColumn('Comments', 'text', 'plaintext', {
         transaction,
       });
-      await queryInterface.renameColumn('Comments', 'body_backup', 'text', {
+      await queryInterface.renameColumn('Comments', 'text_backup', 'text', {
         transaction,
       });
       await queryInterface.addColumn(

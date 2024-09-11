@@ -9,7 +9,6 @@ export const Comment = z.object({
   thread_id: PG_INT,
   address_id: PG_INT,
   text: z.string(),
-  plaintext: z.string(),
   parent_id: z.string().nullish(),
 
   canvas_signed_data: z.string().nullish(),

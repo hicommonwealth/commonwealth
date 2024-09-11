@@ -9,8 +9,6 @@ import {
   emitEvent,
   emitMentions,
   parseUserMentions,
-  quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
@@ -53,8 +51,7 @@ export function CreateComment(): Command<
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
 
-      const text = sanitizeQuillText(payload.text);
-      const plaintext = quillToPlain(text);
+      const text = payload.text;
       const mentions = uniqueMentions(parseUserMentions(text));
 
       // == mutation transaction boundary ==
@@ -66,7 +63,6 @@ export function CreateComment(): Command<
               thread_id,
               parent_id: parent_id ? parent_id.toString() : null, // TODO: change parent_id from string to number
               text,
-              plaintext,
               address_id: address.id!,
               reaction_count: 0,
               reaction_weights_sum: 0,
