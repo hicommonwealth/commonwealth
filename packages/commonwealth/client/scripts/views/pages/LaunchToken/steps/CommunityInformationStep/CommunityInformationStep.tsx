@@ -8,6 +8,7 @@ import {
 } from 'shared/analytics/types';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
 import { CWText } from 'views/components/component_kit/cw_text';
+import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import './CommunityInformationStep.scss';
 
@@ -68,6 +69,11 @@ const CommunityInformationStep = ({
           Let&apos;s start with some basic information about your community
         </CWText>
       </section>
+
+      <CWBanner
+        type="info"
+        body="Some information has been pre-filled by your token inputs. You can edit them now or later."
+      />
 
       <CommunityInformationForm
         onSubmit={handleSubmit}

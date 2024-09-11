@@ -8,12 +8,20 @@ $form-width: 596px;
   gap: 24px;
   position: relative;
 
-  .header {
+  > .header {
     margin-top: 8px;
     width: 100%;
 
     .description {
       color: $neutral-500;
+    }
+  }
+
+  .CWBanner {
+    max-width: $form-width !important;
+
+    .content-container {
+      max-width: calc($form-width - 70px) !important;
     }
   }
 
