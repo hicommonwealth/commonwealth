@@ -1261,6 +1261,9 @@ importers:
       quill:
         specifier: ^1.3.6
         version: 1.3.7
+      quill-delta-to-markdown:
+        specifier: ^0.6.0
+        version: 0.6.0
       quill-image-drop-and-paste:
         specifier: ^1.0.4
         version: 1.3.0
@@ -20187,6 +20190,13 @@ packages:
         integrity: sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==,
       }
     engines: { node: '>=8' }
+
+  quill-delta-to-markdown@0.6.0:
+    resolution:
+      {
+        integrity: sha512-GwNMwSvXsH8G2o6EhvoTnIwEcN8RMbtklSjuyXYdPAXAhseMiQfehngcTwVZCz/3Fn4iu1CxlpLIKoBA9AjgdQ==,
+      }
+    engines: { node: '>=6.4.0' }
 
   quill-delta@3.6.3:
     resolution:
@@ -39972,6 +39982,10 @@ snapshots:
   quick-format-unescaped@4.0.4: {}
 
   quick-lru@4.0.1: {}
+
+  quill-delta-to-markdown@0.6.0:
+    dependencies:
+      lodash: 4.17.21
 
   quill-delta@3.6.3:
     dependencies:
