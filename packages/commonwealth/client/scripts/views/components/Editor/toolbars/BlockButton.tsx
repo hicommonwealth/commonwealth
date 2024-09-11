@@ -10,7 +10,7 @@ import { $createParagraphNode } from 'lexical';
 import React, { ReactNode, useCallback } from 'react';
 
 export type BlockButtonProps = Readonly<{
-  blockType: 'h1' | 'h2' | 'h3' | 'q';
+  blockType: 'h1' | 'h2' | 'h3' | 'quote';
   addTitle: string;
   removeTitle: string;
   children: ReactNode;
@@ -32,7 +32,7 @@ export const BlockButton = (props: BlockButtonProps) => {
         case 'h3':
           convertSelectionToNode(() => $createHeadingNode(blockType));
           break;
-        case 'q':
+        case 'quote':
           convertSelectionToNode(() => $createQuoteNode());
           break;
       }

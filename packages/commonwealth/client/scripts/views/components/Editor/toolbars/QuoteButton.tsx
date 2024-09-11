@@ -8,7 +8,7 @@ export const QuoteButton = () => {
     <BlockButton
       addTitle="Change to quote"
       removeTitle="Change back to paragraph."
-      blockType="q"
+      blockType="quote"
     >
       <CWIcon iconName="quotes" iconSize={DEFAULT_ICON_SIZE} />
     </BlockButton>

@@ -27,21 +27,31 @@ export const ToolbarForDesktop = () => {
           {
             fallback: () => (
               <>
-                <HeadingButton headingTag="h1" />
-                <HeadingButton headingTag="h2" />
-                <HeadingButton headingTag="h3" />
+                <div className="button-container">
+                  <HeadingButton headingTag="h1" />
+                  <HeadingButton headingTag="h2" />
+                  <HeadingButton headingTag="h3" />
+                </div>
+
                 <Separator />
                 <BoldItalicUnderlineToggles />
                 <Separator />
+
                 <StrikeThroughSupSubToggles />
+
                 <Separator />
-                <Separator />
-                <CreateLink />
-                <InsertImage />
-                <InsertCodeBlock />
-                <QuoteButton />
+
                 <ListsToggle />
-                <InsertTable />
+
+                <Separator />
+
+                <div className="button-container">
+                  <CreateLink />
+                  <InsertImage />
+                  <InsertCodeBlock />
+                  <QuoteButton />
+                  <InsertTable />
+                </div>
               </>
             ),
           },
