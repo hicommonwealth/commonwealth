@@ -31,16 +31,15 @@ module.exports = {
       if (encodedThreads.length > 0) {
         let query = ``;
         const replacements = [];
+        const threadIds = [];
         for (const thread of encodedThreads) {
           if (replacements.length > 0) query += ',\n';
           try {
             const decodedBody = decodeURIComponent(thread.body);
             query += 'WHEN id = ? THEN ?';
-            replacements.push([thread.id, decodedBody]);
-          } catch (e) {
-            query += 'WHEN id = ? THEN ?';
-            replacements.push([thread.id, thread.body]);
-          }
+            replacements.push(thread.id, decodedBody);
+            threadIds.push(thread.id);
+          } catch {}
         }
 
         await queryInterface.sequelize.query(
@@ -49,11 +48,21 @@ module.exports = {
           SET body = CASE
                           ${query}
                       END
-          WHERE body_backup = body AND body ~ '%[0-9A-Fa-f]{2}';
+          WHERE id IN (?);
       `,
-          { transaction, replacements },
+          { transaction, replacements: [...replacements, threadIds] },
         );
       }
+
+      await queryInterface.removeColumn('Comments', 'body_backup', {
+        transaction,
+      });
+      await queryInterface.renameColumn('Comments', 'text', 'body_backup', {
+        transaction,
+      });
+      await queryInterface.renameColumn('Comments', 'plaintext', 'text', {
+        transaction,
+      });
     });
   },
 
@@ -67,6 +76,22 @@ module.exports = {
       });
       await queryInterface.addColumn(
         'Threads',
+        'body_backup',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
+
+      await queryInterface.renameColumn('Comments', 'text', 'plaintext', {
+        transaction,
+      });
+      await queryInterface.renameColumn('Comments', 'body_backup', 'text', {
+        transaction,
+      });
+      await queryInterface.addColumn(
+        'Comments',
         'body_backup',
         {
           type: Sequelize.STRING,
