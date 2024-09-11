@@ -145,10 +145,8 @@ export const getFeedHandler = async (
         id: thread.url,
         link: `https://common.xyz/${community_id}/discussions/${thread.id}-${slug}`,
         date: toDate(thread),
-        // @ts-expect-error StrictNullChecks
-        content: thread.body,
-        // @ts-expect-error StrictNullChecks
-        description: thread.plaintext,
+        content: thread.body || '',
+        description: thread.body || '',
         author: [
           {
             // @ts-expect-error StrictNullChecks

@@ -203,7 +203,6 @@ type RecentComment = {
   id: number;
   address: string;
   text: string;
-  plainText: string;
   created_at: string;
   updated_at: string;
   marked_as_spam_at?: string;
@@ -446,7 +445,6 @@ export class Thread implements IUniqueId {
           author: rc?.address,
           last_edited: rc?.updated_at ? moment(rc.updated_at) : null,
           created_at: rc?.created_at ? moment(rc?.created_at) : null,
-          plaintext: rc?.plainText,
           text: rc?.text,
           Address: {
             user_id: rc?.user_id,

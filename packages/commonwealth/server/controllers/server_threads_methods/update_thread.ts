@@ -353,7 +353,6 @@ export async function __updateThread(
           'id',
           'address_id',
           'text',
-          ['plaintext', 'plainText'],
           'created_at',
           'updated_at',
           'deleted_at',

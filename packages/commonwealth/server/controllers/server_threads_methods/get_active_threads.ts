@@ -63,7 +63,6 @@ export async function __getActiveThreads(
         'id',
         'address_id',
         'text',
-        ['plaintext', 'plainText'],
         'created_at',
         'updated_at',
         'deleted_at',
