@@ -173,7 +173,7 @@ export const AdminActions = ({
             const isSpam = !thread.markedAsSpamAt;
             try {
               const input = await buildUpdateThreadInput({
-                communityId: app.activeChainId(),
+                communityId: app.activeChainId() || '',
                 threadId: thread.id,
                 spam: isSpam,
                 address: user.activeAccount?.address || '',
@@ -199,7 +199,7 @@ export const AdminActions = ({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
       readOnly: !thread.readOnly,
-      communityId: app.activeChainId(),
+      communityId: app.activeChainId() || '',
     });
     editThread(input)
       .then(() => {
