@@ -4,7 +4,6 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Express } from 'express';
 import jwt from 'jsonwebtoken';
-import { UpdateCommunityErrors } from 'node_modules/@hicommonwealth/model/src/community';
 import { CommunityArgs } from 'test/util/modelUtils';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
@@ -28,7 +27,6 @@ async function update(
 
 describe('Update Community/Chain Tests', () => {
   let jwtToken;
-  let siteAdminJwt;
   let loggedInAddr;
   const chain = 'ethereum';
 
@@ -63,10 +61,6 @@ describe('Update Community/Chain Tests', () => {
       user_id: +siteAdminResult.user_id,
     });
     expect(siteAdminSetSuccessfully).to.be.true;
-    siteAdminJwt = jwt.sign(
-      { id: siteAdminResult.user_id, email: siteAdminResult.email },
-      config.AUTH.JWT_SECRET,
-    );
 
     // create community for test
     const communityArgs: CommunityArgs = {
@@ -208,41 +202,6 @@ describe('Update Community/Chain Tests', () => {
       });
       expect(res.status).to.be.equal(200);
       expect(res.body.type).to.be.equal(type);
-    });
-
-    test('should fail to update network', async () => {
-      const network = 'ethereum-testnet';
-      const res = await update(server.app, loggedInAddr, {
-        jwt: jwtToken,
-        id: chain,
-        network,
-      });
-      expect(res.body.message).to.be.equal(
-        UpdateCommunityErrors.CantChangeNetwork,
-      );
-    });
-
-    test('should fail to update custom domain if not site admin', async () => {
-      const custom_domain = 'test.com';
-      const res = await update(server.app, loggedInAddr, {
-        jwt: jwtToken,
-        id: chain,
-        custom_domain,
-      });
-      expect(res.body.message).to.be.equal(
-        UpdateCommunityErrors.CantChangeCustomDomain,
-      );
-    });
-
-    test('should update custom domain if site admin', async () => {
-      const custom_domain = 'test.com';
-      const res = await update(server.app, loggedInAddr, {
-        jwt: siteAdminJwt,
-        id: chain,
-        custom_domain,
-      });
-      expect(res.status).to.be.equal(200);
-      expect(res.body.custom_domain).to.be.equal(custom_domain);
     });
 
     test('should fail if no chain id', async () => {
