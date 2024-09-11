@@ -1,4 +1,5 @@
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useAppStatus from 'hooks/useAppStatus';
@@ -41,6 +42,7 @@ export const ReactionButton = ({
   const reactors = thread?.associatedReactions?.map((t) => t.address);
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
@@ -98,6 +100,7 @@ export const ReactionButton = ({
         reactionId: reactedId as number,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
         console.error(e.response.data.error || e?.message);
@@ -113,6 +116,7 @@ export const ReactionButton = ({
       });
       createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
         console.error(e.response.data.error || e?.message);

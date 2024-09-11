@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';
@@ -32,6 +33,8 @@ export const EditBody = (props: EditBodyProps) => {
     cancelEditing,
     threadUpdatedCallback,
   } = props;
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const threadBody =
     shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
@@ -107,6 +110,7 @@ export const EditBody = (props: EditBodyProps) => {
         threadUpdatedCallback(title, newBody);
       } catch (err) {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         console.error(err?.responseJSON?.error || err?.message);

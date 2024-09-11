@@ -1,4 +1,5 @@
 import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -88,6 +89,7 @@ export const NewThreadForm = () => {
   const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
 
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const contestTopicError = threadTopic?.activeContestManagers?.length
     ? threadTopic?.activeContestManagers
@@ -194,6 +196,7 @@ export const NewThreadForm = () => {
       navigate(`/discussion/${thread.id}`);
     } catch (err) {
       if (err instanceof SessionKeyError) {
+        checkForSessionKeyRevalidationErrors(err);
         return;
       }
 

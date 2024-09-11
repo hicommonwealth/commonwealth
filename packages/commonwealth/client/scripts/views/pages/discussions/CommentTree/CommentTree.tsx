@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { buildUpdateCommentInput } from 'client/scripts/state/api/comments/editComment';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
@@ -67,6 +68,7 @@ export const CommentTree = ({
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
 
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   useEffect(() => {
     let timeout;
@@ -202,6 +204,7 @@ export const CommentTree = ({
               });
             } catch (err) {
               if (err instanceof SessionKeyError) {
+                checkForSessionKeyRevalidationErrors(err);
                 return;
               }
               console.error(err.response.data.error || err?.message);
@@ -375,6 +378,7 @@ export const CommentTree = ({
       clearEditingLocalStorage(comment.id, ContentType.Comment);
     } catch (err) {
       if (err instanceof SessionKeyError) {
+        checkForSessionKeyRevalidationErrors(err);
         return;
       }
       console.error(err?.responseJSON?.error || err?.message);

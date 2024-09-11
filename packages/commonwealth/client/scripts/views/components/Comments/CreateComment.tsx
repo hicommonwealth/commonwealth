@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { buildCreateCommentInput } from 'client/scripts/state/api/comments/createComment';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -43,6 +44,7 @@ export const CreateComment = ({
 
   const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
@@ -112,6 +114,7 @@ export const CreateComment = ({
         }, 100);
       } catch (err) {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         const errMsg = err?.responseJSON?.error || err?.message;

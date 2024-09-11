@@ -1,3 +1,4 @@
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -75,6 +76,7 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
@@ -112,6 +114,7 @@ export const AdminActions = ({
               onDelete?.();
             } catch (err) {
               if (err instanceof SessionKeyError) {
+                checkForSessionKeyRevalidationErrors(err);
                 return;
               }
               console.error(err?.responseJSON?.error || err?.message);

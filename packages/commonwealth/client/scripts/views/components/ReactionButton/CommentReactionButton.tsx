@@ -1,4 +1,5 @@
 import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import React, { useState } from 'react';
@@ -28,6 +29,7 @@ export const CommentReactionButton = ({
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const { mutateAsync: createCommentReaction } =
     useCreateCommentReactionMutation({
@@ -81,6 +83,7 @@ export const CommentReactionButton = ({
         reactionId: foundReaction.id,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         console.error(err.response.data.error || err?.message);
@@ -96,6 +99,7 @@ export const CommentReactionButton = ({
       });
       createCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         console.error(err?.responseJSON?.error || err?.message);
