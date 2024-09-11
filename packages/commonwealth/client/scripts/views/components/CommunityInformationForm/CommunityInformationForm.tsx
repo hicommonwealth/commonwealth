@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
-import { ChainBase } from '@hicommonwealth/shared';
-import { notifyError } from 'controllers/app/notifications';
-import useCreateCommunityMutation, {
-  buildCreateCommunityInput,
-} from 'state/api/communities/createCommunity';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
   CWCoverImageUploader,
@@ -19,14 +14,6 @@ import { CommunityType } from 'views/components/component_kit/new_designs/CWComm
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import {
-  BaseMixpanelPayload,
-  MixpanelCommunityCreationEvent,
-  MixpanelLoginPayload,
-} from '../../../../../../../../shared/analytics/types';
-import useAppStatus from '../../../../../../hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from '../../../../../../hooks/useBrowserAnalyticsTrack';
 import './CommunityInformationForm.scss';
 import {
   BASE_ID,
@@ -36,18 +23,25 @@ import {
   POLYGON_ETH_CHAIN_ID,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
-import { CommunityInformationFormProps, FormSubmitValues } from './types';
+import {
+  CommunityInformationFormProps,
+  CommunityInformationFormSubmitValues,
+} from './types';
 import useSocialLinks from './useSocialLinks';
-import { communityInformationFormValidationSchema } from './validation';
-
-const socialLinksDisplay = false; // TODO: Set this when design figures out how we will integrate the social links
+import {
+  baseCommunityInformationFormValidationSchema,
+  communityChainValidation,
+} from './validation';
 
 const CommunityInformationForm = ({
-  selectedAddress,
-  selectedCommunity,
   onSubmit,
   onCancel,
-  handleSelectedChainId,
+  onWatch,
+  withChainsConfig,
+  withSocialLinks = false,
+  initialValues,
+  isCreatingCommunity,
+  submitBtnLabel,
 }: CommunityInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
@@ -63,21 +57,14 @@ const CommunityInformationForm = ({
 
   const { data: configurationData } = useFetchConfigurationQuery();
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
-  const { trackAnalytics } = useBrowserAnalyticsTrack<
-    MixpanelLoginPayload | BaseMixpanelPayload
-  >({
-    onAction: true,
-  });
-
-  const {
-    mutateAsync: createCommunityMutation,
-    isLoading: createCommunityLoading,
-  } = useCreateCommunityMutation();
-
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
   const isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
+
+  const validation = withChainsConfig
+    ? baseCommunityInformationFormValidationSchema.merge(
+        communityChainValidation,
+      )
+    : baseCommunityInformationFormValidationSchema;
 
   const getChainOptions = () => {
     const mappedChainValue = (chainType) => ({
@@ -88,13 +75,13 @@ const CommunityInformationForm = ({
 
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
     // preselected and further input's will be disabled
-    if (selectedCommunity.type === CommunityType.Polygon) {
+    if (withChainsConfig?.community?.type === CommunityType.Polygon) {
       return sortedChains
         .filter((chainType) => chainType.value === POLYGON_ETH_CHAIN_ID)
         .map(mappedChainValue);
     }
 
-    if (selectedCommunity.type === CommunityType.Solana) {
+    if (withChainsConfig?.community?.type === CommunityType.Solana) {
       return sortedChains
         .filter((chainType) => chainType.chainBase === CommunityType.Solana)
         .map(mappedChainValue);
@@ -104,7 +91,7 @@ const CommunityInformationForm = ({
       .filter(
         (chainType) =>
           chainType.chainBase ===
-          (selectedCommunity.type === CommunityType.Cosmos
+          (withChainsConfig?.community?.type === CommunityType.Cosmos
             ? CommunityType.Cosmos
             : CommunityType.Ethereum),
       )
@@ -112,105 +99,47 @@ const CommunityInformationForm = ({
   };
 
   const getInitialValue = () => {
-    switch (selectedCommunity.type) {
-      case CommunityType.Base:
-        return {
-          chain: getChainOptions()?.find((o) => o.value === BASE_ID),
-        };
-      case CommunityType.Ethereum:
-        return {
-          chain: getChainOptions()?.find(
-            (o) => o.value === ETHEREUM_MAINNET_ID,
-          ),
-        };
-      case CommunityType.Cosmos:
-        return {
-          chain: getChainOptions()?.find((o) => o.value === OSMOSIS_ID),
-        };
-      case CommunityType.Blast:
-        return {
-          chain: getChainOptions()?.find((o) => o.value === BLAST_ID),
-        };
-      case CommunityType.Polygon:
-      case CommunityType.Solana:
-        return { chain: getChainOptions()?.[0] };
-    }
+    return {
+      ...(initialValues || {}),
+      ...(withChainsConfig && {
+        chain: (() => {
+          const options = getChainOptions();
+
+          switch (withChainsConfig.community.type) {
+            case CommunityType.Base:
+              return options?.find((o) => o.value === BASE_ID);
+            case CommunityType.Ethereum:
+              return options?.find((o) => o.value === ETHEREUM_MAINNET_ID);
+            case CommunityType.Cosmos:
+              return options?.find((o) => o.value === OSMOSIS_ID);
+            case CommunityType.Blast:
+              return options?.find((o) => o.value === BLAST_ID);
+            case CommunityType.Polygon:
+            case CommunityType.Solana:
+              return options?.[0];
+          }
+        })(),
+      }),
+    };
   };
 
-  const handleSubmit = async (values: FormSubmitValues) => {
+  const handleSubmit = async (values: CommunityInformationFormSubmitValues) => {
     const hasLinksError = validateSocialLinks();
 
     if (isCommunityNameTaken || hasLinksError) return;
     // @ts-expect-error StrictNullChecks
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
-    const selectedChainNode = sortedChains.find(
-      (chain) => String(chain.value) === values.chain.value,
-    );
-
-    try {
-      const input = buildCreateCommunityInput({
-        id: communityId,
-        name: values.communityName,
-        chainBase: selectedCommunity.chainBase,
-        description: values.communityDescription,
-        iconUrl: values.communityProfileImageURL,
-        socialLinks: values.links ?? [],
-        nodeUrl: selectedChainNode!.nodeUrl!,
-        altWalletUrl: selectedChainNode!.altWalletUrl!,
-        userAddress: selectedAddress.address,
-        ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
-          ethChainId: values.chain.value,
-        }),
-        ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
-          cosmosChainId: values.chain.value,
-          bech32Prefix: selectedChainNode?.bech32Prefix,
-        }),
-        isPWA: isAddedToHomeScreen,
-      });
-      await createCommunityMutation(input);
-      onSubmit(communityId, values.communityName);
-    } catch (err) {
-      notifyError(err.message);
-    }
-  };
-
-  const handleCancel = () => {
-    trackAnalytics({
-      event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_CANCELLED,
-      isPWA: isAddedToHomeScreen,
-    });
-
-    openConfirmation({
-      title: 'Are you sure you want to cancel?',
-      description: 'Your details will not be saved. Cancel create community?',
-      buttons: [
-        {
-          label: 'Yes, cancel',
-          buttonType: 'destructive',
-          buttonHeight: 'sm',
-          onClick: onCancel,
-        },
-        {
-          label: 'No, continue',
-          buttonType: 'primary',
-          buttonHeight: 'sm',
-        },
-      ],
-    });
-  };
-
-  const handleWatchForm = (values: any) => {
-    handleSelectedChainId(values?.chain?.value);
+    await onSubmit({ ...values, communityId }).catch(console.error);
   };
 
   return (
     <CWForm
-      validationSchema={communityInformationFormValidationSchema}
+      validationSchema={validation}
       onSubmit={handleSubmit}
       className="CommunityInformationForm"
       initialValues={getInitialValue()}
-      onWatch={handleWatchForm}
+      onWatch={onWatch}
     >
       {/* Form fields */}
       <CWTextInput
@@ -225,18 +154,20 @@ const CommunityInformationForm = ({
         }
       />
 
-      <CWSelectList
-        name="chain"
-        hookToForm
-        isClearable={false}
-        label="Select chain"
-        placeholder="Select chain"
-        isDisabled={
-          selectedCommunity.type === CommunityType.Polygon ||
-          selectedCommunity.type === CommunityType.Solana
-        }
-        options={getChainOptions()}
-      />
+      {withChainsConfig && (
+        <CWSelectList
+          name="chain"
+          hookToForm
+          isClearable={false}
+          label="Select chain"
+          placeholder="Select chain"
+          isDisabled={
+            withChainsConfig.community.type === CommunityType.Polygon ||
+            withChainsConfig.community.type === CommunityType.Solana
+          }
+          options={getChainOptions()}
+        />
+      )}
 
       <CWTextInput
         label="Community URL"
@@ -265,7 +196,7 @@ const CommunityInformationForm = ({
         enableGenerativeAI
       />
 
-      {socialLinksDisplay ? (
+      {withSocialLinks ? (
         <>
           <section className="header">
             <CWText type="h4">
@@ -324,7 +255,9 @@ const CommunityInformationForm = ({
             </button>
           </section>
         </>
-      ) : null}
+      ) : (
+        <></>
+      )}
 
       {/* Action buttons */}
       <section className="action-buttons">
@@ -333,13 +266,13 @@ const CommunityInformationForm = ({
           label="Cancel"
           buttonWidth="wide"
           buttonType="secondary"
-          onClick={handleCancel}
+          onClick={onCancel}
         />
         <CWButton
           type="submit"
           buttonWidth="wide"
-          label="Launch Community"
-          disabled={createCommunityLoading || isProcessingProfileImage}
+          label={submitBtnLabel}
+          disabled={isCreatingCommunity || isProcessingProfileImage}
         />
       </section>
     </CWForm>

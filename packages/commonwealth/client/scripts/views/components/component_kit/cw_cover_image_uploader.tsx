@@ -228,7 +228,10 @@ export const CWCoverImageUploader = ({
 
     setIsUploading(true);
 
-    const [_imageURL, _uploadStatus] = await uploadImage(file);
+    // const [_imageURL, _uploadStatus] = await uploadImage(file);
+    const _imageURL = URL.createObjectURL(file);
+    const _uploadStatus = 'success';
+
     setIsUploading(false);
     setUploadStatus(_uploadStatus);
 
@@ -352,8 +355,8 @@ export const CWCoverImageUploader = ({
           uploadStatus === 'success'
             ? 'Image upload succeeded.'
             : uploadStatus === 'failure'
-            ? 'Image upload failed.'
-            : null
+              ? 'Image upload failed.'
+              : null
         }
         validationStatus={uploadStatus}
       />

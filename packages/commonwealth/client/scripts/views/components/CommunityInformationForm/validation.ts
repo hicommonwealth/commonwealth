@@ -1,7 +1,7 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import z from 'zod';
 
-export const communityInformationFormValidationSchema = z.object({
+export const baseCommunityInformationFormValidationSchema = z.object({
   communityName: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
@@ -13,6 +13,9 @@ export const communityInformationFormValidationSchema = z.object({
   communityProfileImageURL: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+});
+
+export const communityChainValidation = z.object({
   chain: z.object(
     {
       value: z.any().default(-1).optional(),

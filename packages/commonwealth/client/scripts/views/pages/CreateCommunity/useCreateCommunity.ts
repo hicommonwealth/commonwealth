@@ -26,7 +26,7 @@ const useCreateCommunity = () => {
     );
   };
 
-  const handleCompleteBasicInformationStep = (
+  const handleCompleteCommunityInformationStep = (
     communityId: string,
     communityName: string,
   ) => {
@@ -36,7 +36,7 @@ const useCreateCommunity = () => {
   };
 
   const isValidStepToShowCommunityStakeFormStep = [
-    CreateCommunityStep.BasicInformation,
+    CreateCommunityStep.CommunityInformation,
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
 
@@ -57,7 +57,7 @@ const useCreateCommunity = () => {
     setSelectedChainId,
     createdCommunityId,
     createdCommunityName,
-    handleCompleteBasicInformationStep,
+    handleCompleteCommunityInformationStep,
     onChangeStep,
     showCommunityStakeStep,
     selectedChainId,
