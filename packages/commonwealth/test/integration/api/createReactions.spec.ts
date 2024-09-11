@@ -117,7 +117,7 @@ describe('createReaction Integration Tests', () => {
 
     chai.assert.isNotNull(comment);
 
-    const beforeReactionCount = comment.reaction_count;
+    const beforeReactionCount = comment!.reaction_count;
 
     const createReactionResponse = await server.seeder.createReaction({
       chain: communityId,
