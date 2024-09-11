@@ -1,5 +1,5 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Topic, { TopicAttributes } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -24,7 +24,6 @@ import '../../../styles/modals/edit_topic_modal.scss';
 import useAppStatus from '../../hooks/useAppStatus';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import { createDeltaFromText } from '../components/react_quill_editor/utils';
-import { checkForImageInDescription, removeImageMarkdown } from './utils';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -57,15 +56,10 @@ export const EditTopicModal = ({
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
-  const [image, setImage] = useState<string | null>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
 
   const descriptionInsertString = description.ops?.[0].insert;
-
-  useEffect(() => {
-    checkForImageInDescription(descriptionInsertString, setImage);
-  }, [description, descriptionInsertString]);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -132,13 +126,6 @@ export const EditTopicModal = ({
     });
   };
 
-  const onDeleteImageClick = () => {
-    if (description) {
-      setDescription(removeImageMarkdown(descriptionInsertString));
-      setImage(null);
-    }
-  };
-
   return (
     <div className="EditTopicModal">
       <CWModalHeader label="Edit topic" onModalClose={onModalClose} />
@@ -197,16 +184,6 @@ export const EditTopicModal = ({
               label="Delete topic"
             />
           </div>
-          {image && (
-            <div>
-              <CWButton
-                buttonType="destructive"
-                buttonHeight="sm"
-                label="Remove image"
-                onClick={() => onDeleteImageClick()}
-              />
-            </div>
-          )}
           <CWButton
             label="Cancel"
             buttonType="secondary"
