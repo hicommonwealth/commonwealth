@@ -30,15 +30,16 @@ export const DeleteGroupModal = ({
   onClose = () => {},
 }: DeleteGroupModalAttrs) => {
   const navigate = useCommonNavigate();
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: deleteGroup } = useDeleteGroupMutation({
-    communityId: app.activeChainId(),
+    communityId,
   });
   const user = useUserStore();
 
   const handleDelete = async () => {
     await deleteGroup({
       address: user.activeAccount?.address || '',
-      communityId: app.activeChainId(),
+      communityId,
       groupId: groupId,
     })
       .then(() => {

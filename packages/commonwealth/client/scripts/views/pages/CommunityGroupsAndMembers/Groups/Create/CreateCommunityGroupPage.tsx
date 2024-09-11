@@ -21,8 +21,9 @@ const CreateCommunityGroupPage = () => {
 
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: createGroup } = useCreateGroupMutation({
-    communityId: app.activeChainId(),
+    communityId,
   });
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -57,10 +58,7 @@ const CreateCommunityGroupPage = () => {
         try {
           await createGroup(payload);
           notifySuccess('Group Created');
-          setShouldShowGroupMutationBannerForCommunity(
-            app.activeChainId(),
-            true,
-          );
+          setShouldShowGroupMutationBannerForCommunity(communityId, true);
           navigate(`/members?tab=groups`);
         } catch (error) {
           notifyError('Failed to create group');

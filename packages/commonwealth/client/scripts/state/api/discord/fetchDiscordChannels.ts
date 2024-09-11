@@ -8,6 +8,7 @@ const CHANNELS_STALE_TIME = 30 * 1_000; // 30 s
 
 interface FetchDiscordChannelsProps {
   chainId: string;
+  apiEnabled?: boolean;
 }
 
 const fetchChannels = async ({ chainId }: FetchDiscordChannelsProps) => {
@@ -28,11 +29,13 @@ const fetchChannels = async ({ chainId }: FetchDiscordChannelsProps) => {
 
 const useFetchDiscordChannelsQuery = ({
   chainId,
+  apiEnabled = true,
 }: FetchDiscordChannelsProps) => {
   return useQuery({
     queryKey: [ApiEndpoints.DISCORD_CHANNELS, chainId],
     queryFn: () => fetchChannels({ chainId }),
     staleTime: CHANNELS_STALE_TIME,
+    enabled: apiEnabled,
   });
 };
 

@@ -39,11 +39,6 @@ import {
   __searchCommunities,
 } from './server_communities_methods/search_communities';
 import {
-  UpdateChainNodeOptions,
-  UpdateChainNodeResult,
-  __updateChainNode,
-} from './server_communities_methods/update_chain_node';
-import {
   UpdateCommunityOptions,
   UpdateCommunityResult,
   __updateCommunity,
@@ -94,12 +89,6 @@ export class ServerCommunitiesController {
     options: CreateChainNodeOptions,
   ): Promise<CreateChainNodeResult> {
     return __createChainNode.call(this, options);
-  }
-
-  async updateChainNode(
-    options: UpdateChainNodeOptions,
-  ): Promise<UpdateChainNodeResult> {
-    return __updateChainNode.call(this, options);
   }
 
   async getRelatedCommunities(

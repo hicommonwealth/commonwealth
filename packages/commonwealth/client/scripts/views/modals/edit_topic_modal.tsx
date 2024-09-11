@@ -106,7 +106,7 @@ export const EditTopicModal = ({
             await deleteTopic({
               topicId: id,
               topicName: name,
-              communityId: app.activeChainId(),
+              communityId: app.activeChainId() || '',
             });
             if (noRedirect) {
               onModalClose();
