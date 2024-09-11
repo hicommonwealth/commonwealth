@@ -1,5 +1,7 @@
 import {
   ALL_COMMUNITIES,
+  COMMUNITY_NAME_ERROR,
+  COMMUNITY_NAME_REGEX,
   ChainBase,
   ChainType,
   MAX_SCHEMA_INT,
@@ -15,6 +17,9 @@ export const CreateCommunity = {
     name: z
       .string()
       .max(255)
+      .regex(COMMUNITY_NAME_REGEX, {
+        message: COMMUNITY_NAME_ERROR,
+      })
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
@@ -132,8 +137,10 @@ export const GenerateStakeholderGroups = {
   input: z.object({
     id: z.string(),
   }),
-  output: z.object({
-    groups: z.array(Group),
-    created: z.boolean(),
-  }),
+  output: z
+    .object({
+      groups: z.array(Group),
+      created: z.boolean(),
+    })
+    .partial(),
 };

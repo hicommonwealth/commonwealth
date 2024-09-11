@@ -63,7 +63,6 @@ export default (
                     event_name: EventNames.ThreadUpvoted,
                     event_payload: {
                       ...reaction.toJSON(),
-                      reaction: 'like',
                       community_id: thread.community_id,
                       contestManagers,
                     },
@@ -93,6 +92,20 @@ export default (
                 transaction: options.transaction,
               },
             );
+            if (reaction.reaction === 'like') {
+              await emitEvent(
+                sequelize.models.Outbox,
+                [
+                  {
+                    event_name: EventNames.CommentUpvoted,
+                    event_payload: {
+                      ...reaction.toJSON(),
+                    },
+                  },
+                ],
+                options.transaction,
+              );
+            }
             stats().increment('cw.hook.reaction-count', {
               thread_id: String(comments.at(0)!.thread_id),
             });

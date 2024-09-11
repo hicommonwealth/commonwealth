@@ -14,10 +14,11 @@ import './Snapshots.scss';
 import { snapshotValidationSchema } from './validation';
 
 const Snapshots = () => {
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   useRunOnceOnCondition({

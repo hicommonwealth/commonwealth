@@ -1,4 +1,4 @@
-import { Roles, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import { Roles, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
@@ -61,7 +61,6 @@ export const Address = z.object({
   block_info: z.string().max(255).nullish(),
   is_user_default: z.boolean().default(false),
   role: z.enum(Roles).default('member'),
-  wallet_sso_source: z.nativeEnum(WalletSsoSource).nullish(),
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
 

@@ -9,7 +9,6 @@ const {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
-  SEND_EMAILS: _SEND_EMAILS,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
@@ -30,7 +29,6 @@ const {
   CF_API_KEY,
 } = process.env;
 
-const SEND_EMAILS = _SEND_EMAILS === 'true';
 const NO_PRERENDER = _NO_PRERENDER;
 
 const DEFAULTS = {
@@ -50,7 +48,6 @@ const DEFAULTS = {
 export const config = configure(
   { ...model_config, ...adapters_config },
   {
-    SEND_EMAILS,
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
@@ -124,7 +121,6 @@ export const config = configure(
     },
   },
   z.object({
-    SEND_EMAILS: z.boolean(),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
