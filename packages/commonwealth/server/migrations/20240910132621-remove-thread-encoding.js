@@ -33,9 +33,9 @@ module.exports = {
         const replacements = [];
         const threadIds = [];
         for (const thread of encodedThreads) {
-          if (replacements.length > 0) query += ',\n';
           try {
             const decodedBody = decodeURIComponent(thread.body);
+            if (replacements.length > 0) query += ',\n';
             query += 'WHEN id = ? THEN ?';
             replacements.push(thread.id, decodedBody);
             threadIds.push(thread.id);
