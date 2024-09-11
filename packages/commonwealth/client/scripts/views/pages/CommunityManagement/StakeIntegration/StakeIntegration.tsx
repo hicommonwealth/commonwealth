@@ -38,7 +38,7 @@ const StakeIntegration = ({
 
   const contractInfo =
     // @ts-expect-error <StrictNullChecks/>
-    commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.ethChainId];
+    commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.eth_chain_id];
 
   if (!contractInfo) {
     return <PageNotFound />;
