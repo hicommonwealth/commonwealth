@@ -212,7 +212,6 @@
     "process": "^0.11.10",
     "protobufjs": "^6.1.13",
     "quill": "^1.3.7",
-    "quill-delta-to-markdown": "^0.6.0",
     "quill-image-drop-and-paste": "^1.0.4",
     "quill-magic-url": "^4.2.0",
     "quill-mention": "^2.2.7",

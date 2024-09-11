@@ -84,8 +84,8 @@ const editThread = async ({
     jwt: userStore.getState().jwt,
     // for edit profile
     ...(url && { url }),
-    ...(newBody && { body: encodeURIComponent(newBody) }),
-    ...(newTitle && { title: encodeURIComponent(newTitle) }),
+    ...(newBody && { body: newBody }),
+    ...(newTitle && { title: newTitle }),
     ...(authorProfile && { author: JSON.stringify(authorProfile) }),
     // for editing thread locked status
     ...(readOnly !== undefined && { locked: readOnly }),
