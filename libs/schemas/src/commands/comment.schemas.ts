@@ -17,6 +17,18 @@ export const CreateComment = {
   output: Comment.extend({ community_id: z.string() }),
 };
 
+export const UpdateComment = {
+  input: z.object({
+    comment_id: PG_INT,
+    text: z.string().trim().min(1),
+
+    // discord integration
+    thread_id: PG_INT.optional(),
+    discord_meta: DiscordMetaSchema.optional(),
+  }),
+  output: Comment.extend({ community_id: z.string() }),
+};
+
 export const CommentCanvasReaction = z.object({
   comment_id: PG_INT,
   reaction: z.enum(['like']),

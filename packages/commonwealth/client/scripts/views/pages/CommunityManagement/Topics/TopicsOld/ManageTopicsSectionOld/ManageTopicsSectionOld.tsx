@@ -57,7 +57,7 @@ export const ManageTopicsSectionOld = () => {
   const { isWindowExtraSmall } = useBrowserWindow({});
 
   const { data: rawTopics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
   });
 
   const { mutateAsync: updateFeaturedTopicsOrder } =

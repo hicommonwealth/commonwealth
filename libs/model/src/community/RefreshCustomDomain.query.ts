@@ -1,14 +1,15 @@
 import type { Query } from '@hicommonwealth/core';
 import { AppError, config } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { isSuperAdmin } from '../middleware';
+import { isSuperAdmin, type AuthContext } from '../middleware';
 
 /**
  * This function will refresh the acm status for a custom domain in heroku and provide a status update
  * @constructor
  */
 export function RefreshCustomDomain(): Query<
-  typeof schemas.RefreshCustomDomain
+  typeof schemas.RefreshCustomDomain,
+  AuthContext
 > {
   return {
     ...schemas.RefreshCustomDomain,

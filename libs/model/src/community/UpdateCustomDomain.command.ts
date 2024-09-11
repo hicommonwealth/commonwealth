@@ -2,14 +2,15 @@ import type { Command } from '@hicommonwealth/core';
 import { AppError, config } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isSuperAdmin } from '../middleware';
+import { isSuperAdmin, type AuthContext } from '../middleware';
 
 /**
  * This function will add the custom domain to the database as well as add an entry in heroku.
  * @constructor
  */
 export function UpdateCustomDomain(): Command<
-  typeof schemas.UpdateCustomDomain
+  typeof schemas.UpdateCustomDomain,
+  AuthContext
 > {
   return {
     ...schemas.UpdateCustomDomain,

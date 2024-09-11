@@ -48,11 +48,11 @@ describe('getEventSources', () => {
 
   test('should return event sources organized by chain node', async () => {
     const signatures = await getTestSignatures();
-    const abi = await getTestAbi();
+    await getTestAbi();
     const result = await getEventSources(models);
 
     const chainNodeId = String(signatures[0].chain_node_id);
-    const contractAddress = signatures[0].contract_address;
+    const contractAddress = signatures[0].contract_address.toLowerCase();
     expect(result).to.exist.and.to.haveOwnProperty(chainNodeId);
     expect(result[chainNodeId].rpc).to.equal(localRpc);
     expect(result[chainNodeId].contracts).to.exist.and.to.haveOwnProperty(

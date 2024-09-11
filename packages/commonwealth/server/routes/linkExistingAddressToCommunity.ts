@@ -140,10 +140,9 @@ const linkExistingAddressToCommunity = async (
           verified: originalAddress.verified,
           hex,
         },
-        { where: { id: existingAddress.id }, transaction },
+        { where: { id: existingAddress.id }, transaction, returning: true },
       );
-      // @ts-expect-error StrictNullChecks
-      addressId = updatedObj.id;
+      addressId = updatedObj[1][0].id!;
     });
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
@@ -164,7 +163,6 @@ const linkExistingAddressToCommunity = async (
           verification_token_expires: verificationTokenExpires,
           verified: originalAddress.verified,
           wallet_id: originalAddress.wallet_id,
-          wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),
           role: 'member',
           is_user_default: false,

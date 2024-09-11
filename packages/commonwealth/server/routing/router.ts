@@ -90,12 +90,10 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
-import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
-import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
@@ -295,13 +293,6 @@ function setupRouter(
   );
   registerRoute(
     router,
-    'put',
-    '/nodes/:id',
-    passport.authenticate('jwt', { session: false }),
-    updateChainNodeHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'get',
     '/relatedCommunities',
     getRelatedCommunitiesHandler.bind(this, serverControllers),
@@ -443,14 +434,6 @@ function setupRouter(
   );
 
   // comments
-  registerRoute(
-    router,
-    'patch',
-    '/comments/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateCommentHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',

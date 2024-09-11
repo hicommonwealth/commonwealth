@@ -179,7 +179,7 @@ const DetailsFormStep = ({
     if (editMode) {
       try {
         await updateContest({
-          id: app.activeChainId(),
+          id: app.activeChainId() || '',
           contest_address: contestAddress,
           name: values.contestName,
           image_url: values.contestImage,

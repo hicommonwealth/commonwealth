@@ -8,12 +8,14 @@ import UpdateCustomDomainTask from 'views/pages/AdminPanel/UpdateCustomDomainTas
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
 import Analytics from './Analytics';
+import ConnectChainToCommunity from './ConnectChainToCommunityTask';
 import DeleteChainTask from './DeleteChainTask';
 import DownloadMembersListTask from './DownloadMembersListTask';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
 import RefreshCustomDomainTask from './RefreshCustomDomainTask';
 import TopUsers from './TopUsers';
+import TriggerNotificationsWorkflow from './TriggerNotificationsWorkflow';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -38,8 +40,10 @@ const AdminPanelPage = () => {
         <UpdateCommunityIdTask />
         <DownloadMembersListTask />
         <RPCEndpointTask />
+        <ConnectChainToCommunity />
         <MakeSiteAdminTask />
         <TopUsers />
+        <TriggerNotificationsWorkflow />
       </div>
     </CWPageLayout>
   );

@@ -125,10 +125,10 @@ const getRequirementSubFormSchema = (
         requirementTokenId: true,
       })
     : !is1155Requirement
-    ? requirementSubFormValidationSchema.omit({
-        requirementTokenId: true,
-      })
-    : requirementSubFormValidationSchema;
+      ? requirementSubFormValidationSchema.omit({
+          requirementTokenId: true,
+        })
+      : requirementSubFormValidationSchema;
   return schema;
 };
 
@@ -140,13 +140,16 @@ const GroupForm = ({
   allowedAddresses,
   setAllowedAddresses,
 }: GroupFormProps) => {
+  const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    enabled: !!communityId,
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());

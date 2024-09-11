@@ -1,4 +1,5 @@
 import * as Rascal from 'rascal';
+import { config as EnvConfig } from '../config';
 import { getAllRascalConfigs } from './configuration/rascalConfig';
 import {
   RascalBindings,
@@ -31,7 +32,7 @@ export function getRabbitMQConfig(
     rabbitmq_uri.includes('127.0.0.1')
   ) {
     vhost = '/';
-    purge = true;
+    purge = !EnvConfig.BROKER.DISABLE_LOCAL_QUEUE_PURGE;
   } else {
     const count = (rabbitmq_uri.match(/\//g) || []).length;
     if (count == 3) {

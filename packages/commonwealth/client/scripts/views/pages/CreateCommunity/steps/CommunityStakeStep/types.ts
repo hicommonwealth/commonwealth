@@ -17,6 +17,7 @@ export interface SignStakeTransactionsProps {
   selectedAddress: AddressInfo;
   createdCommunityId: string;
   chainId: string;
+  isTopicFlow?: boolean;
 }
 
 export interface EnableStakeProps {
@@ -24,6 +25,7 @@ export interface EnableStakeProps {
   onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
   communityStakeData: StakeData;
   chainId: string;
+  isTopicFlow?: boolean;
 }
 
 export const defaultActionState: ActionState = {

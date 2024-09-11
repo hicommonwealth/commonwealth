@@ -100,15 +100,15 @@ const ContestCard = ({
 
   const { data: oneOffContestBalance } = useGetContestBalanceQuery({
     contestAddress: address,
-    chainRpc: app.chain.meta?.ChainNode?.url,
-    ethChainId: app.chain.meta?.ChainNode?.ethChainId || 0,
+    chainRpc: app.chain.meta?.ChainNode?.url || '',
+    ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
     apiEnabled: !isRecurring,
   });
 
   const handleCancel = () => {
     cancelContest({
       contest_address: address,
-      id: app.activeChainId(),
+      id: app.activeChainId() || '',
     }).catch((error) => {
       console.error('Failed to cancel contest: ', error);
     });
