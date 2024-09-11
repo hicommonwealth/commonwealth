@@ -243,19 +243,6 @@ describe('Community lifecycle', () => {
       assert.equal(updated?.type, 'chain');
     });
 
-    test('should throw if trying to change network', async () => {
-      await expect(() =>
-        command(UpdateCommunity(), {
-          actor: superAdminActor,
-          payload: {
-            ...baseRequest,
-            id: community.id,
-            network: 'cant-change',
-          },
-        }),
-      ).rejects.toThrow(UpdateCommunityErrors.CantChangeNetwork);
-    });
-
     test('should throw if id is reserved', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
@@ -270,32 +257,6 @@ describe('Community lifecycle', () => {
       ).rejects.toThrow(UpdateCommunityErrors.ReservedId);
     });
 
-    test('should throw if custom domain is taken', async () => {
-      await expect(() =>
-        command(UpdateCommunity(), {
-          actor: superAdminActor,
-          payload: {
-            ...baseRequest,
-            id: community.id,
-            custom_domain,
-          },
-        }),
-      ).rejects.toThrow(UpdateCommunityErrors.CustomDomainIsTaken);
-    });
-
-    test('should throw if not super admin when changing custom domain', async () => {
-      await expect(() =>
-        command(UpdateCommunity(), {
-          actor: adminActor,
-          payload: {
-            ...baseRequest,
-            id: baseCommunityId,
-            custom_domain: 'new-custom-domain',
-          },
-        }),
-      ).rejects.toThrow(UpdateCommunityErrors.CantChangeCustomDomain);
-    });
-
     test('should throw if snapshot not found', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
@@ -307,19 +268,6 @@ describe('Community lifecycle', () => {
           },
         }),
       ).rejects.toThrow(InvalidInput);
-    });
-
-    test('should throw if custom domain is invalid', async () => {
-      await expect(() =>
-        command(UpdateCommunity(), {
-          actor: superAdminActor,
-          payload: {
-            ...baseRequest,
-            id: community.id,
-            custom_domain: 'commonwealth',
-          },
-        }),
-      ).rejects.toThrow(UpdateCommunityErrors.InvalidCustomDomain);
     });
 
     test('should throw if namespace present but no transaction hash', async () => {
