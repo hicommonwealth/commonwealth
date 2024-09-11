@@ -33,6 +33,7 @@ async function main() {
         queryCases += 'WHEN id = ? THEN ?';
         replacements.push(id!, decodedBody);
         threadIds.push(id!);
+        // eslint-disable-next-line no-empty
       } catch {}
     }
 
