@@ -3,15 +3,17 @@ import React from 'react';
 import { Avatar } from 'views/components/Avatar';
 
 import clsx from 'clsx';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import './TokenBanner.scss';
 
 interface TokenBannerProps {
   avatarUrl?: string;
-  name: string;
-  ticker: string;
-  value: number;
-  change: number;
+  name?: string;
+  ticker?: string;
+  value?: number;
+  change?: number;
+  isLoading: boolean;
 }
 
 const TokenBanner = ({
@@ -20,7 +22,12 @@ const TokenBanner = ({
   ticker,
   value,
   change,
+  isLoading,
 }: TokenBannerProps) => {
+  if (isLoading) {
+    return <Skeleton height="100px" />;
+  }
+
   return (
     <div className="TokenBanner">
       <div className="token-identification">
