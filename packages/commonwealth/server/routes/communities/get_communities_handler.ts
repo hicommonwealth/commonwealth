@@ -1,5 +1,8 @@
 import { AppError } from '@hicommonwealth/core';
-import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
+import {
+  SearchCommunitiesOptions,
+  SearchCommunitiesResult,
+} from 'server/controllers/server_communities_methods/search_communities';
 import { ServerControllers } from '../../routing/router';
 import {
   PaginationQueryParams,
@@ -39,7 +42,8 @@ export const getCommunitiesHandler = async (
     // @ts-expect-error StrictNullChecks
     page: parseInt(options.page, 10) || 0,
     orderBy: options.order_by,
-    orderDirection: options.order_direction as any,
+    orderDirection:
+      options.order_direction as SearchCommunitiesOptions['orderDirection'],
   });
   return success(res, results);
 };
