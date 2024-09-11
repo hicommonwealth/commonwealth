@@ -34,11 +34,6 @@ import {
   __searchCommunities,
 } from './server_communities_methods/search_communities';
 import {
-  UpdateCommunityOptions,
-  UpdateCommunityResult,
-  __updateCommunity,
-} from './server_communities_methods/update_community';
-import {
   UpdateCommunityIdOptions,
   UpdateCommunityIdResult,
   __updateCommunityId,
@@ -54,12 +49,6 @@ export class ServerCommunitiesController {
     options: SearchCommunitiesOptions,
   ): Promise<SearchCommunitiesResult> {
     return __searchCommunities.call(this, options);
-  }
-
-  async updateCommunity(
-    options: UpdateCommunityOptions,
-  ): Promise<UpdateCommunityResult> {
-    return __updateCommunity.call(this, options);
   }
 
   async deleteCommunity(
