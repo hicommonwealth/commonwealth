@@ -222,7 +222,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       const communityChain = chainId ?? this.getChainId();
       const chainIdHex = `0x${parseInt(communityChain, 10).toString(16)}`;
       try {
-        await window.ethereum.request({
+        await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainIdHex }],
         });
