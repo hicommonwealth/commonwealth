@@ -27,7 +27,7 @@ World War II or the Second World War (1 September 1939 – 2 September 1945) was
 
 ~~Strikethrough~~
 
-<s>Strikethrough (when enable html tag decode.)</s>
+<s>Strikethrough (within s HTML tag)</s>
 
 *Italic*      _Italic_
 
