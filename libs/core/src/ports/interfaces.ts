@@ -247,7 +247,15 @@ export interface Broker extends Disposable {
 }
 
 export type BlobType = string | Uint8Array | Buffer | Readable;
-export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
+export const BlobBuckets = [
+  'assets',
+  'sitemap',
+  'archives',
+  'threadVersionHistories',
+  'commentVersionHistories',
+  'threads',
+  'comments',
+] as const;
 export type BlobBucket = (typeof BlobBuckets)[number];
 
 /**
