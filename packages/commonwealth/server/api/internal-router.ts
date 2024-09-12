@@ -10,6 +10,7 @@ import * as feed from './feed';
 import * as integrations from './integrations';
 import * as loadTest from './load-test';
 import * as subscription from './subscription';
+import * as superAdmin from './super-admin';
 import * as thread from './thread';
 import * as user from './user';
 import * as wallet from './wallet';
@@ -26,6 +27,7 @@ const api = {
   subscription: subscription.trpcRouter,
   loadTest: loadTest.trpcRouter,
   webhook: webhook.trpcRouter,
+  superAdmin: superAdmin.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

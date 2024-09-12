@@ -23,7 +23,7 @@ import z from 'zod';
 import './Webhooks.scss';
 
 const Webhooks = () => {
-  const communityId = app.activeChainId();
+  const communityId = app.activeChainId() || '';
   const [hasExistingWebhooks, setHasExistingWebhooks] = useState(false);
   const [webhookToConfigure, setWebhookToConfigure] = useState<z.infer<
     typeof Webhook

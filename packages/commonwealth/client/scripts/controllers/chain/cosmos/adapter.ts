@@ -1,6 +1,7 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { IApp } from 'state';
-import type ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import IChainAdapter from '../../../models/IChainAdapter';
 import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
@@ -16,12 +17,12 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
 
   public readonly base = ChainBase.CosmosSDK;
 
-  constructor(meta: ChainInfo, app: IApp) {
+  constructor(meta: z.infer<typeof ExtendedCommunity>, app: IApp) {
     super(meta, app);
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);
     this.governance =
-      meta.ChainNode.cosmosGovernanceVersion === 'v1'
+      meta?.ChainNode?.cosmos_gov_version === 'v1'
         ? new CosmosGovernanceV1(this.app)
         : new CosmosGovernance(this.app);
   }

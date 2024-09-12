@@ -1,5 +1,7 @@
 import {
   ALL_COMMUNITIES,
+  COMMUNITY_NAME_ERROR,
+  COMMUNITY_NAME_REGEX,
   ChainBase,
   ChainType,
   MAX_SCHEMA_INT,
@@ -15,6 +17,9 @@ export const CreateCommunity = {
     name: z
       .string()
       .max(255)
+      .regex(COMMUNITY_NAME_REGEX, {
+        message: COMMUNITY_NAME_ERROR,
+      })
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
@@ -118,13 +123,17 @@ export const UpdateCustomDomain = {
   }),
 };
 
+const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
+
 export const UpdateCommunity = {
-  input: z.object({
-    id: z.string(),
-    namespace: z.string(),
-    txHash: z.string(),
-    address: z.string(),
-  }),
+  input: Community.omit({ network: true, custom_domain: true })
+    .partial()
+    .extend({
+      id: z.string(),
+      featuredTopics: z.array(z.string()).optional(),
+      snapshot: Snapshot.or(z.array(Snapshot)).optional(),
+      transactionHash: z.string().optional(),
+    }),
   output: Community,
 };
 

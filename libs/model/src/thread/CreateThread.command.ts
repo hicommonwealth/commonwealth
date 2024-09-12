@@ -13,7 +13,8 @@ import { GetActiveContestManagers } from '../contest';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorized } from '../middleware/guards';
+import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
 import {
   emitMentions,
@@ -90,7 +91,9 @@ export function CreateThread(): Command<
       isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
     ],
-    body: async ({ actor, payload }) => {
+    body: async ({ actor, payload, auth }) => {
+      const { address } = mustBeAuthorized(actor, auth);
+
       const { community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
@@ -108,16 +111,6 @@ export function CreateThread(): Command<
         await checkAddressBalance(activeContestManagers, actor.address!);
         checkContestLimits(activeContestManagers, actor.address!);
       }
-
-      // Loading to update last_active
-      const address = await models.Address.findOne({
-        where: {
-          user_id: actor.user.id,
-          community_id,
-          address: actor.address,
-        },
-      });
-      mustExist('Community address', address);
 
       const body = sanitizeQuillText(payload.body);
       const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
@@ -139,6 +132,7 @@ export function CreateThread(): Command<
               comment_count: 0,
               reaction_count: 0,
               reaction_weights_sum: 0,
+              search: getThreadSearchVector(rest.title, body),
             },
             {
               transaction,

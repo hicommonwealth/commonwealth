@@ -37,7 +37,7 @@ type ComponentInteriorProps =
       body: React.ReactNode;
     };
 
-type CWPopoverProps = {
+export type CWPopoverProps = {
   placement?: PopperPlacementType;
   disablePortal?: boolean;
   modifiers?: PopperOwnProps['modifiers'];

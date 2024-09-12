@@ -66,7 +66,7 @@ export const processThreadUpvoted: EventHandler<
   }
 
   const provider = notificationsProvider();
-  return await provider.triggerWorkflow({
+  const res = await provider.triggerWorkflow({
     key: WorkflowKeys.NewUpvotes,
     users: [{ id: String(threadAuthorSubscription.user_id) }],
     data: {
@@ -83,4 +83,6 @@ export const processThreadUpvoted: EventHandler<
       ),
     },
   });
+
+  return !res.some((r) => r.status === 'rejected');
 };

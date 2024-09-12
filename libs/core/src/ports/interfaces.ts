@@ -429,7 +429,7 @@ export type IdentifyUserOptions = {
 export interface NotificationsProvider extends Disposable {
   triggerWorkflow(
     options: NotificationsProviderTriggerOptions,
-  ): Promise<boolean>;
+  ): Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>;
 
   getMessages(
     options: NotificationsProviderGetMessagesOptions,
