@@ -33,7 +33,7 @@ import { editorTranslator } from './utils/editorTranslator';
 import { fileToText } from './utils/fileToText';
 import { iconComponentFor } from './utils/iconComponentFor';
 
-import './Editor.scss';
+import './MarkdownEditor.scss';
 
 export type ImageURL = string;
 
