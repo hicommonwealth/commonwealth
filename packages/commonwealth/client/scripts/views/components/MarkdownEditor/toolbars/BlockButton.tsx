@@ -17,7 +17,7 @@ export type BlockButtonProps = Readonly<{
 }>;
 
 export const BlockButton = (props: BlockButtonProps) => {
-  const { blockType, removeTitle, addTitle } = props;
+  const { blockType, removeTitle, addTitle, children } = props;
 
   const currentBlockType = useCellValue(currentBlockType$);
   const convertSelectionToNode = usePublisher(convertSelectionToNode$);
@@ -47,7 +47,7 @@ export const BlockButton = (props: BlockButtonProps) => {
       on={active}
       onValueChange={toggleFormat}
     >
-      {props.children}
+      {children}
     </ToggleSingleGroupWithItem>
   );
 };
