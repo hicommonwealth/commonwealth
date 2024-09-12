@@ -70,14 +70,14 @@ export class RejectedMember extends InvalidActor {
 }
 
 /**
- * Prepares authorization context
+ * Builds authorization context
  *
  * @param actor command actor
  * @param payload command payload
  * @param auth authorization context
  * @param roles roles filter
  */
-async function authorizeAddress(
+async function buildAuth(
   ctx: Context<ZodSchema, AuthContext>,
   roles: Role[],
 ): Promise<AuthContext> {
@@ -255,14 +255,14 @@ export function isAuthorized({
   collaborators?: boolean;
 }): AuthHandler {
   return async (ctx) => {
-    const isSuperAdmin = ctx.actor.user.isAdmin;
+    const isAdmin = ctx.actor.user.isAdmin;
 
-    const auth = await authorizeAddress(
+    const auth = await buildAuth(
       ctx,
-      isSuperAdmin ? ['admin', 'moderator', 'member'] : roles,
+      isAdmin ? ['admin', 'moderator', 'member'] : roles,
     );
 
-    if (isSuperAdmin) return;
+    if (isAdmin) return;
 
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
 
