@@ -1,66 +1,48 @@
 import { AppError } from '@hicommonwealth/core';
 import { UserInstance } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
   ChainNodeExists: 'Chain Node already exists',
   NotAdmin: 'Not an admin',
   ChainIdNaN: 'eth_chain_id is required on ethereum Chain Nodes',
-  NeedCosmosChainId:
-    'cosmos_chain_id is a string, required on Cosmos Chain Nodes',
+  MissingChainArguments: 'Missing chain arguments',
+  BalanceTypeNotSupported: 'Balance type not supported',
 };
 
 export type CreateChainNodeOptions = {
   user: UserInstance;
   url: string;
   name?: string;
-  bech32?: string;
-  slip44?: number;
   balanceType?: string;
   eth_chain_id?: number;
-  cosmos_chain_id?: string;
 };
 export type CreateChainNodeResult = { node_id: number };
 
 export async function __createChainNode(
   this: ServerCommunitiesController,
-  {
-    user,
-    url,
-    name,
-    bech32,
-    slip44,
-    balanceType,
-    eth_chain_id,
-    cosmos_chain_id,
-  }: CreateChainNodeOptions,
+  { user, url, name, balanceType, eth_chain_id }: CreateChainNodeOptions,
 ): Promise<CreateChainNodeResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
-  if (balanceType === 'ethereum' && typeof eth_chain_id !== 'number') {
+  if (typeof eth_chain_id !== 'number') {
     throw new AppError(Errors.ChainIdNaN);
   }
-  if (
-    balanceType === BalanceType.Cosmos &&
-    typeof cosmos_chain_id !== 'string'
-  ) {
-    throw new AppError(Errors.NeedCosmosChainId);
+
+  if (balanceType != 'ethereum') {
+    throw new AppError(Errors.BalanceTypeNotSupported);
   }
 
-  let where;
-  if (eth_chain_id) {
-    where = { [Op.or]: { url, eth_chain_id } };
-  } else if (cosmos_chain_id) {
-    where = { [Op.or]: { url, cosmos_chain_id } };
-  } else {
-    where = { url };
+  if (!url || !name) {
+    throw new AppError(Errors.MissingChainArguments);
   }
 
-  const chainNode = await this.models.ChainNode.findOne({ where });
+  const chainNode = await this.models.ChainNode.findOne({
+    where: { eth_chain_id },
+  });
 
   if (chainNode) {
     throw new AppError(Errors.ChainNodeExists);
@@ -68,15 +50,11 @@ export async function __createChainNode(
 
   const newChainNode = await this.models.ChainNode.create({
     url,
-    // @ts-expect-error StrictNullChecks
     name,
     balance_type: balanceType as BalanceType,
-    bech32,
-    slip44,
+    alt_wallet_url: url,
     eth_chain_id,
-    cosmos_chain_id,
   });
 
-  // @ts-expect-error StrictNullChecks
-  return { node_id: newChainNode.id };
+  return { node_id: newChainNode.id! };
 }

@@ -643,12 +643,12 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
-      //.set('address', address)
+      .set('address', args.creator_address)
       .send({
         ...args,
         type: 'offchain',
         base: 'ethereum',
-        eth_chain_id: 1,
+        eth_chain_id: 2,
         user_address: args.creator_address,
         node_url: 'http://chain.url',
         network: 'network',

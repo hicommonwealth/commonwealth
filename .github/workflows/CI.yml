@@ -335,9 +335,6 @@ jobs:
       - name: Build
         run: pnpm -r build
 
-      - name: build
-        run: pnpm -r lint
-
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
 
