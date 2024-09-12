@@ -111,7 +111,9 @@ const StakeIntegration = ({
           </>
         ) : (
           <CommunityStakeStep
-            refetchStakeQuery={refetchStakeQuery}
+            refetchStakeQuery={() => {
+              refetchStakeQuery().catch(console.error);
+            }}
             goToSuccessStep={handleStepChange}
             onTopicFlowStepChange={onTopicFlowStepChange}
             createdCommunityName={community?.name}
