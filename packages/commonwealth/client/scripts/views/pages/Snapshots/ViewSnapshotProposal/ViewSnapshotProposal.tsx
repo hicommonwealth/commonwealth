@@ -49,7 +49,7 @@ const ViewSnapshotProposal = ({
   const user = useUserStore();
 
   const { data, error, isLoading } = useGetThreadsByLinkQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     link: {
       source: LinkSource.Snapshot,
       // @ts-expect-error <StrictNullChecks/>

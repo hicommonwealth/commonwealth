@@ -1,6 +1,6 @@
+import moment from 'moment/moment';
 import { useEffect, useState } from 'react';
 import app from 'state';
-import moment from 'moment/moment';
 
 const JOIN_COMMUNITY_BANNER_KEY = (communityId: string) =>
   `${communityId}-joinCommunityBannerClosedAt`;
@@ -10,7 +10,9 @@ const useJoinCommunityBanner = () => {
 
   useEffect(() => {
     const bannerClosedAt = Number(
-      localStorage.getItem(JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()))
+      localStorage.getItem(
+        JOIN_COMMUNITY_BANNER_KEY(app.activeChainId() || ''),
+      ),
     );
 
     if (!bannerClosedAt) {
@@ -26,8 +28,8 @@ const useJoinCommunityBanner = () => {
 
   const handleCloseBanner = () => {
     localStorage.setItem(
-      JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()),
-      String(Date.now())
+      JOIN_COMMUNITY_BANNER_KEY(app.activeChainId() || ''),
+      String(Date.now()),
     );
     setIsBannerVisible(false);
   };

@@ -34,8 +34,8 @@ const FundContestDrawer = ({
     useState<FundContestStep>('Form');
   const [txHash, setTxHash] = useState('');
 
-  const chainRpc = app?.chain?.meta?.ChainNode?.url;
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
 
   const { addressOptions, selectedAddress, setSelectedAddress } =
     useUserAddressesForFundForm();
@@ -52,7 +52,6 @@ const FundContestDrawer = ({
   } = useFundContestForm({
     contestAddress,
     chainRpc,
-    // @ts-expect-error <StrictNullChecks/>
     ethChainId,
     userAddress: selectedAddress.value,
   });
@@ -68,7 +67,6 @@ const FundContestDrawer = ({
 
     fundContest({
       contestAddress,
-      // @ts-expect-error <StrictNullChecks/>
       ethChainId,
       chainRpc,
       amount: Number(amountEth),

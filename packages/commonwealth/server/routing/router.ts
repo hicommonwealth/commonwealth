@@ -45,7 +45,6 @@ import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
-import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -90,18 +89,14 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
-import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
-import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
-import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
-import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
@@ -117,7 +112,6 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
@@ -176,8 +170,8 @@ function setupRouter(
   router.use(useragent.express());
 
   // API routes
-  app.use(api.internal.PATH, api.internal.router);
-  app.use(api.external.PATH, api.external.router);
+  app.use(api.internal.PATH, useragent.express(), api.internal.router);
+  app.use(api.external.PATH, useragent.express(), api.external.router);
   app.use(
     api.integration.PATH,
     api.integration.build(serverControllers, databaseValidationService),
@@ -270,13 +264,6 @@ function setupRouter(
 
   registerRoute(
     router,
-    'patch',
-    '/communities/:communityId',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'get',
     '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
@@ -294,13 +281,6 @@ function setupRouter(
     '/nodes',
     passport.authenticate('jwt', { session: false }),
     createChainNodeHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/nodes/:id',
-    passport.authenticate('jwt', { session: false }),
-    updateChainNodeHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
@@ -436,23 +416,7 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
 
-  registerRoute(
-    router,
-    'get',
-    '/bulkOffchain',
-    databaseValidationService.validateCommunity,
-    bulkOffchain.bind(this, models),
-  );
-
   // comments
-  registerRoute(
-    router,
-    'patch',
-    '/comments/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateCommentHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',
@@ -523,22 +487,6 @@ function setupRouter(
   );
 
   // reactions
-  registerRoute(
-    router,
-    'post',
-    '/threads/:id/reactions',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadReactionHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/comments/:id/reactions',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createCommentReactionHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'delete',

@@ -287,7 +287,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         setDarkMode(true);
       }
       if (app.chain) {
-        await updateActiveAddresses(app.activeChainId());
+        await updateActiveAddresses(app.activeChainId() || '');
       }
     }
 
@@ -495,7 +495,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
               ? addressSwapper({
                   address: address,
                   currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
                     10,
                   ),
                 })
@@ -536,8 +536,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       } = await createUserWithAddress(
         address,
         wallet.name,
-        // @ts-expect-error <StrictNullChecks>
-        null, // no sso source
         chainIdentifier,
         session.publicKey,
         validationBlockInfo,
@@ -578,8 +576,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const { account } = await createUserWithAddress(
       address,
       wallet.name,
-      // @ts-expect-error <StrictNullChecks>
-      null, // no sso source?
       chainIdentifier,
       // TODO: I don't think we need this field in Account at all
       session.publicKey,

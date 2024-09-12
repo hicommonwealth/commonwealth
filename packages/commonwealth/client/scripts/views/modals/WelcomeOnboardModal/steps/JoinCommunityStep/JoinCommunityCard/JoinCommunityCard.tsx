@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import ChainInfo from 'models/ChainInfo';
 import React from 'react';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -8,10 +7,12 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './JoinCommunityCard.scss';
 
 type JoinCommunityCardProps = {
-  community: Pick<
-    ChainInfo,
-    'name' | 'iconUrl' | 'profileCount' | 'lifetimeThreadCount'
-  >;
+  community: {
+    name: string;
+    iconUrl: string;
+    profileCount: number;
+    lifetimeThreadCount: number;
+  };
   isJoined?: boolean;
   canJoin?: boolean;
   onJoinClick?: () => void;

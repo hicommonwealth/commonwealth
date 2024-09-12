@@ -1,9 +1,10 @@
 import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
+import { getCommentSearchVector } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isCommunityAdminOrTopicMember } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyCommentSignature } from '../middleware/canvas';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import {
   emitEvent,
   emitMentions,
@@ -22,38 +23,31 @@ export const CreateCommentErrors = {
   ThreadArchived: 'Thread is archived',
 };
 
-export function CreateComment(): Command<typeof schemas.CreateComment> {
+export function CreateComment(): Command<
+  typeof schemas.CreateComment,
+  AuthContext
+> {
   return {
     ...schemas.CreateComment,
     auth: [
-      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_COMMENT),
+      isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT }),
       verifyCommentSignature,
     ],
-    body: async ({ actor, payload }) => {
-      const { thread_id, parent_id, ...rest } = payload;
+    body: async ({ actor, payload, auth }) => {
+      const { address, thread } = mustBeAuthorizedThread(actor, auth);
 
-      const thread = await models.Thread.findOne({ where: { id: thread_id } });
-      if (!mustExist('Thread', thread)) return;
       if (thread.read_only)
         throw new InvalidState(CreateCommentErrors.CantCommentOnReadOnly);
       if (thread.archived_at)
         throw new InvalidState(CreateCommentErrors.ThreadArchived);
 
-      const address = await models.Address.findOne({
-        where: {
-          community_id: thread.community_id,
-          user_id: actor.user.id,
-          address: actor.address,
-        },
-      });
-      if (!mustExist('Community address', address)) return;
-
+      const { thread_id, parent_id, ...rest } = payload;
       if (parent_id) {
         const parent = await models.Comment.findOne({
           where: { id: parent_id, thread_id },
           include: [models.Address],
         });
-        if (!mustExist('Parent Comment', parent)) return;
+        mustExist('Parent Comment', parent);
         const [, depth] = await getCommentDepth(parent, MAX_COMMENT_DEPTH);
         if (depth === MAX_COMMENT_DEPTH)
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
@@ -77,6 +71,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               reaction_count: 0,
               reaction_weights_sum: 0,
               created_by: '',
+              search: getCommentSearchVector(text),
             },
             {
               transaction,
@@ -133,14 +128,6 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               comment,
               community_id: thread.community_id,
             }));
-
-          // @timolegros is this used somewhere?
-          // const excludedAddrs: string[] = [];
-          // excludedAddrs.push(address.address);
-          // const rootNotifExcludeAddresses = [...excludedAddrs];
-          // if (parentComment && parentComment.Address) {
-          //   rootNotifExcludeAddresses.push(parentComment.Address.address);
-          // }
 
           return comment.id;
         },

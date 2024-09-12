@@ -38,7 +38,7 @@ export const SnapshotInformationCard = ({
                 app.chain ? (
                   <User
                     userAddress={proposal?.author}
-                    userCommunityId={app.activeChainId()}
+                    userCommunityId={app.activeChainId() || ''}
                     shouldHideAvatar
                     shouldLinkProfile
                     shouldShowPopover

@@ -98,6 +98,10 @@ export default (
         allowNull: true,
         defaultValue: new Date(),
       },
+      search: {
+        type: Sequelize.TSVECTOR,
+        allowNull: false,
+      },
     },
     {
       timestamps: true,
@@ -155,7 +159,7 @@ export default (
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           const { Community } = sequelize.models;
-          await Community.increment('lifetime_thread_count', {
+          await Community.decrement('lifetime_thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,
@@ -164,3 +168,22 @@ export default (
       },
     },
   );
+
+export function getThreadSearchVector(title: string, body: string) {
+  let decodedTitle = title;
+  let decodedBody = body;
+  try {
+    decodedTitle = decodeURIComponent(title);
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  try {
+    decodedBody = decodeURIComponent(body);
+    // eslint-disable-next-line no-empty
+  } catch {}
+  return Sequelize.fn(
+    'to_tsvector',
+    'english',
+    decodedTitle + ' ' + decodedBody,
+  );
+}

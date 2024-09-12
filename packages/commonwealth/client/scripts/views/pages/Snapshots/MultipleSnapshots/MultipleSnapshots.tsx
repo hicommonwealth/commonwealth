@@ -13,8 +13,10 @@ import { SnapshotSpaceCard } from './SnapshotSpaceCard';
 import './MultipleSnapshots.scss';
 
 const MultipleSnapshots = () => {
+  const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
+    id: communityId,
+    enabled: !!communityId,
   });
   const snapshotSpaces: string[] = community?.snapshot_spaces || [];
 

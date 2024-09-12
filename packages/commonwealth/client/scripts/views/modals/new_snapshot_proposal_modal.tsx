@@ -33,7 +33,7 @@ export const NewSnapshotProposalModal = ({
 
   const snapshotOptions = useMemo(
     () =>
-      app.chain?.meta.snapshot.map((snapshot) => ({
+      app.chain?.meta.snapshot_spaces.map((snapshot) => ({
         value: snapshot,
         label: snapshot,
       })) || [],

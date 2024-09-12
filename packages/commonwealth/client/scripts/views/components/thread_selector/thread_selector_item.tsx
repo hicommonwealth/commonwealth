@@ -20,7 +20,7 @@ export const ThreadSelectorItem = ({
   const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [thread?.authorCommunity || thread?.authorCommunity],
     profileAddresses: [thread?.author],
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!(
       (thread?.authorCommunity || thread?.authorCommunity) &&
       thread?.author

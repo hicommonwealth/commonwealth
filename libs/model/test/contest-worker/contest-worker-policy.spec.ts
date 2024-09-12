@@ -163,7 +163,6 @@ describe('Contest Worker Policy', () => {
           address_id: addressId,
           reaction: 'like',
           thread_id: threadId,
-          comment_id: 0,
         },
       });
 

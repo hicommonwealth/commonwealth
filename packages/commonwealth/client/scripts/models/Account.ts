@@ -1,5 +1,5 @@
 import { Session } from '@canvas-js/interfaces';
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { serializeCanvas } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type momentType from 'moment';
@@ -8,13 +8,12 @@ import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { userStore } from 'state/ui/user';
 import NewProfilesController from '../controllers/server/newProfiles';
-import ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
 
 export type AccountCommunity = {
-  id: ChainInfo['id'];
-  base?: ChainInfo['base'];
-  ss58Prefix?: ChainInfo['ss58Prefix'] | number;
+  id: string;
+  base?: ChainBase;
+  ss58Prefix?: number;
 };
 
 class Account {
@@ -31,7 +30,6 @@ class Account {
 
   private _addressId?: number;
   private _walletId?: WalletId;
-  private _walletSsoSource?: WalletSsoSource;
 
   private _profile?: MinimumProfile;
 
@@ -49,7 +47,6 @@ class Account {
     ghostAddress,
     addressId,
     walletId,
-    walletSsoSource,
     validationToken,
     sessionPublicAddress,
     validationBlockInfo,
@@ -64,7 +61,6 @@ class Account {
     // optional args
     addressId?: number;
     walletId?: WalletId;
-    walletSsoSource?: WalletSsoSource;
     validationToken?: string;
     sessionPublicAddress?: string;
     validationBlockInfo?: string;
@@ -81,7 +77,6 @@ class Account {
     this.address = address;
     this._addressId = addressId;
     this._walletId = walletId;
-    this._walletSsoSource = walletSsoSource;
     this._validationToken = validationToken;
     // @ts-expect-error StrictNullChecks
     this._sessionPublicAddress = sessionPublicAddress;
@@ -147,13 +142,6 @@ class Account {
     this._walletId = walletId;
   }
 
-  get walletSsoSource() {
-    return this._walletSsoSource;
-  }
-
-  public setWalletSsoSource(walletSsoSource: WalletSsoSource) {
-    this._walletSsoSource = walletSsoSource;
-  }
   get validationToken() {
     return this._validationToken;
   }
@@ -185,7 +173,6 @@ class Account {
       jwt: userStore.getState().jwt,
       session: serializeCanvas(session),
       wallet_id: this.walletId,
-      wallet_sso_source: this.walletSsoSource,
     };
 
     return await axios.post(`${SERVER_URL}/verifyAddress`, params);

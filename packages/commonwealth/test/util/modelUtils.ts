@@ -446,14 +446,16 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const { jwt, text, comment_id, chain, community, address } = args;
     const res = await chai.request
       .agent(app)
-      .patch(`/api/comments/${comment_id}`)
+      .patch(`/api/v1/UpdateComment`)
       .set('Accept', 'application/json')
+      .set('address', address!.split(':')[2])
       .send({
         author_chain: chain,
         address,
         body: encodeURIComponent(text),
         jwt,
         chain: community ? undefined : chain,
+        comment_id,
         community,
       });
     return res.body;
@@ -489,8 +491,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
-      .post(`/api/comments/${comment_id}/reactions`)
+      .post(`/api/v1/CreateCommentReaction`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address: walletAddress,
@@ -532,8 +535,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
-      .post(`/api/threads/${thread_id}/reactions`)
+      .post(`/api/v1/CreateThreadReaction`)
       .set('Accept', 'application/json')
+      .set('address', address.split(':')[2])
       .send({
         chain,
         address: walletAddress,
@@ -609,12 +613,12 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
-      //.set('address', address.split(':')[2])
+      .set('address', args.creator_address)
       .send({
         ...args,
         type: 'offchain',
         base: 'ethereum',
-        eth_chain_id: 1,
+        eth_chain_id: 2,
         user_address: args.creator_address,
         node_url: 'http://chain.url',
         network: 'network',

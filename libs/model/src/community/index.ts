@@ -10,4 +10,5 @@ export * from './GetStakeHistoricalPrice.query';
 export * from './GetStakeTransaction.query';
 export * from './RefreshCustomDomain.query';
 export * from './SetCommunityStake.command';
+export * from './UpdateCommunity.command';
 export * from './UpdateCustomDomain.command';

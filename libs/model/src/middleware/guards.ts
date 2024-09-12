@@ -4,6 +4,8 @@ import {
   InvalidState,
   logger,
 } from '@hicommonwealth/core';
+import { AddressInstance, ThreadInstance } from '../models';
+import { AuthContext } from './authorization';
 
 const log = logger(import.meta);
 
@@ -11,22 +13,25 @@ const log = logger(import.meta);
  * Guards for existing models. Throws InvalidState error when undefined
  * @param subject state description
  * @param state state representing a model
- * @returns true if state is defined
  */
-export const mustExist = <T>(subject: string, state?: T | null): state is T => {
+export function mustExist<T>(
+  subject: string,
+  state?: T | null,
+): asserts state is NonNullable<T> {
   if (!state) throw new InvalidState(`${subject} must exist`, state);
-  return true;
-};
+}
 
 /**
  * Guards for non existing models. Throws InvalidState error when defined
  * @param subject state description
  * @param state state representing a model
- * @returns true if state is undefined
  */
-export const mustNotExist = <T>(subject: string, state?: T | null) => {
+export function mustNotExist<T>(
+  subject: string,
+  state?: T | null,
+): asserts state is null | undefined {
   if (state) throw new InvalidState(`${subject} must not exist`, state);
-};
+}
 
 /**
  * Used for error reporting if data is missing or corrupt in a query.
@@ -36,22 +41,58 @@ export const mustNotExist = <T>(subject: string, state?: T | null) => {
  * @param state state representing a model
  * @returns true if state is defined, false if undefined
  */
-export const shouldExist = <T>(subject: string, state?: T | null) => {
+export function shouldExist<T>(subject: string, state?: T | null) {
   if (!state) {
     const err = new InvalidState(`${subject} should exist`, state);
     log.error(err.message, err);
     return false;
   }
   return true;
-};
+}
 
 /**
  * Guards for super admin actors
  * @param actor current actor
- * @returns true if user is super admin
  */
-export const mustBeSuperAdmin = (actor: Actor) => {
+export function mustBeSuperAdmin(actor: Actor) {
   if (!actor.user.isAdmin)
     throw new InvalidActor(actor, 'Must be super administrator');
-  return true;
-};
+}
+
+/**
+ * Address authorization guard
+ * @param auth auth context
+ * @returns narrowed auth context
+ */
+export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
+  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
+  return auth as AuthContext & { address: AddressInstance };
+}
+
+/**
+ * Thread authorization guard
+ * @param auth auth context
+ * @returns narrowed auth context
+ */
+export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
+  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!auth?.thread) throw new InvalidActor(actor, 'Not authorized thread');
+  return auth as AuthContext & {
+    address: AddressInstance;
+    thread: ThreadInstance;
+  };
+}
+
+/**
+ * Comment authorization guard
+ * @param auth auth context
+ * @returns narrowed auth context
+ */
+export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
+  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!auth?.comment) throw new InvalidActor(actor, 'Not authorized comment');
+  return auth as AuthContext & {
+    address: AddressInstance;
+    comment: ThreadInstance;
+  };
+}

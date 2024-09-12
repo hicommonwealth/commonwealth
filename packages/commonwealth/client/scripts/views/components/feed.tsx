@@ -61,7 +61,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     communityId: thread.communityId,
     // @ts-expect-error <StrictNullChecks/>
     address: account?.address,
-    apiEnabled: !!account?.address,
+    apiEnabled: !!account?.address && !!thread.communityId,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>

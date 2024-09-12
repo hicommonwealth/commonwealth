@@ -11,9 +11,10 @@ import { z } from 'zod';
 import { config } from '../config';
 import { GetActiveContestManagers } from '../contest';
 import { models } from '../database';
-import { isCommunityAdminOrTopicMember } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorized } from '../middleware/guards';
+import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
 import {
   emitMentions,
@@ -80,14 +81,19 @@ function checkContestLimits(
     throw new AppError(CreateThreadErrors.PostLimitReached);
 }
 
-export function CreateThread(): Command<typeof schemas.CreateThread> {
+export function CreateThread(): Command<
+  typeof schemas.CreateThread,
+  AuthContext
+> {
   return {
     ...schemas.CreateThread,
     auth: [
-      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD),
+      isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
     ],
-    body: async ({ actor, payload }) => {
+    body: async ({ actor, payload, auth }) => {
+      const { address } = mustBeAuthorized(actor, auth);
+
       const { community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
@@ -105,16 +111,6 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         await checkAddressBalance(activeContestManagers, actor.address!);
         checkContestLimits(activeContestManagers, actor.address!);
       }
-
-      // Loading to update last_active
-      const address = await models.Address.findOne({
-        where: {
-          user_id: actor.user.id,
-          community_id,
-          address: actor.address,
-        },
-      });
-      if (!mustExist('Community address', address)) return;
 
       const body = sanitizeQuillText(payload.body);
       const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
@@ -136,6 +132,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               comment_count: 0,
               reaction_count: 0,
               reaction_weights_sum: 0,
+              search: getThreadSearchVector(rest.title, body),
             },
             {
               transaction,

@@ -27,15 +27,15 @@ type StatusResp = {
   loggedIn?: boolean;
   user?: {
     id: number;
-    email: string;
-    emailVerified: boolean;
-    emailInterval: EmailNotificationInterval;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    emailInterval?: EmailNotificationInterval;
     jwt: string;
     knockJwtToken: string;
     addresses: AddressInstance[];
     selectedCommunity: CommunityInstance;
     isAdmin: boolean;
-    disableRichText: boolean;
+    disableRichText?: boolean;
     communities: StarredCommunityResponse[];
   };
   communityWithRedirects?: CommunityWithRedirects[];
@@ -71,7 +71,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ]);
 
   // get starred communities for user
-  const userCommunities = await sequelize.query(
+  const userCommunities = await sequelize.query<StarredCommunityResponse>(
     `
       SELECT 
         id, 
@@ -106,6 +106,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       replacements: {
         user_id: user.id,
       },
+      type: QueryTypes.SELECT,
     },
   );
 
@@ -123,7 +124,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       selectedCommunity,
       isAdmin,
       disableRichText,
-      communities: userCommunities?.[0] || [],
+      communities: userCommunities || [],
     },
     id: user.id,
     email: user.email,
@@ -168,8 +169,11 @@ export const status = async (
 
       return success(res, {
         loggedIn: true,
-        // @ts-expect-error StrictNullChecks
-        user,
+        user: {
+          ...user,
+          id: user.id!,
+          isAdmin: user.isAdmin ?? false,
+        },
         communityWithRedirects: communityWithRedirects || [],
         evmTestEnv: config.TEST_EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
