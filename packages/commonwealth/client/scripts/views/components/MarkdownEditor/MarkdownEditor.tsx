@@ -37,7 +37,7 @@ import './MarkdownEditor.scss';
 
 export type ImageURL = string;
 
-export type EditorMode = 'desktop' | 'mobile';
+export type MarkdownEditorMode = 'desktop' | 'mobile';
 
 export type ImageHandler = 'S3' | 'local' | 'failure';
 
@@ -58,7 +58,7 @@ export const DEFAULT_UPDATE_CONTENT_STRATEGY =
 
 type EditorProps = {
   readonly markdown?: MarkdownStr;
-  readonly mode?: EditorMode;
+  readonly mode?: MarkdownEditorMode;
   readonly placeholder?: string;
   readonly imageHandler?: ImageHandler;
   readonly onSubmit?: (markdown: MarkdownStr) => void;
