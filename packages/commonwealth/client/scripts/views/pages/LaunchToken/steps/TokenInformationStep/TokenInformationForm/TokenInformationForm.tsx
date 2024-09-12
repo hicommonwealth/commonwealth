@@ -117,7 +117,7 @@ const TokenInformationForm = ({
         hookToForm
         label="Description (Optional)"
         placeholder="Describe your token"
-        charCount={250}
+        charCount={180}
       />
 
       <CWCoverImageUploader
