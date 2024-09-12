@@ -9,7 +9,7 @@ import {
   syntaxExtensions$,
 } from 'commonwealth-mdxeditor';
 import { LexicalNode } from 'lexical';
-import { MarkdownStr } from 'views/components/Editor/Editor';
+import { MarkdownStr } from 'views/components/MarkdownEditor/Editor';
 
 // OK:
 //

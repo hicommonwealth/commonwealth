@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import Editor from 'views/components/Editor';
+import Editor from 'views/components/MarkdownEditor';
 import { describe, test } from 'vitest';
 
 describe('markdownToHTML', () => {

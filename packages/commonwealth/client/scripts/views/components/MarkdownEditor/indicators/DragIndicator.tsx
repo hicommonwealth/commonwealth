@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Indicator } from 'views/components/Editor/indicators/Indicator';
+import { Indicator } from 'views/components/MarkdownEditor/indicators/Indicator';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 export const DragIndicator = () => {

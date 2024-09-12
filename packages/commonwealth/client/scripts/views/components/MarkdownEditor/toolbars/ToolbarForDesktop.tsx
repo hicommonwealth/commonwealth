@@ -11,8 +11,8 @@ import {
   StrikeThroughSupSubToggles,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { HeadingButton } from 'views/components/Editor/toolbars/HeadingButton';
-import { QuoteButton } from 'views/components/Editor/toolbars/QuoteButton';
+import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
+import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
 import './ToolbarForDesktop.scss';
 
 export const ToolbarForDesktop = () => {
