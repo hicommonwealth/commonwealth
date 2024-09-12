@@ -22,6 +22,10 @@ This just tests all the major markdown features we want to support.
 
 https://www.youtube.com/watch?v=eRBOgtp0Hac
 
+# Images
+
+![Do Not Taunt Happy Fun Ball](https://upload.wikimedia.org/wikipedia/en/6/65/Happy_fun_ball.jpg "Happy Fun Ball")
+
 # Paragraphs
 
 This is the first paragraph.

@@ -12,7 +12,7 @@ import {
   tablePlugin,
   thematicBreakPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { useEditorErrorHandler } from 'views/components/MarkdownEditor/useEditorErrorHandler';
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
 
@@ -31,17 +31,13 @@ export const MarkdownViewer = memo(function MarkdownViewer(
 
   const errorHandler = useEditorErrorHandler();
 
-  const handleKeyDownCapture = useCallback((event: React.KeyboardEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-  }, []);
-
   return (
-    <div onKeyDownCapture={handleKeyDownCapture} className="MarkdownViewer">
+    <div className="MarkdownViewer">
       <MDXEditor
         onError={errorHandler}
         markdown={markdown ?? ''}
         placeholder=""
+        readOnly={true}
         plugins={[
           listsPlugin(),
           quotePlugin(),

@@ -1097,8 +1097,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       commonwealth-mdxeditor:
-        specifier: ^0.0.7
-        version: 0.0.7(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18)
+        specifier: ^0.0.8
+        version: 0.0.8(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18)
       compression:
         specifier: ^1.7.4
         version: 1.7.4
@@ -12597,10 +12597,10 @@ packages:
         integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==,
       }
 
-  commonwealth-mdxeditor@0.0.7:
+  commonwealth-mdxeditor@0.0.8:
     resolution:
       {
-        integrity: sha512-Js7+8Nr7lNfQ3qaPTfEUoMug+ix7PI6mI63DJYl7BE7iO7tSkPqRX8S9TSCr6vJgHSh1UOSWYhMsGEuF5qMnlg==,
+        integrity: sha512-L4HQsd6FWXiw5cfzMSy86Tkb//KDea5CdA8KlRl1wBVLjHRWwsOJSzFqNkrcpxrnRfUVL7YJWF176pieyObwvg==,
       }
     engines: { node: '>=16' }
     peerDependencies:
@@ -34909,7 +34909,7 @@ snapshots:
 
   commondir@1.0.1: {}
 
-  commonwealth-mdxeditor@0.0.7(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18):
+  commonwealth-mdxeditor@0.0.8(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18):
     dependencies:
       '@codemirror/lang-markdown': 6.2.5
       '@codemirror/language-data': 6.5.1(@codemirror/view@6.33.0)

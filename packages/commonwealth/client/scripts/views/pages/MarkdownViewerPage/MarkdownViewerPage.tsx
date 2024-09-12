@@ -11,7 +11,7 @@ export const MarkdownViewerPage = () => {
   return (
     <CWPageLayout>
       <section>
-        <MarkdownViewer markdown={supported} />;
+        <MarkdownViewer markdown={supported} />
       </section>
     </CWPageLayout>
   );
