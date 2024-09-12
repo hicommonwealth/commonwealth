@@ -35,6 +35,8 @@ export const Comment = z.object({
   reaction_count: PG_INT,
   reaction_weights_sum: PG_INT.optional(),
 
+  search: z.union([z.string(), z.record(z.any())]),
+
   Address: Address.nullish(),
   Thread: Thread.nullish(),
   Reaction: Reaction.nullish(),
