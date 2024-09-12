@@ -46,11 +46,6 @@ const TokenInformationForm = ({
   };
 
   const handleCancel = () => {
-    trackAnalytics({
-      event: MixpanelCommunityCreationEvent.CREATE_TOKEN_COMMUNITY_CANCELLED,
-      isPWA: isAddedToHomeScreen,
-    });
-
     openConfirmation({
       title: 'Are you sure you want to cancel?',
       description: 'Your details will not be saved. Cancel create token flow?',
@@ -59,7 +54,15 @@ const TokenInformationForm = ({
           label: 'Yes, cancel',
           buttonType: 'destructive',
           buttonHeight: 'sm',
-          onClick: onCancel,
+          onClick: () => {
+            trackAnalytics({
+              event:
+                MixpanelCommunityCreationEvent.CREATE_TOKEN_COMMUNITY_CANCELLED,
+              isPWA: isAddedToHomeScreen,
+            });
+
+            onCancel();
+          },
         },
         {
           label: 'No, continue',
