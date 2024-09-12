@@ -45,6 +45,7 @@ const CWCommunitySelector = ({
     <div
       className={clsx(ComponentType.CommunitySelector, {
         active: withRadioButton?.checked,
+        withRadio: !!withRadioButton,
       })}
       onClick={onClick}
     >
