@@ -1,8 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { tester, type DB } from '@hicommonwealth/model';
+import {
+  ThreadAttributes,
+  getThreadSearchVector,
+  tester,
+  type DB,
+} from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { Optional } from 'sequelize';
+import { NullishPropertiesOf } from 'sequelize/lib/utils';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 
 chai.use(chaiHttp);
@@ -38,13 +45,18 @@ describe('Thread queries', () => {
     const thread = (
       await models.Thread.findOrCreate({
         where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: chain.id,
+          community_id: chain!.id,
           address_id: address.id,
           title: 'title',
           kind: 'kind',
           stage: 'stage',
         },
+        defaults: {
+          search: getThreadSearchVector('title', ''),
+        } as unknown as Optional<
+          ThreadAttributes,
+          NullishPropertiesOf<ThreadAttributes>
+        >,
       })
     )[0];
     expect(thread.id).to.be.greaterThan(0);

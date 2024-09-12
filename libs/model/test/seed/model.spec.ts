@@ -39,8 +39,8 @@ const generateSchemas = async () => {
   const migration_schema = await get_info_schema(migration, {
     ignore_columns: {
       // Missing in model - migrations with backups
-      Comments: ['body_backup', 'text_backup', 'root_id', '_search'],
-      Threads: ['body_backup', '_search'],
+      Comments: ['body_backup', 'text_backup', 'root_id'],
+      Threads: ['body_backup'],
       Topics: ['default_offchain_template_backup'],
       GroupPermissions: ['allowed_actions'],
     },
