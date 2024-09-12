@@ -233,13 +233,6 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
     }
   }, [onSubmit]);
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    console.log('FIXME');
-    event.preventDefault();
-    event.stopPropagation();
-    return false;
-  };
-
   return (
     <div className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}>
       <div
@@ -247,7 +240,6 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
           'mdxeditor-container',
           'mdxeditor-container-mode-' + mode,
         )}
-        onKeyDownCapture={handleKeyDown}
         onDrop={handleDrop}
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
