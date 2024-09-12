@@ -41,7 +41,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const communityId = app.activeChainId();
+  const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
@@ -66,6 +66,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
+    apiEnabled: !!communityId,
   });
   const contestAddress = searchParams.get('contest');
   const contestStatus = searchParams.get('status');
@@ -83,7 +84,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -100,7 +101,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
-      communityId: app.activeChainId(),
+      communityId: communityId,
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -118,6 +119,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
+      apiEnabled: !!communityId,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));

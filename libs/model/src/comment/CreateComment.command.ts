@@ -1,4 +1,5 @@
 import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
+import { getCommentSearchVector } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
@@ -70,6 +71,7 @@ export function CreateComment(): Command<
               reaction_count: 0,
               reaction_weights_sum: 0,
               created_by: '',
+              search: getCommentSearchVector(text),
             },
             {
               transaction,

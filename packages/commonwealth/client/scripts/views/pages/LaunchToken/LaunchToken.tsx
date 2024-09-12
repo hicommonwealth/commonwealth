@@ -1,3 +1,4 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -6,10 +7,12 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './LaunchToken.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';
+import TokenInformationStep from './steps/TokenInformationStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateTokenCommunityStep, getFormSteps } from './utils';
 
 const LaunchToken = () => {
+  const navigate = useCommonNavigate();
   const { createTokenCommunityStep, onChangeStep } = useCreateCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -27,8 +30,12 @@ const LaunchToken = () => {
   const getCurrentStep = () => {
     switch (createTokenCommunityStep) {
       case CreateTokenCommunityStep.TokenInformation:
-        // TODO: https://github.com/hicommonwealth/commonwealth/issues/8705
-        return <>Not Implemented</>;
+        return (
+          <TokenInformationStep
+            handleGoBack={() => navigate('/')} // redirect to home
+            handleContinue={() => onChangeStep(true)}
+          />
+        );
       case CreateTokenCommunityStep.CommunityInformation:
         return (
           <CommunityInformationStep
@@ -36,7 +43,6 @@ const LaunchToken = () => {
             handleContinue={() => onChangeStep(true)}
           />
         );
-        return <>Not Implemented</>;
       case CreateTokenCommunityStep.SignatureLaunch:
         // TODO: https://github.com/hicommonwealth/commonwealth/issues/8707
         return <>Not Implemented</>;

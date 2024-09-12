@@ -1,6 +1,7 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { IApp } from 'state';
-import type ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import IChainAdapter from '../../../models/IChainAdapter';
 import { NearAccounts } from './account';
 import NearChain from './chain';
@@ -11,7 +12,7 @@ export default class Near extends IChainAdapter<any, any> {
   public chain: NearChain;
   public accounts: NearAccounts;
 
-  constructor(meta: ChainInfo, app: IApp) {
+  constructor(meta: z.infer<typeof ExtendedCommunity>, app: IApp) {
     super(meta, app);
     this.chain = new NearChain(this.app);
     this.accounts = new NearAccounts(this.app);

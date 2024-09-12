@@ -1,3 +1,4 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -26,9 +27,10 @@ const CTA_TEXT = {
 };
 
 const Discord = () => {
+  const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
+    id: communityId,
+    enabled: !!communityId,
   });
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
@@ -51,10 +53,12 @@ const Discord = () => {
     community?.discord_bot_webhooks_enabled,
   );
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
-    chainId: app.activeChainId(),
+    chainId: communityId,
+    apiEnabled: !!communityId,
   });
   const { data: topics = [], refetch: refetchTopics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: communityId,
+    apiEnabled: !!communityId,
   });
 
   const {
@@ -109,7 +113,7 @@ const Discord = () => {
       return;
     try {
       await removeDiscordBotConfig({
-        communityId: app.activeChainId(),
+        communityId,
       });
 
       if (queryParams.has('discordConfigId')) {
@@ -123,6 +127,7 @@ const Discord = () => {
       console.error(e);
       notifyError('Failed to disconnect Discord');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionStatus, queryParams, removeDiscordBotConfig]);
 
   const onToggleWebhooks = useCallback(async () => {
@@ -130,10 +135,12 @@ const Discord = () => {
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
 
     try {
-      await updateCommunity({
-        communityId: community?.id,
-        discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
+        }),
+      );
       setIsDiscordWebhooksEnabled(!isDiscordWebhooksEnabled);
 
       notifySuccess(`Discord webhooks ${toggleMsgType}d!`);

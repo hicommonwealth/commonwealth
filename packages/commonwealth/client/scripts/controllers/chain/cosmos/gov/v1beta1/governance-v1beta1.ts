@@ -31,6 +31,7 @@ class CosmosGovernance extends ProposalModule<
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
+  /* eslint-disable-next-line @typescript-eslint/require-await */
   public async init(
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
