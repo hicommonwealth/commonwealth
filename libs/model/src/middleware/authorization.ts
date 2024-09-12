@@ -255,9 +255,15 @@ export function isAuthorized({
   collaborators?: boolean;
 }): AuthHandler {
   return async (ctx) => {
-    if (ctx.actor.user.isAdmin) return;
+    const isSuperAdmin = ctx.actor.user.isAdmin;
 
-    const auth = await authorizeAddress(ctx, roles);
+    const auth = await authorizeAddress(
+      ctx,
+      isSuperAdmin ? ['admin', 'moderator', 'member'] : roles,
+    );
+
+    if (isSuperAdmin) return;
+
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
 
     auth.is_author = auth.address!.id === auth.author_address_id;
