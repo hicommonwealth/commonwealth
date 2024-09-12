@@ -51,6 +51,8 @@ const LIST_ITEM_PREFIX = {
 type CustomQuillToolbarProps = {
   toolbarId: string;
   isDisabled?: boolean;
+  setIsModalOpen: (isOpen: boolean) => void;
+  isModalOpen: boolean;
 };
 
 export const CustomQuillToolbar = ({
@@ -86,11 +88,17 @@ export const CustomQuillToolbar = ({
 type UseMarkdownToolbarHandlersProps = {
   editorRef: MutableRefObject<ReactQuill>;
   setContentDelta: (value: DeltaStatic) => void;
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
+  childInputRef: any;
 };
 
 export const useMarkdownToolbarHandlers = ({
   editorRef,
   setContentDelta,
+  isModalOpen,
+  setIsModalOpen,
+  childInputRef,
 }: UseMarkdownToolbarHandlersProps) => {
   const createHandler = (markdownChars: string) => {
     return () => {
@@ -153,29 +161,8 @@ export const useMarkdownToolbarHandlers = ({
       if (!selection) {
         return;
       }
-      const linkText =
-        selection.length === 0
-          ? prompt('Enter link text:')
-          : editor.getText(selection.index, selection.length);
-      let linkUrl = prompt('Enter link URL:');
-      // @ts-expect-error <StrictNullChecks/>
-      if (!linkUrl.startsWith('https://')) {
-        // @ts-expect-error <StrictNullChecks/>
-        if (linkUrl.startsWith('http://')) {
-          // convert HTTP to HTTPS
-          // @ts-expect-error <StrictNullChecks/>
-          linkUrl = `https://${linkUrl.substring('http://'.length)}`;
-        } else {
-          linkUrl = `https://${linkUrl}`;
-        }
-      }
-      const linkMarkdown = `[${linkText}](${linkUrl})`;
-      editor.deleteText(selection.index, selection.length);
-      editor.insertText(selection.index, linkMarkdown);
-      setContentDelta({
-        ...editor.getContents(),
-        ___isMarkdown: true,
-      } as SerializableDeltaStatic);
+      childInputRef.current = selection;
+      setIsModalOpen(!isModalOpen);
     };
   };
 
@@ -189,6 +176,7 @@ export const useMarkdownToolbarHandlers = ({
       if (!selection) {
         return;
       }
+
       const start = selection.index;
       const prefix = start === 0 ? '' : '\n';
       editor.insertText(start, `${prefix}> `);
