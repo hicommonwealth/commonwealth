@@ -60,6 +60,10 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      search: {
+        type: Sequelize.TSVECTOR,
+        allowNull: false,
+      },
     },
     {
       hooks: {
@@ -114,3 +118,14 @@ export default (
       ],
     },
   );
+
+export function getCommentSearchVector(body: string) {
+  let decodedBody = body;
+
+  try {
+    decodedBody = decodeURIComponent(body);
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  return Sequelize.fn('to_tsvector', 'english', decodedBody);
+}

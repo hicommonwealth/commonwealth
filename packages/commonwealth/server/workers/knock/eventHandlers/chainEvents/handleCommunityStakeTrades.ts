@@ -54,7 +54,7 @@ export async function handleCommunityStakeTrades(
 
   if (users.length) {
     const provider = notificationsProvider();
-    return await provider.triggerWorkflow({
+    const res = await provider.triggerWorkflow({
       key: WorkflowKeys.CommunityStake,
       users,
       data: {
@@ -64,6 +64,7 @@ export async function handleCommunityStakeTrades(
         community_stakes_url: getCommunityUrl(community.id),
       },
     });
+    return !res.some((r) => r.status === 'rejected');
   }
 
   return true;

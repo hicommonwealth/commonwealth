@@ -9,6 +9,7 @@ import {
   UserInstance,
   emitMentions,
   findMentionDiff,
+  getThreadSearchVector,
   parseUserMentions,
 } from '@hicommonwealth/model';
 import { renderQuillDeltaToText } from '@hicommonwealth/shared';
@@ -114,11 +115,12 @@ export async function __updateThread(
   // check if thread is part of a contest topic
   const contestManagers = await this.models.sequelize.query(
     `
-    SELECT cm.contest_address FROM "Threads" t
-    JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
-    JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
-    WHERE t.id = :thread_id
-  `,
+        SELECT cm.contest_address
+        FROM "Threads" t
+                 JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
+                 JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
+        WHERE t.id = :thread_id
+    `,
     {
       type: QueryTypes.SELECT,
       replacements: {
@@ -225,6 +227,7 @@ export async function __updateThread(
     await thread.update(
       {
         ...toUpdate,
+        search: getThreadSearchVector(title || thread.title, body),
         last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       { transaction },

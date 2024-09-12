@@ -33,6 +33,7 @@ export const CreateCommunityErrors = {
   InvalidBase: 'Must provide valid chain base',
   MissingNodeUrl: 'Missing node url',
   InvalidNode: 'RPC url returned invalid response. Check your node url',
+  // eslint-disable-next-line max-len
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -266,7 +267,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const uniqueLinksArray = [
         ...new Set(
           [...social_links, website, telegram, discord, element, github].filter(
-            (a) => a,
+            (a): a is string => typeof a === 'string' && a.length > 0,
           ),
         ),
       ];

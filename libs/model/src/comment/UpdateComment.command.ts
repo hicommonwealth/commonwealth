@@ -1,8 +1,9 @@
-import { type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorized } from '../middleware/guards';
+import { getCommentSearchVector } from '../models';
 import {
   emitMentions,
   findMentionDiff,
@@ -19,31 +20,24 @@ export function UpdateComment(): Command<
   return {
     ...schemas.UpdateComment,
     auth: [isAuthorized({})],
-    body: async ({ actor, payload }) => {
+    body: async ({ actor, payload, auth }) => {
+      const { address } = mustBeAuthorized(actor, auth);
       const { comment_id, discord_meta } = payload;
 
+      // find by comment_id or discord_meta
       const comment = await models.Comment.findOne({
         where: comment_id ? { id: comment_id } : { discord_meta },
         include: [{ model: models.Thread, required: true }],
       });
-      mustExist('Comment', comment);
-      const thread = comment.Thread!;
+      if (!comment) throw new InvalidInput('Comment not found');
 
+      const thread = comment.Thread!;
       const currentVersion = await models.CommentVersionHistory.findOne({
         where: { comment_id: comment.id },
         order: [['timestamp', 'DESC']],
       });
 
       if (currentVersion?.text !== payload.text) {
-        const address = await models.Address.findOne({
-          where: {
-            community_id: thread.community_id,
-            user_id: actor.user.id,
-            address: actor.address,
-          },
-        });
-        mustExist('Community address', address);
-
         const text = sanitizeQuillText(payload.text);
         const plaintext = quillToPlain(text);
         const mentions = findMentionDiff(
@@ -54,7 +48,7 @@ export function UpdateComment(): Command<
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
-            { text, plaintext },
+            { text, plaintext, search: getCommentSearchVector(text) },
             { where: { id: comment.id }, transaction },
           );
 

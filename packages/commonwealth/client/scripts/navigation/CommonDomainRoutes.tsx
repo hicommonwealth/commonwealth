@@ -12,6 +12,7 @@ const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
   () =>
@@ -113,6 +114,7 @@ const CommunityNotFoundPage = lazy(
 const CommonDomainRoutes = ({
   contestEnabled,
   farcasterContestEnabled,
+  tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/markdown-editor"
@@ -136,6 +138,15 @@ const CommonDomainRoutes = ({
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
+  ...(tokenizedCommunityEnabled
+    ? [
+        <Route
+          key="/createTokenCommunity"
+          path="/createTokenCommunity"
+          element={withLayout(LaunchToken, { type: 'common' })}
+        />,
+      ]
+    : []),
   <Route
     key="/dashboard"
     path="/dashboard"
