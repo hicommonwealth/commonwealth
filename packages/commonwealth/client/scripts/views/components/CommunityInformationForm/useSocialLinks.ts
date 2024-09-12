@@ -37,7 +37,7 @@ const useSocialLinks = () => {
           ...updatedSocialLinks[index],
           error: '',
         };
-      } catch (e: any) {
+      } catch (e) {
         const zodError = e as ZodError;
         updatedSocialLinks[index] = {
           ...updatedSocialLinks[index],
@@ -67,7 +67,7 @@ const useSocialLinks = () => {
         ...updatedSocialLinks[index],
         error: '',
       };
-    } catch (e: any) {
+    } catch (e) {
       const zodError = e as ZodError;
       updatedSocialLinks[index] = {
         ...updatedSocialLinks[index],

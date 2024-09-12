@@ -29,9 +29,10 @@ const CommunityInformationStep = ({
     onAction: true,
   });
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: unknown) => {
     // TODO 8706: integrate endpoint
     console.log('values => ', values);
+    await new Promise((r) => setTimeout(r, 10));
     handleContinue();
   };
 
