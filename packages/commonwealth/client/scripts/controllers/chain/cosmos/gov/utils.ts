@@ -25,7 +25,7 @@ export const getCompletedProposals = async (
   const { chain, accounts, governance, meta } = cosmosChain;
   console.log(cosmosChain);
   const isGovgen =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1govgen;
   const isV1 =
     meta.ChainNode?.cosmosGovernanceVersion === CosmosGovernanceVersion.v1;
@@ -79,7 +79,7 @@ export const getActiveProposals = async (
 ): Promise<CosmosProposal[]> => {
   const { chain, accounts, governance, meta } = cosmosChain;
   const isGovgen =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1govgen;
   const isV1 =
     meta.ChainNode?.cosmosGovernanceVersion === CosmosGovernanceVersion.v1;
