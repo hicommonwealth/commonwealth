@@ -39,7 +39,7 @@ const TokenInformationForm = ({
     onAction: true,
   });
 
-  const handleSubmit = async (values: FormSubmitValues) => {
+  const handleSubmit = (values: FormSubmitValues) => {
     // TODO 8705: call token launch endpoint
     console.log('values => ', values);
     onSubmit();
