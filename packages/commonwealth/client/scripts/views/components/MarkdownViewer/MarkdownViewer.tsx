@@ -1,5 +1,4 @@
 import {
-  MDXEditor,
   codeBlockPlugin,
   codeMirrorPlugin,
   frontmatterPlugin,
@@ -7,7 +6,7 @@ import {
   imagePlugin,
   linkPlugin,
   listsPlugin,
-  markdownShortcutPlugin,
+  MDXEditor,
   quotePlugin,
   tablePlugin,
   thematicBreakPlugin,
@@ -51,7 +50,6 @@ export const MarkdownViewer = memo(function MarkdownViewer(
           tablePlugin(),
           thematicBreakPlugin(),
           frontmatterPlugin(),
-          markdownShortcutPlugin(),
         ]}
       />
     </div>
