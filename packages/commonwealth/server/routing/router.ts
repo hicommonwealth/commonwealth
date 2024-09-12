@@ -45,7 +45,6 @@ import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
-import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -98,7 +97,6 @@ import { createChainNodeHandler } from '../routes/communities/create_chain_node_
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
-import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
@@ -266,13 +264,6 @@ function setupRouter(
 
   registerRoute(
     router,
-    'patch',
-    '/communities/:communityId',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'get',
     '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
@@ -424,14 +415,6 @@ function setupRouter(
     searchProfilesHandler.bind(this, serverControllers),
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
-
-  registerRoute(
-    router,
-    'get',
-    '/bulkOffchain',
-    databaseValidationService.validateCommunity,
-    bulkOffchain.bind(this, models),
-  );
 
   // comments
   registerRoute(

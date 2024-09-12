@@ -19,11 +19,6 @@ import {
   __getChainNodes,
 } from './server_communities_methods/get_chain_nodes';
 import {
-  GetCommunitiesOptions,
-  GetCommunitiesResult,
-  __getCommunities,
-} from './server_communities_methods/get_communities';
-import {
   GetCommunityStakeOptions,
   GetCommunityStakeResult,
   __getCommunityStake,
@@ -38,11 +33,6 @@ import {
   SearchCommunitiesResult,
   __searchCommunities,
 } from './server_communities_methods/search_communities';
-import {
-  UpdateCommunityOptions,
-  UpdateCommunityResult,
-  __updateCommunity,
-} from './server_communities_methods/update_community';
 import {
   UpdateCommunityIdOptions,
   UpdateCommunityIdResult,
@@ -59,18 +49,6 @@ export class ServerCommunitiesController {
     options: SearchCommunitiesOptions,
   ): Promise<SearchCommunitiesResult> {
     return __searchCommunities.call(this, options);
-  }
-
-  async getCommunities(
-    options: GetCommunitiesOptions,
-  ): Promise<GetCommunitiesResult> {
-    return __getCommunities.call(this, options);
-  }
-
-  async updateCommunity(
-    options: UpdateCommunityOptions,
-  ): Promise<UpdateCommunityResult> {
-    return __updateCommunity.call(this, options);
   }
 
   async deleteCommunity(

@@ -19,7 +19,7 @@ import {
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
-export const ThreadCreated = Thread.extend({
+export const ThreadCreated = Thread.omit({ search: true }).extend({
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
@@ -27,7 +27,7 @@ export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
   community_id: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
-export const CommentCreated = Comment.extend({
+export const CommentCreated = Comment.omit({ search: true }).extend({
   community_id: z.string(),
   users_mentioned: z
     .array(PG_INT)

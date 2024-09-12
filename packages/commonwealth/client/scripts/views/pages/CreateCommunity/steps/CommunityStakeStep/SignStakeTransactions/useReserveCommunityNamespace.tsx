@@ -1,3 +1,4 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
@@ -55,12 +56,14 @@ const useReserveCommunityNamespace = ({
         chainId,
       );
 
-      await updateCommunity({
-        communityId,
-        namespace,
-        symbol,
-        transactionHash: txReceipt.transactionHash,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId,
+          namespace,
+          symbol,
+          transactionHash: txReceipt.transactionHash,
+        }),
+      );
 
       setReserveNamespaceData({
         state: 'completed',

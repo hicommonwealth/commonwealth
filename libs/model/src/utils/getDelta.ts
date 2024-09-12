@@ -2,8 +2,8 @@ type Delta<T> = Partial<{
   [K in keyof T]: T[K] extends object
     ? Delta<T[K]>
     : T[K] extends Array<infer U>
-    ? Array<U>
-    : T[K];
+      ? Array<U>
+      : T[K];
 }>;
 
 /**

@@ -79,7 +79,7 @@ export async function __searchComments(
   }
 
   const communityWhere = bind.community
-    ? '"Comments".community_id = $community AND'
+    ? '"Threads".community_id = $community AND'
     : '';
 
   const sqlBaseQuery = `
@@ -94,7 +94,7 @@ export async function __searchComments(
       "Addresses".community_id as address_community_id,
       "Comments".created_at,
       "Threads".community_id as community_id,
-      ts_rank_cd("Comments"._search, query) as rank
+      ts_rank_cd("Comments".search, query) as rank
     FROM "Comments"
     JOIN "Threads" ON "Comments".thread_id = "Threads".id
     JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
@@ -102,7 +102,7 @@ export async function __searchComments(
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
-      query @@ "Comments"._search
+      query @@ "Comments".search
     ${paginationSort}
   `;
 
@@ -116,7 +116,7 @@ export async function __searchComments(
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
-      query @@ "Comments"._search
+      query @@ "Comments".search
   `;
 
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([
