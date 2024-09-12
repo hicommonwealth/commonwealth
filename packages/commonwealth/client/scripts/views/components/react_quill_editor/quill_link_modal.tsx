@@ -29,6 +29,8 @@ export const AddLinkModal = ({
 }: LinkModalAttrs) => {
   const handleModalClose = () => {
     setIsModalOpen(!isModalOpen);
+    setLinkText('');
+    setLinkUrl('');
   };
   return (
     <CWModal

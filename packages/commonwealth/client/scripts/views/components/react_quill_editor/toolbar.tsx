@@ -84,13 +84,13 @@ export const CustomQuillToolbar = ({
     </div>
   </div>
 );
-
+type QuillRange = { index: number; length: number };
 type UseMarkdownToolbarHandlersProps = {
   editorRef: MutableRefObject<ReactQuill>;
   setContentDelta: (value: DeltaStatic) => void;
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
-  childInputRef: any;
+  childInputRef: MutableRefObject<QuillRange | null>;
 };
 
 export const useMarkdownToolbarHandlers = ({
@@ -161,7 +161,12 @@ export const useMarkdownToolbarHandlers = ({
       if (!selection) {
         return;
       }
-      childInputRef.current = selection;
+      // Store the selection range
+      childInputRef.current = {
+        index: selection.index,
+        length: selection.length,
+      };
+      // console.log("Stored selection:", childInputRef.current)
       setIsModalOpen(!isModalOpen);
     };
   };
