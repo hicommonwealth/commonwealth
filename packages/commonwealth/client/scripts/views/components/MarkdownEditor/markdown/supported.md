@@ -29,13 +29,17 @@ World War II or the Second World War (1 September 1939 – 2 September 1945) was
 
 <s>Strikethrough (within s HTML tag)</s>
 
-*Italic*      _Italic_
+*Italic*     
+_Italic using underscores_
 
-**Emphasis**  __Emphasis__
+**Emphasis**  
+__Emphasis using underscores__
 
-***Emphasis Italic*** ___Emphasis Italic___
+***Emphasis Italic*** 
+___Emphasis Italic using underscores___
 
-Subscript: X<sub>2</sub>，Superscript: O<sup>2</sup>
+Subscript: X<sub>2</sub>
+Superscript: O<sup>2</sup>
 
 # Code Blocks
 
