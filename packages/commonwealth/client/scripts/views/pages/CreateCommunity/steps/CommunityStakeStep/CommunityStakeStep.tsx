@@ -13,7 +13,7 @@ interface CommunityStakeStepProps {
   chainId: string;
   isTopicFlow?: boolean;
   onTopicFlowStepChange?: (step: CreateTopicStep) => void;
-  refetchStakeQuery?: () => void;
+  refetchStakeQuery?: () => Promise<void>;
 }
 
 const CommunityStakeStep = ({
