@@ -7,6 +7,7 @@ import { RouteFeatureFlags } from './Router';
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
   () =>
@@ -103,6 +104,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CustomDomainRoutes = ({
   contestEnabled,
   farcasterContestEnabled,
+  tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -118,6 +120,15 @@ const CustomDomainRoutes = ({
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
+    ...(tokenizedCommunityEnabled
+      ? [
+          <Route
+            key="/createTokenCommunity"
+            path="/createTokenCommunity"
+            element={withLayout(LaunchTokenPage, { type: 'common' })}
+          />,
+        ]
+      : []),
     <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
     <Route
       key="/search"
