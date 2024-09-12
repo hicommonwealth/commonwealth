@@ -5,6 +5,7 @@ import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
+const MarkdownViewerPage = lazy(() => import('views/pages/MarkdownViewerPage'));
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
@@ -117,6 +118,12 @@ const CommonDomainRoutes = ({
     key="/markdown-editor"
     path="/markdown-editor"
     element={<MarkdownEditorPage />}
+  />,
+
+  <Route
+    key="/markdown-viewer"
+    path="/markdown-viewer"
+    element={<MarkdownViewerPage />}
   />,
 
   <Route
