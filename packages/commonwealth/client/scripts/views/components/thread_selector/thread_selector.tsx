@@ -27,15 +27,16 @@ export const ThreadSelector = ({
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
+  const communityId = app.activeChainId() || '';
   const sharedQueryOptions = {
-    communityId: app.activeChainId(),
+    communityId,
     searchTerm: debouncedSearchTerm,
     limit: 5,
     orderBy: APIOrderBy.Rank,
     orderDirection: APIOrderDirection.Desc,
     threadTitleOnly: true,
   };
-  const queryEnabled = debouncedSearchTerm?.trim().length > 0;
+  const queryEnabled = debouncedSearchTerm?.trim().length > 0 && !!communityId;
 
   const { data: threadsData, isLoading } = useSearchThreadsQuery({
     ...sharedQueryOptions,

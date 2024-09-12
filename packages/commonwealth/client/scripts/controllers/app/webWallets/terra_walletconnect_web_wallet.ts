@@ -69,7 +69,7 @@ class TerraWalletConnectWebWalletController
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix,
+      bech32Prefix: `${app.chain?.meta.bech32_prefix || 0}`,
       signer: {
         type: 'bytes',
         getAddress: () => this._accounts[0].address,

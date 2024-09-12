@@ -48,7 +48,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
       }
 
       const communityWhere = bind.community
-        ? '"Comments".community_id = $community AND'
+        ? '"Threads".community_id = $community AND'
         : '';
 
       const sqlBaseQuery = `
@@ -63,7 +63,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
       "Addresses".community_id as address_community_id,
       "Comments".created_at,
       "Threads".community_id as community_id,
-      ts_rank_cd("Comments"._search, query) as rank
+      ts_rank_cd("Comments".search, query) as rank
     FROM "Comments"
     JOIN "Threads" ON "Comments".thread_id = "Threads".id
     JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
@@ -71,7 +71,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
-      query @@ "Comments"._search
+      query @@ "Comments".search
     ${paginationSort}
   `;
 
@@ -85,7 +85,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
-      query @@ "Comments"._search
+      query @@ "Comments".search
   `;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
