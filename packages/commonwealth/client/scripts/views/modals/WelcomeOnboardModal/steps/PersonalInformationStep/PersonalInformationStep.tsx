@@ -127,7 +127,6 @@ const PersonalInformationStep = ({
       promotional_emails_enabled: values.enableProductUpdates,
       profile: {
         name: values.username.trim(),
-        email: values.email.trim(),
       },
     });
 
