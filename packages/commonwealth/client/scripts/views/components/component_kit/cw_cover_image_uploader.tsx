@@ -228,9 +228,7 @@ export const CWCoverImageUploader = ({
 
     setIsUploading(true);
 
-    // const [_imageURL, _uploadStatus] = await uploadImage(file);
-    const _imageURL = URL.createObjectURL(file);
-    const _uploadStatus = 'success';
+    const [_imageURL, _uploadStatus] = await uploadImage(file);
 
     setIsUploading(false);
     setUploadStatus(_uploadStatus);
