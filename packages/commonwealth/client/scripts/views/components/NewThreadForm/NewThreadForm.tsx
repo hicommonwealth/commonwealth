@@ -17,8 +17,8 @@ import {
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
-import Editor from 'views/components/MarkdownEditor';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import Editor from 'views/components/MarkdownEditor';
 import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';

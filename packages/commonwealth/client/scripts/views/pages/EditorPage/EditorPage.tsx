@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Editor from 'views/components/MarkdownEditor';
-import { EditorMode } from 'views/components/MarkdownEditor/Editor';
+import { EditorMode } from 'views/components/MarkdownEditor/MarkdownEditor';
 
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
 

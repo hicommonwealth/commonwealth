@@ -1,1 +1,1 @@
-export { Editor as default } from './Editor';
+export { MarkdownEditor as default } from './MarkdownEditor';

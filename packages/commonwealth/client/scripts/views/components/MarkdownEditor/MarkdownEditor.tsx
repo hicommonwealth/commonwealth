@@ -64,7 +64,7 @@ type EditorProps = {
   readonly onSubmit?: (markdown: MarkdownStr) => void;
 };
 
-export const Editor = memo(function Editor(props: EditorProps) {
+export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
   const { onSubmit } = props;
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
