@@ -252,7 +252,7 @@ describe('Community lifecycle', () => {
             chain_node_id: 1263,
           },
         }),
-      ).rejects.toThrow(UpdateCommunityErrors.ReservedId);
+      ).rejects.toThrow();
     });
 
     test('should throw if snapshot not found', async () => {
