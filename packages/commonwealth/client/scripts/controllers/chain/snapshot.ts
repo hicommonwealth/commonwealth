@@ -1,7 +1,9 @@
 import { EventEmitter } from 'events';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import { getSpace } from 'helpers/snapshot_utils';
-import { getSnapshotProposalsQuery } from 'state/api/snapshots';
+import {
+  getSnapshotProposalsQuery,
+  getSnapshotSpaceQuery,
+} from 'state/api/snapshots';
 
 class SnapshotController {
   private _space: SnapshotSpace;
@@ -34,7 +36,7 @@ class SnapshotController {
     if (this._initializing) return;
     this._initializing = true;
     try {
-      this._space = await getSpace(space);
+      this._space = await getSnapshotSpaceQuery({ space });
       this._proposals = await getSnapshotProposalsQuery({
         space,
       });

@@ -1,5 +1,8 @@
 import module from '@snapshot-labs/snapshot.js';
-import { getSnapshotProposalsQuery } from 'state/api/snapshots';
+import {
+  getSnapshotProposalsQuery,
+  getSnapshotSpaceQuery,
+} from 'state/api/snapshots';
 import { notifyError } from '../controllers/app/notifications';
 let apolloClient = null;
 
@@ -36,41 +39,6 @@ class GqlLazyLoader {
       // TODO uninstall graphql-tag
       this.gql = (await import('graphql-tag')).gql;
     }
-  }
-
-  // todo ✅
-  public static async SPACE_QUERY() {
-    await this.init();
-    return this.gql`
-  query Space($space: String!) {
-    space(id: $space) {
-      id
-      name
-      about
-      symbol
-      private
-      network
-      avatar
-      validation {
-        params
-      }
-      voting {
-        period
-        delay
-      }
-      filters {
-        minScore
-        onlyMembers
-      }
-      strategies {
-        name
-        network
-        params
-      }
-      members
-    }
-  }
-`;
   }
 
   // TODO ✅
@@ -199,19 +167,6 @@ export type SnapshotProposalVote = {
   choice: number;
   balance: number;
 };
-
-// TODO ✅
-export async function getSpace(space: string): Promise<SnapshotSpace> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const spaceObj = await apolloClient.query({
-    query: await GqlLazyLoader.SPACE_QUERY(),
-    variables: {
-      space,
-    },
-  });
-  return spaceObj.data.space;
-}
 
 // TODO ✅
 export async function getProposal(
@@ -402,7 +357,7 @@ export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
         space: cleanSpaceId,
       });
 
-      const space = await getSpace(cleanSpaceId);
+      const space = await getSnapshotSpaceQuery({ space: cleanSpaceId });
       spacesData.push({ space, proposals });
     } catch (e) {
       console.error(`Failed to initialize snapshot: ${cleanSpaceId}.`);
