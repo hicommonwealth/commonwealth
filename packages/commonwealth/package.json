@@ -72,7 +72,6 @@
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {
-    "@apollo/client": "^3.3.18",
     "@brillout/import": "^0.2.2",
     "@canvas-js/chain-cosmos": "0.10.0-beta.3",
     "@canvas-js/chain-ethereum": "0.10.0-beta.3",
@@ -156,6 +155,7 @@
     "buffer": "^6.0.3",
     "cheerio": "1.0.0-rc.3",
     "clsx": "^1.2.1",
+    "commonwealth-mdxeditor": "^0.0.3",
     "compression": "^1.7.4",
     "connect-session-sequelize": "^7.1.1",
     "cookie-parser": "^1.4.4",
@@ -179,7 +179,6 @@
     "firebase": "^10.12.1",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
-    "graphql-tag": "^2.12.4",
     "highlight-words-core": "^1.2.2",
     "is-ipfs": "^8.0.1",
     "is-my-json-valid": "^2.20.6",
@@ -260,8 +259,7 @@
     "web3-validator": "2.0.5",
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
-    "zustand": "^4.3.8",
-    "commonwealth-mdxeditor": "^0.0.3"
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@ethersproject/keccak256": "5.7.0",

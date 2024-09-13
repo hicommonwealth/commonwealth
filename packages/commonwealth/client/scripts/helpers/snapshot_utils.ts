@@ -1,11 +1,10 @@
 import module from '@snapshot-labs/snapshot.js';
+import { notifyError } from 'controllers/app/notifications';
 import {
   getSnapshotProposalsQuery,
   getSnapshotSpaceQuery,
 } from 'state/api/snapshots';
 import { getSnapshotVotesQuery } from 'state/api/snapshots/getVotes';
-import { notifyError } from '../controllers/app/notifications';
-let apolloClient = null;
 
 class SnapshotLazyLoader {
   private static snapshot;
@@ -29,45 +28,6 @@ class SnapshotLazyLoader {
     await this.init();
     return this.client;
   }
-}
-
-// Queries from: https://github.com/snapshot-labs/snapshot/blob/develop/src/helpers/queries.ts
-class GqlLazyLoader {
-  private static gql;
-
-  private static async init() {
-    if (!this.gql) {
-      // TODO uninstall graphql-tag
-      this.gql = (await import('graphql-tag')).gql;
-    }
-  }
-}
-
-async function getApolloClient() {
-  if (apolloClient) return apolloClient;
-
-  const { ApolloClient, createHttpLink, InMemoryCache } = await import(
-    '@apollo/client/core'
-  );
-  // HTTP connection to the API
-  const httpLink = createHttpLink({
-    // You should use an absolute URL here
-    uri: `${
-      process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
-    }/graphql`,
-  });
-  // Create the apollo client
-  // @ts-expect-error StrictNullChecks
-  apolloClient = new ApolloClient({
-    link: httpLink,
-    cache: new InMemoryCache(),
-    defaultOptions: {
-      query: {
-        fetchPolicy: 'no-cache',
-      },
-    },
-  });
-  return apolloClient;
 }
 
 export interface SnapshotSpace {

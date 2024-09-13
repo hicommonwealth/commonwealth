@@ -43,8 +43,6 @@ const getVotes = async ({ proposalId }: UseGetVotesQueryProps) => {
     },
   );
 
-  console.log('res??', res);
-
   return res.votes;
 };
 
