@@ -1,26 +1,26 @@
 import React from 'react';
 import { FileUploadButton } from 'views/components/MarkdownEditor/toolbars/FileUploadButton';
-import { DEFAULT_ICON_SIZE } from 'views/components/MarkdownEditor/utils/iconComponentFor';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { IMAGE_ACCEPT } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './DesktopEditorFooter.scss';
 
 type DesktopEditorFooterProps = Readonly<{
   onImportMarkdown?: (file: File) => void;
+  onImage?: (file: File) => void;
   onSubmit?: () => void;
 }>;
 
 export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
-  const { onImportMarkdown, onSubmit } = props;
+  const { onImportMarkdown, onSubmit, onImage } = props;
 
   return (
     <div className="DesktopEditorFooter">
       <div className="Item">
-        <div className="IconAndText">
-          <div>
-            <CWIcon iconName="clipboard" iconSize={DEFAULT_ICON_SIZE} />
-          </div>
-          <div>Paste, drop or click to add files</div>
-        </div>
+        <FileUploadButton
+          accept={IMAGE_ACCEPT}
+          iconName="clipboard"
+          text="Paste, drop or click to add images"
+          onFile={(file) => onImage?.(file)}
+        />
       </div>
       <div className="Item">
         <FileUploadButton

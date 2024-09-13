@@ -294,6 +294,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
 
         {mode === 'desktop' && (
           <DesktopEditorFooter
+            onImage={imageUploadHandlerWithMarkdownInsertion}
             onImportMarkdown={handleImportMarkdown}
             onSubmit={handleSubmit}
           />
