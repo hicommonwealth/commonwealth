@@ -20,7 +20,7 @@ import './MarkdownViewer.scss';
 export type MarkdownStr = string;
 
 export type MarkdownViewerProps = Readonly<{
-  markdown: MarkdownStr;
+  markdown: MarkdownStr | undefined;
 }>;
 
 export const MarkdownViewer = memo(function MarkdownViewer(
