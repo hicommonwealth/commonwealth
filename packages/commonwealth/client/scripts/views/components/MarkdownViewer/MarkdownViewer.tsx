@@ -25,23 +25,20 @@ export type MarkdownViewerProps = Readonly<{
   cutoffLines?: number;
 }>;
 
-function truncateMarkdown(
-  markdown: MarkdownStr,
-  cutoffLines: number | undefined,
-): string {
-  return markdown.split('\n', cutoffLines).join('\n');
-}
-
 function useComputeMarkdownWithCutoff(
   markdown: MarkdownStr,
   cutoffLines: number | undefined,
 ): [boolean, string, string] {
   return useMemo(() => {
-    if (!cutoffLines) {
+    const lines = markdown.split('\n');
+
+    if (!cutoffLines || cutoffLines >= lines.length) {
       return [false, markdown, markdown];
     }
 
-    return [true, truncateMarkdown(markdown, cutoffLines), markdown];
+    const head = lines.slice(0, cutoffLines);
+
+    return [true, head.join('\n'), markdown];
   }, [cutoffLines, markdown]);
 }
 
