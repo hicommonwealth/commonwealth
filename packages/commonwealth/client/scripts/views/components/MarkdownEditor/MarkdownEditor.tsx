@@ -242,6 +242,12 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
     }
   }, [onSubmit]);
 
+  const doFocus = useCallback(() => {
+    if (mdxEditorRef.current) {
+      mdxEditorRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}>
       <div
@@ -267,7 +273,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
               location: mode === 'mobile' ? 'bottom' : 'top',
               toolbarContents: () =>
                 mode === 'mobile' ? (
-                  <ToolbarForMobile onSubmit={handleSubmit} />
+                  <ToolbarForMobile onSubmit={handleSubmit} focus={doFocus} />
                 ) : (
                   <ToolbarForDesktop
                     onImage={imageUploadHandlerWithMarkdownInsertion}
