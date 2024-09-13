@@ -42,6 +42,9 @@ export const UpdateThread = {
       .optional(),
     canvas_signed_data: z.string().optional(),
     canvas_hash: z.string().optional(),
+
+    // discord bot integration
+    community_id: z.string().optional(),
     discord_meta: DiscordMetaSchema.optional(),
   }),
   output: Thread,

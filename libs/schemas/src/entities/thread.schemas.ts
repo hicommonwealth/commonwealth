@@ -46,6 +46,8 @@ export const Thread = z.object({
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
 
+  search: z.union([z.string(), z.record(z.any())]),
+
   // associations
   Address: Address.nullish(),
   topic: Topic.nullish(),

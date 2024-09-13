@@ -28,7 +28,7 @@ export type AuthContext = {
   thread?: ThreadInstance | null;
   comment?: CommentInstance | null;
   author_address_id?: number;
-  is_author?: boolean;
+  is_author: boolean;
   is_collaborator?: boolean;
 };
 
@@ -70,16 +70,17 @@ export class RejectedMember extends InvalidActor {
 }
 
 /**
- * Prepares authorization context
+ * Builds authorization context
  *
  * @param actor command actor
  * @param payload command payload
  * @param auth authorization context
  * @param roles roles filter
  */
-async function authorizeAddress(
+async function buildAuth(
   ctx: Context<ZodSchema, AuthContext>,
   roles: Role[],
+  collaborators = false,
 ): Promise<AuthContext> {
   const { actor, payload } = ctx;
   if (!actor.address)
@@ -100,7 +101,7 @@ async function authorizeAddress(
    * 2. Find by thread_id when payload contains thread_id
    * 3. Find by comment_id when payload contains comment_id
    */
-  const auth: AuthContext = { address: null };
+  const auth: AuthContext = { address: null, is_author: false };
   (ctx as { auth: AuthContext }).auth = auth;
 
   auth.community_id =
@@ -125,15 +126,19 @@ async function authorizeAddress(
         throw new InvalidInput('Must provide a valid comment id');
       auth.community_id = auth.comment.Thread!.community_id;
       auth.topic_id = auth.comment.Thread!.topic_id;
+      auth.thread_id = auth.comment.Thread!.id;
       auth.author_address_id = auth.comment.address_id;
     } else {
+      const include = collaborators
+        ? {
+            model: models.Address,
+            as: 'collaborators',
+            required: false,
+          }
+        : undefined;
       auth.thread = await models.Thread.findOne({
         where: { id: auth.thread_id },
-        include: {
-          model: models.Address,
-          as: 'collaborators',
-          required: false,
-        },
+        include,
       });
       if (!auth.thread)
         throw new InvalidInput('Must provide a valid thread id');
@@ -153,6 +158,8 @@ async function authorizeAddress(
   });
   if (!auth.address)
     throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+  auth.is_author = auth.address!.id === auth.author_address_id;
 
   // fire and forget address activity tracking
   auth.address.last_active = new Date();
@@ -237,13 +244,13 @@ export const isSuperAdmin: AuthHandler = async (ctx) => {
 };
 
 /**
- * Validates if actor address is authorized by checking for:
- * - **super admin**: Allow all operations when the user is a super admin (god mode)
- * - **in roles**: Allow when user is in the provides community roles
- * - **not banned**: Reject if user is banned
- * - **author**: Allow when the user is the creator of the entity
- * - **topic group**: Allow when user has group permissions in topic
- * - **collaborators**: Allow collaborators
+ * Validates if actor's address is authorized by checking in the following order:
+ * - 1. **in roles**: User address must be in the provided community roles
+ * - 2. **admin**: Allows all operations when the user is an admin or super admin (god mode, site admin)
+ * - 3. **not banned**: Reject if address is banned
+ * - 4. **topic group**: Allows when address has group permissions in topic
+ * - 5. **author**: Allows when address is the creator of the entity
+ * - 6. **collaborators**: Allows when address is a collaborator
  *
  * @param roles specific community roles - all by default
  * @param action specific group permission action
@@ -260,29 +267,36 @@ export function isAuthorized({
   collaborators?: boolean;
 }): AuthHandler {
   return async (ctx) => {
-    if (ctx.actor.user.isAdmin) return;
+    const isAdmin = ctx.actor.user.isAdmin;
 
-    const auth = await authorizeAddress(ctx, roles);
+    const auth = await buildAuth(
+      ctx,
+      isAdmin ? ['admin', 'moderator', 'member'] : roles,
+      collaborators,
+    );
+
+    if (isAdmin || auth.address?.role === 'admin') return;
+
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
 
-    auth.is_author = auth.address!.id === auth.author_address_id;
+    if (action) {
+      // waterfall stops here after validating the action
+      await isTopicMember(ctx.actor, auth, action);
+      return;
+    }
+
     if (auth.is_author) return;
 
-    if (auth.address!.role === 'member') {
-      if (action) {
-        await isTopicMember(ctx.actor, auth, action);
-        return;
-      }
-
-      if (collaborators) {
-        const found = auth.thread?.collaborators?.find(
-          ({ address }) => address === ctx.actor.address,
-        );
-        auth.is_collaborator = !!found;
-        if (auth.is_collaborator) return;
-      }
-
-      throw new InvalidActor(ctx.actor, 'Not authorized member');
+    if (collaborators) {
+      const found = auth.thread?.collaborators?.find(
+        ({ address }) => address === ctx.actor.address,
+      );
+      auth.is_collaborator = !!found;
+      if (auth.is_collaborator) return;
+      throw new InvalidActor(ctx.actor, 'Not authorized collaborator');
     }
+
+    // at this point, the address is either a moderator or member
+    // without any action or collaboration requirements
   };
 }

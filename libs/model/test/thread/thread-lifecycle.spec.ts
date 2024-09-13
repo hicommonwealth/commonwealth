@@ -183,37 +183,39 @@ describe('Thread lifecycle', () => {
     await dispose()();
   });
 
-  const authorizationTests = {
-    admin: undefined,
-    member: undefined,
-    nonmember: NonMember,
-    banned: BannedActor,
-    rejected: RejectedMember,
-  } as Record<(typeof roles)[number], any>;
+  describe('create', () => {
+    const authorizationTests = {
+      admin: undefined,
+      member: undefined,
+      nonmember: NonMember,
+      banned: BannedActor,
+      rejected: RejectedMember,
+    } as Record<(typeof roles)[number], any>;
 
-  roles.forEach((role) => {
-    if (!authorizationTests[role]) {
-      it(`should create thread as ${role}`, async () => {
-        const _thread = await command(CreateThread(), {
-          actor: actors[role],
-          payload,
-        });
-        expect(_thread?.title).to.equal(title);
-        expect(_thread?.body).to.equal(body);
-        expect(_thread?.stage).to.equal(stage);
-        // capture as admin author for other tests
-        if (!thread) thread = _thread!;
-      });
-    } else {
-      it(`should reject create thread as ${role}`, async () => {
-        await expect(
-          command(CreateThread(), {
+    roles.forEach((role) => {
+      if (!authorizationTests[role]) {
+        it(`should create thread as ${role}`, async () => {
+          const _thread = await command(CreateThread(), {
             actor: actors[role],
             payload,
-          }),
-        ).rejects.toThrowError(authorizationTests[role]);
-      });
-    }
+          });
+          expect(_thread?.title).to.equal(title);
+          expect(_thread?.body).to.equal(body);
+          expect(_thread?.stage).to.equal(stage);
+          // capture as admin author for other tests
+          if (!thread) thread = _thread!;
+        });
+      } else {
+        it(`should reject create thread as ${role}`, async () => {
+          await expect(
+            command(CreateThread(), {
+              actor: actors[role],
+              payload,
+            }),
+          ).rejects.toThrowError(authorizationTests[role]);
+        });
+      }
+    });
   });
 
   describe('updates', () => {

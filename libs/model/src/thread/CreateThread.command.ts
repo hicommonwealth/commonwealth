@@ -14,6 +14,7 @@ import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
 import { mustBeAuthorized } from '../middleware/guards';
+import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
 import {
   emitMentions,
@@ -131,6 +132,7 @@ export function CreateThread(): Command<
               comment_count: 0,
               reaction_count: 0,
               reaction_weights_sum: 0,
+              search: getThreadSearchVector(rest.title, body),
             },
             {
               transaction,

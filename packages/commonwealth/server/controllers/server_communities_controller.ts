@@ -19,11 +19,6 @@ import {
   __getChainNodes,
 } from './server_communities_methods/get_chain_nodes';
 import {
-  GetCommunitiesOptions,
-  GetCommunitiesResult,
-  __getCommunities,
-} from './server_communities_methods/get_communities';
-import {
   GetCommunityStakeOptions,
   GetCommunityStakeResult,
   __getCommunityStake,
@@ -54,12 +49,6 @@ export class ServerCommunitiesController {
     options: SearchCommunitiesOptions,
   ): Promise<SearchCommunitiesResult> {
     return __searchCommunities.call(this, options);
-  }
-
-  async getCommunities(
-    options: GetCommunitiesOptions,
-  ): Promise<GetCommunitiesResult> {
-    return __getCommunities.call(this, options);
   }
 
   async deleteCommunity(

@@ -42,6 +42,7 @@ import {
   getTMClient,
 } from './chain.utils';
 import EthSigningClient from './eth_signing_client';
+import type { GovgenGovExtension } from './gov/govgen/queries-v1beta1';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -57,6 +58,7 @@ export interface ICosmosTXData extends ITXData {
 export type CosmosApiType = QueryClient &
   StakingExtension &
   GovExtension &
+  GovgenGovExtension &
   BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
