@@ -4,14 +4,13 @@ import { useDebounce } from 'usehooks-ts';
 import { commonProtocol } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import useTokenMetadataQuery from 'state/api/tokens/getTokenMetadata';
+import { alphabeticallySortedChains } from 'views/components/CommunityInformationForm/constants';
 import TokenBanner from 'views/components/TokenBanner';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-// eslint-disable-next-line max-len
-import { alphabeticallySortedChains } from 'views/pages/CreateCommunity/steps/BasicInformationStep/BasicInformationForm/constants';
 
 import { CreateTopicStep } from '../utils';
 

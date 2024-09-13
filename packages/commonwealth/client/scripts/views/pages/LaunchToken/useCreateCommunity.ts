@@ -4,7 +4,7 @@ import { CreateTokenCommunityStep, handleChangeStep } from './utils';
 const useCreateCommunity = () => {
   const [createTokenCommunityStep, setCreateTokenCommunityStep] =
     useState<CreateTokenCommunityStep>(
-      CreateTokenCommunityStep.TokenInformation,
+      CreateTokenCommunityStep.CommunityInformation,
     );
 
   const onChangeStep = (forward: boolean) => {
