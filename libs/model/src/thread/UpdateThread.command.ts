@@ -5,7 +5,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Op, QueryTypes, Sequelize } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
@@ -204,22 +204,22 @@ export function UpdateThread(): Command<
         collaboratorsPatch.add.length > 0 ||
         collaboratorsPatch.remove.length > 0
       ) {
-        const contestManagers = await models.sequelize.query(
-          `
-SELECT cm.contest_address FROM "Threads" t
-JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
-JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
-WHERE t.id = :thread_id
-`,
-          {
-            type: QueryTypes.SELECT,
-            replacements: {
-              thread_id: thread!.id,
+        const found = await models.Thread.findOne({
+          where: { id: thread_id },
+          include: [
+            {
+              model: models.ContestTopic,
+              required: true,
+              include: [
+                {
+                  model: models.ContestManager,
+                  required: true,
+                },
+              ],
             },
-          },
-        );
-        if (contestManagers.length > 0)
-          throw new InvalidInput(UpdateThreadErrors.ContestLock);
+          ],
+        });
+        if (found) throw new InvalidInput(UpdateThreadErrors.ContestLock);
       }
 
       // == mutation transaction boundary ==

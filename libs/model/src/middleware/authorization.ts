@@ -80,6 +80,7 @@ export class RejectedMember extends InvalidActor {
 async function buildAuth(
   ctx: Context<ZodSchema, AuthContext>,
   roles: Role[],
+  collaborators = false,
 ): Promise<AuthContext> {
   const { actor, payload } = ctx;
   if (!actor.address)
@@ -127,13 +128,16 @@ async function buildAuth(
       auth.topic_id = auth.comment.Thread!.topic_id;
       auth.author_address_id = auth.comment.address_id;
     } else {
+      const include = collaborators
+        ? {
+            model: models.Address,
+            as: 'collaborators',
+            required: false,
+          }
+        : undefined;
       auth.thread = await models.Thread.findOne({
         where: { id: auth.thread_id },
-        include: {
-          model: models.Address,
-          as: 'collaborators',
-          required: false,
-        },
+        include,
       });
       if (!auth.thread)
         throw new InvalidInput('Must provide a valid thread id');
@@ -260,6 +264,7 @@ export function isAuthorized({
     const auth = await buildAuth(
       ctx,
       isAdmin ? ['admin', 'moderator', 'member'] : roles,
+      collaborators,
     );
 
     if (isAdmin) return;
