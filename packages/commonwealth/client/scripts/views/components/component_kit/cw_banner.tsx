@@ -3,12 +3,13 @@ import React from 'react';
 import 'components/component_kit/cw_banner.scss';
 import { CWIconButton } from './cw_icon_button';
 
+import CWBannerText from './CWBannerText';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
 type BannerProps = {
-  bannerContent: string | React.ReactNode;
+  bannerContent: string;
   className?: string;
   onClose?: () => void;
 };
@@ -22,7 +23,7 @@ export const Old_CWBanner = ({
     <div
       className={getClasses<{ className?: string }>(
         { className },
-        ComponentType.Banner
+        ComponentType.Banner,
       )}
     >
       <CWText type="b2">{bannerContent}</CWText>
@@ -31,6 +32,7 @@ export const Old_CWBanner = ({
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWMessageBanner = ({
   bannerContent,
   className,
@@ -40,12 +42,10 @@ export const CWMessageBanner = ({
     <div
       className={getClasses<{ className?: string }>(
         { className },
-        ComponentType.MessageBanner
+        ComponentType.MessageBanner,
       )}
     >
-      <CWText type="b1" fontWeight="semiBold">
-        {bannerContent}
-      </CWText>
+      <CWBannerText text={bannerContent} />
       {onClose && (
         <CWIconButton
           iconName="close"
