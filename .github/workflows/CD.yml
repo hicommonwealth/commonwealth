@@ -55,8 +55,6 @@ jobs:
   deploy:
     needs: [build]
     runs-on: ubuntu-latest
-    env:
-      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
     steps:
       - name: Set Heroku app name based on branch
         id: set-heroku-app-name
@@ -82,22 +80,10 @@ jobs:
           esac
           echo "HEROKU_APP_NAME=$APP_NAME" >> $GITHUB_ENV
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
-
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ steps.extract_branch.outputs.branch }}
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
 
       - uses: akhileshns/heroku-deploy@v3.13.15
         with:
-          dontuseforce: 1
           heroku_api_key: ${{secrets.HEROKU_API_TOKEN}}
           heroku_app_name: ${{ env.HEROKU_APP_NAME }}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-          branch: ${{ steps.extract_branch.outputs.branch }}
