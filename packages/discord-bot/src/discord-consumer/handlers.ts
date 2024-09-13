@@ -45,12 +45,16 @@ export async function handleThreadMessages(
     case 'thread-title-update':
       await axios.patch(`${bot_path}/threads`, {
         ...sharedReqData,
+        thread_id: 0, // required in command
+        community_id: topic.community_id, // to auth command
         title: encodeURIComponent(message.title),
       });
       break;
     case 'thread-body-update':
       await axios.patch(`${bot_path}/threads`, {
         ...sharedReqData,
+        thread_id: 0, // required in command
+        community_id: topic.community_id, // to auth command
         body: encodeURIComponent(
           `[Go to Discord post](https://discord.com/channels/${message.guild_id}/${message.channel_id}) \n\n` +
             message.content +

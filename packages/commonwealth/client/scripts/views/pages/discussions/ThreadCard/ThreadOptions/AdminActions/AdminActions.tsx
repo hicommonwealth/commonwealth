@@ -1,3 +1,4 @@
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -177,13 +178,14 @@ export const AdminActions = ({
           onClick: async () => {
             const isSpam = !thread.markedAsSpamAt;
             try {
-              await editThread({
+              const input = await buildUpdateThreadInput({
                 communityId: app.activeChainId() || '',
                 threadId: thread.id,
                 threadMsgId: thread.canvasMsgId,
                 spam: isSpam,
                 address: user.activeAccount?.address || '',
-              })
+              });
+              await editThread(input)
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
                 .catch(() => {
                   notifyError(
@@ -199,14 +201,15 @@ export const AdminActions = ({
     });
   };
 
-  const handleThreadLockToggle = () => {
-    editThread({
+  const handleThreadLockToggle = async () => {
+    const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId,
       readOnly: !thread.readOnly,
       communityId: app.activeChainId() || '',
-    })
+    });
+    editThread(input)
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
         onLockToggle?.(!thread?.readOnly);
@@ -217,14 +220,15 @@ export const AdminActions = ({
       });
   };
 
-  const handleThreadPinToggle = () => {
-    editThread({
+  const handleThreadPinToggle = async () => {
+    const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId,
       communityId: app.activeChainId() || '',
       pinned: !thread.pinned,
-    })
+    });
+    editThread(input)
       .then(() => {
         notifySuccess(thread?.pinned ? 'Unpinned!' : 'Pinned!');
         onPinToggle?.(!thread.pinned);
@@ -273,17 +277,18 @@ export const AdminActions = ({
     );
   };
 
-  const handleArchiveThread = () => {
+  const handleArchiveThread = async () => {
     if (thread.archivedAt === null) {
       setIsArchiveThreadModalOpen(true);
     } else {
-      editThread({
+      const input = await buildUpdateThreadInput({
         threadId: thread.id,
         threadMsgId: thread.canvasMsgId,
         communityId: app.activeChainId() || '',
         archived: !thread.archivedAt,
         address: user.activeAccount?.address || '',
-      })
+      });
+      editThread(input)
         .then(() => {
           notifySuccess(
             `Thread has been ${

@@ -22,6 +22,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { User } from '../components/user/user';
 
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
 import '../../../styles/modals/edit_collaborators_modal.scss';
 
@@ -178,7 +179,7 @@ export const EditCollaboratorsModal = ({
               removedCollaborators.length > 0
             ) {
               try {
-                const updatedThread = await editThread({
+                const input = await buildUpdateThreadInput({
                   threadId: thread.id,
                   threadMsgId: thread.canvasMsgId,
                   communityId: app.activeChainId() || '',
@@ -192,6 +193,7 @@ export const EditCollaboratorsModal = ({
                     }),
                   },
                 });
+                const updatedThread = await editThread(input);
                 notifySuccess('Collaborators updated');
                 onCollaboratorsUpdated &&
                   // @ts-expect-error <StrictNullChecks/>

@@ -62,7 +62,7 @@ export const chainTypes =
 
 // Sort chains alphabetically by labels
 export const alphabeticallySortedChains = [...(chainTypes || [])].sort((a, b) =>
-  (a?.label || '').toLowerCase().localeCompare(b?.label || ''),
+  (b?.label || '').toLowerCase().localeCompare(a?.label || ''),
 );
 
 // Sort chains by stake, chains having stake enabled will come first

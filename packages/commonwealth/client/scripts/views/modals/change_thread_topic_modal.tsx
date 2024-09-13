@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
@@ -49,14 +50,14 @@ export const ChangeThreadTopicModal = ({
 
   const handleSaveChanges = async () => {
     try {
-      await editThread({
+      const input = await buildUpdateThreadInput({
         communityId: app.activeChainId() || '',
         address: user.activeAccount?.address || '',
         threadMsgId: thread.canvasMsgId,
         threadId: thread.id,
         topicId: activeTopic.id,
       });
-
+      await editThread(input);
       onModalClose && onModalClose();
     } catch (err) {
       const error =

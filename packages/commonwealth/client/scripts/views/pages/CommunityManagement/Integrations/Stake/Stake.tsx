@@ -13,8 +13,10 @@ const Stake = () => {
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
   const canEnableStake =
-    // @ts-expect-error <StrictNullChecks/>
-    !!commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.ethChainId];
+    !!commonProtocol?.factoryContracts[
+      // @ts-expect-error <StrictNullChecks/>
+      app?.chain?.meta?.ChainNode?.eth_chain_id
+    ];
 
   const actionButton = (
     <CWButton

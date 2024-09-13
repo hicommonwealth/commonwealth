@@ -1,11 +1,8 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { signUpdateThread } from 'controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
-import { SERVER_URL } from 'state/api/config';
 import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
@@ -44,7 +41,7 @@ interface EditThreadProps {
   };
 }
 
-const editThread = async ({
+export const buildUpdateThreadInput = async ({
   address,
   communityId,
   threadId,
@@ -68,7 +65,7 @@ const editThread = async ({
   topicId,
   // for editing thread collaborators
   collaborators,
-}: EditThreadProps): Promise<Thread> => {
+}: EditThreadProps) => {
   let canvasSignedData;
   if (newBody || newTitle) {
     canvasSignedData = await signUpdateThread(address, {
@@ -80,11 +77,12 @@ const editThread = async ({
     });
   }
 
-  const response = await axios.patch(`${SERVER_URL}/threads/${threadId}`, {
+  return {
     // common payload
     author_community_id: communityId,
     address: address,
     community_id: communityId,
+    thread_id: threadId,
     jwt: userStore.getState().jwt,
     // for edit profile
     ...(url && { url }),
@@ -102,13 +100,11 @@ const editThread = async ({
     // for editing thread archived status
     ...(archived !== undefined && { archived }),
     // for editing thread topic
-    ...(topicId !== undefined && { topicId }),
+    ...(topicId !== undefined && { topic_id: topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
     ...toCanvasSignedDataApiArgs(canvasSignedData),
-  });
-
-  return new Thread(response.data.result);
+  };
 };
 
 interface UseEditThreadMutationProps {
@@ -128,9 +124,10 @@ const useEditThreadMutation = ({
   const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: editThread,
-    onSuccess: async (updatedThread) => {
+  return trpc.thread.updateThread.useMutation({
+    onSuccess: (updated) => {
+      // @ts-expect-error StrictNullChecks
+      const updatedThread = new Thread(updated);
       // Update community level thread counters variables
       if (currentStage !== updatedThread.stage) {
         updateThreadCountsByStageChange(

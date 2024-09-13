@@ -63,7 +63,7 @@ export const verify = async ({
 export const verifyComment = async (
   canvasSignedData: CanvasSignedData,
   fields: {
-    thread_id: number;
+    thread_id: string | null;
     text: string;
     address: string;
     parent_comment_id: string | null;
@@ -178,23 +178,23 @@ export const verifyDeleteThread = async (
 export const verifyReaction = async (
   canvasSignedData: CanvasSignedData,
   fields:
-    | { comment_id: string; value: string; address: string }
-    | { thread_id: string; value: string; address: string },
+    | { comment_id: string | null; value: string; address: string }
+    | { thread_id: string | null; value: string; address: string },
 ) => {
   await verify(canvasSignedData);
 
   const isComment = (
     f:
-      | { comment_id: string; value: string; address: string }
-      | { thread_id: string; value: string; address: string },
-  ): f is { comment_id: string; value: string; address: string } => {
+      | { comment_id: string | null; value: string; address: string }
+      | { thread_id: string | null; value: string; address: string },
+  ): f is { comment_id: string | null; value: string; address: string } => {
     return 'comment_id' in f && !('thread_id' in f) && !('proposal_id' in f);
   };
   const isThread = (
     f:
-      | { comment_id: string; value: string; address: string }
-      | { thread_id: string; value: string; address: string },
-  ): f is { thread_id: string; value: string; address: string } => {
+      | { comment_id: string | null; value: string; address: string }
+      | { thread_id: string | null; value: string; address: string },
+  ): f is { thread_id: string | null; value: string; address: string } => {
     return 'thread_id' in f && !('comment_id' in f) && !('proposal_id' in f);
   };
 

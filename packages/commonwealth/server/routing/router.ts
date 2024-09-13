@@ -114,7 +114,6 @@ import { createThreadPollHandler } from '../routes/threads/create_thread_poll_ha
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createTopicHandler } from '../routes/topics/create_topic_handler';
 import { deleteTopicHandler } from '../routes/topics/delete_topic_handler';
 import { getTopicsHandler } from '../routes/topics/get_topics_handler';
@@ -333,15 +332,6 @@ function setupRouter(
     '/admin/top-users',
     passport.authenticate('jwt', { session: false }),
     getTopUsersHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'patch',
-    '/threads/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateThreadHandler.bind(this, serverControllers),
   );
 
   // polls
