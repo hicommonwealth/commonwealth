@@ -26,7 +26,7 @@ export const CreateThread = {
 
 export const ThreadCanvasReaction = z.object({
   thread_id: PG_INT,
-  thread_msg_id: z.string(),
+  thread_msg_id: z.string().nullish(),
   reaction: z.enum(['like']),
   canvas_signed_data: z.string().optional(),
   canvas_msg_id: z.string().optional(),

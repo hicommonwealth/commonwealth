@@ -46,7 +46,7 @@ export const verifyCommentSignature: AuthHandler<
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
     await verifyComment(canvasSignedData, {
-      thread_id: payload.thread_id,
+      thread_id: payload.thread_msg_id,
       parent_comment_id: payload.parent_msg_id ?? null,
       text: payload.text,
       address:
