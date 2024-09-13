@@ -1,5 +1,6 @@
-import { Clipboard, DownloadSimple } from '@phosphor-icons/react';
 import React, { useCallback, useRef } from 'react';
+import { DEFAULT_ICON_SIZE } from 'views/components/MarkdownEditor/utils/iconComponentFor';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import './DesktopEditorFooter.scss';
 
 type DesktopEditorFooterProps = Readonly<{
@@ -34,7 +35,7 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
       <div className="Item">
         <div className="IconAndText">
           <div>
-            <Clipboard size={24} />
+            <CWIcon iconName="clipboard" iconSize={DEFAULT_ICON_SIZE} />
           </div>
           <div>Paste, drop or click to add files</div>
         </div>
@@ -50,7 +51,7 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
         <button onClick={handleImportMarkdown} className="FilePickerButton">
           <div className="IconAndText">
             <div>
-              <DownloadSimple size={24} />
+              <CWIcon iconName="downloadSimple" iconSize={DEFAULT_ICON_SIZE} />
             </div>
             <div>Import markdown</div>
           </div>

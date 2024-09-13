@@ -24,6 +24,7 @@ import {
   CheckCircle,
   CircleNotch,
   CirclesThreePlus,
+  Clipboard,
   ClockCounterClockwise,
   CloudArrowUp,
   Code,
@@ -32,6 +33,7 @@ import {
   Copy,
   DotsThreeVertical,
   Download,
+  DownloadSimple,
   Export,
   Eye,
   Flag,
@@ -103,6 +105,7 @@ export const iconLookup = {
   quotes: withPhosphorIcon(Quotes),
   table: withPhosphorIcon(Table),
   image: withPhosphorIcon(Image),
+  clipboard: withPhosphorIcon(Clipboard),
   cloudArrowUp: withPhosphorIcon(CloudArrowUp),
   archiveTrayFilled: Icons.CWArchiveTrayFilled,
   arrowDownBlue500: Icons.CWArrowDownBlue500,
@@ -274,6 +277,7 @@ export const iconLookup = {
   write: Icons.CWWrite,
   members: Icons.CWMembers,
   download: withPhosphorIcon(Download),
+  downloadSimple: withPhosphorIcon(DownloadSimple),
 };
 
 export const customIconLookup = {

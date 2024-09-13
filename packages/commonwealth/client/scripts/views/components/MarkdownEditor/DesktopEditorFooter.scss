@@ -13,6 +13,10 @@
     margin-top: auto;
     margin-bottom: auto;
     margin-left: 8px;
+
+    button {
+      outline: none;
+    }
   }
 
   .FilePickerInput {
@@ -43,7 +47,7 @@
 
   .IconAndText {
     display: flex;
-    gap: 8px;
+    gap: 4px;
 
     div {
       margin: auto auto;
