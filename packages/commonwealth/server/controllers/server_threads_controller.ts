@@ -39,11 +39,6 @@ import {
   SearchThreadsResult,
   __searchThreads,
 } from './server_threads_methods/search_threads';
-import {
-  UpdateThreadOptions,
-  UpdateThreadResult,
-  __updateThread,
-} from './server_threads_methods/update_thread';
 
 /**
  * Implements methods related to threads
@@ -58,13 +53,6 @@ export class ServerThreadsController {
     options: DeleteThreadOptions,
   ): Promise<DeleteThreadResult> {
     return __deleteThread.call(this, options);
-  }
-
-  async updateThread(
-    this: ServerThreadsController,
-    options: UpdateThreadOptions,
-  ): Promise<UpdateThreadResult> {
-    return __updateThread.call(this, options);
   }
 
   async getThreadsByIds(
