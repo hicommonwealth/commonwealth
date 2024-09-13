@@ -12,8 +12,8 @@ export const HeadingButton = (props: HeadingButtonProps) => {
 
   return (
     <BlockButton
-      addTitle={'Change to ' + headingTag}
-      removeTitle={'Remove ' + headingTag}
+      addTitle={`Change to ${headingTag}`}
+      removeTitle={`Remove ${headingTag}`}
       blockType={headingTag}
     >
       <CWIcon iconName={headingTag} iconSize={DEFAULT_ICON_SIZE} />

@@ -22,7 +22,7 @@ export const MarkdownEditorPage = () => {
 
   return (
     <MarkdownEditor
-      markdown={overview + '\n' + supported}
+      markdown={`${overview}\n${supported}`}
       mode={mode}
       imageHandler="local"
       onSubmit={(markdown) => console.log('markdown: \n' + markdown)}
