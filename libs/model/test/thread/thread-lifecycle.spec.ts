@@ -13,7 +13,12 @@ import {
   dispose,
 } from '@hicommonwealth/core';
 import type { AddressAttributes } from '@hicommonwealth/model';
-import { Community, PermissionEnum, Thread } from '@hicommonwealth/schemas';
+import {
+  Community,
+  PermissionEnum,
+  Thread,
+  TopicWeightedVoting,
+} from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
 import { afterEach } from 'node:test';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -85,7 +90,12 @@ describe('Thread lifecycle', () => {
         is_banned: role === 'banned',
       })),
       groups: [{ id: threadGroupId }, { id: commentGroupId }],
-      topics: [{ group_ids: [threadGroupId, commentGroupId] }],
+      topics: [
+        {
+          group_ids: [threadGroupId, commentGroupId],
+          weighted_voting: TopicWeightedVoting.Stake,
+        },
+      ],
       CommunityStakes: [
         {
           stake_id: 1,
