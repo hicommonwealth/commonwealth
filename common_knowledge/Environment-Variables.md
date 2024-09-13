@@ -37,7 +37,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [DISCORD_CLIENT_ID](#discord_client_id)
 - [DISCORD_WEBHOOK_URL_DEV](#discord_webhook_url_dev)
 - [DL_BUILD](#dl_build)
-- [ENFORCE_SESSION_KEYS](#enforce_session_keys)
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
@@ -202,12 +201,6 @@ Connects to the #webhook-testing Discord channel on the Commond Protocol Discord
 ## DL_BUILD
 
 Boolean which ensures that Heroku only builds the Discobot package and related code when deploying.
-
-## ENFORCE_SESSION_KEYS
-
-Boolean feature flag for server-side enforcement of Canvas session keys; by default, `false`.
-
-Owner: Raymond Zhong.
 
 ## ETH_ALCHEMY_API_KEY
 
