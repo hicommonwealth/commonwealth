@@ -19,18 +19,6 @@
     }
   }
 
-  .FilePickerInput {
-    visibility: hidden;
-    width: 0;
-    height: 0;
-  }
-
-  .FilePickerButton {
-    cursor: pointer;
-    border: none;
-    color: $neutral-500;
-  }
-
   .SubmitButtonItem {
     margin-left: auto;
     background-color: $neutral-200;
@@ -42,15 +30,6 @@
       cursor: pointer;
       border-radius: 8px;
       display: inline-block;
-    }
-  }
-
-  .IconAndText {
-    display: flex;
-    gap: 4px;
-
-    div {
-      margin: auto auto;
     }
   }
 }
