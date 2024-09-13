@@ -1,5 +1,6 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { ChainNodeAttributes } from './chain_node';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
@@ -29,6 +30,7 @@ export type TopicAttributes = {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
+  chain_node?: ChainNodeAttributes;
 };
 
 export type TopicInstance = ModelInstance<TopicAttributes> & {

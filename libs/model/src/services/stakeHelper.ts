@@ -21,26 +21,47 @@ export async function getVotingWeight(
   if (config.STAKE.REACTION_WEIGHT_OVERRIDE)
     return config.STAKE.REACTION_WEIGHT_OVERRIDE;
 
-  const topic = await models.Topic.findByPk(topic_id);
+  const topic = await models.Topic.findByPk(topic_id, {
+    include: [
+      {
+        model: models.Community,
+        as: 'community',
+        required: true,
+        include: [
+          {
+            model: models.ChainNode,
+            required: false,
+          },
+          {
+            model: models.CommunityStake,
+            required: false,
+          },
+        ],
+      },
+      {
+        model: models.ChainNode,
+        required: false,
+      },
+    ],
+  });
+
   mustExist('Topic', topic);
+
+  const { community } = topic;
+
+  mustExist('Community', community);
+
   if (topic.weighted_voting === TopicWeightedVoting.Stake) {
-    const stake = await models.CommunityStake.findOne({
-      where: { community_id: topic.community_id },
-    });
-    mustExist('CommunityStake', stake);
-
-    const community = await models.Community.findByPk(topic.community_id);
-    mustExist('Community', community);
-    mustExist('Chain Node Id', community.chain_node_id);
-
-    const node = await models.ChainNode.findByPk(community.chain_node_id!);
-    mustExist('Chain Node', node);
-    mustExist('Eth Chain Id', node.eth_chain_id);
+    mustExist('Community Namespace Address', community.namespace_address);
+    const stake = topic.community?.CommunityStakes?.at(0);
+    mustExist('Community Stake', stake);
+    const chain_node = community.ChainNode;
+    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const stakeBalances = await contractHelpers.getNamespaceBalance(
-      community.namespace_address!,
+      community.namespace_address,
       stake.stake_id,
-      node.eth_chain_id,
+      chain_node.eth_chain_id,
       [address],
     );
     const stakeBalance = stakeBalances[address];
@@ -49,18 +70,14 @@ export async function getVotingWeight(
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
-    const { chain_node_id, token_address, vote_weight_multiplier } = topic;
-    mustExist('Topic Chain Node Id', topic.chain_node_id);
-
-    const node = await models.ChainNode.findByPk(chain_node_id!);
-    mustExist('Chain Node', node);
-    mustExist('Eth Chain Id', node.eth_chain_id);
+    const { chain_node, token_address, vote_weight_multiplier } = topic;
+    mustExist('Topic Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const balances = await tokenBalanceCache.getBalances({
       balanceSourceType: BalanceSourceType.ERC20,
       addresses: [address],
       sourceOptions: {
-        evmChainId: node.eth_chain_id,
+        evmChainId: chain_node?.eth_chain_id,
         contractAddress: token_address!,
       },
       cacheRefresh: true,
@@ -68,6 +85,7 @@ export async function getVotingWeight(
     const balance = balances[address];
     return commonProtocol.calculateVoteWeight(balance, vote_weight_multiplier!);
   }
+
   // no weighted voting
   return null;
 }
