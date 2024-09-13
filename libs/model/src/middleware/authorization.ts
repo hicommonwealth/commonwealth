@@ -237,13 +237,13 @@ export const isSuperAdmin: AuthHandler = async (ctx) => {
 };
 
 /**
- * Validates if actor address is authorized by checking for:
- * - **super admin**: Allow all operations when the user is a super admin (god mode)
- * - **in roles**: Allow when user is in the provides community roles
- * - **not banned**: Reject if user is banned
- * - **author**: Allow when the user is the creator of the entity
- * - **topic group**: Allow when user has group permissions in topic
- * - **collaborators**: Allow collaborators
+ * Validates if actor's address is authorized by checking in the following order:
+ * - 1. **in roles**: User address must be in the provided community roles
+ * - 2. **admin**: Allows all operations when the user is an admin or super admin (god mode, site admin)
+ * - 3. **not banned**: Reject if address is banned
+ * - 4. **topic group**: Allows when address has group permissions in topic
+ * - 5. **author**: Allows when address is the creator of the entity
+ * - 6. **collaborators**: Allows when address is a collaborator
  *
  * @param roles specific community roles - all by default
  * @param action specific group permission action
@@ -268,28 +268,26 @@ export function isAuthorized({
       collaborators,
     );
 
-    if (isAdmin) return;
+    if (isAdmin || auth.address?.role === 'admin') return;
 
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
+
+    if (action) {
+      await isTopicMember(ctx.actor, auth, action);
+      return;
+    }
 
     auth.is_author = auth.address!.id === auth.author_address_id;
     if (auth.is_author) return;
 
-    if (auth.address!.role === 'member') {
-      if (action) {
-        await isTopicMember(ctx.actor, auth, action);
-        return;
-      }
-
-      if (collaborators) {
-        const found = auth.thread?.collaborators?.find(
-          ({ address }) => address === ctx.actor.address,
-        );
-        auth.is_collaborator = !!found;
-        if (auth.is_collaborator) return;
-      }
-
-      throw new InvalidActor(ctx.actor, 'Not authorized member');
+    if (collaborators) {
+      const found = auth.thread?.collaborators?.find(
+        ({ address }) => address === ctx.actor.address,
+      );
+      auth.is_collaborator = !!found;
+      if (auth.is_collaborator) return;
     }
+
+    throw new InvalidActor(ctx.actor, 'Not authorized member');
   };
 }
