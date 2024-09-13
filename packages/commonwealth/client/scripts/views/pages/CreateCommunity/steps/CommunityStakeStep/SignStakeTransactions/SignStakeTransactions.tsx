@@ -16,12 +16,13 @@ import useReserveCommunityNamespace from './useReserveCommunityNamespace';
 import './SignStakeTransactions.scss';
 
 const SignStakeTransactions = ({
-  goToSuccessStep,
   communityStakeData,
   selectedAddress,
   createdCommunityId,
   chainId,
   isTopicFlow,
+  onSuccess,
+  onCancel,
 }: SignStakeTransactionsProps) => {
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
@@ -36,7 +37,7 @@ const SignStakeTransactions = ({
     useLaunchCommunityStake({
       namespace: communityStakeData.namespace,
       communityId: createdCommunityId,
-      goToSuccessStep,
+      goToSuccessStep: onSuccess,
       selectedAddress: selectedAddress.address,
       chainId,
     });
@@ -79,7 +80,7 @@ const SignStakeTransactions = ({
 
   const handleCancel = () => {
     isTopicFlow
-      ? goToSuccessStep()
+      ? onCancel()
       : openConfirmation({
           title: 'Are you sure you want to cancel?',
           description:
@@ -89,7 +90,7 @@ const SignStakeTransactions = ({
               label: 'Cancel',
               buttonType: 'destructive',
               buttonHeight: 'sm',
-              onClick: goToSuccessStep,
+              onClick: onCancel,
             },
             {
               label: 'Continue',

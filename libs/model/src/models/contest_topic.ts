@@ -1,9 +1,9 @@
-import { ContestTopic } from '@hicommonwealth/schemas';
+import { ContestTopic as ContestTopicSchema } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-type ContestTopic = ModelInstance<z.infer<typeof ContestTopic>>;
+type ContestTopic = ModelInstance<z.infer<typeof ContestTopicSchema>>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -13,6 +13,8 @@ export default (
     {
       contest_address: {
         type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
         primaryKey: true,
       },
       topic_id: { type: Sequelize.INTEGER, primaryKey: true },
@@ -21,6 +23,12 @@ export default (
     {
       tableName: 'ContestTopics',
       timestamps: false,
-      indexes: [],
+      indexes: [
+        {
+          unique: true,
+          fields: ['contest_address'],
+          name: 'contest_address_unique',
+        },
+      ],
     },
   );
