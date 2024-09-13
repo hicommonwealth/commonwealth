@@ -49,6 +49,7 @@ if (config.NODE_ENV === 'test')
   router.use(passport.authenticate('jwt', { session: false }));
 // ===============================================================================
 
+// IMPORTANT NOTE: If you move this file, you will need to update validate-external-api-versioning.js
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {
   title: 'Common API',
