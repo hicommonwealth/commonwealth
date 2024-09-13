@@ -126,6 +126,7 @@ async function buildAuth(
         throw new InvalidInput('Must provide a valid comment id');
       auth.community_id = auth.comment.Thread!.community_id;
       auth.topic_id = auth.comment.Thread!.topic_id;
+      auth.thread_id = auth.comment.Thread!.id;
       auth.author_address_id = auth.comment.address_id;
     } else {
       const include = collaborators

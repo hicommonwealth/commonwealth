@@ -9,7 +9,7 @@ import { Op, Sequelize } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import type { ThreadAttributes, ThreadInstance } from '../models/thread';
 import {
   emitMentions,
@@ -175,7 +175,7 @@ export function UpdateThread(): Command<
     ...schemas.UpdateThread,
     auth: [isAuthorized({ collaborators: true })],
     body: async ({ actor, payload, auth }) => {
-      const { address } = mustBeAuthorized(actor, auth);
+      const { address, topic_id } = mustBeAuthorizedThread(actor, auth);
       const { thread_id, discord_meta } = payload;
 
       // find by discord_meta first if present
@@ -204,18 +204,12 @@ export function UpdateThread(): Command<
         collaboratorsPatch.add.length > 0 ||
         collaboratorsPatch.remove.length > 0
       ) {
-        const found = await models.Thread.findOne({
-          where: { id: thread_id },
+        const found = await models.ContestTopic.findOne({
+          where: { topic_id },
           include: [
             {
-              model: models.ContestTopic,
+              model: models.ContestManager,
               required: true,
-              include: [
-                {
-                  model: models.ContestManager,
-                  required: true,
-                },
-              ],
             },
           ],
         });
