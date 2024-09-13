@@ -155,6 +155,7 @@ export const CommentTree = ({
   });
 
   const scrollToRef = useRef(null);
+  const scrollToEditorRef = useRef(null);
 
   const scrollToElement = () => {
     if (scrollToRef.current) {
@@ -165,6 +166,17 @@ export const CommentTree = ({
       });
     }
   };
+
+  const scrollToEditor = () => {
+    // @ts-expect-error <StrictNullChecks/>
+    scrollToEditorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (isReplying) {
+      scrollToEditor();
+    }
+  }, [isReplying]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
@@ -525,12 +537,15 @@ export const CommentTree = ({
             </div>
             <div ref={scrollToRef}></div>
             {isReplying && parentCommentId === comment.id && (
-              <CreateComment
-                handleIsReplying={handleIsReplying}
-                parentCommentId={parentCommentId}
-                rootThread={thread}
-                canComment={canComment}
-              />
+              <>
+                <CreateComment
+                  handleIsReplying={handleIsReplying}
+                  parentCommentId={parentCommentId}
+                  rootThread={thread}
+                  canComment={canComment}
+                />
+                <div ref={scrollToEditorRef}></div>
+              </>
             )}
           </React.Fragment>
         );
