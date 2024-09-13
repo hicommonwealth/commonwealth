@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import request from 'graphql-request';
-import gql from 'graphql-tag';
+import request, { gql } from 'graphql-request';
 import { ExternalEndpoints } from 'state/api/config';
 
 const PROPOSAL_STALE_TIME = 3 * 1_000 * 60; // 3 minutes

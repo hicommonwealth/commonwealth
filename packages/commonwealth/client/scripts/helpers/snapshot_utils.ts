@@ -1,4 +1,5 @@
 import module from '@snapshot-labs/snapshot.js';
+import { getSnapshotProposalsQuery } from 'state/api/snapshots';
 import { notifyError } from '../controllers/app/notifications';
 let apolloClient = null;
 
@@ -32,6 +33,7 @@ class GqlLazyLoader {
 
   private static async init() {
     if (!this.gql) {
+      // TODO uninstall graphql-tag
       this.gql = (await import('graphql-tag')).gql;
     }
   }
@@ -86,52 +88,6 @@ class GqlLazyLoader {
       id
       title
       space
-    }
-  }
-`;
-  }
-
-  // TODO ✅
-  public static async PROPOSALS_QUERY() {
-    await this.init();
-    return this.gql`
-  query Proposals(
-    $first: Int!
-    $skip: Int!
-    $state: String!
-    $space: String
-    $space_in: [String]
-    $author_in: [String]
-  ) {
-    proposals(
-      first: $first
-      skip: $skip
-      where: {
-        space: $space
-        state: $state
-        space_in: $space_in
-        author_in: $author_in
-      }
-    ) {
-      id
-      ipfs
-      title
-      body
-      choices
-      type
-      start
-      end
-      snapshot
-      state
-      scores
-      scores_total
-      author
-      created
-      strategies {
-        name
-        network
-        params
-      }
     }
   }
 `;
@@ -270,23 +226,6 @@ export async function getProposal(
     },
   });
   return proposalObj.data?.proposals[0];
-}
-
-// TODO ✅
-export async function getProposals(space: string): Promise<SnapshotProposal[]> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const proposalsObj = await apolloClient.query({
-    query: await GqlLazyLoader.PROPOSALS_QUERY(),
-    variables: {
-      space,
-      state: 'all',
-      // TODO: pagination in UI
-      first: 1000,
-      skip: 0,
-    },
-  });
-  return proposalsObj.data.proposals;
 }
 
 // TODO ✅
@@ -459,7 +398,10 @@ export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
       cleanSpaceId = spaceId.slice(spaceId.lastIndexOf('/') + 1).trim();
     }
     try {
-      const proposals = await getProposals(cleanSpaceId);
+      const proposals = await getSnapshotProposalsQuery({
+        space: cleanSpaceId,
+      });
+
       const space = await getSpace(cleanSpaceId);
       spacesData.push({ space, proposals });
     } catch (e) {

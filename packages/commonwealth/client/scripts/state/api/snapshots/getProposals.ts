@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import request from 'graphql-request';
-import gql from 'graphql-tag';
-import { ExternalEndpoints } from 'state/api/config';
+import request, { gql } from 'graphql-request';
+import { ExternalEndpoints, queryClient } from 'state/api/config';
 
 const PROPOSALS_STALE_TIME = 3 * 1_000 * 60; // 3 minutes
 
+// TODO check if we need all properties
 const GET_PROPOSALS_QUERY = gql`
   query Proposals(
     $first: Int!
@@ -47,12 +47,36 @@ const GET_PROPOSALS_QUERY = gql`
   }
 `;
 
+interface ProposalsQueryResponse {
+  proposals: {
+    id: string;
+    ipfs: string;
+    title: string;
+    body: string;
+    choices: string[];
+    type: string;
+    start: number;
+    end: number;
+    snapshot: string;
+    state: string;
+    scores: number[];
+    scores_total: number;
+    author: string;
+    created: number;
+    strategies: {
+      name: string;
+      network: string;
+      params: string;
+    }[];
+  }[];
+}
+
 interface UseGetSnapshotProposalsQueryProps {
   space: string;
 }
 
 const getProposals = async ({ space }: UseGetSnapshotProposalsQueryProps) => {
-  return await request(
+  const res = await request<ProposalsQueryResponse>(
     ExternalEndpoints.snapshotHub.graphql,
     GET_PROPOSALS_QUERY,
     {
@@ -62,6 +86,18 @@ const getProposals = async ({ space }: UseGetSnapshotProposalsQueryProps) => {
       skip: 0,
     },
   );
+
+  return res.proposals;
+};
+
+export const getSnapshotProposalsQuery = async ({
+  space,
+}: UseGetSnapshotProposalsQueryProps) => {
+  return await queryClient.fetchQuery({
+    queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', space],
+    queryFn: () => getProposals({ space }),
+    staleTime: PROPOSALS_STALE_TIME,
+  });
 };
 
 const useGetSnapshotProposalsQuery = ({
