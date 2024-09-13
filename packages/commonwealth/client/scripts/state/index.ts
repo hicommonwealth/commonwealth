@@ -3,7 +3,6 @@ import { updateActiveUser } from 'controllers/app/login';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
-import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import DiscordController from 'controllers/server/discord';
@@ -45,9 +44,6 @@ export interface IApp {
   // Discord
   discord: DiscordController;
 
-  // Web3
-  snapshot: SnapshotController;
-
   sidebarRedraw: EventEmitter;
 }
 
@@ -70,9 +66,6 @@ const app: IApp = {
 
   // Discord
   discord: new DiscordController(),
-
-  // Web3
-  snapshot: new SnapshotController(),
 
   // Global nav state
   sidebarRedraw: new EventEmitter(),
