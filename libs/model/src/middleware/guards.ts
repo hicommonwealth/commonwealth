@@ -80,6 +80,9 @@ export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
   return auth as AuthContext & {
     address: AddressInstance;
     thread: ThreadInstance;
+    community_id: string;
+    topic_id: number;
+    thread_id: number;
   };
 }
 
@@ -94,5 +97,9 @@ export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
   return auth as AuthContext & {
     address: AddressInstance;
     comment: ThreadInstance;
+    community_id: string;
+    topic_id: number;
+    thread_id: number;
+    comment_id: number;
   };
 }

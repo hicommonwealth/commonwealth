@@ -20,6 +20,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -28,6 +29,7 @@ import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
@@ -49,6 +51,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
+
+  const weightedVotingEnabled = useFlag('farcasterContest');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -159,6 +163,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useManageDocumentTitle('Discussions');
 
+  // TODO in upcoming PR add check if topic is weighted with ERC20 method
+  const isTopicWeighted = weightedVotingEnabled && topicId;
+
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
       (topic) => topic.id === topicId,
@@ -255,6 +262,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               <Breadcrumbs />
               <UserTrainingSlider />
               <AdminOnboardingSlider />
+              {isTopicWeighted && (
+                <TokenBanner
+                  name="Token"
+                  ticker="TKN"
+                  popover={{ title: 'Token', body: 'TKN' }}
+                  voteWeight={5}
+                />
+              )}
 
               <HeaderWithFilters
                 // @ts-expect-error <StrictNullChecks/>

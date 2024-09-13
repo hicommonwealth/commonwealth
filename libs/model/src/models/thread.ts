@@ -3,17 +3,13 @@ import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils';
-import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
-  collaborators?: AddressAttributes[];
-  reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
 };
 

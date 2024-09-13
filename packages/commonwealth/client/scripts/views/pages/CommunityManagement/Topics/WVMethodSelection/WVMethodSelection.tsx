@@ -1,5 +1,7 @@
+import { commonProtocol } from '@hicommonwealth/shared';
 import React, { useState } from 'react';
 
+import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -34,6 +36,12 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
     onStepChange(CreateTopicStep.WVStake);
   };
 
+  const canEnableStake =
+    !!commonProtocol?.factoryContracts[
+      // @ts-expect-error <StrictNullChecks/>
+      app?.chain?.meta?.ChainNode?.eth_chain_id
+    ];
+
   return (
     <div className="WVMethodSelection">
       <section className="header">
@@ -61,8 +69,16 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
             onSelect={setSelectedWVMethod}
             label="Use Community stake"
             description="Use non-transferable tokens"
-            popover={{ title: 'Example', body: <>lorem ipsum</> }}
+            popover={
+              canEnableStake
+                ? { title: 'Example', body: <>lorem ipsum</> }
+                : {
+                    title: 'Disabled',
+                    body: 'Stake is not supported on your network',
+                  }
+            }
             isSelected={selectedWVMethod === WVMethod.Stake}
+            disabled={!canEnableStake}
           />
         </CWRadioPanelGroup>
 
