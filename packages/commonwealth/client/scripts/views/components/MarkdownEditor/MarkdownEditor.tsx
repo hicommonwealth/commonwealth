@@ -20,9 +20,9 @@ import {
 import 'commonwealth-mdxeditor/style.css';
 import { notifyError } from 'controllers/app/notifications';
 import React, { memo, useCallback, useRef, useState } from 'react';
-import { DesktopEditorFooter } from './DesktopEditorFooter';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
+import { DesktopEditorFooter } from './toolbars/DesktopEditorFooter';
 import { ToolbarForDesktop } from './toolbars/ToolbarForDesktop';
 import { ToolbarForMobile } from './toolbars/ToolbarForMobile';
 import { useEditorErrorHandler } from './useEditorErrorHandler';

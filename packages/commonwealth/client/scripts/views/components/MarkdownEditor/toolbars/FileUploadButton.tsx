@@ -14,7 +14,7 @@ type FileUploadButtonProps = Readonly<{
 }>;
 
 export const FileUploadButton = (props: FileUploadButtonProps) => {
-  const { onFile, accept, iconName } = props;
+  const { onFile, accept, iconName, text } = props;
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -37,7 +37,7 @@ export const FileUploadButton = (props: FileUploadButtonProps) => {
   );
 
   return (
-    <div className="ImageButton">
+    <div className="FileUploadButton">
       <input
         ref={fileInputRef}
         type="file"
@@ -46,7 +46,11 @@ export const FileUploadButton = (props: FileUploadButtonProps) => {
         onChange={fileHandler}
       />
       <button onClick={handleClick} className="FilePickerButton">
-        <CWIcon iconName={iconName} iconSize={DEFAULT_ICON_SIZE} />
+        <div className="IconAndText">
+          <CWIcon iconName={iconName} iconSize={DEFAULT_ICON_SIZE} />
+
+          {text && <div>{text}</div>}
+        </div>
       </button>
     </div>
   );
