@@ -1,10 +1,7 @@
 import moment from 'moment';
 import React, { useState } from 'react';
-import app from 'state';
 
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { CardsCollection } from 'views/components/cards_collection';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -15,6 +12,7 @@ import {
 
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 
+import { useGetSnapshotProposalsQuery } from 'state/api/snapshots';
 import './SnapshotProposals.scss';
 
 type SnapshotProposalsProps = {
@@ -24,45 +22,28 @@ type SnapshotProposalsProps = {
 
 const SnapshotProposals = ({ snapshotId }: SnapshotProposalsProps) => {
   const [activeTab, setActiveTab] = useState<number>(1);
-  const [isSnapshotProposalsLoading, setIsSnapshotProposalsLoading] =
-    useState<boolean>(true);
-  const [proposals, setProposals] = useState<{
-    active: Array<SnapshotProposal>;
-    ended: Array<SnapshotProposal>;
-  }>({ active: [], ended: [] });
+
+  const { data: snapshotProposals, isLoading: isSnapshotProposalsLoading } =
+    useGetSnapshotProposalsQuery({
+      space: snapshotId,
+    });
+
+  const getActiveProposals = () => {
+    return (snapshotProposals || []).filter(
+      (proposal) => moment(+proposal.end * 1000) >= moment(),
+    );
+  };
+
+  const getEndedProposals = () => {
+    return (snapshotProposals || []).filter(
+      (proposal) => moment(+proposal.end * 1000) < moment(),
+    );
+  };
 
   const proposalsToDisplay =
-    activeTab === 1 ? proposals.active : proposals.ended;
+    activeTab === 1 ? getActiveProposals() : getEndedProposals();
 
   useManageDocumentTitle('Snapshots');
-
-  useNecessaryEffect(() => {
-    const fetch = async () => {
-      setIsSnapshotProposalsLoading(true);
-      await app.snapshot.init(snapshotId);
-
-      if (app.snapshot.initialized) {
-        const tempProposals = {
-          active: [],
-          ended: [],
-        };
-
-        // filter active and ended proposals
-        app.snapshot.proposals.filter((proposal: SnapshotProposal) =>
-          moment(+proposal.end * 1000) >= moment()
-            ? // @ts-expect-error <StrictNullChecks/>
-              tempProposals.active.push(proposal)
-            : // @ts-expect-error <StrictNullChecks/>
-              tempProposals.ended.push(proposal),
-        );
-
-        setProposals(tempProposals);
-        setIsSnapshotProposalsLoading(false);
-      }
-    };
-
-    fetch();
-  }, [snapshotId]);
 
   return (
     <CWPageLayout>

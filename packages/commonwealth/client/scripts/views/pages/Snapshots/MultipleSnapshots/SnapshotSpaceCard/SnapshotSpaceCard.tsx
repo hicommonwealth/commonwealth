@@ -2,7 +2,6 @@ import React from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
 import { CWCard } from 'views/components/component_kit/cw_card';
 
 import { SnapshotSpaceCardSkeleton } from './SnapshotSpaceCardSkeleton';
@@ -37,10 +36,7 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        app.snapshot.init(space.id).then(() => {
-          navigate(`/snapshot/${space.id}`);
-        });
+        navigate(`/snapshot/${space.id}`);
       }}
     >
       <div className="space-card-container">

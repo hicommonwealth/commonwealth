@@ -28,7 +28,6 @@ export const NewSnapshotProposalModal = ({
   );
   const handleSelect = async (item) => {
     setSelectedSnapshotId(item.value);
-    await app.snapshot.init(item.value);
   };
 
   const snapshotOptions = useMemo(

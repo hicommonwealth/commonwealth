@@ -16,11 +16,13 @@ import './SnapshotInformationCard.scss';
 type SnapshotInformationCardProps = {
   proposal: SnapshotProposal;
   threads: Array<{ id: number; title: string }> | null;
+  spaceId: string;
 };
 
 export const SnapshotInformationCard = ({
   proposal,
   threads,
+  spaceId,
 }: SnapshotInformationCardProps) => {
   const votingSystem = _.capitalize(
     proposal.type.split('-').join(' ').concat(' voting'),
@@ -73,7 +75,7 @@ export const SnapshotInformationCard = ({
                   : // @ts-expect-error <StrictNullChecks/>
                     proposal.strategies[0].name
               }
-              url={`https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`}
+              url={`https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`}
             />
             <SnapshotInfoLinkRow
               label="Snapshot"

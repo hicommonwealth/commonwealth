@@ -27,6 +27,10 @@ import {
 } from 'views/components/proposal_pills';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 
+import {
+  useGetSnapshotProposalsQuery,
+  useGetSnapshotSpaceQuery,
+} from 'state/api/snapshots';
 import { SnapshotInformationCard } from './SnapshotInformationCard';
 import { SnapshotPollCardContainer } from './SnapshotPollCard';
 import { SnapshotVotesTable } from './SnapshotVotesTable';
@@ -57,6 +61,12 @@ const ViewSnapshotProposal = ({
     },
     enabled: !!(app.activeChainId() && proposal?.id),
   });
+
+  const { data: spaceData } = useGetSnapshotSpaceQuery({ space: snapshotId });
+  const { data: proposalsData } = useGetSnapshotProposalsQuery({
+    space: snapshotId,
+  });
+
   const threads = data || [];
 
   useEffect(() => {
@@ -88,7 +98,7 @@ const ViewSnapshotProposal = ({
     return new AddressInfo({
       userId: 0, // TODO: is this OK?
       id: 0, // TODO: is this OK?
-      address: proposal.author,
+      address: proposal?.author,
       community: {
         id: activeCommunityId,
         base: user.activeAccount?.community.base,
@@ -102,41 +112,40 @@ const ViewSnapshotProposal = ({
   const { isWindowLarge } = useBrowserWindow({});
 
   const loadVotes = useCallback(
-    async (snapId: string, proposalId: string) => {
-      await app.snapshot.init(snapId);
-      if (!app.snapshot.initialized) {
-        return;
-      }
-
-      const currentProposal = app.snapshot.proposals.find(
+    async (proposalId: string) => {
+      const currentProposal = (proposalsData || []).find(
         (p) => p.id === proposalId,
       );
+
       // @ts-expect-error <StrictNullChecks/>
       setProposal(currentProposal);
 
-      const currentSpace = app.snapshot.space;
-      setSpace(currentSpace);
+      setSpace(spaceData!);
 
       // @ts-expect-error <StrictNullChecks/>
-      const results = await getResults(currentSpace, currentProposal);
+      const results = await getResults(spaceData, currentProposal);
       setVoteResults(results);
 
       const powerRes = await getPower(
-        currentSpace,
-        // @ts-expect-error <StrictNullChecks/>
-        currentProposal,
+        spaceData!,
+        currentProposal!,
         activeUserAddress,
       );
+
       setPower(powerRes);
     },
-    [activeUserAddress],
+    [activeUserAddress, proposalsData, spaceData],
   );
 
   useNecessaryEffect(() => {
-    loadVotes(snapshotId, identifier).catch(console.error);
-  }, [identifier, loadVotes, snapshotId]);
+    if (!proposalsData || !spaceData) {
+      return;
+    }
 
-  if (!proposal) {
+    loadVotes(identifier).catch(console.error);
+  }, [proposalsData, spaceData, identifier, loadVotes]);
+
+  if (!proposal || !space) {
     return (
       <CWPageLayout>
         <CWContentPage
@@ -179,7 +188,11 @@ const ViewSnapshotProposal = ({
           {
             label: 'Info',
             item: (
-              <SnapshotInformationCard proposal={proposal} threads={threads} />
+              <SnapshotInformationCard
+                proposal={proposal}
+                threads={threads}
+                spaceId={space?.id}
+              />
             ),
           },
           {
@@ -191,14 +204,13 @@ const ViewSnapshotProposal = ({
                 identifier={identifier}
                 proposal={proposal}
                 scores={[]} // unused?
-                // @ts-expect-error <StrictNullChecks/>
                 space={space}
                 symbol={symbol}
                 totals={totals}
                 totalScore={totalScore}
                 validatedAgainstStrategies={validatedAgainstStrategies}
                 votes={votes}
-                loadVotes={async () => loadVotes(snapshotId, identifier)}
+                loadVotes={async () => loadVotes(identifier)}
               />
             ),
           },

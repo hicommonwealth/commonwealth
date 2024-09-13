@@ -1,34 +1,11 @@
 import module from '@snapshot-labs/snapshot.js';
 import { notifyError } from 'controllers/app/notifications';
+import { ExternalEndpoints, queryClient } from 'state/api/config';
 import {
   getSnapshotProposalsQuery,
   getSnapshotSpaceQuery,
 } from 'state/api/snapshots';
 import { getSnapshotVotesQuery } from 'state/api/snapshots/getVotes';
-
-class SnapshotLazyLoader {
-  private static snapshot;
-  private static client;
-
-  private static async init() {
-    if (!this.snapshot) {
-      const { Client712 } = module;
-      const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-      this.client = new Client712(hub);
-      this.snapshot = module;
-    }
-  }
-
-  public static async getSnapshot() {
-    await this.init();
-    return this.snapshot;
-  }
-
-  public static async getClient() {
-    await this.init();
-    return this.client;
-  }
-}
 
 export interface SnapshotSpace {
   id: string;
@@ -89,20 +66,56 @@ export type SnapshotProposalVote = {
   balance: number;
 };
 
-export async function castVote(address: string, payload: any) {
+class SnapshotLazyLoader {
+  private static snapshot;
+  private static client;
+
+  private static async init() {
+    if (!this.snapshot) {
+      const { Client712 } = module;
+      const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+      this.client = new Client712(hub);
+      this.snapshot = module;
+    }
+  }
+
+  public static async getSnapshot() {
+    await this.init();
+    return this.snapshot;
+  }
+
+  public static async getClient() {
+    await this.init();
+    return this.client;
+  }
+}
+
+export async function castVote(address: string, payload: any, spaceId: string) {
   const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
+  await queryClient.invalidateQueries({
+    queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],
+  });
 }
 
-export async function createProposal(address: string, payload: any) {
+export async function createProposal(
+  address: string,
+  payload: any,
+  spaceId: string,
+) {
   const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
 
-  const receipt = await client.proposal(web3 as any, address, payload);
-  return receipt;
+  const res = await client.proposal(web3 as any, address, payload);
+
+  await queryClient.invalidateQueries({
+    queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],
+  });
+
+  return res;
 }
 
 export async function getSpaceBlockNumber(network: string): Promise<number> {

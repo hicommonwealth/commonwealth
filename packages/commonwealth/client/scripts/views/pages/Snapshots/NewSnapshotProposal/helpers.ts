@@ -1,7 +1,6 @@
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 import type Account from 'models/Account';
-import app from 'state';
 import { getTextFromDelta } from 'views/components/react_quill_editor';
 
 export type ThreadForm = {
@@ -85,7 +84,5 @@ export const createNewProposal = async (
     metadata: JSON.stringify({}),
   };
 
-  const resp = await createProposal(author.address, proposalPayload);
-  await app.snapshot.refreshProposals();
-  return resp;
+  return await createProposal(author.address, proposalPayload, space.id);
 };

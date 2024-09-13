@@ -24,6 +24,7 @@ import {
 
 import { createNewProposal, ThreadForm } from '../helpers';
 
+import { getSnapshotSpaceQuery } from 'state/api/snapshots';
 import './NewSnapshotProposalForm.scss';
 
 type NewSnapshotProposalFormProps = {
@@ -95,17 +96,6 @@ export const NewSnapshotProposalForm = ({
 
   useEffect(() => {
     const init = async () => {
-      const snapshotNullResponse = await app.snapshot.init(snapshotId);
-      if (snapshotNullResponse === null) {
-        setErrorMessage(true);
-      }
-    };
-    // Add event listener for SnapshotController
-    const handleInitialized = async () => {
-      if (!app.snapshot.initialized) {
-        return;
-      }
-
       const initialForm: ThreadForm = {
         name: !thread ? '' : thread.title,
         body: !thread ? '' : thread.plaintext,
@@ -144,7 +134,9 @@ export const NewSnapshotProposalForm = ({
 
       setForm(initialForm);
 
-      const snapshotSpace = app.snapshot.space;
+      const snapshotSpace = await getSnapshotSpaceQuery({
+        space: snapshotId,
+      });
       const scoreResponse = await getScore(
         snapshotSpace,
         user.activeAccount?.address || '',
@@ -156,15 +148,10 @@ export const NewSnapshotProposalForm = ({
       setLoading(false);
     };
 
-    init();
-
-    app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
-
-    return () => {
-      app.snapshot.snapshotEmitter.off('initialized', handleInitialized);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    init().catch(() => {
+      setErrorMessage(true);
+    });
+  }, [snapshotId, thread, user.activeAccount?.address]);
 
   const author = user.activeAccount;
 
