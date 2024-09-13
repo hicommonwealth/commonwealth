@@ -28,7 +28,7 @@ export type AuthContext = {
   thread?: ThreadInstance | null;
   comment?: CommentInstance | null;
   author_address_id?: number;
-  is_author?: boolean;
+  is_author: boolean;
   is_collaborator?: boolean;
 };
 
@@ -101,7 +101,7 @@ async function buildAuth(
    * 2. Find by thread_id when payload contains thread_id
    * 3. Find by comment_id when payload contains comment_id
    */
-  const auth: AuthContext = { address: null };
+  const auth: AuthContext = { address: null, is_author: false };
   (ctx as { auth: AuthContext }).auth = auth;
 
   auth.community_id =
@@ -158,6 +158,8 @@ async function buildAuth(
   });
   if (!auth.address)
     throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+  auth.is_author = auth.address!.id === auth.author_address_id;
   return auth;
 }
 
@@ -273,11 +275,11 @@ export function isAuthorized({
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
 
     if (action) {
+      // waterfall stops here after validating the action
       await isTopicMember(ctx.actor, auth, action);
       return;
     }
 
-    auth.is_author = auth.address!.id === auth.author_address_id;
     if (auth.is_author) return;
 
     if (collaborators) {
@@ -286,8 +288,10 @@ export function isAuthorized({
       );
       auth.is_collaborator = !!found;
       if (auth.is_collaborator) return;
+      throw new InvalidActor(ctx.actor, 'Not authorized collaborator');
     }
 
-    throw new InvalidActor(ctx.actor, 'Not authorized member');
+    // at this point, the address is either a moderator or member
+    // without any action or collaboration requirements
   };
 }
