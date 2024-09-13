@@ -74,6 +74,10 @@ body,
     // necessary because otherwise code mirror line numbers are too small.
     font-size: inherit !important;
   }
+
+  button {
+    outline: none;
+  }
 }
 
 .mdxeditor-diff-source-wrapper {

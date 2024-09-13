@@ -4,7 +4,6 @@ import {
   ConditionalContents,
   CreateLink,
   InsertCodeBlock,
-  InsertImage,
   InsertTable,
   ListsToggle,
   Separator,
@@ -12,10 +11,17 @@ import {
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
+import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
 import './ToolbarForDesktop.scss';
 
-export const ToolbarForDesktop = () => {
+type ToolbarForDesktopProps = Readonly<{
+  onImage?: (file: File) => void;
+}>;
+
+export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
+  const { onImage } = props;
+
   return (
     <div className="ToolbarForDesktop">
       <ConditionalContents
@@ -47,7 +53,7 @@ export const ToolbarForDesktop = () => {
 
                 <div className="button-container">
                   <CreateLink />
-                  <InsertImage />
+                  <ImageButton onImage={onImage} />
                   <InsertCodeBlock />
                   <QuoteButton />
                   <InsertTable />

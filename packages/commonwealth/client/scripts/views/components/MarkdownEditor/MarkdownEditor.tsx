@@ -102,6 +102,15 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
     [imageUploadHandlerDelegate, terminateDragging],
   );
 
+  const imageUploadHandlerWithMarkdownInsertion = useCallback(
+    async (file: File) => {
+      const url = await imageUploadHandler(file);
+
+      mdxEditorRef.current?.insertMarkdown(`![](${url} "")`);
+    },
+    [imageUploadHandler],
+  );
+
   const handleFile = useCallback(async (file: File) => {
     if (!file.name.endsWith('.md')) {
       notifyError('Not a markdown file.');
@@ -260,7 +269,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
                 mode === 'mobile' ? (
                   <ToolbarForMobile onSubmit={handleSubmit} />
                 ) : (
-                  <ToolbarForDesktop />
+                  <ToolbarForDesktop
+                    onImage={imageUploadHandlerWithMarkdownInsertion}
+                  />
                 ),
             }),
             listsPlugin(),

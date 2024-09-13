@@ -2,12 +2,12 @@ import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
   CreateLink,
-  InsertImage,
   ListsToggle,
   Separator,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 
+import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './ToolbarForMobile.scss';
 
 type ToolbarForMobileProps = Readonly<{
@@ -27,7 +27,7 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <CreateLink />
       <ListsToggle />
       <Separator />
-      <InsertImage />
+      <ImageButton />
       <div className="end">
         <button onClick={() => onSubmit?.()}>➤</button>
       </div>
