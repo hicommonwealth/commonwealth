@@ -41,26 +41,6 @@ class GqlLazyLoader {
     }
   }
 
-  // TODO ✅
-  public static async PROPOSAL_QUERY() {
-    await this.init();
-    return this.gql`
-  query Proposals(
-    $id: Int!
-  ) {
-    proposals(
-      where: {
-        id: $id
-      }
-    ) {
-      id
-      title
-      space
-    }
-  }
-`;
-  }
-
   public static async PROPOSAL_VOTES_QUERY() {
     await this.init();
     return this.gql`
@@ -167,21 +147,6 @@ export type SnapshotProposalVote = {
   choice: number;
   balance: number;
 };
-
-// TODO ✅
-export async function getProposal(
-  id: string,
-): Promise<{ title: string; space: string }> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const proposalObj = await apolloClient.query({
-    query: await GqlLazyLoader.PROPOSAL_QUERY(),
-    variables: {
-      id: +id,
-    },
-  });
-  return proposalObj.data?.proposals[0];
-}
 
 // TODO ✅
 export async function getVotes(
