@@ -8,14 +8,14 @@ import {
   CWModalHeader,
 } from '../component_kit/new_designs/CWModal';
 
-type LinkModalAttrs = {
-  linkText: string; // The text for the link
-  linkUrl: string; // The URL for the link
-  setIsModalOpen: (isOpen: boolean) => void; // Function to control modal state
-  setLinkText: (text: string) => void; // Function to set link text
-  setLinkUrl: (url: string) => void; // Function to set link URL
-  handleAddLink: () => void; // Function to handle adding the link
-  isModalOpen: boolean; //modal state
+type LinkModalProps = {
+  linkText: string;
+  linkUrl: string;
+  setIsModalOpen: (isOpen: boolean) => void;
+  setLinkText: (text: string) => void;
+  setLinkUrl: (url: string) => void;
+  handleAddLink: () => void;
+  isModalOpen: boolean;
 };
 
 export const AddLinkModal = ({
@@ -26,7 +26,7 @@ export const AddLinkModal = ({
   setLinkText,
   setLinkUrl,
   handleAddLink,
-}: LinkModalAttrs) => {
+}: LinkModalProps) => {
   const handleModalClose = () => {
     setIsModalOpen(!isModalOpen);
     setLinkText('');

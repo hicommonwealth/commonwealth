@@ -166,7 +166,7 @@ export const useMarkdownToolbarHandlers = ({
         index: selection.index,
         length: selection.length,
       };
-      // console.log("Stored selection:", childInputRef.current)
+
       setIsModalOpen(!isModalOpen);
     };
   };

@@ -26,7 +26,7 @@ import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { MarkdownPreview } from './MarkdownPreview';
-import { AddLinkModal } from './quill_link_modal';
+import { AddLinkModal } from './QuillLinkModal';
 
 Quill.register('modules/magicUrl', MagicUrl);
 
