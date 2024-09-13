@@ -81,6 +81,7 @@ describe('Thread lifecycle', () => {
     }));
     const [_community] = await seed('Community', {
       chain_node_id: node!.id!,
+      namespace_address: '0x123',
       active: true,
       profile_count: 1,
       Addresses: roles.map((role) => ({

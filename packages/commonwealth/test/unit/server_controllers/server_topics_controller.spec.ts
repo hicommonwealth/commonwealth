@@ -54,6 +54,9 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
       ],
       update: async () => {},
     },
+    CommunityStake: {
+      findOne: async () => ({}),
+    },
     sequelize: {
       transaction: async (callback) => {
         return callback({ transaction: {} });
