@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import request, { gql } from 'graphql-request';
-import { ExternalEndpoints } from 'state/api/config';
+import { ExternalEndpoints, queryClient } from 'state/api/config';
 
 const VOTES_STALE_TIME = 3 * 1_000 * 60; // 3 minutes
 
@@ -21,13 +21,40 @@ const GET_VOTES_QUERY = gql`
   }
 `;
 
+interface VotesQueryResponse {
+  votes: {
+    id: string;
+    voter: string;
+    created: number;
+    choice: any;
+  }[];
+}
+
 interface UseGetVotesQueryProps {
   proposalId?: string;
 }
 
 const getVotes = async ({ proposalId }: UseGetVotesQueryProps) => {
-  return await request(ExternalEndpoints.snapshotHub.graphql, GET_VOTES_QUERY, {
-    proposalId,
+  const res = await request<VotesQueryResponse>(
+    ExternalEndpoints.snapshotHub.graphql,
+    GET_VOTES_QUERY,
+    {
+      proposalId,
+    },
+  );
+
+  console.log('res??', res);
+
+  return res.votes;
+};
+
+export const getSnapshotVotesQuery = async ({
+  proposalId,
+}: UseGetVotesQueryProps) => {
+  return await queryClient.fetchQuery({
+    queryKey: [ExternalEndpoints.snapshotHub.url, 'votes', proposalId],
+    queryFn: () => getVotes({ proposalId }),
+    staleTime: VOTES_STALE_TIME,
   });
 };
 

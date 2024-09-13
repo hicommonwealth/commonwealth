@@ -5,12 +5,13 @@ import useGetSnapshotProposalsQuery, {
   getSnapshotProposalsQuery,
 } from './getProposals';
 import useGetSnapshotSpaceQuery, { getSnapshotSpaceQuery } from './getSpace';
-import useGetVotesQuery from './getVotes';
+import useGetVotesQuery, { getSnapshotVotesQuery } from './getVotes';
 
 export {
   getSnapshotProposalQuery,
   getSnapshotProposalsQuery,
   getSnapshotSpaceQuery,
+  getSnapshotVotesQuery,
   useGetSnapshotProposalQuery,
   useGetSnapshotProposalsQuery,
   useGetSnapshotSpaceQuery,

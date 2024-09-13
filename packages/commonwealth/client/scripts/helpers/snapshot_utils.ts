@@ -3,6 +3,7 @@ import {
   getSnapshotProposalsQuery,
   getSnapshotSpaceQuery,
 } from 'state/api/snapshots';
+import { getSnapshotVotesQuery } from 'state/api/snapshots/getVotes';
 import { notifyError } from '../controllers/app/notifications';
 let apolloClient = null;
 
@@ -39,26 +40,6 @@ class GqlLazyLoader {
       // TODO uninstall graphql-tag
       this.gql = (await import('graphql-tag')).gql;
     }
-  }
-
-  public static async PROPOSAL_VOTES_QUERY() {
-    await this.init();
-    return this.gql`
-  query Votes($proposalHash: String!) {
-    votes(
-      first: 1000
-      skip: 0
-      where: { proposal: $proposalHash }
-      orderBy: "created"
-      orderDirection: desc
-    ) {
-      id
-      voter
-      created
-      choice
-    }
-  }
-`;
   }
 }
 
@@ -148,21 +129,6 @@ export type SnapshotProposalVote = {
   balance: number;
 };
 
-// TODO ✅
-export async function getVotes(
-  proposalHash: string,
-): Promise<SnapshotProposalVote[]> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const response = await apolloClient.query({
-    query: await GqlLazyLoader.PROPOSAL_VOTES_QUERY(),
-    variables: {
-      proposalHash,
-    },
-  });
-  return response.data.votes;
-}
-
 export async function castVote(address: string, payload: any) {
   const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
@@ -213,7 +179,8 @@ export async function getResults(
   proposal: SnapshotProposal,
 ): Promise<VoteResults> {
   try {
-    let votes = await getVotes(proposal.id);
+    let votes = await getSnapshotVotesQuery({ proposalId: proposal.id });
+
     const strategies = proposal.strategies ?? space.strategies;
 
     if (proposal.state !== 'pending') {
