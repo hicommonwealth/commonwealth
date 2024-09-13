@@ -19,7 +19,7 @@ export const MarkdownViewerUsingQuillOrNewEditor = (
   const newEditor = useFlag('newEditor');
 
   if (newEditor) {
-    return <MarkdownViewer markdown={markdown} />;
+    return <MarkdownViewer markdown={markdown} cutoffLines={cutoffLines} />;
   }
 
   return <QuillRenderer doc={markdown ?? ''} cutoffLines={cutoffLines} />;
