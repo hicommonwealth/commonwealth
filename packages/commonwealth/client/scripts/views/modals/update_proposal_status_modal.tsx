@@ -116,6 +116,7 @@ export const UpdateProposalStatusModal = ({
       address: user.activeAccount?.address || '',
       communityId: app.activeChainId() || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
       stage: tempStage!,
     })
       .then((input) => {
