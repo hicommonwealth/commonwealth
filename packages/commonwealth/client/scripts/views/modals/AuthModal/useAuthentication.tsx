@@ -159,7 +159,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === authAddress,
         );
-        await setActiveAccount(signedAddressAccount!);
+        if (signedAddressAccount) {
+          await setActiveAccount(signedAddressAccount);
+        }
         openConfirmation({
           hideWarning: true,
           title: 'Switch Address?',
