@@ -74,11 +74,10 @@ describe('Thread lifecycle', () => {
 
   beforeAll(async () => {
     const signerInfo = await Promise.all(
-      roles.map(async (role) => {
+      roles.map(async () => {
         const signer = getTestSigner();
         const did = await signer.getDid();
-        const { payload, signer: actionSigner } =
-          await signer.newSession(CANVAS_TOPIC);
+        await signer.newSession(CANVAS_TOPIC);
         return {
           signer,
           did,
