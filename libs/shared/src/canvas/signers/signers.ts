@@ -14,6 +14,10 @@ import { addressSwapper } from '@hicommonwealth/shared';
 import * as json from '@ipld/dag-json';
 import { KeypairType } from '@polkadot/util-crypto/types';
 
+export const getTestSigner = () => {
+  return new SIWESigner();
+};
+
 export const getSessionSigners = () => {
   return [
     new SIWESigner(),

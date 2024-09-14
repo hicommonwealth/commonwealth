@@ -14,6 +14,12 @@ import {
 } from '@hicommonwealth/core';
 import type { AddressAttributes } from '@hicommonwealth/model';
 import { Community, PermissionEnum, Thread } from '@hicommonwealth/schemas';
+import {
+  CANVAS_TOPIC,
+  getTestSigner,
+  sign,
+  toCanvasSignedDataApiArgs,
+} from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { afterEach } from 'node:test';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -67,6 +73,20 @@ describe('Thread lifecycle', () => {
   };
 
   beforeAll(async () => {
+    const signerInfo = await Promise.all(
+      roles.map(async (role) => {
+        const signer = getTestSigner();
+        const did = await signer.getDid();
+        const { payload, signer: actionSigner } =
+          await signer.newSession(CANVAS_TOPIC);
+        return {
+          signer,
+          did,
+          address: signer.getAddressFromDid(did),
+        };
+      }),
+    );
+
     const threadGroupId = 123456;
     const commentGroupId = 654321;
     const [node] = await seed('ChainNode', { eth_chain_id: 1 });
@@ -78,12 +98,14 @@ describe('Thread lifecycle', () => {
       chain_node_id: node!.id!,
       active: true,
       profile_count: 1,
-      Addresses: roles.map((role) => ({
-        address: `0xaddressof${role}`,
-        user_id: users[role].id,
-        role: role === 'admin' ? 'admin' : 'member',
-        is_banned: role === 'banned',
-      })),
+      Addresses: roles.map((role, index) => {
+        return {
+          address: signerInfo[index].address,
+          user_id: users[role].id,
+          role: role === 'admin' ? 'admin' : 'member',
+          is_banned: role === 'banned',
+        };
+      }),
       groups: [{ id: threadGroupId }, { id: commentGroupId }],
       topics: [{ group_ids: [threadGroupId, commentGroupId] }],
       CommunityStakes: [
@@ -195,9 +217,25 @@ describe('Thread lifecycle', () => {
     roles.forEach((role) => {
       if (!authorizationTests[role]) {
         it(`should create thread as ${role}`, async () => {
+          const did = `did:pkh:eip155:1:${actors[role].address}`;
+          const signedArgs = toCanvasSignedDataApiArgs(
+            await sign(
+              did,
+              'thread',
+              {
+                community: payload.community_id,
+                title: payload.title,
+                body: payload.body,
+                link: payload.url,
+                topic: payload.topic_id,
+              },
+              () => [1, []],
+            ),
+          );
+
           const _thread = await command(CreateThread(), {
             actor: actors[role],
-            payload,
+            payload: { ...payload, ...signedArgs },
           });
           expect(_thread?.title).to.equal(title);
           expect(_thread?.body).to.equal(body);
