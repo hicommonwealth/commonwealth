@@ -228,7 +228,7 @@ describe('Thread lifecycle', () => {
                 link: payload.url,
                 topic: payload.topic_id,
               },
-              () => [1, []],
+              async () => [1, []] as [number, string[]],
             ),
           );
 
