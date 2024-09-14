@@ -12,7 +12,8 @@ type Args = any;
 
 export class SessionKeyError extends Error {
   readonly address: string;
-  readonly ssoSource: any; // This was removed from the SessionKeyError constructor, so it's probably not needed here any more
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly ssoSource: any; // This was removed from the SessionKeyError constructor, so it's probably not needed
 
   constructor({
     name,
@@ -23,6 +24,7 @@ export class SessionKeyError extends Error {
     name: string;
     message: string;
     address: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ssoSource?: any;
   }) {
     super(message);
