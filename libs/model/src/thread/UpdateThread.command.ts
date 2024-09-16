@@ -12,6 +12,7 @@ import { isAuthorized, type AuthContext } from '../middleware';
 import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import type { ThreadAttributes, ThreadInstance } from '../models/thread';
 import {
+  decodeContent,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
@@ -43,8 +44,8 @@ function getContentPatch(
   typeof title !== 'undefined' && (patch.title = title);
 
   if (typeof body !== 'undefined' && thread.kind === 'discussion') {
-    patch.body = sanitizeQuillText(body);
-    patch.plaintext = quillToPlain(patch.body);
+    patch.body = decodeContent(body);
+    patch.plaintext = quillToPlain(sanitizeQuillText(body));
   }
 
   typeof url !== 'undefined' && thread.kind === 'link' && (patch.url = url);
@@ -258,8 +259,11 @@ export function UpdateThread(): Command<
             order: [['timestamp', 'DESC']],
             transaction,
           });
+          const decodedThreadVersionBody = currentVersion?.body
+            ? decodeContent(currentVersion?.body)
+            : '';
           // if the modification was different from the original body, create a version history for it
-          if (currentVersion?.body !== content.body) {
+          if (decodedThreadVersionBody !== content.body) {
             await models.ThreadVersionHistory.create(
               {
                 thread_id,
@@ -270,8 +274,8 @@ export function UpdateThread(): Command<
               { transaction },
             );
             const mentions = findMentionDiff(
-              parseUserMentions(currentVersion?.body),
-              parseUserMentions(decodeURIComponent(content.body)),
+              parseUserMentions(decodedThreadVersionBody),
+              parseUserMentions(content.body),
             );
             mentions &&
               (await emitMentions(models, transaction, {
