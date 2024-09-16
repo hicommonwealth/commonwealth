@@ -108,7 +108,7 @@ const TokenInformationForm = ({
         walletAddress: selectedAddress.address,
         // TODO 9207: where to store values.tokenDescription and values.tokenImageURL
       };
-      await launchToken(payload);
+      await launchToken(payload).catch(console.error);
 
       onSubmit(values);
     },
