@@ -15,6 +15,12 @@ import {
 } from '@hicommonwealth/core';
 import type { AddressAttributes } from '@hicommonwealth/model';
 import { Community, PermissionEnum, Thread } from '@hicommonwealth/schemas';
+import {
+  CANVAS_TOPIC,
+  getTestSigner,
+  sign,
+  toCanvasSignedDataApiArgs,
+} from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { afterEach } from 'node:test';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -63,12 +69,25 @@ describe('Thread lifecycle', () => {
     body,
     stage,
     url: 'http://blah',
-    canvas_hash: '',
+    canvas_msg_id: '',
     canvas_signed_data: '',
     read_only: false,
   };
 
   beforeAll(async () => {
+    const signerInfo = await Promise.all(
+      roles.map(async () => {
+        const signer = getTestSigner();
+        const did = await signer.getDid();
+        await signer.newSession(CANVAS_TOPIC);
+        return {
+          signer,
+          did,
+          address: signer.getAddressFromDid(did),
+        };
+      }),
+    );
+
     const threadGroupId = 123456;
     const commentGroupId = 654321;
     const [node] = await seed('ChainNode', { eth_chain_id: 1 });
@@ -80,12 +99,14 @@ describe('Thread lifecycle', () => {
       chain_node_id: node!.id!,
       active: true,
       profile_count: 1,
-      Addresses: roles.map((role) => ({
-        address: `0xaddressof${role}`,
-        user_id: users[role].id,
-        role: role === 'admin' ? 'admin' : 'member',
-        is_banned: role === 'banned',
-      })),
+      Addresses: roles.map((role, index) => {
+        return {
+          address: signerInfo[index].address,
+          user_id: users[role].id,
+          role: role === 'admin' ? 'admin' : 'member',
+          is_banned: role === 'banned',
+        };
+      }),
       groups: [{ id: threadGroupId }, { id: commentGroupId }],
       topics: [{ group_ids: [threadGroupId, commentGroupId] }],
       CommunityStakes: [
@@ -197,9 +218,25 @@ describe('Thread lifecycle', () => {
     roles.forEach((role) => {
       if (!authorizationTests[role]) {
         it(`should create thread as ${role}`, async () => {
+          const did = `did:pkh:eip155:1:${actors[role].address}`;
+          const signedArgs = toCanvasSignedDataApiArgs(
+            await sign(
+              did,
+              'thread',
+              {
+                community: payload.community_id,
+                title: payload.title,
+                body: payload.body,
+                link: payload.url,
+                topic: payload.topic_id,
+              },
+              async () => [1, []] as [number, string[]],
+            ),
+          );
+
           const _thread = await command(CreateThread(), {
             actor: actors[role],
-            payload,
+            payload: { ...payload, ...signedArgs },
           });
           expect(_thread?.title).to.equal(title);
           expect(_thread?.body).to.equal(body);
@@ -225,7 +262,7 @@ describe('Thread lifecycle', () => {
       const body = {
         title: 'hello',
         body: 'wasup',
-        canvas_hash: '',
+        canvas_msg_id: '',
         canvas_signed_data: '',
       };
       const updated = await command(UpdateThread(), {
@@ -415,6 +452,7 @@ describe('Thread lifecycle', () => {
       comment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
+          parent_msg_id: thread!.canvas_msg_id,
           thread_id: thread.id!,
           text,
         },
@@ -431,6 +469,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
+            parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id! + 5,
             text: 'hi',
           },
@@ -443,6 +482,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.nonmember,
           payload: {
+            parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             text: 'hi',
           },
@@ -455,6 +495,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
+            parent_msg_id: thread!.canvas_msg_id,
             thread_id: archived!.id,
             text: 'hi',
           },
@@ -467,6 +508,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
+            parent_msg_id: thread!.canvas_msg_id,
             thread_id: read_only!.id,
             text: 'hi',
           },
@@ -479,6 +521,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
+            parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id: 1234567890,
             text: 'hi',
@@ -494,6 +537,7 @@ describe('Thread lifecycle', () => {
         comment = await command(CreateComment(), {
           actor: actors.member,
           payload: {
+            parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id,
             text: `level${i}`,
@@ -512,6 +556,7 @@ describe('Thread lifecycle', () => {
         command(CreateComment(), {
           actor: actors.member,
           payload: {
+            parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id,
             text: 'hi',
@@ -591,6 +636,7 @@ describe('Thread lifecycle', () => {
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.member,
         payload: {
+          thread_msg_id: thread.canvas_msg_id,
           thread_id: thread.id!,
           reaction: 'like',
         },
@@ -608,6 +654,7 @@ describe('Thread lifecycle', () => {
         command(CreateThreadReaction(), {
           actor: actors.member,
           payload: {
+            thread_msg_id: thread!.canvas_msg_id,
             thread_id: thread.id!,
             reaction: 'like',
           },
@@ -620,6 +667,7 @@ describe('Thread lifecycle', () => {
         command(CreateThreadReaction(), {
           actor: actors.member,
           payload: {
+            thread_msg_id: thread.canvas_msg_id,
             thread_id: thread.id! + 5,
             reaction: 'like',
           },
@@ -632,6 +680,7 @@ describe('Thread lifecycle', () => {
         command(CreateThreadReaction(), {
           actor: actors.nonmember,
           payload: {
+            thread_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             reaction: 'like',
           },
@@ -644,6 +693,7 @@ describe('Thread lifecycle', () => {
         command(CreateThreadReaction(), {
           actor: actors.member,
           payload: {
+            thread_msg_id: thread!.canvas_msg_id,
             thread_id: archived!.id,
             reaction: 'like',
           },
@@ -656,6 +706,7 @@ describe('Thread lifecycle', () => {
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
+          thread_msg_id: thread!.canvas_msg_id,
           thread_id: read_only!.id,
           reaction: 'like',
         },
@@ -677,6 +728,7 @@ describe('Thread lifecycle', () => {
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
+          comment_msg_id: comment!.canvas_msg_id || '',
           comment_id: comment!.id,
           reaction: 'like',
         },
@@ -693,6 +745,7 @@ describe('Thread lifecycle', () => {
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.admin,
         payload: {
+          comment_msg_id: comment!.canvas_msg_id || '',
           comment_id: comment!.id,
           reaction: 'like',
         },
@@ -708,6 +761,7 @@ describe('Thread lifecycle', () => {
         command(CreateCommentReaction(), {
           actor: actors.member,
           payload: {
+            comment_msg_id: comment!.canvas_msg_id || '',
             comment_id: 99999999,
             reaction: 'like',
           },
@@ -721,6 +775,7 @@ describe('Thread lifecycle', () => {
         command(CreateCommentReaction(), {
           actor: actors.member,
           payload: {
+            comment_msg_id: comment!.canvas_msg_id || '',
             comment_id: comment!.id,
             reaction: 'like',
           },
@@ -733,6 +788,7 @@ describe('Thread lifecycle', () => {
         command(CreateCommentReaction(), {
           actor: actors.nonmember,
           payload: {
+            comment_msg_id: comment!.canvas_msg_id || '',
             comment_id: comment!.id,
             reaction: 'like',
           },

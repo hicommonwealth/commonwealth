@@ -8,7 +8,7 @@ export const CanvasThread = z.object({
   title: z.string(),
   body: z.string(),
   canvas_signed_data: z.string().optional(),
-  canvas_hash: z.string().optional(),
+  canvas_msg_id: z.string().optional(),
 });
 
 export const CreateThread = {
@@ -18,6 +18,8 @@ export const CreateThread = {
     url: z.string().optional(),
     read_only: z.boolean(),
     discord_meta: DiscordMetaSchema.optional(),
+    canvas_signed_data: z.string().optional(),
+    canvas_msg_id: z.string().optional(),
   }),
   output: Thread,
 };
@@ -41,7 +43,7 @@ export const UpdateThread = {
       })
       .optional(),
     canvas_signed_data: z.string().optional(),
-    canvas_hash: z.string().optional(),
+    canvas_msg_id: z.string().optional(),
 
     // discord bot integration
     community_id: z.string().optional(),
@@ -52,9 +54,10 @@ export const UpdateThread = {
 
 export const ThreadCanvasReaction = z.object({
   thread_id: PG_INT,
+  thread_msg_id: z.string().nullish(),
   reaction: z.enum(['like']),
   canvas_signed_data: z.string().optional(),
-  canvas_hash: z.string().optional(),
+  canvas_msg_id: z.string().optional(),
 });
 
 export const CreateThreadReaction = {

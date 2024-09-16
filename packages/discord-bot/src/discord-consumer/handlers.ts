@@ -39,7 +39,7 @@ export async function handleThreadMessages(
         kind: 'discussion',
         read_only: false,
         canvas_signed_data: '',
-        canvas_hash: '',
+        canvas_msg_id: '',
       });
       break;
     case 'thread-title-update':
@@ -72,7 +72,7 @@ export async function handleCommentMessages(
 ): Promise<void> {
   const [thread] = await models.sequelize.query<{ id: number }>(
     `
-    SELECT id FROM "Threads" 
+    SELECT id FROM "Threads"
     WHERE discord_meta->>'message_id' = '${message.channel_id}'
     AND deleted_at IS NULL
     LIMIT 1;
