@@ -118,7 +118,9 @@ const TokenInformationForm = ({
   useEffect(() => {
     if (shouldSubmitOnAddressSelection.current) {
       formMethodsRef.current &&
-        formMethodsRef.current.handleSubmit(handleSubmit)();
+        formMethodsRef.current
+          .handleSubmit(handleSubmit)()
+          .catch(console.error);
       shouldSubmitOnAddressSelection.current = false;
     }
   }, [selectedAddress, handleSubmit]);
