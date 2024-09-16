@@ -20,7 +20,6 @@ export class Comment<T extends IUniqueId> {
   public readonly author: string;
   public readonly Address: AddressInfo;
   public readonly text: string;
-  public readonly plaintext: string;
   public reactions: Reaction[];
   public reactionWeightsSum: number;
   public readonly id: number;
@@ -49,7 +48,6 @@ export class Comment<T extends IUniqueId> {
     Address,
     thread_id,
     parent_id,
-    plaintext,
     reactions,
     reaction_weights_sum,
     created_at,
@@ -66,7 +64,6 @@ export class Comment<T extends IUniqueId> {
     this.communityId = community_id;
     this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : getDecodedString(text);
-    this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
     this.versionHistory = versionHistory;
     this.threadId = thread_id;
     this.id = id;
