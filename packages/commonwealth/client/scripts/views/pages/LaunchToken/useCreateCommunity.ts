@@ -11,6 +11,7 @@ const useCreateCommunity = () => {
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(
     new AddressInfo({
       address: '', // add sample address info
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any),
   );
   const [createdTokenInfo, setCreatedTokenInfo] = useState<TokenInfo>({
