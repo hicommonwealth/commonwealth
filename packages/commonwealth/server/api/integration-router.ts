@@ -17,9 +17,6 @@ function build(
   const isBotUser: RequestHandler = (req, res, next) => {
     validator.validateBotUser(req, res, next).catch(next);
   };
-  const isAuthor: RequestHandler = (req, res, next) => {
-    validator.validateAuthor(req, res, next).catch(next);
-  };
 
   const router = Router();
   router.use(express.statsMiddleware);
