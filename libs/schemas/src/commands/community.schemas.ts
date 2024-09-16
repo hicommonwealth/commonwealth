@@ -161,6 +161,7 @@ export const GenerateStakeholderGroups = {
 
 export const DeleteTopic = {
   input: z.object({
+    community_id: z.string(),
     topic_id: PG_INT,
   }),
   output: z.object({

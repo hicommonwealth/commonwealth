@@ -223,7 +223,7 @@ describe('Community lifecycle', () => {
 
       const response = await command(DeleteTopic(), {
         actor: superAdminActor,
-        payload: { topic_id: topic!.id! },
+        payload: { community_id: community.id, topic_id: topic!.id! },
       });
       expect(response?.topic_id).to.equal(topic.id);
     });
@@ -240,7 +240,7 @@ describe('Community lifecycle', () => {
       await expect(
         command(DeleteTopic(), {
           actor: memberActor,
-          payload: { topic_id: topic!.id! },
+          payload: { community_id: community.id, topic_id: topic!.id! },
         }),
       ).rejects.toThrow(InvalidActor);
     });

@@ -103,7 +103,10 @@ export const EditTopicModal = ({
           buttonType: 'destructive',
           buttonHeight: 'sm',
           onClick: async () => {
-            await deleteTopic({ topic_id: id });
+            await deleteTopic({
+              community_id: app.activeChainId() || '',
+              topic_id: id,
+            });
             if (noRedirect) {
               onModalClose();
             } else {

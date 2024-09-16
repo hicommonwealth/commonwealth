@@ -2,7 +2,7 @@ import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorized, mustExist } from '../middleware/guards';
 
 export function DeleteTopic(): Command<
   typeof schemas.DeleteTopic,
@@ -11,11 +11,12 @@ export function DeleteTopic(): Command<
   return {
     ...schemas.DeleteTopic,
     auth: [isAuthorized({})],
-    body: async ({ payload }) => {
-      const { topic_id } = payload;
+    body: async ({ actor, auth }) => {
+      const { community_id, topic_id } = mustBeAuthorized(actor, auth);
 
-      // TODO: get from auth
-      const topic = await models.Topic.findByPk(topic_id);
+      const topic = await models.Topic.findOne({
+        where: { community_id, id: topic_id! },
+      });
       mustExist('Topic', topic);
 
       await models.sequelize.transaction(async (transaction) => {
@@ -32,10 +33,7 @@ export function DeleteTopic(): Command<
         await topic.destroy({ transaction });
       });
 
-      return {
-        community_id: topic.community_id,
-        topic_id,
-      };
+      return { community_id, topic_id: topic.id! };
     },
   };
 }
