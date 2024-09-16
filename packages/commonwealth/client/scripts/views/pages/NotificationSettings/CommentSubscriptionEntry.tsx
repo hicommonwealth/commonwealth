@@ -6,7 +6,7 @@ import { getRelativeTimestamp } from 'helpers/dates';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerUsingQuillOrNewEditor';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';

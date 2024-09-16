@@ -18,10 +18,10 @@ import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
-import { MarkdownViewerUsingQuillOrNewEditor } from '../../components/MarkdownViewerUsingQuillOrNewEditor/MarkdownViewerUsingQuillOrNewEditor';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
@@ -164,9 +164,7 @@ export const ViewSnapshotProposalPage = ({
             <ClosedProposalPill proposalState={proposal.state} />
           )
         }
-        body={() => (
-          <MarkdownViewerUsingQuillOrNewEditor markdown={proposal.body} />
-        )}
+        body={() => <MarkdownViewerWithFallback markdown={proposal.body} />}
         subBody={
           votes.length > 0 && (
             <SnapshotVotesTable

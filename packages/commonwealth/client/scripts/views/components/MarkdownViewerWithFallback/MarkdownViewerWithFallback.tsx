@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 import MarkdownViewer from 'views/components/MarkdownViewer';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 
-type MarkdownViewerUsingQuillOrNewEditor = {
+type MarkdownViewerWithFallbackProps = {
   readonly markdown: string | undefined;
   readonly cutoffLines?: number;
   readonly customShowMoreButton?: ReactNode;
@@ -13,8 +13,8 @@ type MarkdownViewerUsingQuillOrNewEditor = {
 /**
  * Temporary migration component that uses a feature toggle for viewing content.
  */
-export const MarkdownViewerUsingQuillOrNewEditor = (
-  props: MarkdownViewerUsingQuillOrNewEditor,
+export const MarkdownViewerWithFallback = (
+  props: MarkdownViewerWithFallbackProps,
 ) => {
   const { markdown, cutoffLines, customShowMoreButton, className } = props;
 

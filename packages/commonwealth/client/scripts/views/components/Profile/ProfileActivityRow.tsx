@@ -9,8 +9,8 @@ import withRouter, {
   useCommonNavigate,
 } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import { MarkdownViewerUsingQuillOrNewEditor } from '../MarkdownViewerUsingQuillOrNewEditor/MarkdownViewerUsingQuillOrNewEditor';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/new_designs/CWTag';
@@ -139,7 +139,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
       <div className="content">
         <CWText type="b2" className="gray-text">
           {/* @ts-expect-error StrictNullChecks*/}
-          <MarkdownViewerUsingQuillOrNewEditor
+          <MarkdownViewerWithFallback
             markdown={isThread ? body : comment.text}
           />
         </CWText>

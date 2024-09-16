@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerUsingQuillOrNewEditor';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';

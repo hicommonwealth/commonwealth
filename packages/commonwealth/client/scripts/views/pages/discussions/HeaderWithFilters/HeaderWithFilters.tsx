@@ -12,7 +12,7 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerUsingQuillOrNewEditor';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';

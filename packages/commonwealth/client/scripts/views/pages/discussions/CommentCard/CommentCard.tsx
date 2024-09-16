@@ -17,6 +17,7 @@ import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -28,7 +29,6 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
-import { MarkdownViewerUsingQuillOrNewEditor } from '../../../components/MarkdownViewerUsingQuillOrNewEditor/MarkdownViewerUsingQuillOrNewEditor';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -204,7 +204,7 @@ export const CommentCard = ({
         <div className="comment-content">
           {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
-            <MarkdownViewerUsingQuillOrNewEditor markdown={commentText} />
+            <MarkdownViewerWithFallback markdown={commentText} />
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">

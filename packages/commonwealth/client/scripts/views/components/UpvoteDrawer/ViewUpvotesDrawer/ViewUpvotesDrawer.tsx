@@ -4,9 +4,9 @@ import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
-import { MarkdownViewerUsingQuillOrNewEditor } from '../../MarkdownViewerUsingQuillOrNewEditor/MarkdownViewerUsingQuillOrNewEditor';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
@@ -142,7 +142,7 @@ export const ViewUpvotesDrawer = ({
               />
             </div>
             <div className="upvoted-content-body">
-              <MarkdownViewerUsingQuillOrNewEditor
+              <MarkdownViewerWithFallback
                 markdown={contentBody}
                 cutoffLines={10}
               />
