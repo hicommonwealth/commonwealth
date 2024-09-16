@@ -21,11 +21,11 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import { MarkdownViewerUsingQuillOrNewEditor } from '../../components/MarkdownViewerUsingQuillOrNewEditor/MarkdownViewerUsingQuillOrNewEditor';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
@@ -164,7 +164,9 @@ export const ViewSnapshotProposalPage = ({
             <ClosedProposalPill proposalState={proposal.state} />
           )
         }
-        body={() => <QuillRenderer doc={proposal.body} />}
+        body={() => (
+          <MarkdownViewerUsingQuillOrNewEditor markdown={proposal.body} />
+        )}
         subBody={
           votes.length > 0 && (
             <SnapshotVotesTable

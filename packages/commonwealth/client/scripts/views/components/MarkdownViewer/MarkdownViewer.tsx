@@ -1,5 +1,4 @@
 import {
-  MDXEditor,
   codeBlockPlugin,
   codeMirrorPlugin,
   frontmatterPlugin,
@@ -7,14 +6,16 @@ import {
   imagePlugin,
   linkPlugin,
   listsPlugin,
+  MDXEditor,
   quotePlugin,
   tablePlugin,
   thematicBreakPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useState } from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { useEditorErrorHandler } from 'views/components/MarkdownEditor/useEditorErrorHandler';
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { useComputeMarkdownWithCutoff } from 'views/components/MarkdownViewer/UseComputeMarkdownWithCutoff';
 
 import './MarkdownViewer.scss';
 
@@ -24,23 +25,6 @@ export type MarkdownViewerProps = Readonly<{
   markdown: MarkdownStr | undefined;
   cutoffLines?: number;
 }>;
-
-function useComputeMarkdownWithCutoff(
-  markdown: MarkdownStr,
-  cutoffLines: number | undefined,
-): [boolean, string, string] {
-  return useMemo(() => {
-    const lines = markdown.split('\n');
-
-    if (!cutoffLines || cutoffLines >= lines.length) {
-      return [false, markdown, markdown];
-    }
-
-    const head = lines.slice(0, cutoffLines);
-
-    return [true, head.join('\n'), markdown];
-  }, [cutoffLines, markdown]);
-}
 
 export const MarkdownViewer = memo(function MarkdownViewer(
   props: MarkdownViewerProps,
