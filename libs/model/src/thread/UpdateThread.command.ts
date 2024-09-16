@@ -10,7 +10,11 @@ import { z } from 'zod';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
-import type { ThreadAttributes, ThreadInstance } from '../models/thread';
+import {
+  ThreadAttributes,
+  ThreadInstance,
+  getThreadSearchVector,
+} from '../models/thread';
 import {
   decodeContent,
   emitMentions,
@@ -219,12 +223,22 @@ export function UpdateThread(): Command<
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
+        const searchUpdate =
+          content.title || content.body
+            ? {
+                search: getThreadSearchVector(
+                  content.title || thread.title,
+                  content.body || thread.body || '',
+                ),
+              }
+            : {};
         await thread.update(
           {
             ...content,
             ...adminPatch,
             ...ownerPatch,
             last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
+            ...searchUpdate,
           },
           { transaction },
         );
