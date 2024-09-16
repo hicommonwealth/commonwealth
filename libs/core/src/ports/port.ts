@@ -44,7 +44,11 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
           key: `${string}.${string}.${string}`;
         }
       | {
-          key?: `${string}.${string}.${string}`;
+          adapter: T;
+          isDefault: true;
+        }
+      | {
+          key: `${string}.${string}.${string}`;
           adapter: T;
           isDefault: boolean;
         },
@@ -80,6 +84,11 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     }
 
     // adapter is provided
+    if (options.isDefault && defaultAdapters.has(factory.name))
+      throw new Error(
+        `Default adapter for ${factory.name} port already exists`,
+      );
+
     let adapterKey: string | undefined;
     if ('key' in options && options.key) {
       const existingAdapter = adapters.get(options.key);
