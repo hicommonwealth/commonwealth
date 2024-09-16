@@ -34,11 +34,7 @@ export const MarkdownViewerPage = () => {
 
       {quill && (
         <div className="inner">
-          <QuillRenderer
-            doc={supported}
-            cutoffLines={cutoffLines}
-            searchTerm="hello"
-          />
+          <QuillRenderer doc={supported} cutoffLines={cutoffLines} />
         </div>
       )}
     </section>

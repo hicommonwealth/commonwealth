@@ -9,7 +9,13 @@ This just tests all the major markdown features we want to support.
 
 ## Header 3
 
+# Link types
+
 https://www.youtube.com/watch?v=eRBOgtp0Hac
+
+https://x.com/venturetwins/status/1835366788433051677
+
+https://twitter.com/venturetwins/status/1835366788433051677
 
 # Images
 
