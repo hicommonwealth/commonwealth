@@ -99,8 +99,8 @@ export async function signThread(
     'thread',
     {
       community: community || '',
-      title: encodeURIComponent(title),
-      body: encodeURIComponent(body),
+      title,
+      body,
       link: link || '',
       topic: topic || '',
     },
@@ -117,8 +117,8 @@ export async function signUpdateThread(
     'updateThread',
     {
       thread_id,
-      title: encodeURIComponent(title),
-      body: encodeURIComponent(body),
+      title,
+      body,
       link: link || '',
       topic: topic || '',
     },
@@ -146,7 +146,7 @@ export async function signComment(
     'comment',
     {
       thread_id,
-      body: encodeURIComponent(body),
+      body,
       parent_comment_id,
     },
     getClockFromAPI,
@@ -159,7 +159,7 @@ export async function signUpdateComment(address: string, { comment_id, body }) {
     'updateComment',
     {
       comment_id,
-      body: encodeURIComponent(body),
+      body,
     },
     getClockFromAPI,
   );
