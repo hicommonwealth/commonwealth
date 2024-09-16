@@ -7,7 +7,7 @@ import { userStore } from '../../ui/user';
 
 interface CreateTopicProps {
   name: string;
-  description: string;
+  description?: string;
   telegram?: string;
   featuredInSidebar: boolean;
   featuredInNewPost: boolean;

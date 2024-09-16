@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -81,7 +82,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
+  const topicObj = topics?.find(({ name }) => name === topicName);
+  const topicId = topicObj?.id;
 
   const user = useUserStore();
 
@@ -163,8 +165,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useManageDocumentTitle('Discussions');
 
-  // TODO in upcoming PR add check if topic is weighted with ERC20 method
-  const isTopicWeighted = weightedVotingEnabled && topicId;
+  const isTopicWeighted =
+    weightedVotingEnabled &&
+    topicId &&
+    topicObj.weightedVoting === TopicWeightedVoting.ERC20;
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(

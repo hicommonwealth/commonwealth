@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useCommonNavigate } from 'navigation/helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -11,11 +10,13 @@ import './WVConsent.scss';
 
 interface WVConsentProps {
   onStepChange: (step: CreateTopicStep) => void;
-  topicName: string;
+  onCreateTopic: () => Promise<void>;
 }
 
-const WVConsent = ({ onStepChange, topicName }: WVConsentProps) => {
-  const navigate = useCommonNavigate();
+const WVConsent = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
+  const handleCreateRegularTopic = () => {
+    onCreateTopic().catch(console.error);
+  };
 
   return (
     <div className="WVConsent">
@@ -55,12 +56,10 @@ const WVConsent = ({ onStepChange, topicName }: WVConsentProps) => {
         <section className="action-buttons">
           <CWButton
             type="button"
-            label="Skip"
+            label="No, create regular topic"
             buttonWidth="wide"
             buttonType="secondary"
-            onClick={() =>
-              navigate(`/discussions/${encodeURI(topicName.trim())}`)
-            }
+            onClick={handleCreateRegularTopic}
           />
           <CWButton
             type="button"
@@ -69,6 +68,12 @@ const WVConsent = ({ onStepChange, topicName }: WVConsentProps) => {
             onClick={() => onStepChange(CreateTopicStep.WVMethodSelection)}
           />
         </section>
+        <CWButton
+          label="Back"
+          type="button"
+          buttonType="tertiary"
+          onClick={() => onStepChange(CreateTopicStep.TopicDetails)}
+        />
       </section>
     </div>
   );
