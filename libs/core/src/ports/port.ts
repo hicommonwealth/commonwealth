@@ -26,19 +26,80 @@ const log = logger(import.meta);
 const adapters = new Map<string, Disposable>();
 
 /**
+ * Maps ports to default adapters aka factory names to adapter keys or names
+ */
+const defaultAdapters = new Map<string, string>();
+
+const InvalidKey = (key: string) => new Error(`Invalid adapter key: ${key}`);
+
+/**
  * Wraps creation of adapters around factory functions
  * @param factory adapter of T factory function
  * @returns adapter instance
  */
 export function port<T extends Disposable>(factory: AdapterFactory<T>) {
-  return function (adapter?: T) {
-    if (!adapters.has(factory.name)) {
-      const instance = factory(adapter);
-      adapters.set(factory.name, instance);
-      log.info(`[binding adapter] ${instance.name || factory.name}`);
-      return instance;
+  return function (
+    options?:
+      | {
+          key: `${string}.${string}.${string}`;
+        }
+      | {
+          key?: `${string}.${string}.${string}`;
+          adapter: any;
+          isDefault: boolean;
+        },
+  ) {
+    // If no option use default adapter or set in-memory adapter as default
+    if (!options) {
+      const defaultAdapterKey = defaultAdapters.get(factory.name);
+      if (defaultAdapterKey) return adapters.get(defaultAdapterKey) as T;
+
+      const adapterInstance = factory();
+      log.info(`[binding default adapter] ${adapterInstance.name}`);
+      defaultAdapters.set(factory.name, adapterInstance.name);
+      adapters.set(adapterInstance.name, adapterInstance);
+      return adapterInstance as T;
     }
-    return adapters.get(factory.name) as T;
+
+    // validate key at runtime to prevent confusing keys e.g.
+    // key = 'S3' for R2 adapter
+    if ('key' in options && options.key) {
+      const parts = options.key.split('.');
+      if (parts.length !== 3) throw InvalidKey(options.key);
+      if (parts[0] !== factory.name) throw InvalidKey(options.key);
+      if ('adapter' in options && parts[1] !== options.adapter.name)
+        throw InvalidKey(options.key);
+    }
+
+    // if only the key is given then return associated adapter or throw
+    if ('key' in options && !('adapter' in options)) {
+      const adapterInstance = adapters.get(options.key);
+      if (!adapterInstance)
+        throw new Error(`Adapter ${options.key} not found!`);
+      return adapterInstance as T;
+    }
+
+    // adapter is provided
+    let adapterKey: string | undefined;
+    if ('key' in options && options.key) {
+      const existingAdapter = adapters.get(options.key);
+      if (existingAdapter) {
+        log.warn(`Adapter with ${options.key} already exists`);
+        return existingAdapter as T;
+      }
+      adapterKey = options.key;
+    }
+
+    const adapterInstance = factory(options.adapter);
+    if (!adapterKey) adapterKey = adapterInstance.name;
+    // overrides any in-memory default that is already set
+    if (options.isDefault) {
+      defaultAdapters.set(factory.name, adapterKey);
+      log.info(`[binding default adapter] ${adapterKey}`);
+    } else log.info(`[binding adapter] ${adapterKey}`);
+
+    adapters.set(adapterKey, adapterInstance);
+    return adapterInstance as T;
   };
 }
 
