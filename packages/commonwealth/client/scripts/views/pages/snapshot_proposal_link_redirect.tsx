@@ -9,9 +9,9 @@ type SnapshotProposalLinkRedirectProps = {
   scope: string;
 };
 
-export default function SnapshotProposalLinkRedirect({
+const SnapshotProposalLinkRedirect = ({
   identifier,
-}: SnapshotProposalLinkRedirectProps) {
+}: SnapshotProposalLinkRedirectProps) => {
   const navigate = useCommonNavigate();
 
   useNecessaryEffect(() => {
@@ -42,4 +42,6 @@ export default function SnapshotProposalLinkRedirect({
   }, [navigate]);
 
   return <PageLoading />;
-}
+};
+
+export default SnapshotProposalLinkRedirect;
