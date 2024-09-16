@@ -36,7 +36,10 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
       ),
     );
     await rmqAdapter.init();
-    broker(rmqAdapter);
+    broker({
+      adapter: rmqAdapter,
+      isDefault: true,
+    });
   } catch (e) {
     log.error(
       'Rascal consumer setup failed. Please check the Rascal configuration',

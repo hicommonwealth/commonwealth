@@ -27,7 +27,10 @@ import { ZodUndefined } from 'zod';
 import { config } from '../config';
 
 const log = logger(import.meta);
-stats(HotShotsStats());
+stats({
+  adapter: HotShotsStats(),
+  isDefault: true,
+});
 
 let isServiceHealthy = false;
 
@@ -124,7 +127,10 @@ async function main() {
       ),
     );
     await rmqAdapter.init();
-    broker(rmqAdapter);
+    broker({
+      adapter: rmqAdapter,
+      isDefault: true,
+    });
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error('Broker setup failed', e);

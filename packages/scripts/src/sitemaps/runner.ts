@@ -6,7 +6,14 @@ import {
 } from '@hicommonwealth/sitemaps';
 
 const log = logger(import.meta);
-blobStorage(S3BlobStorage());
+blobStorage({
+  adapter: S3BlobStorage(),
+  isDefault: true,
+});
+stats({
+  adapter: HotShotsStats(),
+  isDefault: true,
+});
 
 async function doExec() {
   if (process.env.SITEMAP_ENV !== 'production') {
@@ -22,7 +29,7 @@ async function doExec() {
     throw new Error('Must run with NODE_ENV=production');
   }
 
-  stats(HotShotsStats()).increment('cw.scheduler.email-digest');
+  stats().increment('cw.scheduler.email-digest');
 
   log.info('Creating writer... ');
   log.info('Creating paginator... ');

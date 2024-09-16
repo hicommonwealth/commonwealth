@@ -24,7 +24,10 @@ import { NotificationsSettingsPolicy } from './notificationsSettingsPolicy';
 
 const log = logger(import.meta);
 
-stats(HotShotsStats());
+stats({
+  adapter: HotShotsStats(),
+  isDefault: true,
+});
 
 let isServiceHealthy = false;
 
@@ -50,7 +53,10 @@ async function startKnockWorker() {
       ),
     );
     await rmqAdapter.init();
-    broker(rmqAdapter);
+    broker({
+      adapter: rmqAdapter,
+      isDefault: true,
+    });
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
@@ -61,7 +67,10 @@ async function startKnockWorker() {
 
   // init Knock as notifications provider - this is necessary since the policies do not define the provider
   if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
-    notificationsProvider(KnockProvider());
+    notificationsProvider({
+      adapter: KnockProvider(),
+      isDefault: true,
+    });
   else notificationsProvider();
 
   const sub = await brokerInstance.subscribe(
