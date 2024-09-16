@@ -1,4 +1,4 @@
-import AddressInfo from 'client/scripts/models/AddressInfo';
+import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { TokenInfo } from './types';
 import { CreateTokenCommunityStep, handleChangeStep } from './utils';
