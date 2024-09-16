@@ -53,9 +53,6 @@ export function CreateThreadReaction(): Command<
             transaction,
           });
 
-          address.last_active = new Date();
-          await address.save({ transaction });
-
           return reaction.id;
         },
       );
