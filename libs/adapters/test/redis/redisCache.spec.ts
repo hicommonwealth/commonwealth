@@ -43,7 +43,10 @@ describe('RedisCache', () => {
   const test_namespace: CacheNamespaces = CacheNamespaces.Test_Redis;
 
   beforeAll(async () => {
-    cache(new RedisCache('redis://localhost:6379'));
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+      isDefault: true,
+    });
     await cache().ready();
     await cache().deleteNamespaceKeys(test_namespace);
   });

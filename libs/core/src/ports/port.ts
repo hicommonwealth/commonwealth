@@ -45,7 +45,7 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
         }
       | {
           key?: `${string}.${string}.${string}`;
-          adapter: any;
+          adapter: T;
           isDefault: boolean;
         },
   ) {
@@ -132,6 +132,7 @@ const disposeAndExit = async (
     }),
   );
   adapters.clear();
+  defaultAdapters.clear();
 
   if (config.NODE_ENV !== 'test' && code !== 'UNIT_TEST') {
     rollbar.wait(() => {
@@ -143,10 +144,10 @@ const disposeAndExit = async (
 };
 
 export const disposeAdapter = (name: string): void => {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  adapters.get(name)?.dispose();
+  void adapters.get(name)?.dispose();
   adapters.delete(name);
   adapters.clear();
+  defaultAdapters.clear();
 };
 
 /**

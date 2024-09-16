@@ -60,7 +60,10 @@ describe('Cache Disable Tests', () => {
 
   beforeAll(async () => {
     config.CACHE.DISABLE_CACHE = true;
-    cache(new RedisCache('redis://localhost:6379'));
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+      isDefault: true,
+    });
     cacheDecorator = new CacheDecorator();
     await cache().ready();
     setupCacheTestEndpoints(app, cacheDecorator);
