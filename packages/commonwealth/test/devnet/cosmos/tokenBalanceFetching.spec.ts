@@ -137,7 +137,10 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
   beforeAll(async () => {
     models = await tester.seedDb();
-    cache(new RedisCache('redis://localhost:6379'));
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+      isDefault: true,
+    });
     await cache().ready();
     await resetChainNodes();
   });

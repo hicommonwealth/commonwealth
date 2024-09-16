@@ -67,8 +67,8 @@ describe('subscriptionPreferencesUpdated', () => {
 
   test('should delete all exiting email schedules if emails are disabled', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox.stub().returns(
           Promise.resolve([
             { id: '1', workflow: WorkflowKeys.EmailRecap },
@@ -79,7 +79,8 @@ describe('subscriptionPreferencesUpdated', () => {
           .stub()
           .returns(Promise.resolve(new Set(['1', '2']))),
       }),
-    );
+      isDefault: true,
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
@@ -120,12 +121,13 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox.stub().returns(Promise.resolve([])),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
       }),
-    );
+      isDefault: true,
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
@@ -178,8 +180,8 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox
           .stub()
           .returns(
@@ -187,7 +189,8 @@ describe('subscriptionPreferencesUpdated', () => {
           ),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
       }),
-    );
+      isDefault: true,
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
@@ -221,8 +224,8 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox
           .stub()
           .returns(
@@ -233,7 +236,8 @@ describe('subscriptionPreferencesUpdated', () => {
           .stub()
           .returns(Promise.resolve(new Set(['1']))),
       }),
-    );
+      isDefault: true,
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
@@ -272,15 +276,16 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox.stub().returns(Promise.resolve([])),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
         deleteSchedulesStub: sandbox
           .stub()
           .returns(Promise.resolve(new Set(['1']))),
       }),
-    );
+      isDefault: true,
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,

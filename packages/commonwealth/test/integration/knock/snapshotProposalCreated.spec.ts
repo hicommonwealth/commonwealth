@@ -92,7 +92,10 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   test('should do nothing if there are no relevant community alert subscriptions', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox),
+      isDefault: true,
+    });
 
     const res = await processSnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
@@ -108,7 +111,10 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   test('should execute triggerWorkflow with the appropriate data', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox),
+      isDefault: true,
+    });
 
     await tester.seed('CommunityAlert', {
       // @ts-expect-error StrictNullChecks
@@ -148,7 +154,10 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   test('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
-    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+    notificationsProvider({
+      adapter: ThrowingSpyNotificationsProvider(sandbox),
+      isDefault: true,
+    });
 
     await tester.seed('CommunityAlert', {
       // @ts-expect-error StrictNullChecks
