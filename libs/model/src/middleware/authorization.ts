@@ -157,6 +157,10 @@ async function buildAuth(
 
   auth.is_author = auth.address!.id === auth.author_address_id;
 
+  // fire and forget address activity tracking
+  auth.address.last_active = new Date();
+  void auth.address.save();
+
   return auth;
 }
 

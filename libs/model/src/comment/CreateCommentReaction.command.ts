@@ -39,14 +39,11 @@ export function CreateCommentReaction(): Command<
               comment_id: comment.id,
               reaction: payload.reaction,
               calculated_voting_weight,
-              canvas_hash: payload.canvas_hash,
+              canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
             },
             transaction,
           });
-
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           return reaction.id;
         },
