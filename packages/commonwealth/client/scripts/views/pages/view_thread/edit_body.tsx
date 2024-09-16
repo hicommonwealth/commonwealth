@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';
@@ -92,7 +93,7 @@ export const EditBody = (props: EditBodyProps) => {
     const asyncHandle = async () => {
       try {
         const newBody = JSON.stringify(contentDelta);
-        await editThread({
+        const input = await buildUpdateThreadInput({
           newBody: JSON.stringify(contentDelta) || thread.body,
           newTitle: title || thread.title,
           threadId: thread.id,
@@ -100,6 +101,7 @@ export const EditBody = (props: EditBodyProps) => {
           address: user.activeAccount?.address || '',
           communityId: app.activeChainId() || '',
         });
+        await editThread(input);
         clearEditingLocalStorage(thread.id, ContentType.Thread);
         notifySuccess('Thread successfully edited');
         threadUpdatedCallback(title, newBody);
