@@ -10,11 +10,13 @@ import CommunityInformationForm from 'views/components/CommunityInformationForm/
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { TokenInfo } from '../../types';
 import './CommunityInformationStep.scss';
 
 interface CommunityInformationStepProps {
   handleGoBack: () => void;
   handleContinue: () => void;
+  tokenInfo?: TokenInfo;
 }
 
 const CommunityInformationStep = ({
