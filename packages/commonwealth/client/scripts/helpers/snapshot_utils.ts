@@ -123,7 +123,10 @@ export async function getSpaceBlockNumber(network: string): Promise<number> {
   return snapshot.utils.getBlockNumber(snapshot.utils.getProvider(network));
 }
 
-export async function getScore(space: SnapshotSpace, address: string) {
+export async function getScore(
+  space: SnapshotSpace,
+  address: string,
+): Promise<Array<{ [index: string]: number }>> {
   const snapshot = await SnapshotLazyLoader.getSnapshot();
   return snapshot.utils.getScores(
     space?.id,

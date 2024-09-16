@@ -88,7 +88,7 @@ export const NewSnapshotProposalForm = ({
     } catch (err) {
       err.code === 'ACTION_REJECTED'
         ? notifyError('User rejected signing')
-        : notifyError(_.capitalize(err.error_description));
+        : notifyError(_.capitalize(err.error_description) || err.message);
     } finally {
       setIsSaving(false);
     }
@@ -141,7 +141,8 @@ export const NewSnapshotProposalForm = ({
         snapshotSpace,
         user.activeAccount?.address || '',
       );
-      setUserScore(scoreResponse);
+      const firstKey = Object.keys(scoreResponse?.[0])?.[0];
+      setUserScore(scoreResponse[0][firstKey]);
       setSpace(snapshotSpace);
       setMembers(snapshotSpace.members);
       setSnapshotScoresFetched(true);
@@ -177,7 +178,7 @@ export const NewSnapshotProposalForm = ({
     (!space.filters?.onlyMembers || (space.filters?.onlyMembers && isMember)) &&
     (minScoreFromSpace === 0 ||
       // @ts-expect-error <StrictNullChecks/>
-      (minScoreFromSpace > 0 && userScore > minScoreFromSpace) ||
+      (minScoreFromSpace > 0 && userScore >= minScoreFromSpace) ||
       isMember);
 
   // Check if the space object is not null before rendering the form
