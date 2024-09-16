@@ -43,7 +43,7 @@ export function DeleteComment(): Command<
       });
       // == end of transaction boundary ==
 
-      return { comment_id: comment.id!, canvas_hash: comment.canvas_hash };
+      return { comment_id: comment.id!, canvas_hash: comment.canvas_msg_id };
     },
   };
 }

@@ -36,7 +36,7 @@ const useDeleteCommentMutation = ({
       // [deleted] msg.
       const canvasSignedData = await signDeleteComment(
         userStore.getState().activeAccount?.address || '',
-        { comment_id: response.canvas_hash },
+        { comment_id: response.canvas_msg_id },
       );
       const softDeleted = {
         id: response.comment_id,
