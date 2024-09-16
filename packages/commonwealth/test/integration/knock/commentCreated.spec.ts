@@ -103,9 +103,6 @@ describe('CommentCreated Event Handler', () => {
       text: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
         mentionedUser!.id
       }).`,
-      plaintext: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
-        mentionedUser!.id
-      }).`,
       parent_id: String(rootComment!.id),
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
