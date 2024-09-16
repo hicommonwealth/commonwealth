@@ -1,11 +1,28 @@
+import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
-import React from 'react';
+import React, { memo } from 'react';
+import removeMd from 'remove-markdown';
 import smartTruncate from 'smart-truncate';
 
-export const renderTruncatedHighlights = (
-  searchTerm: string,
-  docText: string,
-) => {
+type MarkdownStr = string;
+
+type MarkdownHitHighlighterProps = Readonly<{
+  markdown: MarkdownStr;
+  searchTerm: string;
+}>;
+
+export const MarkdownHitHighlighter = memo(function MarkdownHitHighlighter(
+  props: MarkdownHitHighlighterProps,
+) {
+  const { markdown, searchTerm } = props;
+
+  const html = DOMPurify.sanitize(markdown, {
+    ALLOWED_TAGS: ['a'],
+    ADD_ATTR: ['target'],
+  });
+
+  const docText = removeMd(html).replace(/\n/g, ' ').replace(/\+/g, ' ');
+
   // extract highlighted text
   const chunks = findAll({
     searchWords: [searchTerm.trim()],
@@ -13,7 +30,7 @@ export const renderTruncatedHighlights = (
   });
 
   // convert chunks to rendered components
-  const textWithHighlights = chunks.map(({ end, highlight, start }, index) => {
+  return chunks.map(({ end, highlight, start }, index) => {
     const middle = 15;
 
     const subString = docText.substr(start, end - start);
@@ -44,6 +61,4 @@ export const renderTruncatedHighlights = (
     }
     return <span key={key}>{text}</span>;
   });
-
-  return textWithHighlights;
-};
+});
