@@ -4,7 +4,6 @@ import { ExternalEndpoints, queryClient } from 'state/api/config';
 
 const SPACE_STALE_TIME = 3 * 1_000 * 60; // 3 minutes
 
-// TODO check if we need all properties
 const GET_SPACE_QUERY = gql`
   query Space($space: String!) {
     space(id: $space) {
@@ -46,7 +45,7 @@ interface SpaceQueryResponse {
     network: string;
     avatar: string;
     validation: {
-      params: any; // Adjust this based on the type of params expected
+      params: any;
     };
     voting: {
       period: number;
@@ -59,7 +58,7 @@ interface SpaceQueryResponse {
     strategies: {
       name: string;
       network: string;
-      params: any; // Adjust this based on the type of params expected
+      params: any;
     }[];
     members: string[];
   };

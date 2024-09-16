@@ -4,7 +4,6 @@ import { ExternalEndpoints, queryClient } from 'state/api/config';
 
 const PROPOSALS_STALE_TIME = 3 * 1_000 * 60; // 3 minutes
 
-// TODO check if we need all properties
 const GET_PROPOSALS_QUERY = gql`
   query Proposals(
     $first: Int!
