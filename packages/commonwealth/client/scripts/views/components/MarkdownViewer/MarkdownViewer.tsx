@@ -11,7 +11,7 @@ import {
   tablePlugin,
   thematicBreakPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { memo, useState } from 'react';
+import React, { memo, ReactNode, useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { useEditorErrorHandler } from 'views/components/MarkdownEditor/useEditorErrorHandler';
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
@@ -24,11 +24,14 @@ export type MarkdownStr = string;
 export type MarkdownViewerProps = Readonly<{
   markdown: MarkdownStr | undefined;
   cutoffLines?: number;
+  customShowMoreButton?: ReactNode;
 }>;
 
 export const MarkdownViewer = memo(function MarkdownViewer(
   props: MarkdownViewerProps,
 ) {
+  const { customShowMoreButton } = props;
+
   const errorHandler = useEditorErrorHandler();
 
   const toggleDisplay = () => setUserExpand(!userExpand);
@@ -64,12 +67,14 @@ export const MarkdownViewer = memo(function MarkdownViewer(
 
       {truncated && !userExpand && (
         <>
-          <div className="show-more-button-wrapper">
-            <div className="show-more-button" onClick={toggleDisplay}>
-              <CWIcon iconName="plus" iconSize="small" />
-              <div className="show-more-text">Show More</div>
+          {customShowMoreButton || (
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div className="show-more-text">Show More</div>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
     </div>
