@@ -285,6 +285,7 @@ const CommunityProfileForm = () => {
             />
 
             <CWTextArea
+              charCount={250}
               hookToForm
               name="communityDescription"
               label="Community Description"

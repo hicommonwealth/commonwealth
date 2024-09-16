@@ -42,7 +42,7 @@ export const buildCreateCommentInput = async ({
     thread_msg_id: threadMsgId,
     parent_msg_id: parentCommentMsgId,
     parent_id: parentCommentId ?? undefined,
-    text: encodeURIComponent(unescapedText),
+    text: unescapedText,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
 };

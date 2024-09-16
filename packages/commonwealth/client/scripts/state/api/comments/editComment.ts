@@ -35,7 +35,7 @@ export const buildUpdateCommentInput = async ({
     author_community_id: communityId,
     comment_id: commentId,
     community_id: communityId,
-    text: encodeURIComponent(updatedBody),
+    text: updatedBody,
     jwt: userStore.getState().jwt,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
@@ -62,8 +62,6 @@ const useEditCommentMutation = ({
     onSuccess: async (updatedComment) => {
       // @ts-expect-error StrictNullChecks
       const comment = new Comment(updatedComment);
-      console.log({ comment, updatedComment });
-
       // update fetch comments query state with updated comment
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });

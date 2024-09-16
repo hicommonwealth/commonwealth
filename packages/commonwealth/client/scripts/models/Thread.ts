@@ -4,7 +4,7 @@ import {
   ContestManager,
   ContestScore,
 } from '@hicommonwealth/schemas';
-import { ProposalType } from '@hicommonwealth/shared';
+import { ProposalType, getDecodedString } from '@hicommonwealth/shared';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import { z } from 'zod';
@@ -13,15 +13,6 @@ import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
-
-function getDecodedString(str: string) {
-  try {
-    return decodeURIComponent(str);
-  } catch (err) {
-    console.error(`Could not decode str: "${str}"`);
-    return str;
-  }
-}
 
 function processAssociatedContests(
   associatedContests?: AssociatedContest[] | null,
