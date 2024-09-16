@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { QuillRenderer } from './react_quill_editor/quill_renderer';
+import { MarkdownViewerUsingQuillOrNewEditor } from './MarkdownViewerUsingQuillOrNewEditor/MarkdownViewerUsingQuillOrNewEditor';
 
 type CollapsibleProposalBodyProps = {
   doc: string;
@@ -9,5 +8,7 @@ type CollapsibleProposalBodyProps = {
 export const CollapsibleProposalBody = ({
   doc,
 }: CollapsibleProposalBodyProps) => {
-  return <QuillRenderer doc={doc} cutoffLines={50} />;
+  return (
+    <MarkdownViewerUsingQuillOrNewEditor markdown={doc} cutoffLines={50} />
+  );
 };
