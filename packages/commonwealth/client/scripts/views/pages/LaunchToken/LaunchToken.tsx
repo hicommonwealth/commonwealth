@@ -13,7 +13,12 @@ import { CreateTokenCommunityStep, getFormSteps } from './utils';
 
 const LaunchToken = () => {
   const navigate = useCommonNavigate();
-  const { createTokenCommunityStep, onChangeStep } = useCreateCommunity();
+  const {
+    createTokenCommunityStep,
+    onChangeStep,
+    createdTokenInfo,
+    selectedAddress,
+  } = useCreateCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -41,6 +46,8 @@ const LaunchToken = () => {
           <CommunityInformationStep
             handleGoBack={() => onChangeStep(false)}
             handleContinue={() => onChangeStep(true)}
+            tokenInfo={createdTokenInfo}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.SignatureLaunch:

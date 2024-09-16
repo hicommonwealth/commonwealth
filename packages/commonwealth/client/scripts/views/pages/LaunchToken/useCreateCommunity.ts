@@ -1,4 +1,6 @@
+import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
+import { TokenInfo } from './types';
 import { CreateTokenCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
@@ -6,6 +8,19 @@ const useCreateCommunity = () => {
     useState<CreateTokenCommunityStep>(
       CreateTokenCommunityStep.CommunityInformation,
     );
+  const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(
+    new AddressInfo({
+      address: '', // add sample address info
+    } as any),
+  );
+  const [createdTokenInfo, setCreatedTokenInfo] = useState<TokenInfo>({
+    // Sample data
+    name: 'Tk token',
+    symbol: 'TKN',
+    description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry.`,
+    imageURL:
+      'https://img.freepik.com/free-vector/bird-colorful-logo-gradient-vector_343694-1365.jpg',
+  });
 
   const onChangeStep = (forward: boolean) => {
     handleChangeStep(
@@ -18,6 +33,10 @@ const useCreateCommunity = () => {
   return {
     createTokenCommunityStep,
     onChangeStep,
+    selectedAddress,
+    setSelectedAddress,
+    createdTokenInfo,
+    setCreatedTokenInfo,
   };
 };
 
