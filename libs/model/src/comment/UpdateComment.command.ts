@@ -9,7 +9,6 @@ import {
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  quillToPlain,
   uniqueMentions,
 } from '../utils';
 
@@ -39,7 +38,6 @@ export function UpdateComment(): Command<
 
       if (currentVersion?.text !== payload.text) {
         const text = decodeContent(payload.text);
-        const plaintext = quillToPlain(text);
         const mentions = findMentionDiff(
           parseUserMentions(currentVersion?.text),
           uniqueMentions(parseUserMentions(text)),
@@ -48,7 +46,7 @@ export function UpdateComment(): Command<
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
-            { text, plaintext, search: getCommentSearchVector(text) },
+            { text, search: getCommentSearchVector(text) },
             { where: { id: comment.id }, transaction },
           );
 

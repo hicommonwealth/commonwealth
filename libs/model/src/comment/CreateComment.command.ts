@@ -9,7 +9,6 @@ import {
   emitEvent,
   emitMentions,
   parseUserMentions,
-  quillToPlain,
   uniqueMentions,
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
@@ -53,7 +52,6 @@ export function CreateComment(): Command<
       }
 
       const text = decodeContent(payload.text);
-      const plaintext = quillToPlain(text);
       const mentions = uniqueMentions(parseUserMentions(text));
 
       // == mutation transaction boundary ==
@@ -65,7 +63,6 @@ export function CreateComment(): Command<
               thread_id,
               parent_id: parent_id ? parent_id.toString() : null, // TODO: change parent_id from string to number
               text,
-              plaintext,
               address_id: address.id!,
               reaction_count: 0,
               reaction_weights_sum: 0,
