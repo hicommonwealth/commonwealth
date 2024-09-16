@@ -5,11 +5,11 @@ import { isAuthorized, type AuthContext } from '../middleware';
 import { mustBeAuthorized } from '../middleware/guards';
 import { getCommentSearchVector } from '../models';
 import {
+  decodeContent,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
   quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
 
@@ -24,9 +24,9 @@ export function UpdateComment(): Command<
       const { address } = mustBeAuthorized(actor, auth);
       const { comment_id, discord_meta } = payload;
 
-      // find by comment_id or discord_meta
+      // find discord_meta first if present
       const comment = await models.Comment.findOne({
-        where: comment_id ? { id: comment_id } : { discord_meta },
+        where: discord_meta ? { discord_meta } : { id: comment_id },
         include: [{ model: models.Thread, required: true }],
       });
       if (!comment) throw new InvalidInput('Comment not found');
@@ -38,7 +38,7 @@ export function UpdateComment(): Command<
       });
 
       if (currentVersion?.text !== payload.text) {
-        const text = sanitizeQuillText(payload.text);
+        const text = decodeContent(payload.text);
         const plaintext = quillToPlain(text);
         const mentions = findMentionDiff(
           parseUserMentions(currentVersion?.text),

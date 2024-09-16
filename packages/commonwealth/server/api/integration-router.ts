@@ -6,7 +6,6 @@ import { RequestHandler, Router, raw } from 'express';
 import DatabaseValidationService from 'server/middleware/databaseValidationService';
 import { deleteBotCommentHandler } from 'server/routes/comments/delete_comment_bot_handler';
 import { deleteBotThreadHandler } from 'server/routes/threads/delete_thread_bot_handler';
-import { updateThreadHandler } from 'server/routes/threads/update_thread_handler';
 import { ServerControllers } from 'server/routing/router';
 
 const PATH = '/api/integration';
@@ -52,8 +51,7 @@ function build(
   router.patch(
     '/bot/threads',
     isBotUser,
-    isAuthor,
-    updateThreadHandler.bind(this, controllers),
+    express.command(Thread.UpdateThread()),
   );
 
   router.delete(
