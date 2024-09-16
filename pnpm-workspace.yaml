@@ -5,3 +5,4 @@ packages:
   - 'packages/snapshot-listener'
   - 'packages/scripts'
   - 'packages/load-testing'
+  - 'packages/network-explorer'
