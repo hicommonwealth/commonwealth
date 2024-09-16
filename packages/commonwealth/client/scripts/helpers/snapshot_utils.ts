@@ -207,8 +207,6 @@ export async function getResults(
       sumOfResultsBalance: votingClass.getScoresTotal(),
     };
 
-    console.log('votes', votes);
-
     return { votes, results } as VoteResults;
   } catch (e) {
     console.error(e);
