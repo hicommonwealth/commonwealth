@@ -5,11 +5,11 @@ import { isAuthorized, type AuthContext } from '../middleware';
 import { mustBeAuthorized } from '../middleware/guards';
 import { getCommentSearchVector } from '../models';
 import {
+  decodeContent,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
   quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
 
@@ -38,7 +38,7 @@ export function UpdateComment(): Command<
       });
 
       if (currentVersion?.text !== payload.text) {
-        const text = sanitizeQuillText(payload.text);
+        const text = decodeContent(payload.text);
         const plaintext = quillToPlain(text);
         const mentions = findMentionDiff(
           parseUserMentions(currentVersion?.text),
@@ -56,10 +56,6 @@ export function UpdateComment(): Command<
             { comment_id: comment.id!, text, timestamp: new Date() },
             { transaction },
           );
-
-          // update timestamps
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           mentions.length &&
             (await emitMentions(models, transaction, {

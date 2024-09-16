@@ -40,7 +40,7 @@ describe('Update Community/Chain Tests', () => {
       { chain },
       'Alice',
     );
-    loggedInAddr = result.address.split(':')[2];
+    loggedInAddr = result.did.split(':')[4];
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       config.AUTH.JWT_SECRET,
