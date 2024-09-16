@@ -249,16 +249,19 @@ export const isSuperAdmin: AuthHandler = async (ctx) => {
  *
  * @param roles specific community roles - all by default
  * @param action specific group permission action
+ * @param author when true, rejects members that are not the author
  * @param collaborators authorize thread collaborators
  * @throws InvalidActor when not authorized
  */
 export function isAuthorized({
   roles = ['admin', 'moderator', 'member'],
   action,
+  author = false,
   collaborators = false,
 }: {
   roles?: Role[];
   action?: GroupPermissionAction;
+  author?: boolean;
   collaborators?: boolean;
 }): AuthHandler {
   return async (ctx) => {
@@ -291,7 +294,9 @@ export function isAuthorized({
       throw new InvalidActor(ctx.actor, 'Not authorized collaborator');
     }
 
+    if (author) throw new InvalidActor(ctx.actor, 'Not authorized member');
+
     // at this point, the address is either a moderator or member
-    // without any action or collaboration requirements
+    // without any security requirements for action, author, or collaboration
   };
 }

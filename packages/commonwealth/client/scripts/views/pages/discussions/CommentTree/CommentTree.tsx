@@ -193,13 +193,7 @@ export const CommentTree = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteComment({
-                communityId,
-                commentId: comment.id,
-                canvasHash: comment.canvasHash,
-                address: user.activeAccount?.address || '',
-                existingNumberOfComments: thread.numberOfComments,
-              });
+              await deleteComment({ comment_id: comment.id });
             } catch (err) {
               if (err instanceof SessionKeyError) {
                 return;

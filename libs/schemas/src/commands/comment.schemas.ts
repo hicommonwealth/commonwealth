@@ -40,3 +40,17 @@ export const CreateCommentReaction = {
   input: CommentCanvasReaction,
   output: Reaction.extend({ community_id: z.string() }),
 };
+
+export const DeleteComment = {
+  input: z.object({
+    comment_id: PG_INT,
+
+    // discord integration
+    thread_id: PG_INT.optional(),
+    message_id: z.string().optional(),
+  }),
+  output: z.object({
+    comment_id: PG_INT,
+    canvas_hash: z.string().nullish(),
+  }),
+};

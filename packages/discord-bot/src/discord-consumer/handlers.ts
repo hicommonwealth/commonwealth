@@ -101,6 +101,9 @@ export async function handleCommentMessages(
       await axios.delete(`${bot_path}/comments/${message.message_id}`, {
         data: {
           ...sharedReqData,
+          comment_id: 0, // required in command
+          thread_id: thread.id, // to auth command
+          message_id: message.message_id,
         },
       });
       break;
