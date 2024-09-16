@@ -18,6 +18,7 @@ interface CreateCommunityProps {
   userAddress: string;
   bech32Prefix?: string;
   isPWA?: boolean;
+  tokenName?: string;
 }
 
 export const buildCreateCommunityInput = ({
@@ -33,6 +34,7 @@ export const buildCreateCommunityInput = ({
   altWalletUrl,
   userAddress,
   bech32Prefix,
+  tokenName,
 }: CreateCommunityProps) => {
   const nameToSymbol = name.toUpperCase().slice(0, 4);
   const communityNetwork =
@@ -55,6 +57,7 @@ export const buildCreateCommunityInput = ({
     network: communityNetwork!,
     default_symbol: nameToSymbol,
     bech32_prefix: bech32Prefix,
+    token_name: tokenName,
   };
 };
 

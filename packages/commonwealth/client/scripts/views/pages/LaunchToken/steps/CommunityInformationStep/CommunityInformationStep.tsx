@@ -90,6 +90,7 @@ const CommunityInformationStep = ({
         userAddress: selectedAddress.address,
         ethChainId: `${baseNode.ethChainId}`,
         isPWA: isAddedToHomeScreen,
+        tokenName: tokenInfo?.name || '',
       });
       await createCommunityMutation(input);
       handleContinue();
