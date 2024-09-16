@@ -7,6 +7,7 @@ const getNamespaceBalanceStub = sinon.stub(
 
 import {
   Actor,
+  InvalidActor,
   InvalidInput,
   InvalidState,
   command,
@@ -28,6 +29,7 @@ import {
   CreateComment,
   CreateCommentErrors,
   CreateCommentReaction,
+  DeleteComment,
   MAX_COMMENT_DEPTH,
   UpdateComment,
 } from '../../src/comment';
@@ -589,6 +591,38 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(InvalidInput);
+    });
+
+    it('should delete a comment', async () => {
+      const text = 'to be deleted';
+      const tbd = await command(CreateComment(), {
+        actor: actors.member,
+        payload: {
+          thread_id: thread.id!,
+          text,
+        },
+      });
+      expect(tbd).to.include({
+        thread_id: thread!.id,
+        text,
+        community_id: thread!.community_id,
+      });
+      const deleted = await command(DeleteComment(), {
+        actor: actors.member,
+        payload: { comment_id: tbd!.id! },
+      });
+      expect(deleted).to.include({ comment_id: tbd!.id! });
+    });
+
+    it('should throw delete when user is not author', async () => {
+      await expect(
+        command(DeleteComment(), {
+          actor: actors.rejected,
+          payload: {
+            comment_id: comment!.id,
+          },
+        }),
+      ).rejects.toThrowError(InvalidActor);
     });
   });
 

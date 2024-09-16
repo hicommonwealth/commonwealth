@@ -90,7 +90,6 @@ import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_me
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
-import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
@@ -405,14 +404,6 @@ function setupRouter(
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
 
   // comments
-  registerRoute(
-    router,
-    'delete',
-    '/comments/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deleteCommentHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'get',
