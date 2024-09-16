@@ -1,5 +1,5 @@
 import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
-import { getCommentSearchVector } from '@hicommonwealth/model';
+import { decodeContent, getCommentSearchVector } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
@@ -10,7 +10,6 @@ import {
   emitMentions,
   parseUserMentions,
   quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
@@ -53,7 +52,7 @@ export function CreateComment(): Command<
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
 
-      const text = sanitizeQuillText(payload.text);
+      const text = decodeContent(payload.text);
       const plaintext = quillToPlain(text);
       const mentions = uniqueMentions(parseUserMentions(text));
 

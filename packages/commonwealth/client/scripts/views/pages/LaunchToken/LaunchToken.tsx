@@ -6,6 +6,7 @@ import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './LaunchToken.scss';
+import CommunityInformationStep from './steps/CommunityInformationStep';
 import TokenInformationStep from './steps/TokenInformationStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateTokenCommunityStep, getFormSteps } from './utils';
@@ -36,8 +37,12 @@ const LaunchToken = () => {
           />
         );
       case CreateTokenCommunityStep.CommunityInformation:
-        // TODO: https://github.com/hicommonwealth/commonwealth/issues/8706
-        return <>Not Implemented</>;
+        return (
+          <CommunityInformationStep
+            handleGoBack={() => onChangeStep(false)}
+            handleContinue={() => onChangeStep(true)}
+          />
+        );
       case CreateTokenCommunityStep.SignatureLaunch:
         // TODO: https://github.com/hicommonwealth/commonwealth/issues/8707
         return <>Not Implemented</>;

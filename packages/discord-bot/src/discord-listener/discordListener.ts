@@ -10,7 +10,6 @@ import { Broker, broker, logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
-  Message,
   MessageType,
   ThreadChannel,
 } from 'discord.js';
@@ -99,23 +98,20 @@ async function startDiscordListener() {
     },
   );
 
-  client.on('messageDelete', async (message: Message) => {
+  client.on('messageDelete', async (message) => {
     await handleMessage(controller, client, message, 'comment-delete');
   });
 
-  client.on(
-    'messageUpdate',
-    async (oldMessage: Message, newMessage: Message) => {
-      await handleMessage(
-        controller,
-        client,
-        newMessage,
-        newMessage.nonce ? 'comment-update' : 'thread-body-update',
-      );
-    },
-  );
+  client.on('messageUpdate', async (_, newMessage) => {
+    await handleMessage(
+      controller,
+      client,
+      newMessage,
+      newMessage.nonce ? 'comment-update' : 'thread-body-update',
+    );
+  });
 
-  client.on('messageCreate', async (message: Message) => {
+  client.on('messageCreate', async (message) => {
     // this conditional prevents handling of messages like ChannelNameChanged which
     // are emitted inside a thread but which we do not want to replicate in the CW thread.
     // Thread/channel name changes are handled in threadUpdate since the that event comes

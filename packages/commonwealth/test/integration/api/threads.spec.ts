@@ -7,9 +7,9 @@ import { dispose } from '@hicommonwealth/core';
 import { Comment, Thread } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { Express } from 'express';
 import jwt from 'jsonwebtoken';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
-import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
@@ -19,6 +19,19 @@ import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
 const { expect } = chai;
+
+async function update(
+  app: Express,
+  address: string,
+  payload: Record<string, unknown>,
+) {
+  return await chai
+    .request(app)
+    .post(`/api/v1/UpdateThread`)
+    .set('Accept', 'application/json')
+    .set('address', address)
+    .send(payload);
+}
 
 // @TODO 1/10/24: was not running previously, so set to skip -- needs cleaning
 describe.skip('Thread Tests', () => {
@@ -487,20 +500,16 @@ describe.skip('Thread Tests', () => {
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
       const readOnly = false;
-      const res = await chai
-        .request(server.app)
-        .put('/api/editThread')
-        .set('Accept', 'application/json')
-        .send({
-          chain,
-          address: adminAddress,
-          author_chain: chain,
-          kind: thread_kind,
-          stage: thread_stage,
-          body: thread.body,
-          read_only: readOnly,
-          jwt: userJWT,
-        });
+      const res = await update(server.app, userAddress, {
+        chain,
+        address: adminAddress,
+        author_chain: chain,
+        kind: thread_kind,
+        stage: thread_stage,
+        body: thread.body,
+        read_only: readOnly,
+        jwt: userJWT,
+      });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(400);
     });
@@ -509,26 +518,19 @@ describe.skip('Thread Tests', () => {
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
       const readOnly = false;
-      const res = await chai
-        .request(server.app)
-        .put('/api/editThread')
-        .set('Accept', 'application/json')
-        .send({
-          chain,
-          address: adminAddress,
-          author_chain: chain,
-          thread_id: null,
-          kind: thread_kind,
-          stage: thread_stage,
-          body: thread.body,
-          read_only: readOnly,
-          jwt: adminJWT,
-        });
+      const res = await update(server.app, userAddress, {
+        chain,
+        address: adminAddress,
+        author_chain: chain,
+        thread_id: null,
+        kind: thread_kind,
+        stage: thread_stage,
+        body: thread.body,
+        read_only: readOnly,
+        jwt: adminJWT,
+      });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(400);
-      expect(res.body.error).to.be.equal(
-        EditThreadHandlerErrors.InvalidThreadID,
-      );
     });
 
     test('should fail to edit a thread without passing a body', async () => {
@@ -536,21 +538,17 @@ describe.skip('Thread Tests', () => {
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
       const readOnly = false;
-      const res = await chai
-        .request(server.app)
-        .put('/api/editThread')
-        .set('Accept', 'application/json')
-        .send({
-          chain,
-          address: adminAddress,
-          author_chain: chain,
-          thread_id,
-          kind: thread_kind,
-          stage: thread_stage,
-          body: null,
-          read_only: readOnly,
-          jwt: adminJWT,
-        });
+      const res = await update(server.app, userAddress, {
+        chain,
+        address: adminAddress,
+        author_chain: chain,
+        thread_id,
+        kind: thread_kind,
+        stage: thread_stage,
+        body: null,
+        read_only: readOnly,
+        jwt: adminJWT,
+      });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(400);
       expect(res.body.error).to.be.equal(EditThreadErrors.NoBody);
@@ -565,21 +563,17 @@ describe.skip('Thread Tests', () => {
         const thread_stage = thread.stage;
         const newBody = 'new Body';
         const readOnly = false;
-        const res = await chai.request
-          .agent(server.app)
-          .put('/api/editThread')
-          .set('Accept', 'application/json')
-          .send({
-            chain,
-            address: adminAddress,
-            author_chain: chain,
-            thread_id,
-            kind: thread_kind,
-            stage: thread_stage,
-            body: newBody,
-            read_only: readOnly,
-            jwt: adminJWT,
-          });
+        const res = await update(server.app, userAddress, {
+          chain,
+          address: adminAddress,
+          author_chain: chain,
+          thread_id,
+          kind: thread_kind,
+          stage: thread_stage,
+          body: newBody,
+          read_only: readOnly,
+          jwt: adminJWT,
+        });
         expect(res.status).to.be.equal(200);
         expect(res.body.result.body).to.be.equal(newBody);
       },
@@ -591,22 +585,18 @@ describe.skip('Thread Tests', () => {
       const thread_stage = thread.stage;
       const newTitle = 'new Title';
       const readOnly = false;
-      const res = await chai
-        .request(server.app)
-        .put('/api/editThread')
-        .set('Accept', 'application/json')
-        .send({
-          chain,
-          address: adminAddress,
-          author_chain: chain,
-          thread_id,
-          kind: thread_kind,
-          stage: thread_stage,
-          body: thread.body,
-          title: newTitle,
-          read_only: readOnly,
-          jwt: adminJWT,
-        });
+      const res = await update(server.app, userAddress, {
+        chain,
+        address: adminAddress,
+        author_chain: chain,
+        thread_id,
+        kind: thread_kind,
+        stage: thread_stage,
+        body: thread.body,
+        title: newTitle,
+        read_only: readOnly,
+        jwt: adminJWT,
+      });
       expect(res.status).to.be.equal(200);
       expect(res.body.result.title).to.be.equal(newTitle);
     });
