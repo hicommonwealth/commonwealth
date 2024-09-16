@@ -7,6 +7,7 @@ type MarkdownViewerUsingQuillOrNewEditor = {
   readonly markdown: string | undefined;
   readonly cutoffLines?: number;
   readonly customShowMoreButton?: ReactNode;
+  readonly className?: string;
 };
 
 /**
@@ -15,7 +16,7 @@ type MarkdownViewerUsingQuillOrNewEditor = {
 export const MarkdownViewerUsingQuillOrNewEditor = (
   props: MarkdownViewerUsingQuillOrNewEditor,
 ) => {
-  const { markdown, cutoffLines, customShowMoreButton } = props;
+  const { markdown, cutoffLines, customShowMoreButton, className } = props;
 
   const newEditor = useFlag('newEditor');
 
@@ -25,12 +26,14 @@ export const MarkdownViewerUsingQuillOrNewEditor = (
         markdown={markdown}
         cutoffLines={cutoffLines}
         customShowMoreButton={customShowMoreButton}
+        className={className}
       />
     );
   }
 
   return (
     <QuillRenderer
+      customClass={className}
       doc={markdown ?? ''}
       cutoffLines={cutoffLines}
       customShowMoreButton={customShowMoreButton}

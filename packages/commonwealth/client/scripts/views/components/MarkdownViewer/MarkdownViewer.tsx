@@ -17,11 +17,13 @@ import { useEditorErrorHandler } from 'views/components/MarkdownEditor/useEditor
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
 import { useComputeMarkdownWithCutoff } from 'views/components/MarkdownViewer/UseComputeMarkdownWithCutoff';
 
+import clsx from 'clsx';
 import './MarkdownViewer.scss';
 
 export type MarkdownStr = string;
 
 export type MarkdownViewerProps = Readonly<{
+  className?: string;
   markdown: MarkdownStr | undefined;
   cutoffLines?: number;
   customShowMoreButton?: ReactNode;
@@ -30,7 +32,7 @@ export type MarkdownViewerProps = Readonly<{
 export const MarkdownViewer = memo(function MarkdownViewer(
   props: MarkdownViewerProps,
 ) {
-  const { customShowMoreButton } = props;
+  const { customShowMoreButton, className } = props;
 
   const errorHandler = useEditorErrorHandler();
 
@@ -42,7 +44,7 @@ export const MarkdownViewer = memo(function MarkdownViewer(
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
   return (
-    <div className="MarkdownViewer">
+    <div className={clsx('MarkdownViewer', className)}>
       <MDXEditor
         key={'user-expand' + userExpand}
         onError={errorHandler}
