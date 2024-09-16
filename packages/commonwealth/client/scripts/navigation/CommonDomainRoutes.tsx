@@ -6,6 +6,9 @@ import { RouteFeatureFlags } from './Router';
 
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
 const MarkdownViewerPage = lazy(() => import('views/pages/MarkdownViewerPage'));
+const MarkdownHitHighlighterPage = lazy(
+  () => import('views/pages/MarkdownHitHighlighterPage'),
+);
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
@@ -120,6 +123,12 @@ const CommonDomainRoutes = ({
     key="/markdown-editor"
     path="/markdown-editor"
     element={<MarkdownEditorPage />}
+  />,
+
+  <Route
+    key="/markdown-hit-highlighter"
+    path="/markdown-hit-highlighter"
+    element={<MarkdownHitHighlighterPage />}
   />,
 
   <Route
