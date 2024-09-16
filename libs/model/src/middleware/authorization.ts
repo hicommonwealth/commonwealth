@@ -108,9 +108,9 @@ async function buildAuth(
   };
   (ctx as { auth: AuthContext }).auth = auth;
 
-  if (comment_id) {
+  if (auth.comment_id) {
     auth.comment = await models.Comment.findOne({
-      where: { id: comment_id },
+      where: { id: auth.comment_id },
       include: [
         {
           model: models.Thread,
@@ -124,7 +124,7 @@ async function buildAuth(
     auth.topic_id = auth.comment.Thread!.topic_id;
     auth.thread_id = auth.comment.Thread!.id;
     auth.author_address_id = auth.comment.address_id;
-  } else if (thread_id) {
+  } else if (auth.thread_id) {
     const include = collaborators
       ? {
           model: models.Address,
@@ -133,21 +133,21 @@ async function buildAuth(
         }
       : undefined;
     auth.thread = await models.Thread.findOne({
-      where: { id: thread_id },
+      where: { id: auth.thread_id },
       include,
     });
     if (!auth.thread) throw new InvalidInput('Must provide a valid thread id');
     auth.community_id = auth.thread.community_id;
     auth.topic_id = auth.thread.topic_id;
     auth.author_address_id = auth.thread.address_id;
-  } else if (!community_id)
+  } else if (!auth.community_id)
     throw new InvalidInput('Must provide a community id');
 
   auth.address = await models.Address.findOne({
     where: {
       user_id: actor.user.id,
       address: actor.address,
-      community_id: auth.community_id!,
+      community_id: auth.community_id,
       role: { [Op.in]: roles },
     },
     order: [['role', 'DESC']],
