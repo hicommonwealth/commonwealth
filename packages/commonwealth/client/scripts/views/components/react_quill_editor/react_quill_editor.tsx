@@ -359,7 +359,10 @@ const ReactQuillEditor = ({
             </div>
           </div>
         ) : (
-          <MarkdownPreview doc={getTextFromDelta(contentDeltaToUse)} />
+          <MarkdownPreview
+            classNameProp={fromManageTopic ? 'preview' : ''}
+            doc={getTextFromDelta(contentDeltaToUse)}
+          />
         )}
       </div>
       {formFieldErrorMessage && (
