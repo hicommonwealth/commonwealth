@@ -15,14 +15,17 @@ export type DeleteThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
   threadId?: number;
+  threadMsgId?: string;
   messageId?: string;
+  canvasSignedData?: string;
+  canvasMsgId?: string;
 };
 
 export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, address, threadId, messageId }: DeleteThreadOptions,
+  { user, address, threadId, threadMsgId, messageId }: DeleteThreadOptions,
 ): Promise<DeleteThreadResult> {
   if (!threadId) {
     // Special handling for discobot threads
@@ -47,6 +50,14 @@ export async function __deleteThread(
   });
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
+  }
+
+  // if the threadMsgId is given, validate that it is the same as the field on
+  // the thread to be deleted
+  if (threadMsgId && thread.canvas_msg_id !== threadMsgId) {
+    throw new AppError(
+      `thread.canvas_msg_id (${thread.canvas_msg_id}) !== threadMsgId (${threadMsgId})`,
+    );
   }
 
   if (address.is_banned) throw new AppError('Banned User');

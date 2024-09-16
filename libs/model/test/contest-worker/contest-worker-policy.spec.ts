@@ -94,7 +94,7 @@ describe('Contest Worker Policy', () => {
             title: threadTitle,
             created_by: address,
             canvas_signed_data: '',
-            canvas_hash: '',
+            canvas_msg_id: '',
             kind: '',
             stage: '',
             view_count: 0,
