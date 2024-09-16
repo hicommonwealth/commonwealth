@@ -1,5 +1,6 @@
 import {
   Actor,
+  InvalidActor,
   InvalidInput,
   InvalidState,
   command,
@@ -12,12 +13,14 @@ import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateCommunity,
   CreateGroup,
+  DeleteTopic,
   Errors,
   GetCommunities,
   MAX_GROUPS_PER_COMMUNITY,
   UpdateCommunity,
   UpdateCommunityErrors,
 } from '../../src/community';
+import { models } from '../../src/database';
 import type {
   ChainNodeAttributes,
   CommunityAttributes,
@@ -29,7 +32,7 @@ const chance = Chance();
 describe('Community lifecycle', () => {
   let ethNode: ChainNodeAttributes, edgewareNode: ChainNodeAttributes;
   let community: CommunityAttributes;
-  let superAdminActor: Actor, adminActor: Actor;
+  let superAdminActor: Actor, adminActor: Actor, memberActor: Actor;
   const custom_domain = 'custom';
   const group_payload = {
     id: '',
@@ -50,6 +53,7 @@ describe('Community lifecycle', () => {
     });
     const [superadmin] = await seed('User', { isAdmin: true });
     const [admin] = await seed('User', { isAdmin: false });
+    const [member] = await seed('User', { isAdmin: false });
     const [base] = await seed('Community', {
       chain_node_id: _ethNode!.id!,
       base: ChainBase.Ethereum,
@@ -64,6 +68,10 @@ describe('Community lifecycle', () => {
         {
           role: 'admin',
           user_id: admin!.id,
+        },
+        {
+          role: 'member',
+          user_id: member!.id,
         },
       ],
       custom_domain,
@@ -82,6 +90,14 @@ describe('Community lifecycle', () => {
     adminActor = {
       user: { id: admin!.id!, email: admin!.email!, isAdmin: admin!.isAdmin! },
       address: base?.Addresses?.at(1)?.address,
+    };
+    memberActor = {
+      user: {
+        id: member!.id!,
+        email: member!.email!,
+        isAdmin: member!.isAdmin!,
+      },
+      address: base?.Addresses?.at(2)?.address,
     };
   });
 
@@ -192,6 +208,41 @@ describe('Community lifecycle', () => {
           },
         }),
       ).rejects.toThrow(Errors.MaxGroups);
+    });
+  });
+
+  describe('topics', () => {
+    test('should delete a topic', async () => {
+      // TODO: use CreateTopic
+      const topic = await models.Topic.create({
+        community_id: community.id,
+        name: 'hhh',
+        featured_in_new_post: false,
+        featured_in_sidebar: false,
+      });
+
+      const response = await command(DeleteTopic(), {
+        actor: superAdminActor,
+        payload: { topic_id: topic!.id! },
+      });
+      expect(response?.topic_id).to.equal(topic.id);
+    });
+
+    test('should throw if not authorized', async () => {
+      // TODO: use CreateTopic
+      const topic = await models.Topic.create({
+        community_id: community.id,
+        name: 'hhh',
+        featured_in_new_post: false,
+        featured_in_sidebar: false,
+      });
+
+      await expect(
+        command(DeleteTopic(), {
+          actor: memberActor,
+          payload: { topic_id: topic!.id! },
+        }),
+      ).rejects.toThrow(InvalidActor);
     });
   });
 

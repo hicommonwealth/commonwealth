@@ -13,6 +13,7 @@ const {
   getCommunities,
   getCommunity,
   getMembers,
+  deleteTopic,
 } = community.trpcRouter;
 const { createThread, updateThread, createThreadReaction } = thread.trpcRouter;
 const { createComment, createCommentReaction, updateComment, getComments } =
@@ -24,6 +25,7 @@ const api = {
   getCommunities,
   getCommunity,
   getMembers,
+  deleteTopic,
   getComments,
   createThread,
   updateThread,

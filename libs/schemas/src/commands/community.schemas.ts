@@ -158,3 +158,13 @@ export const GenerateStakeholderGroups = {
     })
     .partial(),
 };
+
+export const DeleteTopic = {
+  input: z.object({
+    topic_id: PG_INT,
+  }),
+  output: z.object({
+    community_id: z.string(),
+    topic_id: PG_INT,
+  }),
+};
