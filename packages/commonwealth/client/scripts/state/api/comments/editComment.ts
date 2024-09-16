@@ -65,8 +65,6 @@ const useEditCommentMutation = ({
     onSuccess: async (updatedComment) => {
       // @ts-expect-error StrictNullChecks
       const comment = new Comment(updatedComment);
-      console.log({ comment, updatedComment });
-
       // update fetch comments query state with updated comment
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
