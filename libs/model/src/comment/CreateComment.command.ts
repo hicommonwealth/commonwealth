@@ -85,10 +85,6 @@ export function CreateComment(): Command<
             },
           );
 
-          // update timestamps
-          address.last_active = new Date();
-          await address.save({ transaction });
-
           thread.last_commented_on = new Date();
           await thread.save({ transaction });
 
