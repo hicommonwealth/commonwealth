@@ -20,7 +20,11 @@ export async function handleThreadMessages(
   switch (action) {
     case 'thread-delete':
       await axios.delete(`${bot_path}/threads/${message.message_id}`, {
-        data: { ...sharedReqData },
+        data: {
+          ...sharedReqData,
+          community_id: topic.community_id,
+          message_id: message.message_id,
+        },
       });
       break;
     case 'thread-create':
@@ -28,7 +32,6 @@ export async function handleThreadMessages(
         ...sharedReqData,
         community_id: topic.community_id,
         topic_id: topic.id,
-        // topic_name: topic.name,
         title: encodeURIComponent(message.title),
         body: encodeURIComponent(
           `[Go to Discord post](https://discord.com/channels/${message.guild_id}/${message.channel_id}) \n\n` +

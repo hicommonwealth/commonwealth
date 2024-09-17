@@ -34,3 +34,10 @@ export const trpcRouter = trpc.router({
     },
   ),
 });
+// // publish signed data
+// if (hasCanvasSignedDataApiArgs(req.body)) {
+//   const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+//   if (canvasSignedData.actionMessage.payload.args.thread_id !== null) {
+//     await applyCanvasSignedData(canvasSignedData);
+//   }
+// }

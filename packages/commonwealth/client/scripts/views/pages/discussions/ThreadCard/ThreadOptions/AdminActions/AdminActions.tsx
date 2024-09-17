@@ -108,6 +108,7 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 thread_id: thread.id,
+                canvas_signed_data: thread.canvasSignedData,
                 canvas_msg_id: thread.canvasMsgId,
               });
               onDelete?.();

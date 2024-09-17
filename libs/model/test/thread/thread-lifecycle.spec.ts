@@ -482,7 +482,7 @@ describe('Thread lifecycle', () => {
       expect(_deleted?.thread_id).to.equal(_thread!.id);
     });
 
-    it('should should throw error when thread not found', async () => {
+    it('should throw error when thread not found', async () => {
       await expect(
         command(DeleteThread(), {
           actor: actors.member,

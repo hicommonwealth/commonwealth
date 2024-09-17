@@ -2,6 +2,7 @@ import { Command, InvalidActor, InvalidInput } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models, sequelize } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
+import { verifyDeleteThreadSignature } from '../middleware/canvas';
 import { mustBeAuthorized, mustExist } from '../middleware/guards';
 
 export const DeleteThreadErrors = {
@@ -15,7 +16,7 @@ export function DeleteThread(): Command<
 > {
   return {
     ...schemas.DeleteThread,
-    auth: [isAuthorized({})],
+    auth: [isAuthorized({}), verifyDeleteThreadSignature],
     body: async ({ actor, auth, payload }) => {
       const { address } = mustBeAuthorized(actor, auth);
       const { thread_id, message_id, canvas_msg_id } = payload;
