@@ -4,20 +4,25 @@ import MarkdownHitHighlighter from 'views/components/MarkdownHitHighlighter';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 
 type MarkdownHitHighlighterWithFallbackProps = Readonly<{
-  readonly markdown: string;
-  readonly searchTerm: string;
+  className?: string;
+  markdown: string;
+  searchTerm: string;
 }>;
 
 export const MarkdownHitHighlighterWithFallback = (
   props: MarkdownHitHighlighterWithFallbackProps,
 ) => {
-  const { markdown, searchTerm } = props;
+  const { markdown, searchTerm, className } = props;
 
   const newEditor = useFlag('newEditor');
 
   if (newEditor) {
     return (
-      <MarkdownHitHighlighter markdown={markdown} searchTerm={searchTerm} />
+      <MarkdownHitHighlighter
+        markdown={markdown}
+        searchTerm={searchTerm}
+        className={className}
+      />
     );
   }
 

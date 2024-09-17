@@ -11,19 +11,17 @@ function useParams() {
   const [searchParams] = useSearchParams();
   const cutoffLines = searchParams.get('cutoffLines');
   const quill = searchParams.get('quill') === 'true';
-  const searchTerm = searchParams.get('searchTerm') ?? undefined;
 
   return {
     cutoffLines: cutoffLines ? parseInt(cutoffLines) : undefined,
     quill,
-    searchTerm,
   };
 }
 /**
  * Basic demo page that allows us to use either mode and to log the markdown.
  */
 export const MarkdownViewerPage = () => {
-  const { cutoffLines, quill, searchTerm } = useParams();
+  const { cutoffLines, quill } = useParams();
 
   return (
     <section className="MarkdownViewerPage">
@@ -35,11 +33,7 @@ export const MarkdownViewerPage = () => {
 
       {quill && (
         <div className="inner">
-          <QuillRenderer
-            doc={supported}
-            cutoffLines={cutoffLines}
-            searchTerm={searchTerm}
-          />
+          <QuillRenderer doc={supported} cutoffLines={cutoffLines} />
         </div>
       )}
     </section>

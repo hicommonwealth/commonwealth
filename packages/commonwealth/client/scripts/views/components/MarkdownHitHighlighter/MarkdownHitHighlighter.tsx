@@ -2,11 +2,12 @@ import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import React, { memo } from 'react';
 import removeMd from 'remove-markdown';
-import smartTruncate from 'smart-truncate';
+import { HitChunks } from 'views/components/MarkdownHitHighlighter/HitChunks';
 
 type MarkdownStr = string;
 
 type MarkdownHitHighlighterProps = Readonly<{
+  className?: string;
   markdown: MarkdownStr;
   searchTerm: string;
 }>;
@@ -14,7 +15,7 @@ type MarkdownHitHighlighterProps = Readonly<{
 export const MarkdownHitHighlighter = memo(function MarkdownHitHighlighter(
   props: MarkdownHitHighlighterProps,
 ) {
-  const { markdown, searchTerm } = props;
+  const { markdown, searchTerm, className } = props;
 
   const html = DOMPurify.sanitize(markdown, {
     ALLOWED_TAGS: ['a'],
@@ -29,36 +30,9 @@ export const MarkdownHitHighlighter = memo(function MarkdownHitHighlighter(
     textToHighlight: docText,
   });
 
-  // convert chunks to rendered components
-  return chunks.map(({ end, highlight, start }, index) => {
-    const middle = 15;
-
-    const subString = docText.substr(start, end - start);
-
-    const hasSingleChunk = chunks.length <= 1;
-    const truncateLength = hasSingleChunk ? 150 : 40 + searchTerm.trim().length;
-    const truncateOptions = hasSingleChunk
-      ? {}
-      : index === 0
-        ? { position: 0 }
-        : index === chunks.length - 1
-          ? {}
-          : { position: middle };
-
-    let text = smartTruncate(subString, truncateLength, truncateOptions);
-
-    // restore leading and trailing space
-    if (subString.startsWith(' ')) {
-      text = ` ${text}`;
-    }
-    if (subString.endsWith(' ')) {
-      text = `${text} `;
-    }
-
-    const key = `chunk-${index}`;
-    if (highlight) {
-      return <mark key={key}>{text}</mark>;
-    }
-    return <span key={key}>{text}</span>;
-  });
+  return (
+    <div className={className}>
+      <HitChunks chunks={chunks} docText={docText} searchTerm={searchTerm} />
+    </div>
+  );
 });
