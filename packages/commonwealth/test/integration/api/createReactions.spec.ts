@@ -172,7 +172,7 @@ describe('createReaction Integration Tests', () => {
     chai.assert.isNotNull(createReactionResponse);
 
     await thread!.reload();
-    chai.assert.equal(thread!.reaction_count, beforeReactionCount + 1);
+    chai.assert.equal(thread!.reaction_count, beforeReactionCount! + 1);
 
     const reactionId = createReactionResponse.id;
     const deleteReactionResponse = await deleteReaction(
@@ -184,6 +184,6 @@ describe('createReaction Integration Tests', () => {
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
     await thread!.reload();
-    chai.assert.equal(thread!.reaction_count, beforeReactionCount);
+    chai.assert.equal(thread!.reaction_count, beforeReactionCount!);
   });
 });

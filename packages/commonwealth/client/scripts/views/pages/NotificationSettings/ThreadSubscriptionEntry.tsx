@@ -107,7 +107,7 @@ export const ThreadSubscriptionEntry = (
 
       <div className="SubscriptionFooter">
         <CWThreadAction
-          label={pluralize(thread.comment_count, 'Comment')}
+          label={pluralize(thread.comment_count!, 'Comment')}
           action="comment"
           onClick={(e) => {
             e.preventDefault();
