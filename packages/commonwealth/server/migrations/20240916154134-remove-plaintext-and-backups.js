@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.sequelize.transaction(async () => {
+    await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.removeColumn('Threads', 'plaintext', {
         transaction,
       });
