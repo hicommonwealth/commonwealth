@@ -1,6 +1,0 @@
-web: NODE_ENV=production node --import=extensionless/register --enable-source-maps ./build/server.js
-consumer: node --import=extensionless/register build/server/workers/commonwealthConsumer/commonwealthConsumer.js
-evm-ce: node --import=extensionless/register build/server/workers/evmChainEvents/startEvmPolling.js
-knock: node --import=extensionless/register build/server/workers/knock/knockWorker.js
-message-relayer: node --import=extensionless/register build/server/workers/messageRelayer/messageRelayer.js
-release: node --import=extensionless/register build/server/scripts/releasePhaseEnvCheck.js && npx sequelize-cli db:migrate --config server/sequelize.json && node --import=extensionless/register build/server/scripts/purgeCloudflareCache.js
