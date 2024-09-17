@@ -4,7 +4,6 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 FROM base AS build
-ENV NODE_ENV=production
 ## needed for node-gyp to build
 RUN apt-get update && \
     apt-get install -y python3 make gcc g++
