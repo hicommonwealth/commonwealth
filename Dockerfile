@@ -19,7 +19,8 @@ ENV NODE_ENV=production
 COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
 RUN apt-get update && apt-get install -y curl # Needed for heroku
-EXPOSE 8080
+
+ENV PORT=$PORT
 CMD ["node", "--import=extensionless/register", "--enable-source-maps", "./build/server.js"]
 
 # If we plan on moving more applications to docker:
