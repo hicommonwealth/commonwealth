@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get install -y python3 make gcc g++
 COPY . /usr/src/app
 WORKDIR /usr/src/app
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 RUN pnpm deploy --filter=commonwealth --prod /prod/commonwealth
 RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
