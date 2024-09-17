@@ -76,6 +76,11 @@ export async function __createTopic(
     featured_in_new_post,
     default_offchain_template: default_offchain_template || '',
     community_id: community.id,
+    weighted_voting: body.weighted_voting,
+    chain_node_id: body.chain_node_id,
+    token_address: body.token_address,
+    token_symbol: body.token_symbol,
+    vote_weight_multiplier: body.vote_weight_multiplier,
   };
 
   const [newTopic] = await this.models.Topic.findOrCreate({

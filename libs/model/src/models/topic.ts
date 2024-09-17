@@ -20,7 +20,7 @@ export type TopicAttributes = {
   group_ids?: number[];
   telegram?: string;
 
-  weighted_voting?: TopicWeightedVoting;
+  weighted_voting?: TopicWeightedVoting | null;
   chain_node_id?: number;
   token_address?: string;
   token_symbol?: string;
