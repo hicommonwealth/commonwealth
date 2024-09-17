@@ -36,12 +36,12 @@ export const trpcRouter = trpc.router({
   deleteThread: trpc.command(
     Thread.DeleteThread,
     trpc.Tag.Thread,
-    (_, output) => {
+    async (_, output) => {
       // Using track output middleware to invalidate gac
       // TODO: Generalize output middleware to cover (analytics, gac invalidation, canvas, etc)
       const gac = GlobalActivityCache.getInstance(models);
-      gac && gac.deleteActivityFromCache(output.thread_id);
-      return Promise.resolve(undefined);
+      gac && (await gac.deleteActivityFromCache(output.thread_id));
+      return undefined;
     },
     applyCanvasSignedDataMiddleware,
   ),
