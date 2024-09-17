@@ -4,6 +4,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 FROM base AS build
+ENV NODE_ENV=production
 ## needed for node-gyp to build
 RUN apt-get update && \
     apt-get install -y python3 make gcc g++
@@ -15,6 +16,7 @@ RUN pnpm deploy --filter=commonwealth --prod /prod/commonwealth
 RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
 
 FROM base AS commonwealth
+ENV NODE_ENV=production
 COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
 EXPOSE 8080

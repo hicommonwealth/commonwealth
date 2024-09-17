@@ -87,3 +87,5 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_TOKEN}}
           heroku_app_name: ${{ env.HEROKU_APP_NAME }}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
+          stack: "container"
+          usedocker: true
