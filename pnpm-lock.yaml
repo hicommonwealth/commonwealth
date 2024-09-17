@@ -505,7 +505,7 @@ importers:
         version: 6.11.4
       web3:
         specifier: ^4.7.0
-        version: 4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+        version: 4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-core:
         specifier: ^4.3.2
         version: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -992,6 +992,9 @@ importers:
       '@knocklabs/react-notification-feed':
         specifier: ^0.8.15
         version: 0.8.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@libp2p/peer-id-factory':
+        specifier: ^4.2.4
+        version: 4.2.4
       '@magic-ext/cosmos':
         specifier: ^12.1.3
         version: 12.4.0
@@ -26019,12 +26022,6 @@ snapshots:
     optionalDependencies:
       zod: 3.23.6
 
-  abitype@0.7.1(typescript@5.4.5)(zod@3.23.8):
-    dependencies:
-      typescript: 5.4.5
-    optionalDependencies:
-      zod: 3.23.8
-
   abitype@0.8.11(typescript@5.4.5)(zod@3.23.6):
     dependencies:
       typescript: 5.4.5
@@ -35816,17 +35813,6 @@ snapshots:
       - typescript
       - zod
 
-  web3-eth-abi@4.2.1(typescript@5.4.5)(zod@3.23.8):
-    dependencies:
-      abitype: 0.7.1(typescript@5.4.5)(zod@3.23.8)
-      web3-errors: 1.1.4
-      web3-types: 1.6.0
-      web3-utils: 4.2.3
-      web3-validator: 2.0.5
-    transitivePeerDependencies:
-      - typescript
-      - zod
-
   web3-eth-accounts@4.1.2:
     dependencies:
       '@ethereumjs/rlp': 4.0.1
@@ -35853,22 +35839,6 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-contract@4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
-    dependencies:
-      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
-      web3-types: 1.6.0
-      web3-utils: 4.2.3
-      web3-validator: 2.0.5
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-      - zod
-
   web3-eth-contract@4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@6.0.3)(zod@3.23.6):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -35885,7 +35855,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
+  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -35903,13 +35873,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-types: 1.6.0
       web3-utils: 4.2.3
@@ -35966,21 +35936,6 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
-    dependencies:
-      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-rpc-methods: 1.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-types: 1.6.0
-      web3-utils: 4.2.3
-      web3-validator: 2.0.5
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-      - zod
-
   web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@6.0.3)(zod@3.23.6):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -36002,26 +35957,6 @@ snapshots:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
       web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
-      web3-eth-accounts: 4.1.2
-      web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-rpc-methods: 1.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-types: 1.6.0
-      web3-utils: 4.2.3
-      web3-validator: 2.0.5
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-      - zod
-
-  web3-eth@4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
-    dependencies:
-      setimmediate: 1.0.5
-      web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-errors: 1.1.4
-      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
       web3-eth-accounts: 4.1.2
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -36184,7 +36119,7 @@ snapshots:
       web3-types: 1.6.0
       zod: 3.23.6
 
-  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
+  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
@@ -36192,7 +36127,7 @@ snapshots:
       web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
       web3-eth-accounts: 4.1.2
       web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
-      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-eth-iban: 4.0.7
       web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -36209,17 +36144,17 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
       web3-eth-accounts: 4.1.2
-      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-eth-iban: 4.0.7
-      web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-providers-http: 4.1.0
       web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
