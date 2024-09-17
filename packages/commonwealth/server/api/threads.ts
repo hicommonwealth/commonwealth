@@ -43,12 +43,6 @@ export const trpcRouter = trpc.router({
       gac && gac.deleteActivityFromCache(output.thread_id);
       return Promise.resolve(undefined);
     },
+    applyCanvasSignedDataMiddleware,
   ),
 });
-// // publish signed data
-// if (hasCanvasSignedDataApiArgs(req.body)) {
-//   const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-//   if (canvasSignedData.actionMessage.payload.args.thread_id !== null) {
-//     await applyCanvasSignedData(canvasSignedData);
-//   }
-// }
