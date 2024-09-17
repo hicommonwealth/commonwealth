@@ -8,7 +8,16 @@ export enum TopicWeightedVoting {
 
 export const Topic = z.object({
   id: PG_INT.optional(),
-  name: z.string().max(255).default('General'),
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(255)
+    .default('General')
+    .refine(
+      (v) => !v.match(/["<>%{}|\\/^`]/g),
+      'Name must not contain special characters',
+    ),
   community_id: z.string().max(255),
   description: z.string().default(''),
   telegram: z.string().max(255).nullish(),

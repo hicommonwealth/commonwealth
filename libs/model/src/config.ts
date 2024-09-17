@@ -29,6 +29,7 @@ const {
   ETH_RPC,
   COSMOS_REGISTRY_API,
   REACTION_WEIGHT_OVERRIDE,
+  FLAG_FARCASTER_CONTEST,
 } = process.env;
 
 const NAME =
@@ -77,6 +78,7 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 2,
+      FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -156,6 +158,7 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
+      FLAG_FARCASTER_CONTEST: z.boolean(),
     }),
     AUTH: z
       .object({

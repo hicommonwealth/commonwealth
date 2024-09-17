@@ -67,4 +67,18 @@ export const trpcRouter = trpc.router({
     Community.UpdateCustomDomain,
     trpc.Tag.Community,
   ),
+  createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
+    MixpanelCommunityInteractionEvent.CREATE_TOPIC,
+    (result) => ({
+      community: result.topic.community_id,
+      userId: result.user_id,
+    }),
+  ]),
+  updateTopic: trpc.command(Community.UpdateTopic, trpc.Tag.Community, [
+    MixpanelCommunityInteractionEvent.UPDATE_TOPIC,
+    (result) => ({
+      community: result.topic.community_id,
+      userId: result.user_id,
+    }),
+  ]),
 });
