@@ -19,7 +19,7 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import Editor from 'views/components/MarkdownEditor';
+import MarkdownEditor from 'views/components/MarkdownEditor';
 import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -360,7 +360,7 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {newEditor && <Editor mode="desktop" placeholder="" />}
+              {newEditor && <MarkdownEditor placeholder="" />}
 
               {contestThreadBannerVisible && (
                 <ContestThreadBanner

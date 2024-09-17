@@ -39,6 +39,7 @@ import { editorTranslator } from './utils/editorTranslator';
 import { fileToText } from './utils/fileToText';
 import { iconComponentFor } from './utils/iconComponentFor';
 
+import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import './MarkdownEditor.scss';
 
 export type ImageURL = string;
@@ -86,7 +87,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(
   const [active, setActive] = useState(false);
   const dragCounterRef = useRef(0);
 
-  const mode = props.mode ?? 'desktop';
+  const deviceProfile = useDeviceProfile();
+
+  const mode = props.mode ?? deviceProfile;
   const imageHandler: ImageHandler = props.imageHandler ?? 'S3';
 
   const placeholder = props.placeholder ?? 'Share your thoughts...';
