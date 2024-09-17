@@ -1,5 +1,6 @@
 import * as json from '@ipld/dag-json';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import express from 'express';
 import ipld from 'express-ipld';
 import { StatusCodes } from 'http-status-codes';
@@ -16,6 +17,8 @@ import { createAPI } from '@canvas-js/core/api';
 import { contract } from '@hicommonwealth/shared';
 
 import { createDatabase } from './database.js';
+
+dotenv.config();
 
 // this is copied from @canvas-js/gossiplog - we don't need anything else from that module
 const MAX_MESSAGE_ID = 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv';
