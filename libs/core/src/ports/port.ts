@@ -100,6 +100,9 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
       return adapterInstance as T;
     }
 
+    // all options provided i.e. options = { key, adapter, isDefault }
+    // prevent default overrides but return existing adapter for key if
+    // available instead of throwing
     if (options.key && options.adapter && options.isDefault !== undefined) {
       if (options.isDefault && defaultAdapters.has(factory.name)) {
         throw ExistingDefaultAdapter(factory.name);
