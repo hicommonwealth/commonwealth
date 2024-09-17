@@ -989,6 +989,9 @@ importers:
       '@knocklabs/react-notification-feed':
         specifier: ^0.8.15
         version: 0.8.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@lexical/rich-text':
+        specifier: ^0.17.0
+        version: 0.17.1
       '@magic-ext/cosmos':
         specifier: ^12.1.3
         version: 12.4.0
@@ -1119,8 +1122,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       commonwealth-mdxeditor:
-        specifier: ^0.0.3
-        version: 0.0.3(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18)
+        specifier: ^0.0.8
+        version: 0.0.8(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18)
       compression:
         specifier: ^1.7.4
         version: 1.7.4
@@ -1208,6 +1211,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.2
+      lexical:
+        specifier: ^0.17.0
+        version: 0.17.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -8287,8 +8293,8 @@ packages:
   commondir@1.0.1:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
 
-  commonwealth-mdxeditor@0.0.3:
-    resolution: {integrity: sha512-3ilEAe0sTEQYbfa7CMkmVSZ58lkMr38srzcqlgoO0lqBoKrdHhw9+9+NndwoGeYkyLznnHEKhrzVg2mQNqhOzg==}
+  commonwealth-mdxeditor@0.0.8:
+    resolution: {integrity: sha512-L4HQsd6FWXiw5cfzMSy86Tkb//KDea5CdA8KlRl1wBVLjHRWwsOJSzFqNkrcpxrnRfUVL7YJWF176pieyObwvg==}
     engines: {node: '>=16'}
     peerDependencies:
       react: ^18.2.0
@@ -20873,7 +20879,7 @@ snapshots:
   '@polkadot/types-support@10.13.1':
     dependencies:
       '@polkadot/util': 12.6.2
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@polkadot/types-support@11.0.3':
     dependencies:
@@ -25414,7 +25420,7 @@ snapshots:
     dependencies:
       pvtsutils: 1.3.5
       pvutils: 1.1.3
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   assert-plus@1.0.0: {}
 
@@ -26167,7 +26173,7 @@ snapshots:
 
   commondir@1.0.1: {}
 
-  commonwealth-mdxeditor@0.0.3(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18):
+  commonwealth-mdxeditor@0.0.8(@codemirror/language@6.10.2)(@lezer/common@1.2.1)(@lezer/highlight@1.2.1)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.18):
     dependencies:
       '@codemirror/lang-markdown': 6.2.5
       '@codemirror/language-data': 6.5.1(@codemirror/view@6.33.0)
@@ -26917,12 +26923,12 @@ snapshots:
 
   downshift@7.6.2(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.24.5
+      '@babel/runtime': 7.25.6
       compute-scroll-into-view: 2.0.4
       prop-types: 15.8.1
       react: 18.3.1
       react-is: 17.0.2
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   drange@1.1.1: {}
 
@@ -30602,7 +30608,7 @@ snapshots:
   micromark@4.0.0:
     dependencies:
       '@types/debug': 4.1.12
-      debug: 4.3.5
+      debug: 4.3.7
       decode-named-character-reference: 1.0.2
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.1
@@ -31985,7 +31991,7 @@ snapshots:
 
   pvtsutils@1.3.5:
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   pvutils@1.1.3: {}
 
@@ -32469,7 +32475,7 @@ snapshots:
       react: 18.3.1
       react-remove-scroll-bar: 2.3.6(@types/react@18.3.3)(react@18.3.1)
       react-style-singleton: 2.2.1(@types/react@18.3.3)(react@18.3.1)
-      tslib: 2.6.2
+      tslib: 2.7.0
       use-callback-ref: 1.3.2(@types/react@18.3.3)(react@18.3.1)
       use-sidecar: 1.1.2(@types/react@18.3.3)(react@18.3.1)
     optionalDependencies:
