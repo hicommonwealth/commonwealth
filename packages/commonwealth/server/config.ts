@@ -26,6 +26,7 @@ const {
   EVM_CE_POLL_INTERVAL,
   CF_ZONE_ID,
   CF_API_KEY,
+  PEER_ID,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -108,6 +109,7 @@ export const config = configure(
         10,
       ),
     },
+    PEER_ID,
   },
   z.object({
     NO_PRERENDER: z.boolean(),
@@ -207,5 +209,6 @@ export const config = configure(
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
+    PEER_ID: z.string().optional(),
   }),
 );
