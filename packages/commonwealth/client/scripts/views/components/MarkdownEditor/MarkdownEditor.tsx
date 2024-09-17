@@ -19,7 +19,13 @@ import {
 } from 'commonwealth-mdxeditor';
 import 'commonwealth-mdxeditor/style.css';
 import { notifyError } from 'controllers/app/notifications';
-import React, { memo, useCallback, useRef, useState } from 'react';
+import React, {
+  memo,
+  MutableRefObject,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
 import { DesktopEditorFooter } from './toolbars/DesktopEditorFooter';
@@ -62,12 +68,18 @@ export type MarkdownEditorProps = {
   readonly placeholder?: string;
   readonly imageHandler?: ImageHandler;
   readonly onSubmit?: (markdown: MarkdownStr) => void;
+
+  /**
+   * Specify, if you want to get a callback to have the getMarkdown method
+   * to get the content from the editor.
+   */
+  readonly ref?: (method: Pick<MDXEditorMethods, 'getMarkdown'>) => void;
 };
 
 export const MarkdownEditor = memo(function MarkdownEditor(
   props: MarkdownEditorProps,
 ) {
-  const { onSubmit } = props;
+  const { onSubmit, ref } = props;
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -79,7 +91,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
 
   const placeholder = props.placeholder ?? 'Share your thoughts...';
 
-  const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
+  const mdxEditorRef: MutableRefObject<MDXEditorMethods | null> = useRef(null);
 
   const imageUploadHandlerDelegate = useImageUploadHandler(imageHandler);
 
@@ -250,6 +262,14 @@ export const MarkdownEditor = memo(function MarkdownEditor(
     }
   }, []);
 
+  const handleRef = useCallback(
+    (methods: MDXEditorMethods) => {
+      mdxEditorRef.current = methods;
+      ref?.(methods);
+    },
+    [ref],
+  );
+
   return (
     <div className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}>
       <div
@@ -268,7 +288,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
       >
         <MDXEditor
           onError={errorHandler}
-          ref={mdxEditorRef}
+          ref={handleRef}
           markdown={props.markdown ?? ''}
           placeholder={placeholder}
           iconComponentFor={iconComponentFor}

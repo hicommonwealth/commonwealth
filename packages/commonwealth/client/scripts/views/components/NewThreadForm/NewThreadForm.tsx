@@ -178,6 +178,8 @@ export const NewThreadForm = () => {
     setIsSaving(true);
 
     try {
+      // FIXME: this is the only thing that needs to be re-written
+      // I need to build this from the markdown or the delta, and that's it.
       const input = await buildCreateThreadInput({
         address: user.activeAccount?.address || '',
         kind: threadKind,
