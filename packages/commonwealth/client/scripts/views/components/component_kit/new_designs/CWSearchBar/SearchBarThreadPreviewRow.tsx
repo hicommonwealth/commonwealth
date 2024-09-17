@@ -8,6 +8,7 @@ import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
 import { User } from '../../../user/user';
 import { CWText } from '../../cw_text';
 
+import { getDecodedString } from '@hicommonwealth/shared';
 import './SearchBarThreadPreviewRow.scss';
 
 interface SearchBarThreadPreviewRowProps {
@@ -23,8 +24,8 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
 }) => {
   const navigate = useCommonNavigate();
 
-  const title = decodeURIComponent(searchResult.title);
-  const content = decodeURIComponent(searchResult.body);
+  const title = getDecodedString(searchResult.title);
+  const content = getDecodedString(searchResult.body);
 
   const handleClick = () => {
     const path = `/${searchResult.community_id}/discussion/${searchResult.id}`;
