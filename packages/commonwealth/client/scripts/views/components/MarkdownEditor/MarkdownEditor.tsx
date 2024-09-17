@@ -56,7 +56,7 @@ export type UpdateContentStrategy = 'insert' | 'replace';
 export const DEFAULT_UPDATE_CONTENT_STRATEGY =
   'insert' as UpdateContentStrategy;
 
-type EditorProps = {
+export type MarkdownEditorProps = {
   readonly markdown?: MarkdownStr;
   readonly mode?: MarkdownEditorMode;
   readonly placeholder?: string;
@@ -64,12 +64,14 @@ type EditorProps = {
   readonly onSubmit?: (markdown: MarkdownStr) => void;
 };
 
-export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
+export const MarkdownEditor = memo(function MarkdownEditor(
+  props: MarkdownEditorProps,
+) {
   const { onSubmit } = props;
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-
+  const [active, setActive] = useState(false);
   const dragCounterRef = useRef(0);
 
   const mode = props.mode ?? 'desktop';
@@ -254,12 +256,15 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
         className={clsx(
           'mdxeditor-container',
           'mdxeditor-container-mode-' + mode,
+          active ? 'mdxeditor-container-active' : null,
         )}
         onDrop={handleDrop}
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onPaste={(event) => handlePaste(event)}
+        onFocus={() => setActive(true)}
+        onBlur={() => setActive(false)}
       >
         <MDXEditor
           onError={errorHandler}

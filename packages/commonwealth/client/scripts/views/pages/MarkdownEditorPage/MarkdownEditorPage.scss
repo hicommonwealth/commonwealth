@@ -1,0 +1,8 @@
+.MarkdownEditorPage {
+  display: flex;
+  flex-grow: 1;
+  .desktop {
+    flex-grow: 1;
+    margin: 16px;
+  }
+}

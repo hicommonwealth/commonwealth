@@ -18,6 +18,14 @@ body,
   display: none;
 }
 
+.mdxeditor-container {
+  outline: 1px solid $neutral-200;
+}
+
+.mdxeditor-container-active {
+  outline: 1px solid $primary-300;
+}
+
 .mdxeditor-container-mode-mobile {
   .mdxeditor {
     flex-grow: 1;
@@ -61,6 +69,7 @@ body,
   .mdxeditor-toolbar {
     // TODO this only shows up properly for the *mobile* editor not the desktop
     // one.
+    border-collapse: collapse;
     border-top: solid $neutral-200 1px;
     border-radius: inherit;
     background-color: inherit;
