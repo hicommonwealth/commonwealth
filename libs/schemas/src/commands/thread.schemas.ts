@@ -67,7 +67,7 @@ export const CreateThreadReaction = {
 
 export const DeleteThread = {
   input: z.object({
-    thread_id: PG_INT,
+    thread_id: PG_INT.optional(),
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
 
