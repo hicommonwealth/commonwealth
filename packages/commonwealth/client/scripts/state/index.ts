@@ -93,7 +93,6 @@ export async function initAppState(
     await fetchCustomDomainQuery();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-      enforceSessionKeys: statusRes.result.enforceSessionKeys,
       evmTestEnv: statusRes.result.evmTestEnv,
     });
 

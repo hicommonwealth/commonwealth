@@ -48,8 +48,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
 
-import { getCanvasData, postCanvasData } from '../routes/canvas';
-
 import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
@@ -91,6 +89,7 @@ import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
+import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
@@ -609,10 +608,6 @@ function setupRouter(
     updateCommunityCategory.bind(this, models),
   );
 
-  // signed data
-  router.get('/oplog', getCanvasData.bind(this, models));
-  router.post('/oplog', postCanvasData.bind(this, models));
-
   // settings
   registerRoute(
     router,
@@ -796,6 +791,13 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     deleteGroupHandler.bind(this, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/getCanvasClock',
+    getCanvasClockHandler.bind(this, serverControllers),
   );
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));

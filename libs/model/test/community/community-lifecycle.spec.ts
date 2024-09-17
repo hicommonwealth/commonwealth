@@ -6,7 +6,7 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import { ALL_COMMUNITIES, ChainBase, ChainType } from '@hicommonwealth/shared';
+import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
@@ -239,20 +239,6 @@ describe('Community lifecycle', () => {
       assert.equal(updated?.directory_page_enabled, false);
       assert.equal(updated?.directory_page_chain_node_id, null);
       assert.equal(updated?.type, 'chain');
-    });
-
-    test('should throw if id is reserved', async () => {
-      await expect(() =>
-        command(UpdateCommunity(), {
-          actor: superAdminActor,
-          payload: {
-            ...baseRequest,
-            id: ALL_COMMUNITIES,
-            namespace: 'tempNamespace',
-            chain_node_id: 1263,
-          },
-        }),
-      ).rejects.toThrow();
     });
 
     test('should throw if snapshot not found', async () => {

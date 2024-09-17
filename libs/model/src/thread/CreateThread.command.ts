@@ -17,10 +17,10 @@ import { mustBeAuthorized } from '../middleware/guards';
 import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
 import {
+  decodeContent,
   emitMentions,
   parseUserMentions,
   quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
 
@@ -112,7 +112,7 @@ export function CreateThread(): Command<
         checkContestLimits(activeContestManagers, actor.address!);
       }
 
-      const body = sanitizeQuillText(payload.body);
+      const body = decodeContent(payload.body);
       const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
       const mentions = uniqueMentions(parseUserMentions(body));
 
@@ -150,9 +150,6 @@ export function CreateThread(): Command<
               transaction,
             },
           );
-
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           await models.ThreadSubscription.create(
             {

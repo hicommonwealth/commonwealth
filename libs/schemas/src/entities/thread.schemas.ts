@@ -24,7 +24,7 @@ export const Thread = z.object({
   has_poll: z.boolean().nullish(),
 
   canvas_signed_data: z.string().nullish(),
-  canvas_hash: z.string().nullish(),
+  canvas_msg_id: z.string().nullish(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
