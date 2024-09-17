@@ -20,6 +20,7 @@ COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
 RUN apt-get update && apt-get install -y curl # Needed for heroku
 ENV PORT=$PORT
+RUN chmod +x ./scripts/docker-start.sh
 CMD ./scripts/docker-start.sh
 # If we plan on moving more applications to docker:
 # 1. Add a line in the Dockerfile build stage to deploy that package
