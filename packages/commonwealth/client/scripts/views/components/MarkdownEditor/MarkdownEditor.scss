@@ -20,6 +20,7 @@ body,
 
 .mdxeditor-container {
   outline: 1px solid $neutral-200;
+  border-radius: 4px;
 }
 
 .mdxeditor-container-active {
@@ -33,12 +34,16 @@ body,
   }
 
   .mdxeditor-toolbar {
+    border-top: solid $neutral-200 1px;
+
     min-height: 45px !important;
   }
 }
 
 .mdxeditor-container-mode-desktop {
   .mdxeditor-root-contenteditable {
+    border-top: 1px solid $neutral-200;
+
     min-height: 150px;
     max-height: 450px;
   }
@@ -69,8 +74,6 @@ body,
   .mdxeditor-toolbar {
     // TODO this only shows up properly for the *mobile* editor not the desktop
     // one.
-    border-collapse: collapse;
-    border-top: solid $neutral-200 1px;
     border-radius: inherit;
     background-color: inherit;
     overflow: hidden;
