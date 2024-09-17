@@ -201,7 +201,7 @@ export const CommentTree = ({
                 checkForSessionKeyRevalidationErrors(err);
                 return;
               }
-              console.error(err.response.data.error || err?.message);
+              console.error(err.message);
               notifyError('Failed to delete comment');
             }
           },
