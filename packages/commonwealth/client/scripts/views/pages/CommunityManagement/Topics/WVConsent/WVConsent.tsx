@@ -6,16 +6,17 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 import { CreateTopicStep } from '../utils';
 
+import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVConsent.scss';
 
 interface WVConsentProps {
   onStepChange: (step: CreateTopicStep) => void;
-  onCreateTopic: () => Promise<void>;
+  onCreateTopic: (props: HandleCreateTopicProps) => Promise<void>;
 }
 
 const WVConsent = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
   const handleCreateRegularTopic = () => {
-    onCreateTopic().catch(console.error);
+    onCreateTopic({}).catch(console.error);
   };
 
   return (

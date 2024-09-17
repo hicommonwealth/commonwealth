@@ -3,9 +3,11 @@ import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
 import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { TopicForm } from 'views/pages/CommunityManagement/Topics/Topics';
 import { userStore } from '../../ui/user';
 
-interface CreateTopicProps {
+interface CreateTopicProps extends TopicForm {
+  // TODO remove those types below when the CreateTopicSectionOld is removed
   name: string;
   description?: string;
   telegram?: string;
@@ -23,6 +25,11 @@ const createTopic = async ({
   featuredInNewPost,
   defaultOffchainTemplate,
   isPWA,
+  weightedVoting,
+  chainNodeId,
+  tokenAddress,
+  tokenSymbol,
+  voteWeightMultiplier,
 }: CreateTopicProps) => {
   const response = await axios.post(
     `${SERVER_URL}/topics`,
@@ -33,6 +40,11 @@ const createTopic = async ({
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
       default_offchain_template: defaultOffchainTemplate,
+      weighted_voting: weightedVoting,
+      chain_node_id: chainNodeId,
+      token_address: tokenAddress,
+      token_symbol: tokenSymbol,
+      vote_weight_multiplier: voteWeightMultiplier,
       jwt: userStore.getState().jwt,
       community_id: app.activeChainId(),
     },

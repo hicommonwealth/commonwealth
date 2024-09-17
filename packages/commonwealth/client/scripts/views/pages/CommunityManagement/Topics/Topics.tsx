@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
 
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
@@ -17,11 +18,23 @@ import { useCreateTopicMutation } from 'state/api/topics';
 
 import './Topics.scss';
 
-export interface TopicForm {
+interface TopicFormRegular {
   name: string;
   description?: string;
   featuredInSidebar?: boolean;
 }
+
+export interface TopicFormERC20 {
+  tokenAddress?: string;
+  tokenSymbol?: string;
+  voteWeightMultiplier?: number;
+  chainNodeId?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export type HandleCreateTopicProps = { erc20?: TopicFormERC20 };
+
+export interface TopicForm extends TopicFormRegular, TopicFormERC20 {}
 
 export const Topics = () => {
   const [topicFormData, setTopicFormData] = useState<TopicForm | null>(null);
@@ -37,7 +50,7 @@ export const Topics = () => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
   };
 
-  const handleCreateTopic = async () => {
+  const handleCreateTopic = async ({ erc20 }: HandleCreateTopicProps) => {
     if (!topicFormData) {
       return;
     }
@@ -50,7 +63,9 @@ export const Topics = () => {
         featuredInNewPost: false,
         defaultOffchainTemplate: '',
         isPWA: isAddedToHomeScreen,
+        ...erc20,
       });
+
       navigate(`/discussions/${encodeURI(topicFormData.name.trim())}`);
     } catch (err) {
       notifyError('Failed to create topic');
@@ -78,7 +93,12 @@ export const Topics = () => {
       case CreateTopicStep.WVMethodSelection:
         return <WVMethodSelection onStepChange={setCreateCommunityStep} />;
       case CreateTopicStep.WVERC20Details:
-        return <WVERC20Details onStepChange={setCreateCommunityStep} />;
+        return (
+          <WVERC20Details
+            onStepChange={setCreateCommunityStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
       case CreateTopicStep.WVStake:
         return (
           <StakeIntegration
