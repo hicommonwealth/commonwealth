@@ -155,7 +155,6 @@ describe('CommentCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     const res = await processCommentCreated({
@@ -179,7 +178,6 @@ describe('CommentCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     await tester.seed('ThreadSubscription', {
@@ -225,7 +223,6 @@ describe('CommentCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     await tester.seed('CommentSubscription', {
@@ -275,7 +272,6 @@ describe('CommentCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     notificationsProvider({
       adapter: ThrowingSpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     await tester.seed('ThreadSubscription', {
@@ -298,7 +294,6 @@ describe('CommentCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     await tester.seed('CommentSubscription', {

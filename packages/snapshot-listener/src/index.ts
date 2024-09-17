@@ -24,7 +24,6 @@ let isServiceHealthy = false;
 const log = logger(import.meta);
 stats({
   adapter: HotShotsStats(),
-  isDefault: true,
 });
 
 startHealthCheckLoop({

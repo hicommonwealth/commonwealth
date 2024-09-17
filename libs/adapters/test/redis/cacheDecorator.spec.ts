@@ -71,7 +71,6 @@ describe('Cache Decorator', () => {
   beforeAll(async () => {
     cache({
       adapter: new RedisCache('redis://localhost:6379'),
-      isDefault: true,
     });
     cacheDecorator = new CacheDecorator();
     setupCacheTestEndpoints(app, cacheDecorator);

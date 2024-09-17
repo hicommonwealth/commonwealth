@@ -25,7 +25,6 @@ const log = logger(import.meta);
 
 stats({
   adapter: HotShotsStats(),
-  isDefault: true,
 });
 
 let isServiceHealthy = false;
@@ -60,7 +59,6 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     await rmqAdapter.init();
     broker({
       adapter: rmqAdapter,
-      isDefault: true,
     });
     brokerInstance = rmqAdapter;
   } catch (e) {

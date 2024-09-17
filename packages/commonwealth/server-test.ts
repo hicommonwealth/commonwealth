@@ -35,7 +35,6 @@ export const testServer = async (): Promise<TestServer> => {
   // bootstrap test adapters
   cache({
     adapter: new RedisCache('redis://localhost:6379'),
-    isDefault: true,
   });
 
   const { tester } = await import('@hicommonwealth/model');

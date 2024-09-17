@@ -31,6 +31,8 @@ const adapters = new Map<string, Disposable>();
 const defaultAdapters = new Map<string, string>();
 
 const InvalidKey = (key: string) => new Error(`Invalid adapter key: ${key}`);
+const ExistingDefaultAdapter = (key: string) =>
+  new Error(`Default adapter for ${key} port already exists`);
 
 /**
  * Wraps creation of adapters around factory functions
@@ -42,10 +44,13 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     options?:
       | {
           key: `${string}.${string}.${string}`;
+          adapter?: undefined;
+          isDefault?: undefined;
         }
       | {
+          key?: undefined;
           adapter: T;
-          isDefault: true;
+          isDefault?: undefined;
         }
       | {
           key: `${string}.${string}.${string}`;
@@ -67,48 +72,56 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
 
     // validate key at runtime to prevent confusing keys e.g.
     // key = 'S3' for R2 adapter
-    if ('key' in options && options.key) {
+    if (options.key) {
       const parts = options.key.split('.');
       if (parts.length !== 3) throw InvalidKey(options.key);
       if (parts[0] !== factory.name) throw InvalidKey(options.key);
-      if ('adapter' in options && parts[1] !== options.adapter.name)
+      if (options.adapter && parts[1] !== options.adapter.name)
         throw InvalidKey(options.key);
     }
 
-    // if only the key is given then return associated adapter or throw
-    if ('key' in options && !('adapter' in options)) {
+    // only key is given i.e. options = { key }
+    // return adapter associated with given key or throw if not found
+    if (options.key && !options.adapter && options.isDefault === undefined) {
       const adapterInstance = adapters.get(options.key);
       if (!adapterInstance)
         throw new Error(`Adapter ${options.key} not found!`);
       return adapterInstance as T;
     }
 
-    // adapter is provided
-    if (options.isDefault && defaultAdapters.has(factory.name))
-      throw new Error(
-        `Default adapter for ${factory.name} port already exists`,
-      );
+    // only adapter is given i.e. options = { adapter }
+    // set adapter as default for port or throw if default already exists
+    if (options.adapter && !options.key && options.isDefault === undefined) {
+      if (defaultAdapters.has(factory.name))
+        throw ExistingDefaultAdapter(factory.name);
+      const adapterInstance = factory(options.adapter);
+      defaultAdapters.set(factory.name, adapterInstance.name);
+      adapters.set(adapterInstance.name, adapterInstance);
+      return adapterInstance as T;
+    }
 
-    let adapterKey: string | undefined;
-    if ('key' in options && options.key) {
+    if (options.key && options.adapter && options.isDefault !== undefined) {
+      if (options.isDefault && defaultAdapters.has(factory.name)) {
+        throw ExistingDefaultAdapter(factory.name);
+      }
+
       const existingAdapter = adapters.get(options.key);
       if (existingAdapter) {
         log.warn(`Adapter with ${options.key} already exists`);
         return existingAdapter as T;
       }
-      adapterKey = options.key;
+
+      const adapterInstance = factory(options.adapter);
+      if (options.isDefault) {
+        defaultAdapters.set(factory.name, options.key);
+        log.info(`[binding default adapter] ${options.key}`);
+      } else log.info(`[binding adapter] ${options.key}`);
+
+      adapters.set(options.key, adapterInstance);
+      return adapterInstance as T;
     }
 
-    const adapterInstance = factory(options.adapter);
-    if (!adapterKey) adapterKey = adapterInstance.name;
-    // overrides any in-memory default that is already set
-    if (options.isDefault) {
-      defaultAdapters.set(factory.name, adapterKey);
-      log.info(`[binding default adapter] ${adapterKey}`);
-    } else log.info(`[binding adapter] ${adapterKey}`);
-
-    adapters.set(adapterKey, adapterInstance);
-    return adapterInstance as T;
+    throw new Error(`Adapter for the ${factory.name} port not found!`);
   };
 }
 

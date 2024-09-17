@@ -16,7 +16,6 @@ const startProfilesFrom = process.argv[3];
 
 const _blobStorage = blobStorage({
   adapter: S3BlobStorage(),
-  isDefault: true,
 });
 
 async function resizeImage(data: Buffer, contentType: string) {

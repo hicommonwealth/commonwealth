@@ -9,7 +9,6 @@ import { createGzip } from 'zlib';
 const log = logger(import.meta);
 const _blobStorage = blobStorage({
   adapter: S3BlobStorage(),
-  isDefault: true,
 });
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
@@ -182,7 +181,6 @@ async function main() {
 if (import.meta.url.endsWith(process.argv[1])) {
   stats({
     adapter: HotShotsStats(),
-    isDefault: true,
   });
   main()
     .then(async () => {

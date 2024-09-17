@@ -10,7 +10,6 @@ async function main() {
   config.CACHE.REDIS_URL &&
     cache({
       adapter: new RedisCache(config.CACHE.REDIS_URL),
-      isDefault: true,
     });
 
   const groupsController = new ServerGroupsController(models);

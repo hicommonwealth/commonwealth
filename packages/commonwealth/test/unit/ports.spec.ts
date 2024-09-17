@@ -48,7 +48,6 @@ describe('Ports Tests', () => {
   test('should use provided adapter by default without key', () => {
     testPort({
       adapter: s3TestAdapter,
-      isDefault: true,
     });
     testPort({
       key: `testPortFactory.${r2TestAdapterName}.Main`,
@@ -62,7 +61,6 @@ describe('Ports Tests', () => {
   test('should use adapter indicated by key instead of default', () => {
     testPort({
       adapter: s3TestAdapter,
-      isDefault: true,
     });
     const key: `${string}.${string}.${string}` = `testPortFactory.${r2TestAdapterName}.Main`;
     testPort({
@@ -91,7 +89,6 @@ describe('Ports Tests', () => {
   test('should prevent overriding default with new default', () => {
     testPort({
       adapter: s3TestAdapter,
-      isDefault: true,
     });
 
     try {

@@ -45,7 +45,6 @@ describe('RedisCache', () => {
   beforeAll(async () => {
     cache({
       adapter: new RedisCache('redis://localhost:6379'),
-      isDefault: true,
     });
     await cache().ready();
     await cache().deleteNamespaceKeys(test_namespace);

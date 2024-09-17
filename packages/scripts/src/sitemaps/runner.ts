@@ -8,11 +8,9 @@ import {
 const log = logger(import.meta);
 blobStorage({
   adapter: S3BlobStorage(),
-  isDefault: true,
 });
 stats({
   adapter: HotShotsStats(),
-  isDefault: true,
 });
 
 async function doExec() {

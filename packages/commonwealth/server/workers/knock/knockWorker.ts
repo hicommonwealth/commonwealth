@@ -26,7 +26,6 @@ const log = logger(import.meta);
 
 stats({
   adapter: HotShotsStats(),
-  isDefault: true,
 });
 
 let isServiceHealthy = false;
@@ -55,7 +54,6 @@ async function startKnockWorker() {
     await rmqAdapter.init();
     broker({
       adapter: rmqAdapter,
-      isDefault: true,
     });
     brokerInstance = rmqAdapter;
   } catch (e) {
@@ -69,7 +67,6 @@ async function startKnockWorker() {
   if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
     notificationsProvider({
       adapter: KnockProvider(),
-      isDefault: true,
     });
   else notificationsProvider();
 

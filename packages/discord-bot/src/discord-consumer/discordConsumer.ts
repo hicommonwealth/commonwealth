@@ -29,7 +29,6 @@ import { config } from '../config';
 const log = logger(import.meta);
 stats({
   adapter: HotShotsStats(),
-  isDefault: true,
 });
 
 let isServiceHealthy = false;
@@ -129,7 +128,6 @@ async function main() {
     await rmqAdapter.init();
     broker({
       adapter: rmqAdapter,
-      isDefault: true,
     });
     brokerInstance = rmqAdapter;
   } catch (e) {

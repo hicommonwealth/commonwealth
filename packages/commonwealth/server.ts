@@ -25,26 +25,21 @@ import 'express-async-errors';
 // bootstrap adapters
 stats({
   adapter: HotShotsStats(),
-  isDefault: true,
 });
 blobStorage({
   adapter: S3BlobStorage(),
-  isDefault: true,
 });
 (config.ANALYTICS.MIXPANEL_DEV_TOKEN || config.ANALYTICS.MIXPANEL_PROD_TOKEN) &&
   analytics({
     adapter: MixpanelAnalytics(),
-    isDefault: true,
   });
 config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED &&
   notificationsProvider({
     adapter: KnockProvider(),
-    isDefault: true,
   });
 config.CACHE.REDIS_URL &&
   cache({
     adapter: new RedisCache(config.CACHE.REDIS_URL),
-    isDefault: true,
   });
 
 const log = logger(import.meta);

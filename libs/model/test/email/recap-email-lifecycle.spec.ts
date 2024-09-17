@@ -113,7 +113,6 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-      isDefault: true,
     });
 
     const res = await query(GetRecapEmailDataQuery(), {
@@ -151,7 +150,6 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-      isDefault: true,
     });
 
     const res = await query(GetRecapEmailDataQuery(), {
@@ -189,7 +187,6 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-      isDefault: true,
     });
 
     const res = await query(GetRecapEmailDataQuery(), {
@@ -211,7 +208,6 @@ describe('Recap email lifecycle', () => {
     sandbox = sinon.createSandbox();
     notificationsProvider({
       adapter: ThrowingSpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     await expect(

@@ -127,7 +127,6 @@ describe('chainEventCreated Event Handler', () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider({
         adapter: SpyNotificationsProvider(sandbox),
-        isDefault: true,
       });
 
       const res = await processChainEventCreated({
@@ -148,7 +147,6 @@ describe('chainEventCreated Event Handler', () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider({
         adapter: SpyNotificationsProvider(sandbox),
-        isDefault: true,
       });
 
       await tester.seed('Address', {
@@ -187,7 +185,6 @@ describe('chainEventCreated Event Handler', () => {
       sandbox = sinon.createSandbox();
       notificationsProvider({
         adapter: ThrowingSpyNotificationsProvider(sandbox),
-        isDefault: true,
       });
 
       await tester.seed('Address', {
@@ -232,7 +229,6 @@ describe('chainEventCreated Event Handler', () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider({
         adapter: SpyNotificationsProvider(sandbox),
-        isDefault: true,
       });
 
       const res = await processChainEventCreated({
@@ -257,7 +253,6 @@ describe('chainEventCreated Event Handler', () => {
       sandbox = sinon.createSandbox();
       const provider = notificationsProvider({
         adapter: SpyNotificationsProvider(sandbox),
-        isDefault: true,
       });
 
       await tester.seed('CommunityAlert', {
@@ -300,7 +295,6 @@ describe('chainEventCreated Event Handler', () => {
       sandbox = sinon.createSandbox();
       notificationsProvider({
         adapter: ThrowingSpyNotificationsProvider(sandbox),
-        isDefault: true,
       });
 
       await tester.seed('CommunityAlert', {

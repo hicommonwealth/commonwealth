@@ -19,7 +19,6 @@ import { config } from '../config';
 const log = logger(import.meta);
 stats({
   adapter: HotShotsStats(),
-  isDefault: true,
 });
 
 let isServiceHealthy = false;
@@ -58,7 +57,6 @@ async function startDiscordListener() {
     await rmqAdapter.init();
     broker({
       adapter: rmqAdapter,
-      isDefault: true,
     });
     controller = rmqAdapter;
   } catch (e) {

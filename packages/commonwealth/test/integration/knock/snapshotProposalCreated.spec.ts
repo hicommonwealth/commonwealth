@@ -94,7 +94,6 @@ describe('snapshotProposalCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     const res = await processSnapshotProposalCreated({
@@ -113,7 +112,6 @@ describe('snapshotProposalCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     await tester.seed('CommunityAlert', {
@@ -156,7 +154,6 @@ describe('snapshotProposalCreated Event Handler', () => {
     sandbox = sinon.createSandbox();
     notificationsProvider({
       adapter: ThrowingSpyNotificationsProvider(sandbox),
-      isDefault: true,
     });
 
     await tester.seed('CommunityAlert', {

@@ -79,7 +79,6 @@ describe('subscriptionPreferencesUpdated', () => {
           .stub()
           .returns(Promise.resolve(new Set(['1', '2']))),
       }),
-      isDefault: true,
     });
 
     const res = await processSubscriptionPreferencesUpdated({
@@ -126,7 +125,6 @@ describe('subscriptionPreferencesUpdated', () => {
         getSchedulesStub: sandbox.stub().returns(Promise.resolve([])),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
       }),
-      isDefault: true,
     });
 
     const res = await processSubscriptionPreferencesUpdated({
@@ -189,7 +187,6 @@ describe('subscriptionPreferencesUpdated', () => {
           ),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
       }),
-      isDefault: true,
     });
 
     const res = await processSubscriptionPreferencesUpdated({
@@ -236,7 +233,6 @@ describe('subscriptionPreferencesUpdated', () => {
           .stub()
           .returns(Promise.resolve(new Set(['1']))),
       }),
-      isDefault: true,
     });
 
     const res = await processSubscriptionPreferencesUpdated({
@@ -284,7 +280,6 @@ describe('subscriptionPreferencesUpdated', () => {
           .stub()
           .returns(Promise.resolve(new Set(['1']))),
       }),
-      isDefault: true,
     });
 
     const res = await processSubscriptionPreferencesUpdated({

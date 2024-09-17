@@ -38,7 +38,6 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     await rmqAdapter.init();
     broker({
       adapter: rmqAdapter,
-      isDefault: true,
     });
   } catch (e) {
     log.error(
