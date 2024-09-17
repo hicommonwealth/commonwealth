@@ -19,7 +19,8 @@ const launchToken = async ({
 }: LaunchTokenProps) => {
   const launchPad = new LaunchpadBondingCurve(
     '',
-    commonProtocol.factoryContracts[ethChainId].factory,
+    commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
+    commonProtocol.factoryContracts[ethChainId].launchpad,
     chainRpc,
   );
 

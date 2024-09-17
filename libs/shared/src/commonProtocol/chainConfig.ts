@@ -20,6 +20,8 @@ export const factoryContracts: {
   [key in ValidChains]: {
     factory: string;
     communityStake: string;
+    launchpad?: string;
+    lpBondingCurve?: string;
     chainId: number;
   };
 } = {

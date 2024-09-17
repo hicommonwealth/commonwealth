@@ -1,3 +1,4 @@
+import { Contract } from 'web3';
 import {
   buyToken,
   getPrice,
@@ -11,10 +12,20 @@ const LPBondingCurveAbi = {};
 
 class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
+  launchpadFactory: Contract<any>;
 
-  constructor(bondingCurveAddress: string, tokenAddress: string, rpc: string) {
+  constructor(
+    bondingCurveAddress: string,
+    launchpadFactoryAddress: string,
+    tokenAddress: string,
+    rpc: string,
+  ) {
     super(bondingCurveAddress, LPBondingCurveAbi, rpc);
     this.tokenAddress = tokenAddress;
+    this.launchpadFactory = new this.web3.eth.Contract(
+      lpFactoryAbi,
+      launchpadFactoryAddress,
+    );
   }
 
   async launchToken(name: string, symbol: string, walletAddress: string) {
@@ -23,12 +34,12 @@ class LaunchpadBondingCurve extends ContractBase {
     }
 
     const txReceipt = await launchToken(
-      this.contract,
+      this.launchpadFactory,
       name,
       symbol,
-      [], // TODO 9207: where do shares come from?
-      [], // TODO 9207: where do holders come from?
-      0, // TODO 9207: where does totalSupply come from?
+      [7000, 1250, 1500, 750], // 9181 parameters
+      [walletAddress, walletAddress], // should include at community treasury at [0] and contest creation util at [1] curr tbd
+      1_000_000_000e18, // Default 1B tokens
       walletAddress,
     );
     return txReceipt;

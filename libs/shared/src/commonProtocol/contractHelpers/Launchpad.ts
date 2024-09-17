@@ -1,5 +1,3 @@
-const lpHook = '';
-
 export const launchToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
@@ -19,7 +17,6 @@ export const launchToken = async (
       totalSupply,
       0,
       0,
-      lpHook,
       '',
     )
     .send({ from: walletAddress });
