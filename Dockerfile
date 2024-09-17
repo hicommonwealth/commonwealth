@@ -19,7 +19,8 @@ ENV NODE_ENV=production
 COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
 RUN apt-get update && apt-get install -y curl # Needed for heroku
-
+RUN adduser -D myuser
+USER myuser
 ENV PORT=$PORT
 CMD ["node", "--import=extensionless/register", "--enable-source-maps", "./build/server.js"]
 
