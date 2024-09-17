@@ -820,6 +820,9 @@ importers:
       '@ipld/dag-json':
         specifier: ^10.2.0
         version: 10.2.0
+      '@libp2p/peer-id-factory':
+        specifier: ^4.2.4
+        version: 4.2.4
       moment:
         specifier: ^2.23.0
         version: 2.30.1

@@ -1,9 +1,10 @@
 import { logger } from '@hicommonwealth/core';
 import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
 import { parse } from '@ipld/dag-json';
+import { config } from '../config';
 
 const log = logger(import.meta);
-export const canvas = await startCanvasNode();
+export const canvas = await startCanvasNode(config);
 
 log.info(
   'canvas: started libp2p with multiaddrs: ' +

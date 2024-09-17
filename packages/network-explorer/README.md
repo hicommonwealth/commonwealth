@@ -11,6 +11,7 @@
 * Run `node ./create-peer-id.js`
 * For local development, copy the PEER_ID into .env
 * For production deployment, set the PEER_ID as a config variable (e.g. `heroku config:set PEER_ID=...`)
+* Do not reuse the peer ID between different services
 
 ## Deploying on Heroku
 
