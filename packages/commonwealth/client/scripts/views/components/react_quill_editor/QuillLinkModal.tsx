@@ -42,7 +42,7 @@ export const AddLinkModal = ({
           <CWModalBody>
             <CWTextInput
               label="Link Text"
-              placeholder="Enter Link Text"
+              placeholder="Enter link text"
               value={linkText}
               onInput={(e) => {
                 setLinkText(e.target.value);

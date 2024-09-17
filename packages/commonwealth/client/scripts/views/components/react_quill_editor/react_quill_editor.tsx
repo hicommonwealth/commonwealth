@@ -277,20 +277,15 @@ const ReactQuillEditor = ({
         newLink = `https://${linkUrl}`;
       }
     }
-    // Insert the markdown-formatted link
     const linkMarkdown = `[${linkText}](${newLink})`;
 
-    // Replace the selected text with the markdown link
     editor.deleteText(selection.index, selection.length);
     editor.insertText(selection.index, linkMarkdown);
-    // Set the cursor right after the inserted text
     editor.setSelection(selection.index + linkMarkdown.length, 0);
-    // Update the content delta if needed
     setContentDeltaToUse({
       ...editor.getContents(),
       ___isMarkdown: true,
     });
-    // Close the modal (reset modal open state)
     setIsModalOpen(false);
     setLinkText('');
     setLinkUrl('');
