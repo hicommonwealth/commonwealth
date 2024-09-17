@@ -44,13 +44,13 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     options?:
       | {
           key: `${string}.${string}.${string}`;
-          adapter?: undefined;
-          isDefault?: undefined;
+          adapter?: never;
+          isDefault?: never;
         }
       | {
-          key?: undefined;
+          key?: never;
           adapter: T;
-          isDefault?: undefined;
+          isDefault?: never;
         }
       | {
           key: `${string}.${string}.${string}`;
