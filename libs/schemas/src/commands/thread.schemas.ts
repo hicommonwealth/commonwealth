@@ -69,7 +69,7 @@ export const DeleteThread = {
   input: z.object({
     thread_id: PG_INT,
     canvas_signed_data: z.string().nullish(),
-    canvas_msg_id: z.string().optional(),
+    canvas_msg_id: z.string().nullish(),
 
     // discord bot integration
     community_id: z.string().optional(),

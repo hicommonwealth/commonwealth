@@ -41,8 +41,6 @@ export async function handleThreadMessages(
         stage: 'discussion',
         kind: 'discussion',
         read_only: false,
-        canvas_signed_data: '',
-        canvas_msg_id: '',
       });
       break;
     case 'thread-title-update':
