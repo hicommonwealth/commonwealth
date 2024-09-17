@@ -219,6 +219,8 @@ describe('Community lifecycle', () => {
         name: 'hhh',
         featured_in_new_post: false,
         featured_in_sidebar: false,
+        description: '',
+        group_ids: [],
       });
 
       const response = await command(DeleteTopic(), {
@@ -235,6 +237,8 @@ describe('Community lifecycle', () => {
         name: 'hhh',
         featured_in_new_post: false,
         featured_in_sidebar: false,
+        description: '',
+        group_ids: [],
       });
 
       await expect(
