@@ -44,4 +44,4 @@ jobs:
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
           dontautocreate: true
-          docker_heroku_process_type: web, consumer, evm-ce, knock, message-relayer
+          docker_heroku_process_type: web consumer evm-ce knock message-relayer
