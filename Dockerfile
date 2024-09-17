@@ -11,16 +11,15 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
-RUN pnpm deploy --filter=commonwealth --prod /prod/commonwealth
-RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
+RUN pnpm deploy --filter=commonwealth --prod /packages/commonwealth
+RUN mv /usr/src/app/packages/commonwealth/build /packages/commonwealth/build
 
 FROM base AS commonwealth
 ENV NODE_ENV=production
-COPY --from=build /prod/commonwealth /prod/commonwealth
-WORKDIR /prod/commonwealth
+COPY --from=build /packages/commonwealth /packages/commonwealth
+WORKDIR /
 RUN apt-get update && apt-get install -y curl # Needed for heroku
 ENV PORT=$PORT
-CMD ["node", "--import=extensionless/register", "--enable-source-maps", "./build/server.js"]
 
 # If we plan on moving more applications to docker:
 # 1. Add a line in the Dockerfile build stage to deploy that package
