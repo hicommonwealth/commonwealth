@@ -18,6 +18,7 @@ FROM base AS commonwealth
 ENV NODE_ENV=production
 COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
+RUN apt-get update && apt-get install -y curl # Needed for heroku
 EXPOSE 8080
 CMD ["node", "--import=extensionless/register", "--enable-source-maps", "./build/server.js"]
 
