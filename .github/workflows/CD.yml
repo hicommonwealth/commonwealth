@@ -8,50 +8,6 @@ on:
       - frack
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Check if Docker image exists
-        id: check-image
-        run: |
-          IMAGE_EXISTS=$(aws ecr describe-images \
-            --repository-name commonwealth \
-            --image-ids imageTag=$GITHUB_SHA \
-            --query 'imageDetails[0].imageTags' \
-            --output text 2>/dev/null || echo "false")
-          if [[ "$IMAGE_EXISTS" == "false" ]]; then
-            echo "Image does not exist. Building and uploading"
-            echo "IMAGE_EXISTS=false" >> $GITHUB_ENV
-          else
-            echo "Image exists. Will skip build and upload"
-            echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
-          fi
-
-      - name: Build, tag, and push docker image to Amazon ECR
-        if: env.IMAGE_EXISTS == 'false'
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: commonwealth
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-
   deploy:
     needs: [build]
     runs-on: ubuntu-latest
