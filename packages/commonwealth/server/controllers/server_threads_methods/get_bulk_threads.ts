@@ -120,9 +120,9 @@ export async function __getBulkThreads(
         top_threads AS (
         SELECT id, title, url, body, kind, stage, read_only, discord_meta,
             pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
-            has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
+            has_poll, last_commented_on, comment_count as "numberOfComments",
             marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
-            canvas_msg_id, plaintext, last_edited, address_id
+            canvas_msg_id, last_edited, address_id
         FROM "Threads" T
         WHERE
             community_id = :communityId AND

@@ -34,7 +34,6 @@ export const BulkThread = z.object({
   collaborators: z.any().array(),
   has_poll: z.boolean().nullable().optional(),
   last_commented_on: z.date().nullable().optional(),
-  plaintext: z.string().nullable().optional(),
   Address: z.object({
     id: PG_INT,
     address: z.string(),

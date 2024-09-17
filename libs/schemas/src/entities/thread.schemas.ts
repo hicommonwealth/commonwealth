@@ -9,13 +9,13 @@ export const Thread = z.object({
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
-  stage: z.string(),
+  stage: z.string().optional(),
   body: z.string().nullish(),
   url: z.string().nullish(),
   topic_id: PG_INT.nullish(),
   pinned: z.boolean().nullish(),
   community_id: z.string(),
-  view_count: PG_INT,
+  view_count: PG_INT.optional(),
   links: z.object(linksSchema).array().nullish(),
 
   read_only: z.boolean().nullish(),
@@ -36,9 +36,9 @@ export const Thread = z.object({
   discord_meta: DiscordMetaSchema.nullish(),
 
   //counts
-  reaction_count: PG_INT,
-  reaction_weights_sum: PG_INT,
-  comment_count: PG_INT,
+  reaction_count: PG_INT.optional(),
+  reaction_weights_sum: PG_INT.optional(),
+  comment_count: PG_INT.optional().optional(),
 
   activity_rank_date: z.coerce.date().nullish(),
 

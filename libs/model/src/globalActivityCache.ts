@@ -29,7 +29,6 @@ export async function getActivityFeed(models: DB, id = 0) {
           json_build_object(
             'id', T.id,
             'body', T.body,
-            'plaintext', T.plaintext,
             'title', T.title,
             'numberOfComments', T.comment_count,
             'created_at', T.created_at,
