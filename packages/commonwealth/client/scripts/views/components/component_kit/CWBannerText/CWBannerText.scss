@@ -5,15 +5,13 @@
 }
 
 .link {
-  color: #3498db; // Link color
+  color: #3498db;
   text-decoration: none;
   margin-right: 8px;
-
   &:hover {
     text-decoration: underline;
   }
 }
-
 .text {
-  margin-right: 8px; // Space between text and link
+  margin-right: 4px;
 }

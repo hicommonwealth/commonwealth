@@ -1,3 +1,4 @@
+// import { RenderTextWithLink } from 'client/scripts/views/components/component_kit/CWBannerText/RenderTextWithLink';
 import React from 'react';
 import { CWText } from '../cw_text';
 import './CWBannerText.scss';
@@ -5,35 +6,48 @@ import './CWBannerText.scss';
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 type TextProps = {
-  text: string;
+  text: string | React.ReactNode;
 };
+
 const RenderTextWithLink = ({ text }: TextProps) => {
-  const urls = text.split(urlRegex);
+  if (typeof text !== 'string') {
+    return <>{text}</>;
+  }
+  const parts = text.split(urlRegex);
 
   return (
     <>
-      {urls.map((url, index) => {
-        // If part matches the URL regex, render it as a link
-        if (urlRegex.test(url)) {
+      {parts.map((part, index) => {
+        if (urlRegex.test(part)) {
           return (
-            <a key={index} href={url} target="_blank" rel="noopener noreferrer">
-              {url}
-            </a>
+            <React.Fragment key={index}>
+              <CWText type="b2" className="terms-text">
+                <a
+                  href={part}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link"
+                >
+                  {part}
+                </a>
+              </CWText>
+            </React.Fragment>
+          );
+        } else {
+          return (
+            <CWText type="b2" className="terms-text text" key={index}>
+              {part}
+            </CWText>
           );
         }
-        return (
-          <CWText key={index} type="b1" fontWeight="semiBold" className="text">
-            {url}
-          </CWText>
-        );
       })}
     </>
   );
 };
-export const CWBannerText = ({ text }: { text: string }) => {
+export const CWBannerText = ({ text }: TextProps) => {
   return (
     <div className="linkTextRow">
-      <RenderTextWithLink text={text} />.
+      <RenderTextWithLink text={text} />
     </div>
   );
 };

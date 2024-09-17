@@ -9,7 +9,7 @@ import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
 type BannerProps = {
-  bannerContent: string;
+  bannerContent: string | React.ReactNode;
   className?: string;
   onClose?: () => void;
 };
@@ -32,7 +32,6 @@ export const Old_CWBanner = ({
   );
 };
 
-// eslint-disable-next-line react/no-multi-comp
 export const CWMessageBanner = ({
   bannerContent,
   className,
