@@ -23,7 +23,7 @@ export default (
       calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       hooks: {

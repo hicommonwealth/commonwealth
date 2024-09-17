@@ -34,7 +34,7 @@ function getContentPatch(
     title,
     body,
     url,
-    canvas_hash,
+    canvas_msg_id,
     canvas_signed_data,
   }: z.infer<typeof schemas.UpdateThread.input>,
 ) {
@@ -50,7 +50,7 @@ function getContentPatch(
   typeof url !== 'undefined' && thread.kind === 'link' && (patch.url = url);
 
   if (Object.keys(patch).length > 0) {
-    patch.canvas_hash = canvas_hash;
+    patch.canvas_msg_id = canvas_msg_id;
     patch.canvas_signed_data = canvas_signed_data;
   }
   return patch;

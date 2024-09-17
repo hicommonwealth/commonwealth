@@ -304,6 +304,9 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
+  if (process.env.MAGIC_PUBLISHABLE_KEY === undefined) {
+    throw new Error('Missing magic key');
+  }
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: !isCosmos
       ? [new OAuthExtension()]
@@ -427,6 +430,9 @@ export async function handleSocialLoginCallback({
       magicAddress = metadata.publicAddress;
     } else {
       const { utils } = await import('ethers');
+      if (metadata.publicAddress === null) {
+        throw new Error('Expected magic to return publicAddress');
+      }
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
