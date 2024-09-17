@@ -1,35 +1,33 @@
 # network-explorer
 
-## Setup
+## Development
 
-Create a Postgres database called network-explorer:
+* Create a Postgres database called network-explorer: `createdb network-explorer`
+* Start the server: `pnpm run dev:server`
+* Start the client: `pnpm run dev:client`
 
-```
-createdb network-explorer
-```
+## Configuring a Peer ID
 
-```
-pnpm run dev:server
-```
+* Run `node ./create-peer-id.js`
+* For local development, copy the PEER_ID into .env
+* For production deployment, set the PEER_ID as a config variable (e.g. `heroku config:set PEER_ID=...`)
 
-```
-pnpm run dev:client
-```
+## Deploying on Heroku
 
-## Deploying the server on Railway
+TBD
 
-Create a Railway space, and add the `canvasxyz/canvas` Github repo as a service.
-Also create a Postgres database.
+## Deploying on Railway
 
-For the main service:
+You can deploy the server on Railway. To do this, create a Railway space, and add the
+`hicommonwealth/commonwealth` Github repo as a service. Also create a Postgres database.
 
-- Configure the build command to `npm run build`.
-- Configure the start command to `npm start:server --workspace=@canvas-js/network-explorer`.
+- Configure the build command to `pnpm -r build`.
+- Configure the start command to `pnpm start:server -F=network-explorer`.
 - Add the DATABASE_URL as a environment variable, pointed to the Postgres database.
 - To check the app is working, add Public Networking using a Railway provided domain to port 8080.
 - To use the network explorer, add two custom domains:
-  - One should be connected to port 8080, for the network explorer API.
-  - One should be connected to port 3334, for the libp2p service.
+  - One should be connected to port 8888, for the network explorer API.
+  - One should be connected to port 8889, for the libp2p service.
 - If you want the network explorer to connect to another server, set a BOOTSTRAP_LIST as the environment variable.
 - If you want other services to connect to the network explorer, look up the Peer ID by running `railway logs`,
   and then provide the other services with a multiaddr of the form:
@@ -38,7 +36,7 @@ For the main service:
 /dns4/network-explorer-libp2p.mydomain.org/tcp/443/wss/p2p/12D3...
 ```
 
-## Deploying the frontend on Vercel
+## Deploying on Vercel
 
 Create a Vercel app from this directory.
 
