@@ -1,5 +1,5 @@
 import { ThreadSubscription } from '@hicommonwealth/schemas';
-import { getThreadUrl } from '@hicommonwealth/shared';
+import { getDecodedString, getThreadUrl } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
@@ -28,7 +28,7 @@ export const ThreadSubscriptionEntry = (
     {
       chain: thread.community_id,
       id: thread.id!,
-      title: decodeURIComponent(thread.title),
+      title: getDecodedString(thread.title),
     },
     undefined,
     true,
@@ -101,7 +101,7 @@ export const ThreadSubscriptionEntry = (
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
+          <CWText type="h4">{getDecodedString(thread.title)}</CWText>
         </CWText>
       </div>
 

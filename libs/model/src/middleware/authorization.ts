@@ -83,10 +83,10 @@ export class RejectedMember extends InvalidActor {
  *
  * TODO: Find ways to cache() by args to avoid db trips
  *
- * @param actor command actor
- * @param payload command payload
- * @param auth authorization context
- * @param roles roles filter
+ * @param ctx execution context
+ * @param roles community roles filter when authorizing specific roles
+ * @param collaborators flag to include thread collaborators when preloading threads
+ * @returns authorization context
  */
 async function buildAuth(
   ctx: Context<ZodSchema, AuthContext>,
