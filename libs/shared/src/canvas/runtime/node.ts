@@ -8,7 +8,9 @@ export const CANVAS_TOPIC = contractTopic;
 export const startCanvasNode = async () => {
   const path =
     process.env.FEDERATION_POSTGRES_DB_URL ??
-    'postgresql://commonwealth:edgeware@localhost/federation';
+    (process.env.APP_ENV === 'local'
+      ? undefined
+      : 'postgresql://commonwealth:edgeware@localhost/federation');
   const announce =
     process.env.FEDERATION_ANNOUNCE_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
   const listen =

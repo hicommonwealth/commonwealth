@@ -1,13 +1,12 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ALL_COMMUNITIES, ChainBase } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { checkSnapshotObjectExists, commonProtocol } from '../services';
 
 export const UpdateCommunityErrors = {
-  ReservedId: 'The id is reserved and cannot be used',
   NotAdmin: 'Not an admin',
   SnapshotOnlyOnEthereum:
     'Snapshot data may only be added to chains with Ethereum base',
@@ -46,9 +45,6 @@ export function UpdateCommunity(): Command<
         namespace,
         transactionHash,
       } = payload;
-
-      if (id === ALL_COMMUNITIES)
-        throw new InvalidInput(UpdateCommunityErrors.ReservedId);
 
       const community = await models.Community.findOne({
         where: { id },
