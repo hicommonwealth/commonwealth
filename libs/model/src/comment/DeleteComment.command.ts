@@ -26,7 +26,6 @@ export function DeleteComment(): Command<
             required: true,
           },
         ],
-        logging: true,
       });
       mustExist('Comment', comment);
 
@@ -43,7 +42,11 @@ export function DeleteComment(): Command<
       });
       // == end of transaction boundary ==
 
-      return { comment_id: comment.id!, canvas_hash: comment.canvas_msg_id };
+      return {
+        comment_id: comment.id!,
+        canvas_signed_data: comment.canvas_signed_data,
+        canvas_msg_id: comment.canvas_msg_id,
+      };
     },
   };
 }

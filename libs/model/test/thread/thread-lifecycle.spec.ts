@@ -593,7 +593,7 @@ describe('Thread lifecycle', () => {
       ).rejects.toThrowError(InvalidInput);
     });
 
-    it('should delete a comment', async () => {
+    it('should delete a comment as author', async () => {
       const text = 'to be deleted';
       const tbd = await command(CreateComment(), {
         actor: actors.member,
@@ -609,6 +609,27 @@ describe('Thread lifecycle', () => {
       });
       const deleted = await command(DeleteComment(), {
         actor: actors.member,
+        payload: { comment_id: tbd!.id! },
+      });
+      expect(deleted).to.include({ comment_id: tbd!.id! });
+    });
+
+    it('should delete a comment as admin', async () => {
+      const text = 'to be deleted';
+      const tbd = await command(CreateComment(), {
+        actor: actors.member,
+        payload: {
+          thread_id: thread.id!,
+          text,
+        },
+      });
+      expect(tbd).to.include({
+        thread_id: thread!.id,
+        text,
+        community_id: thread!.community_id,
+      });
+      const deleted = await command(DeleteComment(), {
+        actor: actors.admin,
         payload: { comment_id: tbd!.id! },
       });
       expect(deleted).to.include({ comment_id: tbd!.id! });

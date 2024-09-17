@@ -54,6 +54,7 @@ export const DeleteComment = {
   }),
   output: z.object({
     comment_id: PG_INT,
+    canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
 };
