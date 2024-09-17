@@ -11,13 +11,13 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
-RUN pnpm deploy --filter=commonwealth --prod /packages/commonwealth
-RUN mv /usr/src/app/packages/commonwealth/build /packages/commonwealth/build
+RUN pnpm deploy --filter=commonwealth --prod /prod/commonwealth
+RUN mv /usr/src/app/prod/commonwealth/build /prod/commonwealth/build
 
 FROM base AS commonwealth
 ENV NODE_ENV=production
-COPY --from=build /packages/commonwealth /packages/commonwealth
-WORKDIR /
+COPY --from=build /prod/commonwealth /prod/commonwealth
+WORKDIR /prod/commonwealth
 RUN apt-get update && apt-get install -y curl # Needed for heroku
 ENV PORT=$PORT
 
