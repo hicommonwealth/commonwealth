@@ -1,4 +1,3 @@
-// import { RenderTextWithLink } from 'client/scripts/views/components/component_kit/CWBannerText/RenderTextWithLink';
 import React from 'react';
 import { CWText } from '../cw_text';
 import './CWBannerText.scss';
