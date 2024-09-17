@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 RUN pnpm deploy --filter=commonwealth --prod /prod/commonwealth
-RUN mv /usr/src/app/prod/commonwealth/build /prod/commonwealth/build
+RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
 
 FROM base AS commonwealth
 ENV NODE_ENV=production
