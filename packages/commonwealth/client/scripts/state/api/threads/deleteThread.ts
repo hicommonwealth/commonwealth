@@ -1,42 +1,8 @@
-import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
-import { SERVER_URL } from 'state/api/config';
 import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
-import { userStore } from '../../ui/user';
 import { updateCommunityThreadCount } from '../communities/getCommuityById';
 import { removeThreadFromAllCaches } from './helpers/cache';
-
-interface DeleteThreadProps {
-  communityId: string;
-  threadId: number;
-  threadMsgId: string;
-  address: string;
-}
-
-const deleteThread = async ({
-  communityId,
-  threadId,
-  threadMsgId,
-  address,
-}: DeleteThreadProps) => {
-  const canvasSignedData = await signDeleteThread(address, {
-    thread_id: threadMsgId,
-  });
-
-  return await axios.delete(`${SERVER_URL}/threads/${threadId}`, {
-    data: {
-      author_community_id: communityId,
-      community_id: communityId,
-      address: address,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
-  });
-};
 
 interface UseDeleteThreadMutationProps {
   communityId: string;
@@ -53,8 +19,7 @@ const useDeleteThreadMutation = ({
   const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: deleteThread,
+  return trpc.thread.deleteThread.useMutation({
     onSuccess: async (response) => {
       removeThreadFromAllCaches(communityId, threadId);
 
@@ -68,7 +33,7 @@ const useDeleteThreadMutation = ({
         );
       }
 
-      return response.data;
+      return response;
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

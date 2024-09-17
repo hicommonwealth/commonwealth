@@ -107,10 +107,8 @@ export const AdminActions = ({
           onClick: async () => {
             try {
               await deleteThread({
-                threadId: thread.id,
-                threadMsgId: thread.canvasMsgId,
-                communityId: app.activeChainId() || '',
-                address: user.activeAccount?.address || '',
+                thread_id: thread.id,
+                canvas_msg_id: thread.canvasMsgId,
               });
               onDelete?.();
             } catch (err) {
@@ -118,7 +116,7 @@ export const AdminActions = ({
                 checkForSessionKeyRevalidationErrors(err);
                 return;
               }
-              console.error(err?.responseJSON?.error || err?.message);
+              console.error(err.message);
               notifyError('Failed to delete thread');
             }
           },

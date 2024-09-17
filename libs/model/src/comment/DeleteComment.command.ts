@@ -29,7 +29,7 @@ export function DeleteComment(): Command<
       });
       mustExist('Comment', comment);
 
-      if (comment.address_id !== address!.id && address.role === 'member')
+      if (comment.address_id !== address.id && address.role === 'member')
         throw new InvalidActor(actor, 'Not authorized author');
 
       // == mutation transaction boundary ==

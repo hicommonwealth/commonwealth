@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { ContestTopic } from './contest-manager.schemas';
 
 export enum TopicWeightedVoting {
   Stake = 'stake',
@@ -34,4 +35,7 @@ export const Topic = z.object({
   vote_weight_multiplier: PG_INT.nullish().describe(
     'vote weight multiplier, used for ERC20 topics',
   ),
+
+  // associations
+  contest_topics: z.array(ContestTopic).nullish(),
 });

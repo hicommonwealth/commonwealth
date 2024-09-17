@@ -1,18 +1,11 @@
 import { express } from '@hicommonwealth/adapters';
 import { ChainEvents, Comment, Thread } from '@hicommonwealth/model';
 import { RequestHandler, Router, raw } from 'express';
-
-// TODO: remove as we migrate to tRPC commands
 import DatabaseValidationService from 'server/middleware/databaseValidationService';
-import { deleteBotThreadHandler } from 'server/routes/threads/delete_thread_bot_handler';
-import { ServerControllers } from 'server/routing/router';
 
 const PATH = '/api/integration';
 
-function build(
-  controllers: ServerControllers,
-  validator: DatabaseValidationService,
-) {
+function build(validator: DatabaseValidationService) {
   // Async middleware wrappers
   const isBotUser: RequestHandler = (req, res, next) => {
     validator.validateBotUser(req, res, next).catch(next);
@@ -53,7 +46,7 @@ function build(
   router.delete(
     '/bot/threads/:message_id',
     isBotUser,
-    deleteBotThreadHandler.bind(this, controllers),
+    express.command(Thread.DeleteThread()),
   );
 
   router.post(
