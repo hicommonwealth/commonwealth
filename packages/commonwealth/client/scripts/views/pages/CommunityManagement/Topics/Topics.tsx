@@ -32,7 +32,14 @@ export interface TopicFormERC20 {
   weightedVoting?: TopicWeightedVoting | null;
 }
 
-export type HandleCreateTopicProps = { erc20?: TopicFormERC20 };
+export interface TopicFormStake {
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export type HandleCreateTopicProps = {
+  erc20?: TopicFormERC20;
+  stake: TopicFormStake;
+};
 
 export interface TopicForm extends TopicFormRegular, TopicFormERC20 {}
 
@@ -50,7 +57,10 @@ export const Topics = () => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
   };
 
-  const handleCreateTopic = async ({ erc20 }: HandleCreateTopicProps) => {
+  const handleCreateTopic = async ({
+    erc20,
+    stake,
+  }: HandleCreateTopicProps) => {
     if (!topicFormData) {
       return;
     }
@@ -64,6 +74,7 @@ export const Topics = () => {
         defaultOffchainTemplate: '',
         isPWA: isAddedToHomeScreen,
         ...erc20,
+        ...stake,
       });
 
       navigate(`/discussions/${encodeURI(topicFormData.name.trim())}`);
@@ -104,6 +115,7 @@ export const Topics = () => {
           <StakeIntegration
             isTopicFlow
             onTopicFlowStepChange={setCreateCommunityStep}
+            onCreateTopic={handleCreateTopic}
           />
         );
     }

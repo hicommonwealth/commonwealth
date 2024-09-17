@@ -103,6 +103,7 @@ export const ReactionButton = ({
           checkForSessionKeyRevalidationErrors(e);
           return;
         }
+        notifyError('Failed to unvote');
         console.error(e.response.data.error || e?.message);
       });
     } else {
@@ -119,6 +120,7 @@ export const ReactionButton = ({
           checkForSessionKeyRevalidationErrors(e);
           return;
         }
+        notifyError('Failed to upvote');
         console.error(e.response.data.error || e?.message);
       });
     }
