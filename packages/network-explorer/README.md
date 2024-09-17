@@ -15,7 +15,12 @@
 
 ## Deploying on Heroku
 
-TBD
+You can deploy the server on Heroku. To do this, create a Heroku app:
+
+- `heroku create common-network-explorer`
+- `heroku buildpacks:add -a common-network-explorer heroku-community/multi-procfile`
+- `heroku config:set -a common-network-explorer PROCFILE=packages/network-explorer/Procfile`
+- `git push heroku master`
 
 ## Deploying on Railway
 
