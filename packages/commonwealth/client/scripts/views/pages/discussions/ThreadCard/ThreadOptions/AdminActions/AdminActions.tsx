@@ -1,3 +1,4 @@
+import { buildDeleteThreadInput } from 'client/scripts/state/api/threads/deleteThread';
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { SessionKeyError } from 'controllers/server/sessions';
@@ -106,11 +107,14 @@ export const AdminActions = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteThread({
-                thread_id: thread.id,
-                canvas_signed_data: thread.canvasSignedData,
-                canvas_msg_id: thread.canvasMsgId,
+              const input = await buildDeleteThreadInput({
+                address: user.activeAccount?.address || '',
+                communityId: app.activeChainId() || '',
+                threadId: thread.id,
+                threadMsgId: thread.canvasMsgId,
+                currentStage: thread.stage,
               });
+              await deleteThread(input);
               onDelete?.();
             } catch (err) {
               if (err instanceof SessionKeyError) {
