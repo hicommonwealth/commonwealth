@@ -24,7 +24,7 @@ RUN curl -o /tmp/DATADOG_APT_KEY_382E94DE.public "${DATADOG_APT_KEYS_URL}/DATADO
 RUN apt-get update && apt-get -y --force-yes install --reinstall datadog-agent
 
 # Copy entrypoint
-COPY scripts/heroku-entrypoint.sh /
+COPY ./scripts/heroku-entrypoint.sh /
 
 # Expose DogStatsD and trace-agent ports
 EXPOSE 8125/udp 8126/tcp
