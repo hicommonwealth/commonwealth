@@ -33,12 +33,14 @@ describe('CommentCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined,
     author: z.infer<typeof schemas.User> | undefined,
     subscriber: z.infer<typeof schemas.User> | undefined,
-    authorProfile: z.infer<typeof schemas.Profile> | undefined,
-    subscriberProfile: z.infer<typeof schemas.Profile> | undefined,
+    mentionedUser: z.infer<typeof schemas.User> | undefined,
     thread: z.infer<typeof schemas.Thread> | undefined,
     rootComment: z.infer<typeof schemas.Comment> | undefined,
     replyComment: z.infer<typeof schemas.Comment> | undefined,
+    mentionedComment: z.infer<typeof schemas.Comment> | undefined,
     sandbox: sinon.SinonSandbox;
+
+  const customDomain = 'random_custom_domain.com';
 
   beforeAll(async () => {
     const [chainNode] = await tester.seed(
@@ -54,60 +56,59 @@ describe('CommentCreated Event Handler', () => {
     );
     [author] = await tester.seed('User', {});
     [subscriber] = await tester.seed('User', {});
-    [authorProfile] = await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: author.id,
-    });
-    [subscriberProfile] = await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: subscriber.id,
-    });
+    [mentionedUser] = await tester.seed('User', {});
+
     [community] = await tester.seed('Community', {
+      custom_domain: customDomain,
       chain_node_id: chainNode?.id,
+      lifetime_thread_count: 0,
+      profile_count: 2,
       Addresses: [
         {
           role: 'member',
           user_id: author!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',
           user_id: subscriber!.id,
-          profile_id: subscriberProfile!.id,
+        },
+        {
+          role: 'member',
+          user_id: mentionedUser!.id,
         },
       ],
     });
 
     [thread] = await tester.seed('Thread', {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[1].id,
+      community_id: community!.id!,
+      address_id: community!.Addresses![1].id,
       topic_id: null,
       deleted_at: null,
       read_only: false,
-      version_history: [],
       pinned: false,
     });
     [rootComment] = await tester.seed('Comment', {
       parent_id: null,
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      thread_id: thread.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[0].id,
+      thread_id: thread!.id!,
+      address_id: community!.Addresses![0].id,
       deleted_at: null,
     });
     [replyComment] = await tester.seed('Comment', {
-      // @ts-expect-error StrictNullChecks
-      parent_id: String(rootComment.id),
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      thread_id: thread.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[0].id,
+      parent_id: String(rootComment!.id),
+      thread_id: thread!.id!,
+      address_id: community!.Addresses![0].id,
+      deleted_at: null,
+    });
+    [mentionedComment] = await tester.seed('Comment', {
+      text: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
+        mentionedUser!.id
+      }).`,
+      plaintext: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
+        mentionedUser!.id
+      }).`,
+      parent_id: String(rootComment!.id),
+      thread_id: thread!.id!,
+      address_id: community!.Addresses![0].id,
       deleted_at: null,
     });
   });
@@ -184,7 +185,7 @@ describe('CommentCreated Event Handler', () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       // @ts-expect-error StrictNullChecks
-      payload: { ...rootComment },
+      payload: { ...rootComment, community_id: community.id },
     });
     expect(
       res,
@@ -201,16 +202,13 @@ describe('CommentCreated Event Handler', () => {
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: authorProfile.profile_name,
+        author: author?.profile.name,
         comment_parent_name: 'thread',
-        // @ts-expect-error StrictNullChecks
-        community_name: community.name,
-        // @ts-expect-error StrictNullChecks
-        comment_body: rootComment.text.substring(0, 255),
-        // @ts-expect-error StrictNullChecks
-        comment_url: getCommentUrl(community.id, thread.id, rootComment.id),
-        comment_created_event: rootComment,
+        community_name: community?.name,
+        comment_body: rootComment?.text.substring(0, 255),
+        comment_url: `https://${customDomain}/${community!
+          .id!}/discussion/${thread!.id!}?comment=${rootComment!.id!}`,
+        comment_created_event: { ...rootComment, community_id: community!.id },
       },
       // @ts-expect-error StrictNullChecks
       actor: { id: String(author.id) },
@@ -230,7 +228,7 @@ describe('CommentCreated Event Handler', () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       // @ts-expect-error StrictNullChecks
-      payload: { ...replyComment },
+      payload: { ...replyComment, community_id: community.id },
     });
     expect(
       res,
@@ -247,16 +245,17 @@ describe('CommentCreated Event Handler', () => {
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: authorProfile.profile_name,
+        author: author?.profile.name,
         comment_parent_name: 'comment',
-        // @ts-expect-error StrictNullChecks
-        community_name: community.name,
-        // @ts-expect-error StrictNullChecks
-        comment_body: replyComment.text.substring(0, 255),
-        // @ts-expect-error StrictNullChecks
-        comment_url: getCommentUrl(community.id, thread.id, replyComment.id),
-        comment_created_event: replyComment,
+        community_name: community?.name,
+        comment_body: replyComment?.text.substring(0, 255),
+        comment_url: getCommentUrl(
+          community!.id!,
+          thread!.id!,
+          replyComment!.id!,
+          customDomain,
+        ),
+        comment_created_event: { ...replyComment, community_id: community!.id },
       },
       // @ts-expect-error StrictNullChecks
       actor: { id: String(author.id) },
@@ -278,8 +277,65 @@ describe('CommentCreated Event Handler', () => {
       processCommentCreated({
         name: EventNames.CommentCreated,
         // @ts-expect-error StrictNullChecks
-        payload: { ...rootComment },
+        payload: { ...rootComment, community_id: community.id },
       }),
     ).to.eventually.be.rejectedWith(ProviderError);
+  });
+
+  test('should not trigger workflow for mentioned users', async () => {
+    sandbox = sinon.createSandbox();
+    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+
+    await tester.seed('CommentSubscription', {
+      user_id: subscriber!.id,
+      comment_id: rootComment!.id,
+    });
+    await tester.seed('CommentSubscription', {
+      user_id: mentionedUser!.id,
+      comment_id: rootComment!.id,
+    });
+
+    const res = await processCommentCreated({
+      name: EventNames.CommentCreated,
+      // @ts-expect-error StrictNullChecks
+      payload: {
+        ...mentionedComment,
+        community_id: community!.id!,
+        users_mentioned: [mentionedUser!.id!],
+      },
+    });
+
+    expect(
+      res,
+      'The event handler should return true if it triggered a workflow',
+    ).to.be.true;
+    expect(
+      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
+      'The event handler should trigger a workflow',
+    ).to.be.true;
+    expect(
+      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
+    ).to.deep.equal({
+      key: WorkflowKeys.CommentCreation,
+      users: [{ id: String(subscriber!.id) }],
+      data: {
+        author: author?.profile.name,
+        comment_parent_name: 'comment',
+        community_name: community?.name,
+        comment_body: mentionedComment?.text.substring(0, 255),
+        comment_url: getCommentUrl(
+          community!.id!,
+          thread!.id!,
+          mentionedComment!.id!,
+          customDomain,
+        ),
+        comment_created_event: {
+          ...mentionedComment,
+          users_mentioned: [mentionedUser!.id!],
+          community_id: community!.id,
+        },
+      },
+      actor: { id: String(author!.id) },
+    });
   });
 });

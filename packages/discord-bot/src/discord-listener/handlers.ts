@@ -5,18 +5,25 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { DiscordAction } from '@hicommonwealth/model';
-import { Client, Message, ThreadChannel } from 'discord.js';
-import { fileURLToPath } from 'url';
+import {
+  Client,
+  Message,
+  OmitPartialGroupDMChannel,
+  PartialMessage,
+  ThreadChannel,
+} from 'discord.js';
 import { getImageUrls } from '../discord-listener/util';
 import { getForumLinkedTopic } from '../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 export async function handleMessage(
   controller: Broker,
   client: Client,
-  message: Partial<Message>,
+  message:
+    | OmitPartialGroupDMChannel<Message<boolean> | PartialMessage>
+    | Message<boolean>
+    | PartialMessage,
   action: DiscordAction,
 ) {
   log.info(
@@ -30,7 +37,7 @@ export async function handleMessage(
 
     if (channel?.type !== 11 && channel?.type !== 15) return; // must be thread channel(all forum posts are Threads)
     const parent_id =
-      channel?.type === 11 ? channel.parentId : channel.id ?? '0';
+      channel?.type === 11 ? channel.parentId : (channel.id ?? '0');
 
     // Only process messages from relevant channels
     const topicId = await getForumLinkedTopic(parent_id);

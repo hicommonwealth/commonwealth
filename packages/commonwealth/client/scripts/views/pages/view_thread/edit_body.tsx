@@ -1,4 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';
@@ -7,7 +9,6 @@ import React from 'react';
 import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Thread from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -34,6 +35,8 @@ export const EditBody = (props: EditBodyProps) => {
     threadUpdatedCallback,
   } = props;
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   const threadBody =
     shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
   const body = deserializeDelta(threadBody);
@@ -43,23 +46,15 @@ export const EditBody = (props: EditBodyProps) => {
 
   const user = useUserStore();
 
-  const {
-    mutateAsync: editThread,
-    reset: resetEditThreadMutation,
-    error: editThreadError,
-  } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+  const { mutateAsync: editThread } = useEditThreadMutation({
+    threadMsgId: thread.canvasMsgId,
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
   });
 
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetEditThreadMutation,
-    error: editThreadError,
-  });
-
-  const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const cancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
     const hasContentChanged =
@@ -94,59 +89,63 @@ export const EditBody = (props: EditBodyProps) => {
     }
   };
 
-  const save = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const save = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
     setSaving(true);
 
-    try {
-      const newBody = JSON.stringify(contentDelta);
-      await editThread({
-        newBody: JSON.stringify(contentDelta) || thread.body,
-        newTitle: title || thread.title,
-        threadId: thread.id,
-        authorProfile: user.activeAccount?.profile,
-        address: user.activeAccount?.address || '',
-        communityId: app.activeChainId(),
-      });
-      clearEditingLocalStorage(thread.id, ContentType.Thread);
-      notifySuccess('Thread successfully edited');
-      threadUpdatedCallback(title, newBody);
-    } catch (err) {
-      if (err instanceof SessionKeyError) {
-        return;
+    const asyncHandle = async () => {
+      try {
+        const newBody = JSON.stringify(contentDelta);
+        const input = await buildUpdateThreadInput({
+          newBody: JSON.stringify(contentDelta) || thread.body,
+          newTitle: title || thread.title,
+          threadId: thread.id,
+          threadMsgId: thread.canvasMsgId,
+          authorProfile: user.activeAccount?.profile,
+          address: user.activeAccount?.address || '',
+          communityId: app.activeChainId() || '',
+        });
+        await editThread(input);
+        clearEditingLocalStorage(thread.id, ContentType.Thread);
+        notifySuccess('Thread successfully edited');
+        threadUpdatedCallback(title, newBody);
+      } catch (err) {
+        if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
+        notifyError('Failed to edit thread');
+      } finally {
+        setSaving(false);
       }
-      console.error(err?.responseJSON?.error || err?.message);
-      notifyError('Failed to edit thread');
-    } finally {
-      setSaving(false);
-    }
+    };
+
+    asyncHandle().then().catch(console.error);
   };
 
   return (
-    <>
-      <div className="EditBody">
-        <ReactQuillEditor
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-          cancelEditing={cancelEditing}
+    <div className="EditBody">
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+        cancelEditing={cancelEditing}
+      />
+      <div className="buttons-row">
+        <CWButton
+          label="Cancel"
+          disabled={saving}
+          buttonType="tertiary"
+          onClick={cancel}
         />
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            disabled={saving}
-            buttonType="tertiary"
-            onClick={cancel}
-          />
-          <CWButton
-            label="Save"
-            buttonWidth="wide"
-            disabled={saving}
-            onClick={save}
-          />
-        </div>
+        <CWButton
+          label="Save"
+          buttonWidth="wide"
+          disabled={saving}
+          onClick={save}
+        />
       </div>
-      {RevalidationModal}
-    </>
+    </div>
   );
 };

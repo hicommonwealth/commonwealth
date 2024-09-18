@@ -4,9 +4,9 @@ import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
-import useAuthModalStore from 'state/ui/modals/authModal';
 import AuthButton from 'views/components/AuthButton';
 import {
+  AuthSSOs,
   AuthTypes,
   AuthWallets,
   EVMWallets,
@@ -29,12 +29,6 @@ import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubM
 import './ModalBase.scss';
 
 const MODAL_COPY = {
-  [AuthModalType.AccountTypeGuidance]: {
-    title: '',
-    description: `We don't recognize the address you're trying to sign in with. \nWould you like to:`,
-    showFooter: false,
-    showExistingAccountSignInFooter: false,
-  },
   [AuthModalType.CreateAccount]: {
     title: 'Create account',
     description: `Common is built on web3 technology that utilizes wallets. \nHow would you like to sign up?`,
@@ -47,41 +41,55 @@ const MODAL_COPY = {
     showFooter: true,
     showExistingAccountSignInFooter: false,
   },
+  [AuthModalType.RevalidateSession]: {
+    title: 'Session Expired',
+    description:
+      'To continue what you were doing with this address, please sign in again',
+    showFooter: true,
+    showExistingAccountSignInFooter: false,
+  },
 };
+
+const SSO_OPTIONS: AuthSSOs[] = [
+  'google',
+  'discord',
+  'x',
+  'apple',
+  'github',
+  'email',
+] as const;
 
 /**
  * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
  * @param onClose callback triggered when the modal is closed or user is authenticated.
  * @param onSuccess callback triggered on successful user authentication.
  * @param layoutType specifies the layout type/variant of the modal.
- * @param hideDescription if `true`, hides the description after modal header.
- * @param customBody custom content to add before the modal body.
- * @param showAuthenticationOptionsFor determines auth options category ('wallets', 'sso', or both) to display.
- *                                     All options are displayed if prop is not provided.
- *                                     Prop is ignored if internal modal state hides SSO options.
+ * @param showAuthOptionFor determines the auth option to display.
+ *                          Modal logic correctly displayed the correct options per page scope if prop is not provided.
+ *                          Prop is ignored if internal modal state hides SSO options.
+ * @param showAuthOptionTypesFor determines auth options category ('wallets', 'sso', or both) to display.
+ *                               All options are displayed if prop is not provided.
+ *                               Prop is ignored if internal modal state hides SSO options.
  * @param showWalletsFor specifies wallets to display for the specified chain.
  * @param bodyClassName custom class to apply to the modal body.
  * @param onSignInClick callback triggered when the user clicks on the `Sign in` link in the modal footer.
- * @param onChangeModalType callback triggered when `layoutType` change is requested from within the modal.
  * @returns {ReactNode}
  */
 const ModalBase = ({
   onClose,
   onSuccess,
   layoutType,
-  hideDescription,
-  customBody,
-  showAuthenticationOptionsFor,
   showWalletsFor,
+  showAuthOptionFor,
+  showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
-  onChangeModalType,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
-    showAuthenticationOptionsFor?.includes('sso') &&
-      showAuthenticationOptionsFor.length === 1
+    showAuthOptionTypesFor?.includes('sso') &&
+      showAuthOptionTypesFor.length === 1
       ? 1
       : 0,
   );
@@ -103,21 +111,6 @@ const ModalBase = ({
     await handleClose();
   };
 
-  const handleUnrecognizedAddressReceived = () => {
-    // if this is the `layoutType == SignIn` modal, and we get an unrecognized
-    // address, then change modal type to `AccountTypeGuidance`
-    if (layoutType === AuthModalType.SignIn) {
-      // @ts-expect-error <StrictNullChecks/>
-      onChangeModalType(AuthModalType.AccountTypeGuidance);
-      return false;
-    }
-
-    return true;
-  };
-
-  const { setShouldOpenGuidanceModalAfterMagicSSORedirect } =
-    useAuthModalStore();
-
   const {
     wallets = [],
     isMagicLoading,
@@ -129,11 +122,11 @@ const ModalBase = ({
     onSocialLogin,
     onVerifyMobileWalletSignature,
   } = useAuthentication({
+    withSessionKeyLoginFlow: layoutType === AuthModalType.RevalidateSession,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
-    onUnrecognizedAddressReceived: handleUnrecognizedAddressReceived,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
@@ -216,7 +209,7 @@ const ModalBase = ({
     },
     {
       name: 'Email or Social',
-      options: ['google', 'discord', 'x', 'apple', 'github', 'email'],
+      options: SSO_OPTIONS,
     },
   ];
 
@@ -224,9 +217,13 @@ const ModalBase = ({
     setActiveTabIndex((prevActiveTab) => {
       if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
 
+      if (showAuthOptionFor) {
+        return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
+      }
+
       if (
-        (showAuthenticationOptionsFor?.includes('sso') &&
-          showAuthenticationOptionsFor.length === 1) ||
+        (showAuthOptionTypesFor?.includes('sso') &&
+          showAuthOptionTypesFor.length === 1) ||
         prevActiveTab === 1
       ) {
         return 1;
@@ -234,14 +231,10 @@ const ModalBase = ({
 
       return 0;
     });
-  }, [showAuthenticationOptionsFor, shouldShowSSOOptions]);
+  }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
-      if (layoutType === AuthModalType.SignIn) {
-        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
-      }
-
       setIsAuthenticatingWithEmail(true);
       return;
     }
@@ -260,15 +253,30 @@ const ModalBase = ({
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
-      if (layoutType === AuthModalType.SignIn) {
-        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
-      }
-
       // TODO: decide if twitter references are to be updated to 'x'
       await onSocialLogin(
         option === 'x' ? WalletSsoSource.Twitter : (option as WalletSsoSource),
       );
     }
+  };
+
+  const renderAuthButton = (option: AuthTypes) => {
+    if (
+      showAuthOptionFor &&
+      option !== showAuthOptionFor &&
+      !(showAuthOptionFor === 'metamask' && option === 'walletconnect')
+    ) {
+      return <></>;
+    }
+
+    return (
+      <AuthButton
+        key={option}
+        type={option}
+        disabled={isMagicLoading}
+        onClick={async () => await onAuthMethodSelect(option)}
+      />
+    );
   };
 
   return (
@@ -282,7 +290,7 @@ const ModalBase = ({
           {copy.title}
         </CWText>
 
-        {copy.description && !hideDescription && (
+        {copy.description && (
           <CWText type="b1" className="description" isCentered>
             {...copy.description.split('\n').map((line, index) => (
               <Fragment key={index}>
@@ -294,14 +302,13 @@ const ModalBase = ({
         )}
 
         <CWModalBody className={clsx('content', bodyClassName)}>
-          {customBody}
-
           {/* @ts-expect-error StrictNullChecks*/}
-          {showAuthenticationOptionsFor?.length > 0 && (
+          {showAuthOptionTypesFor?.length > 0 && (
             <>
               {shouldShowSSOOptions &&
                 // @ts-expect-error StrictNullChecks*
-                showAuthenticationOptionsFor?.length > 1 && (
+                showAuthOptionTypesFor?.length > 1 &&
+                !showAuthOptionFor && (
                   <CWTabsRow className="tabs">
                     {tabsList.map((tab, index) => (
                       <CWTab
@@ -328,14 +335,7 @@ const ModalBase = ({
                 */}
                 {(activeTabIndex === 0 ||
                   (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
-                  tabsList[activeTabIndex].options.map((option, key) => (
-                    <AuthButton
-                      key={key}
-                      type={option}
-                      disabled={isMagicLoading}
-                      onClick={async () => await onAuthMethodSelect(option)}
-                    />
-                  ))}
+                  tabsList[activeTabIndex].options.map(renderAuthButton)}
 
                 {/* If email option is selected from the SSO's list, show email form */}
                 {activeTabIndex === 1 && isAuthenticatingWithEmail && (
@@ -377,9 +377,10 @@ const ModalBase = ({
           [
             ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
             ...evmWallets.filter((x) => x !== 'walletconnect'),
-          ] as EVMWallets[]
+          ].filter((wallet) =>
+            showAuthOptionFor ? wallet === showAuthOptionFor : true,
+          ) as EVMWallets[]
         }
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         isOpen={isEVMWalletsModalVisible}
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClose={async () => {

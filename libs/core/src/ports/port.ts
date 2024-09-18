@@ -1,22 +1,24 @@
-import { fileURLToPath } from 'url';
+import { delay } from '@hicommonwealth/shared';
 import { config } from '../config';
 import { logger, rollbar } from '../logging';
 import { ExitCode } from './enums';
+import { inMemoryBlobStorage } from './in-memory-blob-storage';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
   AdapterFactory,
   Analytics,
+  BlobStorage,
   Broker,
   Cache,
   Disposable,
   Disposer,
+  IdentifyUserOptions,
   NotificationsProvider,
   NotificationsProviderSchedulesReturn,
   Stats,
 } from './interfaces';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 /**
  * Map of disposable adapter instances
@@ -55,8 +57,10 @@ const disposeAndExit = async (
   forceExit: boolean = false,
 ): Promise<void> => {
   // don't kill process when errors are caught in production
-  if (code === 'ERROR' && config.NODE_ENV === 'production' && !forceExit)
-    return;
+  if (code === 'ERROR' && config.NODE_ENV === 'production') {
+    if (forceExit) await delay(1_000);
+    else return;
+  }
 
   // call disposers
   await Promise.all(disposers.map((disposer) => disposer()));
@@ -78,6 +82,7 @@ const disposeAndExit = async (
 };
 
 export const disposeAdapter = (name: string): void => {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   adapters.get(name)?.dispose();
   adapters.delete(name);
   adapters.clear();
@@ -96,18 +101,22 @@ export const dispose = (disposer?: Disposer): typeof disposeAndExit => {
 /**
  * Handlers to dispose registered resources on exit or unhandled exceptions
  */
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('SIGINT', async (arg?: any) => {
   log.info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('SIGTERM', async (arg?: any) => {
   log.info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('uncaughtException', async (arg?: any) => {
   log.error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.once('unhandledRejection', async (arg?: any) => {
   log.error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');
@@ -121,16 +130,34 @@ export const stats = port(function stats(stats?: Stats) {
     stats || {
       name: 'in-memory-stats',
       dispose: () => Promise.resolve(),
-      histogram: () => {},
+      histogram: (key, value, tags) => {
+        log.trace('stats.histogram', { key, value, tags });
+      },
       set: () => {},
-      increment: () => {},
-      incrementBy: () => {},
-      decrement: () => {},
-      decrementBy: () => {},
-      on: () => {},
-      off: () => {},
-      gauge: () => {},
-      timing: () => {},
+      increment: (key, tags) => {
+        log.trace('stats.increment', { key, tags });
+      },
+      incrementBy: (key, value, tags) => {
+        log.trace('stats.incrementBy', { key, value, tags });
+      },
+      decrement: (key, tags) => {
+        log.trace('stats.decrement', { key, tags });
+      },
+      decrementBy: (key, value, tags) => {
+        log.trace('stats.decrementBy', { key, value, tags });
+      },
+      on: (key) => {
+        log.trace('stats.on', { key });
+      },
+      off: (key) => {
+        log.trace('stats.off', { key });
+      },
+      gauge: (key, value) => {
+        log.trace('stats.gauge', { key, value });
+      },
+      timing: (key, duration, time) => {
+        log.trace('stats.timing', { key, duration, time });
+      },
     }
   );
 });
@@ -169,7 +196,9 @@ export const analytics = port(function analytics(analytics?: Analytics) {
     analytics || {
       name: 'in-memory-analytics',
       dispose: () => Promise.resolve(),
-      track: () => {},
+      track: (event, payload) => {
+        log.trace('analytics.track', { event, payload });
+      },
     }
   );
 });
@@ -181,14 +210,28 @@ export const broker = port(function broker(broker?: Broker) {
   return broker || successfulInMemoryBroker;
 });
 
+/**
+ * External blob storage port factory
+ */
+export const blobStorage = port(function blobStorage(
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  blobStorage?: BlobStorage,
+) {
+  return blobStorage || inMemoryBlobStorage;
+});
+
+/**
+ * Notifications provider port factory
+ */
 export const notificationsProvider = port(function notificationsProvider(
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   notificationsProvider?: NotificationsProvider,
 ) {
   return (
     notificationsProvider || {
       name: 'in-memory-notifications-provider',
       dispose: () => Promise.resolve(),
-      triggerWorkflow: () => Promise.resolve(true),
+      triggerWorkflow: () => Promise.resolve([]),
       getMessages: () => Promise.resolve([]),
       getSchedules: () =>
         Promise.resolve([] as NotificationsProviderSchedulesReturn),
@@ -196,7 +239,10 @@ export const notificationsProvider = port(function notificationsProvider(
         Promise.resolve([] as NotificationsProviderSchedulesReturn),
       deleteSchedules: ({ schedule_ids }) =>
         Promise.resolve(new Set(schedule_ids)),
+      identifyUser: (options: IdentifyUserOptions) =>
+        Promise.resolve({ id: options.user_id }),
       registerClientRegistrationToken: () => Promise.resolve(false),
+      unregisterClientRegistrationToken: () => Promise.resolve(false),
     }
   );
 });

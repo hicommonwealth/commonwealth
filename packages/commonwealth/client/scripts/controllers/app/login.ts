@@ -21,28 +21,36 @@ import { CosmosExtension } from '@magic-ext/cosmos';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { Magic } from 'magic-sdk';
 
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import app from 'state';
-import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { SERVER_URL } from 'state/api/config';
 import {
   onUpdateEmailError,
   onUpdateEmailSuccess,
   updateEmail,
 } from 'state/api/user/updateEmail';
-import { authModal } from 'state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
+import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
-import type ChainInfo from '../../models/ChainInfo';
+
+function storeActiveAccount(account: Account) {
+  const user = userStore.getState();
+  user.setData({ activeAccount: account });
+  !user.accounts.some((a) => isSameAccount(a, account)) &&
+    user.setData({ accounts: [...user.accounts, account] });
+}
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   community: string,
   originChain: string,
 ) {
-  return axios.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
+  return axios.post(`${SERVER_URL}/linkExistingAddressToCommunity`, {
     address,
     community_id: community,
     originChain, // not used
@@ -52,36 +60,8 @@ export function linkExistingAddressToChainOrCommunity(
 
 export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
-  const role = app.roles.getRoleInCommunity({ account, community });
-
-  if (!role) {
-    userStore.getState().setData({
-      activeAccount: account,
-    });
-    if (
-      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
-        .length === 0
-    ) {
-      userStore.getState().setData({
-        accounts: [...userStore.getState().accounts, account],
-      });
-    }
-
-    // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
-    // Emit a force re-render on cosmos chains to make sure
-    // that user.activeAccount (in useUserStore) is set - this is required for many actions
-    // There is a race condition b/w the app accessing user.activeAccount (in useUserStore)
-    // and updating it. A proper solution would be to fix this race condition
-    // for cosmos chains - since the issue happens only on that chain
-    if (app.chain.base === 'cosmos') {
-      app.loginStateEmitter.emit('redraw');
-    }
-
-    return;
-  }
-
   try {
-    const response = await axios.post(`${app.serverUrl()}/setDefaultRole`, {
+    const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
       address: account.address,
       author_community_id: account.community.id,
       community_id: community,
@@ -89,26 +69,11 @@ export async function setActiveAccount(account: Account): Promise<void> {
       auth: true,
     });
 
-    app.roles.getAllRolesInCommunity({ community }).forEach((r) => {
-      r.is_user_default = false;
-    });
-    role.is_user_default = true;
-
     if (response.data.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
 
-    userStore.getState().setData({
-      activeAccount: account,
-    });
-    if (
-      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
-        .length === 0
-    ) {
-      userStore.getState().setData({
-        accounts: [...userStore.getState().accounts, account],
-      });
-    }
+    storeActiveAccount(account);
   } catch (err) {
     // Failed to set the user's active address to this account.
     // This might be because this address isn't `verified`,
@@ -120,75 +85,41 @@ export async function setActiveAccount(account: Account): Promise<void> {
 
 export async function completeClientLogin(account: Account) {
   try {
-    let addressInfo = userStore
-      .getState()
-      .addresses.find(
-        (a) =>
-          a.address === account.address &&
-          a.community.id === account.community.id,
-      );
+    const user = userStore.getState();
+
+    let addressInfo = user.addresses.find(
+      (a) =>
+        a.address === account.address &&
+        a.community.id === account.community.id,
+    );
 
     if (!addressInfo && account.addressId) {
       addressInfo = new AddressInfo({
+        userId: user.id,
         id: account.addressId,
         address: account.address,
-        communityId: account.community.id,
+        community: account.community,
         walletId: account.walletId,
-        walletSsoSource: account.walletSsoSource,
       });
-      userStore.getState().addresses.push(addressInfo);
-    }
-
-    // link the address to the community
-    if (app.chain) {
-      try {
-        if (
-          !app.roles.getRoleInCommunity({
-            account,
-            community: app.activeChainId(),
-          })
-        ) {
-          await app.roles.createRole({
-            // @ts-expect-error StrictNullChecks
-            address: addressInfo,
-            community: app.activeChainId(),
-          });
-        }
-      } catch (e) {
-        // this may fail if the role already exists, e.g. if the address is being migrated from another user
-        console.error('Failed to create role');
-      }
+      user.addresses.push(addressInfo);
     }
 
     // set the address as active
     await setActiveAccount(account);
-    if (
-      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
-        .length === 0
-    ) {
-      userStore.getState().setData({
-        accounts: [...userStore.getState().accounts, account],
-      });
-    }
   } catch (e) {
     console.trace(e);
   }
 }
 
-export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
+export async function updateActiveAddresses(chainId: string) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   userStore.getState().setData({
     accounts: userStore
       .getState()
-      .addresses // @ts-expect-error StrictNullChecks
-      .filter((a) => a.community.id === chain.id)
+      .addresses.filter((a) => a.community.id === chainId)
       .map((addr) => {
-        const tempAddr = app.chain?.accounts.get(
-          addr.address,
-          addr.keytype,
-          false,
-        );
+        const tempAddr = app.chain?.accounts.get(addr.address, false);
         tempAddr.profile = addr.profile;
         tempAddr.lastActive = addr.lastActive;
         return tempAddr;
@@ -198,8 +129,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
 
   // select the address that the new chain should be initialized with
   const memberAddresses = userStore.getState().accounts.filter((account) => {
-    // @ts-expect-error StrictNullChecks
-    return app.roles.isMember({ community: chain.id, account });
+    return account.community.id === chainId;
   });
 
   if (memberAddresses.length === 1) {
@@ -212,7 +142,7 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
     const communityAddressesSortedByLastUsed = [
       ...(userStore
         .getState()
-        .addresses.filter((a) => a.community.id === chain?.id) || []),
+        .addresses.filter((a) => a.community.id === chainId) || []),
     ].sort((a, b) => {
       if (b.lastActive && a.lastActive) return b.lastActive.diff(a.lastActive);
       if (!b.lastActive && !a.lastActive) return 0; // no change
@@ -260,15 +190,16 @@ export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
 
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
+  const user = userStore.getState();
+
   if (!data || data.loggedIn === false) {
-    userStore.getState().setData({
+    user.setData({
       id: 0,
       email: '',
       emailNotificationInterval: '',
       knockJWT: '',
       addresses: [],
-      starredCommunities: [],
-      joinedCommunitiesWithNewContent: [],
+      communities: [],
       accounts: [],
       activeAccount: null,
       jwt: null,
@@ -276,50 +207,45 @@ export function updateActiveUser(data) {
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
+      isLoggedIn: false,
     });
   } else {
     const addresses = data.addresses.map(
       (a) =>
         new AddressInfo({
+          userId: user.id,
           id: a.id,
           address: a.address,
-          communityId: a.community_id,
-          keytype: a.keytype,
+          community: {
+            id: a.community_id,
+            base: a.Community.base,
+            ss58Prefix: a.Community.ss58_prefix,
+          },
           walletId: a.wallet_id,
-          walletSsoSource: a.wallet_sso_source,
           ghostAddress: a.ghost_address,
           lastActive: a.last_active,
         }),
     );
 
-    const joinedCommunitiesWithNewContent = (() => {
-      if (!data.unseenPosts) return [];
-
-      const communityIds: string[] = [];
-
-      // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8391
-      Object.keys(data.unseenPosts).map(
-        (c) =>
-          (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
-          communityIds.push(c),
-      );
-
-      return communityIds;
-    })();
-
-    userStore.getState().setData({
+    user.setData({
       id: data.id || 0,
       email: data.email || '',
       emailNotificationInterval: data.emailInterval || '',
       knockJWT: data.knockJwtToken || '',
       addresses,
-      joinedCommunitiesWithNewContent,
       jwt: data.jwt || null,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+      communities: (data?.communities || []).map((c) => ({
+        id: c.id || '',
+        iconUrl: c.icon_url || '',
+        name: c.name || '',
+        isStarred: c.is_starred || false,
+      })),
+      isLoggedIn: true,
     });
   }
 }
@@ -327,32 +253,39 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
-  validationBlockInfo?: BlockInfo,
+  validationBlockInfo?: BlockInfo | null,
 ): Promise<{
   account: Account;
   newlyCreated: boolean;
   joinedCommunity: boolean;
 }> {
-  const response = await axios.post(`${app.serverUrl()}/createAddress`, {
+  const response = await axios.post(`${SERVER_URL}/createAddress`, {
     address,
     community_id: chain,
     jwt: userStore.getState().jwt,
     wallet_id: walletId,
-    wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
       ? JSON.stringify(validationBlockInfo)
       : null,
   });
 
   const id = response.data.result.id;
-  const chainInfo = app.config.chains.getById(chain);
+
+  const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+    chain || '',
+    true,
+  );
+
   const account = new Account({
     addressId: id,
     address,
-    community: chainInfo,
+    community: {
+      id: communityInfo?.id || '',
+      base: communityInfo?.base,
+      ss58Prefix: communityInfo?.ss58_prefix || 0,
+    },
     validationToken: response.data.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
@@ -371,6 +304,9 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
+  if (process.env.MAGIC_PUBLISHABLE_KEY === undefined) {
+    throw new Error('Missing magic key');
+  }
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: !isCosmos
       ? [new OAuthExtension()]
@@ -379,9 +315,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
             // so we can't use app.chain.meta?.node?.url
-            rpcUrl: `${
-              document.location.origin
-            }${app.serverUrl()}/magicCosmosProxy/${chain}`,
+            rpcUrl: `${document.location.origin}${SERVER_URL}/magicCosmosProxy/${chain}`,
           }),
         ],
   });
@@ -405,23 +339,20 @@ export async function startLoginWithMagicLink({
   const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
-    const authModalState = authModal.getState();
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const { address, isAddressNew } = await handleSocialLoginCallback({
+    const { address } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Email,
-      returnEarlyIfNewAddress:
-        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
     });
 
-    return { bearer, address, isAddressNew };
+    return { bearer, address };
   } else {
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
     }&chain=${chain || ''}&sso=${provider}`;
     await magic.oauth.loginWithRedirect({
-      provider: provider as any,
+      provider,
       redirectURI: new URL(
         '/finishsociallogin' + params,
         window.location.origin,
@@ -469,17 +400,21 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
-  returnEarlyIfNewAddress = false,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
-  returnEarlyIfNewAddress?: boolean;
-}): Promise<{ address: string; isAddressNew: boolean }> {
+}): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
-  // @ts-expect-error StrictNullChecks
-  const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
+  let desiredChain = app.chain?.meta;
+  if (!desiredChain && chain) {
+    const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+      chain || '',
+      true,
+    );
+    desiredChain = communityInfo as z.infer<typeof ExtendedCommunity>;
+  }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
   const isEmail = walletSsoSource === WalletSsoSource.Email;
@@ -495,6 +430,9 @@ export async function handleSocialLoginCallback({
       magicAddress = metadata.publicAddress;
     } else {
       const { utils } = await import('ethers');
+      if (metadata.publicAddress === null) {
+        throw new Error('Expected magic to return publicAddress');
+      }
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
@@ -515,32 +453,12 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let isAddressNew = false;
-  // check if this address exists in db
-  const profileAddresses = await fetchProfilesByAddress({
-    currentChainId: '',
-    profileAddresses: [magicAddress],
-    profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
-    initiateProfilesAfterFetch: false,
-  });
-
-  isAddressNew = profileAddresses?.length === 0;
-  const isAttemptingToConnectAddressToCommunity =
-    app.isLoggedIn() && app.activeChainId();
-  if (
-    isAddressNew &&
-    !isAttemptingToConnectAddressToCommunity &&
-    returnEarlyIfNewAddress
-  ) {
-    return { address: magicAddress, isAddressNew };
-  }
-
   let session: Session | null = null;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
       const signer = { signMessage: magic.cosmos.sign };
-      const prefix = app.chain?.meta?.bech32Prefix || 'cosmos';
+      const prefix = app.chain?.meta?.bech32_prefix || 'cosmos';
       const canvasChainId = chainBaseToCanvasChainId(
         ChainBase.CosmosSDK,
         prefix,
@@ -570,7 +488,7 @@ export async function handleSocialLoginCallback({
 
       const sessionSigner = new SIWESigner({
         signer,
-        chainId: app.chain?.meta.node?.ethChainId || 1,
+        chainId: app.chain?.meta?.ChainNode?.eth_chain_id || 1,
       });
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {
@@ -589,7 +507,7 @@ export async function handleSocialLoginCallback({
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await axios.post(
-    `${app.serverUrl()}/auth/magic`,
+    `${SERVER_URL}/auth/magic`,
     {
       data: {
         community_id: desiredChain?.id,
@@ -614,10 +532,17 @@ export async function handleSocialLoginCallback({
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:
     if (app.chain) {
-      const c =
-        userStore.getState().activeCommunity ||
-        app.config.chains.getById(app.activeChainId());
-      await updateActiveAddresses({ chain: c });
+      let chainInfo = userStore.getState().activeCommunity;
+
+      if (!chainInfo && chain) {
+        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+          chain || '',
+          true,
+        );
+        chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
+      }
+
+      chainInfo && (await updateActiveAddresses(chainInfo.id || ''));
     }
 
     const { Profiles: profiles, email: ssoEmail } = response.data.result;
@@ -632,14 +557,14 @@ export async function handleSocialLoginCallback({
 
     // if account is newly created and user has not completed onboarding flow
     // then open the welcome modal.
-    const profileId = profiles?.[0]?.id;
-    if (profileId && !userStore.getState().isWelcomeOnboardFlowComplete) {
+    const userId = profiles?.[0]?.id;
+    if (userId && !userStore.getState().isWelcomeOnboardFlowComplete) {
       setTimeout(() => {
         welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
       }, 1000);
     }
 
-    return { address: magicAddress, isAddressNew };
+    return { address: magicAddress };
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }

@@ -25,7 +25,13 @@ import {
   LaunchContestStep,
 } from '../../types';
 
+import useAppStatus from 'client/scripts/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
 import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
@@ -56,6 +62,12 @@ const SignTransactionsStep = ({
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const user = useUserStore();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
+    onAction: true,
+  });
+
   const isContestRecurring =
     contestFormData.contestRecurring === ContestRecurringType.Yes;
   const isDirectDepositSelected =
@@ -64,8 +76,8 @@ const SignTransactionsStep = ({
   const devContest = useFlag('contestDev');
 
   const signTransaction = async () => {
-    const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
-    const chainRpc = app?.chain?.meta?.ChainNode?.url;
+    const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+    const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
       ? ONE_HOUR_IN_SECONDS
@@ -130,7 +142,7 @@ const SignTransactionsStep = ({
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
-        id: app.activeChainId(),
+        id: app.activeChainId() || '',
         image_url: contestFormData?.contestImage,
         funding_token_address: exchangeToken,
         prize_percentage: isContestRecurring
@@ -145,6 +157,10 @@ const SignTransactionsStep = ({
 
       onSetLaunchContestStep('ContestLive');
       onSetCreatedContestAddress(contestAddress);
+      trackAnalytics({
+        event: MixpanelContestEvents.CONTEST_CREATED,
+        isPWA: isAddedToHomeScreen,
+      });
     } catch (error) {
       console.log('error', error);
       setLaunchContestData((prevState) => ({

@@ -1,7 +1,8 @@
 import {
+  config,
   models,
-  ProfileAttributes,
   ThreadInstance,
+  UserAttributes,
 } from '@hicommonwealth/model';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
@@ -10,6 +11,7 @@ export interface Link {
   readonly id: number;
   readonly url: string;
   readonly updated_at: string;
+  readonly priority?: number;
 }
 
 /**
@@ -30,6 +32,11 @@ export interface Paginator {
   readonly next: () => Promise<Page>;
 }
 
+const NULL_PAGINATOR: Paginator = {
+  hasNext: async () => Promise.resolve(false),
+  next: async () => Promise.resolve(null!),
+};
+
 interface TableAdapter {
   /**
    * Covert the object to a record or undefined if we can't use it with the sitemaps.
@@ -43,10 +50,11 @@ export function createDatabasePaginatorDefault(limit: number = 50000) {
     createThreadsTableAdapter(),
     limit,
   );
-  const profiles = createDatabasePaginatorWithAdapter(
-    createProfilesTableAdapter(),
-    limit,
-  );
+
+  const profiles =
+    config.SITEMAP.PROFILE_PRIORITY !== -1
+      ? createDatabasePaginatorWithAdapter(createProfilesTableAdapter(), limit)
+      : NULL_PAGINATOR;
 
   return { threads, profiles };
 }
@@ -73,6 +81,7 @@ function createThreadsTableAdapter(): TableAdapter {
       id: thread.id,
       url,
       updated_at: thread.updated_at.toISOString(),
+      priority: config.SITEMAP.THREAD_PRIORITY,
     };
   }
 
@@ -93,21 +102,22 @@ function createThreadsTableAdapter(): TableAdapter {
 }
 
 function createProfilesTableAdapter(): TableAdapter {
-  type ProfileInstancePartial = Required<Pick<ProfileAttributes, 'id'>> &
-    Pick<ProfileAttributes, 'updated_at'>;
+  type UserInstancePartial = Required<Pick<UserAttributes, 'id'>> &
+    Pick<UserAttributes, 'updated_at'>;
 
   function toRecord(obj: object) {
-    const profile = obj as ProfileInstancePartial;
+    const user = obj as UserInstancePartial;
 
-    if (!profile.updated_at) {
+    if (!user.updated_at) {
       return undefined;
     }
 
-    const url = `https://commonwealth.im/profile/id/${profile.id}`;
+    const url = `https://commonwealth.im/profile/id/${user.id}`;
     return {
-      id: profile.id,
+      id: user.id,
       url,
-      updated_at: profile.updated_at.toISOString(),
+      updated_at: user.updated_at.toISOString(),
+      priority: config.SITEMAP.PROFILE_PRIORITY,
     };
   }
 
@@ -115,7 +125,7 @@ function createProfilesTableAdapter(): TableAdapter {
     ptr: number,
     limit: number,
   ): Promise<ReadonlyArray<object>> {
-    return await models.Profile.findAll({
+    return await models.User.findAll({
       attributes: ['id', 'updated_at'],
       where: {
         id: { [Op.gt]: ptr },
@@ -138,6 +148,7 @@ export function createDatabasePaginatorWithAdapter(
 
   let records: ReadonlyArray<Link> = [];
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async function hasNext() {
     return idx === 0 || records.length !== 0;
   }
@@ -191,10 +202,12 @@ export function createDatabasePaginatorMockForTable(
 
   let idx = 0;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async function hasNext() {
     return pageIdx <= maxPages;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async function next(): Promise<Page> {
     ++pageIdx;
     const links = [

@@ -4,6 +4,7 @@ import type IWebWallet from '../../../models/IWebWallet';
 import { toBase64 } from '@cosmjs/encoding';
 import { CosmosSignerCW } from '@hicommonwealth/shared';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 
 declare global {
   interface Window {
@@ -63,9 +64,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -81,7 +80,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix,
+      bech32Prefix: `${app.chain?.meta.bech32_prefix || 0}`,
       signer: {
         type: 'bytes',
         signBytes: (message) => window.station.signBytes(toBase64(message)),

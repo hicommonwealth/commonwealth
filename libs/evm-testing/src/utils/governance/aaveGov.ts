@@ -11,6 +11,7 @@ export class aaveGovernor implements IGovernor {
   public async createArbitraryProposal(
     accountIndex: number,
     advanceDays?: number | string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
@@ -64,6 +65,7 @@ export class aaveGovernor implements IGovernor {
   public async queueProposal(
     proposalId: string | number,
     _advanceTime?: boolean | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const secs = 3 * 86400;
     const blocks = secs / 12 + 500;
@@ -79,6 +81,7 @@ export class aaveGovernor implements IGovernor {
     return { block: Number(queued['blockNumber']) };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async cancelProposal(proposalId: string | number): Promise<any> {
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
@@ -98,6 +101,7 @@ export class aaveGovernor implements IGovernor {
     proposalId: string | number,
     accountIndex: number,
     forAgainst: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
@@ -109,6 +113,7 @@ export class aaveGovernor implements IGovernor {
     return { block: Number(vote['blockNumber']) };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async getProposalDetails(proposalId: string | number): Promise<any> {
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
@@ -119,6 +124,7 @@ export class aaveGovernor implements IGovernor {
   public async executeProposal(
     proposalId: string | number,
     _advanceTime?: boolean | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const secs = 86400;
     const blocks = secs / 12 + 500;
@@ -136,6 +142,7 @@ export class aaveGovernor implements IGovernor {
   public async getVotes(
     accountIndex: number,
     numberOfVotes: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const provider = getProvider();
     const aaveToken = erc20(this.aaveToken, provider);

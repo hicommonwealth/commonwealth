@@ -1,11 +1,12 @@
+import { CommunityMember } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
-import React, { useMemo } from 'react';
-
 import 'pages/search/index.scss';
-
+import React, { useMemo } from 'react';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
-import CommunityInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
 import { CommunityLabel } from '../../components/community_label';
@@ -21,6 +22,7 @@ export type ThreadResult = {
   title: string;
   body: string;
   address_id: number;
+  address_user_id: number;
   address: string;
   address_community_id: string;
   created_at: string;
@@ -35,19 +37,20 @@ const ThreadResultRow = ({
   searchTerm,
   setRoute,
 }: ThreadResultRowProps) => {
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(thread.title);
-    } catch (error) {
-      return thread.title;
-    }
+    return getDecodedString(thread.title);
   }, [thread.title]);
 
   const handleClick = () => {
     setRoute(`/discussion/${thread.id}`, {}, thread.community_id);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== thread.community_id) {
+  if (
+    domain?.isCustomDomain &&
+    domain?.customDomainId !== thread.community_id
+  ) {
     return <></>;
   }
 
@@ -112,12 +115,10 @@ const ReplyResultRow = ({
   const proposalId = comment.proposalid;
   const communityId = comment.community_id;
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(comment.title);
-    } catch (error) {
-      return comment.title;
-    }
+    return getDecodedString(comment.title);
   }, [comment.title]);
 
   const handleClick = () => {
@@ -128,7 +129,7 @@ const ReplyResultRow = ({
     );
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== communityId) {
+  if (domain?.isCustomDomain && domain?.customDomainId !== communityId) {
     return <></>;
   }
 
@@ -193,34 +194,22 @@ const CommunityResultRow = ({
     setRoute(community.id ? `/${community.id}` : '/', {}, null);
   };
 
-  const communityInfo = CommunityInfo.fromJSON(community as any);
-
   return (
     <div
       key={community.id}
       className="community-result-row"
       onClick={handleClick}
     >
-      <CommunityLabel community={communityInfo} />
+      <CommunityLabel
+        name={community?.name || ''}
+        iconUrl={community?.icon_url || ''}
+      />
     </div>
   );
 };
 
-export type MemberResult = {
-  id: number;
-  user_id: string;
-  profile_name: string;
-  avatar_url: string;
-  addresses: {
-    id: number;
-    community_id: string;
-    address: string;
-    stake_balance?: string;
-  }[];
-  group_ids?: [];
-  roles?: any[];
-  last_active: string;
-};
+export type MemberResult = z.infer<typeof CommunityMember>;
+
 type MemberResultRowProps = {
   addr: MemberResult;
   setRoute: any;
@@ -231,16 +220,18 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [community_id],
     profileAddresses: [address],
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!(community_id && address),
   });
   const profile: MinimumProfile = users?.[0];
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const handleClick = () => {
-    setRoute(`/profile/id/${profile?.id}`, {}, null);
+    setRoute(`/profile/id/${profile?.userId}`, {}, null);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== community_id) {
+  if (domain?.isCustomDomain && domain?.customDomainId !== community_id) {
     return null;
   }
 

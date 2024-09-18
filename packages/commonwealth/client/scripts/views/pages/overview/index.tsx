@@ -1,9 +1,8 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
-import React, { useEffect } from 'react';
+import React from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -19,28 +18,21 @@ import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
-  const forceRerender = useForceRerender();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const user = useUserStore();
 
+  const communityId = app.activeChainId() || '';
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
-    communityId: app.activeChainId(),
+    communityId,
     topicsPerThread: 3,
     withXRecentComments: 3,
-    // TODO: ask for a pinned thread prop here to show pinned threads
+    apiEnabled: !!communityId,
   });
 
-  useEffect(() => {
-    app.loginStateEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.loginStateEmitter.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
-
   const { data: topics = [] } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);

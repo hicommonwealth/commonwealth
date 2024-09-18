@@ -2,7 +2,6 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import ChainInfo from 'models/ChainInfo';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
@@ -14,6 +13,7 @@ import {
   useBuyStakeMutation,
   useSellStakeMutation,
 } from 'state/api/communityStake';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import NumberSelector from 'views/components/NumberSelector';
@@ -61,7 +61,6 @@ interface StakeExchangeFormProps {
   numberOfStakeToExchange: number;
   onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
   denomination: string;
-  community?: ChainInfo;
 }
 
 const StakeExchangeForm = ({
@@ -74,14 +73,17 @@ const StakeExchangeForm = ({
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
   denomination,
-  community,
 }: StakeExchangeFormProps) => {
   const user = useUserStore();
 
+  const { selectedCommunity: community } = useManageCommunityStakeModalStore();
+
   const chainRpc =
-    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
   const ethChainId =
-    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
+    community?.ChainNode?.ethChainId ||
+    app?.chain?.meta?.ChainNode?.eth_chain_id ||
+    0;
   // Use the `selectedAddress.value` if buying stake in a non active community (i.e app.activeChainId() != community.id)
   const activeAccountAddress =
     (community ? selectedAddress?.value : user.activeAccount?.address) || '';
@@ -96,7 +98,10 @@ const StakeExchangeForm = ({
     mode,
     address: selectedAddress?.value,
     numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
-    community,
+    community: {
+      namespace: community?.namespace,
+      ChainNode: community?.ChainNode,
+    },
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
@@ -119,7 +124,7 @@ const StakeExchangeForm = ({
 
   const isBuyMode = mode === 'buy';
 
-  const communityId = community?.id || app.activeChainId();
+  const communityId = community?.id || app.activeChainId() || '';
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -137,7 +142,6 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
         ...(community?.ChainNode?.ethChainId && {
           chainId: `${community.ChainNode.ethChainId}`,
@@ -160,8 +164,12 @@ const StakeExchangeForm = ({
       if (!isMemberOfCommunity) {
         await linkSpecificAddressToSpecificCommunity({
           address: selectedAddress?.value,
-          communityId: communityId,
-          communityChainBase: community?.base || app?.chain?.base,
+          community: {
+            id: communityId,
+            name: community?.name || app?.chain?.meta?.name,
+            base: community?.base || app?.chain?.base,
+            iconUrl: community?.iconUrl || app?.chain?.meta?.icon_url || '',
+          },
           ...(app.activeChainId() && { activeChainId: app.activeChainId() }),
         });
       }
@@ -169,7 +177,7 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
         community: communityId,
-        userId: user.activeAccount?.profile?.id || 0,
+        userId: user.activeAccount?.profile?.userId || 0,
         userAddress: selectedAddress?.value,
         isPWA: isAddedToHomeScreen,
       });
@@ -189,7 +197,6 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
       });
 
@@ -205,7 +212,7 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_SOLD,
         community: communityId,
-        userId: user.activeAccount?.profile?.id || 0,
+        userId: user.activeAccount?.profile?.userId || 0,
         userAddress: selectedAddress?.value,
         isPWA: isAddedToHomeScreen,
       });

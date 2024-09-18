@@ -18,8 +18,12 @@
       display: flex;
       flex-direction: row;
       height: 24px;
-      justify-content: space-between;
+      justify-content: flex-start;
       width: auto;
+      > *:last-child {
+        margin-left: auto; /* Pushes the last item to the end */
+        margin-right: 0; /* Ensure no extra margin on the right */
+      }
 
       svg {
         cursor: pointer;

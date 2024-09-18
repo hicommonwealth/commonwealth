@@ -128,7 +128,7 @@ export async function getTestContract(version?: 'v1' | 'v2') {
   const [contract] = await models.Contract.findOrCreate({
     where: {
       address,
-      chain_node_id: chainNode.id,
+      chain_node_id: chainNode.id!,
       type: 'erc20',
     },
   });
@@ -162,30 +162,6 @@ export async function getTestUser() {
   return user;
 }
 
-export async function getTestSubscription(version?: 'v1' | 'v2') {
-  const chain = await getTestChain(version);
-  const user = await getTestUser();
-
-  const [sub, created] = await models.Subscription.findOrCreate({
-    where: {
-      subscriber_id: user.id,
-      category_id: 'chain-event',
-      community_id: chain.id,
-    },
-    // @ts-expect-error StrictNullChecks
-    defaults: {
-      is_active: true,
-      immediate_email: false,
-    },
-  });
-
-  if (!created && (!sub.is_active || sub.immediate_email)) {
-    await sub.update({ is_active: true, immediate_email: false });
-  }
-
-  return sub;
-}
-
 export async function getTestSignatures(version?: 'v1' | 'v2') {
   const chainNode = await getTestChainNode(version);
   const abi = await getTestAbi(version);
@@ -200,7 +176,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
   // signatures are the same for v1 and v2
   const [es1] = await models.EvmEventSource.findOrCreate({
     where: {
-      chain_node_id: chainNode.id,
+      chain_node_id: chainNode.id!,
       contract_address: contractAddress,
       event_signature: compoundPropCreatedSignature,
       kind: 'proposal-created',
@@ -210,7 +186,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
 
   const [es2] = await models.EvmEventSource.findOrCreate({
     where: {
-      chain_node_id: chainNode.id,
+      chain_node_id: chainNode.id!,
       contract_address: contractAddress,
       event_signature: compoundPropQueuedSignature,
       kind: 'proposal-queued',

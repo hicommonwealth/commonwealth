@@ -5,17 +5,12 @@ import type { DB } from './factories';
  */
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
-    .withMany(db.Profile, { onUpdate: 'CASCADE' })
     .withMany(db.ProfileTags)
-    .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
-    .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
-    });
-
-  // TODO: to be deprecated by #5564
-  db.Profile.withMany(db.Address);
+    })
+    .withMany(db.Wallets);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -62,10 +57,7 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Notification)
     .withMany(db.Webhook)
-    .withMany(db.Ban)
-    .withMany(db.CommunityBanner)
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
@@ -101,7 +93,6 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.Notification)
     .withMany(db.ThreadVersionHistory);
 
   db.Comment.withMany(db.Reaction, {
@@ -133,10 +124,6 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.NotificationCategory.withMany(db.Subscription, {
-    foreignKey: 'category_id',
-  }).withMany(db.Notification, { foreignKey: 'category_id' });
-
   db.Group.withMany(db.GroupPermission);
 
   // Many-to-many associations (cross-references)
@@ -152,18 +139,22 @@ export const buildAssociations = (db: DB) => {
       asOne: 'address',
     },
   );
+
   db.Collaboration.withManyToMany(
     { model: db.Address },
     { model: db.Thread, asMany: 'collaborators' },
   );
+
   db.CommunityContract.withManyToMany(
     { model: db.Community },
     { model: db.Contract },
   );
+
   db.StarredCommunity.withManyToMany(
     { model: db.Community, onUpdate: 'CASCADE' },
     { model: db.User, onUpdate: 'CASCADE' },
   );
+
   db.CommunityAlert.withManyToMany(
     {
       model: db.User,
@@ -189,6 +180,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     },
   );
+
   db.CommentSubscription.withManyToMany(
     {
       model: db.Comment,
@@ -201,32 +193,4 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     },
   );
-  db.NotificationsRead.withManyToMany(
-    { model: db.Subscription, onDelete: 'CASCADE' },
-    {
-      model: db.Notification,
-      onDelete: 'CASCADE',
-      hooks: true,
-    },
-  );
-
-  // "loose" FKs
-  db.Comment.belongsTo(db.Community, {
-    foreignKey: 'community_id',
-  });
-  db.Reaction.belongsTo(db.Community, {
-    foreignKey: 'community_id',
-  });
-  db.Subscription.belongsTo(db.Community, {
-    foreignKey: 'community_id',
-  });
-  db.Subscription.belongsTo(db.Thread, {
-    foreignKey: 'thread_id',
-  });
-  db.Subscription.belongsTo(db.Comment, {
-    foreignKey: 'comment_id',
-  });
-  db.ContestManager.belongsTo(db.ContestManager, {
-    foreignKey: 'community_id',
-  });
 };

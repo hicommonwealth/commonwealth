@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape3Url from 'assets/img/shapes/shape3.svg';
 import shape4Url from 'assets/img/shapes/shape4.svg';
@@ -8,6 +8,7 @@ import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -56,16 +57,23 @@ export const AdminOnboardingSlider = () => {
 
   const navigate = useCommonNavigate();
 
-  const community = app.config.chains.getById(app.activeChainId());
+  const communityId = app.activeChainId() || '';
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: communityId,
+      enabled: !!communityId,
+    });
+
   const integrations = {
-    snapshot: community?.snapshot?.length > 0,
-    discordBot: community?.discordConfigId !== null,
-    discordBotWebhooksEnabled: community?.discordBotWebhooksEnabled,
+    snapshot: (community?.snapshot_spaces || [])?.length > 0,
+    discordBot: community?.discord_config_id !== null,
+    discordBotWebhooksEnabled: community?.discord_bot_webhooks_enabled,
   };
-  const hasAnyIntegration =
+  const hasAnyIntegration = !!(
     integrations.snapshot ||
     integrations.discordBot ||
-    integrations.discordBotWebhooksEnabled;
+    integrations.discordBotWebhooksEnabled
+  );
 
   const {
     setIsVisible,
@@ -78,22 +86,22 @@ export const AdminOnboardingSlider = () => {
 
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
-      communityId: app.activeChainId(),
-      apiEnabled: !!app.activeChainId(),
+      communityId,
+      apiEnabled: !!communityId,
     });
 
   const { data: groups = [], isLoading: isLoadingGroups = false } =
     useFetchGroupsQuery({
-      communityId: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      communityId,
+      enabled: !!communityId,
     });
 
   const { data: threadCount = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
-      communityId: app.activeChainId(),
+      communityId,
       queryType: 'count',
       limit: 1,
-      apiEnabled: !!app.activeChainId(),
+      apiEnabled: !!communityId,
     });
 
   const redirectToPage = (
@@ -111,12 +119,19 @@ export const AdminOnboardingSlider = () => {
     pageName === 'create-topic' && navigate('/manage/topics');
   };
 
-  const isEvmCommunity = community?.base === ChainBase.Ethereum;
+  const isCommunitySupported =
+    community?.base === ChainBase.Ethereum &&
+    community?.ChainNode?.eth_chain_id &&
+    [
+      commonProtocol.ValidChains.Base,
+      commonProtocol.ValidChains.SepoliaBase,
+    ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
-    contestEnabled && isEvmCommunity && contestsData?.length > 0;
+    contestEnabled && isCommunitySupported && contestsData?.length > 0;
 
   const isSliderHidden =
-    !app.activeChainId() ||
+    !communityId ||
+    isLoadingCommunity ||
     isContestDataLoading ||
     isLoadingTopics ||
     isLoadingGroups ||
@@ -130,7 +145,7 @@ export const AdminOnboardingSlider = () => {
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,
-    ].includes(app.activeChainId());
+    ].includes(communityId);
 
   useEffect(() => {
     setIsVisible(!isSliderHidden);
@@ -148,7 +163,7 @@ export const AdminOnboardingSlider = () => {
         headerText="Finish setting up your community"
         onDismiss={() => setIsModalVisible(true)}
       >
-        {contestEnabled && isEvmCommunity && (
+        {contestEnabled && isCommunitySupported && (
           <ActionCard
             ctaText={CARD_TYPES['launch-contest'].ctaText}
             title={CARD_TYPES['launch-contest'].title}
@@ -213,7 +228,7 @@ export const AdminOnboardingSlider = () => {
             onDismiss={(shouldDismissPermanently) => {
               setIsModalVisible(false);
               setShouldHideAdminOnboardingCardsForCommunity(
-                app.activeChainId(),
+                communityId,
                 shouldDismissPermanently,
               );
             }}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import app from 'state';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
@@ -22,8 +22,9 @@ interface ManageContestProps {
 const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
-
   const [createdContestAddress, setCreatedContestAddress] = useState('');
+
+  const user = useUserStore();
 
   const {
     setContestFormData,
@@ -36,7 +37,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   });
 
   if (
-    !app.isLoggedIn() ||
+    !user.isLoggedIn ||
     !stakeEnabled ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     contestNotFound
@@ -69,7 +70,10 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
 
       case 'ContestLive':
         return (
-          <ContestLiveStep createdContestAddress={createdContestAddress} />
+          <ContestLiveStep
+            createdContestAddress={createdContestAddress}
+            isFarcasterContest={!!contestFormData?.farcasterContestDuration}
+          />
         );
     }
   };

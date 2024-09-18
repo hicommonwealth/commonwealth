@@ -1,11 +1,9 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
-import { fileURLToPath } from 'url';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const logger = _logger(__filename);
+const logger = _logger(import.meta);
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
@@ -47,7 +45,7 @@ export async function getLogs({
   let startBlock = startingBlockNum;
   let endBlock = endingBlockNum;
   const provider = getProvider(rpc);
-  if (!endBlock) endBlock = await provider.getBlockNumber();
+  if (!endBlock) endBlock = (await provider.getBlockNumber()) - 1;
 
   if (startBlock > endBlock) {
     logger.error(
@@ -117,8 +115,17 @@ export async function parseLogs(
   const events: EvmEvent[] = [];
   const interfaces = {};
   for (const log of logs) {
-    const address = ethers.utils.getAddress(log.address);
+    const address = ethers.utils.getAddress(log.address).toLowerCase();
     const data: AbiSignatures = sources[address];
+    if (!data) {
+      logger.error('Missing event source', undefined, {
+        // should be logged even if address is undefined -> do not shorten
+        address: `${address}`,
+        sourceContracts: Object.keys(sources),
+      });
+      continue;
+    }
+
     const evmEventSource = data.sources.find(
       (s) => s.event_signature === log.topics[0],
     );

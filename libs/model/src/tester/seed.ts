@@ -1,8 +1,16 @@
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { randomInt } from 'crypto';
 import { Model, type ModelStatic } from 'sequelize';
-import z, { ZodNullable, ZodObject, ZodUnknown } from 'zod';
+import z, {
+  ZodArray,
+  ZodNullable,
+  ZodObject,
+  ZodOptional,
+  ZodString,
+  ZodUnknown,
+} from 'zod';
 import type { State } from '../models';
 import { bootstrap_testing } from './bootstrap';
 
@@ -23,6 +31,22 @@ function isNullable(value: ZodUnknown) {
   return isNullable(value._def.innerType as ZodUnknown);
 }
 
+function isArray(
+  value: ZodUnknown | ZodOptional<ZodUnknown> | ZodNullable<ZodUnknown>,
+) {
+  if (value instanceof ZodOptional || value instanceof ZodNullable)
+    return isArray(value._def.innerType);
+  return value instanceof ZodArray;
+}
+
+function isString(
+  value: ZodUnknown | ZodOptional<ZodUnknown> | ZodNullable<ZodUnknown>,
+) {
+  if (value instanceof ZodOptional || value instanceof ZodNullable)
+    return isString(value._def.innerType);
+  return value instanceof ZodString;
+}
+
 /**
  * Seeds aggregate for unit testing
  * - Partial seed values can be provided to define attributes specific to the unit test, and to drive how many child entities are created
@@ -35,14 +59,35 @@ function isNullable(value: ZodUnknown) {
  */
 export async function seed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas[T]>>,
+  values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<[z.infer<typeof schemas[T]> | undefined, State[]]> {
+): Promise<[z.infer<(typeof schemas)[T]> | undefined, State[]]> {
   const db = await bootstrap_testing();
 
   const records: State[] = [];
   await _seed(db![name], values ?? {}, options, records, 0);
   return [records.at(0) as any, records];
+}
+
+/**
+ * Seeds multiple aggregates and returns record indexed by keys
+ */
+export async function seedRecord<T extends schemas.Aggregates, K>(
+  name: T,
+  keys: Readonly<Array<keyof K>>,
+  valuesFn: (key: keyof K) => DeepPartial<z.infer<(typeof schemas)[T]>>,
+): Promise<Record<keyof K, z.infer<(typeof schemas)[T]>>> {
+  const values = await Promise.all(
+    keys.map(async (key) => {
+      const [value] = await seed(name, valuesFn(key));
+      return [key, value];
+    }),
+  );
+  return values.reduce(
+    (record, [key, value]) =>
+      Object.assign(record, { [key!.toString()]: value }),
+    {} as Record<keyof K, z.infer<(typeof schemas)[T]>>,
+  );
 }
 
 async function _seed(
@@ -59,10 +104,17 @@ async function _seed(
     const undefs = {} as State;
     Object.entries(schema.shape).forEach(([key, value]) => {
       if (key !== 'id' && typeof values[key] === 'undefined') {
-        if (model.associations[key]) undefs[key] = [];
-        else if (isNullable(value)) undefs[key] = null;
+        if (model.associations[key]) {
+          if (isArray(value)) undefs[key] = [];
+          else undefs[key] = undefined;
+        } else if (isNullable(value)) undefs[key] = null;
       }
+      // super-randomize string pks to avoid CI failures
+      if (model.primaryKeyAttribute === key && isString(value))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (mocked as any)[key] = `${(mocked as any)[key]}-${randomInt(1000)}`;
     });
+    // eslint-disable-next-line no-param-reassign
     values = { ...mocked, ...undefs, ...values };
   }
   const record = (

@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { getLastEdited } from 'server/util/getLastEdited';
 import { sanitizeDeletedComment } from 'server/util/sanitizeDeletedComment';
 
 export const Errors = {
@@ -28,8 +27,6 @@ const viewComments = async (
   }
 
   const comments = await models.Comment.findAll({
-    // @ts-expect-error StrictNullChecks
-    where: { community_id: community.id, thread_id: threadId },
     include: [
       {
         model: models.Address,
@@ -38,17 +35,15 @@ const viewComments = async (
             model: models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
+      },
+      {
+        model: models.Thread,
+        attributes: ['id'],
+        required: true,
+        where: { id: threadId, community_id: community!.id },
       },
       {
         model: models.Reaction,
@@ -64,19 +59,14 @@ const viewComments = async (
                 model: models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
+                attributes: ['id', 'profile'],
               },
             ],
           },
         ],
+      },
+      {
+        model: models.CommentVersionHistory,
       },
     ],
     order: [['created_at', 'DESC']],
@@ -87,7 +77,7 @@ const viewComments = async (
     const data = c.toJSON();
     return {
       ...sanitizeDeletedComment(data),
-      last_edited: getLastEdited(data),
+      last_edited: data.updated_at,
     };
   });
 

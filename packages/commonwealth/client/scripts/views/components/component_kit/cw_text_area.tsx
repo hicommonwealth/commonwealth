@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import 'components/component_kit/cw_text_area.scss';
 
 import { useFormContext } from 'react-hook-form';
+import { CWLabel } from './cw_label';
 import type { BaseTextInputProps } from './cw_text_input';
 import { MessageRow, useTextInputWithValidation } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
@@ -20,6 +21,7 @@ type TextAreaStyleProps = {
 type TextAreaFormValidationProps = {
   name?: string;
   hookToForm?: boolean;
+  charCount?: number;
 };
 
 type TextAreaProps = BaseTextInputProps &
@@ -31,6 +33,7 @@ export const CWTextArea = (props: TextAreaProps) => {
   const textareaRef = useRef(null);
 
   const {
+    charCount = false,
     autoComplete,
     autoFocus,
     value,
@@ -46,6 +49,8 @@ export const CWTextArea = (props: TextAreaProps) => {
     hookToForm,
     instructionalMessage,
   } = props;
+
+  const [characterCount, setCharacterCount] = useState(0);
 
   useEffect(() => {
     if (resizeWithText) {
@@ -107,7 +112,8 @@ export const CWTextArea = (props: TextAreaProps) => {
           } else {
             e.stopPropagation();
             validationProps.setIsTyping(true);
-            clearTimeout(validationProps.inputTimeout);
+            validationProps.inputTimeout &&
+              clearTimeout(validationProps.inputTimeout);
             const timeout = e.currentTarget.value?.length > 3 ? 250 : 1000;
             validationProps.setInputTimeout(
               setTimeout(() => {
@@ -119,6 +125,7 @@ export const CWTextArea = (props: TextAreaProps) => {
                 }
               }, timeout),
             );
+            setCharacterCount(e.currentTarget.value.length);
           }
         }}
         onBlur={(e) => {
@@ -154,6 +161,11 @@ export const CWTextArea = (props: TextAreaProps) => {
             (formFieldErrorMessage ? 'failure' : undefined)
           }
         />
+      )}
+      {charCount && (
+        <div className="character-count">
+          <CWLabel label={`Character count: ${characterCount}/${charCount}`} />
+        </div>
       )}
     </div>
   );

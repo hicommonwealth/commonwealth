@@ -1,67 +1,42 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { AuthModalType } from 'views/modals/AuthModal/types';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface AuthModalStore {
-  shouldOpenGuidanceModalAfterMagicSSORedirect: boolean;
-  setShouldOpenGuidanceModalAfterMagicSSORedirect: (
-    shouldOpen: boolean,
-  ) => void;
-  triggerOpenModalType: AuthModalType;
-  setTriggerOpenModalType: (modalType: AuthModalType) => void;
-  validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived: () => void;
+  authModalType: AuthModalType | undefined;
+  setAuthModalType: (type: AuthModalType | undefined) => void;
+  sessionKeyValidationError?: SessionKeyError;
+  checkForSessionKeyRevalidationErrors: (error: unknown) => void;
 }
 
 export const authModal = createStore<AuthModalStore>()(
-  devtools(
-    persist(
-      (set) => ({
-        shouldOpenGuidanceModalAfterMagicSSORedirect: false,
-        setShouldOpenGuidanceModalAfterMagicSSORedirect: (shouldOpen) => {
-          set((state) => {
-            return {
-              ...state,
-              shouldOpenGuidanceModalAfterMagicSSORedirect: shouldOpen,
-            };
-          });
-        },
-        // @ts-expect-error StrictNullChecks
-        triggerOpenModalType: null,
-        setTriggerOpenModalType: (modalType) => {
-          set((state) => {
-            return {
-              ...state,
-              triggerOpenModalType: modalType,
-            };
-          });
-        },
-        validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived: () => {
-          set((state) => {
-            if (state.shouldOpenGuidanceModalAfterMagicSSORedirect) {
-              return {
-                ...state,
-                triggerOpenModalType: AuthModalType.AccountTypeGuidance,
-                shouldOpenGuidanceModalAfterMagicSSORedirect: false,
-              };
-            }
+  devtools((set) => ({
+    authModalType: undefined,
+    setAuthModalType: (type) => {
+      set((state) => {
+        return {
+          ...state,
+          authModalType: type,
+        };
+      });
+    },
+    checkForSessionKeyRevalidationErrors: (error) => {
+      const sessionKeyValidationError =
+        error instanceof SessionKeyError && error;
 
-            return {
-              ...state,
-              shouldOpenGuidanceModalAfterMagicSSORedirect: false,
-            };
-          });
-        },
-      }),
-      {
-        name: 'auth-modal', // unique name
-        partialize: (state) => ({
-          shouldOpenGuidanceModalAfterMagicSSORedirect:
-            state.shouldOpenGuidanceModalAfterMagicSSORedirect,
-        }), // persist only shouldOpenGuidanceModalAfterMagicSSORedirect
-      },
-    ),
-  ),
+      if (sessionKeyValidationError) {
+        set((state) => {
+          return {
+            ...state,
+            sessionKeyValidationError: sessionKeyValidationError,
+            authModalType: AuthModalType.RevalidateSession,
+          };
+        });
+      }
+    },
+  })),
 );
 
 const useAuthModalStore = createBoundedUseStore(authModal);

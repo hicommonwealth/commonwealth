@@ -1,6 +1,11 @@
 import { notifySuccess } from 'controllers/app/notifications';
-import React, { useState } from 'react';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import React from 'react';
 import app from 'state';
+import {
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
+} from 'state/api/communities';
 import _ from 'underscore';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -8,11 +13,34 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './Snapshots.scss';
 import { snapshotValidationSchema } from './validation';
 
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 const Snapshots = () => {
-  const community = app.config.chains.getById(app.activeChainId());
-  const [hasExistingSnapshots, setHasExistingSnapshots] = useState(
-    community.snapshot.length > 0,
-  );
+  const communityId = app.activeChainId() || '';
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: communityId,
+      enabled: !!communityId,
+    });
+
+  useRunOnceOnCondition({
+    callback: () => {
+      setLinks(
+        (community?.snapshot_spaces || []).map((x) => ({
+          value: x,
+          error: '',
+          canDelete: true,
+          canUpdate: true,
+        })),
+      );
+    },
+    shouldRun: !isLoadingCommunity && !!community,
+  });
+
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
+
+  const hasExistingSnapshots = (community?.snapshot_spaces || [])?.length > 0;
   const {
     links: snapshots,
     setLinks,
@@ -21,17 +49,12 @@ const Snapshots = () => {
     onLinkUpdatedAtIndex,
     areLinksValid,
   } = useLinksArray({
-    initialLinks: (community.snapshot || []).map((x) => ({
-      value: x,
-      error: '',
-      canDelete: true,
-      canUpdate: true,
-    })),
+    initialLinks: [],
     linkValidation: snapshotValidationSchema,
   });
 
   const onSaveChanges = async () => {
-    if (!areLinksValid()) return;
+    if (!areLinksValid() || !community?.id) return;
 
     try {
       // get unique snapshot names from links (if any value in array was link)
@@ -46,9 +69,14 @@ const Snapshots = () => {
             }),
         ),
       ];
-      await community.updateChainData({
-        snapshot: newSnapshots,
-      });
+
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          snapshot: newSnapshots,
+        }),
+      );
+
       setLinks(
         newSnapshots.map((snapshot) => ({
           value: snapshot,
@@ -60,7 +88,6 @@ const Snapshots = () => {
 
       notifySuccess('Snapshot links updated!');
       app.sidebarRedraw.emit('redraw');
-      setHasExistingSnapshots(newSnapshots.length > 0);
     } catch {
       notifySuccess('Failed to update snapshot links!');
     }
@@ -96,7 +123,9 @@ const Snapshots = () => {
             [...snapshots.map((x) => x.value.trim())].sort((a, b) =>
               a.localeCompare(b),
             ),
-            [...(community.snapshot || [])].sort((a, b) => a.localeCompare(b)),
+            [...(community?.snapshot_spaces || [])].sort((a, b) =>
+              a.localeCompare(b),
+            ),
           )}
           onClick={onSaveChanges}
         />

@@ -13,6 +13,7 @@
     .contest-image {
       border-radius: 5px 0 0 5px;
       max-height: 240px;
+      max-width: 522px;
     }
   }
 
@@ -96,6 +97,36 @@
             height: 24px;
           }
         }
+      }
+    }
+
+    .farcaster-cta {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      padding-block: 8px;
+      border: 1px solid $neutral-200;
+      border-radius: 6px;
+      margin-top: 8px;
+
+      &:hover {
+        cursor: pointer;
+        background-color: $neutral-25;
+      }
+
+      &:active {
+        background-color: $neutral-50;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      img {
+        width: 32px;
+        height: 32px;
       }
     }
   }

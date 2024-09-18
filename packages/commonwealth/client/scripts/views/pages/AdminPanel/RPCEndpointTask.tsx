@@ -1,87 +1,50 @@
-import { BalanceType, ChainType } from '@hicommonwealth/shared';
-import axios from 'axios';
+import { BalanceType } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
-import CommunityInfo from 'models/ChainInfo';
 import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
-import React, { useEffect, useState } from 'react';
-import app from 'state';
-import { getNodeByCosmosChainId, getNodeByUrl } from 'state/api/nodes/utils';
+import React, { useState } from 'react';
+import { getNodeByUrl } from 'state/api/nodes/utils';
 import useFetchNodesQuery from '../../../state/api/nodes/fetchNodes';
-import {
-  CWDropdown,
-  DropdownItemType,
-} from '../../components/component_kit/cw_dropdown';
-import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWTextInput as CWTextInputOld } from '../../components/component_kit/cw_text_input';
 import {
   CWValidationText,
   ValidationStatus,
 } from '../../components/component_kit/cw_validation_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import { CWTypeaheadSelectList } from '../../components/component_kit/new_designs/CWTypeaheadSelectList';
+import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
-import { createChainNode, updateChainNode } from './utils';
+import { createChainNode } from './utils';
 
 const RPCEndpointTask = () => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [rpcEndpointCommunityValue, setRpcEndpointCommunityValue] =
-    useState<string>('');
-  // @ts-expect-error <StrictNullChecks/>
-  const [communityInfo, setCommunityInfo] = useState<CommunityInfo>(null);
   const [rpcEndpoint, setRpcEndpoint] = useState<string>('');
-  const [communityInfoValueValidated, setCommunityInfoValueValidated] =
-    useState<boolean>(false);
   // @ts-expect-error <StrictNullChecks/>
   const [communityChainNode, setCommunityChainNode] = useState<NodeInfo>(null);
   const [communityChainNodeValidated, setCommunityChainNodeValidated] =
     useState<boolean>(false);
   const [rpcName, setRpcName] = useState<string>('');
-  const [bech32, setBech32] = useState<string>('');
   const [balanceType, setBalanceType] = useState<BalanceType>(
     BalanceType.Ethereum,
   );
-  const [chainNodeNotCreated, setChainNodeNotCreated] =
-    useState<boolean>(false);
   // @ts-expect-error <StrictNullChecks/>
   const [ethChainId, setEthChainId] = useState<number>(null);
-  const [cosmosChainIds, setCosmosChainIds] = useState<DropdownItemType[]>([
-    {
-      label: '',
-      value: '',
-    },
-  ]);
-  // @ts-expect-error <StrictNullChecks/>
-  const [cosmosChainId, setCosmosChainId] = useState<string>(null);
+
   const [ethChainIdValueValidated, setEthChainIdValueValidated] =
     useState<boolean>(false);
 
   const { data: nodes } = useFetchNodesQuery();
 
-  useEffect(() => {
-    if (balanceType === BalanceType.Cosmos) {
-      getCosmosChainIds().then((res) => {
-        setCosmosChainIds(res);
-      });
-    }
-  }, [balanceType]);
-
   const buttonEnabled =
     (communityChainNodeValidated &&
       communityChainNode &&
-      communityInfoValueValidated &&
       balanceType !== BalanceType.Ethereum &&
       !ethChainIdValueValidated) ||
     (rpcName !== '' &&
-      (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
+      balanceType === BalanceType.Ethereum &&
       rpcEndpoint !== '');
-
-  const setCommunityIdInput = (e) => {
-    setRpcEndpointCommunityValue(e.target.value);
-    if (e.target.value.length === 0) setCommunityInfoValueValidated(false);
-  };
 
   const RPCEndpointValidationFn = (
     value: string,
@@ -104,25 +67,8 @@ const RPCEndpointTask = () => {
     if (nodeInfo) {
       setCommunityChainNode(nodeInfo);
       setCommunityChainNodeValidated(true);
-    } else {
-      setChainNodeNotCreated(true);
     }
-
     return [];
-  };
-
-  const checkIfCosmosChainNodeExists = (
-    selectedCosmosChainId: string,
-  ): void => {
-    const cosmosNodeInfo = getNodeByCosmosChainId(selectedCosmosChainId);
-
-    if (cosmosNodeInfo) {
-      setCommunityChainNode(cosmosNodeInfo);
-      setCommunityChainNodeValidated(true);
-      setChainNodeNotCreated(false);
-    } else {
-      setChainNodeNotCreated(true);
-    }
   };
 
   const ethChainIdEndpointValidationFn = (
@@ -139,69 +85,19 @@ const RPCEndpointTask = () => {
     return ['failure', err];
   };
 
-  const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
-    const communityInfoData = app.config.chains.getById(value);
-    if (!communityInfoData) {
-      setCommunityInfoValueValidated(false);
-      const err = 'Community not found';
-      setErrorMsg(err);
-      return ['failure', err];
-    }
-    if (communityInfoData.type !== ChainType.Chain) {
-      setCommunityInfoValueValidated(false);
-      const err = 'Community is not a chain';
-      setErrorMsg(err);
-      return ['failure', err];
-    }
-    setCommunityInfo(communityInfoData);
-    setCommunityInfoValueValidated(true);
-    setErrorMsg(null);
-    return [];
-  };
-
   const update = async () => {
     try {
-      let nodeId = null;
-      if (chainNodeNotCreated) {
-        // Create Chain Node if not yet created
-        const res = await createChainNode({
-          url: rpcEndpoint,
-          name: rpcName,
-          bech32,
-          balance_type: balanceType,
-          eth_chain_id: ethChainId,
-          cosmos_chain_id: cosmosChainId,
-        });
-        nodeId = res.data.result.node_id;
-      } else {
-        await updateChainNode({
-          id: communityChainNode.id,
-          url: rpcEndpoint,
-          name: rpcName,
-          bech32,
-          balance_type: balanceType,
-          eth_chain_id: ethChainId,
-          cosmos_chain_id: cosmosChainId,
-        });
-        // @ts-expect-error <StrictNullChecks/>
-        nodeId = communityChainNode.id;
-      }
+      await createChainNode({
+        url: rpcEndpoint,
+        name: rpcName,
+        balance_type: balanceType,
+        eth_chain_id: ethChainId,
+      });
 
-      if (communityInfo && communityInfoValueValidated) {
-        await communityInfo.updateChainData({
-          chain_node_id: nodeId ?? communityChainNode.id.toString(),
-          type: ChainType.Chain,
-        });
-      }
-
-      setRpcEndpointCommunityValue('');
       setRpcEndpoint('');
-      // @ts-expect-error <StrictNullChecks/>
-      setCommunityInfo(null);
       // @ts-expect-error <StrictNullChecks/>
       setCommunityChainNode(null);
       setCommunityChainNodeValidated(false);
-      setBech32('');
       setRpcName('');
       setErrorMsg(null);
       notifySuccess('RPC Endpoint Updated');
@@ -215,7 +111,7 @@ const RPCEndpointTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update RPC Endpoint',
-      description: `Are you sure you want to update the rpc endpoint on ${rpcEndpointCommunityValue}?`,
+      description: `Are you sure you want to create this rpc endpoint?`,
       buttons: [
         {
           label: 'Update',
@@ -232,56 +128,48 @@ const RPCEndpointTask = () => {
     });
   };
 
-  const getCosmosChainIds = async (): Promise<DropdownItemType[]> => {
-    let chainIds = [{ label: '', value: '' }];
-
-    const { data: chains } = await axios.get(
-      `${process.env.COSMOS_REGISTRY_API}/api/v1/mainnet`,
-    );
-
-    if (chains) {
-      chainIds = chains.map((chain) => {
-        return { label: chain, value: chain };
-      });
-    }
-
-    return chainIds;
-  };
-
   return (
     <div className="TaskGroup">
-      <CWText type="h4">Switch/Add RPC Endpoint</CWText>
+      <CWText type="h4">Add RPC Endpoint/Create Chain Node</CWText>
       <CWText type="caption">
-        Changes the RPC endpoint for a specific chain community, or adds a Chain
-        Node if it doesn&apos;t yet exist.
+        Adds a Chain Node for a specific chain community
       </CWText>
+      <CWText type="caption">
+        Chain name, ETH chain id, and RPC enpoint can be found here:
+      </CWText>
+      <div>
+        <a
+          href="https://chainlist.org/"
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: 'blue' }}
+        >
+          https://chainlist.org/
+        </a>
+      </div>
       <div className="MultiRow">
-        <div className="TaskRow">
-          <CWTextInput
-            value={rpcEndpointCommunityValue}
-            onInput={setCommunityIdInput}
-            inputValidationFn={idValidationFn}
-            placeholder="Enter a community id"
-          />
-          <CWTextInput
-            value={rpcEndpoint}
-            onInput={(e) => {
-              setRpcEndpoint(e.target.value);
-            }}
-            inputValidationFn={RPCEndpointValidationFn}
-            placeholder="Enter an RPC endpoint"
-          />
-          <CWButton
-            label={chainNodeNotCreated ? 'Create' : 'Update'}
-            className="TaskButton"
-            disabled={!buttonEnabled}
-            onClick={openConfirmationModal}
-          />
-        </div>
+        {balanceType === BalanceType.Ethereum && (
+          <div className="TaskRow">
+            <CWTextInputOld
+              value={rpcEndpoint}
+              onInput={(e) => {
+                setRpcEndpoint(e.target.value.trim());
+              }}
+              inputValidationFn={RPCEndpointValidationFn}
+              placeholder="Enter an RPC endpoint (Required)"
+            />
+            <CWButton
+              label="Create"
+              className="TaskButton"
+              disabled={!buttonEnabled}
+              onClick={openConfirmationModal}
+            />
+          </div>
+        )}
         <div>
           <div className="TaskRow">
             <CWDropdown
-              label="balance type"
+              label="Network family"
               options={[
                 { label: 'ethereum', value: BalanceType.Ethereum },
                 { label: 'solana', value: BalanceType.Solana },
@@ -293,18 +181,18 @@ const RPCEndpointTask = () => {
                 setBalanceType(item.value as BalanceType);
               }}
             />
-            <CWTextInput
-              label="name"
-              value={rpcName}
-              onInput={(e) => {
-                setRpcName(e.target.value);
-              }}
-              placeholder={`Enter chain node name ${
-                chainNodeNotCreated ? '' : ' (optional)'
-              }`}
-            />
+            {balanceType === BalanceType.Ethereum && (
+              <CWTextInput
+                label="Chain name"
+                value={rpcName}
+                onInput={(e) => {
+                  setRpcName(e.target.value.trim());
+                }}
+                placeholder="Enter chain node name (Required)"
+              />
+            )}
           </div>
-          {balanceType === BalanceType.Ethereum && (
+          {balanceType === BalanceType.Ethereum ? (
             <div className="TaskRow">
               <CWTextInput
                 value={ethChainId}
@@ -312,38 +200,14 @@ const RPCEndpointTask = () => {
                   setEthChainId(parseInt(e.target.value));
                 }}
                 inputValidationFn={ethChainIdEndpointValidationFn}
-                placeholder="Enter an ETH chain id"
+                placeholder="Enter an ETH chain id (Required)"
                 label="eth chain id"
               />
             </div>
-          )}
-          {balanceType === BalanceType.Cosmos && (
-            <div className="TaskRow">
-              <div className="dropdown-type multi-select w-full">
-                <CWLabel label="cosmos chain id" />
-                <CWTypeaheadSelectList
-                  placeholder="Select Cosmos Chain ID"
-                  options={cosmosChainIds}
-                  defaultValue={{
-                    label: 'Search for Cosmos ID',
-                    value: '',
-                  }}
-                  onChange={(selectedOption) => {
-                    checkIfCosmosChainNodeExists(selectedOption.value);
-                    setCosmosChainId(selectedOption.value);
-                  }}
-                />
-              </div>
-              <CWTextInput
-                label="bech32"
-                value={bech32}
-                onInput={(e) => {
-                  setBech32(e.target.value);
-                }}
-                placeholder={`Enter bech32 ${
-                  chainNodeNotCreated ? '' : ' (optional)'
-                }`}
-              />
+          ) : (
+            <div className="nonEVMMessage">
+              Please contact an engineer to add any chains that are not
+              EVM/Ethereum
             </div>
           )}
         </div>

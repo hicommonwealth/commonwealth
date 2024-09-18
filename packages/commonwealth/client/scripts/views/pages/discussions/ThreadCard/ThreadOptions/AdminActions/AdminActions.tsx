@@ -1,3 +1,5 @@
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -11,7 +13,6 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
@@ -27,6 +28,7 @@ import './AdminActions.scss';
 
 export type AdminActionsProps = {
   thread: Thread;
+  canUpdateThread?: boolean;
   onDelete?: () => any;
   onSpamToggle?: (thread: Thread) => any;
   onLockToggle?: (isLocked: boolean) => any;
@@ -37,6 +39,7 @@ export type AdminActionsProps = {
   onEditStart?: () => any;
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
+  onDownloadMarkdown?: () => void;
   hasPendingEdits?: boolean;
   editingDisabled?: boolean;
 };
@@ -55,6 +58,8 @@ export const AdminActions = ({
   onEditConfirm,
   hasPendingEdits,
   editingDisabled,
+  onDownloadMarkdown,
+  canUpdateThread,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
@@ -72,27 +77,20 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
-
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
-  const {
-    mutateAsync: deleteThread,
-    reset: resetDeleteThreadMutation,
-    error: deleteThreadError,
-  } = useDeleteThreadMutation({
-    communityId: app.activeChainId(),
+  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
   });
 
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetDeleteThreadMutation,
-    error: deleteThreadError,
-  });
-
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
     currentTopicId: thread.topic?.id,
   });
@@ -110,12 +108,14 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 threadId: thread.id,
-                communityId: app.activeChainId(),
+                threadMsgId: thread.canvasMsgId,
+                communityId: app.activeChainId() || '',
                 address: user.activeAccount?.address || '',
               });
               onDelete?.();
             } catch (err) {
               if (err instanceof SessionKeyError) {
+                checkForSessionKeyRevalidationErrors(err);
                 return;
               }
               console.error(err?.responseJSON?.error || err?.message);
@@ -178,12 +178,14 @@ export const AdminActions = ({
           onClick: async () => {
             const isSpam = !thread.markedAsSpamAt;
             try {
-              await editThread({
-                communityId: app.activeChainId(),
+              const input = await buildUpdateThreadInput({
+                communityId: app.activeChainId() || '',
                 threadId: thread.id,
+                threadMsgId: thread.canvasMsgId,
                 spam: isSpam,
                 address: user.activeAccount?.address || '',
-              })
+              });
+              await editThread(input)
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
                 .catch(() => {
                   notifyError(
@@ -199,13 +201,15 @@ export const AdminActions = ({
     });
   };
 
-  const handleThreadLockToggle = () => {
-    editThread({
+  const handleThreadLockToggle = async () => {
+    const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
       readOnly: !thread.readOnly,
-      communityId: app.activeChainId(),
-    })
+      communityId: app.activeChainId() || '',
+    });
+    editThread(input)
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
         onLockToggle?.(!thread?.readOnly);
@@ -216,13 +220,15 @@ export const AdminActions = ({
       });
   };
 
-  const handleThreadPinToggle = () => {
-    editThread({
+  const handleThreadPinToggle = async () => {
+    const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
-      communityId: app.activeChainId(),
+      threadMsgId: thread.canvasMsgId,
+      communityId: app.activeChainId() || '',
       pinned: !thread.pinned,
-    })
+    });
+    editThread(input)
       .then(() => {
         notifySuccess(thread?.pinned ? 'Unpinned!' : 'Pinned!');
         onPinToggle?.(!thread.pinned);
@@ -262,25 +268,27 @@ export const AdminActions = ({
   };
 
   const handleSnapshotProposalClick = () => {
-    const snapshotSpaces = app.chain.meta.snapshot;
+    const snapshotSpaces = app.chain.meta?.snapshot_spaces;
     onSnapshotProposalFromThread && onSnapshotProposalFromThread();
     navigate(
-      snapshotSpaces.length > 1
+      snapshotSpaces?.length > 1
         ? '/multiple-snapshots'
         : `/snapshot/${snapshotSpaces}`,
     );
   };
 
-  const handleArchiveThread = () => {
+  const handleArchiveThread = async () => {
     if (thread.archivedAt === null) {
       setIsArchiveThreadModalOpen(true);
     } else {
-      editThread({
+      const input = await buildUpdateThreadInput({
         threadId: thread.id,
-        communityId: app.activeChainId(),
+        threadMsgId: thread.canvasMsgId,
+        communityId: app.activeChainId() || '',
         archived: !thread.archivedAt,
         address: user.activeAccount?.address || '',
-      })
+      });
+      editThread(input)
         .then(() => {
           notifySuccess(
             `Thread has been ${
@@ -307,7 +315,8 @@ export const AdminActions = ({
         <PopoverMenu
           className="AdminActions compact"
           menuItems={[
-            ...(thread.archivedAt === null &&
+            ...(canUpdateThread &&
+            thread.archivedAt === null &&
             (hasAdminPermissions ||
               isThreadAuthor ||
               (isThreadCollaborator && !thread.readOnly))
@@ -330,7 +339,7 @@ export const AdminActions = ({
                   },
                 ]
               : []),
-            ...(hasAdminPermissions
+            ...(canUpdateThread && hasAdminPermissions
               ? [
                   ...(thread.archivedAt === null
                     ? [
@@ -368,9 +377,17 @@ export const AdminActions = ({
                   },
                 ]
               : []),
-            ...(isThreadAuthor || hasAdminPermissions
+            ...[
+              {
+                onClick: () => onDownloadMarkdown?.(),
+                label: 'Download as Markdown',
+                iconLeft: 'download' as const,
+                iconLeftWeight: 'bold' as const,
+              },
+            ],
+            ...(canUpdateThread && (isThreadAuthor || hasAdminPermissions)
               ? [
-                  ...(app.chain?.meta.snapshot.length
+                  ...(app.chain?.meta?.snapshot_spaces?.length
                     ? [
                         {
                           label: 'Snapshot proposal from thread',
@@ -387,7 +404,8 @@ export const AdminActions = ({
                           iconLeft: 'democraticProposal' as const,
                           iconLeftWeight: 'bold' as const,
                           onClick: () => {
-                            const snapshotSpaces = app.chain.meta.snapshot;
+                            const snapshotSpaces =
+                              app?.chain?.meta?.snapshot_spaces;
                             // @ts-expect-error StrictNullChecks
                             onSnapshotProposalFromThread();
                             navigate(
@@ -488,7 +506,6 @@ export const AdminActions = ({
         onClose={() => setIsArchiveThreadModalOpen(false)}
         open={isArchiveThreadModalOpen}
       />
-      {RevalidationModal}
     </>
   );
 };

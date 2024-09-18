@@ -1,8 +1,14 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
+import {
+  useGetCommunityByIdQuery,
+  useUpdateCommunityMutation,
+} from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -22,15 +28,31 @@ const Directory = () => {
   const chainNodeOptionsSorted = (chainNodeOptions || []).sort((a, b) =>
     a.label.localeCompare(b.label),
   );
-  const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
+  const communityId = app.activeChainId() || '';
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: communityId,
+      enabled: !!communityId,
+      includeNodeInfo: true,
+    });
+
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId: community?.id || '',
+  });
+  const communityDefaultChainNodeId = community?.ChainNode?.id;
 
   const navigate = useCommonNavigate();
-  const [community] = useState(app.config.chains.getById(app.activeChainId()));
-  const [isEnabled, setIsEnabled] = useState(community.directoryPageEnabled);
-  const [chainNodeId, setChainNodeId] = useState(
-    community.directoryPageChainNodeId,
-  );
+  const [isEnabled, setIsEnabled] = useState<boolean>(false);
+  const [chainNodeId, setChainNodeId] = useState<number | null>();
   const [isSaving, setIsSaving] = useState(false);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      setIsEnabled(!!community?.directory_page_enabled);
+      setChainNodeId(community?.directory_page_chain_node_id);
+    },
+    shouldRun: !isLoadingCommunity && !!community,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -42,18 +64,23 @@ const Directory = () => {
   const onSaveChanges = useCallback(async () => {
     if (
       isSaving ||
-      (isEnabled === community.directoryPageEnabled &&
-        chainNodeId === community.directoryPageChainNodeId)
+      !community?.id ||
+      (isEnabled === community?.directory_page_enabled &&
+        chainNodeId === community?.directory_page_chain_node_id)
     )
       return;
 
     try {
       setIsSaving(true);
-      await community.updateChainData({
-        directory_page_enabled: isEnabled,
-        directory_page_chain_node_id: chainNodeId,
-        isPWA: isAddedToHomeScreen,
-      });
+
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          directoryPageChainNodeId: chainNodeId || undefined,
+          directoryPageEnabled: isEnabled,
+          isPWA: isAddedToHomeScreen,
+        }),
+      );
 
       notifySuccess('Updated community directory');
       app.sidebarRedraw.emit('redraw');
@@ -62,7 +89,16 @@ const Directory = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [community, isEnabled, chainNodeId, isSaving, isAddedToHomeScreen]);
+  }, [
+    isSaving,
+    chainNodeId,
+    community?.id,
+    community?.directory_page_enabled,
+    community?.directory_page_chain_node_id,
+    isEnabled,
+    isAddedToHomeScreen,
+    updateCommunity,
+  ]);
 
   return (
     <section className="Directory">
@@ -98,7 +134,7 @@ const Directory = () => {
           <CWTooltip
             placement="top"
             content={
-              community.directoryPageEnabled
+              community?.directory_page_enabled
                 ? null
                 : 'Save changes to enable directory page'
             }
@@ -109,7 +145,9 @@ const Directory = () => {
                 className="cta-button-container"
               >
                 <CWButton
-                  disabled={!community.directoryPageEnabled}
+                  disabled={
+                    !community?.directory_page_enabled || isLoadingCommunity
+                  }
                   buttonType="tertiary"
                   buttonHeight="sm"
                   label="Go to directory"
@@ -126,8 +164,9 @@ const Directory = () => {
         buttonType="secondary"
         label="Save Changes"
         disabled={
-          isEnabled === community.directoryPageEnabled &&
-          chainNodeId === community.directoryPageChainNodeId
+          (isEnabled === community?.directory_page_enabled &&
+            chainNodeId === community?.directory_page_chain_node_id) ||
+          isLoadingCommunity
         }
         onClick={onSaveChanges}
       />

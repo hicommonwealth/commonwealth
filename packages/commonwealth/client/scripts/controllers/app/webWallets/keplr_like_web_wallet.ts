@@ -12,7 +12,9 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import IWebWallet from '../../../models/IWebWallet';
+import { getChainDecimals } from './utils';
 
 declare global {
   interface Window {
@@ -73,9 +75,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -91,7 +91,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta?.bech32Prefix || 'osmo',
+      bech32Prefix: app.chain?.meta?.bech32_prefix || 'osmo',
       signer: {
         type: 'amino',
         signAmino: window.wallet.signAmino,
@@ -116,7 +116,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+      const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${
         app.chain?.id || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');
@@ -125,6 +125,8 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
       this._chainId = chainId;
       client.disconnect();
 
+      const decimals = getChainDecimals(app.chain?.id || '', app.chain?.base);
+
       try {
         await window.wallet.enable(this._chainId);
       } catch (err) {
@@ -132,14 +134,14 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
         );
 
-        const bech32Prefix = app.chain?.meta?.bech32Prefix?.toLowerCase();
+        const bech32Prefix = app.chain?.meta?.bech32_prefix?.toLowerCase();
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain?.meta?.name,
           rpc: url,
           // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
           // use the RPC url as hack, which will break some querying functionality but not signing.
-          rest: app.chain?.meta?.node?.altWalletUrl || url,
+          rest: app.chain?.meta?.ChainNode?.alt_wallet_url || url,
           bip44: {
             coinType: 118,
           },
@@ -155,27 +157,27 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
             {
               coinDenom: app.chain?.meta?.default_symbol,
               coinMinimalDenom: `u${app.chain?.meta?.default_symbol?.toLowerCase()}`,
-              coinDecimals: app.chain?.meta?.decimals || 6,
+              coinDecimals: decimals || 6,
             },
           ],
           feeCurrencies: [
             {
               coinDenom: app.chain?.meta?.default_symbol,
               coinMinimalDenom: `u${app.chain?.meta?.default_symbol?.toLowerCase()}`,
-              coinDecimals: app.chain?.meta?.decimals || 6,
+              coinDecimals: decimals || 6,
               gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
             },
           ],
           stakeCurrency: {
             coinDenom: app.chain?.meta?.default_symbol,
             coinMinimalDenom: `u${app.chain?.meta?.default_symbol?.toLowerCase()}`,
-            coinDecimals: app.chain?.meta?.decimals || 6,
+            coinDecimals: decimals || 6,
           },
           features: [],
         };
         await window.wallet.experimentalSuggestChain(info);
         await window.wallet.enable(this._chainId);
-        this._chain = app.chain.id;
+        this._chain = app.chain.id || '';
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 

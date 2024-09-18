@@ -12,15 +12,14 @@ interface UseContestTopicsProps {
 const useContestTopics = ({
   initialToggledTopicList,
 }: UseContestTopicsProps) => {
-  const [allTopicsToggled, setAllTopicsToggled] = useState(
-    initialToggledTopicList?.every(({ checked }) => checked),
-  );
   const [toggledTopicList, setToggledTopicList] = useState<
     ContestFormData['toggledTopicList']
   >(initialToggledTopicList || []);
 
+  const communityId = app.activeChainId() || '';
   const { data: topicsData } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   // @ts-expect-error StrictNullChecks
@@ -39,14 +38,13 @@ const useContestTopics = ({
       const mappedTopics = topicsData.map(({ name, id }) => ({
         name,
         id,
-        // for brand-new contest, set all topics to true by default
-        // otherwise, take value from saved contest
+        // for brand-new contest, set all
+        // topics to false by default, otherwise restore existing state
         checked: initialToggledTopicList
           ? !!initialToggledTopicList?.find((t) => t.id === id)?.checked
-          : true,
+          : false,
       }));
       setToggledTopicList(mappedTopics);
-      setAllTopicsToggled(mappedTopics.every(({ checked }) => checked));
     }
   }, [initialToggledTopicList, topicsData]);
 
@@ -55,6 +53,7 @@ const useContestTopics = ({
       (topic) => topic.id === topicId,
     )?.checked;
 
+    // only one can be checked at a time
     const mappedTopics = toggledTopicList.map((topic) => {
       if (topic.id === topicId) {
         return {
@@ -62,31 +61,18 @@ const useContestTopics = ({
           checked: !isChecked,
         };
       }
-      return topic;
+      return {
+        ...topic,
+        checked: false,
+      };
     });
 
-    const allChecked = mappedTopics.every(({ checked }) => checked);
-
     setToggledTopicList(mappedTopics);
-    setAllTopicsToggled(allChecked);
-  };
-
-  const handleToggleAllTopics = () => {
-    const mappedTopics = toggledTopicList?.map((topic) => ({
-      name: topic.name,
-      id: topic.id,
-      checked: !allTopicsToggled,
-    }));
-
-    setToggledTopicList(mappedTopics);
-    setAllTopicsToggled((prevState) => !prevState);
   };
 
   const topicsEnabledError = toggledTopicList.every(({ checked }) => !checked);
 
   return {
-    allTopicsToggled,
-    handleToggleAllTopics,
     toggledTopicList,
     handleToggleTopic,
     sortedTopics,

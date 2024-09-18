@@ -4,13 +4,12 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, safeTruncateBody } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
+import { models } from '@hicommonwealth/model';
+import { safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
 import { getCommentUrl, getThreadUrl } from '../util';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const output = z.boolean();
 
@@ -33,46 +32,48 @@ export const processUserMentioned: EventHandler<
     return false;
   }
 
-  const profile = await models.Profile.findOne({
+  const user = await models.User.findOne({
     where: {
-      id: payload.authorProfileId,
+      id: payload.authorUserId,
     },
   });
 
-  if (!profile) {
+  if (!user) {
     log.error('Author profile not found', undefined, payload);
     return false;
   }
 
-  return await provider.triggerWorkflow({
+  const res = await provider.triggerWorkflow({
     key: WorkflowKeys.UserMentioned,
     users: [{ id: String(payload.mentionedUserId) }],
     data: {
       author_address_id: payload.authorAddressId,
       author_user_id: payload.authorUserId,
       author_address: payload.authorAddress,
-      author_profile_id: payload.authorProfileId,
       community_id: payload.communityId,
       community_name: community.name,
-      author: profile.profile_name || payload.authorAddress.substring(255),
+      author: user.profile.name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
           ? // @ts-expect-error StrictNullChecks
-            safeTruncateBody(payload.thread.body, 255)
+            safeTruncateBody(decodeURIComponent(payload.thread.body), 255)
           : // @ts-expect-error StrictNullChecks
-            safeTruncateBody(payload.comment.text, 255),
+            safeTruncateBody(decodeURIComponent(payload.comment.text), 255),
       object_url:
         'thread' in payload
-          ? // @ts-expect-error StrictNullChecks
-            getThreadUrl(payload.thread.community_id, payload.thread.id)
+          ? getThreadUrl(
+              payload.communityId,
+              payload.thread!.id!,
+              community.custom_domain,
+            )
           : getCommentUrl(
-              // @ts-expect-error StrictNullChecks
-              payload.comment.community_id,
-              // @ts-expect-error StrictNullChecks
-              payload.comment.thread_id,
-              // @ts-expect-error StrictNullChecks
-              payload.comment.id,
+              payload.communityId,
+              payload.comment!.thread_id,
+              payload.comment!.id!,
+              community.custom_domain,
             ),
     },
   });
+
+  return !res.some((r) => r.status === 'rejected');
 };

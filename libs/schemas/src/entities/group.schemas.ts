@@ -14,7 +14,7 @@ const ContractSource = z.object({
   token_id: z
     .string()
     .regex(/^[0-9]+$/)
-    .optional(),
+    .nullish(),
 });
 
 const NativeSource = z.object({
@@ -61,16 +61,17 @@ export const Requirement = z.union([
 export const GroupMetadata = z.object({
   name: z.string(),
   description: z.string(),
-  required_requirements: PG_INT.optional(),
-  membership_ttl: z.number().optional(), // NOT USED
+  required_requirements: PG_INT.nullish(),
+  membership_ttl: z.number().nullish(), // NOT USED
 });
 
 export const Group = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   community_id: z.string(),
   metadata: GroupMetadata,
   requirements: z.array(Requirement),
   is_system_managed: z.boolean().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

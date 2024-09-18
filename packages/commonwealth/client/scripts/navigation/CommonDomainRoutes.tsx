@@ -4,11 +4,14 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
+const EditorPage = lazy(() => import('views/pages/EditorPage'));
+
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/communities'));
+const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
   () =>
@@ -29,9 +32,6 @@ const FinishSocialLoginPage = lazy(
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 
-const NotificationSettingsOld = lazy(
-  () => import('views/pages/NotificationSettingsOld'),
-);
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
@@ -73,6 +73,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTopicsOld = lazy(
+  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -87,27 +90,33 @@ const Contests = lazy(() => import('views/pages/Contests'));
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
 const SnapshotProposalPage = lazy(
-  () => import('views/pages/snapshot_proposals'),
+  () => import('views/pages/Snapshots/SnapshotProposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
-  () => import('views/pages/view_multiple_snapshot_spaces'),
+  () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
 const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/view_snapshot_proposal'),
+  () => import('views/pages/Snapshots/ViewSnapshotProposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal/NewSnapshotProposalPage'),
+  () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+const CommunityNotFoundPage = lazy(
+  () => import('views/pages/CommunityNotFoundPage'),
+);
 
 const CommonDomainRoutes = ({
   contestEnabled,
-  knockInAppNotifications,
+  farcasterContestEnabled,
+  tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
+  <Route key="/editor" path="/editor" element={<EditorPage />} />,
+
   <Route
     key="/"
     path="/"
@@ -118,6 +127,15 @@ const CommonDomainRoutes = ({
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
+  ...(tokenizedCommunityEnabled
+    ? [
+        <Route
+          key="/createTokenCommunity"
+          path="/createTokenCommunity"
+          element={withLayout(LaunchToken, { type: 'common' })}
+        />,
+      ]
+    : []),
   <Route
     key="/dashboard"
     path="/dashboard"
@@ -210,10 +228,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(
-      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
-      { type: 'common' },
-    )}
+    element={withLayout(NotificationSettings, { type: 'common' })}
   />,
   <Route
     key="/:scope/notification-settings"
@@ -363,9 +378,12 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
-    element={withLayout(CommunityTopics, {
-      scoped: true,
-    })}
+    element={withLayout(
+      farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+      {
+        scoped: true,
+      },
+    )}
   />,
   <Route
     key="/:scope/manage/moderators"
@@ -527,8 +545,8 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
-    key="/profile/id/:profileId"
-    path="/profile/id/:profileId"
+    key="/profile/id/:userId"
+    path="/profile/id/:userId"
     element={withLayout(NewProfilePage, {
       scoped: true,
       type: 'common',
@@ -573,6 +591,15 @@ const CommonDomainRoutes = ({
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
   // LEGACY REDIRECTS END
+
+  // Community not found page - This should be at the end
+  <Route
+    key="/:scope/*"
+    path="/:scope/*"
+    element={withLayout(CommunityNotFoundPage, {
+      scoped: true,
+    })}
+  />,
 ];
 
 export default CommonDomainRoutes;

@@ -13,7 +13,6 @@ $size: 48px;
 
   .BreadcrumbsPageLayout {
     padding-inline: 0;
-    padding-bottom: 52px;
 
     @include smallInclusive {
       padding-bottom: initial;
@@ -23,7 +22,7 @@ $size: 48px;
   .UserTrainingSliderPageLayout,
   .AdminOnboardingSliderPageLayout {
     padding-inline: 0;
-    margin-top: -36px;
+    margin-top: -30px;
 
     @include smallInclusive {
       margin-top: -12px;

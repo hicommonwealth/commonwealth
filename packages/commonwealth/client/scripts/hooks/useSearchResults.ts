@@ -33,7 +33,7 @@ const useSearchResults = (
 } => {
   const communityId = filters.includes('communities')
     ? 'all_communities'
-    : app.activeChainId();
+    : app.activeChainId() || '';
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {
@@ -43,7 +43,7 @@ const useSearchResults = (
     orderBy: APIOrderBy.Rank,
     orderDirection: APIOrderDirection.Desc,
   };
-  const queryEnabled = debouncedSearchTerm.length > 0;
+  const queryEnabled = debouncedSearchTerm.length > 0 && !!communityId;
 
   const { data: threadsData } = useSearchThreadsQuery({
     ...sharedQueryOptions,
@@ -62,8 +62,10 @@ const useSearchResults = (
 
   const { data: profilesData } = useSearchProfilesQuery({
     ...sharedQueryOptions,
-    includeRoles: false,
-    enabled: queryEnabled && filters.includes('members'),
+    enabled:
+      queryEnabled &&
+      filters.includes('members') &&
+      debouncedSearchTerm?.length >= 3,
   });
 
   const searchResults = useMemo(() => {

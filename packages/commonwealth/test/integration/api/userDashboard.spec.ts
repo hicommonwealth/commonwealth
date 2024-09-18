@@ -28,11 +28,15 @@ describe('User Dashboard API', () => {
   let userId;
   let userAddress;
   let userAddressId;
+  let userDid;
+
   let userJWT2;
   let userSession2;
   let userId2;
   let userAddress2;
   let userAddressId2;
+  let userDid2;
+
   let threadOne;
   let topicId: number;
   let topicId2: number;
@@ -66,6 +70,7 @@ describe('User Dashboard API', () => {
     userId = firstUser.user_id;
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
+    userDid = firstUser.did;
     userJWT = jwt.sign(
       { id: userId, email: firstUser.email },
       config.AUTH.JWT_SECRET,
@@ -74,6 +79,7 @@ describe('User Dashboard API', () => {
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
     expect(userJWT).to.not.be.null;
+    expect(userDid).to.not.be.null;
 
     const secondUser = await server.seeder.createAndVerifyAddress(
       { chain: chain2 },
@@ -82,6 +88,7 @@ describe('User Dashboard API', () => {
     userId2 = secondUser.user_id;
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
+    userDid2 = secondUser.did;
     userJWT2 = jwt.sign(
       { id: userId2, email: secondUser.email },
       config.AUTH.JWT_SECRET,
@@ -91,6 +98,7 @@ describe('User Dashboard API', () => {
     expect(userAddress2).to.not.be.null;
     expect(userAddressId2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
+    expect(userDid2).to.not.be.null;
 
     // make second user join alex community
     const communityArgs: JoinCommunityArgs = {
@@ -114,6 +122,7 @@ describe('User Dashboard API', () => {
     const threadOneArgs: ThreadArgs = {
       chainId: chain2,
       address: userAddress2,
+      did: userDid2,
       jwt: userJWT2,
       title,
       body,
@@ -130,6 +139,7 @@ describe('User Dashboard API', () => {
     const threadTwoArgs: ThreadArgs = {
       chainId: chain,
       address: userAddress2,
+      did: userDid2,
       jwt: userJWT2,
       title,
       body,
@@ -231,6 +241,7 @@ describe('User Dashboard API', () => {
         const threadArgs: ThreadArgs = {
           chainId: chain,
           address: userAddress2,
+          did: userDid2,
           jwt: userJWT2,
           title,
           body,

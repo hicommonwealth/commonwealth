@@ -6,8 +6,8 @@ import * as events from './events.schemas';
 const BaseOutboxProperties = z.object({
   event_id: PG_INT.optional(),
   relayed: z.boolean().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });
 
 export const Outbox = z.union([
@@ -99,6 +99,12 @@ export const Outbox = z.union([
     .object({
       event_name: z.literal(EventNames.SubscriptionPreferencesUpdated),
       event_payload: events.SubscriptionPreferencesUpdated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.CommentUpvoted),
+      event_payload: events.CommentUpvoted,
     })
     .merge(BaseOutboxProperties),
 ]);

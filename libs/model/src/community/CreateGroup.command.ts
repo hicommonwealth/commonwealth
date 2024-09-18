@@ -2,7 +2,7 @@ import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
-import { isCommunityAdminOrModerator } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
@@ -12,13 +12,16 @@ export const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
-export function CreateGroup(): Command<typeof schemas.CreateGroup> {
+export function CreateGroup(): Command<
+  typeof schemas.CreateGroup,
+  AuthContext
+> {
   return {
     ...schemas.CreateGroup,
-    auth: [isCommunityAdminOrModerator],
-    body: async ({ id, payload }) => {
+    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
+    body: async ({ payload }) => {
       const groups = await models.Group.findAll({
-        where: { community_id: id },
+        where: { community_id: payload.id },
         attributes: ['metadata'],
         raw: true,
       });
@@ -36,7 +39,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
           id: {
             [Op.in]: payload.topics || [],
           },
-          community_id: id,
+          community_id: payload.id,
         },
       });
       if (payload.topics?.length !== topicsToAssociate.length)
@@ -47,7 +50,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
           // create group
           const group = await models.Group.create(
             {
-              community_id: id!,
+              community_id: payload.id,
               metadata: payload.metadata,
               requirements: payload.requirements,
               is_system_managed: false,
@@ -86,7 +89,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
       //    groupId: newGroup.id,
       //  })
 
-      return { id, groups: [newGroup] };
+      return { id: payload.id, groups: [newGroup] };
     },
   };
 }

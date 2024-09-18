@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import React, { useState } from 'react';
-import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { useDebounce } from 'usehooks-ts';
 import {
   notifyError,
@@ -23,6 +22,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { User } from '../components/user/user';
 
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
 import '../../../styles/modals/edit_collaborators_modal.scss';
 
@@ -50,28 +50,24 @@ export const EditCollaboratorsModal = ({
   >(thread.collaborators as IThreadCollaboratorWithId[]);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
   });
 
   const { data: profiles } = useSearchProfilesQuery({
     searchTerm: debouncedSearchTerm,
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     limit: 30,
-    includeRoles: true,
-    enabled: debouncedSearchTerm.length >= 3,
+    enabled: debouncedSearchTerm.length >= 3 && !!app.activeChainId(),
   });
 
-  const searchResults: Array<RoleInstanceWithPermissionAttributes> = profiles
-    ?.pages?.[0]?.results
+  const searchResults = profiles?.pages?.[0]?.results
     ? profiles.pages[0].results
-        .map((profile) => ({
-          ...profile!.roles?.[0],
-          Address: profile.addresses[0],
-        }))
-        .filter((role) => role.Address.address !== user.activeAccount?.address)
+        .map((p) => p.addresses[0])
+        .filter((a) => a.address !== user.activeAccount?.address)
     : [];
 
   const handleUpdateCollaborators = (c: IThreadCollaboratorWithId) => {
@@ -104,24 +100,18 @@ export const EditCollaboratorsModal = ({
                   className="collaborator-row"
                   onClick={() =>
                     handleUpdateCollaborators({
-                      // @ts-expect-error <StrictNullChecks/>
-                      id: c.Address.id,
-                      // @ts-expect-error <StrictNullChecks/>
-                      address: c.Address.address,
-                      // @ts-expect-error <StrictNullChecks/>
-                      community_id: c.Address.community_id,
+                      id: c.id,
+                      address: c.address,
+                      community_id: c.community_id,
                       // @ts-expect-error <StrictNullChecks/>
                       User: null,
                     })
                   }
                 >
                   <User
-                    // @ts-expect-error <StrictNullChecks/>
-                    userAddress={c?.Address?.address}
-                    userCommunityId={c?.community_id}
-                    shouldShowAsDeleted={
-                      !c?.Address?.address && !c?.community_id
-                    }
+                    userAddress={c.address}
+                    userCommunityId={c.community_id}
+                    shouldShowAsDeleted={!c.address && !c.community_id}
                   />
                 </div>
               ))
@@ -189,9 +179,10 @@ export const EditCollaboratorsModal = ({
               removedCollaborators.length > 0
             ) {
               try {
-                const updatedThread = await editThread({
+                const input = await buildUpdateThreadInput({
                   threadId: thread.id,
-                  communityId: app.activeChainId(),
+                  threadMsgId: thread.canvasMsgId,
+                  communityId: app.activeChainId() || '',
                   address: user.activeAccount?.address || '',
                   collaborators: {
                     ...(newCollaborators.length > 0 && {
@@ -202,16 +193,7 @@ export const EditCollaboratorsModal = ({
                     }),
                   },
                 });
-                updatedThread.collaborators?.forEach((c) =>
-                  c.User.Profiles.forEach((p) => {
-                    p.avatarUrl = (
-                      p as unknown as { avatar_url: string }
-                    ).avatar_url;
-                    p.name = (
-                      p as unknown as { profile_name: string }
-                    ).profile_name;
-                  }),
-                );
+                const updatedThread = await editThread(input);
                 notifySuccess('Collaborators updated');
                 onCollaboratorsUpdated &&
                   // @ts-expect-error <StrictNullChecks/>

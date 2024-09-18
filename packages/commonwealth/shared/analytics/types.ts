@@ -65,6 +65,8 @@ export const enum MixpanelCommunityCreationEvent {
   CONNECT_NEW_WALLET_PRESSED = 'Connect New Wallet Button Pressed',
   NEW_COMMUNITY_CREATION = 'New Community Creation',
   CREATE_COMMUNITY_CANCELLED = 'Create Community Cancel Button Pressed',
+  CREATE_TOKEN_COMMUNITY_VISITED = '/createTokenCommunity Page Visited',
+  CREATE_TOKEN_COMMUNITY_CANCELLED = 'Create Token Community Cancel Button Pressed',
 }
 
 export const enum MixpanelSnapshotEvents {
@@ -83,6 +85,11 @@ export const enum MixpanelGovernanceEvents {
   COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
 }
 
+export const enum MixpanelContestEvents {
+  CREATE_CONTEST_BUTTON_PRESSED = 'Create Contest Button Pressed',
+  CONTEST_CREATED = 'Contest Created',
+}
+
 export const enum MixpanelPWAEvent {
   PWA_USED = 'PWA in use',
   PWA_NOT_USED = 'PWA NOT in use',
@@ -99,6 +106,7 @@ export type MixpanelEvents =
   | MixpanelErrorCaptureEvent
   | MixpanelClickthroughEvent
   | MixpanelGovernanceEvents
+  | MixpanelContestEvents
   | MixpanelPWAEvent;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here

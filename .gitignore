@@ -15,6 +15,7 @@ redis-data
 **/.nyc_output
 **/dependency-graph.svg
 .ghostal
-*dump.sql
 **/yarn.lock
 *coverage
+**/*.dump.sql
+**/*.dump.sql.gz

@@ -1,3 +1,4 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
@@ -29,7 +30,10 @@ const useReserveCommunityNamespace = ({
     useState<ActionState>(defaultActionState);
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId,
+    reInitAppOnSuccess: true,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
@@ -52,12 +56,14 @@ const useReserveCommunityNamespace = ({
         chainId,
       );
 
-      await updateCommunity({
-        communityId,
-        namespace,
-        symbol,
-        transactionHash: txReceipt.transactionHash,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId,
+          namespace,
+          symbol,
+          transactionHash: txReceipt.transactionHash,
+        }),
+      );
 
       setReserveNamespaceData({
         state: 'completed',
@@ -67,7 +73,7 @@ const useReserveCommunityNamespace = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,
         community: chainId,
-        userId: user.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.userId,
         userAddress: userAddress,
         isPWA: isAddedToHomeScreen,
       });

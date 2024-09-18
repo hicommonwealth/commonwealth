@@ -11,9 +11,8 @@ import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
-import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
-import useUserStore, { userStore } from '../state/ui/user';
+import useUserStore from '../state/ui/user';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
@@ -30,12 +29,10 @@ type SublayoutProps = {
 } & React.PropsWithChildren;
 
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
-  const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const [authModalType, setAuthModalType] = useState<AuthModalType>();
-  const [profileId, setProfileId] = useState<null | number>(null);
+
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: true,
@@ -45,55 +42,30 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
+  const { authModalType, setAuthModalType } = useAuthModalStore();
   const user = useUserStore();
-
-  useEffect(() => {
-    if (triggerOpenModalType) {
-      setAuthModalType(triggerOpenModalType);
-      // @ts-expect-error StrictNullChecks
-      setTriggerOpenModalType(undefined);
-    }
-  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
 
-  useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout> | null = null;
-    if (isLoggedIn) {
-      timeout = setTimeout(() => {
-        user.addresses?.[0]?.profile?.id &&
-          setProfileId(user.addresses?.[0]?.profile?.id);
-      }, 100);
-    } else {
-      setProfileId(null);
-    }
-
-    return () => {
-      if (timeout !== null) clearTimeout(timeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
-
   useNecessaryEffect(() => {
     if (
-      isLoggedIn &&
+      user.isLoggedIn &&
       !isWelcomeOnboardModalOpen &&
-      profileId &&
-      !userStore.getState().isWelcomeOnboardFlowComplete
+      user.id &&
+      !user.isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
     }
 
-    if (!isLoggedIn && isWelcomeOnboardModalOpen) {
+    if (!user.isLoggedIn && isWelcomeOnboardModalOpen) {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
-    profileId,
+    user.id,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
-    isLoggedIn,
+    user.isLoggedIn,
   ]);
 
   const location = useLocation();
@@ -145,10 +117,8 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
-  // @ts-expect-error StrictNullChecks
-  const terms = app.chain ? chain.terms : null;
-  // @ts-expect-error StrictNullChecks
-  const banner = app.chain ? chain.communityBanner : null;
+  const terms = app.chain ? chain?.terms : null;
+  const banner = app.chain ? chain?.communityBanner : null;
 
   return (
     <div className="Sublayout">
@@ -192,13 +162,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             resizing,
           )}
         >
-          {/* @ts-expect-error StrictNullChecks */}
-          <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+          <SublayoutBanners banner={banner || ''} terms={terms || ''} />
 
           <div className="Body">
             <div
               className={clsx('mobile-auth-buttons', {
-                isVisible: !isLoggedIn && isWindowExtraSmall,
+                isVisible: !user.isLoggedIn && isWindowExtraSmall,
               })}
               id="mobile-auth-buttons"
             >

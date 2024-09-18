@@ -2,21 +2,23 @@ import { PopperPlacementType } from '@mui/base/Popper';
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
 import React, { useRef } from 'react';
-import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CommentVersionHistory } from '../../../../../models/Comment';
 import { UserProfile } from '../../../../../models/MinimumProfile';
 import {
   IThreadCollaborator,
-  VersionHistory,
+  ThreadVersionHistory,
 } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { CWSelectList } from '../../../../components/component_kit/new_designs/CWSelectList/index';
@@ -52,7 +54,7 @@ export type AuthorAndPublishInfoProps = {
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
-  versionHistory?: VersionHistory[];
+  versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
   changeContentText?: (text: string) => void;
 };
 
@@ -92,36 +94,45 @@ export const AuthorAndPublishInfo = ({
 
   const collaboratorLookupInfo: Record<string, string> =
     collaboratorsInfo?.reduce((acc, collaborator) => {
-      acc[collaborator.address] = collaborator.User.Profiles[0].name;
+      acc[collaborator.address] = collaborator.User.profile.name;
       return acc;
     }, {}) ?? {};
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
   const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.body,
+    value: v.body || v.text,
     label: formatVersionText(
-      v.timestamp,
-      // @ts-expect-error <StrictNullChecks>
-      v.author?.address,
-      profile,
+      moment(v.timestamp),
+      v.address,
       collaboratorLookupInfo,
+      profile?.name,
     ),
   }));
 
   const isCommunityFirstLayout = layoutType === 'community-first';
-  const communtyInfo = app.config.chains.getById(authorCommunityId);
+  const { data: communtyInfo, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: authorCommunityId,
+      enabled: !!authorCommunityId,
+    });
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
       {isCommunityFirstLayout && (
         <>
-          <CommunityInfo
-            name={communtyInfo.name}
-            iconUrl={communtyInfo.iconUrl}
-            iconSize="regular"
-            communityId={authorCommunityId}
-          />
-          {dotIndicator}
+          {isLoadingCommunity ? (
+            <CWCircleMultiplySpinner />
+          ) : (
+            <>
+              <CommunityInfo
+                name={communtyInfo?.name || ''}
+                iconUrl={communtyInfo?.icon_url || ''}
+                iconSize="regular"
+                communityId={authorCommunityId}
+              />
+              {dotIndicator}
+            </>
+          )}
         </>
       )}
       <FullUser
@@ -184,7 +195,7 @@ export const AuthorAndPublishInfo = ({
                         key={address}
                         userAddress={address}
                         userCommunityId={community_id}
-                        profile={User.Profiles[0]}
+                        profile={User.profile}
                       />
                     );
                   })}

@@ -1,30 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import app from 'state';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { ApiEndpoints, queryClient } from 'state/api/config';
-import { userStore } from '../../ui/user';
-
-interface DeleteTopicProps {
-  topicId: number;
-  communityId: string;
-  topicName: string;
-}
-
-const deleteTopic = async ({ topicId, communityId }: DeleteTopicProps) => {
-  await axios.delete(`${app.serverUrl()}/topics/${topicId}`, {
-    data: {
-      community_id: communityId,
-      jwt: userStore.getState().jwt,
-    },
-  });
-};
 
 const useDeleteTopicMutation = () => {
-  return useMutation({
-    mutationFn: deleteTopic,
-    onSuccess: async (data, variables) => {
+  return trpc.community.deleteTopic.useMutation({
+    onSuccess: async (response) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, variables.communityId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, response.community_id],
       });
       // TODO: add a new method in thread cache to deal with this
       // await app.threads.listingStore.removeTopic(variables.topicName);

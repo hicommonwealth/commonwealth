@@ -36,6 +36,7 @@ export type CosmosProposalType =
   | 'upgrade'
   | 'parameter'
   | 'communitySpend';
+export type GovgenProposalType = Exclude<CosmosProposalType, 'communitySpend'>;
 export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
 export type CosmosProposalState =
   | 'Unspecified'

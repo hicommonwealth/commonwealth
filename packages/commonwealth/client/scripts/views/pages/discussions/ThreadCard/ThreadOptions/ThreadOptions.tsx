@@ -1,16 +1,22 @@
+import {
+  CanvasSignedData,
+  deserializeCanvas,
+  verify,
+} from '@hicommonwealth/shared';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import Thread from 'models/Thread';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import {
-  getCommentSubscription,
-  getReactionSubscription,
-  handleToggleSubscription,
-} from '../../helpers';
+import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
@@ -59,31 +65,30 @@ export const ThreadOptions = ({
   setIsUpvoteDrawerOpen,
   editingDisabled,
 }: OptionsProps) => {
-  const [isSubscribed, setIsSubscribed] = useState(
-    thread &&
-      getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive,
-  );
-
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
+  const userStore = useUserStore();
 
-  const handleToggleSubscribe = async (e) => {
-    // prevent clicks from propagating to discussion row
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!thread) {
-      return;
-    }
-
-    await handleToggleSubscription(
-      thread,
-      getCommentSubscription(thread),
-      getReactionSubscription(thread),
-      isSubscribed,
-      setIsSubscribed,
-    );
+  const handleDownloadMarkdown = () => {
+    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
   };
+
+  const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
+    useState<CanvasSignedData | null>(null);
+  useEffect(() => {
+    try {
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        thread.canvasSignedData,
+      );
+      if (!canvasSignedData) return;
+      verify(canvasSignedData)
+        .then(() => {
+          setVerifiedCanvasSignedData(canvasSignedData);
+        })
+        .catch(() => null);
+    } catch (error) {
+      // ignore errors or missing data
+    }
+  }, [thread.canvasSignedData]);
 
   return (
     <>
@@ -135,16 +140,37 @@ export const ThreadOptions = ({
           {/* @ts-expect-error StrictNullChecks*/}
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
-          <CWThreadAction
-            action="subscribe"
-            label="Subscribe"
-            onClick={handleToggleSubscribe}
-            selected={!isSubscribed}
-            disabled={!isCommunityMember}
-          />
+          {userStore.id > 0 && (
+            <ToggleThreadSubscribe
+              thread={thread}
+              isCommunityMember={isCommunityMember}
+            />
+          )}
 
-          {canUpdateThread && thread && (
+          {verifiedCanvasSignedData && (
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="verification-icon"
+            >
+              <CWTooltip
+                placement="top"
+                content="Signed by author"
+                renderTrigger={(handleInteraction) => (
+                  <span
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  >
+                    <CWIcon iconName="check" iconSize="xs" />
+                  </span>
+                )}
+              ></CWTooltip>
+            </CWText>
+          )}
+
+          {thread && (
             <AdminActions
+              canUpdateThread={canUpdateThread}
               thread={thread}
               onLockToggle={onLockToggle}
               onCollaboratorsEdit={onCollaboratorsEdit}
@@ -156,6 +182,7 @@ export const ThreadOptions = ({
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onSpamToggle={onSpamToggle}
+              onDownloadMarkdown={handleDownloadMarkdown}
               hasPendingEdits={hasPendingEdits}
               editingDisabled={editingDisabled}
             />

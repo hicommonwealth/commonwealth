@@ -1,11 +1,20 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import React from 'react';
-import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWContentPageCard } from 'views/components/component_kit/CWContentPageCard';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
+import { z } from 'zod';
 
 const CardsShowcase = () => {
+  const sampleCommunityId = 'dydx';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: sampleCommunityId,
+    enabled: !!sampleCommunityId,
+    includeNodeInfo: true,
+  });
+
   return (
     <>
       <CWText type="h5">Card</CWText>
@@ -36,11 +45,13 @@ const CardsShowcase = () => {
       />
 
       <CWText type="h5">Related Community Card</CWText>
-      <CWRelatedCommunityCard
-        community={app.config.chains.getAll()[30]}
-        memberCount="123"
-        threadCount="456"
-      />
+      {community && (
+        <CWRelatedCommunityCard
+          community={community as z.infer<typeof ExtendedCommunity>}
+          memberCount="123"
+          threadCount="456"
+        />
+      )}
     </>
   );
 };

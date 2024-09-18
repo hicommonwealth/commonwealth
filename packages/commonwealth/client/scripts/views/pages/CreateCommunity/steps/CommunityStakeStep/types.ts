@@ -12,11 +12,13 @@ export type StakeData = {
 };
 
 export interface SignStakeTransactionsProps {
-  goToSuccessStep: () => void;
+  onSuccess: () => void;
+  onCancel: () => void;
   communityStakeData: StakeData;
   selectedAddress: AddressInfo;
   createdCommunityId: string;
   chainId: string;
+  isTopicFlow?: boolean;
 }
 
 export interface EnableStakeProps {
@@ -24,6 +26,7 @@ export interface EnableStakeProps {
   onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
   communityStakeData: StakeData;
   chainId: string;
+  isTopicFlow?: boolean;
 }
 
 export const defaultActionState: ActionState = {

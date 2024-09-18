@@ -31,13 +31,17 @@ describe('Community alerts lifecycle', () => {
     });
     [community] = await seed('Community', {
       chain_node_id: node?.id,
+      lifetime_thread_count: 0,
+      profile_count: 0,
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: node?.id,
+      lifetime_thread_count: 0,
+      profile_count: 0,
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: '0x',
+      address: '0x',
     };
   });
 
@@ -51,6 +55,7 @@ describe('Community alerts lifecycle', () => {
 
   test('should create a new community alert', async () => {
     const payload = {
+      id: actor.user.id!,
       community_id: community!.id!,
     };
 
@@ -71,6 +76,7 @@ describe('Community alerts lifecycle', () => {
       community_id: community!.id!,
     });
     const payload = {
+      id: actor.user.id!,
       community_ids: [community!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
@@ -90,6 +96,7 @@ describe('Community alerts lifecycle', () => {
       community_id: communityTwo!.id!,
     });
     const payload = {
+      id: actor.user.id!,
       community_ids: [community!.id!, communityTwo!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
@@ -105,6 +112,7 @@ describe('Community alerts lifecycle', () => {
       community_id: community!.id!,
     });
     const payload = {
+      id: actor.user.id!,
       community_ids: [community!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
@@ -124,6 +132,7 @@ describe('Community alerts lifecycle', () => {
       community_id: communityTwo!.id!,
     });
     const payload = {
+      id: actor.user.id!,
       community_ids: [community!.id!, communityTwo!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {

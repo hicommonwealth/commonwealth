@@ -4,6 +4,7 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
 import { useDebounce } from 'usehooks-ts';
@@ -20,6 +21,7 @@ import useDirectoryPageData, {
 import ErrorPage from 'views/pages/error';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './DirectoryPage.scss';
 
 const DirectoryPage = () => {
@@ -30,15 +32,20 @@ const DirectoryPage = () => {
 
   const { data: nodes } = useFetchNodesQuery();
 
-  const directoryPageEnabled = app.config.chains.getById(
-    app.activeChainId(),
-  )?.directoryPageEnabled;
-  const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
-  const selectedChainNodeId = app.config.chains.getById(
-    app.activeChainId(),
-  )?.directoryPageChainNodeId;
+  const communityId = app.activeChainId() || '';
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: communityId,
+      enabled: !!communityId,
+      includeNodeInfo: true,
+    });
+  const directoryPageEnabled = community?.directory_page_enabled;
+  const communityDefaultChainNodeId = community?.ChainNode?.id;
+  const selectedChainNodeId = community?.directory_page_chain_node_id;
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
-  const baseChain = getNodeById(defaultChainNodeId, nodes);
+  const baseChain = defaultChainNodeId
+    ? getNodeById(defaultChainNodeId, nodes)
+    : undefined;
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -64,6 +71,10 @@ const DirectoryPage = () => {
       isPWA: isAddedToHomeScreen,
     },
   });
+
+  if (isLoadingCommunity) {
+    return <CWCircleMultiplySpinner />;
+  }
 
   if (!directoryPageEnabled) {
     return (

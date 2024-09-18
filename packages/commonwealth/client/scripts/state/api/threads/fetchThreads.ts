@@ -3,8 +3,7 @@ import axios from 'axios';
 import Thread from 'models/Thread';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { ThreadTimelineFilterTypes } from '../../../models/types';
 import { cacheTypes } from './helpers/cache';
 import { getToAndFromDatesRangesForThreadsTimelines } from './helpers/dates';
@@ -24,7 +23,7 @@ const queryTypeToRQMap = {
 };
 
 interface CommonProps {
-  queryType: typeof QueryTypes[keyof typeof QueryTypes];
+  queryType: (typeof QueryTypes)[keyof typeof QueryTypes];
   communityId: string;
   apiEnabled?: boolean;
 }
@@ -38,7 +37,7 @@ interface FetchBulkThreadsProps extends CommonProps {
   topicId?: number;
   stage?: string;
   includePinnedThreads?: boolean;
-  isOnArchivePage?: boolean;
+  includeArchivedThreads?: boolean;
   contestAddress?: string;
   contestStatus?: string;
   orderBy?:
@@ -152,35 +151,32 @@ const fetchBulkThreads = (props) => {
     };
     pageParam: number | undefined;
   }> => {
-    const res = await axios.get(
-      `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
-      {
-        params: {
-          bulk: true,
-          page: pageParam,
-          limit: props.limit,
-          community_id: props.communityId,
-          ...(props.topicId && { topic_id: props.topicId }),
-          ...(props.stage && { stage: props.stage }),
-          ...(props.includePinnedThreads && {
-            includePinnedThreads: props.includePinnedThreads || true,
-          }),
-          ...(props.fromDate && { from_date: props.fromDate }),
-          to_date: props.toDate,
-          orderBy: props.orderBy || 'newest',
-          ...(props.isOnArchivePage && { archived: true }),
-          ...(props.contestAddress && {
-            contestAddress: props.contestAddress,
-          }),
-          ...(props.contestStatus && {
-            status: props.contestStatus,
-          }),
-          ...(props.withXRecentComments && {
-            withXRecentComments: props.withXRecentComments,
-          }),
-        },
+    const res = await axios.get(`${SERVER_URL}${ApiEndpoints.FETCH_THREADS}`, {
+      params: {
+        bulk: true,
+        page: pageParam,
+        limit: props.limit,
+        community_id: props.communityId,
+        ...(props.topicId && { topic_id: props.topicId }),
+        ...(props.stage && { stage: props.stage }),
+        ...(props.includePinnedThreads && {
+          includePinnedThreads: props.includePinnedThreads || true,
+        }),
+        ...(props.fromDate && { from_date: props.fromDate }),
+        to_date: props.toDate,
+        orderBy: props.orderBy || 'newest',
+        ...(props.includeArchivedThreads && { archived: true }),
+        ...(props.contestAddress && {
+          contestAddress: props.contestAddress,
+        }),
+        ...(props.contestStatus && {
+          status: props.contestStatus,
+        }),
+        ...(props.withXRecentComments && {
+          withXRecentComments: props.withXRecentComments,
+        }),
       },
-    );
+    });
 
     // transform the response
     const transformedData = {
@@ -198,7 +194,7 @@ const fetchBulkThreads = (props) => {
 const fetchActiveThreads = (props) => {
   return async (): Promise<Thread[]> => {
     const response = await axios.get(
-      `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
+      `${SERVER_URL}${ApiEndpoints.FETCH_THREADS}`,
       {
         params: {
           active: true,
@@ -219,7 +215,7 @@ const fetchActiveThreads = (props) => {
 const fetchThreadCount = (props) => {
   return async (): Promise<number> => {
     const response = await axios.get(
-      `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
+      `${SERVER_URL}${ApiEndpoints.FETCH_THREADS}`,
       {
         params: {
           community_id: props.communityId,

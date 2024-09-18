@@ -3,7 +3,6 @@ import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
-  createAsyncWriterMock,
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '../../src';
@@ -27,6 +26,8 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
     const [community] = await tester.seed('Community', {
       name: 'Acme',
       chain_node_id: node.id,
+      lifetime_thread_count: 0,
+      profile_count: 0,
     });
 
     if (!community) {
@@ -64,7 +65,7 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
         updated_at: now,
         view_count: 0,
         canvas_signed_data: '',
-        canvas_hash: '',
+        canvas_msg_id: '',
         reaction_count: 0,
         reaction_weights_sum: 0,
         comment_count: 0,
@@ -79,10 +80,8 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
   });
 
   test.skip('basic', async () => {
-    const writer = createAsyncWriterMock();
     const paginator = createDatabasePaginatorDefault(50);
-
-    const sitemapGenerator = createSitemapGenerator(writer, [
+    const sitemapGenerator = createSitemapGenerator([
       paginator.threads,
       paginator.profiles,
     ]);

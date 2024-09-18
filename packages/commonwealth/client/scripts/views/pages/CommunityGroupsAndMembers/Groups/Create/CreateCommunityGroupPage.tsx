@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import { useCreateGroupMutation } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../../hooks/useAppStatus';
@@ -16,11 +17,13 @@ import './CreateCommunityGroupPage.scss';
 const CreateCommunityGroupPage = () => {
   const navigate = useCommonNavigate();
   const [allowedAddresses, setAllowedAddresses] = useState([]);
+  const user = useUserStore();
 
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: createGroup } = useCreateGroupMutation({
-    communityId: app.activeChainId(),
+    communityId,
   });
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -33,7 +36,7 @@ const CreateCommunityGroupPage = () => {
   });
 
   if (
-    !app.isLoggedIn() ||
+    !user.isLoggedIn ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {
     return <PageNotFound />;
@@ -55,10 +58,7 @@ const CreateCommunityGroupPage = () => {
         try {
           await createGroup(payload);
           notifySuccess('Group Created');
-          setShouldShowGroupMutationBannerForCommunity(
-            app.activeChainId(),
-            true,
-          );
+          setShouldShowGroupMutationBannerForCommunity(communityId, true);
           navigate(`/members?tab=groups`);
         } catch (error) {
           notifyError('Failed to create group');

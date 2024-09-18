@@ -10,16 +10,13 @@ import { Broker, broker, logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
-  Message,
   MessageType,
   ThreadChannel,
 } from 'discord.js';
-import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { config } from '../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
@@ -40,7 +37,7 @@ log.info(
 );
 
 async function startDiscordListener() {
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
 
   // async imports to delay calling logger
   const { handleMessage, handleThreadChannel } = await import(
@@ -95,23 +92,20 @@ async function startDiscordListener() {
     },
   );
 
-  client.on('messageDelete', async (message: Message) => {
+  client.on('messageDelete', async (message) => {
     await handleMessage(controller, client, message, 'comment-delete');
   });
 
-  client.on(
-    'messageUpdate',
-    async (oldMessage: Message, newMessage: Message) => {
-      await handleMessage(
-        controller,
-        client,
-        newMessage,
-        newMessage.nonce ? 'comment-update' : 'thread-body-update',
-      );
-    },
-  );
+  client.on('messageUpdate', async (_, newMessage) => {
+    await handleMessage(
+      controller,
+      client,
+      newMessage,
+      newMessage.nonce ? 'comment-update' : 'thread-body-update',
+    );
+  });
 
-  client.on('messageCreate', async (message: Message) => {
+  client.on('messageCreate', async (message) => {
     // this conditional prevents handling of messages like ChannelNameChanged which
     // are emitted inside a thread but which we do not want to replicate in the CW thread.
     // Thread/channel name changes are handled in threadUpdate since the that event comes

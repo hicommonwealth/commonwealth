@@ -2,29 +2,30 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { signDeleteCommentReaction } from 'controllers/server/sessions';
-import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
-  communityId: string;
   address: string;
-  canvasHash: string;
+  communityId: string;
+  commentMsgId: string;
   reactionId: number;
 }
 
 const deleteReaction = async ({
-  communityId,
   address,
-  canvasHash,
+  communityId,
+  commentMsgId,
   reactionId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteCommentReaction(address, {
-    comment_id: canvasHash,
+    comment_id: commentMsgId,
   });
+
   return await axios
-    .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
+    .delete(`${SERVER_URL}/reactions/${reactionId}`, {
       data: {
         author_community_id: communityId,
         address: address,
@@ -62,6 +63,8 @@ const useDeleteCommentReactionMutation = ({
     threadId,
   });
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
@@ -83,6 +86,7 @@ const useDeleteCommentReactionMutation = ({
         });
       });
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

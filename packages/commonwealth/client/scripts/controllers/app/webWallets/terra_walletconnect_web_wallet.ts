@@ -10,6 +10,7 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile
@@ -52,9 +53,7 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -70,7 +69,7 @@ class TerraWalletConnectWebWalletController
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix,
+      bech32Prefix: `${app.chain?.meta.bech32_prefix || 0}`,
       signer: {
         type: 'bytes',
         getAddress: () => this._accounts[0].address,

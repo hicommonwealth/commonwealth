@@ -4,7 +4,6 @@ import {
   CommunityInstance,
   ModelInstance,
 } from '@hicommonwealth/model';
-import { ChainNetwork } from '@hicommonwealth/shared';
 import { type ModelStatic } from 'sequelize';
 import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -61,9 +60,10 @@ export async function __updateCommunityId(
         id: new_community_id,
         ...communityData,
         redirect: community_id,
-        network: (communityData.network === id
-          ? new_community_id
-          : communityData.network) as ChainNetwork,
+        network:
+          communityData.network === id
+            ? new_community_id
+            : communityData.network,
       },
       { transaction },
     );
@@ -74,39 +74,18 @@ export async function __updateCommunityId(
     //  in the long-term. Alternative is to gradually duplicate the data
     //  and then delete the old data once redirect from old to new community
     //  is enabled
-    const models: ModelStatic<ModelInstance<{ community_id?: string }>>[] = [
-      // @ts-expect-error StrictNullChecks
+    const models: ModelStatic<ModelInstance<{ community_id: string }>>[] = [
       this.models.Address,
-      // @ts-expect-error StrictNullChecks
-      this.models.Ban,
-      // @ts-expect-error StrictNullChecks
-      this.models.Comment,
-      // @ts-expect-error StrictNullChecks
-      this.models.CommunityBanner,
-      // @ts-expect-error StrictNullChecks
       this.models.Topic,
-      // @ts-expect-error StrictNullChecks
       this.models.Thread,
-      this.models.Notification,
-      // @ts-expect-error StrictNullChecks
       this.models.Poll,
-      // @ts-expect-error StrictNullChecks
-      this.models.Reaction,
-      // @ts-expect-error StrictNullChecks
       this.models.StarredCommunity,
-      // @ts-expect-error StrictNullChecks
       this.models.Vote,
-      // @ts-expect-error StrictNullChecks
       this.models.Webhook,
-      // @ts-expect-error StrictNullChecks
       this.models.CommunityContract,
-      // @ts-expect-error StrictNullChecks
       this.models.CommunityStake,
-      // @ts-expect-error StrictNullChecks
       this.models.DiscordBotConfig,
-      // @ts-expect-error StrictNullChecks
       this.models.Group,
-      this.models.Subscription,
     ];
     for (const model of models) {
       await model.update(

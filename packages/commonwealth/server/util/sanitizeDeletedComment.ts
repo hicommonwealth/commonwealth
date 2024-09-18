@@ -15,14 +15,13 @@ export function sanitizeDeletedComment(
       verification_token: '',
       role: 'member',
       is_user_default: false,
+      ghost_address: false,
+      is_banned: false,
     },
     address_id: 0,
-    // @ts-expect-error <StrictNullChecks>
-    canvas_hash: null,
-    // @ts-expect-error <StrictNullChecks>
+    canvas_msg_id: null,
     canvas_signed_data: null,
     plaintext: '[deleted]',
     text: '[deleted]',
-    version_history: [],
   };
 }

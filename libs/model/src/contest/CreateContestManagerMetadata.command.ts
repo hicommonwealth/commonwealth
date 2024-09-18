@@ -4,7 +4,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
-import { isCommunityAdmin } from '../middleware';
+import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { TopicAttributes } from '../models';
 
@@ -13,13 +13,14 @@ const Errors = {
 };
 
 export function CreateContestManagerMetadata(): Command<
-  typeof schemas.CreateContestManagerMetadata
+  typeof schemas.CreateContestManagerMetadata,
+  AuthContext
 > {
   return {
     ...schemas.CreateContestManagerMetadata,
-    auth: [isCommunityAdmin],
-    body: async ({ id, payload }) => {
-      const { topic_ids, ...rest } = payload;
+    auth: [isAuthorized({ roles: ['admin'] })],
+    body: async ({ payload }) => {
+      const { id, topic_ids, ...rest } = payload;
 
       let contestTopics: TopicAttributes[] = [];
       let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
@@ -38,6 +39,7 @@ export function CreateContestManagerMetadata(): Command<
         }
         contestTopics = topics.map((t) => t.get({ plain: true }));
         contestTopicsToCreate = topics.map((t) => ({
+          weighted_voting: schemas.TopicWeightedVoting.Stake,
           contest_address: rest.contest_address,
           topic_id: t.id!,
           created_at: new Date(),
@@ -49,7 +51,7 @@ export function CreateContestManagerMetadata(): Command<
           const manager = await models.ContestManager.create(
             {
               ...rest,
-              community_id: id!,
+              community_id: id.toString(),
               created_at: new Date(),
               cancelled: false,
             },
@@ -64,16 +66,15 @@ export function CreateContestManagerMetadata(): Command<
         },
       );
 
-      if (mustExist('Contest Manager', contestManager)) {
-        return {
-          contest_managers: [
-            {
-              ...contestManager.get({ plain: true }),
-              topics: contestTopics as Required<TopicAttributes>[],
-            },
-          ],
-        };
-      }
+      mustExist('Contest Manager', contestManager);
+      return {
+        contest_managers: [
+          {
+            ...contestManager.get({ plain: true }),
+            topics: contestTopics as Required<TopicAttributes>[],
+          },
+        ],
+      };
     },
   };
 }

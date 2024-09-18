@@ -8,20 +8,21 @@ import type {
   StdFee,
 } from '@cosmjs/stargate';
 import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import {
   ChainNetwork,
   CosmosGovernanceVersion,
   WalletId,
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
-
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import { LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
-import ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import {
   IChainModule,
   ITXData,
@@ -41,6 +42,7 @@ import {
   getTMClient,
 } from './chain.utils';
 import EthSigningClient from './eth_signing_client';
+import type { GovgenGovExtension } from './gov/govgen/queries-v1beta1';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -56,6 +58,7 @@ export interface ICosmosTXData extends ITXData {
 export type CosmosApiType = QueryClient &
   StakingExtension &
   GovExtension &
+  GovgenGovExtension &
   BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
@@ -97,10 +100,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _tmClient: Tendermint34Client;
 
-  public async init(chain: ChainInfo, reset = false) {
-    const url = `${window.location.origin}${this.app.serverUrl()}/cosmosProxy/${
-      chain.id
-    }`;
+  public async init(chain: z.infer<typeof ExtendedCommunity>, reset = false) {
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chain.id}`;
 
     // TODO: configure broadcast mode
     try {
@@ -122,15 +123,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
 
     if (
-      chain?.ChainNode?.cosmosGovernanceVersion ===
-        CosmosGovernanceVersion.v1 ||
-      chain?.ChainNode?.cosmosGovernanceVersion ===
+      chain?.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1 ||
+      chain?.ChainNode?.cosmos_gov_version ===
         CosmosGovernanceVersion.v1beta1Failed
     ) {
       try {
-        const lcdUrl = `${
-          window.location.origin
-        }${this.app.serverUrl()}/cosmosProxy/v1/${chain.id}`;
+        const lcdUrl = `${window.location.origin}${SERVER_URL}/cosmosProxy/v1/${chain.id}`;
         console.log(`Starting LCD API at ${lcdUrl}...`);
         const lcd = await getLCDClient(lcdUrl);
         this._lcd = lcd;
@@ -238,9 +236,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
       client = EthSigningClient(
         {
-          restUrl: `${
-            window.location.origin
-          }${this.app.serverUrl()}/cosmosProxy/v1/${dbId}`,
+          restUrl: `${window.location.origin}${SERVER_URL}/cosmosProxy/v1/${dbId}`,
           chainId,
           path: dbId,
         },
@@ -248,7 +244,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       );
     } else {
       client = await getSigningClient(
-        chain.meta.node.url,
+        chain?.meta?.ChainNode?.url || '',
         wallet.offlineSigner,
       );
     }

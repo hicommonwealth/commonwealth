@@ -82,7 +82,7 @@ export async function __searchThreads(
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
   if (!threadTitleOnly) {
-    searchWhere = `("Threads".title ILIKE '%' || $searchTerm || '%' OR query @@ "Threads"._search)`;
+    searchWhere = `("Threads".title ILIKE '%' || $searchTerm || '%' OR query @@ "Threads".search)`;
   }
 
   const sqlBaseQuery = `
@@ -92,11 +92,12 @@ export async function __searchThreads(
       ${threadTitleOnly ? '' : `"Threads".body,`}
       'thread' as type,
       "Addresses".id as address_id,
+      "Addresses".user_id as address_user_id,
       "Addresses".address,
       "Addresses".community_id as address_community_id,
       "Threads".created_at,
       "Threads".community_id as community_id,
-      ts_rank_cd("Threads"._search, query) as rank
+      ts_rank_cd("Threads".search, query) as rank
     FROM "Threads"
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
     websearch_to_tsquery('english', $searchTerm) as query

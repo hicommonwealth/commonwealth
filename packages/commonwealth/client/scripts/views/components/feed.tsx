@@ -11,7 +11,8 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
@@ -35,6 +36,8 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const discussionLink = getProposalUrlPath(
     thread.slug,
     `${thread.identifier}-${slugify(thread.title)}`,
@@ -42,11 +45,13 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     thread.communityId,
   );
 
-  const chain = app.config.chains.getById(thread.communityId);
+  const { data: community } = useGetCommunityByIdQuery({
+    id: thread.communityId,
+    enabled: !!thread.communityId,
+  });
 
   const isAdmin =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin(undefined, thread.communityId);
+    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community);
 
   const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
@@ -56,7 +61,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     communityId: thread.communityId,
     // @ts-expect-error <StrictNullChecks/>
     address: account?.address,
-    apiEnabled: !!account?.address,
+    apiEnabled: !!account?.address && !!thread.communityId,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -78,6 +83,13 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     isThreadTopicGated: isRestrictedMembership,
   });
 
+  // edge case for deleted communities with orphaned posts
+  if (!community) {
+    return (
+      <ThreadCard thread={thread} layoutType="community-first" showSkeleton />
+    );
+  }
+
   return (
     <ThreadCard
       thread={thread}
@@ -87,14 +99,14 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       onStageTagClick={() => {
         navigate(
           `${
-            app.isCustomDomain() ? '' : `/${thread.communityId}`
+            domain?.isCustomDomain ? '' : `/${thread.communityId}`
           }/discussions?stage=${thread.stage}`,
         );
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
       disabledActionsTooltipText={disabledActionsTooltipText}
-      customStages={chain?.customStages}
+      customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
       layoutType="community-first"
@@ -152,9 +164,9 @@ export const Feed = ({
         customScrollParent={customScrollParent}
         totalCount={queryData?.data?.length || DEFAULT_COUNT}
         style={{ height: '100%' }}
-        itemContent={(i) => {
-          return <FeedThread key={1} thread={queryData.data[i] as Thread} />;
-        }}
+        itemContent={(i) => (
+          <FeedThread key={i} thread={queryData.data[i] as Thread} />
+        )}
       />
     </div>
   );

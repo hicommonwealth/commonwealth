@@ -1,6 +1,8 @@
-export type BaseGroupFilter = 'All groups' | 'Ungrouped';
+export type BaseGroupFilter = 'all-community' | 'not-in-group' | number; // the number type is here for group id's
 
 export type SearchFilters = {
   searchText?: string;
-  groupFilter?: BaseGroupFilter | number; // or the group id represented by number
+  groupFilter?: BaseGroupFilter;
 };
+
+export type MemberResultsOrderBy = 'name' | 'last_active' | undefined;

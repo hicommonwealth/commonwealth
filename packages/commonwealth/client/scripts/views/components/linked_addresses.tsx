@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import 'components/linked_addresses.scss';
 
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type AddressInfo from '../../models/AddressInfo';
 import type NewProfile from '../../models/NewProfile';
@@ -27,9 +28,23 @@ const Address = (props: AddressProps) => {
   const { addressInfo, toggleRemoveModal } = props;
   const { address, community } = addressInfo;
 
+  // user.addresses.community from user store don't have icon_url
+  // and name, we make a new query to get them, ideally this should be returned
+  // from api
+  const { data: fetchedCommunity } = useGetCommunityByIdQuery({
+    id: community.id,
+    enabled: !!community.id,
+  });
+
   return (
     <div className="AddressContainer">
-      <CWTruncatedAddress address={address} communityInfo={community} />
+      <CWTruncatedAddress
+        address={address}
+        communityInfo={{
+          iconUrl: fetchedCommunity?.icon_url || '',
+          name: fetchedCommunity?.name || '',
+        }}
+      />
       <PopoverMenu
         menuItems={[
           {
@@ -76,7 +91,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
             <DeleteAddressModal
               profile={profile}
               addresses={addresses}
-              address={currentAddress?.address}
+              address={currentAddress}
               chain={currentAddress?.community?.id}
               closeModal={() => {
                 setIsRemoveModalOpen(false);

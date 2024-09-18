@@ -27,7 +27,7 @@ describe('Verify Address Routes', () => {
     sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
     const { payload } = await sessionSigner.newSession(CANVAS_TOPIC);
     session = payload;
-    walletAddress = session.address.split(':')[2];
+    walletAddress = session.did.split(':')[4];
 
     const res = await chai.request
       .agent(server.app)

@@ -6,6 +6,7 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { CosmosSignerCW } from '@hicommonwealth/shared';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import { Transaction, Web3BaseProvider } from 'web3';
 import IWebWallet from '../../../models/IWebWallet';
@@ -61,9 +62,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -83,7 +82,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix || 'inj',
+      bech32Prefix: app.chain?.meta.bech32_prefix || 'inj',
       signer: {
         type: 'ethereum',
         signEthereum: (
@@ -126,13 +125,13 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       } else {
         for (const acc of this._ethAccounts) {
           this._accounts.push(
-            encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', acc),
+            encodeEthAddress(app.chain?.meta.bech32_prefix || 'inj', acc),
           );
         }
       }
 
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+      const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${
         app.chain?.network || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');
@@ -155,7 +154,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       'accountsChanged',
       async (accounts: string[]) => {
         const encodedAccounts = accounts.map((a) =>
-          encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a),
+          encodeEthAddress(app.chain?.meta.bech32_prefix || 'inj', a),
         );
         const updatedAddress = userStore
           .getState()

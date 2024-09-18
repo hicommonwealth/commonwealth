@@ -13,10 +13,7 @@ import {
   upgradeBetaNodeIfNeeded,
 } from '../utils';
 
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 // @ts-expect-error StrictNullChecks
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300;
@@ -103,7 +100,6 @@ export async function cosmosHandler(
           community.ChainNode as ChainNodeInstance,
         );
       }
-
       return res.send(response.data);
     } catch (err) {
       log.error('Failed to query internal Cosmos chain node', err, {

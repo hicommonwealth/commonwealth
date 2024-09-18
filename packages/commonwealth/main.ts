@@ -2,6 +2,7 @@ import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { GlobalActivityCache } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -20,16 +21,17 @@ import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
+import * as api from './server/api';
 import { config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
-import BanCache from './server/util/banCheckCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const parseJson = json({ limit: '1mb' });
 
 /**
  * Bootstraps express app
@@ -49,12 +51,15 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
-  const log = logger(__filename);
+  const log = logger(import.meta);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  // @ts-expect-error StrictNullChecks
+  sgMail.setApiKey(config.SENDGRID.API_KEY);
 
   const cacheDecorator = new CacheDecorator();
 
@@ -130,7 +135,11 @@ export async function main(
         }),
       );
 
-    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use((req, res, next) => {
+      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
+      else parseJson(req, res, next);
+    });
+
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
@@ -143,8 +152,6 @@ export async function main(
 
   setupMiddleware();
   setupPassport(db);
-
-  const banCache = new BanCache(db);
 
   // TODO: decouple as global singleton
   const globalActivityCache = GlobalActivityCache.getInstance(db);
@@ -161,7 +168,6 @@ export async function main(
     app,
     db,
     viewCountCache,
-    banCache,
     globalActivityCache,
     dbValidationService,
     cacheDecorator,

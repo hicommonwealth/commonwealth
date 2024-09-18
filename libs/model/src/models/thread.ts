@@ -2,23 +2,14 @@ import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent } from '../utils';
-import type { AddressAttributes } from './address';
+import { emitEvent, getThreadContestManagers } from '../utils';
 import type { CommunityAttributes } from './community';
-import type { NotificationAttributes } from './notification';
-import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
-import type { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
-  version_history_updated?: boolean;
   Community?: CommunityAttributes;
-  collaborators?: AddressAttributes[];
-  topic?: TopicAttributes;
-  Notifications?: NotificationAttributes[];
-  reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
 };
 
@@ -62,18 +53,13 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
-        allowNull: false,
-      },
       links: { type: Sequelize.JSONB, allowNull: true },
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
       has_poll: { type: Sequelize.BOOLEAN, allowNull: true },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -108,18 +94,9 @@ export default (
         allowNull: true,
         defaultValue: new Date(),
       },
-
-      //notifications
-      max_notif_id: {
-        type: Sequelize.INTEGER,
+      search: {
+        type: Sequelize.TSVECTOR,
         allowNull: false,
-        defaultValue: 0,
-      },
-
-      version_history_updated: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
       },
     },
     {
@@ -137,7 +114,7 @@ export default (
         { fields: ['community_id', 'updated_at'] },
         { fields: ['community_id', 'pinned'] },
         { fields: ['community_id', 'has_poll'] },
-        { fields: ['canvas_hash'] },
+        { fields: ['canvas_msg_id'] },
       ],
       hooks: {
         afterCreate: async (
@@ -146,18 +123,28 @@ export default (
         ) => {
           const { Community, Outbox } = sequelize.models;
 
-          await Community.increment('thread_count', {
+          await Community.increment('lifetime_thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,
           });
+
+          const { topic_id, community_id } = thread.get({
+            plain: true,
+          });
+          const contestManagers = !topic_id
+            ? []
+            : await getThreadContestManagers(sequelize, topic_id, community_id);
 
           await emitEvent(
             Outbox,
             [
               {
                 event_name: EventNames.ThreadCreated,
-                event_payload: thread.get({ plain: true }),
+                event_payload: {
+                  ...thread.get({ plain: true }),
+                  contestManagers,
+                },
               },
             ],
             options.transaction,
@@ -168,7 +155,7 @@ export default (
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           const { Community } = sequelize.models;
-          await Community.increment('thread_count', {
+          await Community.decrement('lifetime_thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,
@@ -177,3 +164,22 @@ export default (
       },
     },
   );
+
+export function getThreadSearchVector(title: string, body: string) {
+  let decodedTitle = title;
+  let decodedBody = body;
+  try {
+    decodedTitle = decodeURIComponent(title);
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  try {
+    decodedBody = decodeURIComponent(body);
+    // eslint-disable-next-line no-empty
+  } catch {}
+  return Sequelize.fn(
+    'to_tsvector',
+    'english',
+    decodedTitle + ' ' + decodedBody,
+  );
+}

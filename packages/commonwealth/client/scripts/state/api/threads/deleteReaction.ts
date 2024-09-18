@@ -3,12 +3,15 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { signDeleteThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
-  communityId: string;
   address: string;
+  communityId: string;
+  threadMsgId: string;
   threadId: number;
 }
 
@@ -17,27 +20,25 @@ interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
 }
 
 const deleteReaction = async ({
-  communityId,
   address,
+  communityId,
+  threadMsgId,
   reactionId,
   threadId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteThreadReaction(address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
   });
 
-  const response = await axios.delete(
-    `${app.serverUrl()}/reactions/${reactionId}`,
-    {
-      data: {
-        author_community_id: communityId,
-        address: address,
-        community_id: app.chain.id,
-        jwt: userStore.getState().jwt,
-        ...toCanvasSignedDataApiArgs(canvasSignedData),
-      },
+  const response = await axios.delete(`${SERVER_URL}/reactions/${reactionId}`, {
+    data: {
+      author_community_id: communityId,
+      address: address,
+      community_id: app.chain.id,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
-  );
+  });
 
   return {
     ...response,
@@ -55,6 +56,8 @@ const useDeleteThreadReactionMutation = ({
   communityId,
   threadId,
 }: UseDeleteThreadReactionMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
@@ -69,6 +72,7 @@ const useDeleteThreadReactionMutation = ({
         'removeFromExisting',
       );
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

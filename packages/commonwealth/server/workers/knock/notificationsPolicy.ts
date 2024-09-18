@@ -1,13 +1,11 @@
-import { Policy, events, logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'url';
+import { Policy, events } from '@hicommonwealth/core';
 import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';
+import { processCommentUpvoted } from './eventHandlers/commentUpvoted';
 import { processSnapshotProposalCreated } from './eventHandlers/snapshotProposalCreated';
-import { processSubscriptionPreferencesUpdated } from './eventHandlers/subscriptionPreferencesUpdated';
+import { processThreadCreated } from './eventHandlers/threadCreated';
+import { processThreadUpvoted } from './eventHandlers/threadUpvoted';
 import { processUserMentioned } from './eventHandlers/userMentioned';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
 
 const notificationInputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,
@@ -15,7 +13,8 @@ const notificationInputs = {
   ThreadCreated: events.ThreadCreated,
   CommentCreated: events.CommentCreated,
   UserMentioned: events.UserMentioned,
-  SubscriptionPreferencesUpdated: events.SubscriptionPreferencesUpdated,
+  ThreadUpvoted: events.ThreadUpvoted,
+  CommentUpvoted: events.CommentUpvoted,
 };
 
 export function NotificationsPolicy(): Policy<typeof notificationInputs> {
@@ -31,8 +30,8 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
         await processChainEventCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
-      ThreadCreated: async () => {
-        log.info('Method not implemented');
+      ThreadCreated: async (event) => {
+        await processThreadCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
       CommentCreated: async (event) => {
@@ -43,8 +42,12 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
         await processUserMentioned(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
-      SubscriptionPreferencesUpdated: async (event) => {
-        await processSubscriptionPreferencesUpdated(event);
+      ThreadUpvoted: async (event) => {
+        await processThreadUpvoted(event);
+      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      CommentUpvoted: async (event) => {
+        await processCommentUpvoted(event);
       },
     },
   };

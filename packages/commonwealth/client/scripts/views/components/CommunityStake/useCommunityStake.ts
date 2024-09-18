@@ -1,6 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {
   useFetchCommunityStakeQuery,
@@ -8,11 +6,16 @@ import {
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
-import { useFlag } from '../../../hooks/useFlag';
-import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
 
 interface UseCommunityStakeProps {
-  community?: ChainInfo | CommunityData;
+  community?: {
+    id?: string;
+    namespace?: string;
+    ChainNode?: {
+      url: string;
+      ethChainId: number;
+    };
+  };
   stakeId?: number;
   walletAddress?: string;
 }
@@ -24,20 +27,20 @@ const chainIds = {
 };
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
-  const communityStakeEnabled = useFlag('communityStake');
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
-  const { isLoggedIn } = useUserLoggedIn();
   const user = useUserStore();
 
-  const activeCommunityId = community?.id || app?.chain?.id;
+  const activeCommunityId = community?.id || app?.chain?.id || '';
   const activeCommunityNamespace =
     community?.namespace || app?.chain?.meta?.namespace;
   const chainRpc =
-    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
   const ethChainId =
-    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
+    community?.ChainNode?.ethChainId ||
+    app?.chain?.meta?.ChainNode?.eth_chain_id ||
+    0;
   const activeAccountAddress = user.activeAccount?.address || '';
-  const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
+  const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id || 0];
 
   const {
     isInitialLoading: communityStakeLoading,
@@ -46,17 +49,16 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   } = useFetchCommunityStakeQuery({
     communityId: activeCommunityId,
     stakeId,
-    apiEnabled: communityStakeEnabled && !!activeCommunityId,
+    apiEnabled: !!activeCommunityId,
   });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
   const apiEnabled = Boolean(
-    communityStakeEnabled &&
-      stakeEnabled &&
+    stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&
-      isLoggedIn,
+      user.isLoggedIn,
   );
 
   const {
@@ -70,7 +72,6 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
     keepPreviousData: true,
-    // @ts-expect-error StrictNullChecks
     ethChainId,
   });
 
@@ -82,7 +83,6 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
-      // @ts-expect-error StrictNullChecks
       ethChainId,
       keepPreviousData: true,
     });

@@ -35,22 +35,18 @@ const proposalId = '0x1';
 describe('snapshotProposalCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
-  let userProfile: z.infer<typeof schemas.Profile> | undefined,
-    sandbox: sinon.SinonSandbox;
+  let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
     [user] = await tester.seed('User', {});
-    [userProfile] = await tester.seed('Profile', {
-      user_id: user!.id,
-    });
     [community] = await tester.seed('Community', {
-      // @ts-expect-error StrictNullChecks
       chain_node_id: null,
+      lifetime_thread_count: 0,
+      profile_count: 0,
       Addresses: [
         {
           role: 'member',
           user_id: user!.id,
-          profile_id: userProfile!.id,
         },
       ],
       snapshot_spaces: [space],
@@ -145,7 +141,6 @@ describe('snapshotProposalCreated Event Handler', () => {
         community_id: community!.id,
         community_name: community!.name,
         space_name: space,
-        // @ts-expect-error StrictNullChecks
         snapshot_proposal_url: getSnapshotUrl(community!.id, space, proposalId),
       },
     });

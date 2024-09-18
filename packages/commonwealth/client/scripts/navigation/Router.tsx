@@ -6,6 +6,7 @@ import {
   createRoutesFromElements,
   Route,
 } from 'react-router-dom';
+import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { withLayout } from 'views/Layout';
 import { PageNotFound } from 'views/pages/404';
 import CommonDomainRoutes from './CommonDomainRoutes';
@@ -13,27 +14,38 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   contestEnabled: boolean;
-  knockInAppNotifications: boolean;
+  farcasterContestEnabled: boolean;
+  tokenizedCommunityEnabled: boolean;
 };
 
-const Router = (customDomain: string) => {
+const Router = () => {
   const client = OpenFeature.getClient();
   const contestEnabled = client.getBooleanValue('contest', false);
 
-  const knockInAppNotifications = client.getBooleanValue(
-    'knockInAppNotifications',
+  const farcasterContestEnabled = client.getBooleanValue(
+    'farcasterContest',
+    false,
+  );
+
+  const tokenizedCommunityEnabled = client.getBooleanValue(
+    'tokenizedCommunity',
     false,
   );
 
   const flags = {
     contestEnabled,
-    knockInAppNotifications,
+    farcasterContestEnabled,
+    tokenizedCommunityEnabled,
   };
+
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
 
   return createBrowserRouter(
     createRoutesFromElements([
       ...GeneralRoutes(),
-      ...(customDomain ? CustomDomainRoutes(flags) : CommonDomainRoutes(flags)),
+      ...(isCustomDomain
+        ? CustomDomainRoutes(flags)
+        : CommonDomainRoutes(flags)),
       <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );

@@ -1,6 +1,7 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -30,8 +31,8 @@ export default class WebWalletController {
 
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
     // handle case like injective, where we require a specific wallet
-    const specificChain = app.chain?.meta?.id;
-    if (app.chain?.meta?.id) {
+    const specificChain = app.chain?.meta?.id || '';
+    if (specificChain) {
       const specificWallets = this._wallets.filter(
         (w) => !!w.specificChains?.includes(specificChain),
       );
@@ -60,7 +61,7 @@ export default class WebWalletController {
     }
     // do nothing on failure
     try {
-      await axios.post(`${app.serverUrl()}/setAddressWallet`, {
+      await axios.post(`${SERVER_URL}/setAddressWallet`, {
         address: account.address,
         author_community_id: account.community.id,
         wallet_id: wallet,

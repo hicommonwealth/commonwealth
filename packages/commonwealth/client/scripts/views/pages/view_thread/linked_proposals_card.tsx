@@ -8,6 +8,7 @@ import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -19,13 +20,18 @@ import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_m
 type ThreadLinkProps = {
   threadChain: string;
   identifier: string;
+  isCustomDomain?: boolean;
 };
 
-const getThreadLink = ({ threadChain, identifier }: ThreadLinkProps) => {
+const getThreadLink = ({
+  threadChain,
+  identifier,
+  isCustomDomain,
+}: ThreadLinkProps) => {
   // XXX 7/3/2024: proposal links only supported for cosmos
   const slug = ProposalType.CosmosProposal;
   const threadLink = `${
-    app.isCustomDomain() ? '' : `/${threadChain}`
+    isCustomDomain ? '' : `/${threadChain}`
   }${getProposalUrlPath(slug, identifier, true)}`;
 
   return threadLink;
@@ -45,6 +51,8 @@ export const LinkedProposalsCard = ({
   const [snapshotTitle, setSnapshotTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const initialSnapshotLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Snapshot),
     [thread.links],
@@ -60,31 +68,33 @@ export const LinkedProposalsCard = ({
       const proposal = initialSnapshotLinks[0];
       if (proposal.identifier.includes('/')) {
         setSnapshotUrl(
-          `${app.isCustomDomain() ? '' : `/${thread.communityId}`}/snapshot/${
+          `${domain?.isCustomDomain ? '' : `/${thread.communityId}`}/snapshot/${
             proposal.identifier
           }`,
         );
       } else {
-        loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-          for (const { space: _space, proposals } of data) {
-            const matchingSnapshot = proposals.find(
-              (sn) => sn.id === proposal.identifier,
-            );
-            if (matchingSnapshot) {
-              setSnapshotTitle(matchingSnapshot.title);
-              setSnapshotUrl(
-                `${
-                  app.isCustomDomain() ? '' : `/${thread.communityId}`
-                }/snapshot/${_space.id}/${matchingSnapshot.id}`,
+        loadMultipleSpacesData(app.chain.meta?.snapshot_spaces || [])
+          .then((data) => {
+            for (const { space: _space, proposals } of data) {
+              const matchingSnapshot = proposals.find(
+                (sn) => sn.id === proposal.identifier,
               );
-              break;
+              if (matchingSnapshot) {
+                setSnapshotTitle(matchingSnapshot.title);
+                setSnapshotUrl(
+                  `${
+                    domain?.isCustomDomain ? '' : `/${thread.communityId}`
+                  }/snapshot/${_space.id}/${matchingSnapshot.id}`,
+                );
+                break;
+              }
             }
-          }
-        });
+          })
+          .catch(console.error);
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks, thread.communityId]);
+  }, [domain?.isCustomDomain, initialSnapshotLinks, thread.communityId]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
@@ -111,6 +121,7 @@ export const LinkedProposalsCard = ({
                             to={getThreadLink({
                               threadChain: thread.communityId,
                               identifier: l.identifier,
+                              isCustomDomain: domain?.isCustomDomain,
                             })}
                           >
                             {`${l.title ?? 'Proposal'} #${l.identifier}`}

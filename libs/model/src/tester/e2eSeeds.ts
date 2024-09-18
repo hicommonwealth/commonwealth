@@ -6,12 +6,12 @@ import type {
   CommentInstance,
   CommunityInstance,
   DB,
-  ProfileAttributes,
   ReactionAttributes,
   ThreadInstance,
   TopicAttributes,
   UserInstance,
 } from '../../src';
+import { getCommentSearchVector, getThreadSearchVector } from '../models';
 
 export type E2E_TestEntities = {
   testThreads: ThreadInstance[];
@@ -23,7 +23,6 @@ export type E2E_TestEntities = {
   testReactions: ReactionAttributes[];
   testChainNodes: ChainNodeAttributes[];
   testTopics: TopicAttributes[];
-  testProfiles: ProfileAttributes[];
 };
 
 export const e2eTestEntities = async function (
@@ -38,7 +37,6 @@ export const e2eTestEntities = async function (
   const testReactions: ReactionAttributes[] = [];
   const testChainNodes: ChainNodeAttributes[] = [];
   const testTopics: TopicAttributes[] = [];
-  const testProfiles: ProfileAttributes[] = [];
 
   try {
     testUsers.push(
@@ -52,26 +50,11 @@ export const e2eTestEntities = async function (
                   email: `test${i - 1}@gmail.com`,
                   emailVerified: true,
                   isAdmin: true,
-                  profile: {},
-                },
-              })
-            )[0],
-        ),
-      )),
-    );
-
-    testProfiles.push(
-      ...(await Promise.all(
-        [...Array(2).keys()].map(
-          async (i) =>
-            (
-              await testDb.Profile.findOrCreate({
-                where: {
-                  id: -i - 1,
-                  profile_name: `testName${-i - 1}`,
-                  avatar_url: `testAvatarUrl${-i - 1}`,
-                  email: `test${i - 1}@gmail.com`,
-                  user_id: -i - 1,
+                  profile: {
+                    name: `testName${-i - 1}`,
+                    avatar_url: `testAvatarUrl${-i - 1}`,
+                    email: `test${-i - 1}@gmail.com`,
+                  },
                 },
               })
             )[0],
@@ -107,35 +90,46 @@ export const e2eTestEntities = async function (
     );
 
     testChains.push(
-      ...(await testDb.Community.bulkCreate([
-        {
-          id: 'cmntest',
-          chain_node_id: 9999,
-          name: 'cmntest',
-          network: ChainNetwork.Ethereum,
-          type: ChainType.Offchain,
-          base: ChainBase.Ethereum,
+      ...(await testDb.Community.bulkCreate(
+        [
+          {
+            id: 'cmntest',
+            chain_node_id: 9999,
+            name: 'cmntest',
+            network: ChainNetwork.Ethereum,
+            type: ChainType.Offchain,
+            base: ChainBase.Ethereum,
+            icon_url:
+              'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
+            active: true,
+            default_symbol: 'cmn',
+            custom_domain: 'customdomain.com',
+          },
+          {
+            id: 'cmntest2',
+            chain_node_id: 99999,
+            name: 'cmntest2',
+            network: ChainNetwork.Ethereum,
+            type: ChainType.Offchain,
+            base: ChainBase.Ethereum,
+            icon_url:
+              'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
+            active: true,
+            default_symbol: 'cmntest2',
+            custom_domain: 'customdomain.com',
+          },
+        ].map((x) => ({
+          ...x,
+          social_links: [],
           custom_stages: [],
-          icon_url:
-            'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
-          active: true,
-          default_symbol: 'cmn',
-          custom_domain: 'customdomain.com',
-        },
-        {
-          id: 'cmntest2',
-          chain_node_id: 99999,
-          name: 'cmntest2',
-          network: ChainNetwork.Ethereum,
-          type: ChainType.Offchain,
-          base: ChainBase.Ethereum,
-          icon_url:
-            'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
-          active: true,
-          default_symbol: 'cmntest2',
-          custom_domain: 'customdomain.com',
-        },
-      ])),
+          snapshot_spaces: [],
+          stages_enabled: true,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          has_homepage: 'false' as any,
+          collapsed_on_homepage: false,
+          directory_page_enabled: false,
+        })),
+      )),
     );
 
     testTopics.push(
@@ -176,11 +170,10 @@ export const e2eTestEntities = async function (
               await testDb.Address.findOrCreate({
                 where: {
                   id: -i - 1,
-                  user_id: -i - 1,
+                  user_id: i < 2 ? -1 : -2,
                   address: addresses[i],
                   community_id: 'cmntest',
                   verification_token: '',
-                  profile_id: i < 2 ? -1 : -2,
                   verified: new Date(),
                 },
               })
@@ -197,6 +190,8 @@ export const e2eTestEntities = async function (
               await testDb.Thread.findOrCreate({
                 where: {
                   id: -i - 1,
+                },
+                defaults: {
                   address_id: -1,
                   title: `testThread Title ${-i - 1}`,
                   body: `testThread Body ${-i - 1}`,
@@ -204,6 +199,15 @@ export const e2eTestEntities = async function (
                   topic_id: -1,
                   kind: 'discussion',
                   plaintext: 'text',
+                  stage: 'discussion',
+                  view_count: 0,
+                  reaction_count: 0,
+                  reaction_weights_sum: 0,
+                  comment_count: 0,
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1}`,
+                    `testThread Body ${-i - 1}`,
+                  ),
                 },
               })
             )[0],
@@ -219,6 +223,8 @@ export const e2eTestEntities = async function (
               await testDb.Thread.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
+                },
+                defaults: {
                   address_id: -2,
                   title: `testThread Title ${-i - 1 - 2}`,
                   body: `testThread Body ${-i - 1 - 2}`,
@@ -226,6 +232,15 @@ export const e2eTestEntities = async function (
                   topic_id: -2,
                   kind: 'discussion',
                   plaintext: 'text',
+                  stage: 'discussion',
+                  view_count: 0,
+                  reaction_count: 0,
+                  reaction_weights_sum: 0,
+                  comment_count: 0,
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1 - 2}`,
+                    `testThread Body ${-i - 1 - 2}`,
+                  ),
                 },
               })
             )[0],
@@ -257,11 +272,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1,
-                  community_id: 'cmntest',
+                },
+                defaults: {
                   address_id: -1,
                   text: '',
                   thread_id: -1,
                   plaintext: '',
+                  reaction_count: 0,
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],
@@ -277,11 +295,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
-                  community_id: 'cmntest',
+                },
+                defaults: {
                   address_id: -2,
                   text: '',
                   thread_id: -2,
                   plaintext: '',
+                  reaction_count: 0,
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],
@@ -300,7 +321,6 @@ export const e2eTestEntities = async function (
                   reaction: 'like',
                   address_id: -1,
                   thread_id: -1,
-                  community_id: 'cmntest',
                 },
               })
             )[0],
@@ -319,40 +339,12 @@ export const e2eTestEntities = async function (
                   reaction: 'like',
                   address_id: -2,
                   comment_id: -2,
-                  community_id: 'cmntest',
                 },
               })
             )[0],
         ),
       )),
     );
-
-    const notificationCategories: [string, string][] = [
-      ['new-thread-creation', 'someone makes a new thread'],
-      ['new-comment-creation', 'someone makes a new comment'],
-      ['new-mention', 'someone @ mentions a user'],
-      ['new-reaction', 'someone reacts to a post'],
-      ['chain-event', 'a chain event occurs'],
-      ['new-collaboration', 'someone collaborates with a user'],
-      ['thread-edit', 'A thread is edited'],
-      ['comment-edit', 'A comment is edited'],
-      ['snapshot-proposal', 'Snapshot proposal notifications'],
-    ];
-
-    try {
-      await Promise.all(
-        notificationCategories.map(async (n) => {
-          await testDb.NotificationCategory.findOrCreate({
-            where: {
-              name: n[0],
-              description: n[1],
-            },
-          });
-        }),
-      );
-    } catch (e) {
-      console.log(e);
-    }
 
     return {
       testThreads,
@@ -364,7 +356,6 @@ export const e2eTestEntities = async function (
       testReactions,
       testChainNodes,
       testTopics,
-      testProfiles,
     };
   } catch (e) {
     console.error('Error creating E2E test entities:', e);

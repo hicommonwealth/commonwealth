@@ -1,4 +1,3 @@
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -12,10 +11,9 @@ import { CARD_TYPES } from './constants';
 import { UserTrainingCardTypes } from './types';
 
 export const UserTrainingSlider = () => {
-  const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
   const user = useUserStore();
-  const profileId = user.addresses?.[0]?.profile?.id;
+  const userId = user.id.toString();
 
   const [cardToDismiss, setCardToDismiss] = useState<
     UserTrainingCardTypes | 'all'
@@ -23,7 +21,7 @@ export const UserTrainingSlider = () => {
 
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({
-      apiCallEnabled: isLoggedIn,
+      apiCallEnabled: user.isLoggedIn,
       shouldFetchSelfProfile: true,
     });
 
@@ -43,15 +41,13 @@ export const UserTrainingSlider = () => {
       UserTrainingCardTypes.CreateContent,
       UserTrainingCardTypes.FinishProfile,
       UserTrainingCardTypes.ExploreCommunities,
-      // @ts-expect-error <StrictNullChecks/>
-    ].map((card) => markTrainingActionAsPermanentlyHidden(card, profileId));
+    ].map((card) => markTrainingActionAsPermanentlyHidden(card, userId));
   };
 
   const isCardVisible = (cardName: UserTrainingCardTypes) => {
     return (
       completedActions.includes(cardName) ||
-      // @ts-expect-error <StrictNullChecks/>
-      !trainingActionPermanentlyHidden?.[profileId]?.includes(cardName)
+      !trainingActionPermanentlyHidden?.[userId]?.includes(cardName)
     );
   };
 
@@ -75,29 +71,29 @@ export const UserTrainingSlider = () => {
       hideAllCards();
     } else {
       // @ts-expect-error <StrictNullChecks/>
-      markTrainingActionAsPermanentlyHidden(cardToDismiss, profileId);
+      markTrainingActionAsPermanentlyHidden(cardToDismiss, userId);
     }
     setCardToDismiss(undefined);
   };
 
   useEffect(() => {
-    if (!isLoggedIn && completedActions.length > 0) {
+    if (!user.isLoggedIn && completedActions.length > 0) {
       clearCompletedActionsState();
     }
-  }, [isLoggedIn, completedActions, clearCompletedActionsState]);
+  }, [user.isLoggedIn, completedActions, clearCompletedActionsState]);
 
   useEffect(() => {
-    if (isLoggedIn && !isLoadingProfile && profile && profileId) {
+    if (user.isLoggedIn && !isLoadingProfile && profile && userId) {
       // if user has already given any upvotes, then hide `give-upvote` card
       if (
         profile?.totalUpvotes > 0 &&
-        !trainingActionPermanentlyHidden?.[profileId]?.includes(
+        !trainingActionPermanentlyHidden?.[userId]?.includes(
           UserTrainingCardTypes.GiveUpvote,
         )
       ) {
         markTrainingActionAsPermanentlyHidden(
           UserTrainingCardTypes.GiveUpvote,
-          profileId,
+          userId,
         );
       }
 
@@ -108,44 +104,44 @@ export const UserTrainingSlider = () => {
         )?.length > 0;
       if (
         (hasSocialLinks || user.email) &&
-        !trainingActionPermanentlyHidden?.[profileId]?.includes(
+        !trainingActionPermanentlyHidden?.[userId]?.includes(
           UserTrainingCardTypes.FinishProfile,
         )
       ) {
         markTrainingActionAsPermanentlyHidden(
           UserTrainingCardTypes.FinishProfile,
-          profileId,
+          userId,
         );
       }
 
       // if user has created any comment/thread, then hide `create-content` card
       if (
         (profile?.comments?.length > 0 || profile?.threads?.length > 0) &&
-        !trainingActionPermanentlyHidden?.[profileId]?.includes(
+        !trainingActionPermanentlyHidden?.[userId]?.includes(
           UserTrainingCardTypes.CreateContent,
         )
       ) {
         markTrainingActionAsPermanentlyHidden(
           UserTrainingCardTypes.CreateContent,
-          profileId,
+          userId,
         );
       }
     }
   }, [
     user.email,
-    isLoggedIn,
+    user.isLoggedIn,
     isLoadingProfile,
     profile,
-    profileId,
+    userId,
     trainingActionPermanentlyHidden,
     markTrainingActionAsPermanentlyHidden,
   ]);
 
   if (
-    !profileId ||
-    !isLoggedIn ||
+    !userId ||
+    !user.isLoggedIn ||
     isLoadingProfile ||
-    (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&
+    (trainingActionPermanentlyHidden?.[userId]?.length === 4 &&
       completedActions.length === 0) ||
     isAdminSliderVisible // if admin slider is visible, we hide user training slider
   ) {
@@ -246,7 +242,7 @@ export const UserTrainingSlider = () => {
 
               markTrainingActionAsComplete(
                 UserTrainingCardTypes.ExploreCommunities,
-                profileId,
+                userId,
               );
             }}
           />

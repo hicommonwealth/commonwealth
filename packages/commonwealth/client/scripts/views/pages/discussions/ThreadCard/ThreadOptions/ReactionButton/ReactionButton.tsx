@@ -1,5 +1,8 @@
+import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import useAppStatus from 'hooks/useAppStatus';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -16,8 +19,6 @@ import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSm
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { AuthModal } from 'views/modals/AuthModal';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
@@ -41,6 +42,7 @@ export const ReactionButton = ({
   const reactors = thread?.associatedReactions?.map((t) => t.address);
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
@@ -57,34 +59,20 @@ export const ReactionButton = ({
     thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
   const popoverProps = usePopover();
 
-  const {
-    mutateAsync: createThreadReaction,
-    isLoading: isAddingReaction,
-    error: createThreadReactionError,
-    reset: resetCreateThreadReactionMutation,
-  } = useCreateThreadReactionMutation({
-    communityId: app.activeChainId(),
-    threadId: thread.id,
-  });
-  const {
-    mutateAsync: deleteThreadReaction,
-    isLoading: isDeletingReaction,
-    error: deleteThreadReactionError,
-    reset: resetDeleteThreadReactionMutation,
-  } = useDeleteThreadReactionMutation({
-    communityId: app.activeChainId(),
-    address: user.activeAccount?.address || '',
-    threadId: thread.id,
-  });
-
-  const resetSessionRevalidationModal = createThreadReactionError
-    ? resetCreateThreadReactionMutation
-    : resetDeleteThreadReactionMutation;
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetSessionRevalidationModal,
-    error: createThreadReactionError || deleteThreadReactionError,
-  });
+  const communityId = app.activeChainId() || '';
+  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
+    useCreateThreadReactionMutation({
+      communityId,
+      threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
+    });
+  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
+    useDeleteThreadReactionMutation({
+      communityId,
+      address: user.activeAccount?.address || '',
+      threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
+    });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
@@ -94,7 +82,7 @@ export const ReactionButton = ({
     event.preventDefault();
     if (isLoading || disabled) return;
 
-    if (!app.isLoggedIn() || !user.activeAccount) {
+    if (!user.isLoggedIn || !user.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }
@@ -105,25 +93,30 @@ export const ReactionButton = ({
       }
 
       deleteThreadReaction({
-        communityId: app.activeChainId(),
+        communityId,
         address: user.activeAccount?.address,
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId,
         reactionId: reactedId as number,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
         console.error(e.response.data.error || e?.message);
       });
     } else {
-      createThreadReaction({
-        communityId: app.activeChainId(),
+      const input = await buildCreateThreadReactionInput({
+        communityId,
         address: activeAddress || '',
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId,
         reactionType: 'like',
         isPWA: isAddedToHomeScreen,
-      }).catch((e) => {
+      });
+      createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
         console.error(e.response.data.error || e?.message);
@@ -180,7 +173,6 @@ export const ReactionButton = ({
         onClose={() => setIsAuthModalOpen(false)}
         isOpen={isAuthModalOpen}
       />
-      {RevalidationModal}
     </>
   );
 };

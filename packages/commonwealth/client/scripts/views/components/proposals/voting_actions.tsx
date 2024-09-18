@@ -8,13 +8,15 @@ import {
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
+import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
+import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
@@ -33,34 +35,21 @@ type VotingActionsProps = {
   proposalRedrawState: boolean;
 };
 
-export const VotingActions = (props: VotingActionsProps) => {
-  const {
-    proposal,
-    toggleVotingModal,
-    votingModalOpen,
-    redrawProposals,
-    proposalRedrawState,
-  } = props;
-
+export const VotingActions = ({
+  proposal,
+  toggleVotingModal,
+  votingModalOpen,
+  redrawProposals,
+  proposalRedrawState,
+}: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
 
   const { isAddedToHomeScreen } = useAppStatus();
   const userData = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
-  useEffect(() => {
-    app.loginStateEmitter.once('redraw', () => {
-      setIsLoggedIn(app.isLoggedIn());
-    });
-
-    return () => {
-      app.loginStateEmitter.removeAllListeners();
-    };
-  }, []);
-
-  if (!isLoggedIn) {
+  if (!userData.isLoggedIn) {
     return <CannotVote label="Sign in to vote" />;
   } else if (!userData.activeAccount) {
     return <CannotVote label="Connect an address to vote" />;
@@ -72,7 +61,8 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   if (
     proposal instanceof CosmosProposal ||
-    proposal instanceof CosmosProposalV1
+    proposal instanceof CosmosProposalV1 ||
+    proposal instanceof CosmosProposalGovgen
   ) {
     user = userData.activeAccount as CosmosAccount;
   } else {
@@ -94,7 +84,10 @@ export const VotingActions = (props: VotingActionsProps) => {
       if (proposal.status === 'DepositPeriod') {
         const chain = app.chain as Cosmos;
         const depositAmountInMinimalDenom = parseInt(
-          naturalDenomToMinimal(amount, chain.meta?.decimals),
+          naturalDenomToMinimal(
+            amount,
+            getChainDecimals(chain.meta.id || '', chain.base),
+          ),
           10,
         );
 

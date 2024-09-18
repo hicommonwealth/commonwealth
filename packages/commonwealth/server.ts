@@ -3,34 +3,35 @@ import {
   KnockProvider,
   MixpanelAnalytics,
   RedisCache,
+  S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   analytics,
+  blobStorage,
   cache,
   logger,
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
 import express from 'express';
-import { fileURLToPath } from 'url';
 import { config } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
 import 'express-async-errors';
 
-// bootstrap production adapters
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+// bootstrap adapters
 stats(HotShotsStats());
-analytics(MixpanelAnalytics());
+blobStorage(S3BlobStorage());
+(config.ANALYTICS.MIXPANEL_DEV_TOKEN || config.ANALYTICS.MIXPANEL_PROD_TOKEN) &&
+  analytics(MixpanelAnalytics());
+config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED &&
+  notificationsProvider(KnockProvider());
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
-if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
-  notificationsProvider(KnockProvider());
-else notificationsProvider();
+const log = logger(import.meta);
 
 let isServiceHealthy = false;
 startHealthCheckLoop({
@@ -51,7 +52,7 @@ const app = express();
  */
 const start = async () => {
   const { models } = await import('@hicommonwealth/model');
-  config.NODE_ENV !== 'production' && console.log(config);
+  config.APP_ENV === 'local' && console.log(config);
 
   const { main } = await import('./main');
 
@@ -59,10 +60,7 @@ const start = async () => {
     port: config.PORT,
     noGlobalActivityCache: config.NO_GLOBAL_ACTIVITY_CACHE,
     withLoggingMiddleware: true,
-    withPrerender:
-      config.NODE_ENV === 'production' &&
-      !config.NO_PRERENDER &&
-      config.SERVER_URL.includes('commonwealth.im'),
+    withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
   })
     .then(() => {
       isServiceHealthy = true;

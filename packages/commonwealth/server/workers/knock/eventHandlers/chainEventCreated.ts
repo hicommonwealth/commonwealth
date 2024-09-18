@@ -5,13 +5,11 @@ import {
   models,
   proposalEventSignatures,
 } from '@hicommonwealth/model';
-import { fileURLToPath } from 'url';
 import z from 'zod';
 import { handleCommunityStakeTrades } from './chainEvents/handleCommunityStakeTrades';
 import { handleGovernanceProposalEvents } from './chainEvents/handleGovnernanceProposalEvents';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
+const log = logger(import.meta);
 
 const output = z.boolean();
 

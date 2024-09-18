@@ -19,38 +19,38 @@ describe('Digest email lifecycle', () => {
       isAdmin: false,
       selected_community_id: null,
     });
-    const [authorProfile] = await seed('Profile', {
-      user_id: authorUser!.id,
-    });
 
     [communityOne] = await seed('Community', {
       chain_node_id: undefined,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: undefined,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
       chain_node_id: undefined,
+      lifetime_thread_count: 0,
+      profile_count: 1,
       Addresses: [
         {
           role: 'member',
           user_id: authorUser!.id,
-          profile_id: authorProfile!.id,
         },
       ],
     });
@@ -153,8 +153,14 @@ describe('Digest email lifecycle', () => {
     expect(res![communityTwo!.id!]!.length).to.equal(1);
 
     delete threadOne?.Address;
+    delete threadOne?.collaborators;
+    delete threadOne?.reactions;
     delete threadTwo?.Address;
+    delete threadTwo?.collaborators;
+    delete threadTwo?.reactions;
     delete threadFour?.Address;
+    delete threadFour?.collaborators;
+    delete threadFour?.reactions;
 
     expect(res![communityOne!.id!]![0]!).to.deep.equal({
       name: communityOne!.name,

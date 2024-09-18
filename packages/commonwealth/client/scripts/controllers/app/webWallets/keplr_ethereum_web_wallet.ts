@@ -14,6 +14,7 @@ import {
 } from '@hicommonwealth/shared';
 import { bytesToHex } from '@noble/hashes/utils';
 import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import IWebWallet from '../../../models/IWebWallet';
 import { getCosmosChains } from './utils';
 
@@ -65,9 +66,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${
-      window.location.origin
-    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
+    const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -83,7 +82,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain.meta.bech32Prefix,
+      bech32Prefix: `${app.chain.meta.bech32_prefix || 0}`,
       signer: {
         type: 'ethereum',
         signEthereum: async (
@@ -122,9 +121,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
-        app.chain.id
-      }`;
+      const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${app.chain.id}`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
@@ -138,14 +135,14 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
+        const bech32Prefix = app.chain.meta.bech32_prefix?.toLowerCase();
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,
           rpc: url,
           // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
           // use the RPC url as hack, which will break some querying functionality but not signing.
-          rest: app.chain.meta.node.altWalletUrl || url,
+          rest: app?.chain?.meta?.ChainNode?.alt_wallet_url || url,
           bip44: {
             coinType: 60,
           },

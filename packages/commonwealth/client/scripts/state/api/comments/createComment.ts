@@ -1,65 +1,50 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import { signComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
-import useUserStore, { userStore } from '../../ui/user';
+import { trpc } from '../../../utils/trpcClient';
+import { useAuthModalStore } from '../../ui/modals';
+import useUserStore from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
+  communityId: string;
   profile: UserProfile;
   threadId: number;
-  communityId: string;
+  threadMsgId: string;
   unescapedText: string;
-  parentCommentId: number;
+  parentCommentId: number | null;
+  parentCommentMsgId: string | null;
   existingNumberOfComments: number;
   isPWA?: boolean;
 }
 
-const createComment = async ({
-  communityId,
+export const buildCreateCommentInput = async ({
   profile,
   threadId,
+  threadMsgId,
   unescapedText,
-  // @ts-expect-error StrictNullChecks
   parentCommentId = null,
-  isPWA,
+  parentCommentMsgId = null,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(profile.address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
     body: unescapedText,
-    parent_comment_id: parentCommentId,
+    parent_comment_id: parentCommentMsgId,
   });
-
-  const response = await axios.post(
-    `${app.serverUrl()}/threads/${threadId}/comments`,
-    {
-      author_community_id: communityId,
-      community_id: communityId,
-      address: profile.address,
-      parent_id: parentCommentId,
-      text: encodeURIComponent(unescapedText),
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
-    {
-      headers: {
-        isPWA: isPWA?.toString(),
-      },
-    },
-  );
-
-  response.data.result.Address.User = {
-    Profiles: [profile],
+  return {
+    thread_id: threadId,
+    thread_msg_id: threadMsgId,
+    parent_msg_id: parentCommentMsgId,
+    parent_id: parentCommentId ?? undefined,
+    text: unescapedText,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
-
-  return new Comment(response.data.result);
 };
 
 const useCreateCommentMutation = ({
@@ -69,10 +54,8 @@ const useCreateCommentMutation = ({
 }: Partial<CreateCommentProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    // @ts-expect-error StrictNullChecks
-    communityId,
-    // @ts-expect-error StrictNullChecks
-    threadId,
+    communityId: communityId!,
+    threadId: threadId!,
   });
 
   const user = useUserStore();
@@ -80,36 +63,40 @@ const useCreateCommentMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  return useMutation({
-    mutationFn: createComment,
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
+  return trpc.comment.createComment.useMutation({
     onSuccess: async (newComment) => {
+      // @ts-expect-error StrictNullChecks
+      const comment = new Comment(newComment);
+
       // update fetch comments query state
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData(key, () => {
-        return [...comments, newComment];
+        return [...comments, comment];
       });
+
       // @ts-expect-error StrictNullChecks
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
+
       updateThreadInAllCaches(
-        // @ts-expect-error StrictNullChecks
-        communityId,
-        threadId,
-        { recentComments: [newComment] },
+        communityId!,
+        threadId!,
+        { recentComments: [comment] },
         'combineAndRemoveDups',
       );
 
-      const profileId = user.addresses?.[0]?.profile?.id;
-      profileId &&
+      const userId = user.addresses?.[0]?.profile?.userId;
+      userId &&
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          profileId,
+          userId,
         );
-
-      return newComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -1,7 +1,7 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useEffect, useMemo, useRef } from 'react';
-import app from 'state';
+import { SERVER_URL } from 'state/api/config';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWIconButton } from './cw_icon_button';
 import { CWButton } from './new_designs/CWButton';
@@ -139,7 +139,7 @@ export const CWCoverImageUploader = ({
   ): Promise<[string, ValidationStatus]> => {
     try {
       const signatureResponse = await axios.post(
-        `${app.serverUrl()}/getUploadSignature`,
+        `${SERVER_URL}/getUploadSignature`,
         {
           name: file.name,
           mimetype: file.type,
@@ -170,7 +170,7 @@ export const CWCoverImageUploader = ({
   const generateImage = async () => {
     try {
       setImageURL('');
-      const res = await axios.post(`${app.serverUrl()}/generateImage`, {
+      const res = await axios.post(`${SERVER_URL}/generateImage`, {
         description: prompt,
         jwt: user.jwt,
       });
@@ -229,6 +229,7 @@ export const CWCoverImageUploader = ({
     setIsUploading(true);
 
     const [_imageURL, _uploadStatus] = await uploadImage(file);
+
     setIsUploading(false);
     setUploadStatus(_uploadStatus);
 
@@ -352,8 +353,8 @@ export const CWCoverImageUploader = ({
           uploadStatus === 'success'
             ? 'Image upload succeeded.'
             : uploadStatus === 'failure'
-            ? 'Image upload failed.'
-            : null
+              ? 'Image upload failed.'
+              : null
         }
         validationStatus={uploadStatus}
       />

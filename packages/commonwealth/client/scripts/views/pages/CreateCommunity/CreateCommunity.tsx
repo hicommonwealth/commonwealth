@@ -4,8 +4,6 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import { useFlag } from '../../../hooks/useFlag';
-import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
@@ -15,9 +13,9 @@ import { CreateCommunityStep, getFormSteps } from './utils';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
+import CommunityInformationStep from './steps/CommunityInformationStep';
 
 const CreateCommunity = () => {
-  const communityStakeEnabled = useFlag('communityStake');
   const {
     createCommunityStep,
     selectedCommunity,
@@ -27,7 +25,7 @@ const CreateCommunity = () => {
     setSelectedChainId,
     createdCommunityId,
     createdCommunityName,
-    handleCompleteBasicInformationStep,
+    handleCompleteCommunityInformationStep,
     onChangeStep,
     showCommunityStakeStep,
     selectedChainId,
@@ -56,15 +54,15 @@ const CreateCommunity = () => {
           />
         );
 
-      case CreateCommunityStep.BasicInformation:
+      case CreateCommunityStep.CommunityInformation:
         return (
-          <BasicInformationStep
+          <CommunityInformationStep
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
             // @ts-expect-error <StrictNullChecks/>
             handleSelectedChainId={setSelectedChainId}
             handleGoBack={() => onChangeStep(false)}
-            handleContinue={handleCompleteBasicInformationStep}
+            handleContinue={handleCompleteCommunityInformationStep}
           />
         );
 
@@ -90,11 +88,7 @@ const CreateCommunity = () => {
       <div className="CreateCommunity">
         {!isSuccessStep && (
           <CWFormSteps
-            steps={getFormSteps(
-              createCommunityStep,
-              showCommunityStakeStep,
-              communityStakeEnabled,
-            )}
+            steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
           />
         )}
 

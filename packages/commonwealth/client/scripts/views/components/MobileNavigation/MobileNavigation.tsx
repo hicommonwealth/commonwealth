@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
+import useUserStore from 'state/ui/user';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 
 import CreateContentDrawer from './CreateContentDrawer';
@@ -13,7 +13,7 @@ import './MobileNavigation.scss';
 const MobileNavigation = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
-  const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -30,7 +30,7 @@ const MobileNavigation = () => {
       onClick: () => navigate('/dashboard', {}, null),
       selected: !!matchesDashboard,
     },
-    ...(isLoggedIn
+    ...(user.isLoggedIn
       ? [
           {
             type: 'create' as const,
@@ -44,7 +44,7 @@ const MobileNavigation = () => {
       onClick: () => navigate('/communities', {}, null),
       selected: !!matchesExplore,
     },
-    ...(isLoggedIn
+    ...(user.isLoggedIn
       ? [
           {
             type: 'notifications' as const,

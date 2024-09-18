@@ -2,6 +2,7 @@ import {
   BrokerPublications,
   BrokerSubscriptions,
   EventNames,
+  RoutingKeyTags,
 } from '@hicommonwealth/core';
 
 export enum RascalPublications {
@@ -14,6 +15,7 @@ export enum RascalSubscriptions {
   DiscordListener = BrokerSubscriptions.DiscordListener,
   ChainEvent = BrokerSubscriptions.ChainEvent,
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
+  NotificationsSettings = BrokerSubscriptions.NotificationsSettings,
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
   ContestProjection = BrokerSubscriptions.ContestProjection,
 }
@@ -29,42 +31,38 @@ export enum RascalQueues {
   DiscordListener = 'DiscordMessageQueueV2',
   ChainEvent = 'ChainEventQueue',
   NotificationsProvider = 'NotificationsProviderQueue',
+  NotificationsSettings = 'NotificationsSettingsQueue',
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
   ContestProjection = 'ContestProjection',
 }
 
 export enum RascalBindings {
-  NotificationsProviderCommentCreated = 'NotificationsProviderCommentCreatedBinding',
-  NotificationsProviderChainEventCreated = 'NotificationsProviderChainEventCreatedBinding',
-  NotificationsProviderSnapshotProposalCreated = 'NotificationsProviderSnapshotProposalCreatedBinding',
-  NotificationsProviderUserMentioned = 'NotificationsProviderUserMentionedBinding',
-  NotificationsProviderPreferencesUpdated = 'NotificationsProviderPreferencesUpdatedBinding',
+  NotificationsProvider = 'NotificationsProvider',
+  NotificationsSettings = 'NotificationsSettings',
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
-
-  ContestWorkerPolicyThreadCreated = 'ContestWorkerPolicyThreadCreatedBinding',
-  ContestWorkerPolicyThreadUpvoted = 'ContestWorkerPolicyThreadUpvotedBinding',
-  ContestProjectionRecurringContestManagerDeployed = 'ContestProjectionRecurringContestManagerDeployed',
-  ContestProjectionOneOffContestManagerDeployed = 'ContestProjectionOneOffContestManagerDeployed',
-  ContestProjectionContestStarted = 'ContestProjectionContestStarted',
-  ContestProjectionContestContentAdded = 'ContestProjectionContestContentAdded',
-  ContestProjectionContestContentUpvoted = 'ContestProjectionContestContentUpvoted',
+  ContestWorkerPolicy = 'ContestWorkerPolicy',
+  ContestProjection = 'ContestProjection',
 }
 
 export enum RascalRoutingKeys {
   NotificationsProviderCommentCreated = EventNames.CommentCreated,
+  NotificationsProviderCommentUpvoted = EventNames.CommentUpvoted,
+  NotificationsProviderThreadUpvoted = `${EventNames.ThreadUpvoted}.#`,
   NotificationsProviderChainEventCreated = EventNames.ChainEventCreated,
   NotificationsProviderSnapshotProposalCreated = EventNames.SnapshotProposalCreated,
   NotificationsProviderUserMentioned = EventNames.UserMentioned,
-  NotificationsProviderPreferencesUpdated = EventNames.SubscriptionPreferencesUpdated,
-  SnapshotListener = EventNames.SnapshotProposalCreated,
+
+  NotificationsSettingsPreferencesUpdated = EventNames.SubscriptionPreferencesUpdated,
+
   DeadLetter = 'DeadLetter',
   DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
 
-  ContestWorkerPolicyThreadCreated = EventNames.ThreadCreated,
-  ContestWorkerPolicyThreadUpvoted = EventNames.ThreadUpvoted,
+  ContestWorkerPolicyThreadCreated = `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}.#`,
+  ContestWorkerPolicyThreadUpvoted = `${EventNames.ThreadUpvoted}.${RoutingKeyTags.Contest}.#`,
+
   ContestProjectionRecurringContestManagerDeployed = EventNames.RecurringContestManagerDeployed,
   ContestProjectionOneOffContestManagerDeployed = EventNames.OneOffContestManagerDeployed,
   ContestProjectionContestStarted = EventNames.ContestStarted,

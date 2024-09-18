@@ -5,33 +5,30 @@ import {
 } from '@hicommonwealth/shared';
 import z from 'zod';
 import { PG_INT } from '../utils';
-import { Community } from './community.schemas';
 import { Contract } from './contract.schemas';
 
 export const ChainNode = z.object({
-  id: PG_INT.optional(),
+  id: PG_INT.optional().nullish(),
   url: z.string().max(255),
-  eth_chain_id: PG_INT.optional(),
-  alt_wallet_url: z.string().max(255).optional(),
-  private_url: z.string().max(255).optional(),
+  eth_chain_id: PG_INT.nullish(),
+  alt_wallet_url: z.string().max(255).nullish(),
+  private_url: z.string().max(255).nullish(),
   balance_type: z.nativeEnum(BalanceType),
   name: z.string().max(255),
-  description: z.string().max(255).optional(),
-  ss58: PG_INT.optional(),
-  bech32: z.string().max(255).optional(),
-  slip44: PG_INT.optional(),
-  created_at: z.any(),
-  updated_at: z.any(),
+  description: z.string().max(255).nullish(),
+  ss58: PG_INT.nullish(),
+  bech32: z.string().max(255).nullish(),
+  slip44: PG_INT.nullish(),
   cosmos_chain_id: z
     .string()
     .regex(/[a-z0-9]+/)
-    .optional(),
-  cosmos_gov_version: z.nativeEnum(CosmosGovernanceVersion).optional(),
-  health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).optional(),
-  contracts: z.array(Contract).optional(),
-  block_explorer: z.string().optional(),
+    .nullish(),
+  cosmos_gov_version: z.nativeEnum(CosmosGovernanceVersion).nullish(),
+  health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).nullish(),
+  contracts: z.array(Contract).nullish(),
+  block_explorer: z.string().nullish(),
   max_ce_block_range: z.number().gte(-1).nullish(),
-});
 
-// aliases
-export const Chain = Community;
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+});

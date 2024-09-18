@@ -20,7 +20,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
 
   const { address, scope } = props;
   const profileAddress = address || user.activeAccount?.address;
-  const communityId = scope || app.activeChainId();
+  const communityId = scope || app.activeChainId() || '';
   const {
     data: users,
     isError,
@@ -33,8 +33,8 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   });
 
   useNecessaryEffect(() => {
-    if (!isError && users && Array.isArray(users) && users[0]?.id) {
-      navigate(`/profile/id/${users[0].id}`, {}, null);
+    if (!isError && users && Array.isArray(users) && users[0]?.userId) {
+      navigate(`/profile/id/${users[0].userId}`, {}, null);
     } else {
       setProfileNotFound(true);
     }

@@ -4,8 +4,7 @@ import {
   ContestManager,
   ContestScore,
 } from '@hicommonwealth/schemas';
-import { ProposalType } from '@hicommonwealth/shared';
-import type MinimumProfile from 'models/MinimumProfile';
+import { ProposalType, getDecodedString } from '@hicommonwealth/shared';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import { z } from 'zod';
@@ -14,15 +13,6 @@ import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
-
-function getDecodedString(str: string) {
-  try {
-    return decodeURIComponent(str);
-  } catch (err) {
-    console.error(`Could not decode str: "${str}"`);
-    return str;
-  }
-}
 
 function processAssociatedContests(
   associatedContests?: AssociatedContest[] | null,
@@ -63,30 +53,6 @@ function processAssociatedContests(
   }
 
   return [];
-}
-
-function processVersionHistory(versionHistory: any[]) {
-  let versionHistoryProcessed;
-  if (versionHistory) {
-    versionHistoryProcessed = versionHistory.map((v) => {
-      if (!v) return;
-      let history;
-      try {
-        history = JSON.parse(v);
-        history.author =
-          typeof history.author === 'string'
-            ? JSON.parse(history.author)
-            : typeof history.author === 'object'
-            ? history.author
-            : null;
-        history.timestamp = moment(history.timestamp);
-      } catch (e) {
-        console.log(e);
-      }
-      return history;
-    });
-  }
-  return versionHistoryProcessed;
 }
 
 function emptyStringToNull(input: string) {
@@ -137,7 +103,7 @@ function processAssociatedReactions(
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
         updated_at: tempReactionTimestamps[i],
-        voting_weight: tempReactionWeights[i] || 1,
+        voting_weight: tempReactionWeights[i] || 0,
         reactedProfileName: emptyStringToNull(reactedProfileName?.[i]),
         reactedProfileAvatarUrl: emptyStringToNull(
           reactedProfileAvatarUrl?.[i],
@@ -172,6 +138,7 @@ const ContestZ = Contest.pick({
   end_time: z.string(),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContestActionZ = ContestAction.pick({
   content_id: true,
   thread_id: true,
@@ -181,16 +148,18 @@ const ContestActionZ = ContestAction.pick({
 
 type ContestActionT = z.infer<typeof ContestActionZ>;
 
-export interface VersionHistory {
-  author?: MinimumProfile & { profile_id: number };
-  timestamp: Moment;
+export interface ThreadVersionHistory {
+  id: number;
+  thread_id: number;
+  address: string;
   body: string;
+  timestamp: string;
 }
 
 export interface IThreadCollaborator {
   address: string;
   community_id: string;
-  User: { Profiles: UserProfile[] };
+  User: { profile: UserProfile };
 }
 
 export type AssociatedReaction = {
@@ -232,7 +201,6 @@ type RecentComment = {
   marked_as_spam_at?: string;
   deleted_at?: string;
   discord_meta?: string;
-  profile_id: number;
   profile_name?: string;
   profile_avatar_url?: string;
   user_id: string;
@@ -272,7 +240,7 @@ export class Thread implements IUniqueId {
   public readOnly: boolean;
 
   public readonly canvasSignedData: string;
-  public readonly canvasHash: string;
+  public readonly canvasMsgId: string;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
   //  we should remove the number to allow the store to work.
@@ -285,7 +253,7 @@ export class Thread implements IUniqueId {
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
-  public readonly versionHistory: VersionHistory[];
+  public readonly versionHistory: ThreadVersionHistory[];
   public readonly communityId: string;
   public readonly lastEdited: Moment;
 
@@ -317,7 +285,7 @@ export class Thread implements IUniqueId {
     topic,
     kind,
     stage,
-    version_history,
+    ThreadVersionHistories,
     community_id,
     read_only,
     body,
@@ -342,11 +310,12 @@ export class Thread implements IUniqueId {
     reactedProfileName,
     reactedProfileAvatarUrl,
     reactedAddressLastActive,
-    canvasSignedData,
-    canvasHash,
+    canvas_signed_data,
+    canvas_msg_id,
     links,
     discord_meta,
-    profile_id,
+    userId,
+    user_id,
     profile_name,
     avatar_url,
     address_last_active,
@@ -365,8 +334,8 @@ export class Thread implements IUniqueId {
     url?: string;
     pinned?: boolean;
     links?: Link[];
-    canvasSignedData?: string;
-    canvasHash?: string;
+    canvas_signed_data?: string;
+    canvas_msg_id?: string;
     plaintext?: string;
     collaborators?: any[];
     last_edited: string;
@@ -389,10 +358,11 @@ export class Thread implements IUniqueId {
     reactionTimestamps?: string[];
     reactionWeights?: number[];
     reaction_weights_sum: number;
-    version_history: any[]; // TODO: fix type
+    ThreadVersionHistories: ThreadVersionHistory[];
     Address: any; // TODO: fix type
     discord_meta?: any;
-    profile_id: number;
+    userId: number;
+    user_id: number;
     profile_name: string;
     avatar_url: string;
     address_last_active: string;
@@ -430,8 +400,8 @@ export class Thread implements IUniqueId {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-      ? this.versionHistory[0].timestamp
-      : null;
+        ? this.versionHistory[0].timestamp
+        : null;
     // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
@@ -439,12 +409,12 @@ export class Thread implements IUniqueId {
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.numberOfComments = numberOfComments || 0;
     // @ts-expect-error StrictNullChecks
-    this.canvasSignedData = canvasSignedData;
+    this.canvasSignedData = canvas_signed_data;
     // @ts-expect-error <StrictNullChecks>
-    this.canvasHash = canvasHash;
+    this.canvasMsgId = canvas_msg_id;
     this.links = links || [];
     this.discord_meta = discord_meta;
-    this.versionHistory = processVersionHistory(version_history);
+    this.versionHistory = ThreadVersionHistories;
     this.reactionWeightsSum = reaction_weights_sum;
     this.associatedReactions =
       associatedReactions ??
@@ -477,15 +447,13 @@ export class Thread implements IUniqueId {
           plaintext: rc?.plainText,
           text: rc?.text,
           Address: {
+            user_id: rc?.user_id,
             address: rc?.address,
             User: {
-              Profiles: [
-                {
-                  id: rc?.profile_id,
-                  profile_name: rc?.profile_name,
-                  avatar_url: rc?.profile_avatar_url,
-                },
-              ],
+              profile: {
+                name: rc?.profile_name,
+                avatar_url: rc?.profile_avatar_url,
+              },
             },
           },
           discord_meta: rc?.discord_meta,
@@ -495,10 +463,10 @@ export class Thread implements IUniqueId {
           // and these should not be added here unless needed.
           parent_id: null,
           reactions: [],
-          version_history: [],
+          CommentVersionHistories: [],
           reaction_weights_sum: 0,
           canvas_signed_data: null,
-          canvas_hash: null,
+          canvas_msg_id: null,
         }),
     );
     this.latestActivity = last_commented_on
@@ -509,7 +477,7 @@ export class Thread implements IUniqueId {
       this.profile = addressToUserProfile(Address);
     } else {
       this.profile = {
-        id: profile_id,
+        userId: userId ?? user_id,
         name: profile_name,
         address: Address?.address,
         lastActive: address_last_active,

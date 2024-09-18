@@ -1,3 +1,4 @@
+import { getDecodedString } from '@hicommonwealth/shared';
 import { To } from 'react-router-dom';
 import { breadCrumbURLS } from './data';
 
@@ -44,10 +45,10 @@ const findMatchedBreadcrumb = (index: number, pathSegments: Array<string>) => {
 
 export const generateBreadcrumbs = (
   locationPath: string,
-  profileId: number,
   navigate: (val: To) => void,
   customDomain: string,
   currentDiscussion?: CurrentDiscussion,
+  userId?: number,
 ) => {
   let link: string;
   let label: string;
@@ -70,7 +71,7 @@ export const generateBreadcrumbs = (
     // Generate the link based on the current path segment.
     switch (pathSegment) {
       case 'profile':
-        link = `profile/id/${profileId}`;
+        link = `profile/id/${userId}`;
         break;
       case 'members':
         link = 'members';
@@ -109,7 +110,7 @@ export const generateBreadcrumbs = (
     const splitLinks = link.split('/').filter((val) => val.length > 0);
 
     // Removed IDs from the breadcrumb
-    const removedThreadId = decodeURIComponent(pathSegments[index]).replace(
+    const removedThreadId = getDecodedString(pathSegments[index]).replace(
       /^\d+-/,
       '',
     );
@@ -121,8 +122,8 @@ export const generateBreadcrumbs = (
         ? // @ts-expect-error StrictNullChecks
           currentDiscussion.currentThreadName
         : matchedBreadcrumb
-        ? matchedBreadcrumb.breadcrumb
-        : removedThreadId;
+          ? matchedBreadcrumb.breadcrumb
+          : removedThreadId;
 
     if (pathSegments[0] === 'profile' && index === 1) {
       label = 'Edit Profile';

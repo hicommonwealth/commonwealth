@@ -19,7 +19,7 @@ import { Mava } from './views/components/Mava';
 OpenFeature.setProvider(openFeatureProvider);
 
 const App = () => {
-  const { customDomain, isLoading } = useInitApp();
+  const { isLoading } = useInitApp();
   const { isAddedToHomeScreen, isMarketingPage, isIOS, isAndroid } =
     useAppStatus();
 
@@ -35,7 +35,7 @@ const App = () => {
               ) : (
                 <>
                   <Mava />
-                  <RouterProvider router={router(customDomain)} />
+                  <RouterProvider router={router()} />
                   {isAddedToHomeScreen || isMarketingPage ? null : (
                     <AddToHomeScreenPrompt
                       isIOS={isIOS}
