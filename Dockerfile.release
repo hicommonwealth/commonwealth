@@ -1,0 +1,4 @@
+FROM base
+CMD node --import=extensionless/register build/server/scripts/releasePhaseEnvCheck.js && \
+  npx sequelize-cli db:migrate --config server/sequelize.json && \
+  node --import=extensionless/register build/server/scripts/purgeCloudflareCache.js
