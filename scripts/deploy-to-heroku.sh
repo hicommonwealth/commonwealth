@@ -21,6 +21,8 @@ machine git.heroku.com
     password ${api_key}
 EOF
 
+heroku container:login
+
 heroku git:remote --app ${app_name}
 
 heroku container:push web --recursive -a ${heroku_app_name}
