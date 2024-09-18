@@ -58,6 +58,7 @@ export const chainTypes =
       bech32Prefix: chain.bech32,
       // @ts-expect-error StrictNullChecks
       hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
+      chainNodeId: chain.id,
     })) || [];
 
 // Sort chains alphabetically by labels
