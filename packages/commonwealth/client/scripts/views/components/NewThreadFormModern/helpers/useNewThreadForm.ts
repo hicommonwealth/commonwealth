@@ -17,6 +17,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
 
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
     `new-thread-${communityId}-info`,
+    { keyVersion: 'v3' },
   );
   const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
 
