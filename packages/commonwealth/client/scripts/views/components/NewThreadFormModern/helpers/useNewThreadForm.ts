@@ -1,16 +1,14 @@
-import type { DeltaStatic } from 'quill';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useDraft } from 'hooks/useDraft';
 import { useSearchParams } from 'react-router-dom';
 import type Topic from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
-import { getTextFromDelta } from '../../react_quill_editor';
 
 type NewThreadDraft = {
   topicId: number;
   title: string;
-  body: DeltaStatic;
+  body: string;
 };
 
 const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
@@ -49,12 +47,10 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   // @ts-expect-error StrictNullChecks
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
-  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    restoredDraft?.body,
+  const [editorText, setEditorText] = useState<string>(
+    restoredDraft?.body ?? '',
   );
   const [isSaving, setIsSaving] = useState(false);
-
-  const editorText = getTextFromDelta(threadContentDelta);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
   const disableSave = isSaving;
@@ -63,6 +59,14 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const titleMissing = !threadTitle;
   const linkContentMissing = !isDiscussion && !threadUrl;
   const contentMissing = editorText.length === 0;
+
+  console.log('FIXME: ', {
+    disableSave,
+    titleMissing,
+    topicMissing,
+    linkContentMissing,
+    contentMissing,
+  });
 
   const isDisabled =
     disableSave ||
@@ -76,19 +80,19 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     const draft = {
       topicId: threadTopic?.id || 0,
       title: threadTitle,
-      body: threadContentDelta,
+      body: editorText,
     };
     if (!draft.topicId && !draft.title && !draft.body) {
       return;
     }
     saveDraft(draft);
 
-    if (!threadContentDelta && threadTopic?.defaultOffchainTemplate) {
+    if (!editorText && threadTopic?.defaultOffchainTemplate) {
       try {
         const template = JSON.parse(
           threadTopic.defaultOffchainTemplate,
-        ) as DeltaStatic;
-        setThreadContentDelta(template);
+        ) as string;
+        setEditorText(template);
       } catch (e) {
         console.log(e);
       }
@@ -97,7 +101,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     if (!threadTopic && defaultTopic) {
       setThreadTopic(defaultTopic);
     }
-  }, [saveDraft, threadTopic, threadTitle, threadContentDelta, defaultTopic]);
+  }, [saveDraft, threadTopic, threadTitle, defaultTopic, editorText]);
 
   return {
     threadKind,
@@ -108,8 +112,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     setThreadTopic,
     threadUrl,
     setThreadUrl,
-    threadContentDelta,
-    setThreadContentDelta,
+    editorText,
+    setEditorText,
     isSaving,
     setIsSaving,
     isDisabled,

@@ -7,7 +7,7 @@ import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -25,7 +25,6 @@ import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdo
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
@@ -36,12 +35,6 @@ import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
-import { ReactQuillEditor } from '../react_quill_editor';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  serializeDelta,
-} from '../react_quill_editor/utils';
 import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
@@ -82,8 +75,8 @@ export const NewThreadForm = () => {
     setThreadTopic,
     threadUrl,
     setThreadUrl,
-    threadContentDelta,
-    setThreadContentDelta,
+    editorText,
+    setEditorText,
     setIsSaving,
     isDisabled,
     clearDraft,
@@ -95,7 +88,6 @@ export const NewThreadForm = () => {
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
-  const newEditor = useFlag('newEditor');
 
   const contestTopicError = threadTopic?.activeContestManagers?.length
     ? threadTopic?.activeContestManagers
@@ -141,10 +133,6 @@ export const NewThreadForm = () => {
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
-  const isPopulated = useMemo(() => {
-    return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
-  }, [threadContentDelta, threadTitle]);
-
   const isTopicGated = !!(memberships || []).find((membership) =>
     membership.topicIds.includes(threadTopic?.id),
   );
@@ -161,9 +149,7 @@ export const NewThreadForm = () => {
     !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
-    const body = newEditor
-      ? markdownEditorMethodsRef.current!.getMarkdown()
-      : serializeDelta(threadContentDelta);
+    const body = markdownEditorMethodsRef.current!.getMarkdown();
 
     if (isRestrictedMembership) {
       notifyError('Topic is gated!');
@@ -184,8 +170,6 @@ export const NewThreadForm = () => {
     setIsSaving(true);
 
     try {
-      // FIXME: this is the only thing that needs to be re-written
-      // I need to build this from the markdown or the delta, and that's it.
       const input = await buildCreateThreadInput({
         address: user.activeAccount?.address || '',
         kind: threadKind,
@@ -200,7 +184,7 @@ export const NewThreadForm = () => {
       });
       const thread = await createThread(input);
 
-      setThreadContentDelta(createDeltaFromText(''));
+      setEditorText('');
       clearDraft();
 
       navigate(`/discussion/${thread.id}`);
@@ -222,15 +206,6 @@ export const NewThreadForm = () => {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleCancel = () => {
-    setThreadTitle('');
-    setThreadTopic(
-      // @ts-expect-error <StrictNullChecks/>
-      topicsForSelector?.find((t) => t?.name?.includes('General')) || null,
-    );
-    setThreadContentDelta(createDeltaFromText(''));
   };
 
   const showBanner = !user.activeAccount && isBannerVisible;
@@ -352,43 +327,28 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {!newEditor && (
-                <ReactQuillEditor
-                  contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
-                  isDisabled={isRestrictedMembership || !user.activeAccount}
-                  tooltipLabel={
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('submit')
-                      : disabledActionsTooltipText
-                  }
-                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-                />
-              )}
-
-              {newEditor && (
-                <MarkdownEditor
-                  onMarkdownEditorMethods={(methods) =>
-                    (markdownEditorMethodsRef.current = methods)
-                  }
-                  disabled={isRestrictedMembership || !user.activeAccount}
-                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-                  SubmitButton={() => (
-                    <MarkdownSubmitButton
-                      label="Create Thread"
-                      disabled={
-                        isDisabled ||
-                        !user.activeAccount ||
-                        isDisabledBecauseOfContestsConsent ||
-                        walletBalanceError ||
-                        contestTopicError
-                      }
-                      tabIndex={4}
-                      onClick={handleNewThreadCreation}
-                    />
-                  )}
-                />
-              )}
+              <MarkdownEditor
+                onMarkdownEditorMethods={(methods) =>
+                  (markdownEditorMethodsRef.current = methods)
+                }
+                onChange={(markdown) => setEditorText(markdown)}
+                disabled={isRestrictedMembership || !user.activeAccount}
+                placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+                SubmitButton={() => (
+                  <MarkdownSubmitButton
+                    label="Create Thread"
+                    disabled={
+                      isDisabled ||
+                      !user.activeAccount ||
+                      isDisabledBecauseOfContestsConsent ||
+                      walletBalanceError ||
+                      contestTopicError
+                    }
+                    tabIndex={4}
+                    onClick={handleNewThreadCreation}
+                  />
+                )}
+              />
 
               {contestThreadBannerVisible && (
                 <ContestThreadBanner
@@ -404,32 +364,6 @@ export const NewThreadForm = () => {
                 validationStatus="failure"
               />
 
-              {!newEditor && (
-                <div className="buttons-row">
-                  {isPopulated && user.activeAccount && (
-                    <CWButton
-                      buttonType="tertiary"
-                      onClick={handleCancel}
-                      tabIndex={3}
-                      label="Cancel"
-                      containerClassName="no-pad"
-                    />
-                  )}
-                  <CWButton
-                    label="Create thread"
-                    disabled={
-                      isDisabled ||
-                      !user.activeAccount ||
-                      isDisabledBecauseOfContestsConsent ||
-                      walletBalanceError ||
-                      contestTopicError
-                    }
-                    onClick={handleNewThreadCreation}
-                    tabIndex={4}
-                    containerClassName="no-pad"
-                  />
-                </div>
-              )}
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
