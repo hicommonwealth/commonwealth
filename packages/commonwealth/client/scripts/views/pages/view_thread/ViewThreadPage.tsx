@@ -29,7 +29,7 @@ import useUserStore from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
-import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';

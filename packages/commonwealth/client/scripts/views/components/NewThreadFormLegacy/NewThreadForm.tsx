@@ -22,7 +22,7 @@ import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownEditor from 'views/components/MarkdownEditor';
 import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
-import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
+import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';

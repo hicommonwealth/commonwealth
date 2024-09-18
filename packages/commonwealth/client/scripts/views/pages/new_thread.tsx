@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import { PageLoading } from 'views/pages/loading';
-import { NewThreadForm } from '../components/NewThreadForm';
+import { NewThreadForm } from '../components/NewThreadFormLegacy';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
