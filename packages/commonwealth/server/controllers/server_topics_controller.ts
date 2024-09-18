@@ -5,11 +5,6 @@ import {
   __createTopic,
 } from './server_topics_methods/create_topic';
 import {
-  DeleteTopicOptions,
-  DeleteTopicResult,
-  __deleteTopic,
-} from './server_topics_methods/delete_topic';
-import {
   GetTopicsOptions,
   GetTopicsResult,
   __getTopics,
@@ -46,10 +41,6 @@ export class ServerTopicsController {
 
   async updateTopic(options: UpdateTopicOptions): Promise<UpdateTopicResult> {
     return __updateTopic.call(this, options);
-  }
-
-  async deleteTopic(options: DeleteTopicOptions): Promise<DeleteTopicResult> {
-    return __deleteTopic.call(this, options);
   }
 
   async updateTopicsOrder(

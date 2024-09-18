@@ -114,7 +114,6 @@ import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { createTopicHandler } from '../routes/topics/create_topic_handler';
-import { deleteTopicHandler } from '../routes/topics/delete_topic_handler';
 import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
@@ -450,13 +449,6 @@ function setupRouter(
     '/topics/:topicId' /* OLD: /editTopic */,
     passport.authenticate('jwt', { session: false }),
     updateTopicHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/topics/:topicId' /* OLD: /deleteTopic */,
-    passport.authenticate('jwt', { session: false }),
-    deleteTopicHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
