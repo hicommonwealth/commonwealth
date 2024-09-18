@@ -7,7 +7,7 @@ const PATH = '/api/integration';
 
 function withThreadId(req, _, next) {
   const message_id = req.params.message_id;
-  models.Thread.findOne({
+  void models.Thread.findOne({
     where: {
       discord_meta: { message_id },
       deleted_at: null,
@@ -25,7 +25,7 @@ function withThreadId(req, _, next) {
 
 function withCommentId(req, _, next) {
   const message_id = req.params.message_id;
-  models.Comment.findOne({
+  void models.Comment.findOne({
     where: {
       discord_meta: { message_id },
       deleted_at: null,
