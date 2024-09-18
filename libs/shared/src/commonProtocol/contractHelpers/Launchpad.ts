@@ -17,7 +17,7 @@ export const launchToken = async (
       totalSupply,
       0,
       0,
-      '',
+      '0x12a35d50a7a12e92063e19d90186c95a10e3e311',
     )
     .send({ from: walletAddress });
   return txReceipt;
