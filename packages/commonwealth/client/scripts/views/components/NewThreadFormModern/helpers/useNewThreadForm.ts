@@ -61,14 +61,6 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const linkContentMissing = !isDiscussion && !threadUrl;
   const contentMissing = editorText.length === 0;
 
-  console.log('FIXME: ', {
-    disableSave,
-    titleMissing,
-    topicMissing,
-    linkContentMissing,
-    contentMissing,
-  });
-
   const isDisabled =
     disableSave ||
     titleMissing ||
