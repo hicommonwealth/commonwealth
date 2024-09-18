@@ -6,9 +6,9 @@ import {
   sellToken,
   transferLiquidity,
 } from '../../../../../../libs/shared/src/commonProtocol';
+import { LpBondingCurve } from './Abi/LpBondingCurveAbi';
 import ContractBase from './ContractBase';
-
-const LPBondingCurveAbi = {};
+import { LaunchpadFactory } from './LaunchpadFactoryAbi';
 
 class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
@@ -20,10 +20,10 @@ class LaunchpadBondingCurve extends ContractBase {
     tokenAddress: string,
     rpc: string,
   ) {
-    super(bondingCurveAddress, LPBondingCurveAbi, rpc);
+    super(bondingCurveAddress, LpBondingCurve, rpc);
     this.tokenAddress = tokenAddress;
     this.launchpadFactory = new this.web3.eth.Contract(
-      lpFactoryAbi,
+      LaunchpadFactory,
       launchpadFactoryAddress,
     );
   }
