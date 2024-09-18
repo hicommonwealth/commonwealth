@@ -7,7 +7,7 @@ import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -20,6 +20,8 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownEditor from 'views/components/MarkdownEditor';
+import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
+import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -51,6 +53,8 @@ export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const contestsEnabled = useFlag('contest');
+
+  const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
@@ -157,6 +161,10 @@ export const NewThreadForm = () => {
     !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
+    const body = newEditor
+      ? markdownEditorMethodsRef.current!.getMarkdown()
+      : serializeDelta(threadContentDelta);
+
     if (isRestrictedMembership) {
       notifyError('Topic is gated!');
       return;
@@ -167,11 +175,9 @@ export const NewThreadForm = () => {
       return;
     }
 
-    const deltaString = JSON.stringify(threadContentDelta);
-
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
-      deltaString,
+      body,
       !!hasTopics,
     );
 
@@ -189,7 +195,7 @@ export const NewThreadForm = () => {
         communityId,
         title: threadTitle,
         topic: threadTopic,
-        body: serializeDelta(threadContentDelta),
+        body,
         url: threadUrl,
       });
       const thread = await createThread(input);
@@ -360,7 +366,19 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {newEditor && <MarkdownEditor placeholder="" />}
+              {newEditor && (
+                <MarkdownEditor
+                  onMarkdownEditorMethods={(methods) =>
+                    (markdownEditorMethodsRef.current = methods)
+                  }
+                  SubmitButton={() => (
+                    <MarkdownSubmitButton
+                      label="Create Thread"
+                      onClick={handleNewThreadCreation}
+                    />
+                  )}
+                />
+              )}
 
               {contestThreadBannerVisible && (
                 <ContestThreadBanner

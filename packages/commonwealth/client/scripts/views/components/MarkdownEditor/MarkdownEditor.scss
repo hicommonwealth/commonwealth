@@ -40,6 +40,12 @@ body,
   }
 }
 
+.mdxeditor-container-disabled {
+  .mdxeditor-root-contenteditable {
+    // TODO: disable editing here...
+  }
+}
+
 .mdxeditor-container-mode-desktop {
   .mdxeditor-root-contenteditable {
     border-top: 1px solid $neutral-200;

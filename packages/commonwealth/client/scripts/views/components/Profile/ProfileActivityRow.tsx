@@ -23,7 +23,8 @@ type ProfileActivityRowProps = {
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
   const { communityId, createdAt, author, id } = activity;
-  let title: string, body: string;
+  let title: string;
+  let body: string = '';
   if (activity instanceof Thread) {
     title = activity.title;
     body = activity.body;
@@ -138,7 +139,6 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
       </div>
       <div className="content">
         <CWText type="b2" className="gray-text">
-          {/* @ts-expect-error StrictNullChecks*/}
           <MarkdownViewerWithFallback
             markdown={isThread ? body : comment.text}
           />

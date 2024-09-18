@@ -57,7 +57,6 @@ const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
       markdown={`${overview}\n${supported}`}
       imageHandler="local"
       SubmitButton={SubmitButton}
-      onSubmit={(markdown) => console.log('markdown: \n' + markdown)}
     />
   );
 };

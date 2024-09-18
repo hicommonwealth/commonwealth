@@ -30,8 +30,10 @@ import React, {
 } from 'react';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
+import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
+import './MarkdownEditor.scss';
 import { MarkdownEditorContext } from './MarkdownEditorContext';
 import { DesktopEditorFooter } from './toolbars/DesktopEditorFooter';
 import { ToolbarForDesktop } from './toolbars/ToolbarForDesktop';
@@ -43,8 +45,6 @@ import { codeBlockLanguages } from './utils/codeBlockLanguages';
 import { editorTranslator } from './utils/editorTranslator';
 import { fileToText } from './utils/fileToText';
 import { iconComponentFor } from './utils/iconComponentFor';
-
-import './MarkdownEditor.scss';
 
 export type ImageURL = string;
 
@@ -67,8 +67,10 @@ export type UpdateContentStrategy = 'insert' | 'replace';
 export const DEFAULT_UPDATE_CONTENT_STRATEGY =
   'insert' as UpdateContentStrategy;
 
-export type MarkdownEditorProps = {
-  readonly markdown?: MarkdownStr;
+export type MarkdownEditorProps = Readonly<{
+  markdown?: MarkdownStr;
+
+  disabled?: boolean;
 
   /**
    * Manually set the mode for the markdown editor, You shouldn't use this
@@ -76,16 +78,17 @@ export type MarkdownEditorProps = {
    *
    * @internal
    */
-  readonly mode?: MarkdownEditorMode;
-  readonly placeholder?: string;
-  readonly imageHandler?: ImageHandler;
-  readonly SubmitButton?: () => ReactNode;
-};
+  mode?: MarkdownEditorMode;
+  placeholder?: string;
+  imageHandler?: ImageHandler;
+  SubmitButton?: () => ReactNode;
+  onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
+}>;
 
 export const MarkdownEditor = memo(function MarkdownEditor(
   props: MarkdownEditorProps,
 ) {
-  const { SubmitButton } = props;
+  const { SubmitButton, onMarkdownEditorMethods, disabled } = props;
   const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -264,9 +267,13 @@ export const MarkdownEditor = memo(function MarkdownEditor(
     }
   }, []);
 
-  const handleRef = useCallback((methods: MDXEditorMethods) => {
-    mdxEditorRef.current = methods;
-  }, []);
+  const handleRef = useCallback(
+    (methods: MDXEditorMethods) => {
+      mdxEditorRef.current = methods;
+      onMarkdownEditorMethods?.(methods);
+    },
+    [onMarkdownEditorMethods],
+  );
 
   const mdxEditorMethods = useMemo(() => {
     return {
@@ -285,6 +292,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
               'mdxeditor-container',
               'mdxeditor-container-mode-' + mode,
               active ? 'mdxeditor-container-active' : null,
+              disabled ? 'mdxeditor-container-disabled' : null,
             )}
             onDrop={handleDrop}
             onDragEnter={handleDragEnter}
