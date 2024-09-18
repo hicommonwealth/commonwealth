@@ -12,6 +12,8 @@ export type MarkdownSubmitButtonProps = Readonly<{
 
 /**
  * Button that adapts itself to mobile vs desktop.
+ *
+ * On mobile devices we don't use the label to save space.
  */
 export const MarkdownSubmitButton = (props: MarkdownSubmitButtonProps) => {
   const { onClick, className, disabled, label, tabIndex } = props;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { FileUploadButton } from 'views/components/MarkdownEditor/toolbars/FileUploadButton';
 import { IMAGE_ACCEPT } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './DesktopEditorFooter.scss';
@@ -6,11 +6,11 @@ import './DesktopEditorFooter.scss';
 type DesktopEditorFooterProps = Readonly<{
   onImportMarkdown?: (file: File) => void;
   onImage?: (file: File) => void;
-  onSubmit?: () => void;
+  SubmitButton?: () => ReactNode;
 }>;
 
 export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
-  const { onImportMarkdown, onSubmit, onImage } = props;
+  const { onImportMarkdown, SubmitButton, onImage } = props;
 
   return (
     <div className="DesktopEditorFooter">
@@ -32,9 +32,7 @@ export const DesktopEditorFooter = (props: DesktopEditorFooterProps) => {
       </div>
 
       <div className="Item SubmitButtonItem">
-        <button onClick={() => onSubmit?.()} className="SubmitButton">
-          Submit
-        </button>
+        {SubmitButton && <SubmitButton />}
       </div>
     </div>
   );

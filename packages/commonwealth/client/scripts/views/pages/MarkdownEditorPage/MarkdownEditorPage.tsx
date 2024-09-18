@@ -10,6 +10,8 @@ import './MarkdownEditorPage.scss';
 
 import overview from 'views/components/MarkdownEditor/markdown/editor_overview.md?raw';
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
+import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
+import { useMarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 
 function useParams() {
   const [searchParams] = useSearchParams();
@@ -38,12 +40,23 @@ export const MarkdownEditorPage = () => {
   return <Inner mode={mode} />;
 };
 
+const SubmitButton = () => {
+  const methods = useMarkdownEditorMethods();
+
+  const handleClick = () => {
+    console.log(methods.getMarkdown());
+  };
+
+  return <MarkdownSubmitButton label="Create Thread" onClick={handleClick} />;
+};
+
 const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
   return (
     <MarkdownEditor
       {...props}
       markdown={`${overview}\n${supported}`}
       imageHandler="local"
+      SubmitButton={SubmitButton}
       onSubmit={(markdown) => console.log('markdown: \n' + markdown)}
     />
   );

@@ -22,8 +22,15 @@ function useDeviceCutoff() {
   }
 }
 
-const CUTOFF = 768;
+const CUTOFF = 600;
 
+/**
+ *
+ * Determine if we're a mobile device based just on the screen width.
+ *
+ * This is different from useBrowserWindow because we have to look at width
+ * not innerWidth.
+ */
 export function useDeviceProfile(): DeviceProfile {
   const deviceCutoff = useDeviceCutoff();
   return deviceCutoff <= CUTOFF ? 'mobile' : 'desktop';
