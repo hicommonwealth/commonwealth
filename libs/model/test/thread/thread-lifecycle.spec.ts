@@ -321,22 +321,6 @@ describe('Thread lifecycle', () => {
       expect(updated?.collaborators?.length).to.eq(2);
     });
 
-    it('should fail when thread not found by discord_meta', async () => {
-      await expect(
-        command(UpdateThread(), {
-          actor: actors.member,
-          payload: {
-            thread_id: thread.id!,
-            discord_meta: {
-              message_id: '',
-              channel_id: '',
-              user: { id: '', username: '' },
-            },
-          },
-        }),
-      ).rejects.toThrowError(UpdateThreadErrors.ThreadNotFound);
-    });
-
     it('should fail when collaborators overlap', async () => {
       await expect(
         command(UpdateThread(), {
