@@ -24,9 +24,10 @@ import { useQuillPasteText } from './useQuillPasteText';
 import 'components/react_quill/react_quill_editor.scss';
 import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
+import { LinkModal } from './LinkModal';
 import { MarkdownPreview } from './MarkdownPreview';
-import { AddLinkModal } from './QuillLinkModal';
 
 Quill.register('modules/magicUrl', MagicUrl);
 
@@ -290,7 +291,20 @@ const ReactQuillEditor = ({
     setLinkText('');
     setLinkUrl('');
   };
-
+  const handleLinkModalClose = () => {
+    const editor = editorRef?.current?.getEditor();
+    if (!editor) {
+      return;
+    }
+    const selection = childInputRef.current;
+    if (!selection) {
+      return;
+    }
+    editor.setSelection(selection.index, 0);
+    setIsModalOpen(false);
+    setLinkText('');
+    setLinkUrl('');
+  };
   return (
     <div className="CWEditor">
       {label && <MessageRow label={label} />}
@@ -403,17 +417,21 @@ const ReactQuillEditor = ({
           <MarkdownPreview doc={getTextFromDelta(contentDeltaToUse)} />
         )}
       </div>
-      {isModalOpen && (
-        <AddLinkModal
-          linkText={linkText}
-          linkUrl={linkUrl}
-          setIsModalOpen={setIsModalOpen}
-          setLinkText={setLinkText}
-          setLinkUrl={setLinkUrl}
-          handleAddLink={handleAddLink}
-          isModalOpen={isModalOpen}
-        />
-      )}
+      <CWModal
+        size="small"
+        content={
+          <LinkModal
+            linkText={linkText}
+            linkUrl={linkUrl}
+            onModalClose={handleLinkModalClose}
+            setLinkText={setLinkText}
+            setLinkUrl={setLinkUrl}
+            handleAddLink={handleAddLink}
+          />
+        }
+        onClose={handleLinkModalClose}
+        open={isModalOpen}
+      />
       {formFieldErrorMessage && (
         <div className="form-error-container">
           <div className="msg">
