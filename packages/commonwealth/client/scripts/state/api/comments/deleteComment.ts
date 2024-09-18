@@ -1,59 +1,11 @@
-import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { signDeleteComment } from 'controllers/server/sessions';
+import { useQueryClient } from '@tanstack/react-query';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { ApiEndpoints } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
-import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
-
-interface DeleteCommentProps {
-  address: string;
-  communityId: string;
-  canvasHash: string;
-  commentId: number;
-  existingNumberOfComments: number;
-}
-
-const deleteComment = async ({
-  address,
-  communityId,
-  commentId,
-  canvasHash,
-}: DeleteCommentProps) => {
-  const canvasSignedData = await signDeleteComment(
-    userStore.getState().activeAccount?.address || '',
-    {
-      comment_id: canvasHash,
-    },
-  );
-
-  await axios.delete(`${SERVER_URL}/comments/${commentId}`, {
-    data: {
-      jwt: userStore.getState().jwt,
-      address: address,
-      community_id: communityId,
-      author_community_id: communityId,
-    },
-  });
-
-  // Important: we render comments in a tree, if the deleted comment is a
-  // leaf node, remove it, but if it has replies, then preserve it with
-  // [deleted] msg.
-  return {
-    softDeleted: {
-      id: commentId,
-      deleted: true,
-      text: '[deleted]',
-      plaintext: '[deleted]',
-      versionHistory: [],
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
-  };
-};
 
 interface UseDeleteCommentMutationProps {
   communityId: string;
@@ -74,18 +26,30 @@ const useDeleteCommentMutation = ({
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: deleteComment,
+  return trpc.comment.deleteComment.useMutation({
     onSuccess: async (response) => {
+      // Important: we render comments in a tree, if the deleted comment is a
+      // leaf node, remove it, but if it has replies, then preserve it with
+      // [deleted] msg.
+      const softDeleted = {
+        id: response.comment_id,
+        deleted: true,
+        text: '[deleted]',
+        plaintext: '[deleted]',
+        versionHistory: [],
+        canvas_signed_data: response.canvas_signed_data,
+        canvas_msg_id: response.canvas_msg_id,
+      };
+
       // find the existing comment index
       const foundCommentIndex = comments.findIndex(
-        (x) => x.id === response.softDeleted.id,
+        (x) => x.id === softDeleted.id,
       );
 
       if (foundCommentIndex > -1) {
         const softDeletedComment = Object.assign(
           { ...comments[foundCommentIndex] },
-          { ...response.softDeleted },
+          { ...softDeleted },
         );
 
         // update fetch comments query state
@@ -104,13 +68,11 @@ const useDeleteCommentMutation = ({
         communityId,
         threadId,
         {
-          recentComments: [
-            { id: response.softDeleted.id },
-          ] as Comment<IUniqueId>[],
+          recentComments: [{ id: softDeleted.id }] as Comment<IUniqueId>[],
         },
         'removeFromExisting',
       );
-      return response;
+      return softDeleted;
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

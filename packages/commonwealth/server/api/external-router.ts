@@ -13,10 +13,16 @@ const {
   getCommunities,
   getCommunity,
   getMembers,
+  deleteTopic,
 } = community.trpcRouter;
 const { createThread, updateThread, createThreadReaction } = thread.trpcRouter;
-const { createComment, createCommentReaction, updateComment, getComments } =
-  comment.trpcRouter;
+const {
+  createComment,
+  createCommentReaction,
+  updateComment,
+  getComments,
+  deleteComment,
+} = comment.trpcRouter;
 
 const api = {
   createCommunity,
@@ -24,6 +30,7 @@ const api = {
   getCommunities,
   getCommunity,
   getMembers,
+  deleteTopic,
   getComments,
   createThread,
   updateThread,
@@ -31,6 +38,7 @@ const api = {
   createComment,
   updateComment,
   createCommentReaction,
+  deleteComment,
 };
 
 const PATH = '/api/v1';

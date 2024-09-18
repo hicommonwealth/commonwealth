@@ -2,7 +2,6 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
-  ENFORCE_SESSION_KEYS,
   TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
@@ -46,7 +45,6 @@ const DEFAULTS = {
 export const config = configure(
   target,
   {
-    ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
@@ -118,7 +116,6 @@ export const config = configure(
     },
   },
   z.object({
-    ENFORCE_SESSION_KEYS: z.boolean(),
     DB: z.object({
       URI: z
         .string()

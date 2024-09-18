@@ -1,10 +1,5 @@
 import { DB } from '@hicommonwealth/model';
 import {
-  DeleteTopicOptions,
-  DeleteTopicResult,
-  __deleteTopic,
-} from './server_topics_methods/delete_topic';
-import {
   GetTopicsOptions,
   GetTopicsResult,
   __getTopics,
@@ -28,10 +23,6 @@ export class ServerTopicsController {
 
   async getTopics(options: GetTopicsOptions): Promise<GetTopicsResult> {
     return __getTopics.call(this, options);
-  }
-
-  async deleteTopic(options: DeleteTopicOptions): Promise<DeleteTopicResult> {
-    return __deleteTopic.call(this, options);
   }
 
   async updateTopicsOrder(

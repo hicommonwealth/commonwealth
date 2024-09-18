@@ -159,24 +159,31 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === authAddress,
         );
-        await setActiveAccount(signedAddressAccount!);
+        if (signedAddressAccount) {
+          await setActiveAccount(signedAddressAccount);
+        }
         openConfirmation({
-          title: 'Address Mismatch',
+          hideWarning: true,
+          title: 'Switch Address?',
           description: (
             <>
-              You tried to sign in as
-              {formatAddress(sessionKeyValidationError?.address || '')} but your
-              wallet has the address {formatAddress(authAddress || '')}.
+              <p style={{ marginBottom: 6 }}>
+                Your account was previously linked to{' '}
+                <strong>
+                  {formatAddress(sessionKeyValidationError?.address || '')}
+                </strong>{' '}
+                but the wallet you just signed in from has the address{' '}
+                <strong>{formatAddress(authAddress || '')}</strong>.
+              </p>
               {signedAddressAccount ? (
                 <p>
-                  We&apos;ve switched your active address to the one in your
-                  wallet. You can switch it back in the user menu.
+                  We&apos;ve switched your active address to the wallet you just
+                  signed in from.
                 </p>
               ) : (
                 <p>
                   Select <strong>Connect a new address</strong> in the user menu
-                  to connect this as a new address, or switch addresses in your
-                  wallet to continue.
+                  to connect this as a new address.
                 </p>
               )}
             </>
@@ -521,7 +528,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      const session = await getSessionFromWallet(wallet);
+      const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       const validationBlockInfo = await getWalletRecentBlock(

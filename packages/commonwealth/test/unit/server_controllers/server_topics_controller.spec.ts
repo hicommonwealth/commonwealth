@@ -79,14 +79,6 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 };
 
 describe('ServerTopicsController', () => {
-  test('#deleteTopic', async () => {
-    const { controller, user } = createMockedTopicsController(true);
-    await controller.deleteTopic({
-      user,
-      topicId: 1,
-    });
-  });
-
   test('#getTopics', async () => {
     const { controller, chain } = createMockedTopicsController();
     const topics = await controller.getTopics({

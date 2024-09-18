@@ -9,7 +9,6 @@ import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';
 import useAppStatus from '../../hooks/useAppStatus';
-import app from '../../state';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
@@ -64,9 +63,8 @@ export const ConfirmSnapshotVoteModal = (
       metadata: JSON.stringify({}),
     };
     try {
-      castVote(author?.address || '', votePayload)
-        .then(async () => {
-          await app.snapshot.refreshProposals();
+      castVote(author?.address || '', votePayload, space.id)
+        .then(() => {
           onModalClose();
           successCallback();
         })

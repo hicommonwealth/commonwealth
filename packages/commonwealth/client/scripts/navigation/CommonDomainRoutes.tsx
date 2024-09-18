@@ -90,16 +90,16 @@ const Contests = lazy(() => import('views/pages/Contests'));
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
 const SnapshotProposalPage = lazy(
-  () => import('views/pages/snapshot_proposals'),
+  () => import('views/pages/Snapshots/SnapshotProposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
-  () => import('views/pages/view_multiple_snapshot_spaces'),
+  () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
 const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/view_snapshot_proposal'),
+  () => import('views/pages/Snapshots/ViewSnapshotProposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal/NewSnapshotProposalPage'),
+  () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 

@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import process from 'process';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +60,12 @@ export const QueryKeys = {
 export const ExternalEndpoints = {
   coinbase: {
     ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',
+  },
+  snapshotHub: {
+    url: process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org',
+    graphql: process.env.SNAPSHOT_HUB_URL
+      ? process.env.SNAPSHOT_HUB_URL + '/graphql'
+      : 'https://hub.snapshot.org/graphql',
   },
 };
 
