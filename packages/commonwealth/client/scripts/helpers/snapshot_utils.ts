@@ -1,4 +1,3 @@
-import module from '@snapshot-labs/snapshot.js';
 import { notifyError } from 'controllers/app/notifications';
 import { ExternalEndpoints, queryClient } from 'state/api/config';
 import {
@@ -31,6 +30,7 @@ export interface SnapshotSpace {
   strategies: Array<{
     name: string;
     network?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: any;
   }>;
   members: string[];
@@ -54,6 +54,7 @@ export interface SnapshotProposal {
   strategies?: Array<{
     name: string;
     network?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: any;
   }>;
 }
@@ -72,10 +73,10 @@ class SnapshotLazyLoader {
 
   private static async init() {
     if (!this.snapshot) {
-      const { Client712 } = module;
+      const module = await import('@snapshot-labs/snapshot.js');
       const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-      this.client = new Client712(hub);
-      this.snapshot = module;
+      this.client = new module.default.Client712(hub);
+      this.snapshot = module.default;
     }
   }
 
@@ -90,8 +91,10 @@ class SnapshotLazyLoader {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function castVote(address: string, payload: any, spaceId: string) {
   const { Web3Provider } = await import('@ethersproject/providers');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
@@ -102,13 +105,16 @@ export async function castVote(address: string, payload: any, spaceId: string) {
 
 export async function createProposal(
   address: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload: any,
   spaceId: string,
 ) {
   const { Web3Provider } = await import('@ethersproject/providers');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res = await client.proposal(web3 as any, address, payload);
 
   await queryClient.invalidateQueries({
@@ -173,10 +179,12 @@ export async function getResults(
             // provider,
           );
           votes = votes
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .map((vote: any) => {
               vote.scores = strategies.map(
                 (strategy, i) => scores[i][vote.voter] || 0,
               );
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
               return vote;
             })
