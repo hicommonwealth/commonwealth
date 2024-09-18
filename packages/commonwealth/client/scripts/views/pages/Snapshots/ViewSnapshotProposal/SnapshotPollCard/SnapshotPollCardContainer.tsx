@@ -19,6 +19,7 @@ type SnapshotProposalCardsProps = {
   scores: number[];
   space: SnapshotSpace;
   symbol: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   totals: any;
   votes: SnapshotProposalVote[];
   validatedAgainstStrategies: boolean;
@@ -115,10 +116,10 @@ export const SnapshotPollCardContainer = (
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
         voteInformation={voteInformation}
-        onSnapshotVoteCast={async (_choice) => {
+        onSnapshotVoteCast={(_choice) => {
           setChoice(_choice);
         }}
-        onVoteCast={async () => {
+        onVoteCast={() => {
           setIsModalOpen(false);
         }}
         incrementalVoteCast={totalScore}

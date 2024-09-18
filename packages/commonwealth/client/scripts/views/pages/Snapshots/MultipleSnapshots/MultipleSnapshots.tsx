@@ -28,7 +28,7 @@ const MultipleSnapshots = () => {
   >();
 
   if (!spacesMetadata && snapshotSpaces.length > 0) {
-    loadMultipleSpacesData(snapshotSpaces).then((data) => {
+    void loadMultipleSpacesData(snapshotSpaces).then((data) => {
       setSpacesMetadata(data);
     });
 
@@ -43,7 +43,7 @@ const MultipleSnapshots = () => {
                 key={index}
                 showSkeleton={true}
                 proposals={[]}
-                space={{} as any}
+                space={{} as SnapshotSpace}
               />
             ))}
           />

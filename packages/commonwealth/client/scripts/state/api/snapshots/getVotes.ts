@@ -26,6 +26,7 @@ interface VotesQueryResponse {
     id: string;
     voter: string;
     created: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     choice: any;
   }[];
 }

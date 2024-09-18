@@ -12,6 +12,7 @@ import {
 
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { useGetSnapshotProposalsQuery } from 'state/api/snapshots';
 import './SnapshotProposals.scss';
 
@@ -86,7 +87,7 @@ const SnapshotProposals = ({ snapshotId }: SnapshotProposalsProps) => {
                 key={i}
                 snapshotId={snapshotId}
                 showSkeleton
-                proposal={{} as any}
+                proposal={{} as SnapshotProposal}
               />
             ))}
           />

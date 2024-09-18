@@ -309,6 +309,7 @@ export const NewSnapshotProposalForm = ({
               buttonHeight="sm"
               label="Publish"
               disabled={!author || isSaving || !isValid}
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={handlePublish}
             />
           </div>

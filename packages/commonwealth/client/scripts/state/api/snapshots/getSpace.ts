@@ -45,6 +45,7 @@ interface SpaceQueryResponse {
     network: string;
     avatar: string;
     validation: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       params: any;
     };
     voting: {
@@ -58,6 +59,7 @@ interface SpaceQueryResponse {
     strategies: {
       name: string;
       network: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       params: any;
     }[];
     members: string[];

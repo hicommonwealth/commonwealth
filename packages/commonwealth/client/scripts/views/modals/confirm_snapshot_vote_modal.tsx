@@ -64,7 +64,7 @@ export const ConfirmSnapshotVoteModal = (
     };
     try {
       castVote(author?.address || '', votePayload, space.id)
-        .then(async () => {
+        .then(() => {
           onModalClose();
           successCallback();
         })
