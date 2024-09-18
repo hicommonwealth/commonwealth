@@ -28,8 +28,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
+import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
+import { MarkdownEditorContext } from './MarkdownEditorContext';
 import { DesktopEditorFooter } from './toolbars/DesktopEditorFooter';
 import { ToolbarForDesktop } from './toolbars/ToolbarForDesktop';
 import { ToolbarForMobile } from './toolbars/ToolbarForMobile';
@@ -41,9 +44,7 @@ import { editorTranslator } from './utils/editorTranslator';
 import { fileToText } from './utils/fileToText';
 import { iconComponentFor } from './utils/iconComponentFor';
 
-import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import './MarkdownEditor.scss';
-import { MarkdownEditorContext } from './MarkdownEditorContext';
 
 export type ImageURL = string;
 
@@ -68,25 +69,23 @@ export const DEFAULT_UPDATE_CONTENT_STRATEGY =
 
 export type MarkdownEditorProps = {
   readonly markdown?: MarkdownStr;
+
+  /**
+   * Manually set the mode for the markdown editor, You shouldn't use this
+   * in prod, just in stories and debug code.
+   *
+   * @internal
+   */
   readonly mode?: MarkdownEditorMode;
   readonly placeholder?: string;
   readonly imageHandler?: ImageHandler;
-  readonly onSubmit?: (markdown: MarkdownStr) => void;
-
   readonly SubmitButton?: () => ReactNode;
-
-  /**
-   * Specify, if you want to get a callback to have the getMarkdown method
-   * to get the content from the editor.
-   */
-  // FIXME: remove this... too complicated
-  readonly ref?: (method: Pick<MDXEditorMethods, 'getMarkdown'>) => void;
 };
 
 export const MarkdownEditor = memo(function MarkdownEditor(
   props: MarkdownEditorProps,
 ) {
-  const { onSubmit, ref, SubmitButton } = props;
+  const { SubmitButton } = props;
   const errorHandler = useEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -259,26 +258,15 @@ export const MarkdownEditor = memo(function MarkdownEditor(
     [handleFiles],
   );
 
-  const handleSubmit = useCallback(() => {
-    if (mdxEditorRef.current) {
-      const markdown = mdxEditorRef.current.getMarkdown();
-      onSubmit?.(markdown);
-    }
-  }, [onSubmit]);
-
   const doFocus = useCallback(() => {
     if (mdxEditorRef.current) {
       mdxEditorRef.current.focus();
     }
   }, []);
 
-  const handleRef = useCallback(
-    (methods: MDXEditorMethods) => {
-      mdxEditorRef.current = methods;
-      ref?.(methods);
-    },
-    [ref],
-  );
+  const handleRef = useCallback((methods: MDXEditorMethods) => {
+    mdxEditorRef.current = methods;
+  }, []);
 
   const mdxEditorMethods = useMemo(() => {
     return {
@@ -287,73 +275,81 @@ export const MarkdownEditor = memo(function MarkdownEditor(
   }, []);
 
   return (
-    <MarkdownEditorContext.Provider value={mdxEditorMethods}>
-      <div
-        className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}
-      >
+    <MarkdownEditorModeContext.Provider value={mode}>
+      <MarkdownEditorContext.Provider value={mdxEditorMethods}>
         <div
-          className={clsx(
-            'mdxeditor-container',
-            'mdxeditor-container-mode-' + mode,
-            active ? 'mdxeditor-container-active' : null,
-          )}
-          onDrop={handleDrop}
-          onDragEnter={handleDragEnter}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onPaste={(event) => handlePaste(event)}
-          onFocus={() => setActive(true)}
-          onBlur={() => setActive(false)}
+          className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}
         >
-          <MDXEditor
-            onError={errorHandler}
-            ref={handleRef}
-            markdown={props.markdown ?? ''}
-            placeholder={placeholder}
-            iconComponentFor={iconComponentFor}
-            translation={editorTranslator}
-            plugins={[
-              toolbarPlugin({
-                location: mode === 'mobile' ? 'bottom' : 'top',
-                toolbarContents: () =>
-                  mode === 'mobile' ? (
-                    <ToolbarForMobile onSubmit={handleSubmit} focus={doFocus} />
-                  ) : (
-                    <ToolbarForDesktop
-                      onImage={imageUploadHandlerWithMarkdownInsertion}
-                    />
-                  ),
-              }),
-              listsPlugin(),
-              quotePlugin(),
-              headingsPlugin(),
-              linkPlugin(),
-              linkDialogPlugin(),
-              codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-              codeMirrorPlugin({
-                codeBlockLanguages,
-              }),
-              imagePlugin({ imageUploadHandler }),
-              tablePlugin(),
-              thematicBreakPlugin(),
-              frontmatterPlugin(),
-              diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
-              markdownShortcutPlugin(),
-            ]}
-          />
-
-          {mode === 'desktop' && (
-            <DesktopEditorFooter
-              onImage={imageUploadHandlerWithMarkdownInsertion}
-              onImportMarkdown={handleImportMarkdown}
-              SubmitButton={SubmitButton}
+          <div
+            className={clsx(
+              'mdxeditor-container',
+              'mdxeditor-container-mode-' + mode,
+              active ? 'mdxeditor-container-active' : null,
+            )}
+            onDrop={handleDrop}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onPaste={(event) => handlePaste(event)}
+            onFocus={() => setActive(true)}
+            onBlur={() => setActive(false)}
+          >
+            <MDXEditor
+              onError={errorHandler}
+              ref={handleRef}
+              markdown={props.markdown ?? ''}
+              placeholder={placeholder}
+              iconComponentFor={iconComponentFor}
+              translation={editorTranslator}
+              plugins={[
+                toolbarPlugin({
+                  location: mode === 'mobile' ? 'bottom' : 'top',
+                  toolbarContents: () =>
+                    mode === 'mobile' ? (
+                      <ToolbarForMobile
+                        SubmitButton={SubmitButton}
+                        focus={doFocus}
+                      />
+                    ) : (
+                      <ToolbarForDesktop
+                        onImage={imageUploadHandlerWithMarkdownInsertion}
+                      />
+                    ),
+                }),
+                listsPlugin(),
+                quotePlugin(),
+                headingsPlugin(),
+                linkPlugin(),
+                linkDialogPlugin(),
+                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+                codeMirrorPlugin({
+                  codeBlockLanguages,
+                }),
+                imagePlugin({ imageUploadHandler }),
+                tablePlugin(),
+                thematicBreakPlugin(),
+                frontmatterPlugin(),
+                diffSourcePlugin({
+                  viewMode: 'rich-text',
+                  diffMarkdown: 'boo',
+                }),
+                markdownShortcutPlugin(),
+              ]}
             />
-          )}
 
-          {dragging && <DragIndicator />}
-          {uploading && <UploadIndicator />}
+            {mode === 'desktop' && (
+              <DesktopEditorFooter
+                onImage={imageUploadHandlerWithMarkdownInsertion}
+                onImportMarkdown={handleImportMarkdown}
+                SubmitButton={SubmitButton}
+              />
+            )}
+
+            {dragging && <DragIndicator />}
+            {uploading && <UploadIndicator />}
+          </div>
         </div>
-      </div>
-    </MarkdownEditorContext.Provider>
+      </MarkdownEditorContext.Provider>
+    </MarkdownEditorModeContext.Provider>
   );
 });

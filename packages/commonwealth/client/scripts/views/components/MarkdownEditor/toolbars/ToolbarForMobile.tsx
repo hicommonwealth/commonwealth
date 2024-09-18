@@ -5,13 +5,13 @@ import {
   ListsToggle,
   Separator,
 } from 'commonwealth-mdxeditor';
-import React, { useCallback, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect } from 'react';
 
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './ToolbarForMobile.scss';
 
 type ToolbarForMobileProps = Readonly<{
-  onSubmit?: () => void;
+  SubmitButton?: () => ReactNode;
 
   /**
    * Focus the toolbar so that it is not blurred when clicking buttons in the
@@ -21,7 +21,7 @@ type ToolbarForMobileProps = Readonly<{
 }>;
 
 export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
-  const { onSubmit, focus } = props;
+  const { SubmitButton, focus } = props;
 
   const adjustForKeyboard = useCallback(() => {
     if (!window.visualViewport) {
@@ -73,9 +73,7 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <ListsToggle />
       <Separator />
       <ImageButton />
-      <div className="end">
-        <button onClick={() => onSubmit?.()}>➤</button>
-      </div>
+      <div className="end">{SubmitButton && <SubmitButton />}</div>
     </div>
   );
 };

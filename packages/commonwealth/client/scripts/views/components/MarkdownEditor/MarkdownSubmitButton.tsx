@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
+import { useMarkdownEditorMode } from 'views/components/MarkdownEditor/useMarkdownEditorMode';
 
 export type MarkdownSubmitButtonProps = Readonly<{
   label: string;
@@ -18,7 +18,7 @@ export type MarkdownSubmitButtonProps = Readonly<{
 export const MarkdownSubmitButton = (props: MarkdownSubmitButtonProps) => {
   const { onClick, className, disabled, label, tabIndex } = props;
 
-  const deviceProfile = useDeviceProfile();
+  const mode = useMarkdownEditorMode();
 
   return (
     <button
@@ -27,7 +27,7 @@ export const MarkdownSubmitButton = (props: MarkdownSubmitButtonProps) => {
       tabIndex={tabIndex}
       className={clsx('MarkdownSubmitButton', className)}
     >
-      {deviceProfile === 'desktop' ? label : '➤'}
+      {mode === 'desktop' ? label : '➤'}
     </button>
   );
 };
