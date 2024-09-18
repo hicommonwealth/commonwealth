@@ -38,7 +38,7 @@ export interface TopicFormStake {
 
 export type HandleCreateTopicProps = {
   erc20?: TopicFormERC20;
-  stake: TopicFormStake;
+  stake?: TopicFormStake;
 };
 
 export interface TopicForm extends TopicFormRegular, TopicFormERC20 {}

@@ -13,6 +13,7 @@ export const CanvasThread = z.object({
 
 export const CreateThread = {
   input: CanvasThread.extend({
+    topic_id: PG_INT.optional(),
     kind: z.enum(['discussion', 'link']),
     stage: z.string(),
     url: z.string().optional(),

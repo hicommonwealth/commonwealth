@@ -46,7 +46,6 @@ export const CreateTopicSectionOld = () => {
     try {
       await createTopic({
         name: values.topicName,
-        // @ts-expect-error <StrictNullChecks/>
         description: values.topicDescription,
         featuredInSidebar,
         featuredInNewPost: false,

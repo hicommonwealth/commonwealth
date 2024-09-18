@@ -9,7 +9,7 @@ const ActiveContestManagers = z.object({
 type TopicAttributesBase = z.infer<typeof schemas.Topic>;
 
 type TopicAttributesExtended = TopicAttributesBase & {
-  active_contest_managers: Array<z.infer<typeof ActiveContestManagers>>; // NIE MA
+  active_contest_managers: Array<z.infer<typeof ActiveContestManagers>>;
   total_threads: number;
 };
 
