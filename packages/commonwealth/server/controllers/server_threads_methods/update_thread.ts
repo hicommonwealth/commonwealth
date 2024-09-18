@@ -7,6 +7,7 @@ import {
   ThreadAttributes,
   ThreadInstance,
   UserInstance,
+  decodeContent,
   emitMentions,
   findMentionDiff,
   getThreadSearchVector,
@@ -62,7 +63,7 @@ export type UpdateThreadOptions = {
     toRemove?: number[];
   };
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
   discordMeta?: any;
 };
 
@@ -84,7 +85,7 @@ export async function __updateThread(
     spam,
     topicId,
     collaborators,
-    canvasHash,
+    canvasMsgId,
     canvasSignedData,
     discordMeta,
   }: UpdateThreadOptions,
@@ -192,7 +193,7 @@ export async function __updateThread(
         title,
         body,
         url,
-        canvasHash,
+        canvasMsgId,
         canvasSignedData,
       },
       isContestThread,
@@ -249,7 +250,7 @@ export async function __updateThread(
         {
           thread_id: threadId!,
           address: address.address,
-          body,
+          body: decodeContent(body),
           timestamp: new Date(),
         },
         {
@@ -448,7 +449,7 @@ export type UpdatableThreadAttributes = {
   body?: string;
   url?: string;
   canvasSignedData?: string;
-  canvasHash?: string;
+  canvasMsgId?: string;
 };
 
 /**
@@ -457,7 +458,13 @@ export type UpdatableThreadAttributes = {
 async function setThreadAttributes(
   permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
-  { title, body, url, canvasSignedData, canvasHash }: UpdatableThreadAttributes,
+  {
+    title,
+    body,
+    url,
+    canvasSignedData,
+    canvasMsgId,
+  }: UpdatableThreadAttributes,
   isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
@@ -490,12 +497,12 @@ async function setThreadAttributes(
       if (thread.kind === 'discussion' && (!body || !body.trim())) {
         throw new AppError(Errors.NoBody);
       }
-      toUpdate.body = body;
+      toUpdate.body = decodeContent(body);
       toUpdate.plaintext = (() => {
         try {
-          return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
+          return renderQuillDeltaToText(JSON.parse(body));
         } catch (e) {
-          return decodeURIComponent(body);
+          return body;
         }
       })();
     }
@@ -509,7 +516,7 @@ async function setThreadAttributes(
     }
 
     toUpdate.canvas_signed_data = canvasSignedData;
-    toUpdate.canvas_hash = canvasHash;
+    toUpdate.canvas_msg_id = canvasMsgId;
   }
 }
 

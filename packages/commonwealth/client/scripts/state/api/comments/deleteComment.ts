@@ -13,7 +13,7 @@ import useFetchCommentsQuery from './fetchComments';
 interface DeleteCommentProps {
   address: string;
   communityId: string;
-  canvasHash: string;
+  commentMsgId: string;
   commentId: number;
   existingNumberOfComments: number;
 }
@@ -22,21 +22,22 @@ const deleteComment = async ({
   address,
   communityId,
   commentId,
-  canvasHash,
+  commentMsgId,
 }: DeleteCommentProps) => {
   const canvasSignedData = await signDeleteComment(
     userStore.getState().activeAccount?.address || '',
     {
-      comment_id: canvasHash,
+      comment_id: commentMsgId,
     },
   );
 
   await axios.delete(`${SERVER_URL}/comments/${commentId}`, {
     data: {
-      jwt: userStore.getState().jwt,
+      author_community_id: communityId,
       address: address,
       community_id: communityId,
-      author_community_id: communityId,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   });
 

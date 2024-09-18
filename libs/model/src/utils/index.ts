@@ -1,3 +1,4 @@
+export * from './decodeContent';
 export * from './denormalizedCountUtils';
 export * from './getDelta';
 export * from './parseUserMentions';
