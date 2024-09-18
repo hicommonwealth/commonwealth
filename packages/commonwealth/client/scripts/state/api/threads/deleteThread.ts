@@ -1,4 +1,5 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
+import Thread from 'client/scripts/models/Thread';
 import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
 import { trpc } from 'utils/trpcClient';
@@ -6,59 +7,38 @@ import { useAuthModalStore } from '../../ui/modals';
 import { updateCommunityThreadCount } from '../communities/getCommuityById';
 import { removeThreadFromAllCaches } from './helpers/cache';
 
-interface UseDeleteThreadMutationProps {
-  address: string;
-  communityId: string;
-  threadId: number;
-  threadMsgId: string;
-  currentStage: ThreadStage;
-}
-
-export const buildDeleteThreadInput = async ({
-  address,
-  communityId,
-  threadId,
-  threadMsgId,
-  currentStage,
-}) => {
+export const buildDeleteThreadInput = async (
+  address: string,
+  thread: Thread,
+) => {
   const canvasSignedData = await signDeleteThread(address, {
-    thread_id: threadMsgId,
+    thread_id: thread.canvasMsgId,
   });
   return {
-    address,
-    communityId,
-    threadId,
-    threadMsgId,
-    currentStage,
+    thread_id: thread.id,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
 };
 
-const useDeleteThreadMutation = ({
-  address,
-  communityId,
-  threadId,
-  threadMsgId,
-  currentStage,
-}: UseDeleteThreadMutationProps) => {
+const useDeleteThreadMutation = (thread: Thread) => {
   const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteThread.useMutation({
-    onSuccess: async (response) => {
-      removeThreadFromAllCaches(communityId, threadId);
+    onSuccess: async (deleted) => {
+      removeThreadFromAllCaches(thread.communityId, thread.id);
 
       // decrement communities thread count
-      if (communityId) {
+      if (thread.communityId) {
         updateCommunityThreadCount(
-          communityId,
+          thread.communityId,
           'decrement',
-          currentStage === ThreadStage.Voting,
+          thread.stage === ThreadStage.Voting,
           utils,
         );
       }
 
-      return response;
+      return deleted;
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

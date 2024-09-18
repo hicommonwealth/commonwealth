@@ -6,7 +6,6 @@ import { verifyDeleteThreadSignature } from '../middleware/canvas';
 import { mustBeAuthorizedThread } from '../middleware/guards';
 
 export const DeleteThreadErrors = {
-  InvalidCanvasMsgId: 'Invalid canvas_msg_id',
   ContestLock: 'Cannot delete thread that is in a contest',
 };
 
@@ -17,14 +16,15 @@ export function DeleteThread(): Command<
   return {
     ...schemas.DeleteThread,
     auth: [isAuthorized({ author: true }), verifyDeleteThreadSignature],
-    body: async ({ actor, auth, payload }) => {
+    body: async ({ actor, auth }) => {
       const { thread } = mustBeAuthorizedThread(actor, auth);
 
-      if (
-        payload.canvas_msg_id &&
-        thread.canvas_msg_id !== payload.canvas_msg_id
-      )
-        throw new InvalidInput(DeleteThreadErrors.InvalidCanvasMsgId);
+      // @rbennettcw do we need to check the canvas_msg_id?
+      // if (
+      //   payload.canvas_msg_id &&
+      //   thread.canvas_msg_id !== payload.canvas_msg_id
+      // )
+      //   throw new InvalidInput(DeleteThreadErrors.InvalidCanvasMsgId);
 
       const found = await models.ContestTopic.findOne({
         where: { topic_id: thread.topic_id! },

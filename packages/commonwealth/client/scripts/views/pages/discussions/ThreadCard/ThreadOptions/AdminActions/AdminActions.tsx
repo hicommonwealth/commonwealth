@@ -81,12 +81,7 @@ export const AdminActions = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
-  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
-    communityId: app.activeChainId() || '',
-    threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
-    currentStage: thread.stage,
-  });
+  const { mutateAsync: deleteThread } = useDeleteThreadMutation(thread);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
@@ -107,13 +102,10 @@ export const AdminActions = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              const input = await buildDeleteThreadInput({
-                address: user.activeAccount?.address || '',
-                communityId: app.activeChainId() || '',
-                threadId: thread.id,
-                threadMsgId: thread.canvasMsgId,
-                currentStage: thread.stage,
-              });
+              const input = await buildDeleteThreadInput(
+                user.activeAccount?.address || '',
+                thread,
+              );
               await deleteThread(input);
               onDelete?.();
             } catch (err) {
