@@ -3,7 +3,7 @@ import React from 'react';
 import 'components/component_kit/cw_banner.scss';
 import { CWIconButton } from './cw_icon_button';
 
-import CWBannerText from './CWBannerText';
+import RenderTextWithLink from './RenderTextWithLink';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
@@ -32,6 +32,7 @@ export const Old_CWBanner = ({
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWMessageBanner = ({
   bannerContent,
   className,
@@ -44,7 +45,7 @@ export const CWMessageBanner = ({
         ComponentType.MessageBanner,
       )}
     >
-      <CWBannerText text={bannerContent} />
+      <RenderTextWithLink text={bannerContent} />
       {onClose && (
         <CWIconButton
           iconName="close"
