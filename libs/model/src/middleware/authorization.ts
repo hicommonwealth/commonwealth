@@ -77,9 +77,9 @@ export class RejectedMember extends InvalidActor {
  * and authorized by prefilling the authorization context.
  *
  * Currenlty, the waterfall is:
- * 1. by comment_id
- * 3. or by thread_id
- * 2. or by community_id (community_id or id)
+ * by comment_id
+ *   or by thread_id
+       or by community_id (community_id or id)
  *
  * TODO: Find ways to cache() by args to avoid db trips
  *
