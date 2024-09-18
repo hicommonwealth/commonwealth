@@ -39,5 +39,5 @@ jobs:
 
       - name: Deploy to Heroku
         run: |
-          chmod +x ./deploy-to-heroku.sh
-          ./deploy-to-heroku.sh "${{ secrets.HEROKU_EMAIL }}" "${{ secrets.HEROKU_API_TOKEN }}" "${{ env.HEROKU_APP_NAME }}" "${{ env.HEROKU_APP_NAME }}"
+          chmod +x ./scripts/deploy-to-heroku.sh
+          ./scripts/deploy-to-heroku.sh "${{ secrets.HEROKU_EMAIL }}" "${{ secrets.HEROKU_API_TOKEN }}" "${{ env.HEROKU_APP_NAME }}" "${{ env.HEROKU_APP_NAME }}"
