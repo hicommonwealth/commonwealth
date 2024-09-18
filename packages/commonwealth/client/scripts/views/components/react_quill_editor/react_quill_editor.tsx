@@ -26,7 +26,6 @@ import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { MarkdownPreview } from './MarkdownPreview';
-import { AddLinkModal } from './QuillLinkModal';
 
 Quill.register('modules/magicUrl', MagicUrl);
 
@@ -78,19 +77,14 @@ const ReactQuillEditor = ({
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
   }, []);
-  type QuillRange = { index: number; length: number };
 
   const editorRef = useRef<ReactQuill>();
-  const childInputRef = useRef<QuillRange | null>(null);
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedTab, setSelectedTab] = useState(TABS[0].label);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [linkText, setLinkText] = useState<string>('');
-  const [linkUrl, setLinkUrl] = useState<string>('');
 
   const formContext = useFormContext();
   const formFieldContext =
@@ -153,9 +147,6 @@ const ReactQuillEditor = ({
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
     setContentDeltaToUse,
-    isModalOpen,
-    setIsModalOpen,
-    childInputRef,
   });
 
   // handle keyboard shortcuts for markdown
@@ -238,6 +229,7 @@ const ReactQuillEditor = ({
 
   const handleDragStart = () => setIsDraggingOver(true);
   const handleDragStop = () => setIsDraggingOver(false);
+
   useEffect(() => {
     if (shouldFocus) {
       // Important: We need to initially focus the editor and then focus it again after
@@ -254,47 +246,6 @@ const ReactQuillEditor = ({
   }, []);
 
   const showTooltip = isDisabled && isHovering;
-
-  const handleAddLink = () => {
-    if (linkText === '' || linkUrl === '') {
-      return;
-    }
-    const editor = editorRef?.current?.getEditor();
-    if (!editor) {
-      return;
-    }
-    // Retrieve the stored selection from childInputRef
-    const selection = childInputRef.current;
-    if (!selection) {
-      return;
-    }
-    // Format the link to ensure it has 'https://'
-    let newLink = linkUrl;
-    if (!linkUrl.startsWith('https://')) {
-      if (linkUrl.startsWith('http://')) {
-        newLink = `https://${linkUrl.substring('http://'.length)}`;
-      } else {
-        newLink = `https://${linkUrl}`;
-      }
-    }
-    // Insert the markdown-formatted link
-    const linkMarkdown = `[${linkText}](${newLink})`;
-
-    // Replace the selected text with the markdown link
-    editor.deleteText(selection.index, selection.length);
-    editor.insertText(selection.index, linkMarkdown);
-    // Set the cursor right after the inserted text
-    editor.setSelection(selection.index + linkMarkdown.length, 0);
-    // Update the content delta if needed
-    setContentDeltaToUse({
-      ...editor.getContents(),
-      ___isMarkdown: true,
-    });
-    // Close the modal (reset modal open state)
-    setIsModalOpen(false);
-    setLinkText('');
-    setLinkUrl('');
-  };
 
   return (
     <div className="CWEditor">
@@ -336,8 +287,6 @@ const ReactQuillEditor = ({
               <CustomQuillToolbar
                 toolbarId={toolbarId}
                 isDisabled={isDisabled}
-                setIsModalOpen={setIsModalOpen}
-                isModalOpen={isModalOpen}
               />
               <DragDropContext onDragEnd={handleDragStop}>
                 <Droppable droppableId="quillEditor">
@@ -408,17 +357,6 @@ const ReactQuillEditor = ({
           <MarkdownPreview doc={getTextFromDelta(contentDeltaToUse)} />
         )}
       </div>
-      {isModalOpen && (
-        <AddLinkModal
-          linkText={linkText}
-          linkUrl={linkUrl}
-          setIsModalOpen={setIsModalOpen}
-          setLinkText={setLinkText}
-          setLinkUrl={setLinkUrl}
-          handleAddLink={handleAddLink}
-          isModalOpen={isModalOpen}
-        />
-      )}
       {formFieldErrorMessage && (
         <div className="form-error-container">
           <div className="msg">
