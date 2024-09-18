@@ -57,7 +57,8 @@ describe('createComment Integration Tests', () => {
     };
     return await chai
       .request(server.app)
-      .del(`/api/comments/${commentId}`)
+      .post(`/api/v1/DeleteComment`)
+      .set('address', validRequest.address)
       .send(validRequest);
   };
 
