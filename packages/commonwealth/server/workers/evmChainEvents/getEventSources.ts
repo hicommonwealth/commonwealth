@@ -1,4 +1,4 @@
-import { DB, getChainNodeUrl } from '@hicommonwealth/model';
+import { DB, buildChainNodeUrl } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { EvmSources } from './types';
 
@@ -44,7 +44,7 @@ export async function getEventSources(models: DB): Promise<EvmSources> {
 
   if (result.length > 0 && result[0].aggregate) {
     for (const key of Object.keys(result[0].aggregate)) {
-      result[0].aggregate[key].rpc = getChainNodeUrl(
+      result[0].aggregate[key].rpc = buildChainNodeUrl(
         result[0].aggregate[key].rpc,
         'private',
       );

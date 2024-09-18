@@ -1,4 +1,5 @@
 import { type Query } from '@hicommonwealth/core';
+import { buildChainNodeUrl } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -294,6 +295,15 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         type: QueryTypes.SELECT,
         nest: true,
       });
+
+      if (include_node_info) {
+        for (const community of communities) {
+          community.ChainNode!.url = buildChainNodeUrl(
+            community.ChainNode!.url!,
+            'public',
+          );
+        }
+      }
 
       return schemas.buildPaginatedResponse(
         communities,

@@ -166,15 +166,30 @@ export function removeUndefined(
   return result;
 }
 
-const alchemyUrlPattern = /^https:\/\/[a-z]+:[a-z]+\.g\.alchemy\.com\/v2\/$/;
+const alchemyUrlPattern = /^https:\/\/[a-z]+-[a-z]+\.g\.alchemy\.com\/v2\//;
 
-export function getChainNodeUrl(url: string, privacy: 'private' | 'public') {
+export function buildChainNodeUrl(url: string, privacy: 'private' | 'public') {
   if (url === '') return url;
 
   if (alchemyUrlPattern.test(url)) {
-    return url + privacy === 'private'
-      ? config.ALCHEMY.APP_KEYS.PRIVATE
-      : config.ALCHEMY.APP_KEYS.PUBLIC;
+    return (
+      url +
+      (privacy === 'private'
+        ? config.ALCHEMY.APP_KEYS.PRIVATE
+        : config.ALCHEMY.APP_KEYS.PUBLIC)
+    );
   }
   return url;
+}
+
+export function getChainNodeUrl({
+  url,
+  private_url,
+}: {
+  url: string;
+  private_url?: string;
+}) {
+  if (!private_url || private_url === '')
+    return buildChainNodeUrl(url, 'public');
+  return buildChainNodeUrl(private_url, 'private');
 }

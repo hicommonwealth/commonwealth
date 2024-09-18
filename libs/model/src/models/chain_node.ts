@@ -1,4 +1,4 @@
-import { getChainNodeUrl } from '@hicommonwealth/model';
+import { buildChainNodeUrl } from '@hicommonwealth/model';
 import { ChainNode } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -22,7 +22,7 @@ export default (
         get() {
           const url: string | null | undefined = this.getDataValue('url');
           if (!url) return url;
-          return getChainNodeUrl(url, 'public');
+          return buildChainNodeUrl(url, 'public');
         },
       },
       eth_chain_id: { type: Sequelize.INTEGER, allowNull: true, unique: true },
@@ -39,7 +39,7 @@ export default (
           const privateUrl: string | null | undefined =
             this.getDataValue('private_url');
           if (!privateUrl) return privateUrl;
-          return getChainNodeUrl(privateUrl, 'private');
+          return buildChainNodeUrl(privateUrl, 'private');
         },
       },
       balance_type: { type: Sequelize.STRING, allowNull: false },
