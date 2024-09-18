@@ -5,41 +5,40 @@ import DatabaseValidationService from 'server/middleware/databaseValidationServi
 
 const PATH = '/api/integration';
 
-async function withThreadId(req, _, next) {
-  try {
-    const message_id = req.params.message_id;
-    const thread = await models.Thread.findOne({
-      where: {
-        discord_meta: { message_id },
-        deleted_at: null,
-      },
-      attributes: ['id'],
-    });
-    if (!thread) throw new Error(`Thread not found for message ${message_id}`);
-    req.body.thread_id = thread.id;
-    return next();
-  } catch (e) {
-    next(e);
-  }
+function withThreadId(req, _, next) {
+  const message_id = req.params.message_id;
+  models.Thread.findOne({
+    where: {
+      discord_meta: { message_id },
+      deleted_at: null,
+    },
+    attributes: ['id'],
+  })
+    .then((thread) => {
+      if (!thread)
+        throw new Error(`Thread not found for message ${message_id}`);
+      req.body.thread_id = thread.id;
+      next();
+    })
+    .catch(next);
 }
 
-async function withCommentId(req, _, next) {
-  try {
-    const message_id = req.params.message_id;
-    const comment = await models.Comment.findOne({
-      where: {
-        discord_meta: { message_id },
-        deleted_at: null,
-      },
-      attributes: ['id'],
-    });
-    if (!comment)
-      throw new Error(`Comment not found for message ${message_id}`);
-    req.body.comment_id = comment.id;
-    return next();
-  } catch (e) {
-    next(e);
-  }
+function withCommentId(req, _, next) {
+  const message_id = req.params.message_id;
+  models.Comment.findOne({
+    where: {
+      discord_meta: { message_id },
+      deleted_at: null,
+    },
+    attributes: ['id'],
+  })
+    .then((comment) => {
+      if (!comment)
+        throw new Error(`Comment not found for message ${message_id}`);
+      req.body.comment_id = comment.id;
+      next();
+    })
+    .catch(next);
 }
 
 function build(validator: DatabaseValidationService) {
