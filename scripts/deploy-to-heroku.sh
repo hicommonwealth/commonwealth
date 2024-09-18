@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ "$#" -ne 4 ]; then
     echo "Usage: $0 <email> <api_key> <app_name> <heroku_app_name>"
     exit 1
