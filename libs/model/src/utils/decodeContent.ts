@@ -1,5 +1,5 @@
-// @ts-expect-error quill-delta-to-markdown doesn't have types
 import { getDecodedString } from '@hicommonwealth/shared';
+// @ts-expect-error quill-delta-to-markdown doesn't have types
 import { deltaToMarkdown } from 'quill-delta-to-markdown';
 
 export function decodeContent(content: string) {
