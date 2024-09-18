@@ -104,9 +104,8 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
           onClick: async () => {
             await deleteTopic({
-              topicId: id,
-              topicName: name,
-              communityId: app.activeChainId() || '',
+              community_id: app.activeChainId() || '',
+              topic_id: id,
             });
             if (noRedirect) {
               onModalClose();

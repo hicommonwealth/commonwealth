@@ -67,4 +67,5 @@ export const trpcRouter = trpc.router({
     Community.UpdateCustomDomain,
     trpc.Tag.Community,
   ),
+  deleteTopic: trpc.command(Community.DeleteTopic, trpc.Tag.Community),
 });
