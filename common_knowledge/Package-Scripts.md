@@ -415,7 +415,7 @@ Description: It creates new `tsx` file and modifies `componentsList.ts` file in 
 
 ### send-cosmos-notifs
 
-Definition: `node --max-old-space-size=$(./scripts/get-max-old-space-size.sh) build/server/workers/cosmosGovNotifications/generateCosmosGovNotifications.js`
+Definition: `node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/cosmosGovNotifications/generateCosmosGovNotifications.js`
 
 Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
 
