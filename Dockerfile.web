@@ -28,6 +28,9 @@ COPY ./scripts/heroku-entrypoint.sh /prod/commonwealth
 
 RUN chmod +x /prod/commonwealth/heroku-entrypoint.sh
 
+# Copy your Datadog configuration
+COPY datadog-config/ /etc/datadog-agent/
+
 # Expose DogStatsD and trace-agent ports
 EXPOSE 8125/udp 8126/tcp
 
