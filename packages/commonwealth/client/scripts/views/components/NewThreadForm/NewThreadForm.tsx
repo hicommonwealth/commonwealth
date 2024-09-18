@@ -371,9 +371,19 @@ export const NewThreadForm = () => {
                   onMarkdownEditorMethods={(methods) =>
                     (markdownEditorMethodsRef.current = methods)
                   }
+                  disabled={isRestrictedMembership || !user.activeAccount}
+                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
                   SubmitButton={() => (
                     <MarkdownSubmitButton
                       label="Create Thread"
+                      disabled={
+                        isDisabled ||
+                        !user.activeAccount ||
+                        isDisabledBecauseOfContestsConsent ||
+                        walletBalanceError ||
+                        contestTopicError
+                      }
+                      tabIndex={4}
                       onClick={handleNewThreadCreation}
                     />
                   )}
@@ -394,31 +404,32 @@ export const NewThreadForm = () => {
                 validationStatus="failure"
               />
 
-              <div className="buttons-row">
-                {isPopulated && user.activeAccount && (
+              {!newEditor && (
+                <div className="buttons-row">
+                  {isPopulated && user.activeAccount && (
+                    <CWButton
+                      buttonType="tertiary"
+                      onClick={handleCancel}
+                      tabIndex={3}
+                      label="Cancel"
+                      containerClassName="no-pad"
+                    />
+                  )}
                   <CWButton
-                    buttonType="tertiary"
-                    onClick={handleCancel}
-                    tabIndex={3}
-                    label="Cancel"
+                    label="Create thread"
+                    disabled={
+                      isDisabled ||
+                      !user.activeAccount ||
+                      isDisabledBecauseOfContestsConsent ||
+                      walletBalanceError ||
+                      contestTopicError
+                    }
+                    onClick={handleNewThreadCreation}
+                    tabIndex={4}
                     containerClassName="no-pad"
                   />
-                )}
-                <CWButton
-                  label="Create thread"
-                  disabled={
-                    isDisabled ||
-                    !user.activeAccount ||
-                    isDisabledBecauseOfContestsConsent ||
-                    walletBalanceError ||
-                    contestTopicError
-                  }
-                  onClick={handleNewThreadCreation}
-                  tabIndex={4}
-                  containerClassName="no-pad"
-                />
-              </div>
-
+                </div>
+              )}
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
