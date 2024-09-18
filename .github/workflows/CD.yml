@@ -44,4 +44,4 @@ jobs:
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
           dontautocreate: true
-          docker_heroku_process_type: web consumer evmCe knock messageRelayer --recursive
+          docker_heroku_process_type: web consumer evm_ce knock message_relayer --recursive
