@@ -25,7 +25,7 @@ const useDeleteThreadMutation = (thread: Thread) => {
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteThread.useMutation({
-    onSuccess: async (deleted) => {
+    onSuccess: (deleted) => {
       removeThreadFromAllCaches(thread.communityId, thread.id);
 
       // decrement communities thread count
