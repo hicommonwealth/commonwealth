@@ -23,6 +23,6 @@ EOF
 
 heroku git:remote --app ${app_name}
 
-heroku container:push --recursive -a ${heroku_app_name}
+heroku container:push web --recursive -a ${heroku_app_name}
 
-heroku container:release web consumer evm_ce knock message_relayer -a ${heroku_app_name}
+heroku container:release web -a ${heroku_app_name}
