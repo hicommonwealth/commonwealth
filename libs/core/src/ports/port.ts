@@ -170,7 +170,6 @@ const disposeAndExit = async (
 
 export const disposeAdapter = (name: string): void => {
   void adapters.get(name)?.dispose();
-  adapters.delete(name);
   adapters.clear();
   defaultAdapters.clear();
 };
@@ -212,7 +211,7 @@ process.once('unhandledRejection', async (arg?: any) => {
 /**
  * Stats port factory
  */
-export const stats = port(function stats(stats?: Stats) {
+export const stats = port(function statsFactory(stats?: Stats) {
   return (
     stats || {
       name: 'in-memory-stats',
@@ -252,7 +251,7 @@ export const stats = port(function stats(stats?: Stats) {
 /**
  * Cache port factory
  */
-export const cache = port(function cache(cache?: Cache) {
+export const cache = port(function cacheFactory(cache?: Cache) {
   return (
     cache || {
       name: 'in-memory-cache',
@@ -278,7 +277,7 @@ export const cache = port(function cache(cache?: Cache) {
 /**
  * Analytics port factory
  */
-export const analytics = port(function analytics(analytics?: Analytics) {
+export const analytics = port(function analyticsFactory(analytics?: Analytics) {
   return (
     analytics || {
       name: 'in-memory-analytics',
@@ -293,14 +292,14 @@ export const analytics = port(function analytics(analytics?: Analytics) {
 /**
  * Broker port factory
  */
-export const broker = port(function broker(broker?: Broker) {
+export const broker = port(function brokerFactory(broker?: Broker) {
   return broker || successfulInMemoryBroker;
 });
 
 /**
  * External blob storage port factory
  */
-export const blobStorage = port(function blobStorage(
+export const blobStorage = port(function blobStorageFactory(
   // eslint-disable-next-line @typescript-eslint/no-shadow
   blobStorage?: BlobStorage,
 ) {
@@ -310,7 +309,7 @@ export const blobStorage = port(function blobStorage(
 /**
  * Notifications provider port factory
  */
-export const notificationsProvider = port(function notificationsProvider(
+export const notificationsProvider = port(function notificationsProviderFactory(
   // eslint-disable-next-line @typescript-eslint/no-shadow
   notificationsProvider?: NotificationsProvider,
 ) {
