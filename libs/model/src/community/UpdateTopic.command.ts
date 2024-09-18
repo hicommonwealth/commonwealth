@@ -18,7 +18,7 @@ export function UpdateTopic(): Command<
     ...schemas.UpdateTopic,
     auth: [isAuthorized({})],
     body: async ({ actor, payload, auth }) => {
-      const { topic_id } = mustBeAuthorized(actor, auth);
+      const { topic_id, community_id } = mustBeAuthorized(actor, auth);
 
       const topic = await models.Topic.findByPk(topic_id!);
       mustExist('Topic', topic);

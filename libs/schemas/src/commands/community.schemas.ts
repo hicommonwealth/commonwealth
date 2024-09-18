@@ -8,7 +8,7 @@ import {
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, Group, StakeTransaction } from '../entities';
+import { Community, Group, StakeTransaction, Topic } from '../entities';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -157,6 +157,54 @@ export const GenerateStakeholderGroups = {
       created: z.boolean(),
     })
     .partial(),
+};
+
+export const CreateTopic = {
+  input: z
+    .object({
+      community_id: z.string(),
+    })
+    .merge(
+      Topic.pick({
+        name: true,
+        description: true,
+        featured_in_sidebar: true,
+        featured_in_new_post: true,
+        default_offchain_template: true,
+        weighted_voting: true,
+        chain_node_id: true,
+        token_address: true,
+        token_symbol: true,
+        vote_weight_multiplier: true,
+      }),
+    ),
+  output: z.object({
+    topic: Topic.partial(),
+    user_id: z.number(),
+  }),
+};
+
+export const UpdateTopic = {
+  input: z
+    .object({
+      topic_id: z.number(),
+      community_id: z.string(),
+    })
+    .merge(
+      Topic.pick({
+        name: true,
+        description: true,
+        group_ids: true,
+        telegram: true,
+        featured_in_sidebar: true,
+        featured_in_new_post: true,
+        default_offchain_template: true,
+      }),
+    ),
+  output: z.object({
+    topic: Topic.partial(),
+    user_id: z.number(),
+  }),
 };
 
 export const DeleteTopic = {
