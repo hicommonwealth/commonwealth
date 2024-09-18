@@ -25,7 +25,7 @@ const createTopic = async ({
   isPWA,
 }: CreateTopicProps) => {
   const response = await axios.post(
-    `${SERVER_URL}/topics`,
+    `${SERVER_URL}/internal/CreateTopic`,
     {
       name,
       description,
@@ -38,6 +38,7 @@ const createTopic = async ({
     },
     {
       headers: {
+        address: userStore.getState().activeAccount?.address,
         isPWA: isPWA?.toString(),
       },
     },
