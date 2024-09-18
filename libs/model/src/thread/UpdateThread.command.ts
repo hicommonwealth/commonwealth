@@ -175,14 +175,10 @@ export function UpdateThread(): Command<
     ...schemas.UpdateThread,
     auth: [isAuthorized({ collaborators: true })],
     body: async ({ actor, payload, auth }) => {
-      const { address, topic_id } = mustBeAuthorizedThread(actor, auth);
-      const { thread_id, discord_meta } = payload;
-
-      // find by discord_meta first if present
-      const thread = await models.Thread.findOne({
-        where: discord_meta ? { discord_meta } : { id: thread_id },
-      });
-      if (!thread) throw new InvalidInput(UpdateThreadErrors.ThreadNotFound);
+      const { address, thread, thread_id } = mustBeAuthorizedThread(
+        actor,
+        auth,
+      );
 
       const content = getContentPatch(thread, payload);
       const adminPatch = getAdminOrModeratorPatch(actor, auth!, payload);
@@ -205,13 +201,7 @@ export function UpdateThread(): Command<
         collaboratorsPatch.remove.length > 0
       ) {
         const found = await models.ContestTopic.findOne({
-          where: { topic_id },
-          include: [
-            {
-              model: models.ContestManager,
-              required: true,
-            },
-          ],
+          where: { topic_id: thread.topic_id! },
         });
         if (found) throw new InvalidInput(UpdateThreadErrors.ContestLock);
       }
@@ -247,10 +237,6 @@ export function UpdateThread(): Command<
             transaction,
           });
         }
-
-        // TODO: we can encapsulate address activity in authorization middleware
-        address.last_active = new Date();
-        await address.save({ transaction });
 
         if (content.body) {
           const currentVersion = await models.ThreadVersionHistory.findOne({
