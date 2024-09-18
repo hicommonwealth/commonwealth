@@ -7,7 +7,7 @@ import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -19,9 +19,6 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import MarkdownEditor from 'views/components/MarkdownEditor';
-import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
-import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -53,8 +50,6 @@ export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const contestsEnabled = useFlag('contest');
-
-  const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
@@ -95,7 +90,6 @@ export const NewThreadForm = () => {
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
-  const newEditor = useFlag('newEditor');
 
   const contestTopicError = threadTopic?.activeContestManagers?.length
     ? threadTopic?.activeContestManagers
@@ -161,10 +155,6 @@ export const NewThreadForm = () => {
     !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
-    const body = newEditor
-      ? markdownEditorMethodsRef.current!.getMarkdown()
-      : serializeDelta(threadContentDelta);
-
     if (isRestrictedMembership) {
       notifyError('Topic is gated!');
       return;
@@ -175,17 +165,17 @@ export const NewThreadForm = () => {
       return;
     }
 
+    const deltaString = JSON.stringify(threadContentDelta);
+
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
-      body,
+      deltaString,
       !!hasTopics,
     );
 
     setIsSaving(true);
 
     try {
-      // FIXME: this is the only thing that needs to be re-written
-      // I need to build this from the markdown or the delta, and that's it.
       const input = await buildCreateThreadInput({
         address: user.activeAccount?.address || '',
         kind: threadKind,
@@ -195,7 +185,7 @@ export const NewThreadForm = () => {
         communityId,
         title: threadTitle,
         topic: threadTopic,
-        body,
+        body: serializeDelta(threadContentDelta),
         url: threadUrl,
       });
       const thread = await createThread(input);
@@ -352,43 +342,17 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {!newEditor && (
-                <ReactQuillEditor
-                  contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
-                  isDisabled={isRestrictedMembership || !user.activeAccount}
-                  tooltipLabel={
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('submit')
-                      : disabledActionsTooltipText
-                  }
-                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-                />
-              )}
-
-              {newEditor && (
-                <MarkdownEditor
-                  onMarkdownEditorMethods={(methods) =>
-                    (markdownEditorMethodsRef.current = methods)
-                  }
-                  disabled={isRestrictedMembership || !user.activeAccount}
-                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-                  SubmitButton={() => (
-                    <MarkdownSubmitButton
-                      label="Create Thread"
-                      disabled={
-                        isDisabled ||
-                        !user.activeAccount ||
-                        isDisabledBecauseOfContestsConsent ||
-                        walletBalanceError ||
-                        contestTopicError
-                      }
-                      tabIndex={4}
-                      onClick={handleNewThreadCreation}
-                    />
-                  )}
-                />
-              )}
+              <ReactQuillEditor
+                contentDelta={threadContentDelta}
+                setContentDelta={setThreadContentDelta}
+                isDisabled={isRestrictedMembership || !user.activeAccount}
+                tooltipLabel={
+                  typeof disabledActionsTooltipText === 'function'
+                    ? disabledActionsTooltipText?.('submit')
+                    : disabledActionsTooltipText
+                }
+                placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+              />
 
               {contestThreadBannerVisible && (
                 <ContestThreadBanner
@@ -404,32 +368,31 @@ export const NewThreadForm = () => {
                 validationStatus="failure"
               />
 
-              {!newEditor && (
-                <div className="buttons-row">
-                  {isPopulated && user.activeAccount && (
-                    <CWButton
-                      buttonType="tertiary"
-                      onClick={handleCancel}
-                      tabIndex={3}
-                      label="Cancel"
-                      containerClassName="no-pad"
-                    />
-                  )}
+              <div className="buttons-row">
+                {isPopulated && user.activeAccount && (
                   <CWButton
-                    label="Create thread"
-                    disabled={
-                      isDisabled ||
-                      !user.activeAccount ||
-                      isDisabledBecauseOfContestsConsent ||
-                      walletBalanceError ||
-                      contestTopicError
-                    }
-                    onClick={handleNewThreadCreation}
-                    tabIndex={4}
+                    buttonType="tertiary"
+                    onClick={handleCancel}
+                    tabIndex={3}
+                    label="Cancel"
                     containerClassName="no-pad"
                   />
-                </div>
-              )}
+                )}
+                <CWButton
+                  label="Create thread"
+                  disabled={
+                    isDisabled ||
+                    !user.activeAccount ||
+                    isDisabledBecauseOfContestsConsent ||
+                    walletBalanceError ||
+                    contestTopicError
+                  }
+                  onClick={handleNewThreadCreation}
+                  tabIndex={4}
+                  containerClassName="no-pad"
+                />
+              </div>
+
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
