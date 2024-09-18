@@ -211,9 +211,9 @@ process.once('unhandledRejection', async (arg?: any) => {
 /**
  * Stats port factory
  */
-export const stats = port(function statsFactory(stats?: Stats) {
+export const stats = port(function statsFactory(statsAdapter?: Stats) {
   return (
-    stats || {
+    statsAdapter || {
       name: 'in-memory-stats',
       dispose: () => Promise.resolve(),
       histogram: (key, value, tags) => {
@@ -251,9 +251,9 @@ export const stats = port(function statsFactory(stats?: Stats) {
 /**
  * Cache port factory
  */
-export const cache = port(function cacheFactory(cache?: Cache) {
+export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
   return (
-    cache || {
+    cacheAdapter || {
       name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
       ready: () => Promise.resolve(true),
@@ -277,9 +277,11 @@ export const cache = port(function cacheFactory(cache?: Cache) {
 /**
  * Analytics port factory
  */
-export const analytics = port(function analyticsFactory(analytics?: Analytics) {
+export const analytics = port(function analyticsFactory(
+  analyticsAdapter?: Analytics,
+) {
   return (
-    analytics || {
+    analyticsAdapter || {
       name: 'in-memory-analytics',
       dispose: () => Promise.resolve(),
       track: (event, payload) => {
@@ -292,29 +294,27 @@ export const analytics = port(function analyticsFactory(analytics?: Analytics) {
 /**
  * Broker port factory
  */
-export const broker = port(function brokerFactory(broker?: Broker) {
-  return broker || successfulInMemoryBroker;
+export const broker = port(function brokerFactory(brokerAdapter?: Broker) {
+  return brokerAdapter || successfulInMemoryBroker;
 });
 
 /**
  * External blob storage port factory
  */
 export const blobStorage = port(function blobStorageFactory(
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  blobStorage?: BlobStorage,
+  blobStorageAdapter?: BlobStorage,
 ) {
-  return blobStorage || inMemoryBlobStorage;
+  return blobStorageAdapter || inMemoryBlobStorage;
 });
 
 /**
  * Notifications provider port factory
  */
 export const notificationsProvider = port(function notificationsProviderFactory(
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  notificationsProvider?: NotificationsProvider,
+  notificationsProviderAdapter?: NotificationsProvider,
 ) {
   return (
-    notificationsProvider || {
+    notificationsProviderAdapter || {
       name: 'in-memory-notifications-provider',
       dispose: () => Promise.resolve(),
       triggerWorkflow: () => Promise.resolve([]),
