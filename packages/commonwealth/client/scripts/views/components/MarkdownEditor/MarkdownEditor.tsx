@@ -83,12 +83,13 @@ export type MarkdownEditorProps = Readonly<{
   imageHandler?: ImageHandler;
   SubmitButton?: () => ReactNode;
   onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
+  onChange?: (markdown: MarkdownStr) => void;
 }>;
 
 export const MarkdownEditor = memo(function MarkdownEditor(
   props: MarkdownEditorProps,
 ) {
-  const { SubmitButton, onMarkdownEditorMethods, disabled } = props;
+  const { SubmitButton, onMarkdownEditorMethods, disabled, onChange } = props;
   const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -309,6 +310,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
               placeholder={placeholder}
               iconComponentFor={iconComponentFor}
               translation={editorTranslator}
+              onChange={(markdown) => onChange?.(markdown)}
               plugins={[
                 toolbarPlugin({
                   location: mode === 'mobile' ? 'bottom' : 'top',
