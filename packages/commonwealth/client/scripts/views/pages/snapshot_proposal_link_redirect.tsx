@@ -1,7 +1,7 @@
-import { getProposal } from 'helpers/snapshot_utils';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { getSnapshotProposalQuery } from 'state/api/snapshots';
 import { PageLoading } from './loading';
 
 type SnapshotProposalLinkRedirectProps = {
@@ -9,23 +9,25 @@ type SnapshotProposalLinkRedirectProps = {
   scope: string;
 };
 
-export default function SnapshotProposalLinkRedirect({
+const SnapshotProposalLinkRedirect = ({
   identifier,
-}: SnapshotProposalLinkRedirectProps) {
+}: SnapshotProposalLinkRedirectProps) => {
   const navigate = useCommonNavigate();
 
   useNecessaryEffect(() => {
     const fetchSnapshotData = async () => {
       try {
         // 1. make query to snapshot to get the specific proposal data
-        const snapshotProposal = await getProposal(identifier);
+        const snapshotProposal = await getSnapshotProposalQuery({
+          id: identifier,
+        });
 
         // 2. query data to construct new link
         const { title, space } = snapshotProposal;
         const newLink = {
           source: 'snapshot',
           title,
-          identifier: `${space}/${identifier}}`,
+          identifier: `${space.id}/${identifier}}`,
         };
 
         // 3. redirect
@@ -40,4 +42,6 @@ export default function SnapshotProposalLinkRedirect({
   }, [navigate]);
 
   return <PageLoading />;
-}
+};
+
+export default SnapshotProposalLinkRedirect;
