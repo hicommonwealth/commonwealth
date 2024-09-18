@@ -91,11 +91,11 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
     }
   }, [isAdapterLoaded, proposalId]);
 
-  if (isFetchingProposal ) {
+  if (isFetchingProposal || !isAdapterLoaded) {
     return <PageLoading message="Loading..." />;
   }
 
-  if (cosmosError  || !isAdapterLoaded) {
+  if (cosmosError) {
     return <PageNotFound message={`We coun't find what you searched for. Try searching again`}/>;
   }
 
