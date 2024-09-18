@@ -17,7 +17,7 @@ machine api.heroku.com
 machine git.heroku.com
     login ${email}
     password ${api_key}
-EOF`
+EOF
 
 heroku git:remote --app ${app_name}
 
