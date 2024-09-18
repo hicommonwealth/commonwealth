@@ -109,9 +109,10 @@ export const AdminActions = ({
             try {
               const input = await buildDeleteThreadInput({
                 address: user.activeAccount?.address || '',
-                thread_id: thread.id,
-                canvas_signed_data: thread.canvasSignedData,
-                canvas_msg_id: thread.canvasMsgId,
+                communityId: app.activeChainId() || '',
+                threadId: thread.id,
+                threadMsgId: thread.canvasMsgId,
+                currentStage: thread.stage,
               });
               await deleteThread(input);
               onDelete?.();
