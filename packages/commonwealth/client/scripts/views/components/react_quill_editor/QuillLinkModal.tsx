@@ -41,7 +41,7 @@ export const AddLinkModal = ({
           <CWModalHeader label="Add Link" onModalClose={handleModalClose} />
           <CWModalBody>
             <CWTextInput
-              label="Link Text"
+              label="Link text"
               placeholder="Enter link text"
               value={linkText}
               onInput={(e) => {
