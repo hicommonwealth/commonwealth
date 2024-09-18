@@ -212,10 +212,14 @@ export const MarkdownEditor = memo(function MarkdownEditor(
         if (canAcceptFileForImport(files[0])) {
           event.preventDefault();
           handleDropAsync(event).catch(errorHandler);
+        } else {
+          notifyError('Can not accept files of this type.');
         }
       }
+
+      terminateDragging();
     },
-    [errorHandler, handleDropAsync],
+    [errorHandler, handleDropAsync, terminateDragging],
   );
 
   const handleDragEnter = useCallback((event: React.DragEvent) => {
