@@ -66,7 +66,6 @@ const CommunityInformationStep = ({
       return;
     }
 
-    // get base chain node info
     const nodes = fetchCachedNodes();
     const baseNode = nodes?.find(
       (n) => n.ethChainId === commonProtocol.ValidChains.Base,
@@ -77,7 +76,6 @@ const CommunityInformationStep = ({
     }
 
     try {
-      // call endpoint
       const input = buildCreateCommunityInput({
         id: values.communityId,
         name: values.communityName,
