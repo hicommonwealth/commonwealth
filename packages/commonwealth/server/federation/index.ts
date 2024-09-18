@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
+import { parse } from '@ipld/dag-json';
 
 const log = logger(import.meta);
 export const canvas = await startCanvasNode();
@@ -11,6 +12,13 @@ log.info(
       .map((m) => m.toString())
       .join(', '),
 );
+
+export const applyCanvasSignedDataMiddleware: (
+  input,
+  output,
+) => Promise<undefined> = async (input, output) => {
+  await applyCanvasSignedData(parse(output.canvas_signed_data));
+};
 
 export const applyCanvasSignedData = async (data: CanvasSignedData) => {
   let appliedSessionId: string | null = null;
