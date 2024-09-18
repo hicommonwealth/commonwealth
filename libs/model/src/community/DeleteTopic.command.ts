@@ -10,7 +10,7 @@ export function DeleteTopic(): Command<
 > {
   return {
     ...schemas.DeleteTopic,
-    auth: [isAuthorized({})],
+    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
     body: async ({ actor, auth }) => {
       const { community_id, topic_id } = mustBeAuthorized(actor, auth);
 
