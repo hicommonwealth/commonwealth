@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 datadog-agent run &
 /opt/datadog-agent/embedded/bin/trace-agent --config=/etc/datadog-agent/datadog.yaml &
