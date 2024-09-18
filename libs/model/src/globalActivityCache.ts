@@ -62,7 +62,6 @@ export async function getActivityFeed(models: DB, id = 0) {
             'id', C.id,
             'address', A.address,
             'text', C.text,
-            'plainText', C.plainText,
             'created_at', C.created_at::text,
             'updated_at', C.updated_at::text,
             'deleted_at', C.deleted_at::text,
