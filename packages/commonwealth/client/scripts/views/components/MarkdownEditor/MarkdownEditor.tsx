@@ -36,8 +36,8 @@ import { MarkdownEditorContext } from './MarkdownEditorContext';
 import { DesktopEditorFooter } from './toolbars/DesktopEditorFooter';
 import { ToolbarForDesktop } from './toolbars/ToolbarForDesktop';
 import { ToolbarForMobile } from './toolbars/ToolbarForMobile';
-import { useEditorErrorHandler } from './useEditorErrorHandler';
 import { useImageUploadHandler } from './useImageUploadHandler';
+import { useMarkdownEditorErrorHandler } from './useMarkdownEditorErrorHandler';
 import { canAcceptFileForImport } from './utils/canAcceptFileForImport';
 import { codeBlockLanguages } from './utils/codeBlockLanguages';
 import { editorTranslator } from './utils/editorTranslator';
@@ -86,7 +86,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
   props: MarkdownEditorProps,
 ) {
   const { SubmitButton } = props;
-  const errorHandler = useEditorErrorHandler();
+  const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [active, setActive] = useState(false);
@@ -159,9 +159,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(
         await handleFile(file);
       }
 
-      doAsync().catch(console.error);
+      doAsync().catch(errorHandler);
     },
-    [handleFile],
+    [handleFile, errorHandler],
   );
 
   const handleFiles = useCallback(
@@ -206,12 +206,12 @@ export const MarkdownEditor = memo(function MarkdownEditor(
 
       if (files.length === 1) {
         if (canAcceptFileForImport(files[0])) {
-          handleDropAsync(event).catch(console.error);
           event.preventDefault();
+          handleDropAsync(event).catch(errorHandler);
         }
       }
     },
-    [handleDropAsync],
+    [errorHandler, handleDropAsync],
   );
 
   const handleDragEnter = useCallback((event: React.DragEvent) => {
@@ -252,10 +252,10 @@ export const MarkdownEditor = memo(function MarkdownEditor(
       if (canAcceptFileForImport(files[0])) {
         // if we can accept this file for import, go ahead and do so...
         event.preventDefault();
-        handleFiles(files).catch(console.error);
+        handleFiles(files).catch(errorHandler);
       }
     },
-    [handleFiles],
+    [errorHandler, handleFiles],
   );
 
   const doFocus = useCallback(() => {

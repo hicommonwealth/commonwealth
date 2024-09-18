@@ -13,7 +13,7 @@ import {
 } from 'commonwealth-mdxeditor';
 import React, { memo, ReactNode, useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { useEditorErrorHandler } from 'views/components/MarkdownEditor/useEditorErrorHandler';
+import { useMarkdownEditorErrorHandler } from 'views/components/MarkdownEditor/useMarkdownEditorErrorHandler';
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
 import { useComputeMarkdownWithCutoff } from 'views/components/MarkdownViewer/UseComputeMarkdownWithCutoff';
 
@@ -34,7 +34,7 @@ export const MarkdownViewer = memo(function MarkdownViewer(
 ) {
   const { customShowMoreButton, className } = props;
 
-  const errorHandler = useEditorErrorHandler();
+  const errorHandler = useMarkdownEditorErrorHandler();
 
   const toggleDisplay = () => setUserExpand(!userExpand);
 
