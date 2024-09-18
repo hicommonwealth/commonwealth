@@ -25,6 +25,8 @@ heroku container:login
 
 heroku git:remote --app ${app_name}
 
-heroku container:push web --recursive -a ${heroku_app_name}
+docker build -f Dockerfile.commonwealth_base -t commonwealth_base .
 
-heroku container:release web -a ${heroku_app_name}
+heroku container:push --recursive -a ${heroku_app_name}
+
+heroku container:release web evm_ce consumer message_relayer knock -a ${heroku_app_name}
