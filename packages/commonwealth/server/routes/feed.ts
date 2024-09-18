@@ -59,7 +59,7 @@ export const getFeedHandler = async (
     queryValidationResult.data;
 
   if (active || search || thread_ids) {
-    throw new Error('Not implemented');
+    throw new AppError('Not implemented');
   }
 
   // get bulk threads
@@ -137,7 +137,7 @@ export const getFeedHandler = async (
     });
 
     bulkThreads.threads.forEach((thread) => {
-      const title = decodeURIComponent(thread.title);
+      const title = thread.title;
       const slug = slugify(title);
       feed.addItem({
         title: title,
@@ -145,10 +145,7 @@ export const getFeedHandler = async (
         id: thread.url,
         link: `https://common.xyz/${community_id}/discussions/${thread.id}-${slug}`,
         date: toDate(thread),
-        // @ts-expect-error StrictNullChecks
-        content: thread.body,
-        // @ts-expect-error StrictNullChecks
-        description: thread.plaintext,
+        content: thread.body || '',
         author: [
           {
             // @ts-expect-error StrictNullChecks
@@ -162,7 +159,8 @@ export const getFeedHandler = async (
     // res.setHeader('content-type', 'text/xml.');
     res.setHeader('content-type', 'application/atom+xml.');
 
+    console.log(feed.atom1());
     res.write(feed.atom1());
-    res.end();
   }
+  res.end();
 };
