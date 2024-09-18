@@ -1,3 +1,4 @@
+import { getChainNodeUrl } from '@hicommonwealth/model';
 import { ChainNode } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
@@ -14,7 +15,16 @@ export default (
     'ChainNode',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: Sequelize.STRING, allowNull: false, unique: true },
+      url: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+        get() {
+          const url: string | null | undefined = this.getDataValue('url');
+          if (!url) return url;
+          return getChainNodeUrl(url, 'public');
+        },
+      },
       eth_chain_id: { type: Sequelize.INTEGER, allowNull: true, unique: true },
       cosmos_chain_id: {
         type: Sequelize.STRING,
@@ -22,7 +32,16 @@ export default (
         unique: true,
       },
       alt_wallet_url: { type: Sequelize.STRING, allowNull: true },
-      private_url: { type: Sequelize.STRING, allowNull: true },
+      private_url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        get() {
+          const privateUrl: string | null | undefined =
+            this.getDataValue('private_url');
+          if (!privateUrl) return privateUrl;
+          return getChainNodeUrl(privateUrl, 'private');
+        },
+      },
       balance_type: { type: Sequelize.STRING, allowNull: false },
       name: { type: Sequelize.STRING, allowNull: false },
       description: { type: Sequelize.STRING, allowNull: true },

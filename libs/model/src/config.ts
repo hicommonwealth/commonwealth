@@ -28,6 +28,8 @@ const {
   ETH_RPC,
   COSMOS_REGISTRY_API,
   REACTION_WEIGHT_OVERRIDE,
+  ALCHEMY_PRIVATE_APP_KEY,
+  ALCHEMY_PUBLIC_APP_KEY,
 } = process.env;
 
 const NAME =
@@ -90,6 +92,10 @@ export const config = configure(
         ALCHEMY_KEY: ALCHEMY_AA_KEY,
         PRIVATE_KEY: ALCHEMY_AA_PRIVATE_KEY,
         GAS_POLICY: ALCHEMY_AA_GAS_POLICY,
+      },
+      APP_KEYS: {
+        PRIVATE: ALCHEMY_PRIVATE_APP_KEY!,
+        PUBLIC: ALCHEMY_PUBLIC_APP_KEY!,
       },
     },
     SITEMAP: {
@@ -188,6 +194,10 @@ export const config = configure(
             return data.PRIVATE_KEY && data.ALCHEMY_KEY && data.GAS_POLICY;
           return true;
         }),
+      APP_KEYS: z.object({
+        PRIVATE: z.string(),
+        PUBLIC: z.string(),
+      }),
     }),
     SITEMAP: z.object({
       THREAD_PRIORITY: z.coerce.number(),

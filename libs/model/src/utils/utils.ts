@@ -132,16 +132,15 @@ export async function getThreadContestManagers(
     contest_address: string;
   }>(
     `
-            SELECT
-              cm.contest_address
-            FROM "Communities" c
-            JOIN "ContestManagers" cm ON cm.community_id = c.id
-            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
-            WHERE ct.topic_id = :topic_id
-            AND cm.community_id = :community_id
-            AND cm.cancelled = false
-            AND (cm.ended IS NULL OR cm.ended = false)
-          `,
+        SELECT cm.contest_address
+        FROM "Communities" c
+                 JOIN "ContestManagers" cm ON cm.community_id = c.id
+                 JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
+        WHERE ct.topic_id = :topic_id
+          AND cm.community_id = :community_id
+          AND cm.cancelled = false
+          AND (cm.ended IS NULL OR cm.ended = false)
+    `,
     {
       type: QueryTypes.SELECT,
       replacements: {
@@ -165,4 +164,17 @@ export function removeUndefined(
   });
 
   return result;
+}
+
+const alchemyUrlPattern = /^https:\/\/[a-z]+:[a-z]+\.g\.alchemy\.com\/v2\/$/;
+
+export function getChainNodeUrl(url: string, privacy: 'private' | 'public') {
+  if (url === '') return url;
+
+  if (alchemyUrlPattern.test(url)) {
+    return url + privacy === 'private'
+      ? config.ALCHEMY.APP_KEYS.PRIVATE
+      : config.ALCHEMY.APP_KEYS.PUBLIC;
+  }
+  return url;
 }
