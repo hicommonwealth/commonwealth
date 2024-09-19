@@ -1,4 +1,5 @@
-import { Contract } from 'web3';
+import { Contract } from 'web3-eth-contract';
+import { AbiItem } from 'web3-utils';
 import {
   buyToken,
   getPrice,
@@ -12,7 +13,7 @@ import { LaunchpadFactory } from './LaunchpadFactoryAbi';
 
 class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
-  launchpadFactory: Contract<any>;
+  launchpadFactory: Contract<typeof LaunchpadFactory>;
 
   constructor(
     bondingCurveAddress: string,
@@ -23,9 +24,9 @@ class LaunchpadBondingCurve extends ContractBase {
     super(bondingCurveAddress, LpBondingCurve, rpc);
     this.tokenAddress = tokenAddress;
     this.launchpadFactory = new this.web3.eth.Contract(
-      LaunchpadFactory,
+      LaunchpadFactory as AbiItem[],
       launchpadFactoryAddress,
-    );
+    ) as unknown as Contract<typeof LaunchpadFactory>;
   }
 
   async launchToken(name: string, symbol: string, walletAddress: string) {
