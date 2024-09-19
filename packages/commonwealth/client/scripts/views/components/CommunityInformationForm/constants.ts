@@ -37,9 +37,12 @@ const particularChainNodes = (nodeInfo: NodeInfo) => {
   );
 };
 
-const chainIdsWithStakeEnabled = Object.values(
+export const chainIdsWithStakeEnabled = Object.values(
   commonProtocol.factoryContracts,
-).map((c) => c.chainId);
+)
+  // we don't support stake on Blast anymore
+  .filter((chain) => chain.chainId !== commonProtocol.ValidChains.Blast)
+  .map((c) => c.chainId);
 
 // Get chain id's from the fetchCachedNodes for all eth and cosmos chains
 export const chainTypes =
