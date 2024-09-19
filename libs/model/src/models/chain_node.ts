@@ -31,7 +31,16 @@ export default (
         allowNull: true,
         unique: true,
       },
-      alt_wallet_url: { type: Sequelize.STRING, allowNull: true },
+      alt_wallet_url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        get() {
+          const url: string | null | undefined =
+            this.getDataValue('alt_wallet_url');
+          if (!url) return url;
+          return buildChainNodeUrl(url, 'public');
+        },
+      },
       private_url: {
         type: Sequelize.STRING,
         allowNull: true,

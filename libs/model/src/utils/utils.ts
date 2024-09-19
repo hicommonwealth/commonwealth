@@ -172,12 +172,18 @@ export function buildChainNodeUrl(url: string, privacy: 'private' | 'public') {
   if (url === '') return url;
 
   if (alchemyUrlPattern.test(url)) {
-    return (
-      url +
-      (privacy === 'private'
-        ? config.ALCHEMY.APP_KEYS.PRIVATE
-        : config.ALCHEMY.APP_KEYS.PUBLIC)
-    );
+    const [baseUrl, key] = url.split('/v2/');
+    if (key === config.ALCHEMY.APP_KEYS.PRIVATE && privacy !== 'private')
+      return `${baseUrl}/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`;
+    else if (key === config.ALCHEMY.APP_KEYS.PUBLIC && privacy !== 'public')
+      return `${baseUrl}/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`;
+    else if (key === '')
+      return (
+        url +
+        (privacy === 'private'
+          ? config.ALCHEMY.APP_KEYS.PRIVATE
+          : config.ALCHEMY.APP_KEYS.PUBLIC)
+      );
   }
   return url;
 }
