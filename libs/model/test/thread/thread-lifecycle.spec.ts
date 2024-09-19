@@ -14,7 +14,7 @@ import {
   dispose,
 } from '@hicommonwealth/core';
 import type { AddressAttributes } from '@hicommonwealth/model';
-import { Community, PermissionEnum, Thread } from '@hicommonwealth/schemas';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   getTestSigner,
@@ -40,6 +40,7 @@ import {
   CreateThread,
   CreateThreadReaction,
   CreateThreadReactionErrors,
+  DeleteThread,
   UpdateThread,
   UpdateThreadErrors,
 } from '../../src/thread';
@@ -47,9 +48,33 @@ import { getCommentDepth } from '../../src/utils/getCommentDepth';
 
 const chance = Chance();
 
+async function signPayload(
+  address: string,
+  payload: z.infer<typeof schemas.CreateThread.input>,
+) {
+  const did = `did:pkh:eip155:1:${address}`;
+  return {
+    ...payload,
+    ...toCanvasSignedDataApiArgs(
+      await sign(
+        did,
+        'thread',
+        {
+          community: payload.community_id,
+          title: payload.title,
+          body: payload.body,
+          link: payload.url,
+          topic: payload.topic_id,
+        },
+        async () => [1, []] as [number, string[]],
+      ),
+    ),
+  };
+}
+
 describe('Thread lifecycle', () => {
-  let community: z.infer<typeof Community>,
-    thread: z.infer<typeof Thread>,
+  let community: z.infer<typeof schemas.Community>,
+    thread: z.infer<typeof schemas.Thread>,
     archived,
     read_only,
     comment;
@@ -122,14 +147,14 @@ describe('Thread lifecycle', () => {
     await seed('GroupPermission', {
       group_id: threadGroupId,
       allowed_actions: [
-        PermissionEnum.CREATE_THREAD,
-        PermissionEnum.CREATE_THREAD_REACTION,
-        PermissionEnum.CREATE_COMMENT_REACTION,
+        schemas.PermissionEnum.CREATE_THREAD,
+        schemas.PermissionEnum.CREATE_THREAD_REACTION,
+        schemas.PermissionEnum.CREATE_COMMENT_REACTION,
       ],
     });
     await seed('GroupPermission', {
       group_id: commentGroupId,
-      allowed_actions: [PermissionEnum.CREATE_COMMENT],
+      allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
     });
 
     community = _community!;
@@ -218,25 +243,9 @@ describe('Thread lifecycle', () => {
     roles.forEach((role) => {
       if (!authorizationTests[role]) {
         it(`should create thread as ${role}`, async () => {
-          const did = `did:pkh:eip155:1:${actors[role].address}`;
-          const signedArgs = toCanvasSignedDataApiArgs(
-            await sign(
-              did,
-              'thread',
-              {
-                community: payload.community_id,
-                title: payload.title,
-                body: payload.body,
-                link: payload.url,
-                topic: payload.topic_id,
-              },
-              async () => [1, []] as [number, string[]],
-            ),
-          );
-
           const _thread = await command(CreateThread(), {
             actor: actors[role],
-            payload: { ...payload, ...signedArgs },
+            payload: await signPayload(actors[role].address!, payload),
           });
           expect(_thread?.title).to.equal(title);
           expect(_thread?.body).to.equal(body);
@@ -310,22 +319,6 @@ describe('Thread lifecycle', () => {
         },
       });
       expect(updated?.collaborators?.length).to.eq(2);
-    });
-
-    it('should fail when thread not found by discord_meta', async () => {
-      await expect(
-        command(UpdateThread(), {
-          actor: actors.member,
-          payload: {
-            thread_id: thread.id!,
-            discord_meta: {
-              message_id: '',
-              channel_id: '',
-              user: { id: '', username: '' },
-            },
-          },
-        }),
-      ).rejects.toThrowError(UpdateThreadErrors.ThreadNotFound);
     });
 
     it('should fail when collaborators overlap', async () => {
@@ -443,6 +436,56 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrowError('Must be admin, moderator, or author');
+    });
+  });
+
+  describe('deletes', () => {
+    it('should delete a thread as author', async () => {
+      const _thread = await command(CreateThread(), {
+        actor: actors.member,
+        payload: await signPayload(actors.member.address!, payload),
+      });
+      expect(_thread?.body).to.equal(body);
+      const _deleted = await command(DeleteThread(), {
+        actor: actors.member,
+        payload: { thread_id: _thread!.id! },
+      });
+      expect(_deleted?.thread_id).to.equal(_thread!.id);
+    });
+
+    it('should delete a thread as admin', async () => {
+      const _thread = await command(CreateThread(), {
+        actor: actors.member,
+        payload: await signPayload(actors.member.address!, payload),
+      });
+      expect(_thread?.body).to.equal(body);
+      const _deleted = await command(DeleteThread(), {
+        actor: actors.admin,
+        payload: { thread_id: _thread!.id! },
+      });
+      expect(_deleted?.thread_id).to.equal(_thread!.id);
+    });
+
+    it('should throw error when thread not found', async () => {
+      await expect(
+        command(DeleteThread(), {
+          actor: actors.member,
+          payload: { thread_id: 123456789 },
+        }),
+      ).rejects.toThrowError(InvalidInput);
+    });
+
+    it('should throw error when not owned', async () => {
+      const _thread = await command(CreateThread(), {
+        actor: actors.member,
+        payload: await signPayload(actors.member.address!, payload),
+      });
+      await expect(
+        command(DeleteThread(), {
+          actor: actors.rejected,
+          payload: { thread_id: _thread!.id! },
+        }),
+      ).rejects.toThrowError(InvalidActor);
     });
   });
 
@@ -819,4 +862,6 @@ describe('Thread lifecycle', () => {
   });
 
   // @rbennettcw do we have contest validation tests to include here?
+  // - updating thread in contest
+  // - deleting thread in contest
 });

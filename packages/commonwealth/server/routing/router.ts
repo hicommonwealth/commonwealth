@@ -110,7 +110,6 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { createTopicHandler } from '../routes/topics/create_topic_handler';
@@ -170,7 +169,7 @@ function setupRouter(
   app.use(api.external.PATH, useragent.express(), api.external.router);
   app.use(
     api.integration.PATH,
-    api.integration.build(serverControllers, databaseValidationService),
+    api.integration.build(databaseValidationService),
   );
 
   registerRoute(
@@ -370,14 +369,6 @@ function setupRouter(
     getPollVotesHandler.bind(this, serverControllers),
   );
 
-  registerRoute(
-    router,
-    'delete',
-    '/threads/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deleteThreadHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'get',
