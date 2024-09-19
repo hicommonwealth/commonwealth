@@ -31,7 +31,7 @@ if [ ! -f ./deployment/environments/.env.public.${app_name} ]; then
   exit 1
 fi
 
-cp ../deployment/environments/.env.public.${app_name} .env
+cp ./deployment/environments/.env.public.${app_name} .env
 
 docker build -f Dockerfile.commonwealth_base -t commonwealth_base .
 
