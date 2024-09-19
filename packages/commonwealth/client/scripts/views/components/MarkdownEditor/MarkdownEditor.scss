@@ -104,6 +104,12 @@ body,
     font-size: inherit !important;
   }
 
+  div[data-editor-block-type='image'] {
+    button {
+      height: 24px;
+    }
+  }
+
   button {
     outline: none;
   }
