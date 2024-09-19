@@ -46,7 +46,6 @@ export async function __getRelatedCommunities(
         FROM "Communities" as c
         WHERE c.active = true
           AND C.chain_node_id = :chainNodeId
-        GROUP BY c.id
         ORDER BY c.profile_count DESC;
     `,
     {
