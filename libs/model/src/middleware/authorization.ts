@@ -295,7 +295,8 @@ export function isAuthorized({
       throw new InvalidActor(ctx.actor, 'Not authorized collaborator');
     }
 
-    if (author) throw new InvalidActor(ctx.actor, 'Not authorized member');
+    if (author && auth.address?.role === 'member')
+      throw new InvalidActor(ctx.actor, 'Not authorized author');
 
     // at this point, the address is either a moderator or member
     // without any security requirements for action, author, or collaboration

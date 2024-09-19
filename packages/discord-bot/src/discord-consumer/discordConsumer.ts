@@ -25,6 +25,8 @@ import { DISCORD_BOT_ADDRESS } from '@hicommonwealth/shared';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
 import { config } from '../config';
+import { getForumLinkedTopic } from '../util';
+import { handleCommentMessages, handleThreadMessages } from './handlers';
 
 const log = logger(import.meta);
 stats(HotShotsStats());
@@ -50,12 +52,6 @@ const processDiscordMessageCreated: EventHandler<
   'DiscordMessageCreated',
   ZodUndefined
 > = async ({ payload }) => {
-  // async imports to delay calling logger
-  const { handleCommentMessages, handleThreadMessages } = await import(
-    '../discord-consumer/handlers'
-  );
-  const { getForumLinkedTopic } = await import('../util');
-
   try {
     const parsedMessage = payload as IDiscordMessage;
     const topic = await getForumLinkedTopic(parsedMessage.parent_channel_id);

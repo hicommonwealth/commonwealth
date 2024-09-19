@@ -44,10 +44,6 @@ export const UpdateThread = {
       .optional(),
     canvas_signed_data: z.string().optional(),
     canvas_msg_id: z.string().optional(),
-
-    // discord bot integration
-    community_id: z.string().optional(),
-    discord_meta: DiscordMetaSchema.optional(),
   }),
   output: Thread,
 };
@@ -63,4 +59,17 @@ export const ThreadCanvasReaction = z.object({
 export const CreateThreadReaction = {
   input: ThreadCanvasReaction,
   output: Reaction.extend({ community_id: z.string() }),
+};
+
+export const DeleteThread = {
+  input: z.object({
+    thread_id: PG_INT,
+    canvas_signed_data: z.string().optional(),
+    canvas_msg_id: z.string().optional(),
+  }),
+  output: z.object({
+    thread_id: PG_INT,
+    canvas_signed_data: z.string().nullish(),
+    canvas_msg_id: z.string().nullish(),
+  }),
 };
