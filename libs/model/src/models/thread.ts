@@ -12,10 +12,7 @@ export type ThreadAttributes = z.infer<typeof Thread> & {
   Community?: CommunityAttributes;
   subscriptions?: ThreadSubscriptionAttributes[];
 };
-
-export type ThreadInstance = ModelInstance<ThreadAttributes> & {
-  // no mixins used
-};
+export type ThreadInstance = ModelInstance<ThreadAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,

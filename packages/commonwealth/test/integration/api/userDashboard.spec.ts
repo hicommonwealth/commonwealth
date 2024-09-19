@@ -58,6 +58,9 @@ describe('User Dashboard API', () => {
       name: 'Test Topic',
       description: 'A topic made for testing',
       community_id: chain2,
+      featured_in_sidebar: false,
+      featured_in_new_post: false,
+      group_ids: [],
     });
     // @ts-expect-error StrictNullChecks
     topicId2 = topic2.id;
