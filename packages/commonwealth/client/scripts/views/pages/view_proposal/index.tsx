@@ -102,7 +102,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   if (cosmosError) {
     return (
       <PageNotFound
-        message={"We coun't find what you searched for. Try searching again"}
+        message={"We couldn't find what you searched for. Try searching again."}
       />
     );
   }
