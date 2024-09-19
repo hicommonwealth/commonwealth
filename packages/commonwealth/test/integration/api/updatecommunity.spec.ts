@@ -67,7 +67,7 @@ describe('Update Community/Chain Tests', () => {
 
     const node = await models.ChainNode.findOne({
       where: {
-        eth_chain_id: 2,
+        eth_chain_id: 10,
       },
     });
 
