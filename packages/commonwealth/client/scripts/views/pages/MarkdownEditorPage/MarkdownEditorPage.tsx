@@ -40,6 +40,7 @@ export const MarkdownEditorPage = () => {
   return <Inner mode={mode} />;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 const SubmitButton = () => {
   const methods = useMarkdownEditorMethods();
 
@@ -50,6 +51,7 @@ const SubmitButton = () => {
   return <MarkdownSubmitButton label="Create Thread" onClick={handleClick} />;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
   return (
     <MarkdownEditor

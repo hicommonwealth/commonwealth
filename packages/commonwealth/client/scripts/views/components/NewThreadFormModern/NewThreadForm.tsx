@@ -75,7 +75,6 @@ export const NewThreadForm = () => {
     setThreadTopic,
     threadUrl,
     setThreadUrl,
-    editorText,
     setEditorText,
     setIsSaving,
     isDisabled,
@@ -209,6 +208,7 @@ export const NewThreadForm = () => {
   };
 
   const showBanner = !user.activeAccount && isBannerVisible;
+  // FIXME: use this with the new buttons I think. Do not remove this.
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,

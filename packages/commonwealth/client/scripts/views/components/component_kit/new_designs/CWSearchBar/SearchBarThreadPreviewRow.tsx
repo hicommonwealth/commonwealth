@@ -8,6 +8,7 @@ import { User } from '../../../user/user';
 import { CWText } from '../../cw_text';
 
 import { getDecodedString } from '@hicommonwealth/shared';
+// eslint-disable-next-line max-len
 import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
 import './SearchBarThreadPreviewRow.scss';
 
