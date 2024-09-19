@@ -1,5 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { Thread } from '@hicommonwealth/model';
+import { GlobalActivityCache, Thread, models } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedDataMiddleware } from '../federation';
 
@@ -31,6 +31,18 @@ export const trpcRouter = trpc.router({
       MixpanelCommunityInteractionEvent.CREATE_REACTION,
       ({ community_id }) => ({ community: community_id }),
     ],
+    applyCanvasSignedDataMiddleware,
+  ),
+  deleteThread: trpc.command(
+    Thread.DeleteThread,
+    trpc.Tag.Thread,
+    async (_, output) => {
+      // Using track output middleware to invalidate gac
+      // TODO: Generalize output middleware to cover (analytics, gac invalidation, canvas, etc)
+      const gac = GlobalActivityCache.getInstance(models);
+      gac && (await gac.deleteActivityFromCache(output.thread_id));
+      return undefined;
+    },
     applyCanvasSignedDataMiddleware,
   ),
 });
