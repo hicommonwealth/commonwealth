@@ -1,12 +1,13 @@
 import moment from 'moment';
 import React, { FC } from 'react';
 
+import { getDecodedString } from '@hicommonwealth/shared';
+import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { ReplyResult } from '../../../../pages/search/helpers';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
 import { CWText } from '../../cw_text';
 
-import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
 import './SearchBarCommentPreviewRow.scss';
 
 interface SearchBarCommentPreviewRowProps {
@@ -20,7 +21,7 @@ export const SearchBarCommentPreviewRow: FC<
 > = ({ searchResult, searchTerm, onSearchItemClick }) => {
   const navigate = useCommonNavigate();
 
-  const title = decodeURIComponent(searchResult.title);
+  const title = getDecodedString(searchResult.title);
   const content = searchResult.text;
 
   const handleClick = () => {

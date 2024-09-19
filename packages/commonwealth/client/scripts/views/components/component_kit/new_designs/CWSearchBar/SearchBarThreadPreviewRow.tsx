@@ -7,6 +7,7 @@ import { renderTruncatedHighlights } from '../../../react_quill_editor/highlight
 import { User } from '../../../user/user';
 import { CWText } from '../../cw_text';
 
+import { getDecodedString } from '@hicommonwealth/shared';
 import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
 import './SearchBarThreadPreviewRow.scss';
 
@@ -23,8 +24,8 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
 }) => {
   const navigate = useCommonNavigate();
 
-  const title = decodeURIComponent(searchResult.title);
-  const content = decodeURIComponent(searchResult.body);
+  const title = getDecodedString(searchResult.title);
+  const content = getDecodedString(searchResult.body);
 
   const handleClick = () => {
     const path = `/${searchResult.community_id}/discussion/${searchResult.id}`;
