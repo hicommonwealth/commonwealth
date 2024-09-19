@@ -30,9 +30,9 @@ import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from 'views/components/proposal_pills';
-import { SnapshotInformationCard } from './snapshot_information_card';
-import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
-import { SnapshotVotesTable } from './snapshot_votes_table';
+import { SnapshotInformationCard } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotInformationCard';
+import { SnapshotPollCardContainer } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
+import { SnapshotVotesTable } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotVotesTable';
 
 type ViewSnapshotProposalProps = {
   identifier: string;
