@@ -1,4 +1,4 @@
-import { Contract } from 'web3-eth-contract';
+import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import {
   buyToken,
