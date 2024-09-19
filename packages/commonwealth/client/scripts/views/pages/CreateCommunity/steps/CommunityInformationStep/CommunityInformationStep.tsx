@@ -66,7 +66,7 @@ const CommunityInformationStep = ({
         socialLinks: values.links ?? [],
         userAddress: selectedAddress.address,
         isPWA: isAddedToHomeScreen,
-        chainNodeId: selectedChainNode?.id!,
+        chainNodeId: selectedChainNode!.id!,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
