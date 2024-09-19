@@ -26,14 +26,14 @@ heroku container:login
 
 heroku git:remote --app ${app_name}
 
-if [ ! -f ./deployment/environments/.env.public.${app_name} ]; then
-  echo "Error: ./deployment/environments/.env.public.${app_name} not found!"
+if [ ! -f ./environments/.env.public.${app_name} ]; then
+  echo "Error: ./environments/.env.public.${app_name} not found!"
   exit 1
 fi
 
-cp ./deployment/environments/.env.public.${app_name} .env
+cp ./environments/.env.public.${app_name} .env
 
-docker build -f ./deployment/dockerfiles/Dockerfile.commonwealth_base -t commonwealth_base .
+docker build -f Dockerfile.commonwealth_base -t commonwealth_base .
 
 heroku container:push --recursive -a ${app_name}
 
