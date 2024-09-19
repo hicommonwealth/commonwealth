@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## Note must be run from root directory due to relative paths (How github CI runs it)
+
 set -e
 
 if [ "$#" -ne 3 ]; then
@@ -24,8 +26,8 @@ heroku container:login
 
 heroku git:remote --app ${app_name}
 
-if [ ! -f ../../deployment/environments/.env.public.${app_name} ]; then
-  echo "Error: ../../deployment/environments/.env.public.${app_name} not found!"
+if [ ! -f ./deployment/environments/.env.public.${app_name} ]; then
+  echo "Error: ./deployment/environments/.env.public.${app_name} not found!"
   exit 1
 fi
 
