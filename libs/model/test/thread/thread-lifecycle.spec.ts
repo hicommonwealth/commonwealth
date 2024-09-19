@@ -861,6 +861,30 @@ describe('Thread lifecycle', () => {
     });
   });
 
+  // describe('#deleteReaction', () => {
+  //   test('should delete a reaction', async () => {
+
+  //     await serverReactionsController.deleteReaction({
+  //       user: user as any,
+  //       reactionId: 777,
+  //       community: { id: 'ethereum' } as any,
+  //       address: address as any,
+  //     });
+  //   });
+
+  //   test('should throw error (reaction not found)', () => {
+  //
+  //     expect(
+  //       serverReactionsController.deleteReaction({
+  //         user: user as any,
+  //         reactionId: 888,
+  //         address: address as any,
+  //         community: { id: 'ethereum' } as any,
+  //       }),
+  //     ).to.be.rejectedWith(`Reaction not found: 888`);
+  //   });
+  // });
+
   // @rbennettcw do we have contest validation tests to include here?
   // - updating thread in contest
   // - deleting thread in contest

@@ -26,11 +26,12 @@ describe('createReaction Integration Tests', () => {
       address,
       author_chain: 'ethereum',
       chain: 'ethereum',
+      reaction_id: reactionId,
     };
 
     const res = await chai
       .request(server.app)
-      .delete(`/api/reactions/${reactionId}`)
+      .post(`/api/v1/DeleteReaction`)
       .set('Accept', 'application/json')
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
