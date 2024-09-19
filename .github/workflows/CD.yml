@@ -6,6 +6,7 @@ on:
       - staging
       - frick
       - frack
+      - production
 
 jobs:
   deploy:
@@ -27,6 +28,9 @@ jobs:
               ;;
             demo)
               APP_NAME="commonwealth-demo"
+              ;;
+            production)
+              APP_NAME="commonwealthapp"
               ;;
             *)
               echo "Branch $BRANCH_NAME is not configured for deployment."
