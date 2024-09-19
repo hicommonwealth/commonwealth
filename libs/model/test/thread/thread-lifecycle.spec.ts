@@ -35,6 +35,7 @@ import {
 } from '../../src/comment';
 import { models } from '../../src/database';
 import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
+import { DeleteReaction } from '../../src/reaction';
 import { seed, seedRecord } from '../../src/tester';
 import {
   CreateThread,
@@ -780,6 +781,37 @@ describe('Thread lifecycle', () => {
       const t = await models.Thread.findByPk(thread!.id);
       expect(t!.reaction_weights_sum).to.eq(expectedWeight);
     });
+
+    it('should delete a reaction', async () => {
+      const reaction = await command(CreateThreadReaction(), {
+        actor: actors.admin,
+        payload: {
+          thread_msg_id: thread!.canvas_msg_id,
+          thread_id: read_only!.id,
+          reaction: 'like',
+        },
+      });
+      const deleted = await command(DeleteReaction(), {
+        actor: actors.admin,
+        payload: {
+          community_id: thread.community_id,
+          reaction_id: reaction!.id!,
+        },
+      });
+      expect(deleted).to.include({ reaction_id: reaction!.id });
+    });
+
+    it('should throw error when reaction not found', () => {
+      expect(
+        command(DeleteReaction(), {
+          actor: actors.admin,
+          payload: {
+            community_id: thread.community_id,
+            reaction_id: 888,
+          },
+        }),
+      ).rejects.toThrowError(InvalidState);
+    });
   });
 
   describe('comment reaction', () => {
@@ -859,31 +891,48 @@ describe('Thread lifecycle', () => {
         }),
       ).rejects.toThrowError(NonMember);
     });
+
+    it('should delete a reaction', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      const reaction = await command(CreateCommentReaction(), {
+        actor: actors.member,
+        payload: {
+          comment_msg_id: comment!.canvas_msg_id || '',
+          comment_id: comment!.id,
+          reaction: 'like',
+        },
+      });
+      const deleted = await command(DeleteReaction(), {
+        actor: actors.member,
+        payload: {
+          community_id: thread.community_id,
+          reaction_id: reaction!.id!,
+        },
+      });
+      expect(deleted).to.include({ reaction_id: reaction!.id });
+    });
+
+    it('should throw when trying to delete a reaction that is not yours', async () => {
+      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      const reaction = await command(CreateCommentReaction(), {
+        actor: actors.member,
+        payload: {
+          comment_msg_id: comment!.canvas_msg_id || '',
+          comment_id: comment!.id,
+          reaction: 'like',
+        },
+      });
+      await expect(
+        command(DeleteReaction(), {
+          actor: actors.admin,
+          payload: {
+            community_id: thread.community_id,
+            reaction_id: reaction!.id!,
+          },
+        }),
+      ).rejects.toThrowError(InvalidState);
+    });
   });
-
-  // describe('#deleteReaction', () => {
-  //   test('should delete a reaction', async () => {
-
-  //     await serverReactionsController.deleteReaction({
-  //       user: user as any,
-  //       reactionId: 777,
-  //       community: { id: 'ethereum' } as any,
-  //       address: address as any,
-  //     });
-  //   });
-
-  //   test('should throw error (reaction not found)', () => {
-  //
-  //     expect(
-  //       serverReactionsController.deleteReaction({
-  //         user: user as any,
-  //         reactionId: 888,
-  //         address: address as any,
-  //         community: { id: 'ethereum' } as any,
-  //       }),
-  //     ).to.be.rejectedWith(`Reaction not found: 888`);
-  //   });
-  // });
 
   // @rbennettcw do we have contest validation tests to include here?
   // - updating thread in contest
