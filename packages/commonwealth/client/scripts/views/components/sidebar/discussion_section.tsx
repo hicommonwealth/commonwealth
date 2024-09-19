@@ -79,8 +79,10 @@ export const DiscussionSection = ({
     location,
   );
 
+  const communityId = app.activeChainId() || '';
   const { data: topicsData } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const topics = (topicsData || [])
@@ -89,7 +91,7 @@ export const DiscussionSection = ({
     // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
-  const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
+  const discussionsLabel = ['vesuvius', 'olympus'].includes(communityId)
     ? 'Forum'
     : 'Discussion';
 
@@ -137,15 +139,9 @@ export const DiscussionSection = ({
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/discussions`,
-          app.activeChainId(),
-          () => {
-            setDiscussionsToggleTree(`children.All.toggledState`, toggle);
-          },
-        );
+        handleRedirectClicks(navigate, e, `/discussions`, communityId, () => {
+          setDiscussionsToggleTree(`children.All.toggledState`, toggle);
+        });
       },
       displayData: null,
     },
@@ -166,7 +162,7 @@ export const DiscussionSection = ({
                 navigate,
                 e,
                 `/contests`,
-                app.activeChainId(),
+                communityId,
                 () => {
                   setDiscussionsToggleTree(
                     `children.Contests.toggledState`,
@@ -188,15 +184,9 @@ export const DiscussionSection = ({
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/overview`,
-          app.activeChainId(),
-          () => {
-            setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
-          },
-        );
+        handleRedirectClicks(navigate, e, `/overview`, communityId, () => {
+          setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
+        });
       },
       displayData: null,
     },
@@ -223,7 +213,7 @@ export const DiscussionSection = ({
             navigate,
             e,
             `/discussions/${encodeURI(topic.name)}`,
-            app.activeChainId(),
+            communityId,
             () => {
               setDiscussionsToggleTree(
                 `children.${topic.name}.toggledState`,
@@ -251,15 +241,9 @@ export const DiscussionSection = ({
     isActive: !!matchesArchivedRoute,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      handleRedirectClicks(
-        navigate,
-        e,
-        `/archived`,
-        app.activeChainId(),
-        () => {
-          setDiscussionsToggleTree(`children.Archived.toggledState`, toggle);
-        },
-      );
+      handleRedirectClicks(navigate, e, `/archived`, communityId, () => {
+        setDiscussionsToggleTree(`children.Archived.toggledState`, toggle);
+      });
     },
     displayData: null,
   };

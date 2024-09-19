@@ -1,5 +1,9 @@
 import { CommentSubscription } from '@hicommonwealth/schemas';
-import { getThreadUrl, safeTruncateBody } from '@hicommonwealth/shared';
+import {
+  getDecodedString,
+  getThreadUrl,
+  safeTruncateBody,
+} from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
@@ -56,7 +60,7 @@ export const CommentSubscriptionEntry = (
       {
         chain: `${thread.community_id}`,
         id: `${thread.id}`,
-        title: decodeURIComponent(thread.title),
+        title: getDecodedString(thread.title),
       },
       comment_id,
       true,

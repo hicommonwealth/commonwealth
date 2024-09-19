@@ -267,7 +267,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const uniqueLinksArray = [
         ...new Set(
           [...social_links, website, telegram, discord, element, github].filter(
-            (a) => a,
+            (a): a is string => typeof a === 'string' && a.length > 0,
           ),
         ),
       ];
@@ -338,7 +338,10 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           {
             community_id: id,
             name: 'General',
+            description: 'General discussions',
             featured_in_sidebar: true,
+            featured_in_new_post: false,
+            group_ids: [],
           },
           { transaction },
         );

@@ -190,14 +190,6 @@ export async function __updateComment(
   });
 ```
 
-  `Repository`
-
-```typescript
-  // update address last active
-  address.last_active = new Date();
-  address.save();
-```
-  
   `Schemas`
 
 ```typescript

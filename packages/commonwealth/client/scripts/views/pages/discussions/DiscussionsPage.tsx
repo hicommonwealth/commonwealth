@@ -20,6 +20,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -28,6 +29,7 @@ import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
@@ -41,7 +43,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const communityId = app.activeChainId();
+  const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
@@ -49,6 +51,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
+
+  const weightedVotingEnabled = useFlag('farcasterContest');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -66,6 +70,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
+    apiEnabled: !!communityId,
   });
   const contestAddress = searchParams.get('contest');
   const contestStatus = searchParams.get('status');
@@ -83,7 +88,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -100,7 +105,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
-      communityId: app.activeChainId(),
+      communityId: communityId,
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -118,6 +123,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
+      apiEnabled: !!communityId,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -156,6 +162,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [topics, topicNameFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
+
+  // TODO in upcoming PR add check if topic is weighted with ERC20 method
+  const isTopicWeighted = weightedVotingEnabled && topicId;
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
@@ -253,6 +262,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               <Breadcrumbs />
               <UserTrainingSlider />
               <AdminOnboardingSlider />
+              {isTopicWeighted && (
+                <TokenBanner
+                  name="Token"
+                  ticker="TKN"
+                  popover={{ title: 'Token', body: 'TKN' }}
+                  voteWeight={5}
+                />
+              )}
 
               <HeaderWithFilters
                 // @ts-expect-error <StrictNullChecks/>

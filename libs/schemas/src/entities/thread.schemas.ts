@@ -1,7 +1,18 @@
 import { z } from 'zod';
 import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { Reaction } from './reaction.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
+
+export const ThreadVersionHistory = z.object({
+  id: PG_INT.optional(),
+  thread_id: PG_INT,
+  address: z
+    .string()
+    .describe('Address of the creator of the post or the collaborator'),
+  body: z.string(),
+  timestamp: z.date(),
+});
 
 export const Thread = z.object({
   id: PG_INT.optional(),
@@ -23,7 +34,7 @@ export const Thread = z.object({
   has_poll: z.boolean().nullish(),
 
   canvas_signed_data: z.string().nullish(),
-  canvas_hash: z.string().nullish(),
+  canvas_msg_id: z.string().nullish(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
@@ -45,17 +56,12 @@ export const Thread = z.object({
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
 
+  search: z.union([z.string(), z.record(z.any())]),
+
   // associations
   Address: Address.nullish(),
   topic: Topic.nullish(),
-});
-
-export const ThreadVersionHistory = z.object({
-  id: PG_INT.optional(),
-  thread_id: PG_INT,
-  address: z
-    .string()
-    .describe('Address of the creator of the post or the collaborator'),
-  body: z.string(),
-  timestamp: z.date(),
+  collaborators: Address.array().nullish(),
+  reactions: Reaction.array().nullish(),
+  ThreadVersionHistories: z.array(ThreadVersionHistory).nullish(),
 });

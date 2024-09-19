@@ -57,7 +57,7 @@ export const ManageTopicsSectionOld = () => {
   const { isWindowExtraSmall } = useBrowserWindow({});
 
   const { data: rawTopics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
   });
 
   const { mutateAsync: updateFeaturedTopicsOrder } =
@@ -160,7 +160,7 @@ export const ManageTopicsSectionOld = () => {
           buttonHeight="med"
           onClick={handleReversion}
           disabled={initialFeaturedTopics.every(
-            (value, index) => value.id === featuredTopics[index].id,
+            (value, index) => value.id === featuredTopics?.[index]?.id,
           )}
         />
         <CWButton

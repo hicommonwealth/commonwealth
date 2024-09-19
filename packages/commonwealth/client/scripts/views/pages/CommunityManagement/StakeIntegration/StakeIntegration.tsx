@@ -10,6 +10,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CreateTopicStep } from 'views/pages/CommunityManagement/Topics/utils';
+import useGetCommunityByIdQuery from '../../../../state/api/communities/getCommuityById';
 import { PageNotFound } from '../../404';
 import CommunityStakeStep from '../../CreateCommunity/steps/CommunityStakeStep';
 import CanBeDisabled from './CanBeDisabled';
@@ -30,6 +31,11 @@ const StakeIntegration = ({
   const user = useUserStore();
   const { stakeEnabled, refetchStakeQuery } = useCommunityStake();
 
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.chain.meta.id,
+    includeNodeInfo: true,
+  });
+
   const handleStepChange = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     refetchStakeQuery();
@@ -38,15 +44,14 @@ const StakeIntegration = ({
 
   const contractInfo =
     // @ts-expect-error <StrictNullChecks/>
-    commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.ethChainId];
+    commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.eth_chain_id];
 
   if (!contractInfo) {
     return <PageNotFound />;
   }
 
-  const community = app.chain.meta;
   const communityChainId = `${
-    community?.ChainNode?.ethChainId || community?.ChainNode?.cosmosChainId
+    community?.ChainNode?.eth_chain_id || community?.ChainNode?.cosmos_chain_id
   }`;
   const selectedAddress = user.addresses.find(
     (x) =>
@@ -64,7 +69,10 @@ const StakeIntegration = ({
     <CWPageLayout className={clsx({ 'topic-stake': isTopicFlow })}>
       <section className="StakeIntegration">
         <CWText type="h2">Stake</CWText>
-        <Status communityName={app.activeChainId()} isEnabled={stakeEnabled} />
+        <Status
+          communityName={app.activeChainId() || ''}
+          isEnabled={stakeEnabled}
+        />
         <CWDivider />
         {stakeEnabled ? (
           <>
@@ -72,6 +80,8 @@ const StakeIntegration = ({
               contractAddress={contractInfo?.factory}
               smartContractAddress={contractInfo?.communityStake}
               voteWeightPerStake="1"
+              namespace={community?.namespace}
+              symbol={community?.default_symbol}
             />
             <CWDivider />
             <CanBeDisabled />
@@ -101,10 +111,13 @@ const StakeIntegration = ({
           </>
         ) : (
           <CommunityStakeStep
+            refetchStakeQuery={() => {
+              refetchStakeQuery().catch(console.error);
+            }}
             goToSuccessStep={handleStepChange}
             onTopicFlowStepChange={onTopicFlowStepChange}
             createdCommunityName={community?.name}
-            createdCommunityId={community?.id}
+            createdCommunityId={community?.id || ''}
             // @ts-expect-error <StrictNullChecks/>
             selectedAddress={selectedAddress}
             chainId={communityChainId}

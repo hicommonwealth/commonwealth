@@ -1,16 +1,16 @@
+import type { IApp } from 'state';
 import type { Coin } from '../../../shared/adapters/currency';
 import type { IIdentifiable } from '../../../shared/adapters/shared';
-import type { IApp } from 'state';
 import { ProposalStore } from '../stores';
-import type { IAccountsModule, IChainModule, IVote } from './interfaces';
 import type Proposal from './Proposal';
 import StorageModule from './StorageModule';
+import type { IAccountsModule, IChainModule, IVote } from './interfaces';
 
 // Implemented by a chain's governance module, assuming it uses a proposal-based mechanism.
 export abstract class ProposalModule<
   ApiT,
   CT extends IIdentifiable,
-  ProposalT extends Proposal<ApiT, Coin, CT, IVote<Coin>>
+  ProposalT extends Proposal<ApiT, Coin, CT, IVote<Coin>>,
 > extends StorageModule {
   public readonly store = new ProposalStore<ProposalT>();
 
@@ -77,8 +77,10 @@ export abstract class ProposalModule<
     TODO: create a helper function that encapsulates this boilerplate
   */
   public abstract init(
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ChainInfo: IChainModule<any, any>,
-    Accounts: IAccountsModule<any>
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    Accounts: IAccountsModule<any>,
   ): Promise<void>;
 
   public deinit() {

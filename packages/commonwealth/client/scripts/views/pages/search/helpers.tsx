@@ -1,14 +1,12 @@
-import moment from 'moment';
-import React, { useMemo } from 'react';
-
-import 'pages/search/index.scss';
-
 import { CommunityMember } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
+import moment from 'moment';
+import 'pages/search/index.scss';
+import React, { useMemo } from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { z } from 'zod';
-import CommunityInfo from '../../../models/ChainInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
 import { CommunityLabel } from '../../components/community_label';
@@ -42,11 +40,7 @@ const ThreadResultRow = ({
   const { data: domain } = useFetchCustomDomainQuery();
 
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(thread.title);
-    } catch (error) {
-      return thread.title;
-    }
+    return getDecodedString(thread.title);
   }, [thread.title]);
 
   const handleClick = () => {
@@ -124,11 +118,7 @@ const ReplyResultRow = ({
   const { data: domain } = useFetchCustomDomainQuery();
 
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(comment.title);
-    } catch (error) {
-      return comment.title;
-    }
+    return getDecodedString(comment.title);
   }, [comment.title]);
 
   const handleClick = () => {
@@ -204,8 +194,6 @@ const CommunityResultRow = ({
     setRoute(community.id ? `/${community.id}` : '/', {}, null);
   };
 
-  const communityInfo = CommunityInfo.fromJSON(community as any);
-
   return (
     <div
       key={community.id}
@@ -213,8 +201,8 @@ const CommunityResultRow = ({
       onClick={handleClick}
     >
       <CommunityLabel
-        name={communityInfo?.name || ''}
-        iconUrl={communityInfo?.iconUrl || ''}
+        name={community?.name || ''}
+        iconUrl={community?.icon_url || ''}
       />
     </div>
   );
@@ -232,7 +220,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [community_id],
     profileAddresses: [address],
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!(community_id && address),
   });
   const profile: MinimumProfile = users?.[0];

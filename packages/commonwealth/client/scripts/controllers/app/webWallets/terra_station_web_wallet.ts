@@ -80,7 +80,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix,
+      bech32Prefix: `${app.chain?.meta.bech32_prefix || 0}`,
       signer: {
         type: 'bytes',
         signBytes: (message) => window.station.signBytes(toBase64(message)),

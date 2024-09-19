@@ -86,6 +86,17 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   }
           FROM    "Communities" AS "Community"
           WHERE  "Community"."active" = true
+                      ${
+                        relevance_by === 'membership'
+                          ? `
+                        AND name NOT LIKE '%<%'
+                        AND name NOT LIKE '%>%'
+                        AND name NOT LIKE '%\`%'
+                        AND name NOT LIKE '%"%'
+                        AND name NOT LIKE '%''%'
+                        `
+                          : ''
+                      }
                         ${
                           base
                             ? `

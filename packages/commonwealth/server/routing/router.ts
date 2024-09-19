@@ -45,11 +45,8 @@ import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
-import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
-
-import { getCanvasData, postCanvasData } from '../routes/canvas';
 
 import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
@@ -90,16 +87,14 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
-import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
-import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
+import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
-import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
@@ -115,12 +110,9 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createTopicHandler } from '../routes/topics/create_topic_handler';
-import { deleteTopicHandler } from '../routes/topics/delete_topic_handler';
 import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
@@ -177,7 +169,7 @@ function setupRouter(
   app.use(api.external.PATH, useragent.express(), api.external.router);
   app.use(
     api.integration.PATH,
-    api.integration.build(serverControllers, databaseValidationService),
+    api.integration.build(databaseValidationService),
   );
 
   registerRoute(
@@ -267,13 +259,6 @@ function setupRouter(
 
   registerRoute(
     router,
-    'patch',
-    '/communities/:communityId',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'get',
     '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
@@ -291,13 +276,6 @@ function setupRouter(
     '/nodes',
     passport.authenticate('jwt', { session: false }),
     createChainNodeHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/nodes/:id',
-    passport.authenticate('jwt', { session: false }),
-    updateChainNodeHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
@@ -353,15 +331,6 @@ function setupRouter(
     getTopUsersHandler.bind(this, serverControllers),
   );
 
-  registerRoute(
-    router,
-    'patch',
-    '/threads/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateThreadHandler.bind(this, serverControllers),
-  );
-
   // polls
   registerRoute(
     router,
@@ -402,14 +371,6 @@ function setupRouter(
 
   registerRoute(
     router,
-    'delete',
-    '/threads/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deleteThreadHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'get',
     '/threads',
     databaseValidationService.validateCommunity,
@@ -433,23 +394,7 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
 
-  registerRoute(
-    router,
-    'get',
-    '/bulkOffchain',
-    databaseValidationService.validateCommunity,
-    bulkOffchain.bind(this, models),
-  );
-
   // comments
-  registerRoute(
-    router,
-    'delete',
-    '/comments/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deleteCommentHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'get',
@@ -495,13 +440,6 @@ function setupRouter(
     '/topics/:topicId' /* OLD: /editTopic */,
     passport.authenticate('jwt', { session: false }),
     updateTopicHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/topics/:topicId' /* OLD: /deleteTopic */,
-    passport.authenticate('jwt', { session: false }),
-    deleteTopicHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
@@ -643,10 +581,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateCommunityCategory.bind(this, models),
   );
-
-  // signed data
-  router.get('/oplog', getCanvasData.bind(this, models));
-  router.post('/oplog', postCanvasData.bind(this, models));
 
   // settings
   registerRoute(
@@ -831,6 +765,13 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     deleteGroupHandler.bind(this, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/getCanvasClock',
+    getCanvasClockHandler.bind(this, serverControllers),
   );
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));

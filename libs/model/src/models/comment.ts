@@ -40,7 +40,7 @@ export default (
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
 
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
@@ -59,6 +59,10 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
+      },
+      search: {
+        type: Sequelize.TSVECTOR,
+        allowNull: false,
       },
     },
     {
@@ -114,3 +118,14 @@ export default (
       ],
     },
   );
+
+export function getCommentSearchVector(body: string) {
+  let decodedBody = body;
+
+  try {
+    decodedBody = decodeURIComponent(body);
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  return Sequelize.fn('to_tsvector', 'english', decodedBody);
+}

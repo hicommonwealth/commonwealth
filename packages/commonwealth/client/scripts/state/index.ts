@@ -3,17 +3,16 @@ import { updateActiveUser } from 'controllers/app/login';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
-import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import DiscordController from 'controllers/server/discord';
 import { EventEmitter } from 'events';
-import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -33,7 +32,7 @@ export interface IApp {
   >;
 
   // XXX: replace this with some app.chain helper
-  activeChainId(): string;
+  activeChainId(): string | undefined;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -44,9 +43,6 @@ export interface IApp {
 
   // Discord
   discord: DiscordController;
-
-  // Web3
-  snapshot: SnapshotController;
 
   sidebarRedraw: EventEmitter;
 }
@@ -71,9 +67,6 @@ const app: IApp = {
   // Discord
   discord: new DiscordController(),
 
-  // Web3
-  snapshot: new SnapshotController(),
-
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 };
@@ -93,7 +86,6 @@ export async function initAppState(
     await fetchCustomDomainQuery();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-      enforceSessionKeys: statusRes.result.enforceSessionKeys,
       evmTestEnv: statusRes.result.evmTestEnv,
     });
 
@@ -126,7 +118,11 @@ export async function initAppState(
     // changing the current state (e.g. when logging in through link_new_address_modal)
     if (updateSelectedCommunity && userResponse?.selectedCommunity) {
       userStore.getState().setData({
-        activeCommunity: ChainInfo.fromJSON(userResponse?.selectedCommunity),
+        // TODO: api should be updated to get relevant data
+        activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
+          userResponse?.selectedCommunity.id,
+          true,
+        ),
       });
     }
 
