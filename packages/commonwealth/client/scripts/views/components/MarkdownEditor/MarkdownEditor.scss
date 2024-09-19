@@ -41,6 +41,17 @@ body,
 }
 
 .mdxeditor-container-disabled {
+  background-color: $neutral-50;
+  cursor: not-allowed !important;
+
+  .DesktopEditorFooter {
+    background-color: $neutral-50;
+  }
+
+  * {
+    pointer-events: none;
+  }
+
   .mdxeditor-root-contenteditable {
     // TODO: disable editing here...
   }

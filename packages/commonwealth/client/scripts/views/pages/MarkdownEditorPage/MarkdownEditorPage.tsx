@@ -54,11 +54,14 @@ const SubmitButton = () => {
 // eslint-disable-next-line react/no-multi-comp
 const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
   return (
-    <MarkdownEditor
-      {...props}
-      markdown={`${overview}\n${supported}`}
-      imageHandler="local"
-      SubmitButton={SubmitButton}
-    />
+    <>
+      <MarkdownEditor
+        {...props}
+        markdown={`${overview}\n${supported}`}
+        imageHandler="local"
+        disabled={true}
+        SubmitButton={SubmitButton}
+      />
+    </>
   );
 };
