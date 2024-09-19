@@ -28,6 +28,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { TooltipIndicator } from 'views/components/MarkdownEditor/indicators/TooltipIndicator';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
@@ -82,7 +83,7 @@ export type MarkdownEditorProps = Readonly<{
   placeholder?: string;
   imageHandler?: ImageHandler;
   SubmitButton?: () => ReactNode;
-  tooltip?: ReactNode;
+  tooltip?: string;
   onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
   onChange?: (markdown: MarkdownStr) => void;
   autoFocus?: boolean;
@@ -97,11 +98,13 @@ export const MarkdownEditor = memo(function MarkdownEditor(
     disabled,
     onChange,
     autoFocus,
+    tooltip,
   } = props;
   const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [active, setActive] = useState(false);
+  const [hovering, setHovering] = useState(false);
 
   const dragCounterRef = useRef(0);
 
@@ -330,6 +333,8 @@ export const MarkdownEditor = memo(function MarkdownEditor(
             onPaste={(event) => handlePaste(event)}
             onFocus={() => setActive(true)}
             onBlur={() => setActive(false)}
+            onMouseEnter={() => setHovering(true)}
+            onMouseLeave={() => setHovering(false)}
             autoFocus={autoFocus}
           >
             <MDXEditor
@@ -384,6 +389,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(
               />
             )}
 
+            {disabled && hovering && tooltip && (
+              <TooltipIndicator label={tooltip} />
+            )}
             {dragging && <DragIndicator />}
             {uploading && <UploadIndicator />}
           </div>

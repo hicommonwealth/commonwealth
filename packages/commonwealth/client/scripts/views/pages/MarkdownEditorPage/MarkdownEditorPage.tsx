@@ -59,7 +59,8 @@ const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
         {...props}
         markdown={`${overview}\n${supported}`}
         imageHandler="local"
-        disabled={true}
+        // disabled={true}
+        // tooltip="this is a tooltip"
         SubmitButton={SubmitButton}
       />
     </>
