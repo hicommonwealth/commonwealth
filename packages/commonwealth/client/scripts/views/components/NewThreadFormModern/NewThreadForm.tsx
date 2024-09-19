@@ -208,7 +208,6 @@ export const NewThreadForm = () => {
   };
 
   const showBanner = !user.activeAccount && isBannerVisible;
-  // FIXME: use this with the new buttons I think. Do not remove this.
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,
@@ -333,6 +332,11 @@ export const NewThreadForm = () => {
                 }
                 onChange={(markdown) => setEditorText(markdown)}
                 disabled={isRestrictedMembership || !user.activeAccount}
+                tooltip={
+                  typeof disabledActionsTooltipText === 'function'
+                    ? disabledActionsTooltipText?.('submit')
+                    : disabledActionsTooltipText
+                }
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
                 SubmitButton={() => (
                   <MarkdownSubmitButton

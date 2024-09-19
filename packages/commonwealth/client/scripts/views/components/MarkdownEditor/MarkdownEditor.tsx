@@ -82,6 +82,7 @@ export type MarkdownEditorProps = Readonly<{
   placeholder?: string;
   imageHandler?: ImageHandler;
   SubmitButton?: () => ReactNode;
+  tooltip?: ReactNode;
   onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
   onChange?: (markdown: MarkdownStr) => void;
 }>;
