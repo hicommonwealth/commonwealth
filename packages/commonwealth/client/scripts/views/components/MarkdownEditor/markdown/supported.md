@@ -1,14 +1,3 @@
-# Example of all supported markdown features
-
-This is a basic demo of the markdown editor.
-
-You can append to the URL ```?mode=desktop``` or ```?mode=mobile``` to test out a specific mode.
-
-The mobile version works in a desktop browser but should really only be run inside a real mobile browser when verifying functionality.
-
-When you hit submit, it will print the markdown to the console.
-
-Image uploads are local and do not go to S3 to avoid polluting our S3 bucket.
 
 # Markdown Rendering Tests
 
@@ -22,6 +11,10 @@ This just tests all the major markdown features we want to support.
 
 https://www.youtube.com/watch?v=eRBOgtp0Hac
 
+# Images
+
+![Do Not Taunt Happy Fun Ball](https://upload.wikimedia.org/wikipedia/en/6/65/Happy_fun_ball.jpg "Happy Fun Ball")
+
 # Paragraphs
 
 This is the first paragraph.
@@ -34,15 +27,19 @@ World War II or the Second World War (1 September 1939 – 2 September 1945) was
 
 ~~Strikethrough~~
 
-<s>Strikethrough (when enable html tag decode.)</s>
+<s>Strikethrough (within s HTML tag)</s>
 
-*Italic*      _Italic_
+*Italic*     
+_Italic using underscores_
 
-**Emphasis**  __Emphasis__
+**Emphasis**  
+__Emphasis using underscores__
 
-***Emphasis Italic*** ___Emphasis Italic___
+***Emphasis Italic*** 
+___Emphasis Italic using underscores___
 
-Subscript: X<sub>2</sub>，Superscript: O<sup>2</sup>
+Subscript: X<sub>2</sub>
+Superscript: O<sup>2</sup>
 
 # Code Blocks
 
