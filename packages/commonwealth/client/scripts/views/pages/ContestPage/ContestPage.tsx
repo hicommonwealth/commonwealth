@@ -1,5 +1,7 @@
 import moment from 'moment';
 import React, { useState } from 'react';
+import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
+import 'react-farcaster-embed/dist/styles.css';
 
 import { Select } from 'views/components/Select';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -9,10 +11,6 @@ import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/C
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import './ContestPage.scss';
-
-interface ContestPageProps {
-  contestAddress: string;
-}
 
 const sortOptions = [
   {
@@ -24,6 +22,10 @@ const sortOptions = [
     label: 'Ascending',
   },
 ];
+
+interface ContestPageProps {
+  contestAddress: string;
+}
 
 const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
@@ -39,6 +41,13 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
 
   const { end_time, score } = contest?.contests[0] || {};
 
+  const entries = [
+    'https://warpcast.com/kugusha.eth/0x64be20bf',
+    'https://warpcast.com/antimofm.eth/0xd082a36c',
+    'https://warpcast.com/linda/0xa72c0daa',
+    'https://warpcast.com/jacob/0x8653763f',
+  ];
+
   return (
     <CWPageLayout>
       <div className="ContestPage">
@@ -46,7 +55,6 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
         <CWText className="description">
           Check out the contest details including leaderboard.
         </CWText>
-
         <ContestCard
           key={contest.contest_address}
           isAdmin={false}
@@ -64,17 +72,27 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
           showShareButton={false}
           showLeaderboardButton={false}
         />
-
-        <div className="filter-section">
-          <CWText type="b2" fontWeight="medium">
-            Sort
+        {entries.length === 0 ? (
+          <CWText className="description">
+            No entries for the contest yet
           </CWText>
-          <Select
-            selected={selectedSort.value}
-            onSelect={setSelectedSort}
-            options={sortOptions}
-          />
-        </div>
+        ) : (
+          <div className="leaderboard-list">
+            <div className="filter-section">
+              <CWText type="b2" fontWeight="medium">
+                Sort
+              </CWText>
+              <Select
+                selected={selectedSort.value}
+                onSelect={setSelectedSort}
+                options={sortOptions}
+              />
+            </div>
+            {entries.map((entry) => (
+              <FarcasterEmbed url={entry} key={entry} />
+            ))}
+          </div>
+        )}
       </div>
     </CWPageLayout>
   );

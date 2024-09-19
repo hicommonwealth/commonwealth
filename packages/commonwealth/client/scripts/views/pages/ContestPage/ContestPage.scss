@@ -3,9 +3,16 @@
   flex-direction: column;
   gap: 16px;
 
-  .filter-section {
+  .leaderboard-list {
+    max-width: 598px;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    gap: 16px;
+
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   }
 }

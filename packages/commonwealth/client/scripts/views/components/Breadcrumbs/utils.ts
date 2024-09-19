@@ -174,6 +174,18 @@ export const generateBreadcrumbs = (
       }
     }
 
+    if (pathSegments.includes('contests')) {
+      if (pathSegments.length === 4 && pathSegments[1] === 'manage') {
+        if (pathSegments[3] === 'launch') {
+          pathSegments[3] = 'Launch Contest';
+        } else {
+          pathSegments[3] = 'Edit Contest';
+        }
+      } else {
+        pathSegments[2] = 'Leaderboard';
+      }
+    }
+
     if (
       pathSegments[pathSegments.length - 1] === 'contract' ||
       (['manage', 'analytics', 'contracts'].includes(pathSegments[1]) &&
@@ -187,13 +199,6 @@ export const generateBreadcrumbs = (
       }
 
       // handle contests
-      if (pathSegments.length === 3 && pathSegments[1] === 'contests') {
-        if (pathSegments[2] === 'launch') {
-          pathSegments[2] = 'Launch Contest';
-        } else {
-          pathSegments[2] = 'Edit Contest';
-        }
-      }
     }
 
     // Create the breadcrumb object.
