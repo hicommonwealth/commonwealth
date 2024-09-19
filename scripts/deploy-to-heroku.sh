@@ -33,7 +33,7 @@ fi
 
 cp ./deployment/environments/.env.public.${app_name} .env
 
-docker build -f Dockerfile.commonwealth_base -t commonwealth_base .
+docker build -f ./deployment/dockerfiles/Dockerfile.commonwealth_base -t commonwealth_base .
 
 heroku container:push --recursive -a ${app_name}
 
