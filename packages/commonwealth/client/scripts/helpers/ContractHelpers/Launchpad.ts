@@ -39,7 +39,8 @@ class LaunchpadBondingCurve extends ContractBase {
       name,
       symbol,
       [7000, 1250, 1500, 750], // 9181 parameters
-      [walletAddress, walletAddress], // should include at community treasury at [0] and contest creation util at [1] curr tbd
+      // should include at community treasury at [0] and contest creation util at [1] curr tbd
+      [walletAddress, walletAddress],
       1_000_000_000e18, // Default 1B tokens
       walletAddress,
     );
