@@ -24,9 +24,9 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
+import { PageNotFound } from '../404';
 import { JSONDisplay } from './JSONDisplay';
 import { ProposalSubheader } from './proposal_components';
-import { PageNotFound } from '../404';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -46,11 +46,15 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   const [description, setDescription] = useState<string>(proposal?.description);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
-  const { data: cosmosProposal , error: cosmosError , isFetching: isFetchingProposal} = useCosmosProposalQuery({
+  const {
+    data: cosmosProposal,
+    error: cosmosError,
+    isFetching: isFetchingProposal,
+  } = useCosmosProposalQuery({
     isApiReady: !!app.chain.apiInitialized,
     proposalId,
   });
-  const { data: metadata, isFetching: isFetchingMetadata} =
+  const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
   const { data: poolData } = usePoolParamsQuery();
   // @ts-expect-error <StrictNullChecks/>
@@ -96,7 +100,11 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   }
 
   if (cosmosError) {
-    return <PageNotFound message={`We coun't find what you searched for. Try searching again`}/>;
+    return (
+      <PageNotFound
+        message={"We coun't find what you searched for. Try searching again"}
+      />
+    );
   }
 
   const proposalTitle = title || proposal?.title;
