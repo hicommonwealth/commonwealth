@@ -130,6 +130,16 @@ export const UpdateCommunity = {
     .partial()
     .extend({
       id: z.string(),
+      name: z
+        .string()
+        .max(255)
+        .regex(COMMUNITY_NAME_REGEX, {
+          message: COMMUNITY_NAME_ERROR,
+        })
+        .refine((data) => !data.includes(ALL_COMMUNITIES), {
+          message: `String must not contain '${ALL_COMMUNITIES}'`,
+        })
+        .optional(),
       featuredTopics: z.array(z.string()).optional(),
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
@@ -147,4 +157,15 @@ export const GenerateStakeholderGroups = {
       created: z.boolean(),
     })
     .partial(),
+};
+
+export const DeleteTopic = {
+  input: z.object({
+    community_id: z.string(),
+    topic_id: PG_INT,
+  }),
+  output: z.object({
+    community_id: z.string(),
+    topic_id: PG_INT,
+  }),
 };

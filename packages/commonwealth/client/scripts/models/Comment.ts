@@ -1,3 +1,4 @@
+import { getDecodedString } from '@hicommonwealth/shared';
 import type momentType from 'moment';
 import moment, { Moment } from 'moment';
 import AddressInfo from './AddressInfo';
@@ -35,7 +36,7 @@ export class Comment<T extends IUniqueId> {
   public readonly parentId: number;
 
   public readonly canvasSignedData: string;
-  public readonly canvasHash: string;
+  public readonly canvasMsgId: string;
   public readonly discord_meta: any;
 
   public readonly profile: UserProfile;
@@ -56,7 +57,7 @@ export class Comment<T extends IUniqueId> {
     authorChain,
     last_edited,
     canvas_signed_data,
-    canvas_hash,
+    canvas_msg_id,
     CommentVersionHistories,
     marked_as_spam_at,
     discord_meta,
@@ -64,7 +65,7 @@ export class Comment<T extends IUniqueId> {
     const versionHistory = CommentVersionHistories;
     this.communityId = community_id;
     this.author = Address?.address || author;
-    this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
+    this.text = deleted_at?.length > 0 ? '[deleted]' : getDecodedString(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
     this.versionHistory = versionHistory;
     this.threadId = thread_id;
@@ -82,7 +83,7 @@ export class Comment<T extends IUniqueId> {
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.length > 0 ? true : false;
     this.canvasSignedData = canvas_signed_data;
-    this.canvasHash = canvas_hash;
+    this.canvasMsgId = canvas_msg_id;
     this.reactions = (reactions || []).map((r) => new Reaction(r));
     this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = thread_id;

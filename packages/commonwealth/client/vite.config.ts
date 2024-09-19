@@ -67,6 +67,7 @@ export default defineConfig(({ mode }) => {
     'process.env.DISCORD_CLIENT_ID':
       JSON.stringify(env.DISCORD_CLIENT_ID) ||
       JSON.stringify('1034502265664454776'),
+    'process.env.SNAPSHOT_HUB_URL': JSON.stringify(env.SNAPSHOT_HUB_URL),
     'process.env.COSMOS_REGISTRY_API': JSON.stringify(env.COSMOS_REGISTRY_API),
     'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
     'process.env.ETH_ALCHEMY_API_KEY':

@@ -1,4 +1,5 @@
 import { CommunityMember } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
 import 'pages/search/index.scss';
 import React, { useMemo } from 'react';
@@ -39,11 +40,7 @@ const ThreadResultRow = ({
   const { data: domain } = useFetchCustomDomainQuery();
 
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(thread.title);
-    } catch (error) {
-      return thread.title;
-    }
+    return getDecodedString(thread.title);
   }, [thread.title]);
 
   const handleClick = () => {
@@ -121,11 +118,7 @@ const ReplyResultRow = ({
   const { data: domain } = useFetchCustomDomainQuery();
 
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(comment.title);
-    } catch (error) {
-      return comment.title;
-    }
+    return getDecodedString(comment.title);
   }, [comment.title]);
 
   const handleClick = () => {

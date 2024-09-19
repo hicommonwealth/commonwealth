@@ -27,7 +27,6 @@ import {
   chainBaseToCanvasChainId,
   getSessionSigners,
 } from '@hicommonwealth/shared';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
 
 import { useCommunityStake } from '../CommunityStake';
 
@@ -86,7 +85,6 @@ const useUserMenuItems = ({
   });
 
   const userData = useUserStore();
-  const { data: configurationData } = useFetchConfigurationQuery();
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
@@ -150,9 +148,9 @@ const useUserMenuItems = ({
             // @ts-expect-error StrictNullChecks
             communityIdOrPrefix,
           );
-          const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+          const did = `did:pkh:${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
-          const signed = authenticatedAddresses[caip2Address];
+          const signed = authenticatedAddresses[did];
           if (signed) signedAddresses.push(account.address);
         }
       }),
@@ -173,13 +171,13 @@ const useUserMenuItems = ({
       type: 'default',
       label: (
         <UserMenuItem
-          isSignedIn={!configurationData?.enforceSessionKeys || signed}
+          isSignedIn={signed}
           hasJoinedCommunity={isActive}
           address={account.address}
         />
       ),
       onClick: async () => {
-        if (!configurationData?.enforceSessionKeys || signed) {
+        if (signed) {
           onAddressItemClick?.();
           return await setActiveAccount(account);
         }

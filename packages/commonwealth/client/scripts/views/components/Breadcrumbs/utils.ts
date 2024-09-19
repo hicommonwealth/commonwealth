@@ -1,3 +1,4 @@
+import { getDecodedString } from '@hicommonwealth/shared';
 import { To } from 'react-router-dom';
 import { breadCrumbURLS } from './data';
 
@@ -109,7 +110,7 @@ export const generateBreadcrumbs = (
     const splitLinks = link.split('/').filter((val) => val.length > 0);
 
     // Removed IDs from the breadcrumb
-    const removedThreadId = decodeURIComponent(pathSegments[index]).replace(
+    const removedThreadId = getDecodedString(pathSegments[index]).replace(
       /^\d+-/,
       '',
     );
@@ -121,8 +122,8 @@ export const generateBreadcrumbs = (
         ? // @ts-expect-error StrictNullChecks
           currentDiscussion.currentThreadName
         : matchedBreadcrumb
-        ? matchedBreadcrumb.breadcrumb
-        : removedThreadId;
+          ? matchedBreadcrumb.breadcrumb
+          : removedThreadId;
 
     if (pathSegments[0] === 'profile' && index === 1) {
       label = 'Edit Profile';

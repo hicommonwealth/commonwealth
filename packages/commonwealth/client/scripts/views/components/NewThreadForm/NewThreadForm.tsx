@@ -1,4 +1,5 @@
 import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -89,6 +90,7 @@ export const NewThreadForm = () => {
   const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
 
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const newEditor = useFlag('newEditor');
 
   const contestTopicError = threadTopic?.activeContestManagers?.length
@@ -196,6 +198,7 @@ export const NewThreadForm = () => {
       navigate(`/discussion/${thread.id}`);
     } catch (err) {
       if (err instanceof SessionKeyError) {
+        checkForSessionKeyRevalidationErrors(err);
         return;
       }
 
@@ -366,7 +369,7 @@ export const NewThreadForm = () => {
 
               <MessageRow
                 hasFeedback={walletBalanceError}
-                statusMessage={`Ensure that your connected wallet has at least 
+                statusMessage={`Ensure that your connected wallet has at least
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"
               />
