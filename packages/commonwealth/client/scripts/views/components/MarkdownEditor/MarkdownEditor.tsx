@@ -131,12 +131,16 @@ export const MarkdownEditor = memo(function MarkdownEditor(
   );
 
   const imageUploadHandlerWithMarkdownInsertion = useCallback(
-    async (file: File) => {
-      const url = await imageUploadHandler(file);
+    (file: File) => {
+      async function doAsync() {
+        const url = await imageUploadHandler(file);
 
-      mdxEditorRef.current?.insertMarkdown(`![](${url} "")`);
+        mdxEditorRef.current?.insertMarkdown(`![](${url} "")`);
+      }
+
+      doAsync().catch(errorHandler);
     },
-    [imageUploadHandler],
+    [errorHandler, imageUploadHandler],
   );
 
   const handleFile = useCallback(async (file: File) => {

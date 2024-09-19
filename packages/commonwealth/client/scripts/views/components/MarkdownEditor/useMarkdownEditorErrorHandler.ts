@@ -7,6 +7,7 @@ type ErrorPayload = Readonly<{
 }>;
 
 function isError(e: ErrorPayload | Error): e is Error {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (e as any).message;
 }
 

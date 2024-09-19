@@ -349,6 +349,7 @@ export const NewThreadForm = () => {
                       contestTopicError
                     }
                     tabIndex={4}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onClick={handleNewThreadCreation}
                   />
                 )}
@@ -371,6 +372,7 @@ export const NewThreadForm = () => {
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onJoin={handleJoinCommunity}
                 />
               )}

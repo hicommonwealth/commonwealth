@@ -387,6 +387,7 @@ export const NewThreadForm = () => {
                     walletBalanceError ||
                     contestTopicError
                   }
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onClick={handleNewThreadCreation}
                   tabIndex={4}
                   containerClassName="no-pad"
@@ -396,6 +397,7 @@ export const NewThreadForm = () => {
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onJoin={handleJoinCommunity}
                 />
               )}
