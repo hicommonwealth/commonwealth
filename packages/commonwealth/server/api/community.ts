@@ -68,4 +68,5 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   deleteTopic: trpc.command(Community.DeleteTopic, trpc.Tag.Community),
+  deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
 });

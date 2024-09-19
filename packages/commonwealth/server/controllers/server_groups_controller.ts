@@ -5,11 +5,6 @@ import {
   __createGroup,
 } from './server_groups_methods/create_group';
 import {
-  DeleteGroupOptions,
-  DeleteGroupResult,
-  __deleteGroup,
-} from './server_groups_methods/delete_group';
-import {
   GetGroupsOptions,
   GetGroupsResult,
   __getGroups,
@@ -58,9 +53,5 @@ export class ServerGroupsController {
 
   async updateGroup(options: UpdateGroupOptions): Promise<UpdateGroupResult> {
     return __updateGroup.call(this, options);
-  }
-
-  async deleteGroup(options: DeleteGroupOptions): Promise<DeleteGroupResult> {
-    return __deleteGroup.call(this, options);
   }
 }

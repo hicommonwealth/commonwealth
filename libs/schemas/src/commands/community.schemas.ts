@@ -169,3 +169,14 @@ export const DeleteTopic = {
     topic_id: PG_INT,
   }),
 };
+
+export const DeleteGroup = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT,
+  }),
+  output: z.object({
+    community_id: z.string(),
+    group_id: PG_INT,
+  }),
+};

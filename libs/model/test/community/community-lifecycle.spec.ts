@@ -13,6 +13,8 @@ import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateCommunity,
   CreateGroup,
+  DeleteGroup,
+  DeleteGroupErrors,
   DeleteTopic,
   Errors,
   GetCommunities,
@@ -29,13 +31,9 @@ import { seed } from '../../src/tester';
 
 const chance = Chance();
 
-describe('Community lifecycle', () => {
-  let ethNode: ChainNodeAttributes, edgewareNode: ChainNodeAttributes;
-  let community: CommunityAttributes;
-  let superAdminActor: Actor, adminActor: Actor, memberActor: Actor;
-  const custom_domain = 'custom';
-  const group_payload = {
-    id: '',
+function buildCreateGroupPayload(community_id: string, topics: number[] = []) {
+  return {
+    community_id,
     metadata: {
       name: chance.name(),
       description: chance.sentence(),
@@ -43,8 +41,15 @@ describe('Community lifecycle', () => {
       membership_ttl: 100,
     },
     requirements: [],
-    topics: [],
+    topics,
   };
+}
+
+describe('Community lifecycle', () => {
+  let ethNode: ChainNodeAttributes, edgewareNode: ChainNodeAttributes;
+  let community: CommunityAttributes;
+  let superAdminActor: Actor, adminActor: Actor, memberActor: Actor;
+  const custom_domain = 'custom';
 
   beforeAll(async () => {
     const [_ethNode] = await seed('ChainNode', { eth_chain_id: 1 });
@@ -128,7 +133,6 @@ describe('Community lifecycle', () => {
     expect(result?.admin_address).toBe(superAdminActor.address);
     // connect results
     community = result!.community! as CommunityAttributes;
-    group_payload.id = result!.community!.id;
   });
 
   describe('groups', () => {
@@ -141,26 +145,32 @@ describe('Community lifecycle', () => {
     });
 
     test('should create group when none exists', async () => {
+      const payload = buildCreateGroupPayload(community.id);
       const results = await command(CreateGroup(), {
         actor: superAdminActor,
-        payload: group_payload,
+        payload,
       });
-      expect(results?.groups?.at(0)?.metadata).to.includes(
-        group_payload.metadata,
-      );
+      expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
 
       const communityResults = await query(GetCommunities(), {
         actor: superAdminActor,
         payload: { has_groups: true } as any,
       });
-      expect(communityResults?.results?.at(0)?.id).to.equal(group_payload.id);
+      expect(communityResults?.results?.at(0)?.id).to.equal(
+        payload.community_id,
+      );
     });
 
     test('should fail group creation when group with same id found', async () => {
+      const payload = buildCreateGroupPayload(community.id);
+      await command(CreateGroup(), {
+        actor: superAdminActor,
+        payload,
+      });
       await expect(() =>
         command(CreateGroup(), {
           actor: superAdminActor,
-          payload: group_payload,
+          payload,
         }),
       ).rejects.toThrow(InvalidState);
     });
@@ -169,45 +179,51 @@ describe('Community lifecycle', () => {
       await expect(
         command(CreateGroup(), {
           actor: superAdminActor,
-          payload: {
-            id: group_payload.id,
-            metadata: {
-              name: chance.name(),
-              description: chance.sentence(),
-              required_requirements: 1,
-            },
-            requirements: [],
-            topics: [1, 2, 3],
-          },
+          payload: buildCreateGroupPayload(community.id, [1, 2, 3]),
         }),
       ).rejects.toThrow(Errors.InvalidTopics);
     });
 
-    test('should fail group creation when community reached max number of groups allowed', async () => {
-      // create max groups
-      for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
-        await command(CreateGroup(), {
-          actor: superAdminActor,
-          payload: {
-            id: group_payload.id,
-            metadata: { name: chance.name(), description: chance.sentence() },
-            requirements: [],
-            topics: [],
-          },
-        });
-      }
+    test('should delete group', async () => {
+      const created = await command(CreateGroup(), {
+        actor: superAdminActor,
+        payload: buildCreateGroupPayload(community.id),
+      });
+      const group_id = created!.groups!.at(0)!.id!;
+      const deleted = await command(DeleteGroup(), {
+        actor: superAdminActor,
+        payload: { community_id: community.id, group_id },
+      });
+      expect(deleted?.community_id).toBe(community.id);
+      expect(deleted?.group_id).toBe(group_id);
+    });
 
+    test('should throw when trying to delete group that is system managed', async () => {
+      const created = await command(CreateGroup(), {
+        actor: superAdminActor,
+        payload: {
+          ...buildCreateGroupPayload(community.id),
+          is_system_managed: true,
+        },
+      });
+      const group_id = created!.groups!.at(0)!.id!;
       await expect(() =>
-        command(CreateGroup(), {
+        command(DeleteGroup(), {
           actor: superAdminActor,
-          payload: {
-            id: group_payload.id,
-            metadata: { name: chance.name(), description: chance.sentence() },
-            requirements: [],
-            topics: [],
-          },
+          payload: { community_id: community.id, group_id },
         }),
-      ).rejects.toThrow(Errors.MaxGroups);
+      ).rejects.toThrow(DeleteGroupErrors.SystemManaged);
+    });
+
+    test('should fail group creation when community reached max number of groups allowed', async () => {
+      await expect(async () => {
+        for (let i = 0; i <= MAX_GROUPS_PER_COMMUNITY; i++) {
+          await command(CreateGroup(), {
+            actor: superAdminActor,
+            payload: buildCreateGroupPayload(community.id),
+          });
+        }
+      }).rejects.toThrow(Errors.MaxGroups);
     });
   });
 
