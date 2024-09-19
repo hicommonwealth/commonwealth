@@ -26,6 +26,7 @@ describe('createReaction Integration Tests', () => {
       address,
       author_chain: 'ethereum',
       chain: 'ethereum',
+      community_id: 'ethereum',
       reaction_id: reactionId,
     };
 
@@ -33,6 +34,7 @@ describe('createReaction Integration Tests', () => {
       .request(server.app)
       .post(`/api/v1/DeleteReaction`)
       .set('Accept', 'application/json')
+      .set('address', address)
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
 
@@ -144,7 +146,7 @@ describe('createReaction Integration Tests', () => {
       userJWT,
       userAddress,
     );
-    chai.assert.equal(deleteReactionResponse.status, 'Success');
+    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount);
@@ -182,7 +184,7 @@ describe('createReaction Integration Tests', () => {
       userAddress,
     );
 
-    chai.assert.equal(deleteReactionResponse.status, 'Success');
+    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
 
     await thread!.reload();
     chai.assert.equal(thread!.reaction_count, beforeReactionCount);
