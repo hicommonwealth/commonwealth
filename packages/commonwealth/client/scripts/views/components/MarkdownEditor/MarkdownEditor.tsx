@@ -85,12 +85,19 @@ export type MarkdownEditorProps = Readonly<{
   tooltip?: ReactNode;
   onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
   onChange?: (markdown: MarkdownStr) => void;
+  autoFocus?: boolean;
 }>;
 
 export const MarkdownEditor = memo(function MarkdownEditor(
   props: MarkdownEditorProps,
 ) {
-  const { SubmitButton, onMarkdownEditorMethods, disabled, onChange } = props;
+  const {
+    SubmitButton,
+    onMarkdownEditorMethods,
+    disabled,
+    onChange,
+    autoFocus,
+  } = props;
   const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -291,6 +298,17 @@ export const MarkdownEditor = memo(function MarkdownEditor(
     };
   }, []);
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (disabled) {
+        // needed to prevent the user from typing into the contenteditable
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    },
+    [disabled],
+  );
+
   return (
     <MarkdownEditorModeContext.Provider value={mode}>
       <MarkdownEditorContext.Provider value={mdxEditorMethods}>
@@ -304,6 +322,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
               active ? 'mdxeditor-container-active' : null,
               disabled ? 'mdxeditor-container-disabled' : null,
             )}
+            onKeyDownCapture={handleKeyDown}
             onDrop={handleDrop}
             onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
@@ -311,6 +330,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
             onPaste={(event) => handlePaste(event)}
             onFocus={() => setActive(true)}
             onBlur={() => setActive(false)}
+            autoFocus={autoFocus}
           >
             <MDXEditor
               onError={errorHandler}
