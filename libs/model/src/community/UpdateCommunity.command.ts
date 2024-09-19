@@ -65,7 +65,7 @@ export function UpdateCommunity(): Command<
           throw new InvalidInput(UpdateCommunityErrors.SnapshotOnlyOnEthereum);
         }
 
-        if(snapshots.length > 0) {
+        if(snapshots.length) {
           const newSpaces = snapshots.filter(
             (s) => !community.snapshot_spaces.includes(s),
           );
