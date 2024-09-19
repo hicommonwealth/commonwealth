@@ -23,7 +23,6 @@ const {
   FLAG_COMMON_WALLET,
   SITEMAP_THREAD_PRIORITY,
   SITEMAP_PROFILE_PRIORITY,
-  ETH_ALCHEMY_API_KEY,
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
@@ -112,7 +111,6 @@ export const config = configure(
       ETH_RPC: ETH_RPC || 'prod',
       // URL of the local Ganache, Anvil, or Hardhat chain
       PROVIDER_URL: PROVIDER_URL ?? 'http://127.0.0.1:8545',
-      ETH_ALCHEMY_API_KEY,
     },
     COSMOS: {
       COSMOS_REGISTRY_API:
@@ -207,8 +205,6 @@ export const config = configure(
     TEST_EVM: z.object({
       ETH_RPC: z.string(),
       PROVIDER_URL: z.string(),
-      ETH_ALCHEMY_API_KEY: z.string().optional(),
-      BASESEP_ALCHEMY_API_KEY: z.string().optional(),
     }),
     COSMOS: z.object({
       COSMOS_REGISTRY_API: z.string(),
