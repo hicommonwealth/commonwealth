@@ -1,9 +1,9 @@
 import { type Query } from '@hicommonwealth/core';
-import { buildChainNodeUrl } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { buildChainNodeUrl } from '../utils/utils';
 
 export function GetCommunities(): Query<typeof schemas.GetCommunities> {
   return {

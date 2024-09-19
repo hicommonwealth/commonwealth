@@ -1,9 +1,9 @@
 import { Query } from '@hicommonwealth/core';
-import { getChainNodeUrl } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
+import { getChainNodeUrl } from '../utils/utils';
 
 // GetActiveContestManagers returns all contest managers which are active
 // in the specified community and topic, along with the actions within

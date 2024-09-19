@@ -1,7 +1,7 @@
-import { buildChainNodeUrl } from '@hicommonwealth/model';
 import { ChainNode } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
+import { buildChainNodeUrl } from '../utils/utils';
 import type { ModelInstance } from './types';
 
 export type ChainNodeAttributes = z.infer<typeof ChainNode>;

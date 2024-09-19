@@ -1,9 +1,9 @@
 import { logger, type Command } from '@hicommonwealth/core';
-import { getChainNodeUrl } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { rollOverContest } from '../services/commonProtocol/contestHelper';
+import { getChainNodeUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 
