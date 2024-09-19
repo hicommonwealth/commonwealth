@@ -60,6 +60,7 @@ interface ContestCardProps {
   feeManagerBalance?: string;
   isRecurring: boolean;
   showShareButton?: boolean;
+  showLeaderboardButton?: boolean;
   isHorizontal?: boolean;
   isFarcaster?: boolean;
 }
@@ -79,6 +80,7 @@ const ContestCard = ({
   feeManagerBalance,
   isRecurring,
   showShareButton = true,
+  showLeaderboardButton = true,
   isHorizontal = false,
   isFarcaster = false,
 }: ContestCardProps) => {
@@ -140,7 +142,9 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    navigate(`/discussions?featured=mostLikes&contest=${address}`);
+    isFarcaster
+      ? navigate(`/contests/${address}`)
+      : navigate(`/discussions?featured=mostLikes&contest=${address}`);
   };
 
   const handleFundClick = () => {
@@ -231,11 +235,13 @@ const ContestCard = ({
           )}
         </>
         <div className="actions">
-          <CWThreadAction
-            label="Leaderboard"
-            action="leaderboard"
-            onClick={handleLeaderboardClick}
-          />
+          {showLeaderboardButton && (
+            <CWThreadAction
+              label="Leaderboard"
+              action="leaderboard"
+              onClick={handleLeaderboardClick}
+            />
+          )}
 
           {showShareButton && (
             <SharePopoverOld
