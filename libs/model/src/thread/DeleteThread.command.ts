@@ -19,13 +19,6 @@ export function DeleteThread(): Command<
     body: async ({ actor, auth }) => {
       const { thread } = mustBeAuthorizedThread(actor, auth);
 
-      // @rbennettcw do we need to check the canvas_msg_id?
-      // if (
-      //   payload.canvas_msg_id &&
-      //   thread.canvas_msg_id !== payload.canvas_msg_id
-      // )
-      //   throw new InvalidInput(DeleteThreadErrors.InvalidCanvasMsgId);
-
       const found = await models.ContestTopic.findOne({
         where: { topic_id: thread.topic_id! },
       });
