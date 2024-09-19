@@ -53,7 +53,7 @@ const useDeleteCommentReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteReaction.useMutation({
-    onSuccess: async (deleted) => {
+    onSuccess: (deleted) => {
       // update fetch comments query state
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
