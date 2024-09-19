@@ -19,7 +19,6 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import Editor from 'views/components/MarkdownEditor';
 import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -91,7 +90,6 @@ export const NewThreadForm = () => {
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
-  const newEditor = useFlag('newEditor');
 
   const contestTopicError = threadTopic?.activeContestManagers?.length
     ? threadTopic?.activeContestManagers
@@ -344,21 +342,17 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {!newEditor && (
-                <ReactQuillEditor
-                  contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
-                  isDisabled={isRestrictedMembership || !user.activeAccount}
-                  tooltipLabel={
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('submit')
-                      : disabledActionsTooltipText
-                  }
-                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-                />
-              )}
-
-              {newEditor && <Editor mode="desktop" placeholder="" />}
+              <ReactQuillEditor
+                contentDelta={threadContentDelta}
+                setContentDelta={setThreadContentDelta}
+                isDisabled={isRestrictedMembership || !user.activeAccount}
+                tooltipLabel={
+                  typeof disabledActionsTooltipText === 'function'
+                    ? disabledActionsTooltipText?.('submit')
+                    : disabledActionsTooltipText
+                }
+                placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+              />
 
               {contestThreadBannerVisible && (
                 <ContestThreadBanner
