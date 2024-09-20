@@ -21,13 +21,7 @@ const getUploadSignature = async (
   if (!req.body.name || !req.body.mimetype) {
     return next(new AppError(Errors.MissingParams));
   }
-  const extension = req.body.name.split('.').pop();
 
-  if (!['gif', 'png', 'jpeg', 'webp'].includes(extension)) {
-    return next(new AppError(Errors.ImageType));
-  }
-
-  const filename = `${uuidv4()}.${extension}`;
   const contentType = req.body.mimetype;
   if (
     ['image/gif', 'image/png', 'image/jpeg', 'image/webp'].indexOf(
@@ -36,6 +30,16 @@ const getUploadSignature = async (
   ) {
     return next(new AppError(Errors.ImageType));
   }
+
+  let extension = req.body.name.split('.').pop();
+
+  if (extension === req.body.name) {
+    extension = contentType.split('/').pop();
+  } else if (!['gif', 'png', 'jpeg', 'webp'].includes(extension)) {
+    return next(new AppError(Errors.ImageType));
+  }
+
+  const filename = `${uuidv4()}.${extension}`;
 
   try {
     const url = await blobStorage().getSignedUrl({
