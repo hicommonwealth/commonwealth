@@ -7,7 +7,9 @@ import { QueryTypes } from 'sequelize';
 import { createGzip } from 'zlib';
 
 const log = logger(import.meta);
-const _blobStorage = blobStorage(S3BlobStorage());
+const _blobStorage = blobStorage({
+  adapter: S3BlobStorage(),
+});
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
   const databaseUrl = config.DB.URI;
@@ -177,13 +179,16 @@ async function main() {
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
+  stats({
+    adapter: HotShotsStats(),
+  });
   main()
     .then(async () => {
-      stats(HotShotsStats()).on('cw.scheduler.archive-outbox');
+      stats().on('cw.scheduler.archive-outbox');
       await dispose()('EXIT', true);
     })
     .catch(async (err) => {
-      stats(HotShotsStats()).off('cw.scheduler.archive-outbox');
+      stats().off('cw.scheduler.archive-outbox');
       log.fatal('Failed to archive outbox child partitions to S3', err);
       await dispose()('ERROR', true);
     });
