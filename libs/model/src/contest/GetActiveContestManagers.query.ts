@@ -25,8 +25,8 @@ export function GetActiveContestManagers(): Query<
       }>(
         `
             SELECT cn.eth_chain_id,
-                   CN.private_url,
-                   CN.url,
+                   cn.private_url,
+                   cn.url,
                    cm.contest_address,
                    co.max_contest_id,
                    COALESCE(JSON_AGG(ca) FILTER (WHERE ca IS NOT NULL), '[]'::json) as actions
