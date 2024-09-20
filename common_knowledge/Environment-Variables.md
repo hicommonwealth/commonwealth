@@ -32,12 +32,11 @@ If you add a new environment variable, you must add documentation here. Please d
 - [DD_LOG_LEVEL](#dd_log_level)
 - [DD_SITE](#dd_site)
 - [DISABLE_CACHE](#disable_cache)
-- [DISCORD_BOT_TOKEN](#discord_bot_token)
+- [DISCORD_TOKEN](#discord_token)
 - [DISCORD_BOT_URL](#discord_bot_url)
 - [DISCORD_CLIENT_ID](#discord_client_id)
 - [DISCORD_WEBHOOK_URL_DEV](#discord_webhook_url_dev)
 - [DL_BUILD](#dl_build)
-- [ENFORCE_SESSION_KEYS](#enforce_session_keys)
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
@@ -183,7 +182,7 @@ DataDog configuration token in our Heroku pipeline, specifying our DataDog site 
 
 If `true`, disables Redis caching middleware.
 
-## DISCORD_BOT_TOKEN
+## DISCORD_TOKEN
 
 This value should mirror the value of `DISCORD_TOKEN` in the Discobot .env file.
 
@@ -203,12 +202,6 @@ Connects to the #webhook-testing Discord channel on the Commond Protocol Discord
 
 Boolean which ensures that Heroku only builds the Discobot package and related code when deploying.
 
-## ENFORCE_SESSION_KEYS
-
-Boolean feature flag for server-side enforcement of Canvas session keys; by default, `false`.
-
-Owner: Raymond Zhong.
-
 ## ETH_ALCHEMY_API_KEY
 
 Used in our CI/CD and stored in GitHub repo secrets. If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work that involves querying Ethereum.
@@ -226,7 +219,6 @@ Owner: Ian Rowan
 Optional. Defaults to 5 minutes (300 seconds).
 This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
 After this time, the server will try the original DB endpoint again.
-
 
 ## FLAG_NEW_CREATE_COMMUNITY
 

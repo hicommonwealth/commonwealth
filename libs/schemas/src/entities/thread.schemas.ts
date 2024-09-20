@@ -1,10 +1,21 @@
 import { z } from 'zod';
-import { discordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
+import { Reaction } from './reaction.schemas';
+import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
+
+export const ThreadVersionHistory = z.object({
+  id: PG_INT.optional(),
+  thread_id: PG_INT,
+  address: z
+    .string()
+    .describe('Address of the creator of the post or the collaborator'),
+  body: z.string(),
+  timestamp: z.date(),
+});
 
 export const Thread = z.object({
   id: PG_INT.optional(),
-  Address: Address.nullish(),
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
@@ -19,12 +30,11 @@ export const Thread = z.object({
   links: z.object(linksSchema).array().nullish(),
 
   read_only: z.boolean().nullish(),
-  version_history: z.array(z.string()).nullish(),
 
   has_poll: z.boolean().nullish(),
 
   canvas_signed_data: z.string().nullish(),
-  canvas_hash: z.string().nullish(),
+  canvas_msg_id: z.string().nullish(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
@@ -34,7 +44,7 @@ export const Thread = z.object({
   marked_as_spam_at: z.coerce.date().nullish(),
   archived_at: z.coerce.date().nullish(),
   locked_at: z.coerce.date().nullish(),
-  discord_meta: z.object(discordMetaSchema).nullish(),
+  discord_meta: DiscordMetaSchema.nullish(),
 
   //counts
   reaction_count: PG_INT,
@@ -43,19 +53,15 @@ export const Thread = z.object({
 
   activity_rank_date: z.coerce.date().nullish(),
 
-  //notifications
-  max_notif_id: PG_INT,
-
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
-});
 
-export const ThreadVersionHistory = z.object({
-  id: PG_INT.optional(),
-  thread_id: PG_INT,
-  address: z
-    .string()
-    .describe('Address of the creator of the post or the collaborator'),
-  body: z.string(),
-  timestamp: z.date(),
+  search: z.union([z.string(), z.record(z.any())]),
+
+  // associations
+  Address: Address.nullish(),
+  topic: Topic.nullish(),
+  collaborators: Address.array().nullish(),
+  reactions: Reaction.array().nullish(),
+  ThreadVersionHistories: z.array(ThreadVersionHistory).nullish(),
 });

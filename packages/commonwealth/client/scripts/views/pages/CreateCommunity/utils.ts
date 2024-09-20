@@ -3,7 +3,7 @@ import { CWFormStepsProps } from 'views/components/component_kit/new_designs/CWF
 
 export enum CreateCommunityStep {
   CommunityTypeSelection = 'CommunityTypeSelection',
-  BasicInformation = 'BasicInformation',
+  CommunityInformation = 'CommunityInformation',
   CommunityStake = 'CommunityStake',
   Success = 'Success',
 }
@@ -21,13 +21,13 @@ export const getFormSteps = (
           : 'completed',
     },
     {
-      label: 'Basic Information',
+      label: 'Community Information',
       state:
-        createCommunityStep < CreateCommunityStep.BasicInformation
+        createCommunityStep < CreateCommunityStep.CommunityInformation
           ? 'inactive'
-          : createCommunityStep === CreateCommunityStep.BasicInformation
-          ? 'active'
-          : 'completed',
+          : createCommunityStep === CreateCommunityStep.CommunityInformation
+            ? 'active'
+            : 'completed',
     },
     ...((showCommunityStakeStep
       ? [
@@ -37,8 +37,8 @@ export const getFormSteps = (
               createCommunityStep < CreateCommunityStep.CommunityStake
                 ? 'inactive'
                 : createCommunityStep === CreateCommunityStep.CommunityStake
-                ? 'active'
-                : 'completed',
+                  ? 'active'
+                  : 'completed',
           },
         ]
       : []) as CWFormStepsProps['steps']),
@@ -55,9 +55,9 @@ export const handleChangeStep = (
 ) => {
   switch (createCommunityStep) {
     case CreateCommunityStep.CommunityTypeSelection:
-      setCreateCommunityStep(CreateCommunityStep.BasicInformation);
+      setCreateCommunityStep(CreateCommunityStep.CommunityInformation);
       return;
-    case CreateCommunityStep.BasicInformation:
+    case CreateCommunityStep.CommunityInformation:
       setCreateCommunityStep(
         forward
           ? showCommunityStakeStep
@@ -70,7 +70,7 @@ export const handleChangeStep = (
       setCreateCommunityStep(
         forward
           ? CreateCommunityStep.Success
-          : CreateCommunityStep.BasicInformation,
+          : CreateCommunityStep.CommunityInformation,
       );
       return;
   }

@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
 import Address from './address';
-import Ban from './ban';
 import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
@@ -10,7 +9,6 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
-import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
@@ -27,9 +25,6 @@ import Group from './group';
 import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import Membership from './membership';
-import Notification from './notification';
-import NotificationCategory from './notification_category';
-import NotificationsRead from './notifications_read';
 import Outbox from './outbox';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
@@ -37,7 +32,6 @@ import Reaction from './reaction';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
-import Subscription from './subscription';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
 import Thread from './thread';
@@ -46,11 +40,11 @@ import ThreadVersionHistory from './thread_version_history';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
+import Wallets from './wallets';
 import Webhook from './webhook';
 
 export const Factories = {
   Address,
-  Ban,
   ChainNode,
   Collaboration,
   Comment,
@@ -58,7 +52,6 @@ export const Factories = {
   CommentSubscription,
   Community,
   CommunityAlert,
-  CommunityBanner,
   CommunityContract,
   CommunityStake,
   CommunityTags,
@@ -75,9 +68,6 @@ export const Factories = {
   GroupPermission,
   LastProcessedEvmBlock,
   Membership,
-  Notification,
-  NotificationCategory,
-  NotificationsRead,
   Outbox,
   Poll,
   ProfileTags,
@@ -85,7 +75,6 @@ export const Factories = {
   SsoToken,
   StakeTransaction,
   StarredCommunity,
-  Subscription,
   Tags,
   SubscriptionPreference,
   Thread,
@@ -95,11 +84,12 @@ export const Factories = {
   User,
   Vote,
   Webhook,
+  Wallets,
 };
 
 export type DB = {
-  [K in keyof typeof Factories]: ReturnType<typeof Factories[K]> &
-    Associable<ReturnType<typeof Factories[K]>>;
+  [K in keyof typeof Factories]: ReturnType<(typeof Factories)[K]> &
+    Associable<ReturnType<(typeof Factories)[K]>>;
 } & {
   sequelize: Sequelize.Sequelize;
   Sequelize: typeof Sequelize.Sequelize;

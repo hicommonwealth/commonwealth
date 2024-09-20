@@ -9,6 +9,7 @@ import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import { ExtendedAddessInstance } from './getNewProfile';
 
 const { Op } = Sequelize;
 
@@ -82,7 +83,6 @@ const linkExistingAddressToCommunity = async (
         verification_token_expires: verificationTokenExpires,
       },
       {
-        // @ts-expect-error StrictNullChecks
         where: {
           user_id: originalAddress.user_id,
           address: req.body.address,
@@ -140,10 +140,9 @@ const linkExistingAddressToCommunity = async (
           verified: originalAddress.verified,
           hex,
         },
-        { where: { id: existingAddress.id }, transaction },
+        { where: { id: existingAddress.id }, transaction, returning: true },
       );
-      // @ts-expect-error StrictNullChecks
-      addressId = updatedObj.id;
+      addressId = updatedObj[1][0].id!;
     });
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
@@ -164,11 +163,11 @@ const linkExistingAddressToCommunity = async (
           verification_token_expires: verificationTokenExpires,
           verified: originalAddress.verified,
           wallet_id: originalAddress.wallet_id,
-          wallet_sso_source: originalAddress.wallet_sso_source,
           last_active: new Date(),
           role: 'member',
           is_user_default: false,
           ghost_address: false,
+          is_banned: false,
         },
         { transaction },
       );
@@ -183,6 +182,10 @@ const linkExistingAddressToCommunity = async (
 
   const ownedAddresses = await models.Address.findAll({
     where: { user_id: originalAddress.user_id },
+    include: {
+      model: models.Community,
+      attributes: ['id', 'base', 'ss58_prefix'],
+    },
   });
 
   const serverAnalyticsController = new ServerAnalyticsController();
@@ -200,7 +203,9 @@ const linkExistingAddressToCommunity = async (
     result: {
       verification_token: verificationToken,
       addressId,
-      addresses: ownedAddresses.map((a) => a.toJSON()),
+      addresses: ownedAddresses.map(
+        (a) => a.toJSON() as ExtendedAddessInstance,
+      ),
       encodedAddress,
     },
   });

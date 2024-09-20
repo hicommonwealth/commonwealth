@@ -1,13 +1,15 @@
 import { CommentSubscription } from '@hicommonwealth/schemas';
-import { getThreadUrl, safeTruncateBody } from '@hicommonwealth/shared';
+import {
+  getDecodedString,
+  getThreadUrl,
+  safeTruncateBody,
+} from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
-import { useCommonNavigate } from 'navigation/helpers';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
-import { getCommunityUrl } from 'utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -31,16 +33,6 @@ export const CommentSubscriptionEntry = (
   const deleteCommentSubscriptionMutation =
     useDeleteCommentSubscriptionMutation();
 
-  const threadUrl = getThreadUrl(
-    {
-      chain: `${thread.community_id}`,
-      id: `${thread.id}`,
-      title: decodeURIComponent(thread.title),
-    },
-    comment_id,
-    true,
-  );
-
   const handleDeleteSubscription = useCallback(() => {
     async function doAsync() {
       await deleteCommentSubscriptionMutation.mutateAsync({
@@ -59,8 +51,32 @@ export const CommentSubscriptionEntry = (
 
   const navigate = useCommonNavigate();
 
+  if (!thread) {
+    return;
+  }
+
   const handleNavigateToThread = () => {
+    const threadUrl = getThreadUrl(
+      {
+        chain: `${thread.community_id}`,
+        id: `${thread.id}`,
+        title: getDecodedString(thread.title),
+      },
+      comment_id,
+      true,
+    );
+
     navigate(threadUrl);
+  };
+
+  const handleNavigateToCommunity = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    navigateToCommunity({
+      navigate,
+      path: '/',
+      chain: thread.Community.id!,
+    });
   };
 
   return (
@@ -76,9 +92,9 @@ export const CommentSubscriptionEntry = (
           />
         </div>
         <div>
-          <Link to={getCommunityUrl(thread.Community.name)}>
+          <a onClick={handleNavigateToCommunity}>
             <CWText fontWeight="semiBold">{thread.Community.name}</CWText>
-          </Link>
+          </a>
         </div>
 
         <div>•</div>

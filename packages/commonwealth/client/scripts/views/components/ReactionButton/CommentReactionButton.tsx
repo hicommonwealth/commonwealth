@@ -1,3 +1,5 @@
+import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import React, { useState } from 'react';
@@ -27,6 +29,7 @@ export const CommentReactionButton = ({
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const { mutateAsync: createCommentReaction } =
     useCreateCommentReactionMutation({
@@ -35,10 +38,11 @@ export const CommentReactionButton = ({
       communityId: app.activeChainId(),
     });
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: deleteCommentReaction } =
     useDeleteCommentReactionMutation({
       commentId: comment.id,
-      communityId: app.activeChainId(),
+      communityId,
       threadId: comment.threadId,
     });
 
@@ -67,28 +71,35 @@ export const CommentReactionButton = ({
       const foundReaction = comment.reactions.find((r) => {
         return r.author === activeAddress;
       });
+      if (!foundReaction) {
+        console.error('missing reaction');
+        notifyError('Failed to update reaction count');
+        return;
+      }
       deleteCommentReaction({
-        communityId: app.activeChainId(),
+        communityId,
         address: user.activeAccount?.address,
-        // @ts-expect-error <StrictNullChecks/>
-        canvasHash: foundReaction.canvasHash,
-        // @ts-expect-error <StrictNullChecks/>
+        commentMsgId: comment.canvasMsgId,
         reactionId: foundReaction.id,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         console.error(err.response.data.error || err?.message);
         notifyError('Failed to update reaction count');
       });
     } else {
-      createCommentReaction({
+      const input = await buildCreateCommentReactionInput({
         address: activeAddress,
         commentId: comment.id,
-        communityId: app.activeChainId(),
+        communityId,
         threadId: comment.threadId,
-      }).catch((err) => {
+        commentMsgId: comment.canvasMsgId,
+      });
+      createCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         console.error(err?.responseJSON?.error || err?.message);

@@ -1,6 +1,8 @@
-import { GetActiveCommunitiesResult } from 'server/controllers/server_communities_methods/get_active_communities';
-import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
-import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
+import { AppError } from '@hicommonwealth/core';
+import {
+  SearchCommunitiesOptions,
+  SearchCommunitiesResult,
+} from 'server/controllers/server_communities_methods/search_communities';
 import { ServerControllers } from '../../routing/router';
 import {
   PaginationQueryParams,
@@ -9,16 +11,17 @@ import {
   success,
 } from '../../types';
 
+const Errors = {
+  QueryRequired: 'query is required',
+};
+
 type GetCommunitiesRequestQuery = {
   active?: string;
   snapshots?: string;
   search?: string;
 } & PaginationQueryParams;
 
-type GetCommunitiesResponse =
-  | GetActiveCommunitiesResult
-  | GetCommunitiesResult
-  | SearchCommunitiesResult;
+type GetCommunitiesResponse = SearchCommunitiesResult;
 
 export const getCommunitiesHandler = async (
   controllers: ServerControllers,
@@ -27,29 +30,20 @@ export const getCommunitiesHandler = async (
 ) => {
   const options = req.query;
 
-  // get active communities
-  if (options.active === 'true') {
-    const results = await controllers.communities.getActiveCommunities({
-      cacheEnabled: true,
-    });
-    return success(res, results);
+  if (!options.search) {
+    throw new AppError(Errors.QueryRequired);
   }
 
   // search communities
-  if (options.search) {
-    const results = await controllers.communities.searchCommunities({
-      search: options.search,
-      // @ts-expect-error StrictNullChecks
-      limit: parseInt(options.limit, 10) || 0,
-      // @ts-expect-error StrictNullChecks
-      page: parseInt(options.page, 10) || 0,
-      orderBy: options.order_by,
-      orderDirection: options.order_direction as any,
-    });
-    return success(res, results);
-  }
-
-  // TODO: throw error here -- route no longer accessible
-  const results = await controllers.communities.getCommunities({});
+  const results = await controllers.communities.searchCommunities({
+    search: options.search,
+    // @ts-expect-error StrictNullChecks
+    limit: parseInt(options.limit, 10) || 0,
+    // @ts-expect-error StrictNullChecks
+    page: parseInt(options.page, 10) || 0,
+    orderBy: options.order_by,
+    orderDirection:
+      options.order_direction as SearchCommunitiesOptions['orderDirection'],
+  });
   return success(res, results);
 };

@@ -11,8 +11,8 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
@@ -35,6 +35,8 @@ const DEFAULT_COUNT = 10;
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
+
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
@@ -59,7 +61,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     communityId: thread.communityId,
     // @ts-expect-error <StrictNullChecks/>
     address: account?.address,
-    apiEnabled: !!account?.address,
+    apiEnabled: !!account?.address && !!thread.communityId,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -97,7 +99,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       onStageTagClick={() => {
         navigate(
           `${
-            app.isCustomDomain() ? '' : `/${thread.communityId}`
+            domain?.isCustomDomain ? '' : `/${thread.communityId}`
           }/discussions?stage=${thread.stage}`,
         );
       }}

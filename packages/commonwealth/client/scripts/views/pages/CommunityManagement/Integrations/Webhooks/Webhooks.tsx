@@ -1,10 +1,9 @@
-import { WebhookCategory } from '@hicommonwealth/shared';
+import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
+import { getWebhookDestination } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { linkValidationSchema } from 'helpers/formValidations/common';
-import { getLinkType, isLinkValid } from 'helpers/link';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import Webhook from 'models/Webhook';
 import React, { useState } from 'react';
 import app from 'state';
 import {
@@ -14,22 +13,23 @@ import {
   useFetchWebhooksQuery,
 } from 'state/api/webhooks';
 import _ from 'underscore';
-import { LinksArray, useLinksArray } from 'views/components/LinksArray';
+import { Link, LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
+import z from 'zod';
 import './Webhooks.scss';
 
 const Webhooks = () => {
-  const communityId = app.activeChainId();
+  const communityId = app.activeChainId() || '';
   const [hasExistingWebhooks, setHasExistingWebhooks] = useState(false);
-  const [webhookToConfigure, setWebhookToConfigure] = useState<Webhook | null>(
-    null,
-  );
+  const [webhookToConfigure, setWebhookToConfigure] = useState<z.infer<
+    typeof Webhook
+  > | null>(null);
   const {
-    links: webhooks,
+    links,
     setLinks,
     onLinkAdd,
     onLinkRemovedAtIndex,
@@ -39,6 +39,8 @@ const Webhooks = () => {
     initialLinks: [],
     linkValidation: linkValidationSchema.required,
   });
+
+  const webhooks = links as (Link & { metadata: z.infer<typeof Webhook> })[];
 
   const { mutateAsync: createWebhook, isLoading: isCreatingWebhook } =
     useCreateWebhookMutation();
@@ -76,16 +78,19 @@ const Webhooks = () => {
     const webhooksToCreate = webhooks.filter(
       (webhook) => !webhook.canConfigure,
     );
+    if (!webhooksToCreate.length) return;
     try {
       await Promise.all(
         webhooksToCreate.map(async (webhook) => {
           await createWebhook({
-            communityId: communityId,
+            id: communityId,
             webhookUrl: webhook.value.trim(),
           });
         }),
       );
-
+      setLinks(
+        [...webhooks].map((webhook) => ({ ...webhook, canConfigure: true })),
+      );
       notifySuccess(
         `${pluralizeWithoutNumberPrefix(
           webhooksToCreate.length,
@@ -98,10 +103,6 @@ const Webhooks = () => {
           webhooksToCreate.length,
           'webhook',
         )}!`,
-      );
-    } finally {
-      setLinks(
-        [...webhooks].map((webhook) => ({ ...webhook, canConfigure: true })),
       );
     }
   };
@@ -116,8 +117,8 @@ const Webhooks = () => {
         webhooks[index].canConfigure
       ) {
         await deleteWebhook({
-          communityId: communityId,
-          webhookUrl: webhooks[index].value,
+          id: webhooks[index].metadata.id,
+          community_id: communityId,
         });
         notifySuccess('Webhook deleted!');
       }
@@ -129,16 +130,16 @@ const Webhooks = () => {
   };
 
   const handleUpdateWebhook = async (
-    webhook: Webhook,
-    categories: WebhookCategory[],
+    webhook: z.infer<typeof Webhook>,
+    events: Array<z.infer<typeof WebhookSupportedEvents>>,
   ) => {
     if (isEditingWebhook) return;
 
     try {
       await editWebhook({
-        communityId: communityId,
-        webhookId: webhook.id,
-        webhookCategories: categories,
+        id: webhook.id!,
+        community_id: communityId,
+        events: events,
       });
       notifySuccess('Updated webhook config!');
     } catch {
@@ -173,9 +174,11 @@ const Webhooks = () => {
               canDelete: !isDeletingWebhook,
               canConfigure: webhook.canConfigure ? !isEditingWebhook : false,
               customElementAfterLink:
-                webhook.canConfigure && isLinkValid(webhook.value) ? (
+                webhook.canConfigure &&
+                webhook?.metadata?.destination &&
+                getWebhookDestination(webhook.metadata?.url) !== 'unknown' ? (
                   <CWTag
-                    label={getLinkType(webhook.value)}
+                    label={webhook.metadata.destination}
                     type="group"
                     classNames="link-type"
                   />
@@ -188,7 +191,7 @@ const Webhooks = () => {
             onLinkRemovedAtIndex={handleLinkRemoval}
             addLinkButtonCTA="+ Add Webhook"
             onLinkConfiguredAtIndex={(index) =>
-              setWebhookToConfigure(webhooks[index].metadata as Webhook)
+              setWebhookToConfigure(webhooks[index].metadata)
             }
             canConfigureLinks
           />
@@ -222,8 +225,7 @@ const Webhooks = () => {
           <WebhookSettingsModal
             onModalClose={() => setWebhookToConfigure(null)}
             updateWebhook={handleUpdateWebhook}
-            // @ts-expect-error <StrictNullChecks/>
-            webhook={webhookToConfigure}
+            webhook={webhookToConfigure!}
           />
         }
         onClose={() => setWebhookToConfigure(null)}

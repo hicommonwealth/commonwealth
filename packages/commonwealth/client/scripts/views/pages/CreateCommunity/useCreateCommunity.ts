@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
@@ -11,6 +12,9 @@ const useCreateCommunity = () => {
     // @ts-expect-error StrictNullChecks
     { type: null, chainBase: null },
   );
+
+  const weightedVotingEnabled = useFlag('farcasterContest');
+
   // @ts-expect-error StrictNullChecks
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
   const [selectedChainId, setSelectedChainId] = useState(null);
@@ -26,7 +30,7 @@ const useCreateCommunity = () => {
     );
   };
 
-  const handleCompleteBasicInformationStep = (
+  const handleCompleteCommunityInformationStep = (
     communityId: string,
     communityName: string,
   ) => {
@@ -36,7 +40,7 @@ const useCreateCommunity = () => {
   };
 
   const isValidStepToShowCommunityStakeFormStep = [
-    CreateCommunityStep.BasicInformation,
+    CreateCommunityStep.CommunityInformation,
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
 
@@ -46,7 +50,9 @@ const useCreateCommunity = () => {
   ).includes(parseInt(selectedChainId));
 
   const showCommunityStakeStep =
-    isValidStepToShowCommunityStakeFormStep && isSupportedChainSelected;
+    !weightedVotingEnabled &&
+    isValidStepToShowCommunityStakeFormStep &&
+    isSupportedChainSelected;
 
   return {
     createCommunityStep,
@@ -57,7 +63,7 @@ const useCreateCommunity = () => {
     setSelectedChainId,
     createdCommunityId,
     createdCommunityName,
-    handleCompleteBasicInformationStep,
+    handleCompleteCommunityInformationStep,
     onChangeStep,
     showCommunityStakeStep,
     selectedChainId,

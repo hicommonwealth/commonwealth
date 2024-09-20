@@ -100,7 +100,6 @@ export async function cosmosHandler(
           community.ChainNode as ChainNodeInstance,
         );
       }
-
       return res.send(response.data);
     } catch (err) {
       log.error('Failed to query internal Cosmos chain node', err, {

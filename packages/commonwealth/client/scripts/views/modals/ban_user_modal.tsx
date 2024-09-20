@@ -38,7 +38,7 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
       handleModalClose(event);
       await banUser({
         address,
-        communityId: app.activeChainId(),
+        communityId: app.activeChainId() || '',
       });
       notifySuccess('Banned Address');
     } catch (err) {

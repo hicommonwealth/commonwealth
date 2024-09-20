@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import process from 'process';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,22 +17,22 @@ export const ApiEndpoints = {
   FETCH_COMMUNITY_STAKES: '/communityStakes',
   FETCH_COMMENTS: '/viewComments',
   FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
-  FETCH_ACTIVE_COMMUNITIES: '/communities',
   FETCH_THREADS: '/threads',
   FETCH_PROFILES_BY_ADDRESS: '/getAddressProfile',
   FETCH_PROFILES_BY_ID: '/profile/v2',
   FETCH_NODES: '/nodes',
+  FETCH_DOMAIN: '/domain',
   DISCORD_CHANNELS: '/getDiscordChannels',
   SET_DISCORD_CONFIG: '/setDiscordBotConfig',
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',
   REFRESH_MEMBERSHIP: '/refresh-membership',
-  FETCH_WEBHOOKS: '/getWebhooks',
   FETCH_TAGS: '/tags',
   UPDATE_USER_EMAIL: '/updateEmail',
   UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
   UPDATE_USER_ACTIVE_COMMUNTY: '/selectCommunity',
+  fetchThreadPolls: (threadId: number) => `/threads/${threadId}/polls`,
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
@@ -59,6 +60,12 @@ export const QueryKeys = {
 export const ExternalEndpoints = {
   coinbase: {
     ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',
+  },
+  snapshotHub: {
+    url: process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org',
+    graphql: process.env.SNAPSHOT_HUB_URL
+      ? process.env.SNAPSHOT_HUB_URL + '/graphql'
+      : 'https://hub.snapshot.org/graphql',
   },
 };
 

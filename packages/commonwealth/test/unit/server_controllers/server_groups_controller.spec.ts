@@ -32,6 +32,7 @@ const createMockedGroupsController = () => {
       id: 1,
       community_id: 'ethereum',
       name: 'hello',
+      description: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [1],
@@ -131,8 +132,7 @@ const createMockedGroupsController = () => {
       transaction: async (callback) => callback(),
     },
   };
-  const banCache: any = {};
-  const controller = new ServerGroupsController(db, banCache);
+  const controller = new ServerGroupsController(db);
   return controller;
 };
 
@@ -168,7 +168,6 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
-      // @ts-expect-error StrictNullChecks
       communityId: chain.id,
     });
     expect(result).to.have.length(1);

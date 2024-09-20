@@ -65,8 +65,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
       },
     },
   };
-  const banCache: any = {};
-  const controller = new ServerTopicsController(db, banCache);
+  const controller = new ServerTopicsController(db);
   // @ts-expect-error StrictNullChecks
   const user = {
     getAddresses: async () => [],
@@ -96,14 +95,6 @@ describe('ServerTopicsController', () => {
     expect(topic.description).to.equal('ddd');
     expect(topic.featured_in_new_post).to.equal(false);
     expect(topic.featured_in_sidebar).to.equal(false);
-  });
-
-  test('#deleteTopic', async () => {
-    const { controller, user } = createMockedTopicsController(true);
-    await controller.deleteTopic({
-      user,
-      topicId: 1,
-    });
   });
 
   test('#getTopics', async () => {

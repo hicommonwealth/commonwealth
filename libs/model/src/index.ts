@@ -8,8 +8,11 @@ export * as Feed from './feed';
 export * as LoadTest from './load-testing';
 export * as Reaction from './reaction';
 export * as Subscription from './subscription';
+export * as SuperAdmin from './super-admin';
 export * as Thread from './thread';
 export * as User from './user';
+export * as Wallet from './wallet';
+export * as Webhook from './webhook';
 
 // Core Services
 export * from './services';

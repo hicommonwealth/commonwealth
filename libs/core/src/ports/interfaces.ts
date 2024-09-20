@@ -12,7 +12,9 @@ import {
   CommentCreatedNotification,
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
+  UpvoteNotification,
   UserMentionedNotification,
+  WebhookNotification,
 } from '../integration/notifications.schemas';
 import { ILogger } from '../logging/interfaces';
 
@@ -139,6 +141,7 @@ export interface Cache extends Disposable {
   ): Promise<boolean>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnalyticsOptions = Record<string, any>;
 
 /**
@@ -200,6 +203,7 @@ export enum BrokerSubscriptions {
   DiscordListener = 'DiscordMessage',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
+  NotificationsSettings = 'NotificationsSettings',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
 }
@@ -232,7 +236,9 @@ export interface Broker extends Disposable {
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       afterHandleEvent: (topic: string, content: any, context: any) => void;
     },
   ): Promise<boolean>;
@@ -242,7 +248,7 @@ export interface Broker extends Disposable {
 
 export type BlobType = string | Uint8Array | Buffer | Readable;
 export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
-export type BlobBucket = typeof BlobBuckets[number];
+export type BlobBucket = (typeof BlobBuckets)[number];
 
 /**
  * External Blob Storage Port
@@ -254,7 +260,9 @@ export interface BlobStorage extends Disposable {
     content: BlobType;
     contentType?: string;
   }): Promise<{ url: string; location: string }>;
+
   exists(options: { key: string; bucket: BlobBucket }): Promise<boolean>;
+
   getSignedUrl(options: {
     key: string;
     bucket: BlobBucket;
@@ -272,8 +280,10 @@ export enum WorkflowKeys {
   UserMentioned = 'user-mentioned',
   CommunityStake = 'community-stake',
   ChainProposals = 'chain-event-proposals',
+  NewUpvotes = 'new-upvote',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
+  Webhooks = 'webhooks',
 }
 
 export enum KnockChannelIds {
@@ -294,29 +304,41 @@ type BaseNotifProviderOptions = {
   actor?: { id: string; email?: string };
 };
 
-export type NotificationsProviderTriggerOptions = BaseNotifProviderOptions &
-  (
-    | {
-        data: z.infer<typeof CommentCreatedNotification>;
-        key: WorkflowKeys.CommentCreation;
-      }
-    | {
-        data: z.infer<typeof SnapshotProposalCreatedNotification>;
-        key: WorkflowKeys.SnapshotProposals;
-      }
-    | {
-        data: z.infer<typeof UserMentionedNotification>;
-        key: WorkflowKeys.UserMentioned;
-      }
-    | {
-        data: z.infer<typeof CommunityStakeNotification>;
-        key: WorkflowKeys.CommunityStake;
-      }
-    | {
-        data: z.infer<typeof ChainProposalsNotification>;
-        key: WorkflowKeys.ChainProposals;
-      }
-  );
+type WebhookProviderOptions = {
+  key: WorkflowKeys.Webhooks;
+  users: { id: string; webhook_url: string; destination: string }[];
+  data: z.infer<typeof WebhookNotification>;
+};
+
+export type NotificationsProviderTriggerOptions =
+  | (BaseNotifProviderOptions &
+      (
+        | {
+            data: z.infer<typeof CommentCreatedNotification>;
+            key: WorkflowKeys.CommentCreation;
+          }
+        | {
+            data: z.infer<typeof SnapshotProposalCreatedNotification>;
+            key: WorkflowKeys.SnapshotProposals;
+          }
+        | {
+            data: z.infer<typeof UserMentionedNotification>;
+            key: WorkflowKeys.UserMentioned;
+          }
+        | {
+            data: z.infer<typeof CommunityStakeNotification>;
+            key: WorkflowKeys.CommunityStake;
+          }
+        | {
+            data: z.infer<typeof ChainProposalsNotification>;
+            key: WorkflowKeys.ChainProposals;
+          }
+        | {
+            data: z.infer<typeof UpvoteNotification>;
+            key: WorkflowKeys.NewUpvotes;
+          }
+      ))
+  | WebhookProviderOptions;
 
 export type NotificationsProviderGetMessagesOptions = {
   user_id: string;
@@ -340,6 +362,7 @@ export type NotificationsProviderGetMessagesReturn = Array<{
     version_id: string;
     key: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   __cursor?: string;
 }>;
@@ -362,11 +385,11 @@ const DaysOfWeek = {
 } as const;
 
 export type NotificationsProviderScheduleRepeats = Array<{
-  frequency: typeof RepeatFrequency[keyof typeof RepeatFrequency];
+  frequency: (typeof RepeatFrequency)[keyof typeof RepeatFrequency];
   interval?: number;
   day_of_month?: number;
   days?:
-    | Array<typeof DaysOfWeek[keyof typeof DaysOfWeek]>
+    | Array<(typeof DaysOfWeek)[keyof typeof DaysOfWeek]>
     | 'weekdays'
     | 'weekends';
   hours?: number;
@@ -386,13 +409,27 @@ export type NotificationsProviderSchedulesReturn = Array<{
   updated_at: string;
 }>;
 
+export type IdentifyUserOptions = {
+  user_id: string;
+  user_properties: {
+    email?: string;
+    avatar?: string;
+    phone_number?: string;
+    locale?: string;
+    timezone?: string;
+    mobile_push_notifications_enabled?: boolean;
+    mobile_push_discussion_activity_enabled?: boolean;
+    mobile_push_admin_alerts_enabled?: boolean;
+  };
+};
+
 /**
  * Notifications Provider Port
  */
 export interface NotificationsProvider extends Disposable {
   triggerWorkflow(
     options: NotificationsProviderTriggerOptions,
-  ): Promise<boolean>;
+  ): Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>;
 
   getMessages(
     options: NotificationsProviderGetMessagesOptions,
@@ -415,6 +452,18 @@ export interface NotificationsProvider extends Disposable {
    * @returns A set containing the ids of the schedules that were successfully deleted
    */
   deleteSchedules(options: { schedule_ids: string[] }): Promise<Set<string>>;
+
+  identifyUser(options: IdentifyUserOptions): Promise<{
+    id: string;
+    name?: string;
+    email?: string;
+    phone_number?: string;
+    avatar?: string;
+    created_at?: string;
+    updated_at?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  }>;
 
   registerClientRegistrationToken(
     userId: number,

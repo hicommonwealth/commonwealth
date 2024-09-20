@@ -30,7 +30,6 @@ export const Subscription = z.object({
 });
 
 export const SubscriptionPreference = z.object({
-  id: PG_INT,
   user_id: PG_INT,
   email_notifications_enabled: z.boolean().default(false),
   digest_email_enabled: z.boolean().default(false),
@@ -71,7 +70,7 @@ export const ThreadSubscription = z.object({
         }),
       }),
     )
-    .optional(),
+    .nullish(),
 });
 
 export const CommentSubscription = z.object({
@@ -96,20 +95,22 @@ export const CommentSubscription = z.object({
           comment_count: true,
           created_at: true,
           url: true,
-        }).merge(
-          z.object({
-            Community: Community.pick({
-              id: true,
-              name: true,
-              icon_url: true,
+        })
+          .merge(
+            z.object({
+              Community: Community.pick({
+                id: true,
+                name: true,
+                icon_url: true,
+              }),
+              Address: Address.pick({
+                id: true,
+                user_id: true,
+                address: true,
+              }),
             }),
-            Address: Address.pick({
-              id: true,
-              user_id: true,
-              address: true,
-            }),
-          }),
-        ),
+          )
+          .nullish(),
       }),
     )
     .optional(),
@@ -119,8 +120,8 @@ export const CommunityAlert = z
   .object({
     user_id: PG_INT,
     community_id: z.string(),
-    created_at: z.coerce.date().optional(),
-    updated_at: z.coerce.date().optional(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional(),
   })
   .merge(
     z.object({

@@ -22,6 +22,7 @@ import {
 } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
+  useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
@@ -77,11 +78,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
-  const [polls, setPolls] = useState<Array<Poll>>([]);
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
-  const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [commentSortType, setCommentSortType] =
@@ -89,7 +88,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isReplying, setIsReplying] = useState(false);
   // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-  const [arePollsFetched, setArePollsFetched] = useState(false);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
@@ -100,9 +98,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
+  const communityId = app.activeChainId() || '';
   const { data: groups = [] } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeTopics: true,
+    enabled: !!communityId,
   });
 
   const {
@@ -110,9 +110,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     error: fetchThreadError,
     isLoading,
   } = useGetThreadsByIdQuery({
-    communityId: app.activeChainId(),
+    communityId,
     ids: [+threadId].filter(Boolean),
-    apiCallEnabled: !!threadId, // only call the api if we have thread id
+    apiCallEnabled: !!threadId && !!communityId, // only call the api if we have thread id
+  });
+
+  const { data: pollsData = [] } = useGetThreadPollsQuery({
+    threadId: +threadId,
+    communityId,
+    apiCallEnabled: !!threadId && !!communityId,
   });
 
   const thread = data?.[0];
@@ -128,25 +134,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
-      communityId: app.activeChainId(),
+      communityId,
       threadId: parseInt(`${threadId}`),
+      apiEnabled: !!communityId,
     });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: parseInt(threadId),
   });
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
+    communityId,
     address: user?.activeAccount?.address || '',
-    apiEnabled: !!user?.activeAccount?.address,
+    apiEnabled: !!user?.activeAccount?.address && !!communityId,
   });
 
   const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
-    communityId: app.activeChainId(),
+    communityId,
     objectId: thread?.id || '',
-    apiCallEnabled: !!thread?.id,
+    apiCallEnabled: !!thread?.id && !!communityId,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -208,13 +215,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     },
   });
 
-  useEffect(() => {
-    if (!initializedPolls && thread?.id) {
-      setInitializedPolls(true);
-      setPolls(app.polls.getByThreadId(thread?.id));
-    }
-  }, [initializedPolls, thread?.id]);
-
   // TODO: unnecessary code - must be in a redirect hook
   useNecessaryEffect(() => {
     if (!thread) {
@@ -231,23 +231,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
   // ------------
-
-  useNecessaryEffect(() => {
-    if (!thread || (thread && arePollsFetched)) {
-      return;
-    }
-
-    app.polls
-      .fetchPolls(app.activeChainId(), thread?.id)
-      .then(() => {
-        setPolls(app.polls.getByThreadId(thread.id));
-        setArePollsFetched(true);
-      })
-      .catch(() => {
-        notifyError('Failed to load polls');
-        setPolls([]);
-      });
-  }, [thread, arePollsFetched]);
 
   useManageDocumentTitle('View thread', thread?.title);
 
@@ -296,7 +279,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   // Todo who should actually be able to view this
   const canCreateSnapshotProposal =
-    app.chain?.meta?.snapshot?.length > 0 && (isAuthor || isAdminOrMod);
+    app.chain?.meta?.snapshot_spaces?.length > 0 && (isAuthor || isAdminOrMod);
 
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
@@ -326,7 +309,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (toAdd.length > 0) {
       try {
         await addThreadLinks({
-          communityId: app.activeChainId(),
+          communityId,
           // @ts-expect-error <StrictNullChecks/>
           threadId: thread.id,
           links: toAdd,
@@ -346,7 +329,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isStageDefault = isDefaultStage(thread.stage);
 
   const tabsShouldBePresent =
-    showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
+    showLinkedProposalOptions ||
+    showLinkedThreadOptions ||
+    pollsData?.length > 0;
 
   const sortedComments = [...comments]
     .filter((c) => !c.parentComment)
@@ -406,7 +391,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     getMetaDescription(thread?.body || '')?.length > 155
       ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
       : getMetaDescription(thread?.body || '');
-  const ogImageUrl = app?.chain?.meta?.iconUrl;
+  const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
@@ -493,7 +478,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showSidebar={
             showLinkedProposalOptions ||
             showLinkedThreadOptions ||
-            polls?.length > 0 ||
+            pollsData?.length > 0 ||
             isAuthor ||
             !!hasWebLinks
           }
@@ -782,8 +767,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     },
                   ]
                 : []),
-              ...(polls?.length > 0 ||
-              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+              ...(pollsData?.length > 0 ||
+              (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
                 ? [
                     {
                       label: 'Polls',
@@ -791,31 +776,27 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <div className="cards-column">
                           {[
                             ...new Map(
-                              polls?.map((poll) => [poll.id, poll]),
+                              pollsData?.map((poll) => [poll.id, poll]),
                             ).values(),
                           ].map((poll: Poll) => {
                             return (
                               <ThreadPollCard
                                 poll={poll}
                                 key={poll.id}
-                                onVote={() => setInitializedPolls(false)}
                                 isTopicMembershipRestricted={
                                   isRestrictedMembership
                                 }
                                 showDeleteButton={isAuthor || isAdmin}
-                                onDelete={() => {
-                                  setInitializedPolls(false);
-                                }}
                               />
                             );
                           })}
                           {isAuthor &&
-                            (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                            (!app.chain?.meta?.admin_only_polling ||
+                              isAdmin) && (
                               <ThreadPollEditorCard
                                 // @ts-expect-error <StrictNullChecks/>
                                 thread={thread}
-                                threadAlreadyHasPolling={!polls?.length}
-                                onPollCreate={() => setInitializedPolls(false)}
+                                threadAlreadyHasPolling={!pollsData?.length}
                               />
                             )}
                         </div>

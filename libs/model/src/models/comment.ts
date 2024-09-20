@@ -1,5 +1,6 @@
-import { EventNames, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -8,7 +9,6 @@ import type {
   ReactionAttributes,
   ThreadInstance,
 } from '.';
-import { emitEvent } from '../utils';
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
@@ -38,15 +38,10 @@ export default (
       created_by: { type: Sequelize.STRING, allowNull: true },
       text: { type: Sequelize.TEXT, allowNull: false },
       plaintext: { type: Sequelize.TEXT, allowNull: true },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
-        allowNull: false,
-      },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
 
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
@@ -66,16 +61,15 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
-      version_history_updated: {
-        type: Sequelize.BOOLEAN,
+      search: {
+        type: Sequelize.TSVECTOR,
         allowNull: false,
-        defaultValue: false,
       },
     },
     {
       hooks: {
         afterCreate: async (comment, options) => {
-          const [, threads] = await (
+          await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
           ).update(
             {
@@ -84,22 +78,8 @@ export default (
             },
             {
               where: { id: comment.thread_id },
-              returning: true,
               transaction: options.transaction,
             },
-          );
-          await emitEvent(
-            sequelize.models.Outbox,
-            [
-              {
-                event_name: EventNames.CommentCreated,
-                event_payload: {
-                  ...comment.toJSON(),
-                  community_id: threads.at(0)!.community_id,
-                },
-              },
-            ],
-            options.transaction,
           );
           stats().increment('cw.hook.comment-count', {
             thread_id: String(comment.thread_id),
@@ -139,3 +119,7 @@ export default (
       ],
     },
   );
+
+export function getCommentSearchVector(body: string) {
+  return Sequelize.fn('to_tsvector', 'english', getDecodedString(body));
+}

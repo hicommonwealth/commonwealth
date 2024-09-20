@@ -140,7 +140,7 @@ export async function getThreadContestManagers(
             WHERE ct.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
-            AND cm.ended = false
+            AND (cm.ended IS NULL OR cm.ended = false)
           `,
     {
       type: QueryTypes.SELECT,
@@ -151,4 +151,18 @@ export async function getThreadContestManagers(
     },
   );
   return contestManagers;
+}
+
+export function removeUndefined(
+  obj: Record<string, string | number | undefined>,
+) {
+  const result: Record<string, string | number | undefined> = {};
+
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] !== undefined) {
+      result[key as string] = obj[key];
+    }
+  });
+
+  return result;
 }

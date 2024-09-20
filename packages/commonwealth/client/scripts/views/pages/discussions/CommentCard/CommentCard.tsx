@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 
 import {
@@ -14,9 +14,7 @@ import {
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -101,8 +99,6 @@ export const CommentCard = ({
   shareURL,
 }: CommentCardProps) => {
   const user = useUserStore();
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
-
   const userOwnsComment = comment.profile.userId === user.id;
 
   const [commentText, setCommentText] = useState(comment.text);
@@ -120,25 +116,21 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  const { data: config } = useFetchConfigurationQuery();
-
-  const doVerify = useCallback(async () => {
+  useEffect(() => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
         comment.canvasSignedData,
       );
-      await verify(canvasSignedData);
-      setVerifiedCanvasSignedData(canvasSignedData);
-    } catch (err) {
-      // ignore invalid signed comments
+      if (!canvasSignedData) return;
+      verify(canvasSignedData)
+        .then(() => {
+          setVerifiedCanvasSignedData(canvasSignedData);
+        })
+        .catch(() => null);
+    } catch (error) {
+      // ignore errors or missing data
     }
   }, [comment.canvasSignedData]);
-
-  useEffect(() => {
-    if (!config?.enforceSessionKeys) return;
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    doVerify();
-  }, [config?.enforceSessionKeys, doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
@@ -154,7 +146,12 @@ export const CommentCard = ({
             // @ts-expect-error <StrictNullChecks/>
             authorAddress={app.chain ? author?.address : comment?.author}
             // @ts-expect-error <StrictNullChecks/>
-            authorCommunityId={author?.community?.id || author?.profile?.chain}
+            authorCommunityId={
+              author?.community?.id ||
+              author?.profile?.chain ||
+              comment?.communityId ||
+              comment?.authorChain
+            }
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
@@ -259,7 +256,7 @@ export const CommentCard = ({
                 />
               )}
 
-              {enableKnockInAppNotifications && user.id > 0 && (
+              {user.id > 0 && (
                 <ToggleCommentSubscribe
                   comment={comment}
                   userOwnsComment={userOwnsComment}

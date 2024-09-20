@@ -1,8 +1,15 @@
+import {
+  CanvasSignedData,
+  deserializeCanvas,
+  verify,
+} from '@hicommonwealth/shared';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import Thread from 'models/Thread';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
@@ -10,7 +17,6 @@ import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
-import { ToggleThreadSubscribeOld } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribeOld';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
@@ -61,11 +67,28 @@ export const ThreadOptions = ({
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   const handleDownloadMarkdown = () => {
     downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
   };
+
+  const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
+    useState<CanvasSignedData | null>(null);
+  useEffect(() => {
+    try {
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        thread.canvasSignedData,
+      );
+      if (!canvasSignedData) return;
+      verify(canvasSignedData)
+        .then(() => {
+          setVerifiedCanvasSignedData(canvasSignedData);
+        })
+        .catch(() => null);
+    } catch (error) {
+      // ignore errors or missing data
+    }
+  }, [thread.canvasSignedData]);
 
   return (
     <>
@@ -118,21 +141,31 @@ export const ThreadOptions = ({
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
           {userStore.id > 0 && (
-            <>
-              {enableKnockInAppNotifications && (
-                <ToggleThreadSubscribe
-                  thread={thread}
-                  isCommunityMember={isCommunityMember}
-                />
-              )}
+            <ToggleThreadSubscribe
+              thread={thread}
+              isCommunityMember={isCommunityMember}
+            />
+          )}
 
-              {!enableKnockInAppNotifications && (
-                <ToggleThreadSubscribeOld
-                  thread={thread}
-                  isCommunityMember={isCommunityMember}
-                />
-              )}
-            </>
+          {verifiedCanvasSignedData && (
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="verification-icon"
+            >
+              <CWTooltip
+                placement="top"
+                content="Signed by author"
+                renderTrigger={(handleInteraction) => (
+                  <span
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  >
+                    <CWIcon iconName="check" iconSize="xs" />
+                  </span>
+                )}
+              ></CWTooltip>
+            </CWText>
           )}
 
           {thread && (

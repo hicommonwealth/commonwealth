@@ -52,8 +52,12 @@ export default (
         defaultValue: false,
       },
       wallet_id: { type: Sequelize.STRING, allowNull: true },
-      wallet_sso_source: { type: Sequelize.STRING, allowNull: true },
       block_info: { type: Sequelize.STRING, allowNull: true },
+      is_banned: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       hex: {
         type: Sequelize.STRING(64),
         allowNull: true,

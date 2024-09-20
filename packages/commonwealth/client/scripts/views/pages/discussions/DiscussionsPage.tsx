@@ -1,12 +1,11 @@
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -18,15 +17,19 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { slugify } from '@hicommonwealth/shared';
+import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
@@ -40,15 +43,16 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const communityId = app.activeChainId();
+  const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
-  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
+
+  const weightedVotingEnabled = useFlag('farcasterContest');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -58,8 +62,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+    includeNodeInfo: true,
+  });
+
+  const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
+    apiEnabled: !!communityId,
   });
   const contestAddress = searchParams.get('contest');
   const contestStatus = searchParams.get('status');
@@ -77,8 +88,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
+
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const { contestsData } = useCommunityContests();
 
@@ -88,11 +101,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isOnArchivePage =
     location.pathname ===
-    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
+    (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
-      communityId: app.activeChainId(),
+      communityId: communityId,
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -105,11 +118,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       toDate: dateCursor.toDate,
       // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
-      isOnArchivePage: isOnArchivePage,
+      includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
       // @ts-expect-error <StrictNullChecks/>
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
+      apiEnabled: !!communityId,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -127,7 +141,30 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
+  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
+  const topicNameFromURL = splitAndDecodeURL(location.pathname);
+
+  //checks for malformed url in topics and redirects if the topic does not exist
+  useEffect(() => {
+    if (
+      !isLoadingTopics &&
+      topicNameFromURL &&
+      topicNameFromURL !== 'archived'
+    ) {
+      const validTopics = topics?.some(
+        (topic) => topic?.name === topicNameFromURL,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics, topicNameFromURL, isLoadingTopics]);
+
   useManageDocumentTitle('Discussions');
+
+  // TODO in upcoming PR add check if topic is weighted with ERC20 method
+  const isTopicWeighted = weightedVotingEnabled && topicId;
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
@@ -225,6 +262,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               <Breadcrumbs />
               <UserTrainingSlider />
               <AdminOnboardingSlider />
+              {isTopicWeighted && (
+                <TokenBanner
+                  name="Token"
+                  ticker="TKN"
+                  popover={{ title: 'Token', body: 'TKN' }}
+                  voteWeight={5}
+                />
+              )}
 
               <HeaderWithFilters
                 // @ts-expect-error <StrictNullChecks/>
@@ -236,8 +281,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                    ? totalThreadsInCommunity
-                    : 0
+                      ? community?.lifetime_thread_count || 0
+                      : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}

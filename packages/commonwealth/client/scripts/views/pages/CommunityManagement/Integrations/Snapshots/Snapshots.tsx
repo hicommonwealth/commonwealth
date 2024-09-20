@@ -13,11 +13,13 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './Snapshots.scss';
 import { snapshotValidationSchema } from './validation';
 
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 const Snapshots = () => {
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   useRunOnceOnCondition({
@@ -68,10 +70,12 @@ const Snapshots = () => {
         ),
       ];
 
-      await updateCommunity({
-        communityId: community?.id,
-        snapshot: newSnapshots,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          snapshot: newSnapshots,
+        }),
+      );
 
       setLinks(
         newSnapshots.map((snapshot) => ({

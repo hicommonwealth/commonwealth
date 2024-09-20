@@ -2,6 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -14,16 +15,19 @@ export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
   const userData = useUserStore();
+  const { data: domain } = useFetchCustomDomainQuery();
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
+  const communityId = app.activeChainId() || '';
   const { data: linkedThreads } = useGetThreadsByIdQuery({
-    communityId: app.activeChainId(),
+    communityId,
     // @ts-expect-error StrictNullChecks
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
       // Only call when in discussion pages prevents unnecessary calls.
-      location.pathname.split('/')[1].toLowerCase() === 'discussion',
+      location.pathname.split('/')[1].toLowerCase() === 'discussion' &&
+      !!communityId,
   });
 
   const currentDiscussion = {
@@ -58,7 +62,7 @@ export const Breadcrumbs = () => {
   const pathnames = generateBreadcrumbs(
     location.pathname,
     navigate,
-    app.isCustomDomain() ? app.activeChainId() : '',
+    domain?.isCustomDomain ? communityId : '',
     currentDiscussion,
     user?.userId,
   );

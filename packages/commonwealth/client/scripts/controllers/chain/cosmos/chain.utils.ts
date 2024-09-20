@@ -7,7 +7,11 @@ import {
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { LCD } from '../../../../../shared/chain/types/cosmos';
 import { CosmosApiType } from './chain';
-import { createAltGovAminoConverters } from './gov/aminomessages';
+import {
+  createAltGovAminoConverters,
+  createGovgenGovAminoConverters,
+} from './gov/aminomessages';
+import { setupGovgenExtension } from './gov/govgen/queries-v1beta1';
 
 export const getTMClient = async (
   rpcUrl: string,
@@ -24,6 +28,7 @@ export const getRPCClient = async (
     tmClient,
     cosm.setupGovExtension,
     cosm.setupStakingExtension,
+    setupGovgenExtension,
     cosm.setupBankExtension,
   );
   return client;
@@ -44,6 +49,7 @@ export const getSigningClient = async (
   const aminoTypes = new AminoTypes({
     ...createDefaultAminoConverters(),
     ...createAltGovAminoConverters(),
+    ...createGovgenGovAminoConverters(),
   });
 
   return await SigningStargateClient.connectWithSigner(url, signer, {

@@ -34,10 +34,11 @@ export const LinkedThreadsCard = ({
     [thread.links],
   );
 
+  const communityId = app.activeChainId() || '';
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
-    communityId: app.activeChainId(),
+    communityId,
     ids: linkedThreadIds.map(Number),
-    apiCallEnabled: linkedThreadIds.length > 0, // only call the api if we have thread id
+    apiCallEnabled: linkedThreadIds.length > 0 && !!communityId, // only call the api if we have thread id
   });
 
   return (

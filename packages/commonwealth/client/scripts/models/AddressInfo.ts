@@ -1,7 +1,8 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import moment from 'moment';
-import app from 'state';
-import Account from './Account';
+import { userStore } from '../state/ui/user';
+import Account, { AccountCommunity } from './Account';
+import MinimumProfile from './MinimumProfile';
 
 class AddressInfo extends Account {
   public readonly userId: number;
@@ -10,32 +11,47 @@ class AddressInfo extends Account {
     userId,
     id,
     address,
-    communityId,
+    community,
     walletId,
-    walletSsoSource,
     ghostAddress,
     lastActive,
   }: {
     userId: number;
     id: number;
     address: string;
-    communityId: string;
+    community: AccountCommunity;
     walletId?: WalletId;
     walletSsoSource?: WalletSsoSource;
     ghostAddress?: boolean;
     lastActive?: string | moment.Moment;
   }) {
-    // TODO: cleanup this with #2617
-    const chain = app.config.chains.getAll().find((c) => c.id === communityId);
-    if (!chain) throw new Error(`Failed to locate chain: ${communityId}`);
+    const authUser = userStore.getState();
+    const ignoreProfile = userId === authUser.id ? true : false;
     super({
       address,
-      community: chain,
+      community,
       addressId: id,
       walletId,
-      walletSsoSource,
       ghostAddress,
-      ignoreProfile: false,
+      profile: (() => {
+        if (!ignoreProfile) return undefined;
+
+        // if this is auth user, use already fetched address/profile data
+        const foundAddress = authUser.addresses.find(
+          (a) => a.address === address && a.community.id === community.id,
+        );
+        const profile = new MinimumProfile(address, community.id);
+        profile.initialize(
+          userId,
+          '', // user name - not needed for auth user
+          address,
+          '', // user avatar url - not needed for auth user
+          community.id,
+          foundAddress?.lastActive?.toDate?.() || null,
+        );
+        return profile;
+      })(),
+      ignoreProfile,
       lastActive,
     });
     this.userId = userId;

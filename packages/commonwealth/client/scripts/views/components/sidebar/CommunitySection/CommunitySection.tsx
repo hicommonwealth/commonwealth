@@ -2,6 +2,8 @@ import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import React from 'react';
 import app from 'state';
+import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
   VoteWeightModule,
@@ -50,8 +52,14 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { isContestAvailable, isContestDataLoading, contestsData } =
     useCommunityContests();
 
+  const { data: domain } = useFetchCustomDomainQuery();
+
   const topicIdsIncludedInContest =
     getUniqueTopicIdsIncludedInActiveContest(contestsData);
+
+  const communityAlerts = useCommunityAlertsQuery({
+    enabled: user.isLoggedIn && !!app.chain,
+  }).data;
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
@@ -108,10 +116,10 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         <div className="buttons-container">
           {user.isLoggedIn && app.chain && (
             <div className="subscription-button">
-              <SubscriptionButton />
+              <SubscriptionButton communityAlerts={communityAlerts} />
             </div>
           )}
-          {app.isCustomDomain() && (
+          {domain?.isCustomDomain && (
             <div
               className="powered-by"
               onClick={() => {

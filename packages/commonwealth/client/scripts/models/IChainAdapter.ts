@@ -1,13 +1,13 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import type { ChainBase } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
+import { z } from 'zod';
 import { setDarkMode } from '../helpers/darkMode';
-import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
-import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -49,22 +49,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    // TODO: cleanup EXCEPTION_CASE_threadCountersStore in 8812
-    EXCEPTION_CASE_threadCountersStore.setState({
-      totalThreadsInCommunity: this.meta.numTotalThreads,
-      totalThreadsInCommunityForVoting: this.meta.numVotingThreads,
-    });
-
     this._serverLoaded = true;
     return true;
   }
 
   public deinitServer() {
     this._serverLoaded = false;
-    EXCEPTION_CASE_threadCountersStore.setState({
-      totalThreadsInCommunity: 0,
-      totalThreadsInCommunityForVoting: 0,
-    });
     console.log(`${this.meta.name} stopped`);
   }
 
@@ -83,7 +73,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async deinit(): Promise<void> {
     this._apiInitialized = false;
     this.app.isModuleReady = false;
-    if (this.app.snapshot) this.app.snapshot.deinit();
     this._loaded = false;
     console.log(`Stopping ${this.meta.id}...`);
 
@@ -99,12 +88,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
 
-  public readonly meta: ChainInfo;
+  public readonly meta: z.infer<typeof ExtendedCommunity>;
   public readonly block: IBlockInfo;
 
   public app: IApp;
 
-  constructor(meta: ChainInfo, app: IApp) {
+  constructor(meta: z.infer<typeof ExtendedCommunity>, app: IApp) {
     this.meta = meta;
     this.app = app;
     this.block = {

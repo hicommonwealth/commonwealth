@@ -5,7 +5,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { safeTruncateBody } from '@hicommonwealth/shared';
+import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
 import { getCommentUrl, getThreadUrl } from '../util';
 
@@ -43,7 +43,7 @@ export const processUserMentioned: EventHandler<
     return false;
   }
 
-  return await provider.triggerWorkflow({
+  const res = await provider.triggerWorkflow({
     key: WorkflowKeys.UserMentioned,
     users: [{ id: String(payload.mentionedUserId) }],
     data: {
@@ -55,22 +55,23 @@ export const processUserMentioned: EventHandler<
       author: user.profile.name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
-          ? // @ts-expect-error StrictNullChecks
-            safeTruncateBody(decodeURIComponent(payload.thread.body), 255)
-          : // @ts-expect-error StrictNullChecks
-            safeTruncateBody(decodeURIComponent(payload.comment.text), 255),
+          ? safeTruncateBody(getDecodedString(payload.thread!.body || ''), 255)
+          : safeTruncateBody(getDecodedString(payload.comment!.text), 255),
       object_url:
         'thread' in payload
-          ? // @ts-expect-error StrictNullChecks
-            getThreadUrl(payload.thread.community_id, payload.thread.id)
+          ? getThreadUrl(
+              payload.communityId,
+              payload.thread!.id!,
+              community.custom_domain,
+            )
           : getCommentUrl(
-              // @ts-expect-error StrictNullChecks
-              payload.comment.community_id,
-              // @ts-expect-error StrictNullChecks
-              payload.comment.thread_id,
-              // @ts-expect-error StrictNullChecks
-              payload.comment.id,
+              payload.communityId,
+              payload.comment!.thread_id,
+              payload.comment!.id!,
+              community.custom_domain,
             ),
     },
   });
+
+  return !res.some((r) => r.status === 'rejected');
 };

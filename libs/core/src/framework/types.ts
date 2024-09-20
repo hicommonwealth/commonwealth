@@ -1,10 +1,4 @@
-import z, {
-  ZodNumber,
-  ZodObject,
-  ZodSchema,
-  ZodString,
-  ZodUndefined,
-} from 'zod';
+import z, { ZodSchema, ZodUndefined } from 'zod';
 import { Events, events } from '../integration/events';
 
 /**
@@ -22,22 +16,24 @@ export const ExternalServiceUserIds = {
 export type AuthStrategies =
   | {
       name: 'jwt' | 'authtoken';
-      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+      userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
     }
   | {
       name: 'custom';
-      userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+      userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       customStrategyFn: (req: any) => void;
     };
 
 /**
  * Deep partial utility
  */
-export type DeepPartial<T> = T extends Array<infer I>
-  ? Array<DeepPartial<I>>
-  : T extends object
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : T;
+export type DeepPartial<T> =
+  T extends Array<infer I>
+    ? Array<DeepPartial<I>>
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T;
 
 /**
  * Represents a user in the system with attributes commonly provided by authentication infrastructure
@@ -54,14 +50,14 @@ export type User = {
  * - Authorization is typically granted based on group membership, role association, or ownership of the targeted entity.
  * - Unique identification is established through the `user.id`
  * - Extends users with additional (optional) attributes that may include:
- *   - `address_id` for the active web wallet address
+ *   - `address` for the active web wallet address
  *
  * Authorization for actors is facilitated through {@link CommandHandler} or {@link QueryHandler} middleware within the context of the invoked command or query.
  * - When executing a command, the `aggregate` may need loading before completing the authorization process.
  */
 export type Actor = {
   readonly user: Readonly<User>;
-  readonly address_id?: string;
+  readonly address?: string;
 };
 
 /**
@@ -81,7 +77,10 @@ export class InvalidInput extends Error {
  * Invalid actor error - usually unauthorized users
  */
 export class InvalidActor extends Error {
-  constructor(public actor: Actor, message: string) {
+  constructor(
+    public actor: Actor,
+    message: string,
+  ) {
     super(message);
     this.name = INVALID_ACTOR_ERROR;
   }
@@ -102,35 +101,15 @@ export class InvalidState extends Error {
 }
 
 /**
- * Command input schemas must include the aggregate id (by definition)
- * - We are currently violating this rule with some creation commands by
- * relying on the DB/ORM layer for the generation of new ids.
- * - Future refactoring to support other DB technologies (for scalability) might solve this
- */
-export type CommandInput = ZodObject<{
-  id: ZodString | ZodNumber;
-}>;
-
-/**
- * Command execution context
+ * Command/Query execution context
  * - `actor`: user actor
  * - `payload`: validated command payload
+ * - `auth`: authorization context
  */
-export type CommandContext<Input extends CommandInput> = {
+export type Context<Input extends ZodSchema, AuthContext> = {
   readonly actor: Actor;
   readonly payload: z.infer<Input>;
-};
-
-/**
- * Query execution context
- * - `actor`: user actor
- * - `payload`: validated query payload (filters)
- *
- * TODO: we can use this context to inject extra authorization filters before executing the query
- */
-export type QueryContext<Input extends ZodSchema> = {
-  readonly actor: Actor;
-  readonly payload: z.infer<Input>;
+  readonly auth?: AuthContext;
 };
 
 /**
@@ -140,33 +119,22 @@ export type QueryContext<Input extends ZodSchema> = {
  */
 export type EventContext<Name extends Events> = {
   readonly name: Name;
-  readonly payload: z.infer<typeof events[Name]>;
+  readonly payload: z.infer<(typeof events)[Name]>;
 };
 
 /**
- * Command handler - can be chained to authorize command actors
+ * Command/Query handler
  * @param context command execution context
- * @param state aggregate state, loaded and modified by domain rules (side effects)
- * @returns may return updated state when preloading aggreggate to verify authority
+ * @returns mutated state
  * @throws {@link InvalidActor} when unauthorized
  */
-export type CommandHandler<
-  Input extends CommandInput,
+export type Handler<
+  Input extends ZodSchema,
   Output extends ZodSchema,
+  AuthContext,
 > = (
-  context: CommandContext<Input>,
-  state?: Partial<z.infer<Output>>,
-) => Promise<Partial<z.infer<Output>> | void>;
-
-/**
- * Query handler - can be chained to authorize query actors
- * @param context query execution context
- * @returns query results
- * @throws {@link InvalidActor} when unauthorized
- */
-export type QueryHandler<Input extends ZodSchema, Output extends ZodSchema> = (
-  context: QueryContext<Input>,
-) => Promise<z.infer<Output> | undefined>;
+  context: Context<Input, AuthContext>,
+) => Promise<z.infer<Output> | undefined | void>;
 
 /**
  * Event handler
@@ -179,37 +147,22 @@ export type EventHandler<
 > = (context: EventContext<Name>) => Promise<Partial<z.infer<Output>> | void>;
 
 /**
- * Declarative metadata to "enforce" the conventional requirements of a command as a chain of responsibility.
+ * Declarative metadata to "enforce" the conventional requirements of a command or query as a chain of responsibility.
  * Decouples infrastructure concerns from core domain logic, allowing a simpler development and testing pattern.
  * - `schema`: zod schema of the command payload
  * - `auth`: authorization chain, may preload the aggregate when necessary
  * - `body`: function implementing core domain logic, and returning side effects (mutations)
  * - `secure`: true when user requires authentication
  */
-export type CommandMetadata<
-  Input extends CommandInput,
+export type Metadata<
+  Input extends ZodSchema,
   Output extends ZodSchema,
+  AuthContext,
 > = {
   readonly input: Input;
   readonly output: Output;
-  readonly auth: CommandHandler<Input, Output>[];
-  readonly body: CommandHandler<Input, Output>;
-  readonly secure?: boolean;
-  readonly authStrategy?: AuthStrategies;
-};
-
-/**
- * Declarative metadata to enforce the conventional requirements of a query as a chain of responsibility.
- * - `schema`: zod schema of the query payload (filters)
- * - `auth`: authorization chain, may inject more filters to the payload
- * - `body`: function implementing the query logic
- * - `secure`: true when user requires authentication
- */
-export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
-  readonly input: Input;
-  readonly output: Output;
-  readonly auth: QueryHandler<Input, Output>[];
-  readonly body: QueryHandler<Input, Output>;
+  readonly auth: Handler<Input, Output, AuthContext>[];
+  readonly body: Handler<Input, Output, AuthContext>;
   readonly secure?: boolean;
   readonly authStrategy?: AuthStrategies;
 };
@@ -218,7 +171,7 @@ export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
  * Domain event schemas
  */
 export type EventSchemas = {
-  [Name in Events]?: typeof events[Name];
+  [Name in Events]?: (typeof events)[Name];
 };
 
 /**
@@ -239,15 +192,7 @@ export type EventsHandlerMetadata<
 };
 
 // =========== PUBLIC ARTIFACT FACTORY INTERFACE ===========
-export type CommandSchemas<
-  Input extends CommandInput,
-  Output extends ZodSchema,
-> = {
-  input: Input;
-  output: Output;
-};
-
-export type QuerySchemas<Input extends ZodSchema, Output extends ZodSchema> = {
+export type Schemas<Input extends ZodSchema, Output extends ZodSchema> = {
   input: Input;
   output: Output;
 };
@@ -255,22 +200,18 @@ export type QuerySchemas<Input extends ZodSchema, Output extends ZodSchema> = {
 /**
  * Command metadata
  */
-export type Command<Schema> = Schema extends CommandSchemas<
-  infer Input,
-  infer Output
->
-  ? CommandMetadata<Input, Output>
-  : never;
+export type Command<Schema, AuthContext = unknown> =
+  Schema extends Schemas<infer Input, infer Output>
+    ? Metadata<Input, Output, AuthContext>
+    : never;
 
 /**
  * Query metadata
  */
-export type Query<Schema> = Schema extends QuerySchemas<
-  infer Input,
-  infer Output
->
-  ? QueryMetadata<Input, Output>
-  : never;
+export type Query<Schema, AuthContext = unknown> =
+  Schema extends Schemas<infer Input, infer Output>
+    ? Metadata<Input, Output, AuthContext>
+    : never;
 
 /**
  * Policy metadata

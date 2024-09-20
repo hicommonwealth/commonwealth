@@ -6,6 +6,7 @@ import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
+import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import app from 'state';
 import {
@@ -63,7 +64,11 @@ export const VotingResults = (props: VotingResultsProps) => {
 
       // TODO: move this marshalling into controller
       const formatCurrency = (n: BN) => {
-        const decimals = new BN(10).pow(new BN(app.chain.meta?.decimals || 6));
+        const decimals = new BN(10).pow(
+          new BN(
+            getChainDecimals(app.chain.id || '', app.chain.meta.base) || 6,
+          ),
+        );
         const denom = app.chain.meta?.default_symbol;
         const coin = new Coin(denom, n, false, decimals);
         return coin.format();

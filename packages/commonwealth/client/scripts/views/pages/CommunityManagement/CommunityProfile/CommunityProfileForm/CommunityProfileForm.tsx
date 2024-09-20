@@ -1,4 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
@@ -57,10 +58,11 @@ const CommunityProfileForm = () => {
     }[]
   >([]);
 
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isCommunityLoading } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
@@ -102,21 +104,24 @@ const CommunityProfileForm = () => {
     callback: () => {
       setIsCustomStagesEnabled(community?.stages_enabled);
 
-      const linksFromCommunity = (community?.social_links || []).map(
-        (link) => ({
-          value: link,
+      const linksFromCommunity = (community?.social_links || [])
+        .filter((x) => x)
+        .map((link) => ({
+          value: link || '',
           canUpdate: true,
           canDelete: true,
           error: '',
-        }),
-      );
+        }));
       setLinks(linksFromCommunity);
       setInitialLinks(linksFromCommunity);
 
       preferenceTags?.length > 0 && updatePreferenceTags();
     },
     shouldRun:
-      !isCommunityLoading && !!community && preferenceTags && !isLoadingTags,
+      !isCommunityLoading &&
+      !!community &&
+      preferenceTags?.length > 0 &&
+      !isLoadingTags,
   });
 
   const communityIdForUrl = slugifyPreserveDashes(
@@ -147,18 +152,20 @@ const CommunityProfileForm = () => {
         bannerText: values.communityBanner ?? '',
       });
 
-      await updateCommunity({
-        communityId: community.id,
-        name: values.communityName,
-        description: values.communityDescription,
-        socialLinks: links.map((link) => link.value.trim()),
-        stagesEnabled: values.hasStagesEnabled,
-        customStages: values.customStages
-          ? JSON.parse(values.customStages)
-          : [],
-        iconUrl: values.communityProfileImageURL,
-        defaultOverview: values.defaultPage === DefaultPage.Overview,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community.id,
+          name: values.communityName,
+          description: values.communityDescription,
+          socialLinks: links.map((link) => link.value.trim()),
+          stagesEnabled: values.hasStagesEnabled,
+          customStages: values.customStages
+            ? JSON.parse(values.customStages)
+            : [],
+          iconUrl: values.communityProfileImageURL,
+          defaultOverview: values.defaultPage === DefaultPage.Overview,
+        }),
+      );
 
       setNameFieldDisabledState({
         isDisabled: true,
@@ -278,6 +285,7 @@ const CommunityProfileForm = () => {
             />
 
             <CWTextArea
+              charCount={250}
               hookToForm
               name="communityDescription"
               label="Community Description"

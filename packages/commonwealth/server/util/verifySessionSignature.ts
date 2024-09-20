@@ -3,9 +3,8 @@ import assert from 'assert';
 
 import {
   CANVAS_TOPIC,
-  NotificationCategories,
   addressSwapper,
-  getSessionSignerForAddress,
+  getSessionSignerForDid,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 
@@ -38,7 +37,7 @@ const verifySessionSignature = async (
       })
     : addressModel.address;
 
-  const sessionRawAddress = session.address.split(':')[2];
+  const sessionRawAddress = session.did.split(':')[4];
   const walletAddress = addressModel.Community?.ss58_prefix
     ? addressSwapper({
         address: sessionRawAddress,
@@ -47,10 +46,10 @@ const verifySessionSignature = async (
     : sessionRawAddress;
   assert(
     walletAddress === expectedAddress,
-    `session.address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
+    `session.did address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
   );
 
-  const signer = getSessionSignerForAddress(session.address);
+  const signer = getSessionSignerForDid(session.did);
   if (!signer) {
     throw new Error('missing signer');
   }
@@ -92,16 +91,6 @@ const verifySessionSignature = async (
           return userEntity;
         });
         if (!user || !user.id) throw new Error('Failed to create user');
-        await models.Subscription.create({
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewMention,
-          is_active: true,
-        });
-        await models.Subscription.create({
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewCollaboration,
-          is_active: true,
-        });
         addressModel.user_id = user!.id;
       }
     }

@@ -1,17 +1,30 @@
-import { BalanceType } from '@hicommonwealth/shared';
-import app from 'state';
+import { BalanceType, ChainBase } from '@hicommonwealth/shared';
+import { fetchCachedNodes } from 'state/api/nodes';
 
 export const getCosmosChains = (isEvm?: boolean): string[] => {
+  const nodes = fetchCachedNodes();
+
   return (
-    app?.config?.chains
-      ?.getAll()
+    nodes
       ?.filter(
-        (chain) =>
-          chain.ChainNode?.balanceType === BalanceType.Cosmos &&
-          (isEvm
-            ? chain.ChainNode.slip44 === 60
-            : chain.ChainNode.slip44 !== 60),
+        (node) =>
+          node.balanceType === BalanceType.Cosmos &&
+          (isEvm ? node.slip44 === 60 : node.slip44 !== 60) &&
+          node.cosmosChainId,
       )
-      ?.map((chain) => chain.id) ?? []
+      ?.map((node) => node.cosmosChainId || '') ?? []
   );
+};
+
+export const getChainDecimals = (
+  chainId: string,
+  chainBase: ChainBase,
+): number => {
+  let decimals = chainBase === ChainBase.CosmosSDK ? 6 : 18;
+
+  if (getCosmosChains(true)?.some((c) => c === chainId)) {
+    decimals = 18;
+  }
+
+  return decimals;
 };

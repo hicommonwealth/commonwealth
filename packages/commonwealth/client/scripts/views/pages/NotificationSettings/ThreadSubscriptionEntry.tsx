@@ -1,13 +1,11 @@
 import { ThreadSubscription } from '@hicommonwealth/schemas';
-import { getThreadUrl } from '@hicommonwealth/shared';
+import { getDecodedString, getThreadUrl } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
-import { useCommonNavigate } from 'navigation/helpers';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
-import { getCommunityUrl } from 'utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -30,7 +28,7 @@ export const ThreadSubscriptionEntry = (
     {
       chain: thread.community_id,
       id: thread.id!,
-      title: decodeURIComponent(thread.title),
+      title: getDecodedString(thread.title),
     },
     undefined,
     true,
@@ -60,6 +58,16 @@ export const ThreadSubscriptionEntry = (
       .catch(console.error);
   }, [deleteThreadSubscription, onUnsubscribe, thread_id]);
 
+  const handleNavigateToCommunity = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    navigateToCommunity({
+      navigate,
+      path: '/',
+      chain: thread.Community.id!,
+    });
+  };
+
   return (
     <div className="SubscriptionEntry">
       <div className="SubscriptionHeader">
@@ -73,9 +81,9 @@ export const ThreadSubscriptionEntry = (
           />
         </div>
         <div>
-          <Link to={getCommunityUrl(thread.Community.name)}>
+          <a onClick={handleNavigateToCommunity}>
             <CWText fontWeight="semiBold">{thread.Community.name}</CWText>
-          </Link>
+          </a>
         </div>
 
         <div>•</div>
@@ -93,7 +101,7 @@ export const ThreadSubscriptionEntry = (
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
+          <CWText type="h4">{getDecodedString(thread.title)}</CWText>
         </CWText>
       </div>
 

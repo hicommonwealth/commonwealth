@@ -32,10 +32,11 @@ const DirectoryPage = () => {
 
   const { data: nodes } = useFetchNodesQuery();
 
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
       includeNodeInfo: true,
     });
   const directoryPageEnabled = community?.directory_page_enabled;

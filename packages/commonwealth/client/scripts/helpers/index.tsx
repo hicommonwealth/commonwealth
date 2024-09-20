@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
 import app from 'state';
+import { getChainDecimals } from '../controllers/app/webWallets/utils';
 import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
@@ -32,7 +33,7 @@ export function isDefaultStage(stage: string, customStages?: string[]) {
   return (
     stage === ThreadStage.Discussion ||
     stage ===
-      parseCustomStages(customStages || app?.chain?.meta?.customStages)[0]
+      parseCustomStages(customStages || app?.chain?.meta?.custom_stages)[0]
   );
 }
 
@@ -56,10 +57,6 @@ export function extractDomain(url) {
 /*
  * comparators
  */
-export function byDescendingCreationDate(a, b) {
-  return +b.createdAt - +a.createdAt;
-}
-
 export function byAscendingCreationDate(a, b) {
   return +a.createdAt - +b.createdAt;
 }
@@ -332,7 +329,7 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
     // Custom for evmos
     decimals = 18;
   } else if (chain && chain.meta) {
-    decimals = chain.meta.decimals;
+    decimals = getChainDecimals(chain.id || '', chain.base);
   } else if (chain.network === ChainNetwork.ERC721) {
     decimals = 0;
   } else if (chain.network === ChainNetwork.ERC1155) {

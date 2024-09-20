@@ -27,15 +27,16 @@ export const ThreadSelector = ({
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
+  const communityId = app.activeChainId() || '';
   const sharedQueryOptions = {
-    communityId: app.activeChainId(),
+    communityId,
     searchTerm: debouncedSearchTerm,
     limit: 5,
     orderBy: APIOrderBy.Rank,
     orderDirection: APIOrderDirection.Desc,
     threadTitleOnly: true,
   };
-  const queryEnabled = debouncedSearchTerm?.trim().length > 0;
+  const queryEnabled = debouncedSearchTerm?.trim().length > 0 && !!communityId;
 
   const { data: threadsData, isLoading } = useSearchThreadsQuery({
     ...sharedQueryOptions,
@@ -54,7 +55,10 @@ export const ThreadSelector = ({
             userId: t.address_user_id,
             id: t.address_id,
             address: t.address,
-            communityId: t.address_community_id,
+            community: {
+              id: t.address_community_id,
+              // we don't get other community properties from api + they aren't needed here
+            },
           }),
         } as ConstructorParameters<typeof Thread>[0]),
     );
