@@ -5,7 +5,6 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import { NearAccount } from 'controllers/chain/near/account';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import DiscordController from 'controllers/server/discord';
 import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
@@ -40,10 +39,6 @@ export interface IApp {
   runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
-
-  // Discord
-  discord: DiscordController;
-
   sidebarRedraw: EventEmitter;
 }
 
@@ -63,10 +58,6 @@ const app: IApp = {
   // need many max listeners because every account will wait on this
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
-
-  // Discord
-  discord: new DiscordController(),
-
   // Global nav state
   sidebarRedraw: new EventEmitter(),
 };
