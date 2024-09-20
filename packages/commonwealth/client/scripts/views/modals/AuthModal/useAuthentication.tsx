@@ -99,7 +99,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}`,
+            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           );
         })

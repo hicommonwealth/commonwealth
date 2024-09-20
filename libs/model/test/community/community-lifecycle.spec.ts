@@ -119,14 +119,12 @@ describe('Community lifecycle', () => {
         type: ChainType.Offchain,
         name,
         default_symbol: name.substring(0, 8).replace(' ', ''),
-        network: 'network',
         base: ChainBase.Ethereum,
-        eth_chain_id: ethNode.eth_chain_id!,
         social_links: [],
         user_address: adminActor.address!,
-        node_url: ethNode.url,
         directory_page_enabled: false,
         tags: [],
+        chain_node_id: ethNode.id!,
       },
     });
 
