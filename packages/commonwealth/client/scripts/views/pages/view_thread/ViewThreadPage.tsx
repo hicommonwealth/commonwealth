@@ -1,4 +1,4 @@
-import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
+import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -6,8 +6,6 @@ import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
@@ -214,23 +212,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       isPWA: isAddedToHomeScreen,
     },
   });
-
-  // TODO: unnecessary code - must be in a redirect hook
-  useNecessaryEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
-      const url = getProposalUrlPath(
-        thread.slug,
-        `${threadId}-${slugify(thread?.title)}${window.location.search}`,
-        true,
-      );
-      navigate(url, { replace: true });
-    }
-  }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
-  // ------------
 
   useManageDocumentTitle('View thread', thread?.title);
 
