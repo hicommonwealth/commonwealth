@@ -40,7 +40,7 @@ export async function __deleteCommunity(
   }
 
   try {
-    await this.models.sequelize.transaction(async (t) => {
+    await this.models.sequelize.transaction(async (transaction) => {
       await this.models.User.update(
         {
           selected_community_id: null,
@@ -49,7 +49,7 @@ export async function __deleteCommunity(
           where: {
             selected_community_id: community.id,
           },
-          transaction: t,
+          transaction,
         },
       );
 
@@ -58,7 +58,7 @@ export async function __deleteCommunity(
         where: {
           community_id: community.id!,
         },
-        transaction: t,
+        transaction,
       });
       const addressIdModels: ModelStatic<
         ModelInstance<{ address_id: number }>
@@ -74,7 +74,7 @@ export async function __deleteCommunity(
             address_id: addressesToDelete.map((c) => c.id!),
           },
           force: true,
-          transaction: t,
+          transaction,
         });
       }
 
@@ -84,7 +84,7 @@ export async function __deleteCommunity(
           where: {
             community_id: community.id,
           },
-          transaction: t,
+          transaction,
           paranoid: false,
         })
       ).map((t) => t.id!);
@@ -95,7 +95,7 @@ export async function __deleteCommunity(
             thread_id: threadsToDelete,
           },
           paranoid: false,
-          transaction: t,
+          transaction,
         })
       ).map((c) => c.id!);
 
@@ -111,7 +111,7 @@ export async function __deleteCommunity(
             comment_id: commentsToDelete,
           },
           force: true,
-          transaction: t,
+          transaction,
         });
       }
 
@@ -120,7 +120,7 @@ export async function __deleteCommunity(
           id: commentsToDelete,
         },
         force: true,
-        transaction: t,
+        transaction,
       });
 
       const threadIdModels: ModelStatic<
@@ -132,7 +132,7 @@ export async function __deleteCommunity(
             thread_id: threadsToDelete,
           },
           force: true,
-          transaction: t,
+          transaction,
         });
       }
 
@@ -155,13 +155,13 @@ export async function __deleteCommunity(
         await model.destroy({
           where: { community_id: community.id },
           force: true,
-          transaction: t,
+          transaction,
         });
       }
 
       await this.models.Community.destroy({
         where: { id: community.id },
-        transaction: t,
+        transaction,
       });
     });
   } catch (e) {
