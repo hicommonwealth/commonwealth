@@ -341,7 +341,7 @@ describe('Community lifecycle', () => {
     test('should throw if actor is not admin', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor: superAdminActor,
+          actor: memberActor,
           payload: {
             ...baseRequest,
             id: community.id,

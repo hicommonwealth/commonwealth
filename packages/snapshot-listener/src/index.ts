@@ -22,7 +22,9 @@ import {
 let isServiceHealthy = false;
 
 const log = logger(import.meta);
-stats(HotShotsStats());
+stats({
+  adapter: HotShotsStats(),
+});
 
 startHealthCheckLoop({
   service: ServiceKey.SnapshotListener,
