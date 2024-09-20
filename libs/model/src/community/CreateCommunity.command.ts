@@ -338,7 +338,10 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           {
             community_id: id,
             name: 'General',
+            description: 'General discussions',
             featured_in_sidebar: true,
+            featured_in_new_post: false,
+            group_ids: [],
           },
           { transaction },
         );

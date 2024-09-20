@@ -47,6 +47,7 @@ export const EditTopicModal = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
+    // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
@@ -60,14 +61,13 @@ export const EditTopicModal = ({
       id,
       description: description,
       name: name,
-      community_id: app.activeChainId() || '',
+      community_id: app.activeChainId(),
+      // @ts-expect-error <StrictNullChecks/>
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: false,
       default_offchain_template: '',
       total_threads: topic.totalThreads || 0,
-      group_ids: topic.groupIds || [],
-      active_contest_managers: topic.activeContestManagers || [],
     };
 
     try {
@@ -104,9 +104,8 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
           onClick: async () => {
             await deleteTopic({
-              topicId: id!,
-              topicName: name,
-              communityId: app.activeChainId() || '',
+              community_id: app.activeChainId() || '',
+              topic_id: id,
             });
             if (noRedirect) {
               onModalClose();

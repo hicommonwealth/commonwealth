@@ -1,0 +1,64 @@
+# Overview
+
+Markdown Editor based on MDXEditor customized for our usage.
+
+It supports desktop and mobile mode.
+
+In desktop mode the UI is responsive and uses a static layout so it can
+operate within the flow of a regular document.
+
+In mobile mode it docks the toolbar above the keyboard.
+
+# Fork
+
+This is currently using the commonwealth-mdxeditor, which is a fork of the
+mdx-editor package.
+
+This is just temporary as I plan on merging this into the main MDXEditor when
+we are done.
+
+Right now the only change is a 'location' property added to the toolbar code
+so that we can place the toolbar below the editor.
+
+# Testing
+
+## Desktop
+
+- success: copy a .md file to the clipboard, try to paste it into the editor. It
+  should insert the content at the editor's cursor
+
+    - this works via a File object (not text) so it's important to test this path.
+
+- success: drag a .md file on top of the editor.  The drag indicator should show
+  up and cover the editor while you're dragging.  Then the file should be inserted
+  at the cursor.
+
+- success: use the 'Import markdown' button to upload a file.
+
+- success: right click and copy an image in the browser, this should upload it
+to the editor and insert it at the current point (I use msnbc.com for this as
+their images are copyable and not CSS background images)
+
+- success: take a screenshot, try to paste it into the editor. The upload
+  indicator should show up.
+
+- success: use the image button at the top to manually upload an image. The
+  upload indicator should show up while this is happening.
+
+- success: drop an image file.  Should upload it for us and not handle it as
+  markdown.
+
+- failure: copy multiple .md files ot the clipboard, try to paste into the editor.
+  It should fail because we can't handle multiple .md files
+
+## Mobile
+
+It's probably best to test this on a REAL mobile browser (not on a desktop).
+
+- The toolbar should be present at the bottom of the UI.
+
+- They keyboard should stay on top of the keyboard.
+
+## Viewer
+
+- make sure images, tables, and code don't have UI control elements
