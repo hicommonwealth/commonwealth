@@ -23,13 +23,24 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 import 'express-async-errors';
 
 // bootstrap adapters
-stats(HotShotsStats());
-blobStorage(S3BlobStorage());
+stats({
+  adapter: HotShotsStats(),
+});
+blobStorage({
+  adapter: S3BlobStorage(),
+});
 (config.ANALYTICS.MIXPANEL_DEV_TOKEN || config.ANALYTICS.MIXPANEL_PROD_TOKEN) &&
-  analytics(MixpanelAnalytics());
+  analytics({
+    adapter: MixpanelAnalytics(),
+  });
 config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED &&
-  notificationsProvider(KnockProvider());
-config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
+  notificationsProvider({
+    adapter: KnockProvider(),
+  });
+config.CACHE.REDIS_URL &&
+  cache({
+    adapter: new RedisCache(config.CACHE.REDIS_URL),
+  });
 
 const log = logger(import.meta);
 
