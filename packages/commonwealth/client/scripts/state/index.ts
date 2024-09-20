@@ -43,8 +43,6 @@ export interface IApp {
 
   // Discord
   discord: DiscordController;
-
-  sidebarRedraw: EventEmitter;
 }
 
 // INITIALIZE MAIN APP
@@ -66,9 +64,6 @@ const app: IApp = {
 
   // Discord
   discord: new DiscordController(),
-
-  // Global nav state
-  sidebarRedraw: new EventEmitter(),
 };
 //allows for FS.identify to be used
 declare const window: any;
