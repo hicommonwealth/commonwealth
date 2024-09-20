@@ -13,6 +13,7 @@ const Stake = () => {
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
   const canEnableStake = chainIdsWithStakeEnabled.includes(
+    // @ts-expect-error StrictNullChecks
     app?.chain?.meta?.ChainNode?.eth_chain_id,
   );
 

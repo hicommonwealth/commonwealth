@@ -37,6 +37,7 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
   };
 
   const canEnableStake = chainIdsWithStakeEnabled.includes(
+    // @ts-expect-error StrictNullChecks
     app?.chain?.meta?.ChainNode?.eth_chain_id,
   );
 

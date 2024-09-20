@@ -17,7 +17,7 @@ const useCreateCommunity = () => {
 
   // @ts-expect-error StrictNullChecks
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
-  const [selectedChainId, setSelectedChainId] = useState(null);
+  const [selectedChainId, setSelectedChainId] = useState<string | null>(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
   const [createdCommunityName, setCreatedCommunityName] = useState('');
 
@@ -45,7 +45,7 @@ const useCreateCommunity = () => {
   ].includes(createCommunityStep);
 
   const isSupportedChainSelected = chainIdsWithStakeEnabled.includes(
-    parseInt(selectedChainId),
+    parseInt(selectedChainId || ''),
   );
 
   const showCommunityStakeStep =
