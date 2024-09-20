@@ -155,12 +155,15 @@ describe('Digest email lifecycle', () => {
     delete threadOne?.Address;
     delete threadOne?.collaborators;
     delete threadOne?.reactions;
+    delete threadOne?.ThreadVersionHistories;
     delete threadTwo?.Address;
     delete threadTwo?.collaborators;
     delete threadTwo?.reactions;
+    delete threadTwo?.ThreadVersionHistories;
     delete threadFour?.Address;
     delete threadFour?.collaborators;
     delete threadFour?.reactions;
+    delete threadFour?.ThreadVersionHistories;
 
     expect(res![communityOne!.id!]![0]!).to.deep.equal({
       name: communityOne!.name,

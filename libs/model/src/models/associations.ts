@@ -84,7 +84,7 @@ export const buildAssociations = (db: DB) => {
     asMany: 'threads',
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
-  }).withMany(db.ContestTopic);
+  }).withMany(db.ContestTopic, { asMany: 'contest_topics' });
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {

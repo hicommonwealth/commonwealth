@@ -1,8 +1,9 @@
 import { defaultSvgIcons, IconKey } from 'commonwealth-mdxeditor';
 import React from 'react';
+import { IconSize } from 'views/components/component_kit/cw_icons/types';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 
-const DEFAULT_ICON_SIZE = 'regular';
+export const DEFAULT_ICON_SIZE: IconSize = 'medium';
 
 export const iconComponentFor = (name: IconKey) => {
   // to add new custom icons, just jump to the IconKey symbol name, then

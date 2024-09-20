@@ -280,12 +280,93 @@ async function decodeComments(lastId: number = 0) {
   }
 }
 
+async function decodeProfileBios(lastId: number = 0) {
+  let lastProfileId = lastId;
+  while (true) {
+    const transaction = await models.sequelize.transaction();
+    try {
+      const profiles = await models.sequelize.query<{
+        id: number;
+        profile_bio: string;
+      }>(
+        `
+            SELECT id, profile -> 'bio' as profile_bio
+            FROM "Users"
+            WHERE profile -> 'bio' != 'null'
+              AND profile -> 'bio' != '""'
+              AND id > :lastId
+            ORDER BY id
+            LIMIT :batch_size FOR UPDATE;
+        `,
+        {
+          transaction,
+          type: QueryTypes.SELECT,
+          replacements: {
+            lastId: lastProfileId,
+            batch_size: BATCH_SIZE,
+          },
+        },
+      );
+
+      if (profiles.length === 0) {
+        await transaction.rollback();
+        break;
+      }
+
+      console.log(profiles);
+
+      lastProfileId = profiles.at(-1)!.id!;
+
+      let queryCases = '';
+      const replacements: (number | string)[] = [];
+      const profileIds: number[] = [];
+      for (const { id, profile_bio } of profiles) {
+        const decodedBody = decodeContent(profile_bio);
+        if (profile_bio === decodedBody) continue;
+        queryCases += `WHEN id = ? THEN JSONB_SET(profile, '{bio}', ?, false) `;
+        replacements.push(
+          id!,
+          decodedBody === '' ? 'null' : JSON.stringify(decodedBody),
+        );
+        profileIds.push(id!);
+      }
+
+      if (replacements.length > 0) {
+        await models.sequelize.query(
+          `
+              UPDATE "Users"
+              SET profile = CASE
+                  ${queryCases}
+                  END
+              WHERE id IN (?);
+          `,
+          {
+            replacements: [...replacements, profileIds],
+            type: QueryTypes.BULKUPDATE,
+            transaction,
+          },
+        );
+      }
+      await transaction.commit();
+      log.info(
+        'Successfully decoded comments' +
+          ` ${profiles[0].id} to ${profiles.at(-1)!.id}`,
+      );
+    } catch (e) {
+      log.error('Failed to update', e);
+      await transaction.rollback();
+      break;
+    }
+  }
+}
+
 async function main() {
   const acceptedArgs = [
     'threads',
     'thread-versions',
     'comments',
     'comment-versions',
+    'profiles',
   ];
   if (!acceptedArgs.includes(process.argv[2])) {
     log.error(`Must provide one of: ${JSON.stringify(acceptedArgs)}`);
@@ -312,6 +393,10 @@ async function main() {
     case 'comment-versions':
       await decodeCommentVersionHistory(lastId);
       log.info('Comment version history decoding finished');
+      break;
+    case 'profiles':
+      await decodeProfileBios(lastId);
+      log.info('Profile decoding finished');
       break;
     default:
       log.error('Invalid argument!');
