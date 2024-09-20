@@ -1,11 +1,14 @@
 /* eslint-disable no-unused-expressions */
 import { dispose } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
+import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Express } from 'express';
 import jwt from 'jsonwebtoken';
-import { CommunityArgs } from 'test/util/modelUtils';
 import { afterAll, beforeAll, describe, test } from 'vitest';
+import { z } from 'zod';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
@@ -62,20 +65,31 @@ describe('Update Community/Chain Tests', () => {
     });
     expect(siteAdminSetSuccessfully).to.be.true;
 
+    const node = await models.ChainNode.findOne({
+      where: {
+        eth_chain_id: 1,
+      },
+    });
+
     // create community for test
-    const communityArgs: CommunityArgs = {
-      jwt: jwtToken,
-      isAuthenticatedForum: 'false',
-      privacyEnabled: 'false',
+    const communityArgs: z.infer<(typeof schemas.CreateCommunity)['input']> = {
       id: 'tester',
       name: 'tester community',
-      creator_address: loggedInAddr,
-      creator_chain: chain,
+      chain_node_id: node!.id!,
+      user_address: loggedInAddr!,
       description: 'Tester community community',
-      default_chain: chain,
+      type: ChainType.Offchain,
+      base: ChainBase.Ethereum,
+      default_symbol: 'test',
+      directory_page_enabled: false,
+      tags: [],
+      social_links: [],
     };
 
-    const created = await server.seeder.createCommunity(communityArgs);
+    const created = await server.seeder.createCommunity(
+      communityArgs,
+      jwtToken,
+    );
     expect(created.name).to.be.equal(communityArgs.name);
   });
 

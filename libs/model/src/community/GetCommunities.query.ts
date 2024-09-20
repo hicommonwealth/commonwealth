@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { buildChainNodeUrl } from '../utils/utils';
 
 export function GetCommunities(): Query<typeof schemas.GetCommunities> {
   return {
@@ -294,6 +295,15 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         type: QueryTypes.SELECT,
         nest: true,
       });
+
+      if (include_node_info) {
+        for (const community of communities) {
+          community.ChainNode!.url = buildChainNodeUrl(
+            community.ChainNode!.url!,
+            'public',
+          );
+        }
+      }
 
       return schemas.buildPaginatedResponse(
         communities,
