@@ -59,3 +59,6 @@ It's probably best to test this on a REAL mobile browser (not on a desktop).
 
 - They keyboard should stay on top of the keyboard.
 
+## Viewer
+
+- make sure images, tables, and code don't have UI control elements

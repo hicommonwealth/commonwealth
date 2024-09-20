@@ -1,6 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import { useCallback } from 'react';
-import { ImageHandler, ImageURL } from './Editor';
+import { ImageHandler, ImageURL } from './MarkdownEditor';
 import { useImageUploadHandlerLocal } from './useImageUploadHandlerLocal';
 import { useImageUploadHandlerS3 } from './useImageUploadHandlerS3';
 import { useImageUploadHandlerWithFailure } from './useImageUploadHandlerWithFailure';

@@ -1,5 +1,6 @@
 import { config } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import z from 'zod';
 
 export const REGEX_IMAGE =
@@ -34,9 +35,5 @@ export function getPreviewImageUrl(
 }
 
 export function getRenderedTitle(threadTitle: string): string {
-  try {
-    return decodeURIComponent(threadTitle);
-  } catch (e) {
-    return threadTitle;
-  }
+  return getDecodedString(threadTitle);
 }

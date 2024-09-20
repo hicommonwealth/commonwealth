@@ -4,6 +4,7 @@ import {
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyComment,
+  verifyDeleteThread,
   verifyReaction,
   verifyThread,
 } from '@hicommonwealth/shared';
@@ -37,6 +38,16 @@ export const verifyThreadSignature: AuthHandler<
             })
           : actor.address!,
     });
+  }
+};
+
+export const verifyDeleteThreadSignature: AuthHandler<
+  typeof schemas.DeleteThread.input
+> = async ({ payload }) => {
+  if (hasCanvasSignedDataApiArgs(payload)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
+    const thread_id = canvasSignedData.actionMessage.payload.args.thread_id;
+    await verifyDeleteThread(canvasSignedData, { thread_id });
   }
 };
 
