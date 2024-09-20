@@ -53,9 +53,10 @@ export const updateChainNode = async ({
 };
 
 export const deleteCommunity = async ({ id }: { id: string }) => {
-  await axios.delete(`${SERVER_URL}/communities/${id}`, {
+  await axios.delete(`${SERVER_URL}/internal/DeleteCommunity`, {
     data: {
       jwt: userStore.getState().jwt,
+      community_id: id,
     },
   });
 };

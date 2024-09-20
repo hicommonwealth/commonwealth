@@ -172,3 +172,12 @@ export const DeleteGroup = {
     group_id: PG_INT,
   }),
 };
+
+export const DeleteCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+  }),
+};
