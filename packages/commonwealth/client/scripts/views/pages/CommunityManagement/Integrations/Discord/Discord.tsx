@@ -12,6 +12,7 @@ import {
   useCreateDiscordBotConfigMutation,
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
+  useSetForumChannelConnectionMutation,
 } from 'state/api/discord';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -42,6 +43,9 @@ const Discord = () => {
 
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
+
+  const { mutateAsync: setForumChannelConnection } =
+    useSetForumChannelConnectionMutation();
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -159,7 +163,7 @@ const Discord = () => {
     topicId: string,
   ) => {
     try {
-      await app.discord.setForumChannelConnection(topicId, channelId);
+      await setForumChannelConnection({ topicId, channelId });
       await refetchTopics();
       const topicName = topics.find(
         (topic) => topic.id === Number(topicId),
