@@ -10,7 +10,7 @@ import { contractHelpers } from '../services/commonProtocol';
 
 /**
  * Calculates voting weight of address based on the topic
- * @param community_id community id
+ * @param topic_id topic id
  * @param address user's address
  * @returns voting weight or null if no stake if found
  */
