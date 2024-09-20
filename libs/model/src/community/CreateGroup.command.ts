@@ -18,7 +18,7 @@ export function CreateGroup(): Command<
 > {
   return {
     ...schemas.CreateGroup,
-    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ actor, payload, auth }) => {
       const { community_id } = mustBeAuthorized(actor, auth);
 

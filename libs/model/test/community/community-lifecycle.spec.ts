@@ -113,7 +113,7 @@ describe('Community lifecycle', () => {
   test('should create community', async () => {
     const name = chance.name();
     const result = await command(CreateCommunity(), {
-      actor: superAdminActor,
+      actor: adminActor,
       payload: {
         id: name,
         type: ChainType.Offchain,
@@ -123,14 +123,14 @@ describe('Community lifecycle', () => {
         base: ChainBase.Ethereum,
         eth_chain_id: ethNode.eth_chain_id!,
         social_links: [],
-        user_address: superAdminActor.address!,
+        user_address: adminActor.address!,
         node_url: ethNode.url,
         directory_page_enabled: false,
         tags: [],
       },
     });
     expect(result?.community?.id).toBe(name);
-    expect(result?.admin_address).toBe(superAdminActor.address);
+    expect(result?.admin_address).toBe(adminActor.address);
     // connect results
     community = result!.community! as CommunityAttributes;
   });
@@ -147,7 +147,7 @@ describe('Community lifecycle', () => {
     test('should create group when none exists', async () => {
       const payload = buildCreateGroupPayload(community.id);
       const results = await command(CreateGroup(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload,
       });
       expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
@@ -164,12 +164,12 @@ describe('Community lifecycle', () => {
     test('should fail group creation when group with same id found', async () => {
       const payload = buildCreateGroupPayload(community.id);
       await command(CreateGroup(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload,
       });
       await expect(() =>
         command(CreateGroup(), {
-          actor: superAdminActor,
+          actor: adminActor,
           payload,
         }),
       ).rejects.toThrow(InvalidState);
@@ -178,7 +178,7 @@ describe('Community lifecycle', () => {
     test('should fail group creation when sending invalid topics', async () => {
       await expect(
         command(CreateGroup(), {
-          actor: superAdminActor,
+          actor: adminActor,
           payload: buildCreateGroupPayload(community.id, [1, 2, 3]),
         }),
       ).rejects.toThrow(Errors.InvalidTopics);
@@ -186,12 +186,12 @@ describe('Community lifecycle', () => {
 
     test('should delete group', async () => {
       const created = await command(CreateGroup(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload: buildCreateGroupPayload(community.id),
       });
       const group_id = created!.groups!.at(0)!.id!;
       const deleted = await command(DeleteGroup(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload: { community_id: community.id, group_id },
       });
       expect(deleted?.community_id).toBe(community.id);
@@ -200,7 +200,7 @@ describe('Community lifecycle', () => {
 
     test('should throw when trying to delete group that is system managed', async () => {
       const created = await command(CreateGroup(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload: {
           ...buildCreateGroupPayload(community.id),
           is_system_managed: true,
@@ -209,7 +209,7 @@ describe('Community lifecycle', () => {
       const group_id = created!.groups!.at(0)!.id!;
       await expect(() =>
         command(DeleteGroup(), {
-          actor: superAdminActor,
+          actor: adminActor,
           payload: { community_id: community.id, group_id },
         }),
       ).rejects.toThrow(DeleteGroupErrors.SystemManaged);
@@ -219,7 +219,7 @@ describe('Community lifecycle', () => {
       await expect(async () => {
         for (let i = 0; i <= MAX_GROUPS_PER_COMMUNITY; i++) {
           await command(CreateGroup(), {
-            actor: superAdminActor,
+            actor: adminActor,
             payload: buildCreateGroupPayload(community.id),
           });
         }
@@ -240,7 +240,7 @@ describe('Community lifecycle', () => {
       });
 
       const response = await command(DeleteTopic(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload: { community_id: community.id, topic_id: topic!.id! },
       });
       expect(response?.topic_id).to.equal(topic.id);
@@ -278,7 +278,7 @@ describe('Community lifecycle', () => {
 
     test('should update community', async () => {
       const updated = await command(UpdateCommunity(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload: {
           ...baseRequest,
           id: community.id,
@@ -296,7 +296,7 @@ describe('Community lifecycle', () => {
 
     test('should remove directory', async () => {
       const updated = await command(UpdateCommunity(), {
-        actor: superAdminActor,
+        actor: adminActor,
         payload: {
           ...baseRequest,
           id: community.id,
@@ -328,7 +328,7 @@ describe('Community lifecycle', () => {
     test('should throw if namespace present but no transaction hash', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor: superAdminActor,
+          actor: adminActor,
           payload: {
             ...baseRequest,
             id: community.id,
@@ -351,7 +351,7 @@ describe('Community lifecycle', () => {
             chain_node_id: edgewareNode!.id!,
           },
         }),
-      ).rejects.toThrow(UpdateCommunityErrors.NotAdmin);
+      ).rejects.toThrow(InvalidActor);
     });
 
     // TODO: implement when we can add members via commands

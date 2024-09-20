@@ -6,7 +6,7 @@ import { AuthContext, isAuthorized } from '../middleware';
 import { mustBeAuthorized, mustExist } from '../middleware/guards';
 
 export const DeleteGroupErrors = {
-  SystemManaged: 'Cannot update group that is system-managed',
+  SystemManaged: 'Cannot delete group that is system-managed',
 };
 
 export function DeleteGroup(): Command<
@@ -15,7 +15,7 @@ export function DeleteGroup(): Command<
 > {
   return {
     ...schemas.DeleteGroup,
-    auth: [isAuthorized({ author: true })],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ actor, payload, auth }) => {
       const { community_id } = mustBeAuthorized(actor, auth);
       const { group_id } = payload;
@@ -25,7 +25,7 @@ export function DeleteGroup(): Command<
       });
       mustExist('Group', group);
 
-      if (group.is_system_managed)
+      if (group.is_system_managed && !actor.user.isAdmin)
         throw new InvalidInput(DeleteGroupErrors.SystemManaged);
 
       await models.sequelize.transaction(async (transaction) => {
@@ -38,7 +38,7 @@ export function DeleteGroup(): Command<
             ),
           },
           {
-            where: { group_ids: { [Op.contains]: [group_id] } },
+            where: { community_id, group_ids: { [Op.contains]: [group_id] } },
             transaction,
           },
         );
