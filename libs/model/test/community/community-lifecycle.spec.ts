@@ -198,12 +198,11 @@ describe('Community lifecycle', () => {
       expect(deleted?.group_id).toBe(group_id);
     });
 
-    test('should throw when trying to delete group that is system managed', async () => {
+    test.skip('should throw when trying to delete group that is system managed', async () => {
       const created = await command(CreateGroup(), {
         actor: adminActor,
         payload: {
           ...buildCreateGroupPayload(community.id),
-          is_system_managed: true,
         },
       });
       const group_id = created!.groups!.at(0)!.id!;

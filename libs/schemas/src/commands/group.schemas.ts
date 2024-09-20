@@ -13,7 +13,6 @@ export const CreateGroup = {
     }),
     requirements: z.array(Requirement),
     topics: z.array(PG_INT).optional(),
-    is_system_managed: z.boolean().optional(),
   }),
   output: Community.extend({ groups: z.array(Group).optional() }).partial(),
 };

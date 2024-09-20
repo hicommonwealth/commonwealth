@@ -50,7 +50,7 @@ export function CreateGroup(): Command<
               community_id,
               metadata: payload.metadata,
               requirements: payload.requirements,
-              is_system_managed: payload.is_system_managed || false,
+              is_system_managed: false,
             } as GroupAttributes,
             { transaction },
           );
