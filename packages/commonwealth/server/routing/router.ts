@@ -99,7 +99,6 @@ import { updateCommunityIdHandler } from '../routes/communities/update_community
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
-import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
@@ -739,15 +738,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     updateGroupHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'delete',
-    '/groups/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deleteGroupHandler.bind(this, serverControllers),
   );
 
   registerRoute(
