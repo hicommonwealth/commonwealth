@@ -1,0 +1,11 @@
+.ToolbarForDesktop {
+  display: flex;
+  flex-grow: 1;
+  user-select: none;
+
+  .button-container {
+    display: flex;
+    padding: 2px;
+    margin: 0 4px;
+  }
+}

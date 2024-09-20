@@ -1,5 +1,4 @@
 import {
-  BlockTypeSelect,
   BoldItalicUnderlineToggles,
   ChangeCodeMirrorLanguage,
   ConditionalContents,
@@ -12,7 +11,8 @@ import {
   StrikeThroughSupSubToggles,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-
+import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
+import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
 import './ToolbarForDesktop.scss';
 
 export const ToolbarForDesktop = () => {
@@ -27,19 +27,31 @@ export const ToolbarForDesktop = () => {
           {
             fallback: () => (
               <>
-                <div className="mdxeditor-block-type-select">
-                  <BlockTypeSelect />
+                <div className="button-container">
+                  <HeadingButton headingTag="h1" />
+                  <HeadingButton headingTag="h2" />
+                  <HeadingButton headingTag="h3" />
                 </div>
+
+                <Separator />
                 <BoldItalicUnderlineToggles />
                 <Separator />
+
                 <StrikeThroughSupSubToggles />
+
                 <Separator />
+
                 <ListsToggle />
+
                 <Separator />
-                <CreateLink />
-                <InsertImage />
-                <InsertCodeBlock />
-                <InsertTable />
+
+                <div className="button-container">
+                  <CreateLink />
+                  <InsertImage />
+                  <InsertCodeBlock />
+                  <QuoteButton />
+                  <InsertTable />
+                </div>
               </>
             ),
           },
