@@ -326,7 +326,7 @@ describe('Community lifecycle', () => {
     test('should throw if actor is not admin', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor: superAdminActor,
+          actor: memberActor,
           payload: {
             ...baseRequest,
             id: community.id,
@@ -335,7 +335,7 @@ describe('Community lifecycle', () => {
             chain_node_id: edgewareNode!.id!,
           },
         }),
-      ).rejects.toThrow(UpdateCommunityErrors.NotAdmin);
+      ).rejects.toThrow('User is not admin in the community');
     });
 
     // TODO: implement when we can add members via commands
