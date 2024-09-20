@@ -45,15 +45,16 @@ export function CreateTopic(): Command<
         group_ids: [],
       };
 
-      if (payload.weighted_voting === schemas.TopicWeightedVoting.Stake) {
-        const stake = await models.CommunityStake.findOne({
-          where: {
-            community_id: community_id!,
-          },
-        });
-        if (!stake) {
-          throw new InvalidState(Errors.StakeNotAllowed);
-        }
+      const stake = await models.CommunityStake.findOne({
+        where: {
+          community_id: community_id!,
+        },
+      });
+      if (
+        !stake &&
+        payload.weighted_voting === schemas.TopicWeightedVoting.Stake
+      ) {
+        throw new InvalidState(Errors.StakeNotAllowed);
       }
 
       if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
@@ -69,8 +70,10 @@ export function CreateTopic(): Command<
           };
         }
       } else {
-        // old path: stake only
-        options.weighted_voting = schemas.TopicWeightedVoting.Stake;
+        // old path: topic staked if community is staked
+        if (stake) {
+          options.weighted_voting = schemas.TopicWeightedVoting.Stake;
+        }
       }
 
       const [newTopic] = await models.Topic.findOrCreate({

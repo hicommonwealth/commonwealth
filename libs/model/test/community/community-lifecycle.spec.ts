@@ -7,8 +7,11 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
+import { CreateTopic } from 'model/src/community/CreateTopic.command';
+import { UpdateTopic } from 'model/src/community/UpdateTopic.command';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateCommunity,
@@ -24,6 +27,7 @@ import { models } from '../../src/database';
 import type {
   ChainNodeAttributes,
   CommunityAttributes,
+  TopicAttributes,
 } from '../../src/models';
 import { seed } from '../../src/tester';
 
@@ -212,17 +216,106 @@ describe('Community lifecycle', () => {
   });
 
   describe('topics', () => {
-    test('should delete a topic', async () => {
-      // TODO: use CreateTopic
-      const topic = await models.Topic.create({
-        community_id: community.id,
-        name: 'hhh',
-        featured_in_new_post: false,
-        featured_in_sidebar: false,
-        description: '',
-        group_ids: [],
-      });
+    test('should throw when creating a topic as a non-admin', async () => {
+      await expect(() =>
+        command(CreateTopic(), {
+          actor: memberActor,
+          payload: {
+            community_id: community.id,
+            name: 'abc',
+            description: 'abc',
+            featured_in_sidebar: false,
+            featured_in_new_post: false,
+          },
+        }),
+      ).rejects.toThrow('User is not admin in the community');
+    });
 
+    let createdTopic: Partial<TopicAttributes>;
+
+    test('should create topic (non-weighted)', async () => {
+      const result = await command(CreateTopic(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          name: 'abc',
+          description: 'bbb',
+          featured_in_sidebar: false,
+          featured_in_new_post: false,
+        },
+      });
+      expect(result).to.haveOwnProperty('topic');
+      expect(result).to.haveOwnProperty('user_id');
+      const { topic } = result!;
+      expect(topic!.community_id).to.equal(community.id);
+      expect(topic!.name).to.equal('abc');
+      expect(topic!.description).to.equal('bbb');
+      expect(topic!.weighted_voting).toBeFalsy();
+      createdTopic = topic!;
+    });
+
+    test('should create topic (stake weighted)', async () => {
+      // when community is staked, topic will automatically be staked
+      await models.CommunityStake.create({
+        community_id: community.id,
+        stake_id: 1,
+        stake_token: 'ABC',
+        vote_weight: 1,
+        stake_enabled: true,
+      });
+      const result = await command(CreateTopic(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          name: 'haha',
+          description: 'boohoo',
+          featured_in_sidebar: false,
+          featured_in_new_post: false,
+        },
+      });
+      const { topic } = result!;
+      expect(topic!.weighted_voting).to.equal(TopicWeightedVoting.Stake);
+    });
+
+    test('should throw when updating topic as non-admin', async () => {
+      await expect(() =>
+        command(UpdateTopic(), {
+          actor: memberActor,
+          payload: {
+            topic_id: createdTopic.id!,
+            community_id: community.id,
+            name: 'aaa',
+            description: 'bbb',
+          },
+        }),
+      ).rejects.toThrow('User is not admin in the community');
+    });
+
+    test('should update topic', async () => {
+      const { topic: updatedTopic } = (await command(UpdateTopic(), {
+        actor: superAdminActor,
+        payload: {
+          topic_id: createdTopic.id!,
+          community_id: community.id,
+          name: 'newName',
+          description: 'newDesc',
+        },
+      }))!;
+      expect(updatedTopic.name).to.eq('newName');
+      expect(updatedTopic.description).to.eq('newDesc');
+    });
+
+    test('should delete a topic', async () => {
+      const { topic } = (await command(CreateTopic(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          name: 'hhh',
+          featured_in_new_post: false,
+          featured_in_sidebar: false,
+          description: '',
+        },
+      }))!;
       const response = await command(DeleteTopic(), {
         actor: superAdminActor,
         payload: { community_id: community.id, topic_id: topic!.id! },
@@ -231,15 +324,16 @@ describe('Community lifecycle', () => {
     });
 
     test('should throw if not authorized', async () => {
-      // TODO: use CreateTopic
-      const topic = await models.Topic.create({
-        community_id: community.id,
-        name: 'hhh',
-        featured_in_new_post: false,
-        featured_in_sidebar: false,
-        description: '',
-        group_ids: [],
-      });
+      const { topic } = (await command(CreateTopic(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          name: 'hhh',
+          featured_in_new_post: false,
+          featured_in_sidebar: false,
+          description: '',
+        },
+      }))!;
 
       await expect(
         command(DeleteTopic(), {

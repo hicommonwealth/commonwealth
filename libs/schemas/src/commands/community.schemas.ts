@@ -199,7 +199,7 @@ export const UpdateTopic = {
         featured_in_sidebar: true,
         featured_in_new_post: true,
         default_offchain_template: true,
-      }),
+      }).partial(),
     ),
   output: z.object({
     topic: Topic.partial(),
