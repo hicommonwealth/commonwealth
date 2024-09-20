@@ -9,6 +9,7 @@ import {
 } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import {
+  useCreateDiscordBotConfigMutation,
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
 } from 'state/api/discord';
@@ -38,6 +39,9 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community?.discord_config_id ? 'connected' : 'none',
   );
+
+  const { mutateAsync: createDiscordBotConfig } =
+    useCreateDiscordBotConfigMutation();
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -79,7 +83,7 @@ const Discord = () => {
 
     try {
       const verificationToken = uuidv4();
-      await app.discord.createConfig(verificationToken);
+      await createDiscordBotConfig({ verificationToken });
 
       const redirectURL = encodeURI(
         !domain?.isCustomDomain
@@ -106,7 +110,7 @@ const Discord = () => {
       notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
     }
-  }, [connectionStatus, domain?.isCustomDomain]);
+  }, [connectionStatus, createDiscordBotConfig, domain?.isCustomDomain]);
 
   const onDisconnect = useCallback(async () => {
     if (connectionStatus === 'connecting' || connectionStatus === 'none')

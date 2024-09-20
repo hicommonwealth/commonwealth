@@ -1,11 +1,15 @@
 /* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+import type { NavigateOptions, To } from 'react-router-dom';
 import app from 'state';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
+import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
+import { CreateDiscordBotConfigProps } from 'state/api/discord/createDiscordBotConfing';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
@@ -33,7 +37,19 @@ const resetSidebarState = () => {
   }
 };
 
-const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
+const getCreateContentMenuItems = (
+  navigate: (
+    url: To,
+    options?: NavigateOptions & { action?: string },
+    prefix?: null | string,
+  ) => void,
+  createDiscordBotConfig?: UseMutateAsyncFunction<
+    void,
+    unknown,
+    CreateDiscordBotConfigProps,
+    string
+  >,
+): PopoverMenuItem[] => {
   const showSnapshotOptions =
     userStore.getState() && !!app.chain?.meta?.snapshot_spaces?.length;
 
@@ -100,8 +116,8 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           iconLeft: 'discord',
           onClick: async () => {
             try {
-              const verification_token = uuidv4();
-              await app.discord.createConfig(verification_token);
+              const verificationToken = uuidv4();
+              await createDiscordBotConfig?.({ verificationToken });
 
               window.open(
                 `https://discord.com/oauth2/authorize?client_id=${
@@ -115,7 +131,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                 )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
                   JSON.stringify({
                     cw_chain_id: app.activeChainId(),
-                    verification_token,
+                    verificationToken,
                     redirect_domain: isCustomDomain
                       ? window.location.origin
                       : undefined,
@@ -170,6 +186,9 @@ export const CreateContentSidebar = ({
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
 
+  const { mutateAsync: createDiscordBotConfig } =
+    useCreateDiscordBotConfigMutation();
+
   return (
     <CWSidebarMenu
       className={getClasses<{
@@ -194,7 +213,7 @@ export const CreateContentSidebar = ({
           }, 200);
         },
       }}
-      menuItems={getCreateContentMenuItems(navigate)}
+      menuItems={getCreateContentMenuItems(navigate, createDiscordBotConfig)}
     />
   );
 };
