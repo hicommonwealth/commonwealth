@@ -6,7 +6,7 @@ import { AuthContext, isAuthorized } from '../middleware';
 import { mustBeAuthorized, mustExist } from '../middleware/guards';
 import { sanitizeQuillText } from '../utils';
 
-export const Errors = {
+const Errors = {
   DefaultTemplateRequired: 'Default Template required',
 };
 
@@ -16,9 +16,9 @@ export function UpdateTopic(): Command<
 > {
   return {
     ...schemas.UpdateTopic,
-    auth: [isAuthorized({})],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ actor, payload, auth }) => {
-      const { topic_id, community_id } = mustBeAuthorized(actor, auth);
+      const { topic_id } = mustBeAuthorized(actor, auth);
 
       const topic = await models.Topic.findByPk(topic_id!);
       mustExist('Topic', topic);

@@ -9,8 +9,6 @@ import { TopicAttributes } from '../models';
 import { sanitizeQuillText } from '../utils';
 
 const Errors = {
-  NotLoggedIn: 'Not signed in',
-  MustBeAdmin: 'Must be an admin',
   DefaultTemplateRequired: 'Default Template required',
   StakeNotAllowed:
     'Cannot create a staked topic if community has not enabled stake',
@@ -22,7 +20,7 @@ export function CreateTopic(): Command<
 > {
   return {
     ...schemas.CreateTopic,
-    auth: [isAuthorized({})],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ actor, payload, auth }) => {
       const { community_id } = mustBeAuthorized(actor, auth);
       const { name, description, featured_in_sidebar, featured_in_new_post } =
@@ -44,6 +42,7 @@ export function CreateTopic(): Command<
         featured_in_new_post,
         default_offchain_template,
         community_id: community_id!,
+        group_ids: [],
       };
 
       if (payload.weighted_voting === schemas.TopicWeightedVoting.Stake) {
