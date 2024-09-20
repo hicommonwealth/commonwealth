@@ -35,7 +35,7 @@ const getUploadSignature = async (
 
   if (extension === req.body.name) {
     extension = contentType.split('/').pop();
-  } else if (!['gif', 'png', 'jpeg', 'webp'].includes(extension)) {
+  } else if (!['gif', 'png', 'jpeg', 'webp', 'jpg'].includes(extension)) {
     return next(new AppError(Errors.ImageType));
   }
 
