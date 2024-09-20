@@ -46,6 +46,7 @@ export const chainTypes =
   fetchCachedNodes()
     ?.filter(particularChainNodes)
     ?.map((chain) => ({
+      id: chain.id,
       chainBase: chain.ethChainId
         ? 'ethereum'
         : chain.cosmosChainId

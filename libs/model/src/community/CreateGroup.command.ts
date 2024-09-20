@@ -18,7 +18,7 @@ export function CreateGroup(): Command<
 > {
   return {
     ...schemas.CreateGroup,
-    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ actor, payload, auth }) => {
       const { community_id } = mustBeAuthorized(actor, auth);
 
@@ -50,7 +50,7 @@ export function CreateGroup(): Command<
               community_id,
               metadata: payload.metadata,
               requirements: payload.requirements,
-              is_system_managed: payload.is_system_managed || false,
+              is_system_managed: false,
             } as GroupAttributes,
             { transaction },
           );

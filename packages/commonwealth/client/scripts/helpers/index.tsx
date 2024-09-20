@@ -303,25 +303,6 @@ export const handleRedirectClicks = (
   }
 };
 
-// Returns a default chain for a chainbase
-export function baseToNetwork(n: ChainBase): ChainNetwork {
-  switch (n) {
-    case ChainBase.CosmosSDK:
-      return ChainNetwork.Osmosis;
-    case ChainBase.Substrate:
-      return ChainNetwork.Edgeware;
-    case ChainBase.Ethereum:
-      return ChainNetwork.Ethereum;
-    case ChainBase.NEAR:
-      return ChainNetwork.NEAR;
-    case ChainBase.Solana:
-      return ChainNetwork.Solana;
-    default:
-      // @ts-expect-error <StrictNullChecks/>
-      return null;
-  }
-}
-
 // Decimals For Tokens
 export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
   let decimals;
