@@ -108,10 +108,8 @@ import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { createTopicHandler } from '../routes/topics/create_topic_handler';
 import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
-import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
@@ -399,14 +397,6 @@ function setupRouter(
   // topics
   registerRoute(
     router,
-    'post',
-    '/topics' /* OLD: /createTopic */,
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    createTopicHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'patch',
     '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
     passport.authenticate('jwt', { session: false }),
@@ -419,13 +409,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     updateTopicsOrderHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'patch',
-    '/topics/:topicId' /* OLD: /editTopic */,
-    passport.authenticate('jwt', { session: false }),
-    updateTopicHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
