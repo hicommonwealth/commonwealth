@@ -21,7 +21,7 @@ export function UpdateCommunity(): Command<
   return {
     ...schemas.UpdateCommunity,
     auth: [isAuthorized({ roles: ['admin'] })],
-    body: async ({ auth, actor, payload }) => {
+    body: async ({ actor, payload }) => {
       const {
         id,
         snapshot,
