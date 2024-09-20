@@ -129,10 +129,24 @@ describe('Community lifecycle', () => {
         tags: [],
       },
     });
+
     expect(result?.community?.id).toBe(name);
     expect(result?.admin_address).toBe(adminActor.address);
     // connect results
     community = result!.community! as CommunityAttributes;
+
+    // create super admin address
+    await models.Address.create({
+      user_id: superAdminActor.user.id,
+      address: superAdminActor.address!,
+      community_id: community.id,
+      is_user_default: true,
+      role: 'admin',
+      last_active: new Date(),
+      ghost_address: false,
+      is_banned: false,
+      verification_token: '123',
+    });
   });
 
   describe('groups', () => {
@@ -198,7 +212,21 @@ describe('Community lifecycle', () => {
       expect(deleted?.group_id).toBe(group_id);
     });
 
-    test.skip('should throw when trying to delete group that is system managed', async () => {
+    test('should delete group as super admin', async () => {
+      const created = await command(CreateGroup(), {
+        actor: superAdminActor,
+        payload: buildCreateGroupPayload(community.id),
+      });
+      const group_id = created!.groups!.at(0)!.id!;
+      const deleted = await command(DeleteGroup(), {
+        actor: superAdminActor,
+        payload: { community_id: community.id, group_id },
+      });
+      expect(deleted?.community_id).toBe(community.id);
+      expect(deleted?.group_id).toBe(group_id);
+    });
+
+    test('should throw when trying to delete group that is system managed', async () => {
       const created = await command(CreateGroup(), {
         actor: adminActor,
         payload: {
@@ -206,6 +234,10 @@ describe('Community lifecycle', () => {
         },
       });
       const group_id = created!.groups!.at(0)!.id!;
+      await models.Group.update(
+        { is_system_managed: true },
+        { where: { id: group_id } },
+      );
       await expect(() =>
         command(DeleteGroup(), {
           actor: adminActor,
