@@ -155,7 +155,6 @@ export const config = configure(
     }),
     STAKE: z.object({
       REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
-      FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
     }),
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
