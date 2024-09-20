@@ -1,13 +1,11 @@
-import {
-  buildUpdateCommunityInput,
-  DEPRECATED_useUpdateCommunityMutation,
-} from 'client/scripts/state/api/communities/updateCommunity';
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
+import { useUpdateCommunityMutation } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ActionState, defaultActionState } from '../types';
@@ -32,11 +30,10 @@ const useReserveCommunityNamespace = ({
     useState<ActionState>(defaultActionState);
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
-  const { mutateAsync: updateCommunity } =
-    DEPRECATED_useUpdateCommunityMutation({
-      communityId,
-      reInitAppOnSuccess: true,
-    });
+  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
+    communityId,
+    reInitAppOnSuccess: true,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
@@ -59,15 +56,14 @@ const useReserveCommunityNamespace = ({
         chainId,
       );
 
-      await updateCommunity({
-        userAddress,
-        ...buildUpdateCommunityInput({
+      await updateCommunity(
+        buildUpdateCommunityInput({
           communityId,
           namespace,
           symbol,
           transactionHash: txReceipt.transactionHash,
         }),
-      });
+      );
 
       setReserveNamespaceData({
         state: 'completed',

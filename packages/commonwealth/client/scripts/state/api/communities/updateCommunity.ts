@@ -1,9 +1,6 @@
 import { ChainType } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { initAppState } from 'state';
-import { SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 import { invalidateAllQueriesForCommunity } from './getCommuityById';
 
@@ -94,33 +91,6 @@ export const buildUpdateCommunityInput = ({
 type UseUpdateCommunityMutationProps = {
   communityId: string;
   reInitAppOnSuccess?: boolean;
-};
-
-export const DEPRECATED_useUpdateCommunityMutation = ({
-  communityId,
-  reInitAppOnSuccess,
-}: UseUpdateCommunityMutationProps) => {
-  return useMutation({
-    mutationFn: async ({ userAddress, jwt, ...payload }) => {
-      await axios.post(
-        `${SERVER_URL}/internal/UpdateCommunity`,
-        { ...payload },
-        {
-          headers: { authorization: jwt, address: userAddress },
-          baseURL: 'http://localhost:3000/',
-        },
-      );
-    },
-    onSuccess: async () => {
-      // since this is the main chain/community object affecting
-      // some other features, better to re-fetch on update.
-      await invalidateAllQueriesForCommunity(communityId);
-
-      if (reInitAppOnSuccess) {
-        await initAppState(false);
-      }
-    },
-  });
 };
 
 const useUpdateCommunityMutation = ({
