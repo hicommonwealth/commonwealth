@@ -53,7 +53,7 @@ const useReserveCommunityNamespace = ({
       });
 
       // set active account so that updateCommunity works
-      setActiveAccount(
+      await setActiveAccount(
         new Account({
           community: {
             id: communityId,
