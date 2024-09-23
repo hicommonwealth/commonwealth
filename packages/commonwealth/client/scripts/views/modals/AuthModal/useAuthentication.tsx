@@ -48,13 +48,12 @@ import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrac
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../../../state/api/profiles/fetchProfilesByAddress';
-import useAuthModalStore from '../../../state/ui/modals/authModal';
 
 type UseAuthenticationProps = {
   onSuccess?: (
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
-  ) => void;
+  ) => Promise<void>;
   onModalClose: () => void;
   withSessionKeyLoginFlow?: boolean;
 };
@@ -95,8 +94,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
 
-  const { sessionKeyValidationError } = useAuthModalStore();
-
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
@@ -130,15 +127,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   }, []);
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 8)}...${address.slice(-5)}`;
-  };
-
   const handleSuccess = async (
     authAddress?: string | null | undefined,
     isNew?: boolean,
   ) => {
-    props?.onSuccess?.(authAddress, isNew);
+    await props?.onSuccess?.(authAddress, isNew);
   };
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
