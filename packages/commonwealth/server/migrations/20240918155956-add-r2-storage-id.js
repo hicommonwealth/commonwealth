@@ -22,6 +22,24 @@ module.exports = {
         },
         { transaction },
       );
+      await queryInterface.addColumn(
+        'Threads',
+        'content_url',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
+      await queryInterface.addColumn(
+        'Comments',
+        'content_url',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
     });
   },
 
@@ -37,6 +55,12 @@ module.exports = {
         'content_url',
         { transaction },
       );
+      await queryInterface.removeColumn('Threads', 'content_url', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Comments', 'content_url', {
+        transaction,
+      });
     });
   },
 };
