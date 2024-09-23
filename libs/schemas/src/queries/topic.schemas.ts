@@ -11,6 +11,7 @@ export const GetTopics = {
     include_contest_managers: zBoolean.default(false),
   }),
   output: Topic.extend({
+    id: z.number(),
     total_threads: z.number(),
     active_contest_managers: z.array(
       schemas.ContestManager.extend({

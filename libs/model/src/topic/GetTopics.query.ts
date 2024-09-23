@@ -3,14 +3,14 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
-import { TopicAttributes } from '../models/index';
+import { TopicAttributes } from '../models';
 
 const ActiveContestManagers = schemas.ContestManager.extend({
   content: z.array(schemas.ContestAction),
   contest_manager: schemas.ContestManager,
 });
 
-type TopicWithTotalThreads = TopicAttributes & {
+type TopicWithTotalThreads = TopicAttributes & { id: number } & {
   total_threads: number;
   active_contest_managers: Array<z.infer<typeof ActiveContestManagers>>;
 };
