@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { GroupAttributes, models } from '@hicommonwealth/model';
+import { GroupAttributes } from '@hicommonwealth/model';
 import { GroupMetadata } from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
 import z from 'zod';
@@ -47,11 +47,6 @@ export const updateGroupHandler = async (
     params: { id: groupId },
     body: { metadata, requirements, topics, allowList },
   } = validationResult.data;
-
-  // @ts-expect-error StrictNullChecks
-  const { metadata: oldGroupMetadata } = await models.Group.findByPk(groupId, {
-    attributes: ['metadata'],
-  });
 
   const [group, analyticsOptions] = await controllers.groups.updateGroup({
     // @ts-expect-error StrictNullChecks
