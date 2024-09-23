@@ -51,9 +51,19 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
-  createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
-    MixpanelCommunityInteractionEvent.CREATE_GROUP,
-  ]),
+  createGroup: trpc.command(
+    Community.CreateGroup,
+    trpc.Tag.Community,
+    [MixpanelCommunityInteractionEvent.CREATE_GROUP],
+    () => {
+      // TODO: call refresh community memberships
+      // .refreshCommunityMemberships({
+      //     communityId: id,
+      //     groupId: newGroup.id,
+      //   })
+      return Promise.resolve(undefined);
+    },
+  ),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,

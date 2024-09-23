@@ -177,48 +177,6 @@ describe('ServerGroupsController', () => {
     expect(result[0]).to.have.property('requirements');
   });
 
-  test('#createGroup', async () => {
-    const controller = createMockedGroupsController();
-    const { user, chain } = createMockParams();
-    const [result, analytics] = await controller.createGroup({
-      user,
-      community: chain,
-      metadata: {
-        name: 'blah',
-        description: 'blah',
-      },
-      requirements: [],
-      topics: [],
-    });
-    expect(result).to.have.property('id');
-    expect(result).to.have.property('community_id');
-    expect(result).to.have.property('metadata');
-    expect(result).to.have.property('requirements');
-
-    expect(analytics).to.eql({
-      event: 'Create New Group',
-      community: chain.id,
-      userId: user.id,
-    });
-  });
-
-  test('#createGroup (invalid requirements)', () => {
-    const controller = createMockedGroupsController();
-    const { user, chain } = createMockParams();
-    expect(
-      controller.createGroup({
-        user,
-        community: chain,
-        metadata: {
-          name: 'blah',
-          description: 'blah',
-        },
-        requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
-        topics: [],
-      }),
-    ).to.eventually.be.rejectedWith('Invalid requirements');
-  });
-
   test('#updateGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, address } = createMockParams();

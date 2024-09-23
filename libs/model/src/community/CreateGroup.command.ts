@@ -78,14 +78,6 @@ export function CreateGroup(): Command<
         },
       );
 
-      // TODO: create domain service to refresh community memberships
-      // TODO: create integration policy to connect creation events (like groups) to service above
-      // TODO: creation integration test that validates this refresh flow
-      //.refreshCommunityMemberships({
-      //    communityId: id,
-      //    groupId: newGroup.id,
-      //  })
-
       return { id: community_id, groups: [newGroup] };
     },
   };
