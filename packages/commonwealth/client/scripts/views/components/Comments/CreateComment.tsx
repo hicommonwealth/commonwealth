@@ -93,7 +93,7 @@ export const CreateComment = ({
       try {
         const input = await buildCreateCommentInput({
           communityId,
-          profile: user.activeAccount!.profile!.toUserProfile(),
+          address: user.activeAccount!.address,
           threadId: rootThread.id,
           threadMsgId: rootThread.canvasMsgId,
           unescapedText: serializeDelta(contentDelta),
