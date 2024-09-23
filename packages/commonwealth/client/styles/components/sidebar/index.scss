@@ -82,6 +82,10 @@
       animation: slideout 0.2s ease-in-out;
       left: -100%;
     }
+
+    .TokenLaunchButton {
+      padding: 8px 16px;
+    }
   }
 
   @keyframes slidein {

@@ -12,6 +12,7 @@ import {
   MixpanelPageViewEvent,
 } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
+import LaunchTokenCard from '../../components/LaunchTokenCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
@@ -138,7 +139,14 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
               )}
             </>
           </div>
-          <TrendingCommunitiesPreview />
+          {isWindowExtraSmall ? (
+            <TrendingCommunitiesPreview />
+          ) : (
+            <div className="featured-cards">
+              <LaunchTokenCard />
+              <TrendingCommunitiesPreview />
+            </div>
+          )}
         </div>
       </div>
     </CWPageLayout>

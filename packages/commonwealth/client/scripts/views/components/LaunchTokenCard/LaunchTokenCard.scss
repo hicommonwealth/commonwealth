@@ -1,0 +1,14 @@
+@import '../../../../styles/shared';
+
+.LaunchTokenCard {
+  background-image: url('assets/img/tokenLaunchCardBg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 8px;
+  padding: 24px 16px 16px 16px;
+  width: 100%;
+
+  .Text {
+    color: $white;
+  }
+}
