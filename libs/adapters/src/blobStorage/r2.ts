@@ -35,7 +35,7 @@ export const R2BlobStorage = (): BlobStorage => {
       const data = await upload_S3sdk(name, client, s3Buckets, options);
       return {
         location: data.Location,
-        url: `${data.Bucket}.common.xyz/${data.Key}`,
+        url: `https://${data.Bucket}.common.xyz/${data.Key}`,
       };
     },
 

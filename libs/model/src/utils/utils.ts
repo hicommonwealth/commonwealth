@@ -220,11 +220,12 @@ export async function uploadIfLarge(
 }> {
   if (content.length > 500) {
     const { url } = await blobStorage({
-      key: 'blobStorage.R2BlobStorage.Main',
+      key: 'blobStorageFactory.R2BlobStorage.Main',
     }).upload({
       key: `${uuidv4()}.md`,
       bucket: type,
       content: content,
+      contentType: 'text/markdown',
     });
     return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
   } else return { contentUrl: null, truncatedBody: null };

@@ -31,7 +31,7 @@ blobStorage({
   adapter: S3BlobStorage(),
 });
 blobStorage({
-  key: 'blobStorage.R2BlobStorage.Main',
+  key: 'blobStorageFactory.R2BlobStorage.Main',
   adapter: R2BlobStorage(),
   isDefault: false,
 });
