@@ -1,7 +1,8 @@
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
 import 'react-farcaster-embed/dist/styles.css';
+import { useInView } from 'react-intersection-observer';
 
 import { Select } from 'views/components/Select';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -10,15 +11,23 @@ import { PageNotFound } from 'views/pages/404';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
+import { useFetchFarcasterCastsQuery } from 'state/api/contests';
+import { Skeleton } from 'views/components/Skeleton';
+import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCircleRingSpinner';
 import './ContestPage.scss';
+
+export enum SortType {
+  DESC = 'desc',
+  ASC = 'asc',
+}
 
 const sortOptions = [
   {
-    value: 'desc',
+    value: SortType.DESC,
     label: 'Descending',
   },
   {
-    value: 'asc',
+    value: SortType.ASC,
     label: 'Ascending',
   },
 ];
@@ -29,24 +38,29 @@ interface ContestPageProps {
 
 const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
-
   const contest = getContestByAddress(contestAddress);
-  console.log('contest', contest);
 
-  const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
+  const [ref, inView] = useInView();
+
+  const [selectedSort, setSelectedSort] = useState(sortOptions[0].value);
+
+  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    useFetchFarcasterCastsQuery({
+      contestAddress,
+      selectedSort,
+    });
+
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage) {
+      fetchNextPage().catch(console.log);
+    }
+  }, [fetchNextPage, hasNextPage, inView, isFetchingNextPage]);
 
   if (!isContestDataLoading && !contest) {
     return <PageNotFound />;
   }
 
   const { end_time, score } = contest?.contests[0] || {};
-
-  const entries = [
-    'https://warpcast.com/kugusha.eth/0x64be20bf',
-    'https://warpcast.com/antimofm.eth/0xd082a36c',
-    'https://warpcast.com/linda/0xa72c0daa',
-    'https://warpcast.com/jacob/0x8653763f',
-  ];
 
   return (
     <CWPageLayout>
@@ -72,27 +86,47 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
           showShareButton={false}
           showLeaderboardButton={false}
         />
-        {entries.length === 0 ? (
-          <CWText className="description">
-            No entries for the contest yet
-          </CWText>
-        ) : (
-          <div className="leaderboard-list">
-            <div className="filter-section">
-              <CWText type="b2" fontWeight="medium">
-                Sort
-              </CWText>
-              <Select
-                selected={selectedSort.value}
-                onSelect={setSelectedSort}
-                options={sortOptions}
-              />
-            </div>
-            {entries.map((entry) => (
-              <FarcasterEmbed url={entry} key={entry} />
-            ))}
-          </div>
-        )}
+
+        <div className="leaderboard-list">
+          {isLoading ? (
+            <>
+              <Skeleton height={300} width="100%" />
+              <Skeleton height={300} width="100%" />
+            </>
+          ) : data?.pages?.[0].data?.length === 0 ? (
+            <CWText>No entries for the contest yet</CWText>
+          ) : (
+            <>
+              <div className="filter-section">
+                <CWText type="b2" fontWeight="medium">
+                  Sort
+                </CWText>
+                <Select
+                  selected={selectedSort}
+                  onSelect={(v: { value: string; label: string }) =>
+                    setSelectedSort(v.value as SortType)
+                  }
+                  options={sortOptions}
+                />
+              </div>
+
+              {data?.pages.map((page) => (
+                <React.Fragment key={page.currentPage}>
+                  {page.data.map((entry) => (
+                    <div key={entry.id}>
+                      <CWText>Likes: {entry.like}</CWText>
+                      <FarcasterEmbed url={entry.url} />
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
+
+              {isFetchingNextPage && <CWCircleRingSpinner />}
+
+              <div ref={ref} />
+            </>
+          )}
+        </div>
       </div>
     </CWPageLayout>
   );

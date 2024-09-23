@@ -170,7 +170,7 @@ const ContestCard = ({
     >
       {imageUrl && (
         <>
-          {isHorizontal && (
+          {isHorizontal && isActive && (
             <CWTag
               label="Active Contest"
               type="contest"
