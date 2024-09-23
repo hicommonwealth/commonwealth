@@ -1,4 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
+import { command } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
@@ -55,13 +56,14 @@ export const trpcRouter = trpc.router({
     Community.CreateGroup,
     trpc.Tag.Community,
     [MixpanelCommunityInteractionEvent.CREATE_GROUP],
-    () => {
-      // TODO: call refresh community memberships
-      // .refreshCommunityMemberships({
-      //     communityId: id,
-      //     groupId: newGroup.id,
-      //   })
-      return Promise.resolve(undefined);
+    async (_, output, ctx) => {
+      await command(Community.RefreshCommunityMemberships(), {
+        actor: ctx.actor,
+        payload: {
+          community_id: output.id!,
+          group_id: output.groups?.at(0)?.id,
+        },
+      });
     },
   ),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
@@ -93,4 +95,8 @@ export const trpcRouter = trpc.router({
   ]),
   deleteTopic: trpc.command(Community.DeleteTopic, trpc.Tag.Community),
   deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
+  refreshCommunityMemberships: trpc.command(
+    Community.RefreshCommunityMemberships,
+    trpc.Tag.Community,
+  ),
 });
