@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.addColumn(
         'ThreadVersionHistories',
-        'blob_storage_id',
+        'content_url',
         {
           type: Sequelize.STRING,
           allowNull: true,
@@ -15,7 +15,7 @@ module.exports = {
       );
       await queryInterface.addColumn(
         'CommentVersionHistories',
-        'blob_storage_id',
+        'content_url',
         {
           type: Sequelize.STRING,
           allowNull: true,
@@ -29,12 +29,12 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.removeColumn(
         'ThreadVersionHistories',
-        'blob_storage_id',
+        'content_url',
         { transaction },
       );
       await queryInterface.removeColumn(
         'CommentVersionHistories',
-        'blob_storage_id',
+        'content_url',
         { transaction },
       );
     });

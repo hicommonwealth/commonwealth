@@ -9,6 +9,7 @@ export const CommentVersionHistory = z.object({
   comment_id: PG_INT,
   text: z.string(),
   timestamp: z.date(),
+  content_url: z.string().nullish(),
 });
 
 export const Comment = z.object({
