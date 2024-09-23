@@ -297,7 +297,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         // @ts-expect-error StrictNullChecks
         const session = await signSessionWithAccount(walletToUse, account);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
-        props.onSuccess?.(account.address, newlyCreated);
+        await props.onSuccess?.(account.address, newlyCreated);
 
         // Create the account with default values
         // await onCreateNewAccount(walletToUse, session, account);
