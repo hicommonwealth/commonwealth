@@ -220,3 +220,15 @@ export const DeleteGroup = {
     group_id: PG_INT,
   }),
 };
+
+export const RefreshCommunityMemberships = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT.optional(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    created: z.number(),
+    updated: z.number(),
+  }),
+};

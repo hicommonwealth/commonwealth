@@ -2,10 +2,10 @@ import {
   AddressAttributes,
   GetBalancesOptions,
   GroupAttributes,
+  makeGetBalancesOptions,
 } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import { makeGetBalancesOptions } from 'server/util/requirementsModule/makeGetBalancesOptions';
 import { describe, test } from 'vitest';
 
 describe('makeGetBalancesOptions', () => {

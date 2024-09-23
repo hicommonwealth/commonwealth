@@ -65,20 +65,21 @@ export const updateGroupHandler = async (
     allowList,
   });
 
-  // refresh memberships in background if requirements or
-  // required requirements updated
-  if (
-    requirements?.length > 0 ||
-    group.metadata.required_requirements !==
-      oldGroupMetadata.required_requirements
-  ) {
-    controllers.groups
-      .refreshCommunityMemberships({
-        communityId: group.community_id,
-        groupId: group.id,
-      })
-      .catch(console.error);
-  }
+  // TODO: to be moved to output middleware like in create group
+  // // refresh memberships in background if requirements or
+  // // required requirements updated
+  // if (
+  //   requirements?.length > 0 ||
+  //   group.metadata.required_requirements !==
+  //     oldGroupMetadata.required_requirements
+  // ) {
+  //   controllers.groups
+  //     .refreshCommunityMemberships({
+  //       communityId: group.community_id,
+  //       groupId: group.id,
+  //     })
+  //     .catch(console.error);
+  // }
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 

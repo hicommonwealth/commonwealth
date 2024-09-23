@@ -1,4 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
+import { command } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
@@ -51,9 +52,20 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
-  createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
-    MixpanelCommunityInteractionEvent.CREATE_GROUP,
-  ]),
+  createGroup: trpc.command(
+    Community.CreateGroup,
+    trpc.Tag.Community,
+    [MixpanelCommunityInteractionEvent.CREATE_GROUP],
+    async (_, output, ctx) => {
+      await command(Community.RefreshCommunityMemberships(), {
+        actor: ctx.actor,
+        payload: {
+          community_id: output.id!,
+          group_id: output.groups?.at(0)?.id,
+        },
+      });
+    },
+  ),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
@@ -83,4 +95,8 @@ export const trpcRouter = trpc.router({
   ]),
   deleteTopic: trpc.command(Community.DeleteTopic, trpc.Tag.Community),
   deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
+  refreshCommunityMemberships: trpc.command(
+    Community.RefreshCommunityMemberships,
+    trpc.Tag.Community,
+  ),
 });
