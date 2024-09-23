@@ -5,7 +5,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models, Webhook } from '@hicommonwealth/model';
-import { safeTruncateBody } from '@hicommonwealth/shared';
+import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
 import { config } from '../../../config';
@@ -50,7 +50,7 @@ export const processThreadCreated: EventHandler<
 
   if (webhooks.length > 0) {
     const threadSummary = safeTruncateBody(
-      decodeURIComponent(payload.body!),
+      getDecodedString(payload.body || ''),
       255,
     );
     const threadURl = getThreadUrl(
@@ -64,7 +64,7 @@ export const processThreadCreated: EventHandler<
     });
     const previewImg = Webhook.getPreviewImageUrl(
       community,
-      decodeURIComponent(payload.body!),
+      getDecodedString(payload.body || ''),
     );
 
     const provider = notificationsProvider();

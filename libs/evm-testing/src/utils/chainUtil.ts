@@ -59,8 +59,8 @@ export async function getAnvil(
 ): Promise<Anvil> {
   const anvil = createAnvil({
     forkUrl: protocolFork
-      ? `https://base-sepolia.g.alchemy.com/v2/${config.TEST_EVM.BASESEP_ALCHEMY_API_KEY}`
-      : `https://eth-mainnet.g.alchemy.com/v2/${config.TEST_EVM.ETH_ALCHEMY_API_KEY}`,
+      ? `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`
+      : `https://eth-mainnet.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`,
     silent: false,
     port: 8545,
     autoImpersonate: true,

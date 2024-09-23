@@ -1,12 +1,8 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { signThread } from 'controllers/server/sessions';
+import { signUpdateThread } from 'controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
-import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
@@ -20,6 +16,7 @@ interface EditThreadProps {
   address: string;
   communityId: string;
   threadId: number;
+  threadMsgId: string;
   // for edit profile
   newBody?: string;
   newTitle?: string;
@@ -44,10 +41,11 @@ interface EditThreadProps {
   };
 }
 
-const editThread = async ({
+export const buildUpdateThreadInput = async ({
   address,
   communityId,
   threadId,
+  threadMsgId,
   // for edit profile
   newBody,
   newTitle,
@@ -67,25 +65,29 @@ const editThread = async ({
   topicId,
   // for editing thread collaborators
   collaborators,
-}: EditThreadProps): Promise<Thread> => {
-  const canvasSignedData = await signThread(address, {
-    community: app.activeChainId(),
-    title: newTitle,
-    body: newBody,
-    link: url,
-    topic: topicId,
-  });
+}: EditThreadProps) => {
+  let canvasSignedData;
+  if (newBody || newTitle) {
+    canvasSignedData = await signUpdateThread(address, {
+      thread_id: threadMsgId,
+      title: newTitle,
+      body: newBody,
+      link: url,
+      topic: topicId,
+    });
+  }
 
-  const response = await axios.patch(`${SERVER_URL}/threads/${threadId}`, {
+  return {
     // common payload
     author_community_id: communityId,
     address: address,
     community_id: communityId,
+    thread_id: threadId,
     jwt: userStore.getState().jwt,
     // for edit profile
     ...(url && { url }),
-    ...(newBody && { body: encodeURIComponent(newBody) }),
-    ...(newTitle && { title: encodeURIComponent(newTitle) }),
+    ...(newBody && { body: newBody }),
+    ...(newTitle && { title: newTitle }),
     ...(authorProfile && { author: JSON.stringify(authorProfile) }),
     // for editing thread locked status
     ...(readOnly !== undefined && { locked: readOnly }),
@@ -98,18 +100,17 @@ const editThread = async ({
     // for editing thread archived status
     ...(archived !== undefined && { archived }),
     // for editing thread topic
-    ...(topicId !== undefined && { topicId }),
+    ...(topicId !== undefined && { topic_id: topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
     ...toCanvasSignedDataApiArgs(canvasSignedData),
-  });
-
-  return new Thread(response.data.result);
+  };
 };
 
 interface UseEditThreadMutationProps {
   communityId: string;
   threadId: number;
+  threadMsgId: string;
   currentStage: ThreadStage;
   currentTopicId: number;
 }
@@ -123,9 +124,10 @@ const useEditThreadMutation = ({
   const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: editThread,
-    onSuccess: async (updatedThread) => {
+  return trpc.thread.updateThread.useMutation({
+    onSuccess: (updated) => {
+      // @ts-expect-error StrictNullChecks
+      const updatedThread = new Thread(updated);
       // Update community level thread counters variables
       if (currentStage !== updatedThread.stage) {
         updateThreadCountsByStageChange(

@@ -5,7 +5,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models, Webhook } from '@hicommonwealth/model';
-import { safeTruncateBody } from '@hicommonwealth/shared';
+import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
 import { config } from '../../../config';
@@ -73,10 +73,7 @@ export const processCommentCreated: EventHandler<
     })) as { user_id: number }[];
   }
 
-  const commentSummary = safeTruncateBody(
-    decodeURIComponent(payload.text),
-    255,
-  );
+  const commentSummary = safeTruncateBody(getDecodedString(payload.text), 255);
   const commentUrl = getCommentUrl(
     payload.community_id,
     payload.thread_id,
@@ -116,7 +113,7 @@ export const processCommentCreated: EventHandler<
     });
     const previewImg = Webhook.getPreviewImageUrl(
       community,
-      decodeURIComponent(payload.text),
+      getDecodedString(payload.text),
     );
 
     const provider = notificationsProvider();

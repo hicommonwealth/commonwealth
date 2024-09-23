@@ -16,8 +16,10 @@ interface CreateCommentProps {
   communityId: string;
   profile: UserProfile;
   threadId: number;
+  threadMsgId: string;
   unescapedText: string;
   parentCommentId: number | null;
+  parentCommentMsgId: string | null;
   existingNumberOfComments: number;
   isPWA?: boolean;
 }
@@ -25,18 +27,22 @@ interface CreateCommentProps {
 export const buildCreateCommentInput = async ({
   profile,
   threadId,
+  threadMsgId,
   unescapedText,
   parentCommentId = null,
+  parentCommentMsgId = null,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(profile.address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
     body: unescapedText,
-    parent_comment_id: parentCommentId,
+    parent_comment_id: parentCommentMsgId,
   });
   return {
     thread_id: threadId,
+    thread_msg_id: threadMsgId,
+    parent_msg_id: parentCommentMsgId,
     parent_id: parentCommentId ?? undefined,
-    text: encodeURIComponent(unescapedText),
+    text: unescapedText,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
 };

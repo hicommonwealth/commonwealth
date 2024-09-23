@@ -51,6 +51,11 @@ export enum Tag {
   SuperAdmin = 'SuperAdmin',
 }
 
+export type Commit<Input extends ZodSchema, Output extends ZodSchema> = (
+  input: z.infer<Input>,
+  output: z.infer<Output>,
+) => Promise<[string, Record<string, unknown>] | undefined>;
+
 /**
  * Supports two options to track analytics
  * 1. A declarative tuple with [event name, optional output mapper]
@@ -138,6 +143,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
   md: Metadata<Input, Output>,
   tag: Tag,
   track?: Track<Input, Output>,
+  commit?: Commit<Input, Output>,
 ) => {
   const secure = isSecure(md);
   return trpc.procedure
@@ -170,6 +176,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
       track &&
         result.ok &&
         void trackAnalytics(track, ctx, rawInput, result.data);
+      commit && result.ok && void commit(rawInput, result.data);
       return result;
     })
     .meta({

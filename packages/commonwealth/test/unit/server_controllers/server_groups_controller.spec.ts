@@ -32,6 +32,7 @@ const createMockedGroupsController = () => {
       id: 1,
       community_id: 'ethereum',
       name: 'hello',
+      description: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [1],
@@ -258,16 +259,5 @@ describe('ServerGroupsController', () => {
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
       }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
-  });
-
-  test('#deleteGroup', async () => {
-    const controller = createMockedGroupsController();
-    const { user, address } = createMockParams();
-    const result = await controller.deleteGroup({
-      user,
-      address,
-      groupId: 1,
-    });
-    expect(result).to.be.undefined;
   });
 });
