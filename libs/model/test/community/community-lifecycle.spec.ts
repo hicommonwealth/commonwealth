@@ -59,6 +59,7 @@ describe('Community lifecycle', () => {
     const [_ethNode] = await seed('ChainNode', { eth_chain_id: 1 });
     const [_edgewareNode] = await seed('ChainNode', {
       name: 'Edgeware Mainnet',
+      eth_chain_id: null,
     });
     const [superadmin] = await seed('User', { isAdmin: true });
     const [admin] = await seed('User', { isAdmin: false });
@@ -152,48 +153,6 @@ describe('Community lifecycle', () => {
   });
 
   describe('groups', () => {
-    // test('#createGroup', async () => {
-    //   const controller = createMockedGroupsController();
-    //   const { user, chain } = createMockParams();
-    //   const [result, analytics] = await controller.createGroup({
-    //     user,
-    //     community: chain,
-    //     metadata: {
-    //       name: 'blah',
-    //       description: 'blah',
-    //     },
-    //     requirements: [],
-    //     topics: [],
-    //   });
-    //   expect(result).to.have.property('id');
-    //   expect(result).to.have.property('community_id');
-    //   expect(result).to.have.property('metadata');
-    //   expect(result).to.have.property('requirements');
-
-    //   expect(analytics).to.eql({
-    //     event: 'Create New Group',
-    //     community: chain.id,
-    //     userId: user.id,
-    //   });
-    // });
-
-    // test('#createGroup (invalid requirements)', () => {
-    //   const controller = createMockedGroupsController();
-    //   const { user, chain } = createMockParams();
-    //   expect(
-    //     controller.createGroup({
-    //       user,
-    //       community: chain,
-    //       metadata: {
-    //         name: 'blah',
-    //         description: 'blah',
-    //       },
-    //       requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
-    //       topics: [],
-    //     }),
-    //   ).to.eventually.be.rejectedWith('Invalid requirements');
-    // });
-
     test('should fail to query community via has_groups when none exists', async () => {
       const communityResults = await query(GetCommunities(), {
         actor: superAdminActor,
@@ -519,20 +478,26 @@ describe('Community lifecycle', () => {
       ).rejects.toThrow(InvalidActor);
     });
 
-    // TODO: implement when we can add members via commands
-    test.skip('should throw if chain node of community does not match supported chain', async () => {
-      await expect(() =>
-        command(UpdateCommunity(), {
-          actor: superAdminActor,
-          payload: {
-            ...baseRequest,
-            id: community.id,
-            namespace: 'tempNamespace',
-            transactionHash: '0x1234',
-            chain_node_id: edgewareNode!.id!,
-          },
-        }),
-      ).rejects.toThrow('Namespace not supported on selected chain');
+    test('should throw if chain node of community does not match supported chain', async () => {
+      await command(UpdateCommunity(), {
+        actor: superAdminActor,
+        payload: {
+          ...baseRequest,
+          id: community.id,
+          chain_node_id: edgewareNode!.id!,
+        },
+      }),
+        await expect(() =>
+          command(UpdateCommunity(), {
+            actor: superAdminActor,
+            payload: {
+              ...baseRequest,
+              id: community.id,
+              namespace: 'tempNamespace',
+              transactionHash: '0x1234',
+            },
+          }),
+        ).rejects.toThrow('Namespace not supported on selected chain');
     });
   });
 });
