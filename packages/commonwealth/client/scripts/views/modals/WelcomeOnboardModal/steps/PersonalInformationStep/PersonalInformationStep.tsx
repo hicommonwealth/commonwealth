@@ -130,11 +130,6 @@ const PersonalInformationStep = ({
       },
     });
 
-    // set email for notifications
-    if (values.email) {
-      await updateEmail({ email: values.email });
-    }
-
     if (values.enableAccountNotifications) {
       await updateSubscriptionPreferences({
         id: user.id,
