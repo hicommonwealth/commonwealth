@@ -27,6 +27,10 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
     navigate('/createCommunity', {}, null);
   };
 
+  const handleCreateTokenCommunity = () => {
+    navigate('/createTokenCommunity', {}, null);
+  };
+
   return (
     <div className="CreateContentDrawer">
       <div className="left-side">
@@ -50,6 +54,10 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
         <div className="item" onClick={handleCreateCommunity}>
           <CWIcon iconName="peopleNew" />
           <CWText>Create community</CWText>
+        </div>
+        <div className="item" onClick={handleCreateTokenCommunity}>
+          <CWIcon iconName="rocketLaunch" />
+          <CWText>Launch Token</CWText>
         </div>
       </div>
       <CWIconButton iconName="close" onClick={onClose} />

@@ -12,6 +12,7 @@ import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
 import { CreateDiscordBotConfigProps } from 'state/api/discord/createDiscordBotConfing';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -20,10 +21,11 @@ import {
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
-import Permissions from '../../utils/Permissions';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import { getClasses } from '../components/component_kit/helpers';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWSidebarMenu } from '../../components/component_kit/cw_sidebar_menu';
+import { getClasses } from '../../components/component_kit/helpers';
+import TokenLaunchButton from '../../components/sidebar/TokenLaunchButton';
+import './CreateContentMenu.scss';
 
 const resetSidebarState = () => {
   //Bouncer pattern -- I have found isMobile does not always detect screen
@@ -102,6 +104,10 @@ const getCreateContentMenuItems = (
         resetSidebarState();
         navigate('/createCommunity', {}, null);
       },
+    },
+    {
+      type: 'element',
+      element: <TokenLaunchButton key={2} buttonHeight="sm" />,
     },
   ];
 
@@ -234,6 +240,7 @@ export const CreateContentPopover = () => {
   return (
     <PopoverMenu
       menuItems={getCreateContentMenuItems(navigate)}
+      className="create-content-popover"
       renderTrigger={(onClick, isMenuOpen) => (
         <CWTooltip
           content="Create content"
