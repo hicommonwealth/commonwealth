@@ -96,6 +96,7 @@ export default (
         type: Sequelize.TSVECTOR,
         allowNull: false,
       },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,

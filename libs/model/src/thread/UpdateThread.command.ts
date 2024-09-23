@@ -212,6 +212,12 @@ export function UpdateThread(): Command<
         if (found) throw new InvalidInput(UpdateThreadErrors.ContestLock);
       }
 
+      let contentUrl: string | null = thread.content_url ?? null;
+      if (content.body) {
+        const result = await uploadIfLarge('threads', content.body);
+        contentUrl = result.contentUrl;
+      }
+
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
         const searchUpdate =
@@ -225,11 +231,13 @@ export function UpdateThread(): Command<
             : {};
         await thread.update(
           {
+            // TODO: body should be set to truncatedBody once client renders content_url
             ...content,
             ...adminPatch,
             ...ownerPatch,
             last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
             ...searchUpdate,
+            content_url: contentUrl,
           },
           { transaction },
         );
@@ -265,15 +273,12 @@ export function UpdateThread(): Command<
             : '';
           // if the modification was different from the original body, create a version history for it
           if (decodedThreadVersionBody !== content.body) {
-            const { contentUrl, truncatedBody } = await uploadIfLarge(
-              'threads',
-              content.body,
-            );
             await models.ThreadVersionHistory.create(
               {
                 thread_id,
                 address: address.address,
-                body: truncatedBody || content.body,
+                // TODO: body should be set to truncatedBody once client renders content_url
+                body: content.body,
                 timestamp: new Date(),
                 content_url: contentUrl,
               },

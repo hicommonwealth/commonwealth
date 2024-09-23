@@ -29,6 +29,7 @@ export const Thread = z.object({
   community_id: z.string(),
   view_count: PG_INT,
   links: z.object(linksSchema).array().nullish(),
+  content_url: z.string().nullish(),
 
   read_only: z.boolean().nullish(),
 
