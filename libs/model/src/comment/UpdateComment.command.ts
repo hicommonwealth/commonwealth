@@ -11,6 +11,7 @@ import {
   parseUserMentions,
   quillToPlain,
   uniqueMentions,
+  uploadIfLarge,
 } from '../utils';
 
 export function UpdateComment(): Command<
@@ -44,8 +45,18 @@ export function UpdateComment(): Command<
             { where: { id: comment.id }, transaction },
           );
 
+          const { contentUrl, truncatedBody } = await uploadIfLarge(
+            'comments',
+            text,
+          );
+
           await models.CommentVersionHistory.create(
-            { comment_id: comment.id!, text, timestamp: new Date() },
+            {
+              comment_id: comment.id!,
+              text: truncatedBody || text,
+              timestamp: new Date(),
+              content_url: contentUrl,
+            },
             { transaction },
           );
 

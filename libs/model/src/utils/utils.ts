@@ -1,5 +1,9 @@
-import { EventPairs, logger } from '@hicommonwealth/core';
-import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
+import { blobStorage, EventPairs, logger } from '@hicommonwealth/core';
+import {
+  getThreadUrl,
+  safeTruncateBody,
+  type AbiType,
+} from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import {
   Model,
@@ -8,6 +12,7 @@ import {
   Sequelize,
   Transaction,
 } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 import { isAddress } from 'web3-validator';
 import { config } from '../config';
 import { OutboxAttributes } from '../models';
@@ -198,4 +203,29 @@ export function getChainNodeUrl({
   if (!private_url || private_url === '')
     return buildChainNodeUrl(url, 'public');
   return buildChainNodeUrl(private_url, 'private');
+}
+
+/**
+ * Uploads content to the appropriate R2 bucket if the content exceeds the
+ * preview limit
+ * @param type
+ * @param content
+ */
+export async function uploadIfLarge(
+  type: 'threads' | 'comments',
+  content: string,
+): Promise<{
+  contentUrl: string | null;
+  truncatedBody: string | null;
+}> {
+  if (content.length > 500) {
+    const { url } = await blobStorage({
+      key: 'blobStorage.R2BlobStorage.Main',
+    }).upload({
+      key: `${uuidv4()}.md`,
+      bucket: type,
+      content: content,
+    });
+    return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
+  } else return { contentUrl: null, truncatedBody: null };
 }

@@ -2,6 +2,7 @@ import {
   HotShotsStats,
   KnockProvider,
   MixpanelAnalytics,
+  R2BlobStorage,
   RedisCache,
   S3BlobStorage,
   ServiceKey,
@@ -28,6 +29,11 @@ stats({
 });
 blobStorage({
   adapter: S3BlobStorage(),
+});
+blobStorage({
+  key: 'blobStorage.R2BlobStorage.Main',
+  adapter: R2BlobStorage(),
+  isDefault: false,
 });
 (config.ANALYTICS.MIXPANEL_DEV_TOKEN || config.ANALYTICS.MIXPANEL_PROD_TOKEN) &&
   analytics({

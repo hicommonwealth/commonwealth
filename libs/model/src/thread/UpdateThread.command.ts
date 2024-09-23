@@ -22,6 +22,7 @@ import {
   parseUserMentions,
   quillToPlain,
   sanitizeQuillText,
+  uploadIfLarge,
 } from '../utils';
 
 export const UpdateThreadErrors = {
@@ -264,12 +265,17 @@ export function UpdateThread(): Command<
             : '';
           // if the modification was different from the original body, create a version history for it
           if (decodedThreadVersionBody !== content.body) {
+            const { contentUrl, truncatedBody } = await uploadIfLarge(
+              'threads',
+              content.body,
+            );
             await models.ThreadVersionHistory.create(
               {
                 thread_id,
                 address: address.address,
-                body: content.body,
+                body: truncatedBody || content.body,
                 timestamp: new Date(),
+                content_url: contentUrl,
               },
               { transaction },
             );
