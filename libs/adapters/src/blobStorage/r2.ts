@@ -1,4 +1,4 @@
-import { CompleteMultipartUploadCommandOutput, S3 } from '@aws-sdk/client-s3';
+import { S3 } from '@aws-sdk/client-s3';
 import { BlobBucket, type BlobStorage } from '@hicommonwealth/core';
 import { config } from '../config';
 import { exists_S3sdk, getSignedUrl_S3sdk, upload_S3sdk } from './util';
@@ -13,15 +13,6 @@ const s3Buckets: Partial<Record<BlobBucket, string>> =
         threads: 'threads',
         comments: 'comments',
       };
-
-function formatR2Url(
-  bucket: BlobBucket,
-  data: CompleteMultipartUploadCommandOutput,
-): string {
-  return config.APP_ENV === 'production'
-    ? `${bucket}.common.xyz/${data.Key}`
-    : '';
-}
 
 export const R2BlobStorage = (): BlobStorage => {
   const client = new S3({
