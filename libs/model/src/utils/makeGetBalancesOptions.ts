@@ -142,7 +142,7 @@ export function makeGetBalancesOptions(
             });
             if (!existingOptions) {
               allOptions.push({
-                balanceSourceType: castedSource.source_type as any,
+                balanceSourceType: castedSource.source_type,
                 sourceOptions: {
                   contractAddress: castedSource.contract_address,
                   cosmosChainId: castedSource.cosmos_chain_id,
