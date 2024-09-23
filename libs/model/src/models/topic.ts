@@ -1,39 +1,18 @@
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { Topic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
+import { ChainNodeAttributes } from './chain_node';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 
-export type TopicAttributes = {
-  id?: number;
-  name: string;
-  description?: string;
-  community_id: string;
-  featured_in_sidebar?: boolean;
-  featured_in_new_post?: boolean;
-  order?: number;
-  channel_id?: string;
-  created_at?: Date;
-  updated_at?: Date;
-  deleted_at?: Date;
-  default_offchain_template?: string;
-  group_ids?: number[];
-  telegram?: string;
-
-  weighted_voting?: TopicWeightedVoting;
-  chain_node_id?: number;
-  token_address?: string;
-  token_symbol?: string;
-  vote_weight_multiplier?: number;
-
+export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
+  chain_node?: ChainNodeAttributes;
 };
-
-export type TopicInstance = ModelInstance<TopicAttributes> & {
-  // no mixins used
-};
+export type TopicInstance = ModelInstance<TopicAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,

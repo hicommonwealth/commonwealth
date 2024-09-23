@@ -16,7 +16,6 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
-import useAppStatus from '../../../../../../hooks/useAppStatus';
 import './CreateTopicSectionOld.scss';
 import { FormSubmitValues } from './types';
 import { topicCreationValidationSchema } from './validation';
@@ -40,18 +39,15 @@ export const CreateTopicSectionOld = () => {
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
   const handleCreateTopic = async (values: FormSubmitValues) => {
     try {
       await createTopic({
         name: values.topicName,
-        // @ts-expect-error <StrictNullChecks/>
         description: values.topicDescription,
-        featuredInSidebar,
-        featuredInNewPost: false,
-        defaultOffchainTemplate: '',
-        isPWA: isAddedToHomeScreen,
+        featured_in_sidebar: featuredInSidebar,
+        featured_in_new_post: false,
+        default_offchain_template: '',
+        community_id: app.activeChainId() || '',
       });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {

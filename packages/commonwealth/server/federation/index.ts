@@ -17,7 +17,8 @@ export const applyCanvasSignedDataMiddleware: (
   input,
   output,
 ) => Promise<undefined> = async (input, output) => {
-  await applyCanvasSignedData(parse(output.canvas_signed_data));
+  if (output.canvas_signed_data)
+    await applyCanvasSignedData(parse(output.canvas_signed_data));
 };
 
 export const applyCanvasSignedData = async (data: CanvasSignedData) => {

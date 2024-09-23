@@ -4,6 +4,13 @@ import { Reaction } from './reaction.schemas';
 import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
 
+export const CommentVersionHistory = z.object({
+  id: PG_INT.optional(),
+  comment_id: PG_INT,
+  text: z.string(),
+  timestamp: z.date(),
+});
+
 export const Comment = z.object({
   id: PG_INT.optional(),
   thread_id: PG_INT,
@@ -40,11 +47,5 @@ export const Comment = z.object({
   Address: Address.nullish(),
   Thread: Thread.nullish(),
   Reaction: Reaction.nullish(),
-});
-
-export const CommentVersionHistory = z.object({
-  id: PG_INT.optional(),
-  comment_id: PG_INT,
-  text: z.string(),
-  timestamp: z.date(),
+  CommentVersionHistories: z.array(CommentVersionHistory).nullish(),
 });
