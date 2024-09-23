@@ -14,7 +14,11 @@ import {
   startLoginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
-import { notifyError, notifyInfo } from 'controllers/app/notifications';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
@@ -24,7 +28,7 @@ import {
   signSessionWithAccount,
 } from 'controllers/server/sessions';
 import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
@@ -45,7 +49,6 @@ import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../../../state/api/profiles/fetchProfilesByAddress';
 import useAuthModalStore from '../../../state/ui/modals/authModal';
-import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
   onSuccess?: (
@@ -136,67 +139,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     isNew?: boolean,
   ) => {
     props?.onSuccess?.(authAddress, isNew);
-
-    // show address mismatch message, if user revalidated session with unexpected address
-    if (props.withSessionKeyLoginFlow) {
-      // @ts-expect-error StrictNullChecks
-      const isSubstrate = user.accounts.find(
-        (addr) => addr.address === sessionKeyValidationError?.address,
-      ).community?.ss58Prefix;
-      if (
-        authAddress === sessionKeyValidationError?.address ||
-        (isSubstrate &&
-          addressSwapper({
-            address: sessionKeyValidationError?.address || '',
-            currentPrefix: 42,
-          }) === authAddress)
-      ) {
-        const updatedAddress = user.accounts.find(
-          (addr) => addr.address === sessionKeyValidationError?.address,
-        );
-        await setActiveAccount(updatedAddress!);
-      } else {
-        const signedAddressAccount = user.accounts.find(
-          (addr) => addr.address === authAddress,
-        );
-        if (signedAddressAccount) {
-          await setActiveAccount(signedAddressAccount);
-        }
-        openConfirmation({
-          hideWarning: true,
-          title: 'Switch Address?',
-          description: (
-            <>
-              <p style={{ marginBottom: 6 }}>
-                Your account was previously linked to{' '}
-                <strong>
-                  {formatAddress(sessionKeyValidationError?.address || '')}
-                </strong>{' '}
-                but the wallet you just signed in from has the address{' '}
-                <strong>{formatAddress(authAddress || '')}</strong>.
-              </p>
-              {signedAddressAccount ? (
-                <p>
-                  We&apos;ve switched your active address to the wallet you just
-                  signed in from.
-                </p>
-              ) : (
-                <p>
-                  Select <strong>Connect a new address</strong> in the user menu
-                  to connect this as a new address.
-                </p>
-              )}
-            </>
-          ),
-          buttons: [
-            {
-              label: 'Continue',
-              buttonType: 'primary',
-            },
-          ],
-        });
-      }
-    }
   };
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
@@ -312,6 +254,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     wallet?: Wallet,
   ) => {
     if (props.withSessionKeyLoginFlow) {
+      await setActiveAccount(account);
+      notifySuccess('Account verified!');
       await handleSuccess(account.address, newlyCreated);
       return;
     }
