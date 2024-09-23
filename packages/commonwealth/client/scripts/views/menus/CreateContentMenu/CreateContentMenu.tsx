@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { uuidv4 } from 'lib/util';
@@ -120,34 +119,34 @@ const getCreateContentMenuItems = (
         {
           label: 'Connect Discord',
           iconLeft: 'discord',
-          onClick: async () => {
-            try {
-              const verificationToken = uuidv4();
-              await createDiscordBotConfig?.({ verificationToken });
-
-              window.open(
-                `https://discord.com/oauth2/authorize?client_id=${
-                  process.env.DISCORD_CLIENT_ID
-                }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-                  `${
-                    !isCustomDomain
-                      ? window.location.origin
-                      : 'https://commonwealth.im'
-                  }`,
-                )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
-                  JSON.stringify({
-                    cw_chain_id: app.activeChainId(),
-                    verificationToken,
-                    redirect_domain: isCustomDomain
-                      ? window.location.origin
-                      : undefined,
-                  }),
-                )}`,
-                '_parent',
-              );
-            } catch (err) {
-              console.log(err);
-            }
+          onClick: () => {
+            const verificationToken = uuidv4();
+            createDiscordBotConfig?.({ verificationToken })
+              .then(() => {
+                window.open(
+                  `https://discord.com/oauth2/authorize?client_id=${
+                    process.env.DISCORD_CLIENT_ID
+                  }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+                    `${
+                      !isCustomDomain
+                        ? window.location.origin
+                        : 'https://commonwealth.im'
+                    }`,
+                  )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
+                    JSON.stringify({
+                      cw_chain_id: app.activeChainId(),
+                      verificationToken,
+                      redirect_domain: isCustomDomain
+                        ? window.location.origin
+                        : undefined,
+                    }),
+                  )}`,
+                  '_parent',
+                );
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           },
         },
       ];
@@ -207,7 +206,7 @@ export const CreateContentSidebar = ({
       )}
       menuHeader={{
         label: 'Create',
-        onClick: async () => {
+        onClick: () => {
           const sidebar = document.getElementsByClassName(
             'CreateContentSidebar',
           );
@@ -224,6 +223,7 @@ export const CreateContentSidebar = ({
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
