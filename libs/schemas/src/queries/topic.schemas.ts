@@ -8,6 +8,7 @@ export const GetTopics = {
     community_id: z.string(),
     topic_id: PG_INT.optional(),
     include_threads: zBoolean.default(false),
+    include_contest_managers: zBoolean.default(false),
   }),
   output: Topic.extend({
     total_threads: z.number(),
