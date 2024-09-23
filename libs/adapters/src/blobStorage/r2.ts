@@ -1,25 +1,37 @@
-import { S3 } from '@aws-sdk/client-s3';
+import { CompleteMultipartUploadCommandOutput, S3 } from '@aws-sdk/client-s3';
 import { BlobBucket, type BlobStorage } from '@hicommonwealth/core';
 import { config } from '../config';
 import { exists_S3sdk, getSignedUrl_S3sdk, upload_S3sdk } from './util';
 
 const s3Buckets: Partial<Record<BlobBucket, string>> =
-  config.APP_ENV === 'local'
+  config.APP_ENV !== 'production'
     ? {
-        threadVersionHistories: 'local.thread-version-histories',
-        threads: 'local.threads',
-        comments: 'local.comments',
-        commentVersionHistories: 'local.commentVersionHistories',
+        threads: 'dev-threads',
+        comments: 'dev-comments',
       }
     : {
-        threadVersionHistories: 'thread-version-histories',
         threads: 'threads',
         comments: 'comments',
-        commentVersionHistories: 'commentVersionHistories',
       };
 
+function formatR2Url(
+  bucket: BlobBucket,
+  data: CompleteMultipartUploadCommandOutput,
+): string {
+  return config.APP_ENV === 'production'
+    ? `${bucket}.common.xyz/${data.Key}`
+    : '';
+}
+
 export const R2BlobStorage = (): BlobStorage => {
-  const client = new S3();
+  const client = new S3({
+    endpoint: `https://${config.CLOUDFLARE.R2.ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: config.CLOUDFLARE.R2.ACCESS_KEY_ID,
+      secretAccessKey: config.CLOUDFLARE.R2.SECRET_ACCESS_KEY,
+    },
+    region: 'auto',
+  });
   const name = 'R2BlobStorage';
   return {
     name,
@@ -32,8 +44,7 @@ export const R2BlobStorage = (): BlobStorage => {
       const data = await upload_S3sdk(name, client, s3Buckets, options);
       return {
         location: data.Location,
-        // TODO: update URL when I have R2 access
-        url: `https://s3.amazonaws.com/${data.Bucket}/${data.Key}`,
+        url: `${data.Bucket}.common.xyz/${data.Key}`,
       };
     },
 

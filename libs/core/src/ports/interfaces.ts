@@ -251,8 +251,6 @@ export const BlobBuckets = [
   'assets',
   'sitemap',
   'archives',
-  'threadVersionHistories',
-  'commentVersionHistories',
   'threads',
   'comments',
 ] as const;
