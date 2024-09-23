@@ -5,6 +5,7 @@ import {
   GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
+  GetEvmBalancesOptions,
   GetSPLBalancesOptions,
   GroupAttributes,
 } from '@hicommonwealth/model';
@@ -27,7 +28,6 @@ export function makeGetBalancesOptions(
       if (requirement.rule === 'threshold') {
         // for each requirement, upsert the appropriate option
         switch (requirement.data.source.source_type) {
-          // ContractSource
           case BalanceSourceType.ERC20:
           case BalanceSourceType.ERC721: {
             const castedSource = requirement.data.source as ContractSource;
@@ -43,13 +43,13 @@ export function makeGetBalancesOptions(
             });
             if (!existingOptions) {
               allOptions.push({
-                balanceSourceType: castedSource.source_type as any,
+                balanceSourceType: castedSource.source_type,
                 sourceOptions: {
                   contractAddress: castedSource.contract_address,
                   evmChainId: castedSource.evm_chain_id,
                 },
                 addresses,
-              });
+              } as GetEvmBalancesOptions);
             }
             break;
           }
@@ -64,8 +64,7 @@ export function makeGetBalancesOptions(
                 castedOpt.sourceOptions.contractAddress ===
                   castedSource.contract_address &&
                 castedOpt.sourceOptions.tokenId ===
-                  // @ts-expect-error StrictNullChecks
-                  parseInt(castedSource.token_id, 10)
+                  parseInt(castedSource.token_id!, 10)
               );
             });
 
@@ -75,8 +74,7 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   evmChainId: castedSource.evm_chain_id,
                   contractAddress: castedSource.contract_address,
-                  // @ts-expect-error StrictNullChecks
-                  tokenId: parseInt(castedSource.token_id, 10),
+                  tokenId: parseInt(castedSource.token_id!, 10),
                 },
                 addresses,
               });

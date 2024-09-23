@@ -2,7 +2,7 @@ import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
@@ -25,7 +25,7 @@ type ComputedMembership = {
   group_id: number;
   address_id: number;
   reject_reason: MembershipRejectReason | null;
-  last_checked: any;
+  last_checked: Date;
 };
 
 function computeMembership(
@@ -44,7 +44,7 @@ function computeMembership(
     group_id: group.id!,
     address_id: address.id!,
     reject_reason: isValid ? null : (messages ?? null),
-    last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
+    last_checked: new Date(),
   };
 }
 
@@ -66,12 +66,12 @@ async function processMemberships(
           'seconds',
         );
         if (moment().isAfter(expiresAt)) {
-          const updated = await computeMembership(address, group, balances);
+          const updated = computeMembership(address, group, balances);
           toUpdate.push(updated);
         }
       } else {
         // membership does not exist, create
-        const created = await computeMembership(address, group, balances);
+        const created = computeMembership(address, group, balances);
         toCreate.push(created);
       }
     }
@@ -187,7 +187,9 @@ export function RefreshCommunityMemberships(): Command<
       });
 
       log.info(
-        `Created ${totalCreated} and updated ${totalUpdated} total memberships in ${community_id} across ${totalAddresses} addresses in ${
+        `Created ${totalCreated} and updated ${totalUpdated} total memberships in ${
+          community_id
+        } across ${totalAddresses} addresses in ${
           (Date.now() - communityStartedAt) / 1000
         }s`,
       );
