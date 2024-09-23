@@ -69,23 +69,27 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
         <CWText className="description">
           Check out the contest details including leaderboard.
         </CWText>
-        <ContestCard
-          key={contest.contest_address}
-          isAdmin={false}
-          address={contest.contest_address}
-          name={contest.name}
-          imageUrl={contest.image_url}
-          topics={contest.topics}
-          score={score}
-          decimals={contest.decimals}
-          ticker={contest.ticker}
-          finishDate={end_time ? moment(end_time).toISOString() : ''}
-          isCancelled={contest.cancelled}
-          isRecurring={!contest.funding_token_address}
-          isHorizontal
-          showShareButton={false}
-          showLeaderboardButton={false}
-        />
+        {contest && (
+          <ContestCard
+            key={contest?.contest_address}
+            isAdmin={false}
+            address={contest?.contest_address}
+            name={contest?.name}
+            imageUrl={contest?.image_url || ''}
+            topics={contest?.topics}
+            // @ts-expect-error <StrictNullChecks/>
+            score={score}
+            decimals={contest?.decimals}
+            ticker={contest?.ticker}
+            finishDate={end_time ? moment(end_time).toISOString() : ''}
+            // @ts-expect-error <StrictNullChecks/>
+            isCancelled={contest?.cancelled}
+            isRecurring={!contest?.funding_token_address}
+            isHorizontal
+            showShareButton={false}
+            showLeaderboardButton={false}
+          />
+        )}
 
         <div className="leaderboard-list">
           {isLoading ? (
