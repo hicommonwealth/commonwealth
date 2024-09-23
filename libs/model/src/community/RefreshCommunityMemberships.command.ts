@@ -18,9 +18,6 @@ import {
   type OptionsWithBalances,
 } from '../services';
 import { makeGetBalancesOptions, validateGroupMembership } from '../utils';
-/*
-import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-*/
 
 const log = logger(import.meta);
 
