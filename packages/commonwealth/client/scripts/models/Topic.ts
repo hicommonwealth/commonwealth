@@ -26,14 +26,14 @@ class Topic {
   public readonly id: number;
   public readonly description: string;
   public readonly telegram?: string;
-  public readonly communityId: string;
-  public readonly channelId?: string;
-  public readonly featuredInSidebar?: boolean;
-  public readonly featuredInNewPost?: boolean;
+  public readonly community_id: string;
+  public readonly channel_id?: string;
+  public readonly feature_in_sidebar?: boolean;
+  public readonly featured_in_new_post?: boolean;
   public order?: number;
-  public readonly defaultOffchainTemplate?: string;
-  public totalThreads?: number;
-  public readonly activeContestManagers: Array<
+  public readonly default_offchain_template?: string;
+  public total_threads?: number;
+  public readonly active_contest_managers: Array<
     z.infer<typeof ActiveContestManagers>
   >;
 
@@ -56,14 +56,14 @@ class Topic {
     this.description = description;
     this.telegram = telegram;
     // @ts-expect-error StrictNullChecks
-    this.communityId = community_id;
-    this.featuredInSidebar = featured_in_sidebar;
-    this.featuredInNewPost = featured_in_new_post;
+    this.community_id = community_id;
+    this.feature_in_sidebar = featured_in_sidebar;
+    this.featured_in_new_post = featured_in_new_post;
     this.order = order;
-    this.defaultOffchainTemplate = default_offchain_template;
-    this.totalThreads = total_threads || 0;
-    this.channelId = channel_id;
-    this.activeContestManagers = active_contest_managers || [];
+    this.default_offchain_template = default_offchain_template;
+    this.total_threads = total_threads || 0;
+    this.channel_id = channel_id;
+    this.active_contest_managers = active_contest_managers || [];
   }
 }
 
