@@ -17,8 +17,13 @@ const {
   deleteTopic,
   deleteGroup,
 } = community.trpcRouter;
-const { getThreads, createThread, updateThread, createThreadReaction, deleteThread } =
-  thread.trpcRouter;
+const {
+  getThreads,
+  createThread,
+  updateThread,
+  createThreadReaction,
+  deleteThread,
+} = thread.trpcRouter;
 const {
   createComment,
   createCommentReaction,
