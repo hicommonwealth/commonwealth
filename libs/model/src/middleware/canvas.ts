@@ -4,6 +4,7 @@ import {
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyComment,
+  verifyDeleteReaction,
   verifyDeleteThread,
   verifyReaction,
   verifyThread,
@@ -102,5 +103,26 @@ export const verifyReactionSignature: AuthHandler<
     if (reaction === null) throw new Error('Invalid reaction');
 
     await verifyReaction(canvasSignedData, reaction);
+  }
+};
+
+export const verifyDeleteReactionSignature: AuthHandler<
+  typeof schemas.DeleteReaction.input
+> = async ({ payload }) => {
+  if (hasCanvasSignedDataApiArgs(payload)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
+    if (canvasSignedData.actionMessage.payload.name === 'unreactComment') {
+      await verifyDeleteReaction(canvasSignedData, {
+        comment_id: canvasSignedData.actionMessage.payload.args.comment_id,
+      });
+    } else if (
+      canvasSignedData.actionMessage.payload.name === 'unreactThread'
+    ) {
+      await verifyDeleteReaction(canvasSignedData, {
+        thread_id: canvasSignedData.actionMessage.payload.args.thread_id,
+      });
+    } else {
+      throw new Error('unexpected signed message');
+    }
   }
 };
