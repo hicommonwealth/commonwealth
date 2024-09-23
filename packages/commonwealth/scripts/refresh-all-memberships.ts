@@ -7,7 +7,10 @@ import { ServerGroupsController } from '../server/controllers/server_groups_cont
 const log = logger(import.meta);
 
 async function main() {
-  config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
+  config.CACHE.REDIS_URL &&
+    cache({
+      adapter: new RedisCache(config.CACHE.REDIS_URL),
+    });
 
   const groupsController = new ServerGroupsController(models);
 

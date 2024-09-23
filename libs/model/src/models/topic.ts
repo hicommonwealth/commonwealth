@@ -1,6 +1,7 @@
 import { Topic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { ChainNodeAttributes } from './chain_node';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
@@ -9,6 +10,7 @@ export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
+  chain_node?: ChainNodeAttributes;
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 

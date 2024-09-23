@@ -15,6 +15,7 @@ import {
 } from '@hicommonwealth/core';
 import type { AddressAttributes } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   getTestSigner,
@@ -122,6 +123,7 @@ describe('Thread lifecycle', () => {
     }));
     const [_community] = await seed('Community', {
       chain_node_id: node!.id!,
+      namespace_address: '0x123',
       active: true,
       profile_count: 1,
       Addresses: roles.map((role, index) => {
@@ -133,7 +135,12 @@ describe('Thread lifecycle', () => {
         };
       }),
       groups: [{ id: threadGroupId }, { id: commentGroupId }],
-      topics: [{ group_ids: [threadGroupId, commentGroupId] }],
+      topics: [
+        {
+          group_ids: [threadGroupId, commentGroupId],
+          weighted_voting: TopicWeightedVoting.Stake,
+        },
+      ],
       CommunityStakes: [
         {
           stake_id: 1,

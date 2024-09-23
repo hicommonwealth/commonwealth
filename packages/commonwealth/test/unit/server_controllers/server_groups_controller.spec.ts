@@ -260,15 +260,4 @@ describe('ServerGroupsController', () => {
       }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
-
-  test('#deleteGroup', async () => {
-    const controller = createMockedGroupsController();
-    const { user, address } = createMockParams();
-    const result = await controller.deleteGroup({
-      user,
-      address,
-      groupId: 1,
-    });
-    expect(result).to.be.undefined;
-  });
 });

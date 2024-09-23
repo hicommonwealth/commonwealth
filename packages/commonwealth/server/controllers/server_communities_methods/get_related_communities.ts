@@ -35,13 +35,18 @@ export async function __getRelatedCommunities(
 ): Promise<GetRelatedCommunitiesResult> {
   return await sequelize.query(
     `
-      SELECT c.id, c.icon_url, c.name as community, c.description,
-      c.lifetime_thread_count, c.profile_count, c.namespace, c.chain_node_id
-      FROM "ChainNodes" as cn 
-      JOIN "Communities" as c on c.chain_node_id = cn.id
-      WHERE cn.id = :chainNodeId AND c.active = true
-      GROUP BY c.id
-      ORDER BY c.profile_count DESC;
+        SELECT c.id,
+               c.icon_url,
+               c.name as community,
+               c.description,
+               c.lifetime_thread_count,
+               c.profile_count,
+               c.namespace,
+               c.chain_node_id
+        FROM "Communities" as c
+        WHERE c.active = true
+          AND C.chain_node_id = :chainNodeId
+        ORDER BY c.profile_count DESC;
     `,
     {
       type: QueryTypes.SELECT,
