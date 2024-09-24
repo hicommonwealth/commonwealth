@@ -1,4 +1,5 @@
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
+import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
@@ -92,13 +93,14 @@ export const ReactionButton = ({
         return notifyError('Upvotes on contest entries cannot be removed');
       }
 
-      deleteThreadReaction({
+      const input = await buildDeleteThreadReactionInput({
         communityId,
         address: user.activeAccount?.address,
-        threadId: thread.id,
+        threadId: thread.id!,
         threadMsgId: thread.canvasMsgId,
-        reactionId: reactedId as number,
-      }).catch((e) => {
+        reactionId: +reactedId,
+      });
+      deleteThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
           checkForSessionKeyRevalidationErrors(e);
           return;

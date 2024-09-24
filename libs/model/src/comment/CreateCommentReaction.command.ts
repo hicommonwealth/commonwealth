@@ -21,7 +21,7 @@ export function CreateCommentReaction(): Command<
       const thread = comment.Thread!;
 
       const calculated_voting_weight = await getVotingWeight(
-        thread.community_id,
+        thread.topic_id!,
         address.address,
       );
 
