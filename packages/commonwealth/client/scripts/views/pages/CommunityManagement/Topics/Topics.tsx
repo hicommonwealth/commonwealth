@@ -1,6 +1,7 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
 
+import app from 'state';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
@@ -12,7 +13,6 @@ import WVMethodSelection from './WVMethodSelection';
 import { CreateTopicStep, getCreateTopicSteps } from './utils';
 
 import { notifyError } from 'controllers/app/notifications';
-import useAppStatus from 'hooks/useAppStatus';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useCreateTopicMutation } from 'state/api/topics';
 
@@ -50,7 +50,6 @@ export const Topics = () => {
   );
 
   const navigate = useCommonNavigate();
-  const { isAddedToHomeScreen } = useAppStatus();
   const { mutateAsync: createTopic } = useCreateTopicMutation();
 
   const handleSetTopicFormData = (data: Partial<TopicForm>) => {
@@ -69,12 +68,24 @@ export const Topics = () => {
       await createTopic({
         name: topicFormData.name,
         description: topicFormData.description,
-        featuredInSidebar: topicFormData.featuredInSidebar || false,
-        featuredInNewPost: false,
-        defaultOffchainTemplate: '',
-        isPWA: isAddedToHomeScreen,
-        ...erc20,
-        ...stake,
+        featured_in_sidebar: topicFormData.featuredInSidebar || false,
+        featured_in_new_post: false,
+        default_offchain_template: '',
+        community_id: app.activeChainId() || '',
+        ...(erc20
+          ? {
+              token_address: erc20.tokenAddress,
+              token_symbol: erc20.tokenSymbol,
+              vote_weight_multiplier: erc20.voteWeightMultiplier,
+              chain_node_id: erc20.chainNodeId,
+              weighted_voting: erc20.weightedVoting,
+            }
+          : {}),
+        ...(stake
+          ? {
+              weighted_voting: stake.weightedVoting,
+            }
+          : {}),
       });
 
       navigate(`/discussions/${encodeURI(topicFormData.name.trim())}`);

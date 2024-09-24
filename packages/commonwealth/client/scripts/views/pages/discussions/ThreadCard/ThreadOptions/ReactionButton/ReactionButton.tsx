@@ -106,7 +106,7 @@ export const ReactionButton = ({
           return;
         }
         notifyError('Failed to unvote');
-        console.error(e.response.data.error || e?.message);
+        console.error(e?.response?.data?.error || e?.message);
       });
     } else {
       const input = await buildCreateThreadReactionInput({
@@ -123,7 +123,7 @@ export const ReactionButton = ({
           return;
         }
         notifyError('Failed to upvote');
-        console.error(e.response.data.error || e?.message);
+        console.error(e?.response?.data?.error || e?.message);
       });
     }
   };
