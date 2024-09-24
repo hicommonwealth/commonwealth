@@ -42,16 +42,23 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
 
-    const admin = await models.Address.findOne({
-      where: { community_id: community.id, role: 'admin' },
-    });
-    await command(Community.RefreshCommunityMemberships(), {
-      actor: {
-        address: admin?.address,
-        user: { id: admin!.user_id!, email: 'system' },
-      },
-      payload: { community_id: community.id },
-    });
+    try {
+      const admin = await models.Address.findOne({
+        where: { community_id: community.id, role: 'admin' },
+      });
+      await command(Community.RefreshCommunityMemberships(), {
+        actor: {
+          address: admin?.address,
+          user: { id: admin!.user_id!, email: 'system' },
+        },
+        payload: { community_id: community.id },
+      });
+    } catch (e) {
+      log.error(
+        `Couldn't refresh memberships for community ${community.id}`,
+        e,
+      );
+    }
   }
 
   log.info(

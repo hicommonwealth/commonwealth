@@ -43,7 +43,9 @@ const CommunityInformationForm = ({
   isCreatingCommunity,
   submitBtnLabel,
 }: CommunityInformationFormProps) => {
-  const [communityName, setCommunityName] = useState('');
+  const [communityName, setCommunityName] = useState(
+    initialValues?.communityName || '',
+  );
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
 

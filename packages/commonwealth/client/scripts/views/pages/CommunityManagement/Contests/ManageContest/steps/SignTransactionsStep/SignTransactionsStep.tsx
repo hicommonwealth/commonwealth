@@ -152,7 +152,7 @@ const SignTransactionsStep = ({
         interval: isContestRecurring ? contestInterval : 0,
         topic_ids: contestFormData?.toggledTopicList
           .filter((t) => t.checked)
-          .map((t) => t.id),
+          .map((t) => t.id!),
       });
 
       onSetLaunchContestStep('ContestLive');

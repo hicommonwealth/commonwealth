@@ -24,5 +24,5 @@ export type ContestFormData = ContestFormValidationSubmitValues & {
   prizePercentage: number;
   payoutStructure: number[];
   farcasterContestDuration?: number;
-  toggledTopicList: { name: string; id: number; checked: boolean }[];
+  toggledTopicList: { name: string; id?: number; checked: boolean }[];
 };

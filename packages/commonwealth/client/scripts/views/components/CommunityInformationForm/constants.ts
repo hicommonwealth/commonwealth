@@ -37,9 +37,12 @@ const particularChainNodes = (nodeInfo: NodeInfo) => {
   );
 };
 
-const chainIdsWithStakeEnabled = Object.values(
+export const chainIdsWithStakeEnabled = Object.values(
   commonProtocol.factoryContracts,
-).map((c) => c.chainId);
+)
+  // we don't support stake on Blast anymore as of 23 Sept, 2024 (#9196)
+  .filter((chain) => chain.chainId !== commonProtocol.ValidChains.Blast)
+  .map((c) => c.chainId);
 
 // Get chain id's from the fetchCachedNodes for all eth and cosmos chains
 export const chainTypes =
@@ -59,6 +62,7 @@ export const chainTypes =
       bech32Prefix: chain.bech32,
       // @ts-expect-error StrictNullChecks
       hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
+      chainNodeId: chain.id,
     })) || [];
 
 // Sort chains alphabetically by labels

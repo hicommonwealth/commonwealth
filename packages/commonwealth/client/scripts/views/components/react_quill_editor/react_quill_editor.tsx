@@ -207,8 +207,7 @@ const ReactQuillEditor = ({
               buttonType: 'secondary',
               buttonHeight: 'sm',
               onClick: () => {
-                // @ts-expect-error <StrictNullChecks/>
-                cancelEditing();
+                cancelEditing?.();
               },
             },
           ],
