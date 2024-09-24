@@ -9,11 +9,6 @@ import {
   __createCommunityStake,
 } from './server_communities_methods/create_community_stake';
 import {
-  DeleteCommunityOptions,
-  DeleteCommunityResult,
-  __deleteCommunity,
-} from './server_communities_methods/delete_community';
-import {
   GetChainNodesOptions,
   GetChainNodesResult,
   __getChainNodes,
@@ -49,12 +44,6 @@ export class ServerCommunitiesController {
     options: SearchCommunitiesOptions,
   ): Promise<SearchCommunitiesResult> {
     return __searchCommunities.call(this, options);
-  }
-
-  async deleteCommunity(
-    options: DeleteCommunityOptions,
-  ): Promise<DeleteCommunityResult> {
-    return __deleteCommunity.call(this, options);
   }
 
   async getChainNodes(

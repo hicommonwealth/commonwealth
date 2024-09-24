@@ -2,6 +2,7 @@ export * from './CreateCommunity.command';
 export * from './CreateGroup.command';
 export * from './CreateStakeTransaction.command';
 export * from './CreateTopic.command';
+export * from './DeleteCommunity.command';
 export * from './DeleteGroup.command';
 export * from './DeleteTopic.command';
 export * from './GenerateStakeholderGroups.command';
