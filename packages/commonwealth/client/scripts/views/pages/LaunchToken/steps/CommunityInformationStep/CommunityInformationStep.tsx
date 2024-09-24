@@ -24,7 +24,7 @@ import { generateCommunityNameFromToken } from './utils';
 
 interface CommunityInformationStepProps {
   handleGoBack: () => void;
-  handleContinue: () => void;
+  handleContinue: (communityId: string) => void;
   tokenInfo?: TokenInfo;
   selectedAddress?: AddressInfo;
 }
@@ -86,10 +86,9 @@ const CommunityInformationStep = ({
         userAddress: selectedAddress.address,
         chainNodeId: baseNode.ethChainId,
         isPWA: isAddedToHomeScreen,
-        tokenName: tokenInfo?.name || '',
       });
       await createCommunityMutation(input);
-      handleContinue();
+      handleContinue(values.communityId);
     } catch (err) {
       notifyError(err.message);
     }

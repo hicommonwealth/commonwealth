@@ -16,10 +16,11 @@ const LaunchToken = () => {
   const {
     createTokenCommunityStep,
     onChangeStep,
-    createdTokenInfo,
+    draftTokenInfo,
     selectedAddress,
     setSelectedAddress,
-    setCreatedTokenInfo,
+    setDraftTokenInfo,
+    setCreatedCommunityId,
   } = useCreateCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -41,7 +42,7 @@ const LaunchToken = () => {
           <TokenInformationStep
             handleGoBack={() => navigate('/')} // redirect to home
             handleContinue={(tokenInfo) => {
-              setCreatedTokenInfo({
+              setDraftTokenInfo({
                 name: tokenInfo.tokenName,
                 symbol: tokenInfo.tokenTicker,
                 description: tokenInfo.tokenDescription,
@@ -58,8 +59,12 @@ const LaunchToken = () => {
         return (
           <CommunityInformationStep
             handleGoBack={() => onChangeStep(false)}
-            handleContinue={() => onChangeStep(true)}
-            tokenInfo={createdTokenInfo}
+            handleContinue={(communityId) => {
+              setCreatedCommunityId(communityId);
+
+              onChangeStep(true);
+            }}
+            tokenInfo={draftTokenInfo}
             selectedAddress={selectedAddress}
           />
         );
