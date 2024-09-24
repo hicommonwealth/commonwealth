@@ -45,13 +45,15 @@ interface ContestCardProps {
   imageUrl?: string;
   finishDate: string;
   topics: { id?: number; name?: string }[];
-  score: {
-    creator_address?: string;
-    content_id?: string;
-    votes?: number;
-    prize?: string;
-    tickerPrize?: number;
-  }[];
+  score?:
+    | {
+        creator_address?: string;
+        content_id?: string;
+        votes?: number;
+        prize?: string;
+        tickerPrize?: number;
+      }[]
+    | null;
   decimals?: number;
   ticker?: string;
   isAdmin: boolean;

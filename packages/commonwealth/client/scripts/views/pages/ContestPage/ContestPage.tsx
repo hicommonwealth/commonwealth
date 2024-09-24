@@ -77,13 +77,11 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             name={contest?.name}
             imageUrl={contest?.image_url || ''}
             topics={contest?.topics}
-            // @ts-expect-error <StrictNullChecks/>
             score={score}
             decimals={contest?.decimals}
             ticker={contest?.ticker}
             finishDate={end_time ? moment(end_time).toISOString() : ''}
-            // @ts-expect-error <StrictNullChecks/>
-            isCancelled={contest?.cancelled}
+            isCancelled={!!contest?.cancelled}
             isRecurring={!contest?.funding_token_address}
             isHorizontal
             showShareButton={false}
