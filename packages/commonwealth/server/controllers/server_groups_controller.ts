@@ -10,11 +10,6 @@ import {
   __getGroups,
 } from './server_groups_methods/get_groups';
 import {
-  RefreshCommunityMembershipsOptions,
-  RefreshCommunityMembershipsResult,
-  __refreshCommunityMemberships,
-} from './server_groups_methods/refresh_community_memberships';
-import {
   RefreshMembershipOptions,
   RefreshMembershipResult,
   __refreshMembership,
@@ -35,12 +30,6 @@ export class ServerGroupsController {
     options: RefreshMembershipOptions,
   ): Promise<RefreshMembershipResult> {
     return __refreshMembership.call(this, options);
-  }
-
-  async refreshCommunityMemberships(
-    options: RefreshCommunityMembershipsOptions,
-  ): Promise<RefreshCommunityMembershipsResult> {
-    return __refreshCommunityMemberships.call(this, options);
   }
 
   async getGroups(options: GetGroupsOptions): Promise<GetGroupsResult> {
