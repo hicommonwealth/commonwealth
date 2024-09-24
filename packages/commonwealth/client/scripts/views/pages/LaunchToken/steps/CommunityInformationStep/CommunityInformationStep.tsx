@@ -83,10 +83,8 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        nodeUrl: baseNode!.url!,
-        altWalletUrl: baseNode!.altWalletUrl!,
         userAddress: selectedAddress.address,
-        ethChainId: `${baseNode.ethChainId}`,
+        chainNodeId: baseNode.ethChainId,
         isPWA: isAddedToHomeScreen,
         tokenName: tokenInfo?.name || '',
       });
