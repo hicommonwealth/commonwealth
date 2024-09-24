@@ -177,7 +177,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       );
 
       const node = await models.ChainNode.findOne({
-        where: { eth_chain_id: chain_node_id },
+        where: { id: chain_node_id },
       });
       mustExist(`Chain Node`, node);
 

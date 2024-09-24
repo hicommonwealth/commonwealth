@@ -84,7 +84,7 @@ const CommunityInformationStep = ({
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
         userAddress: selectedAddress.address,
-        chainNodeId: baseNode.ethChainId,
+        chainNodeId: baseNode.id,
         isPWA: isAddedToHomeScreen,
       });
       await createCommunityMutation(input);
