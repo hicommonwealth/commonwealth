@@ -181,7 +181,9 @@ const DetailsFormStep = ({
           contest_address: contestAddress,
           name: values.contestName,
           image_url: values.contestImage,
-          topic_ids: toggledTopicList.filter((t) => t.checked).map((t) => t.id),
+          topic_ids: toggledTopicList
+            .filter((t) => t.checked)
+            .map((t) => t.id!),
         });
 
         goBack();
