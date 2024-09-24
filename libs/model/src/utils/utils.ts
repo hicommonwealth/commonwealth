@@ -205,11 +205,20 @@ export function getChainNodeUrl({
   return buildChainNodeUrl(private_url, 'private');
 }
 
+//
+//
+//
+/**
+ * Limits content in the Threads.body and Comments.text columns to 2k characters (2kB)
+ * Anything over this character limit is stored in Cloudflare R2.
+ * 55% of threads and 90% of comments are shorter than this.
+ * Anything over 2kB is TOASTed by Postgres so this limit prevents TOAST.
+ */
+const CONTENT_CHAR_LIMIT = 2_000;
+
 /**
  * Uploads content to the appropriate R2 bucket if the content exceeds the
- * preview limit
- * @param type
- * @param content
+ * preview limit (CONTENT_CHAR_LIMIT),
  */
 export async function uploadIfLarge(
   type: 'threads' | 'comments',
@@ -218,7 +227,7 @@ export async function uploadIfLarge(
   contentUrl: string | null;
   truncatedBody: string | null;
 }> {
-  if (content.length > 500) {
+  if (content.length > CONTENT_CHAR_LIMIT) {
     const { url } = await blobStorage({
       key: 'blobStorageFactory.R2BlobStorage.Main',
     }).upload({
