@@ -255,6 +255,15 @@ export const DeleteGroup = {
   }),
 };
 
+export const DeleteCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+  }),
+};
+
 export const RefreshCommunityMemberships = {
   input: z.object({
     community_id: z.string(),
