@@ -16,9 +16,9 @@ const LaunchToken = () => {
   const {
     createTokenCommunityStep,
     onChangeStep,
+    createdTokenInfo,
     selectedAddress,
     setSelectedAddress,
-    createdTokenInfo,
     setCreatedTokenInfo,
   } = useCreateCommunity();
 
@@ -60,6 +60,7 @@ const LaunchToken = () => {
             handleGoBack={() => onChangeStep(false)}
             handleContinue={() => onChangeStep(true)}
             tokenInfo={createdTokenInfo}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.SignatureLaunch:
