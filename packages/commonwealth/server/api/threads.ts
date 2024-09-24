@@ -1,5 +1,10 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { GlobalActivityCache, Thread, models } from '@hicommonwealth/model';
+import {
+  GlobalActivityCache,
+  Reaction,
+  Thread,
+  models,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedDataMiddleware } from '../federation';
 
@@ -43,6 +48,12 @@ export const trpcRouter = trpc.router({
       gac && (await gac.deleteActivityFromCache(output.thread_id));
       return undefined;
     },
+    applyCanvasSignedDataMiddleware,
+  ),
+  deleteReaction: trpc.command(
+    Reaction.DeleteReaction,
+    trpc.Tag.Reaction,
+    undefined,
     applyCanvasSignedDataMiddleware,
   ),
 });
