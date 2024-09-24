@@ -86,7 +86,7 @@ export const DiscussionSection = ({
   });
 
   const topics = (topicsData || [])
-    .filter((t) => t.featuredInSidebar)
+    .filter((t) => t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
@@ -102,7 +102,7 @@ export const DiscussionSection = ({
   };
 
   for (const topic of topics) {
-    if (topic.featuredInSidebar) {
+    if (topic.featured_in_sidebar) {
       discussionsDefaultToggleTree.children[topic.name] = {
         toggledState: true,
         children: {
@@ -193,7 +193,7 @@ export const DiscussionSection = ({
   ];
 
   for (const topic of topics) {
-    if (topic.featuredInSidebar) {
+    if (topic.featured_in_sidebar) {
       const topicInvolvedInActiveContest =
         contestsEnabled && topicIdsIncludedInContest.includes(topic.id);
 

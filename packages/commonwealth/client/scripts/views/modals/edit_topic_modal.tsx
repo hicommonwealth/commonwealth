@@ -34,7 +34,7 @@ export const EditTopicModal = ({
 }: EditTopicModalProps) => {
   const {
     description: descriptionProp,
-    feature_in_sidebar: featuredInSidebarProp,
+    featured_in_sidebar: featuredInSidebarProp,
     id,
     name: nameProp,
   } = topic;
@@ -46,7 +46,6 @@ export const EditTopicModal = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);

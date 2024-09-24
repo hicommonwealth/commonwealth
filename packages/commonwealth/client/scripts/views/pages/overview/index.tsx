@@ -35,10 +35,10 @@ const OverviewPage = () => {
     apiEnabled: !!communityId,
   });
 
-  const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
+  const anyTopicsFeatured = topics.some((t) => t.featured_in_sidebar);
 
   const topicsFiltered = anyTopicsFeatured
-    ? topics.filter((t) => t.featuredInSidebar)
+    ? topics.filter((t) => t.featured_in_sidebar)
     : topics;
 
   const topicsSorted = anyTopicsFeatured
@@ -63,7 +63,7 @@ const OverviewPage = () => {
     return {
       monthlyThreads,
       pinnedThreads: [], // TODO: ask for a pinned thread prop in /threads?active=true api to show pinned threads
-      topic,
+      topic: topic as unknown as Topic,
     };
   });
 

@@ -17,7 +17,7 @@ export const DiscordConnections = ({
   refetchTopics,
 }: {
   channels: DiscordChannels[];
-  topics: { id: string; name: string; channelId: string | null }[];
+  topics: { id: string; name: string; channelId: string | null | undefined }[];
   refetchTopics: () => Promise<void>;
 }) => {
   const topicOptions = topics.map((topic) => {

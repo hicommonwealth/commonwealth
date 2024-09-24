@@ -213,11 +213,10 @@ const Discord = () => {
                       };
                     },
                   )}
-                  // @ts-expect-error <StrictNullChecks/>
                   topics={topics.map((topic) => ({
                     name: topic.name,
                     id: `${topic.id}`,
-                    channelId: topic.channelId,
+                    channelId: topic.channel_id,
                   }))}
                   refetchTopics={async () => {
                     await refetchTopics();

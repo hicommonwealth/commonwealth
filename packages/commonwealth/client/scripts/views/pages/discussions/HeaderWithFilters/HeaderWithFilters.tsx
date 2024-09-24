@@ -121,13 +121,13 @@ export const HeaderWithFilters = ({
   );
 
   const featuredTopics = (topics || [])
-    .filter((t) => t.featuredInSidebar)
+    .filter((t) => t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const otherTopics = (topics || [])
-    .filter((t) => !t.featuredInSidebar)
+    .filter((t) => !t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
@@ -367,7 +367,7 @@ export const HeaderWithFilters = ({
                     setTopicSelectedToEdit(
                       [...featuredTopics, ...otherTopics].find(
                         (x) => x.id === item.id,
-                      ),
+                      ) as unknown as Topic,
                     )
                   }
                 />
@@ -490,23 +490,19 @@ export const HeaderWithFilters = ({
       </div>
 
       {(activeContests || []).map((contest) => {
-        const { end_time, score } =
-          // @ts-expect-error <StrictNullChecks/>
-          contest?.contests[0] || {};
+        if (!contest) return;
+
+        const { end_time, score } = contest.contests?.[0] || {};
 
         return (
           <ContestCard
             key={contest.contest_address}
             isAdmin={false}
-            // @ts-expect-error <StrictNullChecks/>
-            address={contest.contest_address}
-            // @ts-expect-error <StrictNullChecks/>
-            name={contest.name}
+            address={contest!.contest_address!}
+            name={contest!.name!}
             imageUrl={contest.image_url}
-            // @ts-expect-error <StrictNullChecks/>
-            topics={contest.topics}
-            // @ts-expect-error <StrictNullChecks/>
-            score={score}
+            topics={contest!.topics!}
+            score={score!}
             decimals={contest.decimals}
             ticker={contest.ticker}
             finishDate={end_time ? moment(end_time).toISOString() : ''}

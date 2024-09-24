@@ -18,7 +18,7 @@ import './ManageTopicsSection.scss';
 export const ManageTopicsSection = () => {
   const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
-      .filter((topic) => topic.feature_in_sidebar)
+      .filter((topic) => topic.featured_in_sidebar)
       .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
@@ -37,7 +37,7 @@ export const ManageTopicsSection = () => {
 
   const getRegularTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
-      .filter((topic) => !topic.feature_in_sidebar)
+      .filter((topic) => !topic.featured_in_sidebar)
       .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];

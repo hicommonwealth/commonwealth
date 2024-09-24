@@ -1,3 +1,4 @@
+import Topic from 'client/scripts/models/Topic';
 import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
@@ -84,7 +85,7 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
-  } = useNewThreadForm(communityId, topicsForSelector);
+  } = useNewThreadForm(communityId, topicsForSelector as unknown as Topic[]);
 
   const hasTopicOngoingContest =
     threadTopic?.active_contest_managers?.length > 0;
@@ -275,7 +276,7 @@ export const NewThreadForm = () => {
                         originalProps,
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
-                        ),
+                        ) as unknown as Topic,
                       }),
                   }}
                   formatOptionLabel={(option) => (
