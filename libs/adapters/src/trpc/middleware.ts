@@ -53,7 +53,8 @@ export enum Tag {
 export type Commit<Input extends ZodSchema, Output extends ZodSchema> = (
   input: z.infer<Input>,
   output: z.infer<Output>,
-) => Promise<[string, Record<string, unknown>] | undefined>;
+  ctx: Context,
+) => Promise<[string, Record<string, unknown>] | undefined | void>;
 
 /**
  * Supports two options to track analytics
@@ -175,7 +176,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
       track &&
         result.ok &&
         void trackAnalytics(track, ctx, rawInput, result.data);
-      commit && result.ok && void commit(rawInput, result.data);
+      commit && result.ok && void commit(rawInput, result.data, ctx);
       return result;
     })
     .meta({

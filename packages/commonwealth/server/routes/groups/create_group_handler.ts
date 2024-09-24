@@ -50,16 +50,6 @@ export const createGroupHandler = async (
     topics,
   });
 
-  // Warning: keep for now, but should be a debounced async integration policy that get's triggered by creation events
-  // refresh memberships in background
-  controllers.groups
-    .refreshCommunityMemberships({
-      // @ts-expect-error StrictNullChecks
-      communityId: community.id,
-      groupId: group.id,
-    })
-    .catch(console.error);
-
   // Warning: replace with analytics middleware
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
