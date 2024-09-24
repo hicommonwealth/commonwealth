@@ -65,7 +65,7 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
         updated_at: now,
         view_count: 0,
         canvas_signed_data: '',
-        canvas_hash: '',
+        canvas_msg_id: '',
         reaction_count: 0,
         reaction_weights_sum: 0,
         comment_count: 0,

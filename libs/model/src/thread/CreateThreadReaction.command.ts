@@ -29,7 +29,7 @@ export function CreateThreadReaction(): Command<
         throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);
 
       const calculated_voting_weight = await getVotingWeight(
-        thread.community_id,
+        thread.topic_id!,
         address.address,
       );
 
@@ -47,14 +47,11 @@ export function CreateThreadReaction(): Command<
               thread_id: thread.id,
               reaction: payload.reaction,
               calculated_voting_weight,
-              canvas_hash: payload.canvas_hash,
+              canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
             },
             transaction,
           });
-
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           return reaction.id;
         },

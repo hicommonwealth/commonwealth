@@ -10,6 +10,7 @@ import { TopicAttributes } from '../models';
 
 const Errors = {
   InvalidTopics: 'Invalid topics',
+  StakeNotEnabled: 'Stake must be enabled to create a recurring contest',
 };
 
 export function CreateContestManagerMetadata(): Command<
@@ -21,6 +22,16 @@ export function CreateContestManagerMetadata(): Command<
     auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ payload }) => {
       const { id, topic_ids, ...rest } = payload;
+
+      // if stake is not enabled, only allow one-off contests
+      const stake = await models.CommunityStake.findOne({
+        where: {
+          community_id: id,
+        },
+      });
+      if (!stake && payload.interval > 0) {
+        throw new InvalidState(Errors.StakeNotEnabled);
+      }
 
       let contestTopics: TopicAttributes[] = [];
       let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
@@ -39,7 +50,6 @@ export function CreateContestManagerMetadata(): Command<
         }
         contestTopics = topics.map((t) => t.get({ plain: true }));
         contestTopicsToCreate = topics.map((t) => ({
-          weighted_voting: schemas.TopicWeightedVoting.Stake,
           contest_address: rest.contest_address,
           topic_id: t.id!,
           created_at: new Date(),

@@ -13,10 +13,23 @@ const {
   getCommunities,
   getCommunity,
   getMembers,
+  deleteTopic,
+  deleteGroup,
 } = community.trpcRouter;
-const { createThread, updateThread, createThreadReaction } = thread.trpcRouter;
-const { createComment, createCommentReaction, updateComment, getComments } =
-  comment.trpcRouter;
+const {
+  createThread,
+  updateThread,
+  createThreadReaction,
+  deleteThread,
+  deleteReaction,
+} = thread.trpcRouter;
+const {
+  createComment,
+  createCommentReaction,
+  updateComment,
+  getComments,
+  deleteComment,
+} = comment.trpcRouter;
 
 const api = {
   createCommunity,
@@ -24,13 +37,18 @@ const api = {
   getCommunities,
   getCommunity,
   getMembers,
+  deleteTopic,
+  deleteGroup,
   getComments,
   createThread,
   updateThread,
   createThreadReaction,
+  deleteThread,
+  deleteReaction,
   createComment,
   updateComment,
   createCommentReaction,
+  deleteComment,
 };
 
 const PATH = '/api/v1';

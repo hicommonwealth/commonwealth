@@ -1,7 +1,7 @@
-import { commonProtocol } from '@hicommonwealth/shared';
 import React, { useState } from 'react';
 
 import app from 'state';
+import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -36,11 +36,10 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
     onStepChange(CreateTopicStep.WVStake);
   };
 
-  const canEnableStake =
-    !!commonProtocol?.factoryContracts[
-      // @ts-expect-error <StrictNullChecks/>
-      app?.chain?.meta?.ChainNode?.eth_chain_id
-    ];
+  const canEnableStake = chainIdsWithStakeEnabled.includes(
+    // @ts-expect-error StrictNullChecks
+    app?.chain?.meta?.ChainNode?.eth_chain_id,
+  );
 
   return (
     <div className="WVMethodSelection">

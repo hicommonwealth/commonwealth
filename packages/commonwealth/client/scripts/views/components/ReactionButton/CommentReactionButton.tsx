@@ -1,4 +1,6 @@
 import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
+import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/comments/deleteReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import React, { useState } from 'react';
@@ -28,6 +30,7 @@ export const CommentReactionButton = ({
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const { mutateAsync: createCommentReaction } =
     useCreateCommentReactionMutation({
@@ -69,18 +72,23 @@ export const CommentReactionButton = ({
       const foundReaction = comment.reactions.find((r) => {
         return r.author === activeAddress;
       });
-      deleteCommentReaction({
+      if (!foundReaction) {
+        console.error('missing reaction');
+        notifyError('Failed to update reaction count');
+        return;
+      }
+      const input = await buildDeleteCommentReactionInput({
         communityId,
         address: user.activeAccount?.address,
-        // @ts-expect-error <StrictNullChecks/>
-        canvasHash: foundReaction.canvasHash,
-        // @ts-expect-error <StrictNullChecks/>
+        commentMsgId: comment.canvasMsgId,
         reactionId: foundReaction.id,
-      }).catch((err) => {
+      });
+      deleteCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
-        console.error(err.response.data.error || err?.message);
+        console.error(err?.message);
         notifyError('Failed to update reaction count');
       });
     } else {
@@ -89,12 +97,14 @@ export const CommentReactionButton = ({
         commentId: comment.id,
         communityId,
         threadId: comment.threadId,
+        commentMsgId: comment.canvasMsgId,
       });
       createCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
-        console.error(err?.responseJSON?.error || err?.message);
+        console.error(err?.message);
         notifyError('Failed to save reaction');
       });
     }

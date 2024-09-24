@@ -2,7 +2,6 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
-  ENFORCE_SESSION_KEYS,
   TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
@@ -24,11 +23,13 @@ const {
   FLAG_COMMON_WALLET,
   SITEMAP_THREAD_PRIORITY,
   SITEMAP_PROFILE_PRIORITY,
-  ETH_ALCHEMY_API_KEY,
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
   REACTION_WEIGHT_OVERRIDE,
+  FLAG_FARCASTER_CONTEST,
+  ALCHEMY_PRIVATE_APP_KEY,
+  ALCHEMY_PUBLIC_APP_KEY,
 } = process.env;
 
 const NAME =
@@ -45,7 +46,6 @@ const DEFAULTS = {
 export const config = configure(
   target,
   {
-    ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
@@ -77,6 +77,7 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 2,
+      FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -93,6 +94,10 @@ export const config = configure(
         PRIVATE_KEY: ALCHEMY_AA_PRIVATE_KEY,
         GAS_POLICY: ALCHEMY_AA_GAS_POLICY,
       },
+      APP_KEYS: {
+        PRIVATE: ALCHEMY_PRIVATE_APP_KEY!,
+        PUBLIC: ALCHEMY_PUBLIC_APP_KEY!,
+      },
     },
     SITEMAP: {
       THREAD_PRIORITY: SITEMAP_THREAD_PRIORITY
@@ -108,7 +113,6 @@ export const config = configure(
       ETH_RPC: ETH_RPC || 'prod',
       // URL of the local Ganache, Anvil, or Hardhat chain
       PROVIDER_URL: PROVIDER_URL ?? 'http://127.0.0.1:8545',
-      ETH_ALCHEMY_API_KEY,
     },
     COSMOS: {
       COSMOS_REGISTRY_API:
@@ -116,7 +120,6 @@ export const config = configure(
     },
   },
   z.object({
-    ENFORCE_SESSION_KEYS: z.boolean(),
     DB: z.object({
       URI: z
         .string()
@@ -156,6 +159,7 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
+      FLAG_FARCASTER_CONTEST: z.boolean(),
     }),
     AUTH: z
       .object({
@@ -191,6 +195,10 @@ export const config = configure(
             return data.PRIVATE_KEY && data.ALCHEMY_KEY && data.GAS_POLICY;
           return true;
         }),
+      APP_KEYS: z.object({
+        PRIVATE: z.string(),
+        PUBLIC: z.string(),
+      }),
     }),
     SITEMAP: z.object({
       THREAD_PRIORITY: z.coerce.number(),
@@ -200,8 +208,6 @@ export const config = configure(
     TEST_EVM: z.object({
       ETH_RPC: z.string(),
       PROVIDER_URL: z.string(),
-      ETH_ALCHEMY_API_KEY: z.string().optional(),
-      BASESEP_ALCHEMY_API_KEY: z.string().optional(),
     }),
     COSMOS: z.object({
       COSMOS_REGISTRY_API: z.string(),

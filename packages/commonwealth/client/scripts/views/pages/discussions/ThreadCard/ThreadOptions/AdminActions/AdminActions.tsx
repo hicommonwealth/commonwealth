@@ -1,4 +1,6 @@
+import { buildDeleteThreadInput } from 'client/scripts/state/api/threads/deleteThread';
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -76,19 +78,17 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
-  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
-    communityId: app.activeChainId() || '',
-    threadId: thread.id,
-    currentStage: thread.stage,
-  });
+  const { mutateAsync: deleteThread } = useDeleteThreadMutation(thread);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
-    currentTopicId: thread.topic?.id,
+    currentTopicId: thread.topic.id!,
   });
 
   const handleDeleteThread = () => {
@@ -102,17 +102,18 @@ export const AdminActions = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteThread({
-                threadId: thread.id,
-                communityId: app.activeChainId() || '',
-                address: user.activeAccount?.address || '',
-              });
+              const input = await buildDeleteThreadInput(
+                user.activeAccount?.address || '',
+                thread,
+              );
+              await deleteThread(input);
               onDelete?.();
             } catch (err) {
               if (err instanceof SessionKeyError) {
+                checkForSessionKeyRevalidationErrors(err);
                 return;
               }
-              console.error(err?.responseJSON?.error || err?.message);
+              console.error(err.message);
               notifyError('Failed to delete thread');
             }
           },
@@ -175,6 +176,7 @@ export const AdminActions = ({
               const input = await buildUpdateThreadInput({
                 communityId: app.activeChainId() || '',
                 threadId: thread.id,
+                threadMsgId: thread.canvasMsgId,
                 spam: isSpam,
                 address: user.activeAccount?.address || '',
               });
@@ -198,6 +200,7 @@ export const AdminActions = ({
     const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
       readOnly: !thread.readOnly,
       communityId: app.activeChainId() || '',
     });
@@ -216,6 +219,7 @@ export const AdminActions = ({
     const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
       communityId: app.activeChainId() || '',
       pinned: !thread.pinned,
     });
@@ -274,6 +278,7 @@ export const AdminActions = ({
     } else {
       const input = await buildUpdateThreadInput({
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId,
         communityId: app.activeChainId() || '',
         archived: !thread.archivedAt,
         address: user.activeAccount?.address || '',

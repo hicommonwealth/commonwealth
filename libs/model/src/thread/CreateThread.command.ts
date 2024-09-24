@@ -151,9 +151,6 @@ export function CreateThread(): Command<
             },
           );
 
-          address.last_active = new Date();
-          await address.save({ transaction });
-
           await models.ThreadSubscription.create(
             {
               user_id: actor.user.id!,

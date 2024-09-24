@@ -1,4 +1,6 @@
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
+import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useAppStatus from 'hooks/useAppStatus';
@@ -41,6 +43,7 @@ export const ReactionButton = ({
   const reactors = thread?.associatedReactions?.map((t) => t.address);
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
@@ -62,12 +65,14 @@ export const ReactionButton = ({
     useCreateThreadReactionMutation({
       communityId,
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId,
       address: user.activeAccount?.address || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -88,30 +93,37 @@ export const ReactionButton = ({
         return notifyError('Upvotes on contest entries cannot be removed');
       }
 
-      deleteThreadReaction({
+      const input = await buildDeleteThreadReactionInput({
         communityId,
         address: user.activeAccount?.address,
-        threadId: thread.id,
-        reactionId: reactedId as number,
-      }).catch((e) => {
+        threadId: thread.id!,
+        threadMsgId: thread.canvasMsgId,
+        reactionId: +reactedId,
+      });
+      deleteThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        notifyError('Failed to unvote');
+        console.error(e?.response?.data?.error || e?.message);
       });
     } else {
       const input = await buildCreateThreadReactionInput({
         communityId,
         address: activeAddress || '',
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId,
         reactionType: 'like',
         isPWA: isAddedToHomeScreen,
       });
       createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        notifyError('Failed to upvote');
+        console.error(e?.response?.data?.error || e?.message);
       });
     }
   };
