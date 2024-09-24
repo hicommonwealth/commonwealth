@@ -64,13 +64,16 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     apiEnabled: !!account?.address && !!thread.communityId,
   });
 
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    membership.topicIds.includes(thread?.topic?.id),
+  const isTopicGated = !!(memberships || []).find(
+    (membership) =>
+      thread?.topic?.id && membership.topicIds.includes(thread.topic.id),
   );
 
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+      thread?.topic?.id &&
+      membership.topicIds.includes(thread.topic.id) &&
+      membership.isAllowed,
   );
 
   const isRestrictedMembership =

@@ -1,1 +1,1 @@
-export * from './CreateReaction.command';
+export * from './DeleteReaction.command';

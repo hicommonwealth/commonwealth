@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
 import { commonProtocol } from '@hicommonwealth/shared';
-import { useCommonNavigate } from 'navigation/helpers';
 import useTokenMetadataQuery from 'state/api/tokens/getTokenMetadata';
 import { alphabeticallySortedChains } from 'views/components/CommunityInformationForm/constants';
 import TokenBanner from 'views/components/TokenBanner';
@@ -14,17 +13,27 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 
 import { CreateTopicStep } from '../utils';
 
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { notifyError } from 'controllers/app/notifications';
+import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVERC20Details.scss';
 
 interface WVConsentProps {
   onStepChange: (step: CreateTopicStep) => void;
+  onCreateTopic: (props: HandleCreateTopicProps) => Promise<void>;
 }
 
-const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
-  const navigate = useCommonNavigate();
+const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
+  const options = alphabeticallySortedChains.filter((c) => c.hasStakeEnabled);
+  const defaultChain = options.find(
+    (o) => o.value === commonProtocol.ValidChains.Base,
+  );
+
+  const [selectedChain, setSelectedChain] = useState(defaultChain);
   const [multiplier, setMultiplier] = useState(1);
   const [token, setToken] = useState('');
   const debouncedToken = useDebounce<string>(token, 500);
+
   const editMode = false;
 
   const { data: tokenMetadata, isLoading: tokenMetadataLoading } =
@@ -38,7 +47,20 @@ const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
     }
   };
 
-  const options = alphabeticallySortedChains.filter((c) => c.hasStakeEnabled);
+  const handleSubmit = () => {
+    onCreateTopic({
+      erc20: {
+        tokenAddress: debouncedToken,
+        tokenSymbol: tokenMetadata?.symbol,
+        voteWeightMultiplier: multiplier,
+        chainNodeId: Number(selectedChain?.chainNodeId),
+        weightedVoting: TopicWeightedVoting.ERC20,
+      },
+    }).catch((err) => {
+      notifyError('Failed to create topic');
+      console.log(err);
+    });
+  };
 
   return (
     <div className="WVERC20Details">
@@ -61,9 +83,8 @@ const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
       <CWSelectList
         isDisabled={editMode}
         options={options}
-        defaultValue={options.find(
-          (o) => o.value === commonProtocol.ValidChains.Base,
-        )}
+        value={selectedChain}
+        onChange={setSelectedChain}
         isSearchable={false}
       />
 
@@ -104,7 +125,7 @@ const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
           defaultValue={1}
           isCompact
           value={multiplier}
-          onInput={(e) => setMultiplier(e.target.value)}
+          onInput={(e) => setMultiplier(Number(e.target.value))}
         />
         <CWText type="b1" className="description">
           votes.
@@ -146,7 +167,7 @@ const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
           type="button"
           buttonWidth="wide"
           label="Enable weighted voting for topic"
-          onClick={() => navigate('/discussions')}
+          onClick={handleSubmit}
         />
       </section>
     </div>
