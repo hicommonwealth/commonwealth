@@ -16,4 +16,5 @@ export * from './RefreshCustomDomain.query';
 export * from './SetCommunityStake.command';
 export * from './UpdateCommunity.command';
 export * from './UpdateCustomDomain.command';
+export * from './UpdateGroup.command';
 export * from './UpdateTopic.command';

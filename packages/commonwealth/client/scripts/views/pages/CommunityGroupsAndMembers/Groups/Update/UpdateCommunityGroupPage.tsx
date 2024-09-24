@@ -1,3 +1,4 @@
+import { buildUpdateGroupInput } from 'client/scripts/state/api/groups/editGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
@@ -138,12 +139,12 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             isAddedToHomeScreen,
             allowedAddresses,
           );
-          const finalPayload = {
+          const input = buildUpdateGroupInput({
             ...payload,
             groupId: groupId,
-          };
+          });
 
-          editGroup(finalPayload)
+          editGroup(input)
             .then(() => {
               notifySuccess('Group Updated');
               navigate(`/members?tab=groups`);

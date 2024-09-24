@@ -55,7 +55,10 @@ export const trpcRouter = trpc.router({
   createGroup: trpc.command(
     Community.CreateGroup,
     trpc.Tag.Community,
-    [MixpanelCommunityInteractionEvent.CREATE_GROUP],
+    [
+      MixpanelCommunityInteractionEvent.CREATE_GROUP,
+      (result) => ({ community: result.id }),
+    ],
     async (_, output, ctx) => {
       await command(Community.RefreshCommunityMemberships(), {
         actor: ctx.actor,
@@ -63,7 +66,29 @@ export const trpcRouter = trpc.router({
           community_id: output.id!,
           group_id: output.groups?.at(0)?.id,
         },
-      });
+      }).catch(console.error);
+    },
+  ),
+  updateGroup: trpc.command(
+    Community.UpdateGroup,
+    trpc.Tag.Community,
+    [
+      MixpanelCommunityInteractionEvent.UPDATE_GROUP,
+      (result) => ({ community: result.community_id }),
+    ],
+    async (input, output, ctx) => {
+      // refresh memberships in background if requirements or required requirements updated
+      if (
+        input.requirements?.length > 0 ||
+        input.metadata.required_requirements
+      )
+        await command(Community.RefreshCommunityMemberships(), {
+          actor: ctx.actor,
+          payload: {
+            community_id: output.community_id!,
+            group_id: output.id,
+          },
+        }).catch(console.error);
     },
   ),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
