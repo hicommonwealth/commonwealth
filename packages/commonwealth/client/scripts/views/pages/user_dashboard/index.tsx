@@ -140,7 +140,10 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
             </>
           </div>
           {isWindowExtraSmall ? (
-            <TrendingCommunitiesPreview />
+            <>
+              <LaunchTokenCard />
+              <TrendingCommunitiesPreview />
+            </>
           ) : (
             <div className="featured-cards">
               <LaunchTokenCard />
