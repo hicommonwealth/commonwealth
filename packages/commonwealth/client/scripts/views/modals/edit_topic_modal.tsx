@@ -46,7 +46,6 @@ export const EditTopicModal = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
@@ -56,7 +55,7 @@ export const EditTopicModal = ({
 
     try {
       await editTopic({
-        topic_id: id,
+        topic_id: id!,
         description: description,
         name: name,
         community_id: app.activeChainId()!,
@@ -95,7 +94,7 @@ export const EditTopicModal = ({
           onClick: async () => {
             await deleteTopic({
               community_id: app.activeChainId() || '',
-              topic_id: id,
+              topic_id: id!,
             });
             if (noRedirect) {
               onModalClose();

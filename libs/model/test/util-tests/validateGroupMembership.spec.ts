@@ -1,7 +1,9 @@
-import { OptionsWithBalances } from '@hicommonwealth/model';
+import {
+  OptionsWithBalances,
+  validateGroupMembership,
+} from '@hicommonwealth/model';
 import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import validateGroupMembership from 'server/util/requirementsModule/validateGroupMembership';
 import { describe, test } from 'vitest';
 
 type MockRequirementOptions = {
@@ -44,7 +46,7 @@ function createMockThresholdRequirements(
             }
           })(),
         },
-      } as Requirement),
+      }) as Requirement,
   );
 }
 

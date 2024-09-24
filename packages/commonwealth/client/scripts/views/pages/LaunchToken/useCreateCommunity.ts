@@ -1,11 +1,15 @@
+import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
+import { TokenInfo } from './types';
 import { CreateTokenCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
   const [createTokenCommunityStep, setCreateTokenCommunityStep] =
     useState<CreateTokenCommunityStep>(
-      CreateTokenCommunityStep.CommunityInformation,
+      CreateTokenCommunityStep.TokenInformation,
     );
+  const [selectedAddress, setSelectedAddress] = useState<AddressInfo>();
+  const [createdTokenInfo, setCreatedTokenInfo] = useState<TokenInfo>();
 
   const onChangeStep = (forward: boolean) => {
     handleChangeStep(
@@ -18,6 +22,10 @@ const useCreateCommunity = () => {
   return {
     createTokenCommunityStep,
     onChangeStep,
+    selectedAddress,
+    setSelectedAddress,
+    createdTokenInfo,
+    setCreatedTokenInfo,
   };
 };
 

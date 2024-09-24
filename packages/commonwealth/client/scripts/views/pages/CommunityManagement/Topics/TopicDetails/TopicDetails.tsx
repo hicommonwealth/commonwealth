@@ -11,6 +11,7 @@ import { CreateTopicStep } from '../utils';
 import CreateTopicSection from './CreateTopicsSection';
 import ManageTopicsSection from './ManageTopicsSection';
 
+import { TopicForm } from 'views/pages/CommunityManagement/Topics/Topics';
 import './TopicDetails.scss';
 
 const TABS = [
@@ -20,9 +21,15 @@ const TABS = [
 
 interface TopicDetailsProps {
   onStepChange: (step: CreateTopicStep) => void;
+  onSetTopicFormData: (data: Partial<TopicForm>) => void;
+  topicFormData: TopicForm | null;
 }
 
-const TopicDetails = ({ onStepChange }: TopicDetailsProps) => {
+const TopicDetails = ({
+  onStepChange,
+  onSetTopicFormData,
+  topicFormData,
+}: TopicDetailsProps) => {
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const isCreateTopicTab = selectedTab === TABS[0].value;
 
@@ -47,7 +54,11 @@ const TopicDetails = ({ onStepChange }: TopicDetailsProps) => {
             ))}
           </CWTabsRow>
           {isCreateTopicTab ? (
-            <CreateTopicSection onStepChange={onStepChange} />
+            <CreateTopicSection
+              onStepChange={onStepChange}
+              onSetTopicFormData={onSetTopicFormData}
+              topicFormData={topicFormData}
+            />
           ) : (
             <ManageTopicsSection />
           )}
