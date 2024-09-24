@@ -18,8 +18,8 @@ export const R2BlobStorage = (): BlobStorage => {
   const client = new S3({
     endpoint: `https://${config.CLOUDFLARE.R2.ACCOUNT_ID}.r2.cloudflarestorage.com`,
     credentials: {
-      accessKeyId: config.CLOUDFLARE.R2.ACCESS_KEY_ID,
-      secretAccessKey: config.CLOUDFLARE.R2.SECRET_ACCESS_KEY,
+      accessKeyId: config.CLOUDFLARE.R2.ACCESS_KEY_ID!,
+      secretAccessKey: config.CLOUDFLARE.R2.SECRET_ACCESS_KEY!,
     },
     region: 'auto',
   });
