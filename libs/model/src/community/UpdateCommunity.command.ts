@@ -65,18 +65,21 @@ export function UpdateCommunity(): Command<
           throw new InvalidInput(UpdateCommunityErrors.SnapshotOnlyOnEthereum);
         }
 
-        if(snapshots.length) {
+        if (snapshots.length) {
           const newSpaces = snapshots.filter(
             (s) => !community.snapshot_spaces.includes(s),
           );
-  
+
           for (const space of newSpaces) {
             if (!(await checkSnapshotObjectExists('space', space))) {
               throw new InvalidInput(UpdateCommunityErrors.SnapshotNotFound);
             }
           }
-  
-          community.snapshot_spaces = [...community.snapshot_spaces, ...newSpaces];
+
+          community.snapshot_spaces = [
+            ...community.snapshot_spaces,
+            ...newSpaces,
+          ];
         } else {
           community.snapshot_spaces = [];
         }
