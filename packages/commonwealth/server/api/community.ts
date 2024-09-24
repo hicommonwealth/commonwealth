@@ -78,10 +78,7 @@ export const trpcRouter = trpc.router({
     ],
     async (input, output, ctx) => {
       // refresh memberships in background if requirements or required requirements updated
-      if (
-        input.requirements?.length > 0 ||
-        input.metadata.required_requirements
-      )
+      if (input.requirements?.length || input.metadata?.required_requirements)
         await command(Community.RefreshCommunityMemberships(), {
           actor: ctx.actor,
           payload: {
