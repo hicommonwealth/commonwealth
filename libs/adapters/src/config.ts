@@ -311,11 +311,20 @@ export const config = configure(
         },
       ),
     CLOUDFLARE: z.object({
-      R2: z.object({
-        ACCOUNT_ID: z.string(),
-        ACCESS_KEY_ID: z.string(),
-        SECRET_ACCESS_KEY: z.string(),
-      }),
+      R2: z
+        .object({
+          ACCOUNT_ID: z.string(),
+          ACCESS_KEY_ID: z.string(),
+          SECRET_ACCESS_KEY: z.string(),
+        })
+        .refine((data) => {
+          if (target.APP_ENV === 'CI' || target.NODE_ENV === 'test')
+            return true;
+          else
+            return (
+              data.ACCOUNT_ID && data.ACCESS_KEY_ID && data.SECRET_ACCESS_KEY
+            );
+        }),
     }),
   }),
 );
