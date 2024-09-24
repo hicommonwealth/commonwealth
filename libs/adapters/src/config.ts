@@ -81,9 +81,9 @@ export const config = configure(
     },
     CLOUDFLARE: {
       R2: {
-        ACCOUNT_ID: R2_ACCOUNT_ID!,
-        ACCESS_KEY_ID: R2_ACCESS_KEY_ID!,
-        SECRET_ACCESS_KEY: R2_SECRET_ACCESS_KEY!,
+        ACCOUNT_ID: R2_ACCOUNT_ID,
+        ACCESS_KEY_ID: R2_ACCESS_KEY_ID,
+        SECRET_ACCESS_KEY: R2_SECRET_ACCESS_KEY,
       },
     },
   },
@@ -313,9 +313,9 @@ export const config = configure(
     CLOUDFLARE: z.object({
       R2: z
         .object({
-          ACCOUNT_ID: z.string(),
-          ACCESS_KEY_ID: z.string(),
-          SECRET_ACCESS_KEY: z.string(),
+          ACCOUNT_ID: z.string().optional(),
+          ACCESS_KEY_ID: z.string().optional(),
+          SECRET_ACCESS_KEY: z.string().optional(),
         })
         .refine((data) => {
           if (target.APP_ENV === 'CI' || target.NODE_ENV === 'test')
