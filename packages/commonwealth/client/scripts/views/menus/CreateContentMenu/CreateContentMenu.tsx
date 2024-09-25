@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { uuidv4 } from 'lib/util';
@@ -12,6 +11,7 @@ import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
 import { CreateDiscordBotConfigProps } from 'state/api/discord/createDiscordBotConfing';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -20,10 +20,11 @@ import {
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
-import Permissions from '../../utils/Permissions';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import { getClasses } from '../components/component_kit/helpers';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWSidebarMenu } from '../../components/component_kit/cw_sidebar_menu';
+import { getClasses } from '../../components/component_kit/helpers';
+import TokenLaunchButton from '../../components/sidebar/TokenLaunchButton';
+import './CreateContentMenu.scss';
 
 const resetSidebarState = () => {
   //Bouncer pattern -- I have found isMobile does not always detect screen
@@ -103,6 +104,10 @@ const getCreateContentMenuItems = (
         navigate('/createCommunity', {}, null);
       },
     },
+    {
+      type: 'element',
+      element: <TokenLaunchButton key={2} buttonHeight="sm" />,
+    },
   ];
 
   const getDiscordBotConnectionItems = (): PopoverMenuItem[] => {
@@ -114,34 +119,34 @@ const getCreateContentMenuItems = (
         {
           label: 'Connect Discord',
           iconLeft: 'discord',
-          onClick: async () => {
-            try {
-              const verificationToken = uuidv4();
-              await createDiscordBotConfig?.({ verificationToken });
-
-              window.open(
-                `https://discord.com/oauth2/authorize?client_id=${
-                  process.env.DISCORD_CLIENT_ID
-                }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-                  `${
-                    !isCustomDomain
-                      ? window.location.origin
-                      : 'https://commonwealth.im'
-                  }`,
-                )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
-                  JSON.stringify({
-                    cw_chain_id: app.activeChainId(),
-                    verificationToken,
-                    redirect_domain: isCustomDomain
-                      ? window.location.origin
-                      : undefined,
-                  }),
-                )}`,
-                '_parent',
-              );
-            } catch (err) {
-              console.log(err);
-            }
+          onClick: () => {
+            const verificationToken = uuidv4();
+            createDiscordBotConfig?.({ verificationToken })
+              .then(() => {
+                window.open(
+                  `https://discord.com/oauth2/authorize?client_id=${
+                    process.env.DISCORD_CLIENT_ID
+                  }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+                    `${
+                      !isCustomDomain
+                        ? window.location.origin
+                        : 'https://commonwealth.im'
+                    }`,
+                  )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
+                    JSON.stringify({
+                      cw_chain_id: app.activeChainId(),
+                      verificationToken,
+                      redirect_domain: isCustomDomain
+                        ? window.location.origin
+                        : undefined,
+                    }),
+                  )}`,
+                  '_parent',
+                );
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           },
         },
       ];
@@ -201,7 +206,7 @@ export const CreateContentSidebar = ({
       )}
       menuHeader={{
         label: 'Create',
-        onClick: async () => {
+        onClick: () => {
           const sidebar = document.getElementsByClassName(
             'CreateContentSidebar',
           );
@@ -218,6 +223,7 @@ export const CreateContentSidebar = ({
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -234,6 +240,7 @@ export const CreateContentPopover = () => {
   return (
     <PopoverMenu
       menuItems={getCreateContentMenuItems(navigate)}
+      className="create-content-popover"
       renderTrigger={(onClick, isMenuOpen) => (
         <CWTooltip
           content="Create content"
