@@ -21,7 +21,7 @@ export const trpcRouter = trpc.router({
   ),
   createCommentReaction: trpc.command(
     Comment.CreateCommentReaction,
-    trpc.Tag.Comment,
+    trpc.Tag.Reaction,
     [
       MixpanelCommunityInteractionEvent.CREATE_REACTION,
       (output) => ({ community: output.community_id }),
