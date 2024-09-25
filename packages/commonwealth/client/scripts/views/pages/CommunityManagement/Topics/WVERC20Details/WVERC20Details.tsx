@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
-import { useDebounce } from 'usehooks-ts';
 
 import { commonProtocol } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
-import useTokenMetadataQuery from 'state/api/tokens/getTokenMetadata';
 import { alphabeticallySortedChains } from 'views/components/CommunityInformationForm/constants';
-import TokenBanner from 'views/components/TokenBanner';
+import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-
 import { CreateTopicStep } from '../utils';
-
 import './WVERC20Details.scss';
+
+const ETH_CHAIN_NODE_ID = 37;
 
 interface WVConsentProps {
   onStepChange: (step: CreateTopicStep) => void;
@@ -23,22 +21,21 @@ interface WVConsentProps {
 const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
   const navigate = useCommonNavigate();
   const [multiplier, setMultiplier] = useState(1);
-  const [token, setToken] = useState('');
-  const debouncedToken = useDebounce<string>(token, 500);
-  const editMode = false;
-
-  const { data: tokenMetadata, isLoading: tokenMetadataLoading } =
-    useTokenMetadataQuery({
-      tokenId: debouncedToken,
-    });
-
-  const getTokenError = () => {
-    if (debouncedToken && !tokenMetadataLoading && !tokenMetadata?.name) {
-      return 'You must enter a valid token address';
-    }
-  };
 
   const options = alphabeticallySortedChains.filter((c) => c.hasStakeEnabled);
+
+  const {
+    debouncedTokenValue,
+    getTokenError,
+    setTokenValue,
+    tokenMetadata,
+    tokenMetadataLoading,
+    tokenValue,
+  } = useTokenFinder({
+    chainId: ETH_CHAIN_NODE_ID,
+  });
+
+  const editMode = false;
 
   return (
     <div className="WVERC20Details">
@@ -72,25 +69,17 @@ const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
         Any token features such as voting or tipping require your community to
         connect a primary token.
       </CWText>
-      <CWTextInput
-        disabled={editMode}
+      <TokenFinder
+        debouncedTokenValue={debouncedTokenValue}
+        tokenMetadataLoading={tokenMetadataLoading}
+        tokenMetadata={tokenMetadata}
+        setTokenValue={setTokenValue}
+        tokenValue={tokenValue}
         containerClassName="token-input"
+        disabled={editMode}
         fullWidth
-        placeholder="Please enter primary token"
-        value={token}
-        onInput={(e) => setToken(e.target.value)}
-        customError={getTokenError()}
-        label="Token"
+        tokenError={getTokenError()}
       />
-
-      {debouncedToken && !getTokenError() && (
-        <TokenBanner
-          isLoading={tokenMetadataLoading}
-          avatarUrl={tokenMetadata?.logo}
-          name={tokenMetadata?.name}
-          ticker={tokenMetadata?.symbol}
-        />
-      )}
 
       <CWText type="h5">Vote weight multiplier</CWText>
 
@@ -141,7 +130,7 @@ const WVERC20Details = ({ onStepChange }: WVConsentProps) => {
             !multiplier ||
             !!getTokenError() ||
             tokenMetadataLoading ||
-            !debouncedToken
+            !debouncedTokenValue
           }
           type="button"
           buttonWidth="wide"
