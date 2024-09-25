@@ -6,8 +6,8 @@
     padding-bottom: 50px;
   }
   .preview {
-    height: 255px;
-    background-color: red;
+    max-height: 255px;
+    overflow: auto;
   }
 
   .EditTopicModalFooter {
