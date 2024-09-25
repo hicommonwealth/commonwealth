@@ -58,7 +58,6 @@ import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import getDiscordChannels from '../routes/discord/getDiscordChannels';
 import generateImage from '../routes/generateImage';
 
 import * as controllers from '../controller';
@@ -563,16 +562,6 @@ function setupRouter(
     'post',
     '/updateCommunityCustomDomain',
     updateCommunityCustomDomain.bind(this, models),
-  );
-
-  // Discord Bot
-  registerRoute(
-    router,
-    'post',
-    '/getDiscordChannels',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    getDiscordChannels.bind(this, models),
   );
 
   registerRoute(
