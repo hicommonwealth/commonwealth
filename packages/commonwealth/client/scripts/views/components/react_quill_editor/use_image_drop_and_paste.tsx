@@ -66,9 +66,8 @@ export const useImageDropAndPaste = ({
           user.jwt || '',
         );
 
-        const selectedIndex = editor.getSelection()?.index;
+        const selectedIndex = editor.getSelection()?.index || 0;
 
-        // @ts-expect-error <StrictNullChecks/>
         editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
 
         setContentDelta({

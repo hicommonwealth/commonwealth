@@ -39,7 +39,6 @@ export interface IApp {
   runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
-  sidebarRedraw: EventEmitter;
 }
 
 // INITIALIZE MAIN APP
@@ -58,8 +57,6 @@ const app: IApp = {
   // need many max listeners because every account will wait on this
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
-  // Global nav state
-  sidebarRedraw: new EventEmitter(),
 };
 //allows for FS.identify to be used
 declare const window: any;
