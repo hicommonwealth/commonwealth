@@ -8,7 +8,7 @@ export const launchToken = async (
   totalSupply: number,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehtods
+  const txReceipt = await contract.methods
     .launchTokenWithLiquidity(
       name,
       symbol,
@@ -17,7 +17,8 @@ export const launchToken = async (
       totalSupply,
       0,
       0,
-      '0x12a35d50a7a12e92063e19d90186c95a10e3e311',
+      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000000',
     )
     .send({ from: walletAddress });
   return txReceipt;
@@ -44,7 +45,7 @@ export const sellToken = async (
   amount: number,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehthods
+  const txReceipt = await contract.methhods
     .sellToken(tokenAddress, amount)
     .send({ from: walletAddress });
   return txReceipt;
