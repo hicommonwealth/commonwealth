@@ -13,6 +13,7 @@ import { LaunchpadFactory } from './LaunchpadFactoryAbi';
 
 class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
+  launchpadFactoryAddress: string;
   launchpadFactory: Contract<typeof LaunchpadFactory>;
 
   constructor(
@@ -23,9 +24,17 @@ class LaunchpadBondingCurve extends ContractBase {
   ) {
     super(bondingCurveAddress, LpBondingCurve, rpc);
     this.tokenAddress = tokenAddress;
+    this.launchpadFactoryAddress = launchpadFactoryAddress;
+  }
+
+  async initialize(
+    withWallet?: boolean,
+    chainId?: string | undefined,
+  ): Promise<void> {
+    await super.initialize(withWallet, chainId);
     this.launchpadFactory = new this.web3.eth.Contract(
       LaunchpadFactory as AbiItem[],
-      launchpadFactoryAddress,
+      this.launchpadFactoryAddress,
     ) as unknown as Contract<typeof LaunchpadFactory>;
   }
 
