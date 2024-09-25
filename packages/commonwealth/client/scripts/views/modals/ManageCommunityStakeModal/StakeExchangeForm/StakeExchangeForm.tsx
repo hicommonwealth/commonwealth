@@ -39,7 +39,7 @@ import {
   ManageCommunityStakeModalMode,
   ManageCommunityStakeModalState,
 } from '../types';
-import { capDecimals, convertEthToUsd } from '../utils';
+import { capDecimals, convertTokenAmountToUsd } from '../utils';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -267,9 +267,9 @@ const StakeExchangeForm = ({
 
   const pricePerUnitUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.price, ethUsdRate)
+      convertTokenAmountToUsd(buyPriceData?.price, ethUsdRate)
     : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(sellPriceData?.price, ethUsdRate);
+      convertTokenAmountToUsd(sellPriceData?.price, ethUsdRate);
 
   const feesPriceEth = isBuyMode
     ? buyPriceData?.fees
@@ -278,9 +278,12 @@ const StakeExchangeForm = ({
 
   const feesPriceUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.fees, ethUsdRate)
+      convertTokenAmountToUsd(buyPriceData?.fees, ethUsdRate)
     : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
+      convertTokenAmountToUsd(
+        Math.abs(parseFloat(sellPriceData?.fees)),
+        ethUsdRate,
+      );
 
   const totalPriceEth = isBuyMode
     ? buyPriceData?.totalPrice
@@ -288,9 +291,9 @@ const StakeExchangeForm = ({
 
   const totalPriceUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
+      convertTokenAmountToUsd(buyPriceData?.totalPrice, ethUsdRate)
     : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
+      convertTokenAmountToUsd(sellPriceData?.totalPrice, ethUsdRate);
 
   const minusDisabled = numberOfStakeToExchange <= 1;
 

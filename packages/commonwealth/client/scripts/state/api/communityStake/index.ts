@@ -1,7 +1,7 @@
 import useBuyStakeMutation from './buyStake';
 import useUpdateCommunityStake from './editCommunityStake';
 import useFetchCommunityStakeQuery from './fetchCommunityStake';
-import useFetchEthUsdRateQuery from './fetchEthUsdRate';
+import useFetchTokenUsdRateQuery from './fetchTokenUsdRate';
 import useGetBuyPriceQuery from './getBuyPrice';
 import useGetSellPriceQuery from './getSellPrice';
 import useGetUserEthBalanceQuery from './getUserEthBalance';
@@ -11,7 +11,7 @@ import useSellStakeMutation from './sellStake';
 export {
   useBuyStakeMutation,
   useFetchCommunityStakeQuery,
-  useFetchEthUsdRateQuery,
+  useFetchTokenUsdRateQuery,
   useGetBuyPriceQuery,
   useGetSellPriceQuery,
   useGetUserEthBalanceQuery,

@@ -1,7 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { useGetBuyPriceQuery } from '../state/api/communityStake/index';
-import { convertEthToUsd } from '../views/modals/ManageCommunityStakeModal/utils';
+import { convertTokenAmountToUsd } from '../views/modals/ManageCommunityStakeModal/utils';
 
 // I don't want to import web3 otherwise it will pull in bundle
 function fromWei(value: string | null): number | null {
@@ -46,7 +46,7 @@ export const useCommunityCardPrice = ({
   }
 
   // @ts-expect-error StrictNullChecks
-  const stakeValue = convertEthToUsd(buyPriceData?.price, ethUsdRate);
+  const stakeValue = convertTokenAmountToUsd(buyPriceData?.price, ethUsdRate);
   const historicalPriceEth = fromWei(historicalPrice);
 
   let stakeChange = 0;

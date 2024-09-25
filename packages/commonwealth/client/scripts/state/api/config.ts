@@ -58,7 +58,8 @@ export const QueryKeys = {
 
 export const ExternalEndpoints = {
   coinbase: {
-    ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',
+    tokenToUsdRate: (tokenSymbol: string) =>
+      `https://api.coinbase.com/v2/prices/${tokenSymbol}-USD/sell`,
   },
 };
 
