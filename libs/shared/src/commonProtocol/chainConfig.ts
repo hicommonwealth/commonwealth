@@ -33,8 +33,8 @@ export const factoryContracts: {
   [ValidChains.SepoliaBase]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0x5045238a20f07acb34dd1265bb240eab8c8db7a9',
-    lpBondingCurve: '0x7Cc4d8902e3Ca342825D35b9C4ddb064582a910d',
+    launchpad: '0x6b118c6efa258903939ed981e6f644330effebab',
+    lpBondingCurve: '0x24634Cc9A0606b7927B3Fb44b782003B604dDDC4',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
