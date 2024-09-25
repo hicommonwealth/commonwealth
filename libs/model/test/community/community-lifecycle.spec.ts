@@ -59,6 +59,7 @@ describe('Community lifecycle', () => {
     const [_ethNode] = await seed('ChainNode', { eth_chain_id: 1 });
     const [_edgewareNode] = await seed('ChainNode', {
       name: 'Edgeware Mainnet',
+      eth_chain_id: null,
     });
     const [superadmin] = await seed('User', { isAdmin: true });
     const [admin] = await seed('User', { isAdmin: false });
@@ -477,20 +478,26 @@ describe('Community lifecycle', () => {
       ).rejects.toThrow(InvalidActor);
     });
 
-    // TODO: implement when we can add members via commands
-    test.skip('should throw if chain node of community does not match supported chain', async () => {
-      await expect(() =>
-        command(UpdateCommunity(), {
-          actor: superAdminActor,
-          payload: {
-            ...baseRequest,
-            id: community.id,
-            namespace: 'tempNamespace',
-            transactionHash: '0x1234',
-            chain_node_id: edgewareNode!.id!,
-          },
-        }),
-      ).rejects.toThrow('Namespace not supported on selected chain');
+    test('should throw if chain node of community does not match supported chain', async () => {
+      await command(UpdateCommunity(), {
+        actor: superAdminActor,
+        payload: {
+          ...baseRequest,
+          id: community.id,
+          chain_node_id: edgewareNode!.id!,
+        },
+      }),
+        await expect(() =>
+          command(UpdateCommunity(), {
+            actor: superAdminActor,
+            payload: {
+              ...baseRequest,
+              id: community.id,
+              namespace: 'tempNamespace',
+              transactionHash: '0x1234',
+            },
+          }),
+        ).rejects.toThrow('Namespace not supported on selected chain');
     });
   });
 });

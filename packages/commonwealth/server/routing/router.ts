@@ -96,7 +96,6 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
-import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
@@ -697,16 +696,6 @@ function setupRouter(
     '/groups',
     databaseValidationService.validateCommunity,
     getGroupsHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/groups',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
-    createGroupHandler.bind(this, serverControllers),
   );
 
   registerRoute(
