@@ -121,7 +121,7 @@ const Discord = () => {
       return;
     try {
       await removeDiscordBotConfig({
-        communityId,
+        community_id: communityId,
       });
 
       if (queryParams.has('discordConfigId')) {
