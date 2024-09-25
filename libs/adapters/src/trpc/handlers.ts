@@ -11,7 +11,7 @@ import {
 } from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { Tag, Track, buildproc, procedure } from './middleware';
+import { Commit, Tag, Track, buildproc, procedure } from './middleware';
 
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
@@ -26,7 +26,7 @@ const trpcerror = (error: unknown): TRPCError => {
       default:
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message,
+          message: `[${name}] ${message}`,
           cause: error,
         });
     }
@@ -41,7 +41,11 @@ const trpcerror = (error: unknown): TRPCError => {
  * Builds tRPC command POST endpoint
  * @param factory command factory
  * @param tag command tag used for OpenAPI spec grouping
- * @param track analytics tracking metadata as tuple of [event, output mapper]
+ * @param track analytics tracking middleware as:
+ * - tuple of `[event, output mapper]`
+ * - or `(input,output) => Promise<[event, data]|undefined>`
+ * @param commit output middleware (best effort), mainly used to commit actions to canvas
+ * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
  * @returns tRPC mutation procedure
  */
 export const command = <
@@ -51,10 +55,11 @@ export const command = <
 >(
   factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
-  track?: Track<Output>,
+  track?: Track<Input, Output>,
+  commit?: Commit<Input, Output>,
 ) => {
   const md = factory();
-  return buildproc('POST', factory.name, md, tag, track).mutation(
+  return buildproc('POST', factory.name, md, tag, track, commit).mutation(
     async ({ ctx, input }) => {
       try {
         return await coreCommand(

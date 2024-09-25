@@ -7,25 +7,56 @@ import * as comment from './comment';
 import * as community from './community';
 import * as thread from './threads';
 
-const { createCommunity, getCommunities, getCommunity, getMembers } =
-  community.trpcRouter;
-const { createThread, createThreadReaction } = thread.trpcRouter;
-const { createComment, createCommentReaction, updateComment, getComments } =
-  comment.trpcRouter;
-//const { getBulkThreads } = thread.trpcRouter;
+const {
+  getCommunities,
+  getCommunity,
+  getMembers,
+  createCommunity,
+  updateCommunity,
+  createTopic,
+  updateTopic,
+  deleteTopic,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+} = community.trpcRouter;
+const {
+  createThread,
+  updateThread,
+  deleteThread,
+  createThreadReaction,
+  deleteReaction,
+} = thread.trpcRouter;
+const {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+  createCommentReaction,
+} = comment.trpcRouter;
 
 const api = {
-  createCommunity,
   getCommunities,
   getCommunity,
   getMembers,
   getComments,
+  createCommunity,
+  updateCommunity,
+  createTopic,
+  updateTopic,
+  deleteTopic,
+  createGroup,
+  updateGroup,
+  deleteGroup,
   createThread,
-  createThreadReaction,
-  //getBulkThreads,
+  updateThread,
+  deleteThread,
   createComment,
   updateComment,
+  deleteComment,
+  createThreadReaction,
   createCommentReaction,
+  deleteReaction,
 };
 
 const PATH = '/api/v1';

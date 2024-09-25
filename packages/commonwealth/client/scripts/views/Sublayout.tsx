@@ -1,7 +1,6 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -29,7 +28,6 @@ type SublayoutProps = {
 } & React.PropsWithChildren;
 
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
-  const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
 
@@ -93,14 +91,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     ],
     location,
   );
-
-  useEffect(() => {
-    app.sidebarRedraw.on('redraw', forceRerender);
-
-    return () => {
-      app.sidebarRedraw.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;

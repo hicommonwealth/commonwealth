@@ -1,5 +1,6 @@
 import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -40,7 +41,7 @@ export default (
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
 
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
@@ -60,6 +61,11 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      search: {
+        type: Sequelize.TSVECTOR,
+        allowNull: false,
+      },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       hooks: {
@@ -114,3 +120,7 @@ export default (
       ],
     },
   );
+
+export function getCommentSearchVector(body: string) {
+  return Sequelize.fn('to_tsvector', 'english', getDecodedString(body));
+}

@@ -8,6 +8,7 @@ import type {
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { Express } from 'express';
 import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
@@ -16,17 +17,27 @@ import { config } from '../../../server/config';
 chai.use(chaiHttp);
 const { expect } = chai;
 
+async function update(
+  app: Express,
+  address: string,
+  payload: Record<string, unknown>,
+) {
+  return chai.request
+    .agent(app)
+    .post(`/api/v1/UpdateThread`)
+    .set('Accept', 'application/json')
+    .set('address', address)
+    .send(payload);
+}
+
 describe('Thread Patch Update', () => {
   const chain = 'ethereum';
 
   let adminJWT: string;
-  // the adminAddress with the chain and chain id prefix - this is used by canvas
-  let adminCanvasAddress: string;
   let adminAddress: string;
 
   let userJWT: string;
-  // the userAddress with the chain and chain id prefix - this is used by canvas
-  let canvasAddress: string;
+  let userDid: `did:${string}`;
   let userAddress: string;
   let userSession: {
     session: Session;
@@ -44,8 +55,7 @@ describe('Thread Patch Update', () => {
       'Alice',
     );
     {
-      adminCanvasAddress = adminRes.address;
-      adminAddress = adminCanvasAddress.split(':')[2];
+      adminAddress = adminRes.address;
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
         config.AUTH.JWT_SECRET,
@@ -65,8 +75,8 @@ describe('Thread Patch Update', () => {
       'Alice',
     );
     {
-      canvasAddress = userRes.address;
-      userAddress = canvasAddress.split(':')[2];
+      userAddress = userRes.address;
+      userDid = userRes.did;
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
         config.AUTH.JWT_SECRET,
@@ -94,7 +104,8 @@ describe('Thread Patch Update', () => {
     test('should update thread attributes as owner', async () => {
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: canvasAddress,
+        address: userAddress,
+        did: userDid,
         jwt: userJWT,
         title: 'test1',
         body: 'body1',
@@ -105,44 +116,38 @@ describe('Thread Patch Update', () => {
         sign: userSession.sign,
       });
 
-      const res = await chai.request
-        .agent(server.app)
-        // @ts-expect-error StrictNullChecks
-        .patch(`/api/threads/${thread.id}`)
-        .set('Accept', 'application/json')
-        .send({
-          // @ts-expect-error StrictNullChecks
-          author_chain: thread.community_id,
-          // @ts-expect-error StrictNullChecks
-          chain: thread.community_id,
-          address: userAddress,
-          topicId,
-          jwt: userJWT,
-          title: 'newTitle',
-          body: 'newBody',
-          stage: 'voting',
-          locked: true,
-          archived: true,
-        });
+      const res = await update(server.app, userAddress, {
+        thread_id: thread!.id,
+        author_chain: thread!.community_id,
+        chain: thread!.community_id,
+        address: userAddress,
+        topicId,
+        jwt: userJWT,
+        title: 'newTitle',
+        body: 'newBody',
+        stage: 'voting',
+        locked: true,
+        archived: true,
+      });
 
       expect(res.status).to.equal(200);
-      expect(res.body.result).to.contain({
-        // @ts-expect-error StrictNullChecks
-        id: thread.id,
+      expect(res.body).to.contain({
+        id: thread!.id,
         community_id: 'ethereum',
         title: 'newTitle',
         body: 'newBody',
         stage: 'voting',
       });
       // expect(res.body.result.topic.name).to.equal('newTopic');
-      expect(res.body.result.locked).to.not.be.null;
-      expect(res.body.result.archived).to.not.be.null;
+      expect(res.body.locked).to.not.be.null;
+      expect(res.body.archived).to.not.be.null;
     });
 
     test('should not allow non-admin to set pinned or spam', async () => {
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: canvasAddress,
+        address: userAddress,
+        did: userDid,
         jwt: userJWT,
         title: 'test2',
         body: 'body2',
@@ -154,42 +159,30 @@ describe('Thread Patch Update', () => {
       });
 
       {
-        const res = await chai.request
-          .agent(server.app)
-          // @ts-expect-error StrictNullChecks
-          .patch(`/api/threads/${thread.id}`)
-          .set('Accept', 'application/json')
-          .send({
-            // @ts-expect-error StrictNullChecks
-            author_chain: thread.community_id,
-            // @ts-expect-error StrictNullChecks
-            chain: thread.community_id,
-            address: userAddress,
-            body: 'body1',
-            jwt: userJWT,
-            pinned: true,
-            topicId,
-          });
-        expect(res.status).to.equal(400);
+        const res = await update(server.app, userAddress, {
+          thread_id: thread!.id,
+          author_chain: thread!.community_id,
+          chain: thread!.community_id,
+          address: userAddress,
+          body: 'body1',
+          jwt: userJWT,
+          pinned: true,
+          topicId,
+        });
+        expect(res.status).to.equal(401);
       }
 
       {
-        const res = await chai.request
-          .agent(server.app)
-          // @ts-expect-error StrictNullChecks
-          .patch(`/api/threads/${thread.id}`)
-          .set('Accept', 'application/json')
-          .send({
-            // @ts-expect-error StrictNullChecks
-            author_chain: thread.community_id,
-            // @ts-expect-error StrictNullChecks
-            chain: thread.community_id,
-            address: userAddress,
-            jwt: userJWT,
-            spam: true,
-            topicId,
-          });
-        expect(res.status).to.equal(400);
+        const res = await update(server.app, userAddress, {
+          thread_id: thread!.id,
+          author_chain: thread!.community_id,
+          chain: thread!.community_id,
+          address: userAddress,
+          jwt: userJWT,
+          spam: true,
+          topicId,
+        });
+        expect(res.status).to.equal(401);
       }
     });
 
@@ -197,7 +190,8 @@ describe('Thread Patch Update', () => {
       // non-admin creates thread
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: canvasAddress,
+        address: userAddress,
+        did: userDid,
         jwt: userJWT,
         title: 'test2',
         body: 'body1',
@@ -210,46 +204,34 @@ describe('Thread Patch Update', () => {
 
       // admin sets thread as pinned
       {
-        const res = await chai.request
-          .agent(server.app)
-          // @ts-expect-error StrictNullChecks
-          .patch(`/api/threads/${thread.id}`)
-          .set('Accept', 'application/json')
-          .send({
-            // @ts-expect-error StrictNullChecks
-            author_chain: thread.community_id,
-            // @ts-expect-error StrictNullChecks
-            chain: thread.community_id,
-            address: adminAddress,
-            jwt: adminJWT,
-            body: 'body1',
-            pinned: true,
-            topicId,
-          });
+        const res = await update(server.app, adminAddress, {
+          thread_id: thread!.id,
+          author_chain: thread!.community_id,
+          chain: thread!.community_id,
+          address: adminAddress,
+          jwt: adminJWT,
+          body: 'body1',
+          pinned: true,
+          topicId,
+        });
         expect(res.status).to.equal(200);
-        expect(res.body.result.pinned).to.be.true;
+        expect(res.body.pinned).to.be.true;
       }
 
       // admin sets thread as spam
       {
-        const res = await chai.request
-          .agent(server.app)
-          // @ts-expect-error StrictNullChecks
-          .patch(`/api/threads/${thread.id}`)
-          .set('Accept', 'application/json')
-          .send({
-            // @ts-expect-error StrictNullChecks
-            author_chain: thread.community_id,
-            // @ts-expect-error StrictNullChecks
-            chain: thread.community_id,
-            address: adminAddress,
-            jwt: adminJWT,
-            body: 'body1',
-            spam: true,
-            topicId,
-          });
+        const res = await update(server.app, adminAddress, {
+          thread_id: thread!.id,
+          author_chain: thread!.community_id,
+          chain: thread!.community_id,
+          address: adminAddress,
+          jwt: adminJWT,
+          body: 'body1',
+          spam: true,
+          topicId,
+        });
         expect(res.status).to.equal(200);
-        expect(!!res.body.result.marked_as_spam_at).to.be.true;
+        expect(!!res.body.marked_as_spam_at).to.be.true;
       }
     });
   });

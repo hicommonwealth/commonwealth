@@ -1,11 +1,11 @@
 import {
-  Actor,
   InvalidActor,
   InvalidState,
   logger,
+  type Actor,
 } from '@hicommonwealth/core';
-import { AddressInstance, ThreadInstance } from '../models';
-import { AuthContext } from './authorization';
+import type { AddressInstance, ThreadInstance } from '../models';
+import type { AuthContext } from './authorization';
 
 const log = logger(import.meta);
 
@@ -66,7 +66,10 @@ export function mustBeSuperAdmin(actor: Actor) {
  */
 export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
   if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  return auth as AuthContext & { address: AddressInstance };
+  return auth as AuthContext & {
+    address: AddressInstance;
+    community_id: string;
+  };
 }
 
 /**
@@ -80,6 +83,9 @@ export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
   return auth as AuthContext & {
     address: AddressInstance;
     thread: ThreadInstance;
+    community_id: string;
+    topic_id: number;
+    thread_id: number;
   };
 }
 
@@ -94,5 +100,9 @@ export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
   return auth as AuthContext & {
     address: AddressInstance;
     comment: ThreadInstance;
+    community_id: string;
+    topic_id: number;
+    thread_id: number;
+    comment_id: number;
   };
 }

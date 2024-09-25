@@ -162,7 +162,7 @@ export const ManageTopicsSection = () => {
           buttonHeight="med"
           onClick={handleReversion}
           disabled={initialFeaturedTopics.every(
-            (value, index) => value.id === featuredTopics[index].id,
+            (value, index) => value.id === featuredTopics?.[index]?.id,
           )}
         />
         <CWButton

@@ -308,3 +308,11 @@ export function getWebhookDestination(webhookUrl = ''): string {
 
   return destination;
 }
+
+export function getDecodedString(str: string) {
+  try {
+    return decodeURIComponent(str);
+  } catch (err) {
+    return str;
+  }
+}

@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -18,8 +19,10 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
+import { formatAddressShort } from 'helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -28,9 +31,11 @@ import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
+import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -49,6 +54,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
+
+  const weightedVotingEnabled = useFlag('farcasterContest');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -77,7 +84,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
+  const topicObj = topics?.find(({ name }) => name === topicName);
+  const topicId = topicObj?.id;
 
   const user = useUserStore();
 
@@ -98,6 +106,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const isOnArchivePage =
     location.pathname ===
     (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
+
+  const { data: tokenMetadata } = useTokenMetadataQuery({
+    tokenId: topicObj?.tokenAddress || '',
+  });
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -159,6 +171,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useManageDocumentTitle('Discussions');
 
+  const isTopicWeighted =
+    weightedVotingEnabled &&
+    topicId &&
+    topicObj.weightedVoting === TopicWeightedVoting.ERC20;
+
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
       (topic) => topic.id === topicId,
@@ -186,13 +203,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
+          const isTopicGated = !!(memberships || []).find(
+            (membership) =>
+              thread?.topic?.id &&
+              membership.topicIds.includes(thread.topic.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
+              thread?.topic?.id &&
+              membership.topicIds.includes(thread.topic.id) &&
               membership.isAllowed,
           );
 
@@ -255,6 +275,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               <Breadcrumbs />
               <UserTrainingSlider />
               <AdminOnboardingSlider />
+              {isTopicWeighted && (
+                <TokenBanner
+                  name={tokenMetadata?.name}
+                  ticker={topicObj?.tokenSymbol}
+                  avatarUrl={tokenMetadata?.logo}
+                  popover={{
+                    title: tokenMetadata?.name,
+                    body: formatAddressShort(topicObj.tokenAddress!, 6, 6),
+                  }}
+                />
+              )}
 
               <HeaderWithFilters
                 // @ts-expect-error <StrictNullChecks/>

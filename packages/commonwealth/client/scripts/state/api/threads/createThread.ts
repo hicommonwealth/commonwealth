@@ -40,9 +40,9 @@ export const buildCreateThreadInput = async ({
   });
   return {
     community_id: communityId,
-    topic_id: topic.id,
-    title: encodeURIComponent(title),
-    body: encodeURIComponent(body ?? ''),
+    topic_id: topic.id!,
+    title: title,
+    body: body ?? '',
     kind,
     stage,
     url,

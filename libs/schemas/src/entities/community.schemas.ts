@@ -8,11 +8,10 @@ import {
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { ChainNode } from './chain.schemas';
-import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
 import { CommunityStake } from './stake.schemas';
 import { CommunityTags } from './tag.schemas';
-import { Topic } from './topic.schemas';
+import { ContestManager, Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const Community = z.object({
@@ -27,7 +26,7 @@ export const Community = z.object({
   active: z.boolean(),
   type: z.nativeEnum(ChainType).default(ChainType.Chain),
   description: z.string().nullish(),
-  social_links: z.array(z.string().nullish()).default([]),
+  social_links: z.array(z.string().url().nullish()).default([]),
   ss58_prefix: PG_INT.nullish(),
   stages_enabled: z.boolean().default(true),
   custom_stages: z.array(z.string()).default([]),
@@ -37,7 +36,7 @@ export const Community = z.object({
   default_summary_view: z.boolean().nullish(),
   default_page: z.nativeEnum(DefaultPage).nullish(),
   has_homepage: z.enum(['true', 'false']).default('false').nullish(),
-  terms: z.string().nullish(),
+  terms: z.string().trim().or(z.literal('')).or(z.string().url()).nullish(),
   admin_only_polling: z.boolean().nullish(),
   bech32_prefix: z.string().nullish(),
   hide_projects: z.boolean().nullish(),

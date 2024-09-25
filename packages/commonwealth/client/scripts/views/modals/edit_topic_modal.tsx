@@ -1,6 +1,6 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import React, { useState } from 'react';
-import Topic, { TopicAttributes } from '../../models/Topic';
+import Topic from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
@@ -52,7 +52,6 @@ export const EditTopicModal = ({
     createDeltaFromText(descriptionProp),
   );
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
@@ -79,8 +78,14 @@ export const EditTopicModal = ({
 
     try {
       await editTopic({
-        topic: new Topic(topicInfo),
-        isPWA: isAddedToHomeScreen,
+        topic_id: id!,
+        description: description,
+        name: name,
+        community_id: app.activeChainId()!,
+        telegram: null,
+        featured_in_sidebar: featuredInSidebar,
+        featured_in_new_post: false,
+        default_offchain_template: '',
       });
       if (noRedirect) {
         onModalClose();
@@ -111,9 +116,8 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
           onClick: async () => {
             await deleteTopic({
-              topicId: id,
-              topicName: name,
-              communityId: app.activeChainId() || '',
+              community_id: app.activeChainId() || '',
+              topic_id: id!,
             });
             if (noRedirect) {
               onModalClose();

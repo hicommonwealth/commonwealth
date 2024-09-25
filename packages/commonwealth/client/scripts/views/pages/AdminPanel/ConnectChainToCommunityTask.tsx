@@ -1,4 +1,5 @@
 import { ChainType } from '@hicommonwealth/shared';
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
@@ -70,10 +71,12 @@ const ConnectChainToCommunityTask = () => {
   const update = () => {
     if (Object.keys(communityLookupData || {}).length > 0) {
       try {
-        void updateCommunity({
-          communityId: communityId,
-          chainNodeId: chainNameAndId?.value.toString(),
-        });
+        void updateCommunity(
+          buildUpdateCommunityInput({
+            communityId: communityId,
+            chainNodeId: chainNameAndId?.value.toString(),
+          }),
+        );
         setCommunityIdInput('');
         setChainNameAndId({ label: '', value: 0 });
         notifySuccess('Chain connected to community');

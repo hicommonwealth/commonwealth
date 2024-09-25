@@ -1,4 +1,9 @@
 import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
+import {
+  decodeContent,
+  getCommentSearchVector,
+  uploadIfLarge,
+} from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
@@ -9,7 +14,6 @@ import {
   emitMentions,
   parseUserMentions,
   quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
@@ -52,9 +56,11 @@ export function CreateComment(): Command<
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
 
-      const text = sanitizeQuillText(payload.text);
+      const text = decodeContent(payload.text);
       const plaintext = quillToPlain(text);
       const mentions = uniqueMentions(parseUserMentions(text));
+
+      const { contentUrl } = await uploadIfLarge('comments', text);
 
       // == mutation transaction boundary ==
       const new_comment_id = await models.sequelize.transaction(
@@ -70,6 +76,8 @@ export function CreateComment(): Command<
               reaction_count: 0,
               reaction_weights_sum: 0,
               created_by: '',
+              search: getCommentSearchVector(text),
+              content_url: contentUrl,
             },
             {
               transaction,
@@ -81,15 +89,12 @@ export function CreateComment(): Command<
               comment_id: comment.id!,
               text: comment.text,
               timestamp: comment.created_at!,
+              content_url: contentUrl,
             },
             {
               transaction,
             },
           );
-
-          // update timestamps
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           thread.last_commented_on = new Date();
           await thread.save({ transaction });

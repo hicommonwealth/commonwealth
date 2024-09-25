@@ -11,6 +11,7 @@ import type {
   TopicAttributes,
   UserInstance,
 } from '../../src';
+import { getCommentSearchVector, getThreadSearchVector } from '../models';
 
 export type E2E_TestEntities = {
   testThreads: ThreadInstance[];
@@ -189,6 +190,8 @@ export const e2eTestEntities = async function (
               await testDb.Thread.findOrCreate({
                 where: {
                   id: -i - 1,
+                },
+                defaults: {
                   address_id: -1,
                   title: `testThread Title ${-i - 1}`,
                   body: `testThread Body ${-i - 1}`,
@@ -196,6 +199,15 @@ export const e2eTestEntities = async function (
                   topic_id: -1,
                   kind: 'discussion',
                   plaintext: 'text',
+                  stage: 'discussion',
+                  view_count: 0,
+                  reaction_count: 0,
+                  reaction_weights_sum: 0,
+                  comment_count: 0,
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1}`,
+                    `testThread Body ${-i - 1}`,
+                  ),
                 },
               })
             )[0],
@@ -211,6 +223,8 @@ export const e2eTestEntities = async function (
               await testDb.Thread.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
+                },
+                defaults: {
                   address_id: -2,
                   title: `testThread Title ${-i - 1 - 2}`,
                   body: `testThread Body ${-i - 1 - 2}`,
@@ -218,6 +232,15 @@ export const e2eTestEntities = async function (
                   topic_id: -2,
                   kind: 'discussion',
                   plaintext: 'text',
+                  stage: 'discussion',
+                  view_count: 0,
+                  reaction_count: 0,
+                  reaction_weights_sum: 0,
+                  comment_count: 0,
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1 - 2}`,
+                    `testThread Body ${-i - 1 - 2}`,
+                  ),
                 },
               })
             )[0],
@@ -249,10 +272,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1,
+                },
+                defaults: {
                   address_id: -1,
                   text: '',
                   thread_id: -1,
                   plaintext: '',
+                  reaction_count: 0,
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],
@@ -268,10 +295,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
+                },
+                defaults: {
                   address_id: -2,
                   text: '',
                   thread_id: -2,
                   plaintext: '',
+                  reaction_count: 0,
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],

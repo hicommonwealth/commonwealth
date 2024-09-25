@@ -13,6 +13,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './Snapshots.scss';
 import { snapshotValidationSchema } from './validation';
 
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 const Snapshots = () => {
   const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
@@ -63,16 +64,17 @@ const Snapshots = () => {
             .map((x) => x.value)
             .map((link) => {
               const splitLink = link.split('/');
-              const sanitizedLink = splitLink[splitLink.length - 1];
-              return sanitizedLink;
+              return splitLink[splitLink.length - 1];
             }),
         ),
       ];
 
-      await updateCommunity({
-        communityId: community?.id,
-        snapshot: newSnapshots,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          snapshot: newSnapshots,
+        }),
+      );
 
       setLinks(
         newSnapshots.map((snapshot) => ({
@@ -84,7 +86,6 @@ const Snapshots = () => {
       );
 
       notifySuccess('Snapshot links updated!');
-      app.sidebarRedraw.emit('redraw');
     } catch {
       notifySuccess('Failed to update snapshot links!');
     }

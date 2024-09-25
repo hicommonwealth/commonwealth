@@ -98,7 +98,6 @@ const ContestsList = ({
                 imageUrl={contest.image_url}
                 // @ts-expect-error <StrictNullChecks/>
                 topics={contest.topics}
-                // @ts-expect-error <StrictNullChecks/>
                 score={score}
                 decimals={contest.decimals}
                 ticker={contest.ticker}

@@ -12,7 +12,8 @@ export type StakeData = {
 };
 
 export interface SignStakeTransactionsProps {
-  goToSuccessStep: () => void;
+  onSuccess: () => void;
+  onCancel: () => void;
   communityStakeData: StakeData;
   selectedAddress: AddressInfo;
   createdCommunityId: string;

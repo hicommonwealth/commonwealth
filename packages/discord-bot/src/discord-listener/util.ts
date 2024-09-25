@@ -1,6 +1,11 @@
-import { Message } from 'discord.js';
+import { Message, OmitPartialGroupDMChannel, PartialMessage } from 'discord.js';
 
-export function getImageUrls(message: Partial<Message>) {
+export function getImageUrls(
+  message:
+    | OmitPartialGroupDMChannel<Message<boolean> | PartialMessage>
+    | Message<boolean>
+    | PartialMessage,
+) {
   if (!message.attachments) return [];
   const attachments = [...message.attachments.values()];
 

@@ -287,57 +287,65 @@ export const seedDb = async () => {
       })),
     );
 
-    await models.Topic.bulkCreate([
-      {
-        community_id: 'sushi',
-        name: 'General',
-      },
-      {
-        community_id: 'edgeware',
-        name: 'General',
-      },
-      {
-        community_id: 'ethereum',
-        name: 'General',
-      },
-      {
-        community_id: 'alex',
-        name: 'General',
-      },
-      {
-        community_id: 'osmosis',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk-beta',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk',
-        name: 'General',
-      },
-      {
-        community_id: 'yearn',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk-beta-local',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk-v1-local',
-        name: 'General',
-      },
-      {
-        community_id: 'evmos-dev-local',
-        name: 'General',
-      },
-      {
-        name: 'Test Topic',
-        description: 'A topic made for testing',
-        community_id: 'ethereum',
-      },
-    ]);
+    await models.Topic.bulkCreate(
+      [
+        {
+          community_id: 'sushi',
+          name: 'General',
+        },
+        {
+          community_id: 'edgeware',
+          name: 'General',
+        },
+        {
+          community_id: 'ethereum',
+          name: 'General',
+        },
+        {
+          community_id: 'alex',
+          name: 'General',
+        },
+        {
+          community_id: 'osmosis',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk-beta',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk',
+          name: 'General',
+        },
+        {
+          community_id: 'yearn',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk-beta-local',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk-v1-local',
+          name: 'General',
+        },
+        {
+          community_id: 'evmos-dev-local',
+          name: 'General',
+        },
+        {
+          name: 'Test Topic',
+          description: 'A topic made for testing',
+          community_id: 'ethereum',
+        },
+      ].map((t) => ({
+        description: '',
+        ...t,
+        featured_in_sidebar: false,
+        featured_in_new_post: false,
+        group_ids: [],
+      })),
+    );
 
     const [alexContract, yearnContract, sushiContract] =
       await models.Contract.bulkCreate([

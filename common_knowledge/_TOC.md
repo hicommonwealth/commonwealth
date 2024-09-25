@@ -44,6 +44,7 @@
 ## First-party apps
 
 - [Discobot](./Discobot.md): Common's Discord bridge bot.
+- [Federation](./Federation.md): Offchain data federation using Canvas.
 - Farcaster Integration (forthcoming)
 
 ## Observability

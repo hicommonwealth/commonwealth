@@ -20,9 +20,10 @@ type RadioButtoFormValidationProps = {
   hookToForm?: boolean;
 };
 
-type RadioButtonProps = {
+export type RadioButtonProps = {
   groupName?: string;
   onChange?: (e?: any) => void;
+  hideLabels?: boolean;
 } & Omit<RadioButtonType, 'disabled'> &
   RadioButtonStyleProps &
   RadioButtoFormValidationProps;
@@ -37,6 +38,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
     onChange,
     checked,
     value,
+    hideLabels,
   } = props;
 
   const formContext = useFormContext();
@@ -64,9 +66,11 @@ export const CWRadioButton = (props: RadioButtonProps) => {
           await onChange?.(e);
         }}
       />
-      <CWText className="label" type="b2" fontWeight="regular">
-        {label || value}
-      </CWText>
+      {!hideLabels && (
+        <CWText className="label" type="b2" fontWeight="regular">
+          {label || value}
+        </CWText>
+      )}
     </label>
   );
 };

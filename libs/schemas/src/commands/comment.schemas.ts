@@ -4,10 +4,12 @@ import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasComment = z.object({
   thread_id: PG_INT,
-  text: z.string().trim().min(1),
+  thread_msg_id: z.string().nullish(),
+  text: z.string().min(1),
   parent_id: PG_INT.optional(),
+  parent_msg_id: z.string().nullish(),
   canvas_signed_data: z.string().optional(),
-  canvas_hash: z.string().optional(),
+  canvas_msg_id: z.string().optional(),
 });
 
 export const CreateComment = {
@@ -20,23 +22,31 @@ export const CreateComment = {
 export const UpdateComment = {
   input: z.object({
     comment_id: PG_INT,
-    text: z.string().trim().min(1),
-
-    // discord integration
-    thread_id: PG_INT.optional(),
-    discord_meta: DiscordMetaSchema.optional(),
+    text: z.string().min(1),
   }),
   output: Comment.extend({ community_id: z.string() }),
 };
 
 export const CommentCanvasReaction = z.object({
   comment_id: PG_INT,
+  comment_msg_id: z.string().nullish(),
   reaction: z.enum(['like']),
   canvas_signed_data: z.string().optional(),
-  canvas_hash: z.string().optional(),
+  canvas_msg_id: z.string().optional(),
 });
 
 export const CreateCommentReaction = {
   input: CommentCanvasReaction,
   output: Reaction.extend({ community_id: z.string() }),
+};
+
+export const DeleteComment = {
+  input: z.object({
+    comment_id: PG_INT,
+  }),
+  output: z.object({
+    comment_id: PG_INT,
+    canvas_signed_data: z.string().nullish(),
+    canvas_msg_id: z.string().nullish(),
+  }),
 };

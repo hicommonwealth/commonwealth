@@ -1,3 +1,4 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -8,8 +9,10 @@ import {
 } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import {
+  useCreateDiscordBotConfigMutation,
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
+  useSetForumChannelConnectionMutation,
 } from 'state/api/discord';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -37,6 +40,12 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community?.discord_config_id ? 'connected' : 'none',
   );
+
+  const { mutateAsync: createDiscordBotConfig } =
+    useCreateDiscordBotConfigMutation();
+
+  const { mutateAsync: setForumChannelConnection } =
+    useSetForumChannelConnectionMutation();
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -78,7 +87,7 @@ const Discord = () => {
 
     try {
       const verificationToken = uuidv4();
-      await app.discord.createConfig(verificationToken);
+      await createDiscordBotConfig({ verificationToken });
 
       const redirectURL = encodeURI(
         !domain?.isCustomDomain
@@ -105,7 +114,7 @@ const Discord = () => {
       notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
     }
-  }, [connectionStatus, domain?.isCustomDomain]);
+  }, [connectionStatus, createDiscordBotConfig, domain?.isCustomDomain]);
 
   const onDisconnect = useCallback(async () => {
     if (connectionStatus === 'connecting' || connectionStatus === 'none')
@@ -134,10 +143,12 @@ const Discord = () => {
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
 
     try {
-      await updateCommunity({
-        communityId: community?.id,
-        discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          discordBotWebhooksEnabled: !isDiscordWebhooksEnabled,
+        }),
+      );
       setIsDiscordWebhooksEnabled(!isDiscordWebhooksEnabled);
 
       notifySuccess(`Discord webhooks ${toggleMsgType}d!`);
@@ -152,7 +163,7 @@ const Discord = () => {
     topicId: string,
   ) => {
     try {
-      await app.discord.setForumChannelConnection(topicId, channelId);
+      await setForumChannelConnection({ topicId, channelId });
       await refetchTopics();
       const topicName = topics.find(
         (topic) => topic.id === Number(topicId),

@@ -14,13 +14,15 @@ import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
 import { mustBeAuthorized } from '../middleware/guards';
+import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
 import {
+  decodeContent,
   emitMentions,
   parseUserMentions,
   quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
+  uploadIfLarge,
 } from '../utils';
 
 export const CreateThreadErrors = {
@@ -111,9 +113,11 @@ export function CreateThread(): Command<
         checkContestLimits(activeContestManagers, actor.address!);
       }
 
-      const body = sanitizeQuillText(payload.body);
+      const body = decodeContent(payload.body);
       const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
       const mentions = uniqueMentions(parseUserMentions(body));
+
+      const { contentUrl } = await uploadIfLarge('threads', body);
 
       // == mutation transaction boundary ==
       const new_thread_id = await models.sequelize.transaction(
@@ -131,6 +135,8 @@ export function CreateThread(): Command<
               comment_count: 0,
               reaction_count: 0,
               reaction_weights_sum: 0,
+              search: getThreadSearchVector(rest.title, body),
+              content_url: contentUrl,
             },
             {
               transaction,
@@ -143,14 +149,12 @@ export function CreateThread(): Command<
               body,
               address: address.address,
               timestamp: thread.created_at!,
+              content_url: contentUrl,
             },
             {
               transaction,
             },
           );
-
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           await models.ThreadSubscription.create(
             {
