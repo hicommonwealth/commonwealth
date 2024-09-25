@@ -8,7 +8,7 @@ export const launchToken = async (
   totalSupply: number,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehtods
+  const txReceipt = await contract.methods
     .launchTokenWithLiquidity(
       name,
       symbol,
@@ -17,7 +17,8 @@ export const launchToken = async (
       totalSupply,
       0,
       0,
-      '0x12a35d50a7a12e92063e19d90186c95a10e3e311',
+      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000000',
     )
     .send({ from: walletAddress });
   return txReceipt;
@@ -30,7 +31,7 @@ export const buyToken = async (
   walletAddress: string,
   value: number,
 ) => {
-  const txReceipt = await contract.methods.buyToken(tokenAddress).send({
+  const txReceipt = await contract.methods.buyToken(tokenAddress, 0).send({
     from: walletAddress,
     value,
   });
@@ -44,8 +45,8 @@ export const sellToken = async (
   amount: number,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehthods
-    .sellToken(tokenAddress, amount)
+  const txReceipt = await contract.methods
+    .sellToken(tokenAddress, amount, 0)
     .send({ from: walletAddress });
   return txReceipt;
 };
@@ -84,8 +85,7 @@ export const transferLiquidity = async (
   tokenAddress: string,
   walletAddress: string,
 ) => {
-  const remainingTokens =
-    await contract.methods._launchpadLiquidity(tokenAddress);
+  const remainingTokens = await contract.methods._poolLiquidity(tokenAddress);
   const amountIn = await getAmountIn(
     contract,
     tokenAddress,
@@ -94,7 +94,7 @@ export const transferLiquidity = async (
   );
 
   const txReceipt = await contract.methods
-    .transferLiquidity(tokenAddress)
+    .transferLiquidity(tokenAddress, remainingTokens)
     .send({ value: amountIn, from: walletAddress });
   return txReceipt;
 };
