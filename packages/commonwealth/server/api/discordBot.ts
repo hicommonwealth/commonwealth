@@ -10,4 +10,8 @@ export const trpcRouter = trpc.router({
     DiscordBot.CreateDiscordBotConfig,
     trpc.Tag.DiscordBot,
   ),
+  setDiscordBotConfig: trpc.command(
+    DiscordBot.SetDiscordBotConfig,
+    trpc.Tag.DiscordBot,
+  ),
 });

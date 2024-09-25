@@ -1,42 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
-import { userStore } from '../../ui/user';
-
-interface SetDiscordBotConfigProps {
-  communityId: string;
-  guildId: string;
-  verificationToken: string;
-}
-
-const setDiscordBotConfig = async ({
-  communityId,
-  guildId,
-  verificationToken,
-}: SetDiscordBotConfigProps) => {
-  const res = await axios.post(
-    `${SERVER_URL}${ApiEndpoints.SET_DISCORD_CONFIG}`,
-    {
-      community_id: communityId,
-      guild_id: guildId,
-      verification_token: verificationToken,
-      jwt: userStore.getState().jwt,
-    },
-    {
-      headers: { 'Content-Type': 'application/json' },
-    },
-  );
-
-  return { communityId, discordConfigId: res?.data?.result?.discordConfigId };
-};
+import { trpc } from 'utils/trpcClient';
 
 const useSetDiscordBotConfigMutation = () => {
-  return useMutation({
-    mutationFn: setDiscordBotConfig,
-    onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.SET_DISCORD_CONFIG, data.communityId],
-      });
+  const utils = trpc.useUtils();
+
+  return trpc.discordBot.setDiscordBotConfig.useMutation({
+    onSuccess: async () => {
+      await utils.discordBot.setDiscordBotConfig.invalidate();
     },
   });
 };

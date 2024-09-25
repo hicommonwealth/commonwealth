@@ -18,3 +18,15 @@ export const CreateDiscordBotConfig = {
     message: z.string(),
   }),
 };
+
+export const SetDiscordBotConfig = {
+  input: z.object({
+    community_id: z.string(),
+    guild_id: z.string().optional(),
+    verification_token: z.string().optional(),
+  }),
+  output: z.object({
+    message: z.string(),
+    discordConfigId: z.number().nullish(),
+  }),
+};

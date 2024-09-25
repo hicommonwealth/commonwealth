@@ -4,7 +4,6 @@ import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 
 const TOKEN_EXPIRATION_MINUTES = 5;
-export const Errors = {};
 
 export function CreateDiscordBotConfig(): Command<
   typeof schemas.CreateDiscordBotConfig,

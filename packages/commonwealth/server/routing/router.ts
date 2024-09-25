@@ -59,7 +59,6 @@ import setAddressWallet from '../routes/setAddressWallet';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import getDiscordChannels from '../routes/discord/getDiscordChannels';
-import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 
 import * as controllers from '../controller';
@@ -567,13 +566,6 @@ function setupRouter(
   );
 
   // Discord Bot
-  registerRoute(
-    router,
-    'post',
-    '/setDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    setDiscordBotConfig.bind(this, models),
-  );
   registerRoute(
     router,
     'post',

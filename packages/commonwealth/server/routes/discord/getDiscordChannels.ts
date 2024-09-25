@@ -17,10 +17,6 @@ type GetDiscordChannelsResp = {
     id: string;
     name: string;
   }[];
-  selectedChannel: {
-    id: string;
-    name: string;
-  } | null;
 };
 
 const getDiscordChannels = async (
@@ -40,7 +36,6 @@ const getDiscordChannels = async (
     return success(res, {
       channels: [],
       forumChannels: [],
-      selectedChannel: null,
     });
   }
 
@@ -69,12 +64,6 @@ const getDiscordChannels = async (
         .map((channel) => {
           return { id: channel.id, name: channel.name };
         }),
-      selectedChannel: {
-        id: configEntry.snapshot_channel_id,
-        name: channels.find(
-          (channel) => channel.id === configEntry.snapshot_channel_id,
-        )?.name,
-      },
     });
   }
 };

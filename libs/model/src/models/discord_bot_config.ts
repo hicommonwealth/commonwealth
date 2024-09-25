@@ -24,7 +24,6 @@ export default (
         allowNull: false,
       },
       guild_id: { type: Sequelize.STRING, allowNull: true },
-      snapshot_channel_id: { type: Sequelize.STRING, allowNull: true },
       verification_token: { type: Sequelize.STRING, allowNull: true },
       token_expiration: { type: Sequelize.DATE, allowNull: true },
       verified: {
