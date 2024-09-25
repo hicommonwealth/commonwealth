@@ -1,0 +1,1 @@
+export * from './removeDiscordBotConfig.command';
