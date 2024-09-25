@@ -14,6 +14,7 @@ const {
   INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
+  ADDRESS_TOKEN_EXPIRES_IN,
   ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
   ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
   ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
@@ -39,6 +40,7 @@ const NAME =
 
 const DEFAULTS = {
   JWT_SECRET: 'my secret',
+  ADDRESS_TOKEN_EXPIRES_IN: '10',
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
   DEFAULT_COMMONWEALTH_LOGO:
@@ -86,6 +88,10 @@ export const config = configure(
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
       SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
+      ADDRESS_TOKEN_EXPIRES_IN: parseInt(
+        ADDRESS_TOKEN_EXPIRES_IN ?? DEFAULTS.ADDRESS_TOKEN_EXPIRES_IN,
+        10,
+      ),
     },
     ALCHEMY: {
       BASE_WEBHOOK_SIGNING_KEY: ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
@@ -177,6 +183,7 @@ export const config = configure(
       .object({
         JWT_SECRET: z.string(),
         SESSION_EXPIRY_MILLIS: z.number().int(),
+        ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
       })
       .refine(
         (data) => {

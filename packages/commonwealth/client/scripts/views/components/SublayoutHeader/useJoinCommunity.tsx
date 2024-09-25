@@ -1,8 +1,6 @@
 import { addressSwapper, ChainBase } from '@hicommonwealth/shared';
-import {
-  linkExistingAddressToChainOrCommunity,
-  setActiveAccount,
-} from 'controllers/app/login';
+import { trpc } from 'client/scripts/utils/trpcClient';
+import { setActiveAccount } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
 import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
@@ -20,6 +18,8 @@ const useJoinCommunity = () => {
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
+  const { mutateAsync: joinCommunity } =
+    trpc.community.joinCommunity.useMutation();
 
   const user = useUserStore();
 
@@ -102,66 +102,60 @@ const useJoinCommunity = () => {
     activeChainId?: string;
   }) => {
     try {
-      const res = await linkExistingAddressToChainOrCommunity(
+      const res = await joinCommunity({
+        community_id: community.id,
         address,
-        community.id,
-        community.base,
-      );
+      });
 
-      if (res && res.data.result) {
-        const { verification_token, addresses, encodedAddress } =
-          res.data.result;
+      const { verification_token, addresses, encoded_address } = res;
 
-        // update addresses and user communities
-        user.setData({
-          ...(!user.communities.find((c) => c.id === community.id) && {
-            communities: [
-              ...user.communities,
-              {
-                id: community.id,
-                iconUrl: activeChainInfo?.icon_url || community.iconUrl || '',
-                name: activeChainInfo?.name || community.name || '',
-                isStarred: false,
-              },
-            ],
-          }),
-          addresses: addresses.map((a) => {
-            return new AddressInfo({
-              userId: user.id,
-              id: a.id,
-              address: a.address,
-              community: {
-                id: a.community_id,
-                base: a.Community?.base,
-                ss58Prefix: a.Community?.ss58_prefix,
-              },
-              walletId: a.wallet_id,
-            });
-          }),
-        });
+      // update addresses and user communities
+      user.setData({
+        ...(!user.communities.find((c) => c.id === community.id) && {
+          communities: [
+            ...user.communities,
+            {
+              id: community.id,
+              iconUrl: activeChainInfo?.icon_url || community.iconUrl || '',
+              name: activeChainInfo?.name || community.name || '',
+              isStarred: false,
+            },
+          ],
+        }),
+        addresses: addresses.map((a) => {
+          return new AddressInfo({
+            userId: user.id,
+            id: a.id!,
+            address: a.address,
+            community: {
+              id: a.community_id,
+              base: a.base,
+              ss58Prefix: a.ss58Prefix!,
+            },
+            walletId: a.wallet_id!,
+          });
+        }),
+      });
 
-        // set verification token for the newly created account
-        const account = app?.chain?.accounts?.get?.(encodedAddress);
-        if (account && app.chain) {
-          account?.setValidationToken?.(verification_token);
+      // set verification token for the newly created account
+      const account = app?.chain?.accounts?.get?.(encoded_address);
+      if (account && app.chain) {
+        account?.setValidationToken?.(verification_token);
+      }
+
+      // set active address if in a community
+      if (activeChainId) {
+        account && (await setActiveAccount(account));
+
+        // update active accounts
+        if (
+          account &&
+          user.accounts.filter((a) => isSameAccount(a, account)).length === 0
+        ) {
+          user.setData({
+            accounts: [...user.accounts, account],
+          });
         }
-
-        // set active address if in a community
-        if (activeChainId) {
-          account && (await setActiveAccount(account));
-
-          // update active accounts
-          if (
-            account &&
-            user.accounts.filter((a) => isSameAccount(a, account)).length === 0
-          ) {
-            user.setData({
-              accounts: [...user.accounts, account],
-            });
-          }
-        }
-      } else {
-        // Todo: handle error
       }
     } catch (err) {
       console.error(err);

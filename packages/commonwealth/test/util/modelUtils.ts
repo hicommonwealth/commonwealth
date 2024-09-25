@@ -645,16 +645,15 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {
-    const { jwt, address, chain, originChain } = args;
+    const { jwt, address, chain } = args;
     try {
       await chai.request
         .agent(app)
-        .post('/api/linkExistingAddressToCommunity')
+        .post('/api/v1/JoinComunity')
         .set('Accept', 'application/json')
+        .set('address', address)
         .send({
-          address,
           community_id: chain,
-          originChain,
           jwt,
         });
     } catch (e) {

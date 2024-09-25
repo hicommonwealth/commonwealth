@@ -1,5 +1,4 @@
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import { linkExistingAddressToChainOrCommunity } from 'client/scripts/controllers/app/login';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { initAppState } from 'state';
 
@@ -45,14 +44,7 @@ export const buildCreateCommunityInput = ({
 
 const useCreateCommunityMutation = () => {
   return trpc.community.createCommunity.useMutation({
-    onSuccess: async (output) => {
-      if (output.admin_address) {
-        await linkExistingAddressToChainOrCommunity(
-          output.admin_address,
-          output.community.id,
-          output.community.id,
-        );
-      }
+    onSuccess: async () => {
       await initAppState(false);
     },
   });
