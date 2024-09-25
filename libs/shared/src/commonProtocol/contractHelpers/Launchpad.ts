@@ -15,7 +15,7 @@ export const launchToken = async (
       shares,
       holders,
       totalSupply,
-      0,
+      1,
       0,
       '0x0000000000000000000000000000000000000000',
       '0x0000000000000000000000000000000000000000',
