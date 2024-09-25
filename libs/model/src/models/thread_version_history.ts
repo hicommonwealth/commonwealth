@@ -25,6 +25,7 @@ export default (
       address: { type: Sequelize.STRING, allowNull: false },
       body: { type: Sequelize.TEXT, allowNull: false },
       timestamp: { type: Sequelize.DATE, allowNull: false },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'ThreadVersionHistories',

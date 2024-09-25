@@ -1,4 +1,4 @@
-export * from './aws';
+export * from './blobStorage';
 export * from './config';
 export * as express from './express';
 export * from './hot-shots';
