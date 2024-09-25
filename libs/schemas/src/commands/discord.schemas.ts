@@ -8,3 +8,13 @@ export const RemoveDiscordBotConfig = {
     message: z.string(),
   }),
 };
+
+export const CreateDiscordBotConfig = {
+  input: z.object({
+    community_id: z.string(),
+    verification_token: z.string(),
+  }),
+  output: z.object({
+    message: z.string(),
+  }),
+};

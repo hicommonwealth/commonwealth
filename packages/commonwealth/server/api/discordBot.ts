@@ -6,4 +6,8 @@ export const trpcRouter = trpc.router({
     DiscordBot.RemoveDiscordBotConfig,
     trpc.Tag.DiscordBot,
   ),
+  createDiscordBotConfig: trpc.command(
+    DiscordBot.CreateDiscordBotConfig,
+    trpc.Tag.DiscordBot,
+  ),
 });

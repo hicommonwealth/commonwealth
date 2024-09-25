@@ -87,7 +87,10 @@ const Discord = () => {
 
     try {
       const verificationToken = uuidv4();
-      await createDiscordBotConfig({ verificationToken });
+      await createDiscordBotConfig({
+        verification_token: verificationToken,
+        community_id: communityId,
+      });
 
       const redirectURL = encodeURI(
         !domain?.isCustomDomain
