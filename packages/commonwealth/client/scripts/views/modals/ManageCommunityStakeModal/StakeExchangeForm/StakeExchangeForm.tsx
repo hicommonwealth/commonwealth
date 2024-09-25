@@ -279,10 +279,9 @@ const StakeExchangeForm = ({
   const feesPriceUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
       convertTokenAmountToUsd(buyPriceData?.fees, ethUsdRate)
-    : // @ts-expect-error <StrictNullChecks/>
-      convertTokenAmountToUsd(
-        Math.abs(parseFloat(sellPriceData?.fees)),
-        ethUsdRate,
+    : convertTokenAmountToUsd(
+        Math.abs(parseFloat(sellPriceData?.fees || '')),
+        ethUsdRate || '',
       );
 
   const totalPriceEth = isBuyMode

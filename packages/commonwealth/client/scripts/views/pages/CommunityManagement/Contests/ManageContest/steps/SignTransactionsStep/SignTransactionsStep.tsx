@@ -14,7 +14,6 @@ import {
   useDeployRecurringContestOnchainMutation,
   useDeploySingleContestOnchainMutation,
 } from 'state/api/contests';
-import { useTokenMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -38,6 +37,7 @@ interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
   contestFormData: ContestFormData;
   onSetCreatedContestAddress: (address: string) => void;
+  fundingTokenTicker: string;
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
@@ -47,17 +47,11 @@ const SignTransactionsStep = ({
   onSetLaunchContestStep,
   contestFormData,
   onSetCreatedContestAddress,
+  fundingTokenTicker,
 }: SignTransactionsStepProps) => {
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
     errorText: '',
-  });
-
-  const chainId = app.chain.meta.ChainNode?.id || 0;
-  const { data: tokenMetadata } = useTokenMetadataQuery({
-    tokenId: contestFormData.fundingTokenAddress || '',
-    chainId,
-    apiEnabled: !!contestFormData.fundingTokenAddress,
   });
 
   const { stakeData } = useCommunityStake();
@@ -159,7 +153,7 @@ const SignTransactionsStep = ({
         topic_ids: contestFormData?.toggledTopicList
           .filter((t) => t.checked)
           .map((t) => t.id!),
-        ticker: tokenMetadata?.symbol || 'ETH',
+        ticker: fundingTokenTicker,
       });
 
       onSetLaunchContestStep('ContestLive');
