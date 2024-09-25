@@ -56,7 +56,7 @@ const ContestsList = ({
   feeManagerBalance,
   onSetContestSelectionView,
 }: ContestsListProps) => {
-  const [fundDrawerAddress, setFundDrawerAddress] = useState('');
+  const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
 
   if (isLoading) {
     return (
@@ -103,8 +103,7 @@ const ContestsList = ({
                 ticker={contest.ticker}
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
                 isCancelled={contest.cancelled}
-                // @ts-expect-error <StrictNullChecks/>
-                onFund={() => setFundDrawerAddress(contest.contest_address)}
+                onFund={() => setFundDrawerContest(contest)}
                 feeManagerBalance={feeManagerBalance}
                 isRecurring={!contest.funding_token_address}
               />
@@ -113,9 +112,11 @@ const ContestsList = ({
         )}
       </div>
       <FundContestDrawer
-        onClose={() => setFundDrawerAddress('')}
-        isOpen={!!fundDrawerAddress}
-        contestAddress={fundDrawerAddress}
+        onClose={() => setFundDrawerContest(undefined)}
+        isOpen={!!fundDrawerContest}
+        contestAddress={fundDrawerContest?.contest_address || ''}
+        fundingTokenAddress={fundDrawerContest?.funding_token_address}
+        fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
       />
     </>
   );
