@@ -16,10 +16,10 @@ import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateCommunity,
   CreateGroup,
+  CreateGroupErrors,
   DeleteGroup,
   DeleteGroupErrors,
   DeleteTopic,
-  Errors,
   GetCommunities,
   MAX_GROUPS_PER_COMMUNITY,
   UpdateCommunity,
@@ -198,7 +198,7 @@ describe('Community lifecycle', () => {
           actor: adminActor,
           payload: buildCreateGroupPayload(community.id, [1, 2, 3]),
         }),
-      ).rejects.toThrow(Errors.InvalidTopics);
+      ).rejects.toThrow(CreateGroupErrors.InvalidTopics);
     });
 
     test('should delete group', async () => {
@@ -257,7 +257,7 @@ describe('Community lifecycle', () => {
             payload: buildCreateGroupPayload(community.id),
           });
         }
-      }).rejects.toThrow(Errors.MaxGroups);
+      }).rejects.toThrow(CreateGroupErrors.MaxGroups);
     });
   });
 
