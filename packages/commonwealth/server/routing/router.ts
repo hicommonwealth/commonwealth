@@ -60,7 +60,6 @@ import setAddressWallet from '../routes/setAddressWallet';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/discord/createDiscordBotConfig';
 import getDiscordChannels from '../routes/discord/getDiscordChannels';
-import removeDiscordBotConfig from '../routes/discord/removeDiscordBotConfig';
 import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 
@@ -590,14 +589,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     getDiscordChannels.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/removeDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    removeDiscordBotConfig.bind(this, models),
   );
 
   registerRoute(
