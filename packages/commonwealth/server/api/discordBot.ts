@@ -14,4 +14,8 @@ export const trpcRouter = trpc.router({
     DiscordBot.SetDiscordBotConfig,
     trpc.Tag.DiscordBot,
   ),
+  getDiscordChannels: trpc.query(
+    DiscordBot.GetDiscordChannels,
+    trpc.Tag.DiscordBot,
+  ),
 });

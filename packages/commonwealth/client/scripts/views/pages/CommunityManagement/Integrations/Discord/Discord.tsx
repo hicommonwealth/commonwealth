@@ -61,7 +61,7 @@ const Discord = () => {
     community?.discord_bot_webhooks_enabled,
   );
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
-    chainId: communityId,
+    community_id: communityId,
     apiEnabled: !!communityId,
   });
   const { data: topics = [], refetch: refetchTopics } = useFetchTopicsQuery({
