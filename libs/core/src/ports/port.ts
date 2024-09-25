@@ -71,8 +71,9 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     }
 
     // validate key at runtime to prevent confusing keys e.g.
-    // key = 'S3' for R2 adapter
-    if (options.key) {
+    // key = 'S3' for R2 adapter.
+    // skip key checks during tests to allow mocking adapters with specific keys
+    if (options.key && config.NODE_ENV !== 'test') {
       const parts = options.key.split('.');
       if (parts.length !== 3) throw InvalidKey(options.key);
       if (parts[0] !== factory.name) throw InvalidKey(options.key);

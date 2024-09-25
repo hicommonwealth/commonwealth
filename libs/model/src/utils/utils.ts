@@ -205,9 +205,8 @@ export function getChainNodeUrl({
   return buildChainNodeUrl(private_url, 'private');
 }
 
-//
-//
-//
+export const R2_ADAPTER_KEY = 'blobStorageFactory.R2BlobStorage.Main';
+
 /**
  * Limits content in the Threads.body and Comments.text columns to 2k characters (2kB)
  * Anything over this character limit is stored in Cloudflare R2.
@@ -229,7 +228,7 @@ export async function uploadIfLarge(
 }> {
   if (content.length > CONTENT_CHAR_LIMIT) {
     const { url } = await blobStorage({
-      key: 'blobStorageFactory.R2BlobStorage.Main',
+      key: R2_ADAPTER_KEY,
     }).upload({
       key: `${uuidv4()}.md`,
       bucket: type,

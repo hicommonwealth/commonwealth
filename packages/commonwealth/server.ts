@@ -16,6 +16,7 @@ import {
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
+import { R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import express from 'express';
 import { config } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
@@ -31,7 +32,7 @@ blobStorage({
   adapter: S3BlobStorage(),
 });
 blobStorage({
-  key: 'blobStorageFactory.R2BlobStorage.Main',
+  key: R2_ADAPTER_KEY,
   adapter: R2BlobStorage(),
   isDefault: false,
 });
