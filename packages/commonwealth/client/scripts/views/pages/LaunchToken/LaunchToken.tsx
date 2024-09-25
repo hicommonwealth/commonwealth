@@ -7,6 +7,7 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './LaunchToken.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';
+import SuccessStep from './steps/SuccessStep';
 import TokenInformationStep from './steps/TokenInformationStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateTokenCommunityStep, getFormSteps } from './utils';
@@ -66,6 +67,8 @@ const LaunchToken = () => {
       case CreateTokenCommunityStep.SignatureLaunch:
         // TODO: https://github.com/hicommonwealth/commonwealth/issues/8707
         return <>Not Implemented</>;
+      case CreateTokenCommunityStep.Success:
+        return <SuccessStep communityId="" withToken />; // TODO: community id will come after 8707 is complete
     }
   };
 

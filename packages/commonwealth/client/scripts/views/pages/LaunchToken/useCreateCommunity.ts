@@ -5,9 +5,7 @@ import { CreateTokenCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
   const [createTokenCommunityStep, setCreateTokenCommunityStep] =
-    useState<CreateTokenCommunityStep>(
-      CreateTokenCommunityStep.TokenInformation,
-    );
+    useState<CreateTokenCommunityStep>(CreateTokenCommunityStep.Success);
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>();
   const [createdTokenInfo, setCreatedTokenInfo] = useState<TokenInfo>();
 
