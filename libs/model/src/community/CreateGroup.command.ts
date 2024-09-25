@@ -1,4 +1,4 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
@@ -7,7 +7,8 @@ import { mustBeAuthorized, mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
-export const Errors = {
+
+export const CreateGroupErrors = {
   MaxGroups: 'Exceeded max number of groups',
   InvalidTopics: 'Invalid topics',
 };
@@ -29,7 +30,7 @@ export function CreateGroup(): Command<
         },
       });
       if (payload.topics?.length !== topics.length)
-        throw new InvalidState(Errors.InvalidTopics);
+        throw new InvalidInput(CreateGroupErrors.InvalidTopics);
 
       const groups = await models.Group.findAll({
         where: { community_id },
@@ -41,7 +42,7 @@ export function CreateGroup(): Command<
         groups.find((g) => g.metadata.name === payload.metadata.name),
       );
       if (groups.length >= MAX_GROUPS_PER_COMMUNITY)
-        throw new InvalidState(Errors.MaxGroups);
+        throw new InvalidInput(CreateGroupErrors.MaxGroups);
 
       const newGroup = await models.sequelize.transaction(
         async (transaction) => {
@@ -65,11 +66,7 @@ export function CreateGroup(): Command<
                 ),
               },
               {
-                where: {
-                  id: {
-                    [Op.in]: topics.map(({ id }) => id!),
-                  },
-                },
+                where: { id: { [Op.in]: topics.map(({ id }) => id!) } },
                 transaction,
               },
             );

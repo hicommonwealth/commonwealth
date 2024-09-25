@@ -176,8 +176,10 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
       }
       track &&
         result.ok &&
-        void trackAnalytics(track, ctx, rawInput, result.data);
-      commit && result.ok && void commit(rawInput, result.data, ctx);
+        void trackAnalytics(track, ctx, rawInput, result.data).catch(log.error);
+      commit &&
+        result.ok &&
+        void commit(rawInput, result.data, ctx).catch(log.error);
       return result;
     })
     .meta({

@@ -20,7 +20,6 @@ export const trpcRouter = trpc.router({
     async (input, output) => {
       const { directory_page_enabled } = input;
       if (directory_page_enabled === undefined) return undefined;
-      // track directory page enabled/disabled events
       const event = directory_page_enabled
         ? MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_ENABLED
         : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
@@ -55,7 +54,10 @@ export const trpcRouter = trpc.router({
   createGroup: trpc.command(
     Community.CreateGroup,
     trpc.Tag.Community,
-    [MixpanelCommunityInteractionEvent.CREATE_GROUP],
+    [
+      MixpanelCommunityInteractionEvent.CREATE_GROUP,
+      (result) => ({ community: result.id }),
+    ],
     async (_, output, ctx) => {
       await command(Community.RefreshCommunityMemberships(), {
         actor: ctx.actor,
@@ -64,6 +66,24 @@ export const trpcRouter = trpc.router({
           group_id: output.groups?.at(0)?.id,
         },
       });
+    },
+  ),
+  updateGroup: trpc.command(
+    Community.UpdateGroup,
+    trpc.Tag.Community,
+    [
+      MixpanelCommunityInteractionEvent.UPDATE_GROUP,
+      (result) => ({ community: result.community_id }),
+    ],
+    async (input, output, ctx) => {
+      if (input.requirements?.length || input.metadata?.required_requirements)
+        await command(Community.RefreshCommunityMemberships(), {
+          actor: ctx.actor,
+          payload: {
+            community_id: output.community_id!,
+            group_id: output.id,
+          },
+        });
     },
   ),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),

@@ -94,7 +94,6 @@ import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
-import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
@@ -660,15 +659,6 @@ function setupRouter(
     '/groups',
     databaseValidationService.validateCommunity,
     getGroupsHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'put',
-    '/groups/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateGroupHandler.bind(this, serverControllers),
   );
 
   registerRoute(
