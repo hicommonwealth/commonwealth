@@ -12,15 +12,15 @@ WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
-RUN pnpm -C ./packages/discord-bot run build
-RUN pnpm deploy --filter=discord-bot --prod /prod/discord-bot
+RUN pnpm -F discord-bot run build
+RUN pnpm deploy -F discord-bot --prod /prod/discord-bot
 RUN mv /usr/src/app/packages/discord-bot/build /prod/discord-bot/build
 
-RUN pnpm -C ./packages/snapshot-listener run build
-RUN pnpm deploy --filter=snapshot-listener --prod /prod/discord-bot
+RUN pnpm -F snapshot-listener run build
+RUN pnpm deploy -F snapshot-listener --prod /prod/discord-bot
 RUN mv /usr/src/app/packages/snapshot-listener/build /prod/snapshot-listener/build
 
-RUN pnpm deploy --filter=commonwealth --prod /prod/commonwealth
+RUN pnpm deploy -F commonwealth --prod /prod/commonwealth
 RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
 
 FROM base AS commonwealth
