@@ -36,14 +36,6 @@ cp ${env_path} .env
 
 docker build . --target commonwealth -f Dockerfile.commonwealth_base -t commonwealth_base
 
-commonwealth_path=./packages/commonwealth/deploy/dockerfiles
-
-for dockerfile in ${commonwealth_path}/Dockerfile.*; do
-   base_name=$(basename $dockerfile | cut -d. -f2)
-   docker build -f $dockerfile -t ${base_name}:registry.heroku.com/${app_name}/${base_name} .
-   echo "Built image ${base_name}:registry.heroku.com/${app_name}/${base_name} using $dockerfile"
-done
-
 process_types=""
 for dockerfile in ${commonwealth_path}/Dockerfile.*; do
    base_name=$(basename $dockerfile | cut -d. -f2)
