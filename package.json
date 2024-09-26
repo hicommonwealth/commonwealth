@@ -9,7 +9,7 @@
   "packageManager": "pnpm@9.10.0",
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "docker-build-commonwealth": "docker build -f Dockerfile.web --tag commonwealth:latest .",
+    "docker-build-commonwealth": "docker build -f Dockerfile.commonwealth_base --tag commonwealth:latest .",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F commonwealth db-all",
