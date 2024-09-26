@@ -26,12 +26,13 @@ heroku container:login
 
 heroku git:remote --app ${app_name}
 
-if [ ! -f ./packages/commonwealth/deploy/environments/.env.public.${app_name} ]; then
-  echo "Error: ./packages/commonwealth/deploy/environments/.env.public.${app_name} not found"
+env_path=./packages/commonwealth/deploy/environments/.env.public.${app_name}
+if [ ! -f ${env_path} ]; then
+  echo "Error: ${env_path} not found"
   exit 1
 fi
 
-cp ./environments/.env.public.${app_name} .env
+cp ${env_path} .env
 
 docker build -f Dockerfile.commonwealth_base -t commonwealth_base .
 
