@@ -34,7 +34,7 @@ fi
 
 cp ${env_path} .env
 
-docker build -f Dockerfile.commonwealth_base -t commonwealth_base .
+docker build . --target commonwealth -f Dockerfile.commonwealth_base -t commonwealth_base
 
 commonwealth_path=./packages/commonwealth/deploy/dockerfiles
 
