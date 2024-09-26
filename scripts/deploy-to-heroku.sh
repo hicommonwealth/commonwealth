@@ -48,17 +48,17 @@ process_types=""
 for dockerfile in ${commonwealth_path}/Dockerfile.*; do
    base_name=$(basename $dockerfile | cut -d. -f2)
 
-   image_name="registry.heroku.com/${app_name}/${base_name}"
+   docker build -f $dockerfile -t ${base_name} .
 
-   docker build -f $dockerfile -t ${base_name}:registry.heroku.com/${app_name}/${base_name} .
+   heroku_tag=registry.heroku.com/${app_name}/${base_name}
 
-   docker build -f "$dockerfile" -t "$image_name" .
+   docker tag ${base_name} ${heroku_tag}
 
-   docker push "$image_name"
+   docker push ${heroku_tag}
 
    process_types="${process_types} ${base_name}"
 
-   echo "Built and pushed image $image_name using $dockerfile"
+   echo "Built and pushed image ${heroku_tag} using $dockerfile"
 }
 
 process_types=$(echo $process_types | xargs)
