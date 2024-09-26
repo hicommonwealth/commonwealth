@@ -1,2 +1,0 @@
-web: cd packages/snapshot-listener && node --import=extensionless/register --max_old_space_size=$(../../scripts/get-max-old-space-size.sh) ./build/src/index.js
-release: cd packages/snapshot-listener && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) ./build/scripts/releasePhaseEnvCheck.js

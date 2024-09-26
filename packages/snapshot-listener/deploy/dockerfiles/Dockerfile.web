@@ -1,0 +1,2 @@
+FROM snapshot-listener
+CMD ./datadog-entrypoint.sh NODE_ENV=production --import=extensionless/register --enable-source-maps ./build/src/index.js

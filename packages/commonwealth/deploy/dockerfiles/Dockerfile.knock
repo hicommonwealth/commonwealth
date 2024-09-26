@@ -1,2 +1,2 @@
-FROM commonwealth_base
-CMD node --import=extensionless/register build/server/workers/knock/knockWorker.js
+FROM commonwealth
+CMD ./datadog-entrypoint.sh NODE_ENV=production node --import=extensionless/register build/server/workers/knock/knockWorker.js
