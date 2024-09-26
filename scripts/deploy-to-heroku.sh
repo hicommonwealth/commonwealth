@@ -54,7 +54,7 @@ for dockerfile in ${commonwealth_path}/Dockerfile.*; do
    process_types="${process_types} ${base_name}"
 
    echo "Built and pushed image ${heroku_tag} using $dockerfile"
-}
+done
 
 process_types=$(echo $process_types | xargs)
 heroku container:release ${process_types} -a ${app_name}
