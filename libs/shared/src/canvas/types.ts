@@ -7,6 +7,8 @@ export type CanvasSignedData = {
   actionMessageSignature: Signature;
 };
 
+export type CanvasSignedDataOption = CanvasSignedData | undefined;
+
 export type CanvasSignResult = {
   canvasSignedData: CanvasSignedData;
   canvasMsgId: string;
