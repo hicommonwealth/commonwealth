@@ -1,7 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { command } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
-import { JoinCommunity } from 'node_modules/@hicommonwealth/model/src/community';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
@@ -121,7 +120,7 @@ export const trpcRouter = trpc.router({
     Community.RefreshCommunityMemberships,
     trpc.Tag.Community,
   ),
-  joinCommunity: trpc.command(JoinCommunity, trpc.Tag.Community, [
+  joinCommunity: trpc.command(Community.JoinCommunity, trpc.Tag.Community, [
     MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
     (result) => ({
       community: result.community_id,
