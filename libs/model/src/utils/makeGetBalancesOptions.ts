@@ -5,7 +5,6 @@ import {
   GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
-  GetEvmBalancesOptions,
   GetSPLBalancesOptions,
   GroupAttributes,
 } from '@hicommonwealth/model';
@@ -43,13 +42,15 @@ export function makeGetBalancesOptions(
             });
             if (!existingOptions) {
               allOptions.push({
-                balanceSourceType: castedSource.source_type,
+                balanceSourceType: castedSource.source_type as
+                  | BalanceSourceType.ERC20
+                  | BalanceSourceType.ERC721,
                 sourceOptions: {
                   contractAddress: castedSource.contract_address,
                   evmChainId: castedSource.evm_chain_id,
                 },
                 addresses,
-              } as GetEvmBalancesOptions);
+              });
             }
             break;
           }

@@ -8,7 +8,13 @@ import {
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, Group, StakeTransaction, Topic } from '../entities';
+import {
+  Community,
+  Group,
+  Requirement,
+  StakeTransaction,
+  Topic,
+} from '../entities';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -208,6 +214,34 @@ export const DeleteTopic = {
     community_id: z.string(),
     topic_id: PG_INT,
   }),
+};
+
+const GroupMetadata = z.object({
+  name: z.string(),
+  description: z.string(),
+  required_requirements: PG_INT.nullish(),
+  membership_ttl: PG_INT.optional(),
+});
+
+export const CreateGroup = {
+  input: z.object({
+    community_id: z.string(),
+    metadata: GroupMetadata,
+    requirements: z.array(Requirement).optional(),
+    topics: z.array(PG_INT).optional(),
+  }),
+  output: Community.extend({ groups: z.array(Group).optional() }).partial(),
+};
+
+export const UpdateGroup = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT,
+    metadata: GroupMetadata.optional(),
+    requirements: z.array(Requirement).optional(),
+    topics: z.array(PG_INT).optional(),
+  }),
+  output: Group.partial(),
 };
 
 export const DeleteGroup = {
