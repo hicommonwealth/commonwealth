@@ -44,9 +44,6 @@ for dockerfile in ${commonwealth_path}/Dockerfile.*; do
 
    heroku_tag=registry.heroku.com/${app_name}/${base_name}
 
-   echo ${dockerfile}
-   echo ${heroku_tag}:latest
-
    docker build -f ${dockerfile} -t ${heroku_tag}:latest .
 
    echo docker image ls
@@ -54,8 +51,6 @@ for dockerfile in ${commonwealth_path}/Dockerfile.*; do
    docker push ${heroku_tag}:latest
 
    process_types="${process_types} ${base_name}"
-
-   echo "Built and pushed image ${heroku_tag} using $dockerfile"
 done
 
 process_types=$(echo $process_types | xargs)
