@@ -50,7 +50,12 @@ for dockerfile in ${commonwealth_path}/Dockerfile.*; do
 
    heroku_tag=registry.heroku.com/${app_name}/${base_name}
 
-   docker build -f "$dockerfile" -t "$image_name:latest" .
+   echo ${dockerfile}
+   echo ${image_name}:latest
+
+   docker build -f ${dockerfile} -t ${image_name}:latest .
+
+   echo docker image ls
 
    docker push ${heroku_tag}:latest
 
