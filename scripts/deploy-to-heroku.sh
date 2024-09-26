@@ -27,7 +27,7 @@ heroku container:login
 heroku git:remote --app ${app_name}
 
 if [ ! -f ./packages/commonwealth/deploy/environments/.env.public.${app_name} ]; then
-  echo "Error: ./packages/commonwealth/deploy/environments/.env.public.${app_name} not found!"
+  echo "Error: ./packages/commonwealth/deploy/environments/.env.public.${app_name} not found"
   exit 1
 fi
 
