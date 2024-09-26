@@ -15,7 +15,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { isAddress } from 'web3-validator';
 import { config } from '../config';
-import { OutboxAttributes } from '../models';
+import type { OutboxAttributes } from '../models/outbox';
 
 const log = logger(import.meta);
 

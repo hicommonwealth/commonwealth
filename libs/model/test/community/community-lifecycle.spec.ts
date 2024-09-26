@@ -21,6 +21,9 @@ import {
   DeleteGroupErrors,
   DeleteTopic,
   GetCommunities,
+  GetMembers,
+  JoinCommunity,
+  JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
   UpdateCommunity,
   UpdateCommunityErrors,
@@ -74,14 +77,17 @@ describe('Community lifecycle', () => {
         {
           role: 'member',
           user_id: superadmin!.id,
+          verified: true,
         },
         {
           role: 'admin',
           user_id: admin!.id,
+          verified: true,
         },
         {
           role: 'member',
           user_id: member!.id,
+          verified: true,
         },
       ],
       custom_domain,
@@ -498,6 +504,45 @@ describe('Community lifecycle', () => {
             },
           }),
         ).rejects.toThrow('Namespace not supported on selected chain');
+    });
+  });
+
+  describe('joining', () => {
+    test('should join community', async () => {
+      const address = await command(JoinCommunity(), {
+        actor: memberActor,
+        payload: {
+          community_id: community.id,
+          address: memberActor.address!,
+        },
+      });
+      expect(address?.encoded_address).toBe(memberActor.address);
+      const members = await query(GetMembers(), {
+        actor: superAdminActor,
+        payload: { community_id: community.id, limit: 10, cursor: 1 },
+      });
+      expect(members?.results.length).toBe(3);
+    });
+
+    test('should throw when not verified', async () => {
+      const [member] = await seed('User', { isAdmin: false });
+      const actor = {
+        user: {
+          id: member!.id,
+          email: member!.profile.email!,
+          isAdmin: member!.isAdmin!,
+        },
+        address: '0x1234',
+      };
+      await expect(
+        command(JoinCommunity(), {
+          actor,
+          payload: {
+            community_id: community.id,
+            address: actor.address,
+          },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
     });
   });
 });
