@@ -180,10 +180,8 @@ export interface SubscriptionArgs {
 
 export interface JoinCommunityArgs {
   jwt: string;
-  address_id: number;
   address: string;
   chain: string;
-  originChain: string;
 }
 
 export interface SetSiteAdminArgs {
@@ -649,11 +647,12 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     try {
       await chai.request
         .agent(app)
-        .post('/api/v1/JoinComunity')
+        .post('/api/v1/JoinCommunity')
         .set('Accept', 'application/json')
         .set('address', address)
         .send({
           community_id: chain,
+          address,
           jwt,
         });
     } catch (e) {
