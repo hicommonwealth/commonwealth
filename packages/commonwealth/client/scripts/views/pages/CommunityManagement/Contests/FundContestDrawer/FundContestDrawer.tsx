@@ -21,6 +21,8 @@ interface FundContestDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   contestAddress: string;
+  fundingTokenAddress?: string;
+  fundingTokenTicker: string;
 }
 
 export type FundContestStep = 'Form' | 'Loading' | 'Success' | 'Failure';
@@ -29,37 +31,42 @@ const FundContestDrawer = ({
   isOpen,
   onClose,
   contestAddress,
+  fundingTokenAddress,
+  fundingTokenTicker,
 }: FundContestDrawerProps) => {
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
   const [txHash, setTxHash] = useState('');
 
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
+  const chainNodeId = app?.chain?.meta?.ChainNode?.id || 0;
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
 
   const { addressOptions, selectedAddress, setSelectedAddress } =
     useUserAddressesForFundForm();
 
   const {
-    amountEth,
-    amountEthInUsd,
-    setAmountEth,
+    tokenAmount,
+    tokenAmountInUsd,
+    setTokenAmount,
     amountError,
-    contestEthBalance,
+    contestTokenBalance,
     newContestBalanceInUsd,
-    newContestBalanceInEth,
-    userEthBalance,
+    newContestTokenBalance,
+    userTokenBalance,
   } = useFundContestForm({
+    fundingTokenAddress,
     contestAddress,
     chainRpc,
     ethChainId,
+    chainNodeId,
     userAddress: selectedAddress.value,
   });
 
   const { mutateAsync: fundContest } = useFundContestOnchainMutation();
 
-  const handleChangeEthAmount = (e) => {
-    setAmountEth(e.target.value);
+  const handleChangeTokenAmount = (e) => {
+    setTokenAmount(e.target.value);
   };
 
   const handleTransferFunds = () => {
@@ -69,7 +76,7 @@ const FundContestDrawer = ({
       contestAddress,
       ethChainId,
       chainRpc,
-      amount: Number(amountEth),
+      amount: Number(tokenAmount),
       walletAddress: selectedAddress.value,
     })
       .then((tx) => {
@@ -85,7 +92,7 @@ const FundContestDrawer = ({
   const handleClose = () => {
     onClose();
     setFundContestDrawerStep('Form');
-    setAmountEth(INITIAL_AMOUNT);
+    setTokenAmount(INITIAL_AMOUNT);
     setTxHash('');
   };
 
@@ -96,20 +103,21 @@ const FundContestDrawer = ({
           <FundContestForm
             onClose={handleClose}
             handleTransferFunds={handleTransferFunds}
-            amountEth={amountEth}
+            tokenAmount={tokenAmount}
             // @ts-expect-error <StrictNullChecks/>
             amountError={amountError}
-            handleChangeEthAmount={handleChangeEthAmount}
+            handleChangeTokenAmount={handleChangeTokenAmount}
             selectedAddress={selectedAddress}
             onSetSelectedAddress={setSelectedAddress}
             addressOptions={addressOptions}
             // @ts-expect-error <StrictNullChecks/>
-            userEthBalance={userEthBalance}
-            contestEthBalance={contestEthBalance}
-            amountEthInUsd={amountEthInUsd}
-            newContestBalanceInEth={newContestBalanceInEth}
+            userTokenBalance={userTokenBalance}
+            contestTokenBalance={contestTokenBalance}
+            tokenAmountInUsd={tokenAmountInUsd}
+            newContestTokenBalance={newContestTokenBalance}
             newContestBalanceInUsd={newContestBalanceInUsd}
             contestAddress={contestAddress}
+            fundingTokenTicker={fundingTokenTicker}
           />
         );
 
