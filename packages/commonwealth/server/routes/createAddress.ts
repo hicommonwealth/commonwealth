@@ -90,7 +90,7 @@ const createAddress = async (
       // cosmos or injective
       const { words } = bech32.decode(req.body.address, 50);
       encodedAddress = bech32.encode(community.bech32_prefix, words);
-      addressHex = await bech32ToHex(req.body.address);
+      addressHex = bech32ToHex(req.body.address);
 
       // check all addresses for matching hex
       const existingHexes = await models.Address.scope(
