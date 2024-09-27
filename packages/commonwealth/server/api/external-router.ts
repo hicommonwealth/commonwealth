@@ -1,4 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { getSaltedApiKeyHash, models } from '@hicommonwealth/model';
 import cors from 'cors';
 import { NextFunction, Request, Response, Router } from 'express';
@@ -79,13 +80,14 @@ if (config.NODE_ENV === 'test')
 
 // API Key Authentication
 router.use(async (req: Request, response: Response, next: NextFunction) => {
+  // whitelist docs and openAPI spec
   if (req.path.startsWith('/docs/') || req.path === '/openapi.json') {
     return next();
   }
 
   const apiKey = req.headers['x-api-key'];
-  if (!apiKey) throw new Error('Missing API key');
-  if (typeof apiKey !== 'string') throw new Error('Invalid API key');
+  if (!apiKey) throw new AppError('Unauthorized', 401);
+  if (typeof apiKey !== 'string') throw new AppError('Unauthorized', 401);
 
   const address = await models.Address.findOne({
     attributes: ['user_id'],
@@ -94,26 +96,26 @@ router.use(async (req: Request, response: Response, next: NextFunction) => {
       verified: { [Op.ne]: null },
     },
   });
-  if (!address || !address.user_id) throw new Error('Address not found');
+  if (!address || !address.user_id) throw new AppError('Unauthorized', 401);
 
   const apiKeyRecord = await models.ApiKey.findOne({
     where: {
       user_id: address.user_id,
     },
   });
-  if (!apiKeyRecord) throw new Error('No API key registered for address');
+  if (!apiKeyRecord) throw new AppError('Unauthorized', 401);
 
   const hashedApiKey = getSaltedApiKeyHash(apiKey, apiKeyRecord.salt);
 
   if (hashedApiKey !== apiKeyRecord.hashed_api_key)
-    throw new Error('UNAUTHENTICATED');
+    throw new AppError('Unauthorized', 401);
 
   const user = await models.User.findOne({
     where: {
       id: address.user_id,
     },
   });
-  if (!user) throw new Error('UNAUTHENTICATED');
+  if (!user) throw new AppError('Unauthorized', 401);
 
   req.user = user;
 
@@ -121,7 +123,6 @@ router.use(async (req: Request, response: Response, next: NextFunction) => {
   apiKeyRecord.updated_at = new Date();
   void apiKeyRecord.save();
 
-  console.log(`API KEY AUTHENTICATED: ${req.user.id}`);
   return next();
 });
 
