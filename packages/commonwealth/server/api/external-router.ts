@@ -1,9 +1,11 @@
-import { express, trpc } from '@hicommonwealth/adapters';
+import { express, RedisCache, trpc } from '@hicommonwealth/adapters';
 import { AppError } from '@hicommonwealth/core';
 import { getSaltedApiKeyHash, models } from '@hicommonwealth/model';
 import cors from 'cors';
 import { NextFunction, Request, Response, Router } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import passport from 'passport';
+import { RedisStore } from 'rate-limit-redis';
 import { Op } from 'sequelize';
 import { config } from '../config';
 import * as comment from './comment';
@@ -125,6 +127,66 @@ router.use(async (req: Request, response: Response, next: NextFunction) => {
 
   return next();
 });
+
+if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
+  // not using the cache port because the rate limiter is explicitly only
+  // compatible with Redis and the `sendCommand` function which sends arbitrary
+  // commands that only Redis may support
+  const redis = new RedisCache(config.CACHE.REDIS_URL);
+
+  const baseLimiterOptions = {
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: async (req: Request) => {
+      return `${req.path}_${req.headers['x-api-key']}`;
+    },
+  };
+
+  // 10 requests per minute (1 request per 6 seconds average)
+  const tierOneRateLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 10,
+    store: new RedisStore({
+      prefix: 'tier_one_rate_limit',
+      sendCommand: (...args: string[]) => redis.sendCommand(args),
+    }),
+    ...baseLimiterOptions,
+  });
+  // 60 requests per minute (1 per second average)
+  const tierTwoRateLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 60,
+    store: new RedisStore({
+      prefix: 'tier_two_rate_limit',
+      sendCommand: (...args: string[]) => redis.sendCommand(args),
+    }),
+    ...baseLimiterOptions,
+  });
+
+  // construct express request paths from trpc routers
+  const communityPaths = Object.keys(community.trpcRouter).map(
+    (p) => `/${p[0].toUpperCase()}${p.substring(1)}`,
+  );
+  const threadPaths = Object.keys(thread.trpcRouter).map(
+    (p) => `/${p[0].toUpperCase()}${p.substring(1)}`,
+  );
+  const commentPaths = Object.keys(comment.trpcRouter).map(
+    (p) => `/${p[0].toUpperCase()}${p.substring(1)}`,
+  );
+
+  router.use(async (req: Request, res: Response, next: NextFunction) => {
+    if (communityPaths.includes(req.path)) {
+      return tierOneRateLimiter(req, res, next);
+    } else if (
+      threadPaths.includes(req.path) ||
+      commentPaths.includes(req.path)
+    ) {
+      return tierTwoRateLimiter(req, res, next);
+    } else {
+      return tierOneRateLimiter(req, res, next);
+    }
+  });
+}
 
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {
