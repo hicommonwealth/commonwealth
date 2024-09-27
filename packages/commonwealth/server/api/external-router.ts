@@ -1,7 +1,6 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { models } from '@hicommonwealth/model';
+import { getSaltedApiKeyHash, models } from '@hicommonwealth/model';
 import cors from 'cors';
-import { createHash } from 'crypto';
 import { NextFunction, Request, Response, Router } from 'express';
 import passport from 'passport';
 import { Op } from 'sequelize';
@@ -77,12 +76,6 @@ if (config.NODE_ENV === 'test')
   router.use(passport.authenticate('jwt', { session: false }));
 
 // ===============================================================================
-
-function getSaltedApiKeyHash(apiKey: string, salt: string): string {
-  return createHash('sha256')
-    .update(apiKey + salt)
-    .digest('hex');
-}
 
 // API Key Authentication
 router.use(async (req: Request, response: Response, next: NextFunction) => {
