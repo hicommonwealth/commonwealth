@@ -72,8 +72,6 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
       profile: { type: Sequelize.JSONB, allowNull: false },
-      hashed_api_key: { type: Sequelize.STRING, allowNull: true },
-      api_key_salt: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,

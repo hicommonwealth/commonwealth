@@ -4,35 +4,25 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.addColumn(
-        'Users',
-        'api_key_salt',
-        {
-          type: Sequelize.STRING,
-          allowNull: true,
+      await queryInterface.createTable('ApiKeys', {
+        user_id: {
+          primaryKey: true,
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Users',
+            key: 'id',
+            onDelete: 'CASCADE',
+          },
         },
-        { transaction },
-      );
-      await queryInterface.addColumn(
-        'Users',
-        'hashed_api_key',
-        {
-          type: Sequelize.STRING,
-          allowNull: true,
-        },
-        { transaction },
-      );
+        hashed_api_key: { type: Sequelize.STRING, allowNull: false },
+        salt: { type: Sequelize.STRING, allowNull: false },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
+      });
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.removeColumn('Users', 'hashed_api_key', {
-        transaction,
-      });
-      await queryInterface.removeColumn('Users', 'api_key_salt', {
-        transaction,
-      });
-    });
+    await queryInterface.dropTable('ApiKeys');
   },
 };

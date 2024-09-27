@@ -25,7 +25,8 @@ export const buildAssociations = (db: DB) => {
     .withOne(db.SsoToken, {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
-    });
+    })
+    .withOne(db.ApiKey);
 
   db.ChainNode.withMany(db.Community)
     .withMany(db.Contract, { asMany: 'contracts' })

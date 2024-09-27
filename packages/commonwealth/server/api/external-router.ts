@@ -91,27 +91,24 @@ router.use(async (req: Request, response: Response, next: NextFunction) => {
   if (typeof apiKey !== 'string') throw new Error('Invalid API key');
 
   const address = await models.Address.findOne({
-    attributes: ['id'],
+    attributes: ['user_id'],
     where: {
       address: req.headers['address'],
       verified: { [Op.ne]: null },
     },
-    include: [
-      {
-        model: models.User.scope('withPrivateData'),
-        required: true,
-      },
-    ],
   });
+  if (!address || !address.user_id) throw new Error('Address not found');
 
-  if (!address) throw new Error('Address not found');
+  const apiKeyRecord = await models.ApiKey.findOne({
+    where: {
+      user_id: address.user_id,
+    },
+  });
+  if (!apiKeyRecord) throw new Error('No API key registered for address');
 
-  if (!address.User!.hashed_api_key || !address.User!.api_key_salt)
-    throw new Error('No API key associated with given address');
+  const hashedApiKey = getSaltedApiKeyHash(apiKey, apiKeyRecord.salt);
 
-  const hashedApiKey = getSaltedApiKeyHash(apiKey, address.User!.api_key_salt);
-
-  if (hashedApiKey !== address.User!.hashed_api_key)
+  if (hashedApiKey !== apiKeyRecord.hashed_api_key)
     throw new Error('UNAUTHENTICATED');
 
   req.user = models.User.build({

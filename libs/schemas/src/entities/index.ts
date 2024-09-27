@@ -1,3 +1,4 @@
+export * from './api-key.schemas';
 export * from './chain.schemas';
 export * from './comment.schemas';
 export * from './community.schemas';
