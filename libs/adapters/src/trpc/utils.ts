@@ -77,16 +77,11 @@ export function useOAS(
         version,
         baseUrl,
         securitySchemes: {
-          oauth2: {
-            type: 'oauth2',
-            flows: {
-              authorizationCode: {
-                authorizationUrl: 'https://example.com/oauth/authorize',
-                tokenUrl: 'https://example.com/oauth/token',
-                refreshUrl: 'https://example.com/oauth/refresh',
-                scopes: {},
-              },
-            },
+          apiKey: {
+            type: 'apiKey',
+            description: 'Create an API key on Common to use the Common API',
+            name: 'x-api-key',
+            in: 'header',
           },
         },
       }),
