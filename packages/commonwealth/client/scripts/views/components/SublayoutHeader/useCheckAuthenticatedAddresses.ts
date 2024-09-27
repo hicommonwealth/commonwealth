@@ -8,7 +8,7 @@ import {
   getSessionSigners,
 } from '@hicommonwealth/shared';
 import app from 'state';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { getCommunityById } from 'state/api/communities/getCommuityById';
 import useUserStore from 'state/ui/user';
 
 interface UseCheckAuthenticatedAddressesProps {
@@ -39,10 +39,7 @@ const useCheckAuthenticatedAddresses = ({
       // making a fresh query to get chain and community info for this address
       // as all the necessary fields don't exist on user.address, these should come
       // from api in the user address response, and the extra api call here removed
-      const community = await EXCEPTION_CASE_VANILLA_getCommunityById(
-        account.community.id,
-        true,
-      );
+      const community = await getCommunityById(account.community.id, true);
       if (!community) continue;
 
       const communityCaip2Prefix = chainBaseToCaip2(community.base);

@@ -4,7 +4,7 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import { z } from 'zod';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
+import { getCommunityById } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
 
 export const deinitChainOrCommunity = async () => {
@@ -41,10 +41,7 @@ export const loadCommunityChainInfo = async (
     if (activeCommunity) {
       tempChain = activeCommunity;
     } else {
-      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-        DEFAULT_CHAIN,
-        true,
-      );
+      const communityInfo = await getCommunityById(DEFAULT_CHAIN, true);
       tempChain = communityInfo;
     }
 

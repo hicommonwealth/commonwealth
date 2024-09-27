@@ -11,7 +11,7 @@ import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
+import { getCommunityById } from './api/communities/getCommuityById';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -107,7 +107,7 @@ export async function initAppState(
     if (updateSelectedCommunity && userResponse?.selectedCommunity) {
       userStore.getState().setData({
         // TODO: api should be updated to get relevant data
-        activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
+        activeCommunity: await getCommunityById(
           userResponse?.selectedCommunity.id,
           true,
         ),

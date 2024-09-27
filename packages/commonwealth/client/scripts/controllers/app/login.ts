@@ -24,7 +24,7 @@ import { Magic } from 'magic-sdk';
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import app from 'state';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import {
   onUpdateEmailError,
@@ -273,10 +273,7 @@ export async function createUserWithAddress(
 
   const id = response.data.result.id;
 
-  const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-    chain || '',
-    true,
-  );
+  const communityInfo = await getCommunityById(chain || '', true);
 
   const account = new Account({
     addressId: id,
@@ -409,10 +406,7 @@ export async function handleSocialLoginCallback({
   // a page without a chain, in which case we default to an eth login
   let desiredChain = app.chain?.meta;
   if (!desiredChain && chain) {
-    const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-      chain || '',
-      true,
-    );
+    const communityInfo = await getCommunityById(chain || '', true);
     desiredChain = communityInfo as z.infer<typeof ExtendedCommunity>;
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
@@ -535,10 +529,7 @@ export async function handleSocialLoginCallback({
       let chainInfo = userStore.getState().activeCommunity;
 
       if (!chainInfo && chain) {
-        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-          chain || '',
-          true,
-        );
+        const communityInfo = await getCommunityById(chain || '', true);
         chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
       }
 

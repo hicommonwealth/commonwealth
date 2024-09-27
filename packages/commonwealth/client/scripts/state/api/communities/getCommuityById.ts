@@ -1,7 +1,6 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import axios from 'axios';
 import { ThreadStage } from 'models/types';
-import { BASE_API_PATH, trpc } from 'utils/trpcClient';
+import { trpc, trpcVanilla } from 'utils/trpcClient';
 import { z } from 'zod';
 import { queryClient } from '../config';
 
@@ -123,7 +122,7 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
   }
 };
 
-export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
+export const getCommunityById = async (
   communityId: string,
   includeNodeInfo = false,
 ): Promise<z.infer<typeof ExtendedCommunity> | undefined> => {
@@ -141,21 +140,15 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
     return cachedCommunity;
   }
 
-  // HACK: with @trpc/react-query v10.x, we can't directly call an endpoint outside of 'react-context'
-  // with this way the api can be used in non-react files. This should be cleaned up when we migrate
-  // to @trpc/react-query v11.x
-  const response = await axios.get(
-    // eslint-disable-next-line max-len
-    `${BASE_API_PATH}/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
-  );
-  const fetchedCommunity = response?.data[0]?.result?.data as z.infer<
-    typeof ExtendedCommunity
-  >;
+  const community = await trpcVanilla.community.getCommunity.query({
+    id: communityId,
+    include_node_info: includeNodeInfo,
+  });
 
   // add response in cache
-  queryClient.setQueryData(queryKey, fetchedCommunity);
+  queryClient.setQueryData(queryKey, community);
 
-  return fetchedCommunity;
+  return community as z.infer<typeof ExtendedCommunity>;
 };
 
 const useGetCommunityByIdQuery = ({
@@ -171,6 +164,9 @@ const useGetCommunityByIdQuery = ({
     {
       staleTime: COMMUNITIY_STALE_TIME,
       enabled,
+      onError: (err) => {
+        console.log(err);
+      },
     },
   );
 };

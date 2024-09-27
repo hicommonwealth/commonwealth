@@ -9,7 +9,7 @@ import * as email from './emails';
 import * as feed from './feed';
 import * as integrations from './integrations';
 import * as loadTest from './load-test';
-import * as subscription from './subscription';
+import * as subscriptions from './subscription';
 import * as superAdmin from './super-admin';
 import * as thread from './threads';
 import * as user from './user';
@@ -24,7 +24,7 @@ const api = {
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
-  subscription: subscription.trpcRouter,
+  subscriptions: subscriptions.trpcRouter,
   loadTest: loadTest.trpcRouter,
   webhook: webhook.trpcRouter,
   superAdmin: superAdmin.trpcRouter,
