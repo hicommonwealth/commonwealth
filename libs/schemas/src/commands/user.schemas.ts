@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ApiKey, User } from '../entities';
+import { User } from '../entities';
 
 export const UpdateUser = {
   input: User.omit({ is_welcome_onboard_flow_complete: true }).extend({
@@ -26,7 +26,10 @@ export const CreateApiKey = {
 
 export const GetApiKey = {
   input: z.object({}),
-  output: ApiKey.pick({ hashed_api_key: true, created_at: true }),
+  output: z.object({
+    hashed_api_key: z.string().optional(),
+    created_at: z.string().optional(),
+  }),
 };
 
 export const DeleteApiKey = {

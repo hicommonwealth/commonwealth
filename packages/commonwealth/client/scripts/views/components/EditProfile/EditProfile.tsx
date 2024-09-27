@@ -391,7 +391,7 @@ const EditProfile = () => {
                 onTagClick={toggleTagFromSelection}
               />
             </ProfileSection>
-            {ManageApiKey()}
+            <ManageApiKey />
             {actionButtons}
           </CWForm>
         </div>

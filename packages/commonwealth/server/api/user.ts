@@ -5,4 +5,5 @@ export const trpcRouter = trpc.router({
   updateUser: trpc.command(User.UpdateUser, trpc.Tag.User),
   getNewContent: trpc.query(User.GetNewContent, trpc.Tag.User),
   createApiKey: trpc.command(User.CreateApiKey, trpc.Tag.User),
+  getApiKey: trpc.query(User.GetApiKey, trpc.Tag.User),
 });
