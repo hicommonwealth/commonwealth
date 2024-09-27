@@ -86,6 +86,10 @@ function getSaltedApiKeyHash(apiKey: string, salt: string): string {
 
 // API Key Authentication
 router.use(async (req: Request, response: Response, next: NextFunction) => {
+  if (req.path.startsWith('/docs/') || req.path === '/openapi.json') {
+    return next();
+  }
+
   const apiKey = req.headers['x-api-key'];
   if (!apiKey) throw new Error('Missing API key');
   if (typeof apiKey !== 'string') throw new Error('Invalid API key');
