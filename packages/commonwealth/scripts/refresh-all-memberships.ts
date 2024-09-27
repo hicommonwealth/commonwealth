@@ -1,25 +1,29 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import { cache, dispose, logger, query } from '@hicommonwealth/core';
+import { cache, command, dispose, logger, query } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import { config } from '../server/config';
-import { ServerGroupsController } from '../server/controllers/server_groups_controller';
-import BanCache from '../server/util/banCheckCache';
 
 const log = logger(import.meta);
 
 async function main() {
-  config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
+  config.CACHE.REDIS_URL &&
+    cache({
+      adapter: new RedisCache(config.CACHE.REDIS_URL),
+    });
 
-  const banCache = new BanCache(models);
-
-  const groupsController = new ServerGroupsController(models, banCache);
+  const actor = {
+    address: 'system',
+    user: {
+      email: 'system',
+    },
+  };
 
   // fetch all communities via pagination
   const limit = 50;
   let cursor = 1;
   const communitiesResult = await query(Community.GetCommunities(), {
     // no need for an actor, but argument is mandatory
-    actor: { user: { email: '' } },
+    actor,
     payload: { has_groups: true, cursor, limit },
   });
   const totalPages = communitiesResult!.totalPages;
@@ -27,7 +31,7 @@ async function main() {
   while (cursor < totalPages) {
     cursor += 1;
     const cr = await query(Community.GetCommunities(), {
-      actor: { user: { email: '' } },
+      actor,
       payload: { has_groups: true, cursor, limit },
     });
     communities.push(...cr!.results);
@@ -37,10 +41,24 @@ async function main() {
   for (const community of communities) {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
-    await groupsController.refreshCommunityMemberships({
-      // @ts-expect-error StrictNullChecks
-      communityId: community.id,
-    });
+
+    try {
+      const admin = await models.Address.findOne({
+        where: { community_id: community.id, role: 'admin' },
+      });
+      await command(Community.RefreshCommunityMemberships(), {
+        actor: {
+          address: admin?.address,
+          user: { id: admin!.user_id!, email: 'system' },
+        },
+        payload: { community_id: community.id },
+      });
+    } catch (e) {
+      log.error(
+        `Couldn't refresh memberships for community ${community.id}`,
+        e,
+      );
+    }
   }
 
   log.info(

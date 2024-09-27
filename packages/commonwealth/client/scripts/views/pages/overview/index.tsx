@@ -21,16 +21,18 @@ const OverviewPage = () => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const user = useUserStore();
 
+  const communityId = app.activeChainId() || '';
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
-    communityId: app.activeChainId(),
+    communityId,
     topicsPerThread: 3,
     withXRecentComments: 3,
-    // TODO: ask for a pinned thread prop here to show pinned threads
+    apiEnabled: !!communityId,
   });
 
   const { data: topics = [] } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);

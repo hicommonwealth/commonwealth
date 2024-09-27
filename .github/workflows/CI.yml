@@ -12,9 +12,11 @@ env:
   USES_DOCKER_PGSQL: true
   PORT: 8080
   REDIS_URL: redis://localhost:6379
-  ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
   ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
   GITHUB_BASE_REF: ${{ github.base_ref }}
+  FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
   pull_request:
@@ -258,6 +260,36 @@ jobs:
       - name: Run linter
         run: pnpm lint-branch
 
+
+  detect-broken-ts-expect-error:
+    name: Detect Broken TS expect errors
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 20 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Assert pnpm-lock.yaml is correct
+        run: |
+          if ! git diff --quiet; then
+            echo 'You need to update the pnpm-lock.yaml file (potentially after installing node-gyp)'
+            exit 1
+          fi
+
+      - name: build
+        run: pnpm -r build
+
+      - name: run detect-broken-ts-expect-error.sh
+        run: cd packages/commonwealth && ./scripts/detect-broken-ts-expect-error.sh
+
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
     name: Commonwealth Unit And Integration Tests
@@ -303,9 +335,6 @@ jobs:
       # TODO: use devmode instead to avoid building
       - name: Build
         run: pnpm -r build
-
-      - name: build
-        run: pnpm -r lint
 
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
@@ -484,5 +513,3 @@ jobs:
         with:
           parallel-finished: true
           carryforward: "cosmos-devnet-test-coverage"
-
-

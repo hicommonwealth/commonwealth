@@ -12,7 +12,7 @@ import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
-import { decodeThreadContentUrl } from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl } from '../utils';
 
 const log = logger(import.meta);
 
@@ -93,22 +93,22 @@ async function updateOrCreateWithAlert(
         msg,
         new MissingContestManager(msg, namespace, contest_address),
       );
+      mustExist(`Community with namespace: ${namespace}`, community);
 
-      if (mustExist(`Community with namespace: ${namespace}`, community))
-        await models.ContestManager.create(
-          {
-            contest_address,
-            community_id: community.id!,
-            interval,
-            ticker,
-            decimals,
-            created_at: new Date(),
-            name: community.name,
-            image_url: 'http://default.image', // TODO: can we have a default image for this?
-            payout_structure: [],
-          },
-          { transaction },
-        );
+      await models.ContestManager.create(
+        {
+          contest_address,
+          community_id: community.id!,
+          interval,
+          ticker,
+          decimals,
+          created_at: new Date(),
+          name: community.name,
+          image_url: 'http://default.image', // TODO: can we have a default image for this?
+          payout_structure: [],
+        },
+        { transaction },
+      );
     }
 
     // create first contest instance
@@ -128,31 +128,31 @@ async function updateOrCreateWithAlert(
     const contestAbi = await models.ContractAbi.findOne({
       where: { nickname: abiNickname },
     });
-    if (mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi)) {
-      const sigs = isOneOff
-        ? [
-            EvmEventSignatures.Contests.ContentAdded,
-            EvmEventSignatures.Contests.SingleContestStarted,
-            EvmEventSignatures.Contests.SingleContestVoterVoted,
-          ]
-        : [
-            EvmEventSignatures.Contests.ContentAdded,
-            EvmEventSignatures.Contests.RecurringContestStarted,
-            EvmEventSignatures.Contests.RecurringContestVoterVoted,
-          ];
-      const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
-        (eventSignature) => {
-          return {
-            chain_node_id: community!.ChainNode!.id!,
-            contract_address: contest_address,
-            event_signature: eventSignature,
-            kind: signatureToKind[eventSignature],
-            abi_id: contestAbi.id,
-          };
-        },
-      );
-      await models.EvmEventSource.bulkCreate(sourcesToCreate, { transaction });
-    }
+    mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi);
+
+    const sigs = isOneOff
+      ? [
+          EvmEventSignatures.Contests.ContentAdded,
+          EvmEventSignatures.Contests.SingleContestStarted,
+          EvmEventSignatures.Contests.SingleContestVoterVoted,
+        ]
+      : [
+          EvmEventSignatures.Contests.ContentAdded,
+          EvmEventSignatures.Contests.RecurringContestStarted,
+          EvmEventSignatures.Contests.RecurringContestVoterVoted,
+        ];
+    const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
+      (eventSignature) => {
+        return {
+          chain_node_id: community!.ChainNode!.id!,
+          contract_address: contest_address,
+          event_signature: eventSignature,
+          kind: signatureToKind[eventSignature],
+          abi_id: contestAbi.id,
+        };
+      },
+    );
+    await models.EvmEventSource.bulkCreate(sourcesToCreate, { transaction });
   });
 }
 
@@ -168,9 +168,12 @@ type ContestDetails = {
 async function getContestDetails(
   contest_address: string,
 ): Promise<ContestDetails | undefined> {
-  const [result] = await models.sequelize.query<ContestDetails>(
+  const [result] = await models.sequelize.query<
+    ContestDetails & { private_url: string }
+  >(
     `
-        select coalesce(cn.private_url, cn.url) as url,
+        select cn.private_url,
+               cn.url,
                cm.prize_percentage,
                cm.payout_structure
         from "ContestManagers" cm
@@ -184,7 +187,12 @@ async function getContestDetails(
       replacements: { contest_address },
     },
   );
-  return result;
+
+  return {
+    url: getChainNodeUrl(result),
+    prize_percentage: result.prize_percentage,
+    payout_structure: result.payout_structure,
+  };
 }
 
 /**

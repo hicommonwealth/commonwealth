@@ -57,10 +57,11 @@ export const AdminOnboardingSlider = () => {
 
   const navigate = useCommonNavigate();
 
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   const integrations = {
@@ -85,22 +86,22 @@ export const AdminOnboardingSlider = () => {
 
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
-      communityId: app.activeChainId(),
-      apiEnabled: !!app.activeChainId(),
+      communityId,
+      apiEnabled: !!communityId,
     });
 
   const { data: groups = [], isLoading: isLoadingGroups = false } =
     useFetchGroupsQuery({
-      communityId: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      communityId,
+      enabled: !!communityId,
     });
 
   const { data: threadCount = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
-      communityId: app.activeChainId(),
+      communityId,
       queryType: 'count',
       limit: 1,
-      apiEnabled: !!app.activeChainId(),
+      apiEnabled: !!communityId,
     });
 
   const redirectToPage = (
@@ -129,7 +130,7 @@ export const AdminOnboardingSlider = () => {
     contestEnabled && isCommunitySupported && contestsData?.length > 0;
 
   const isSliderHidden =
-    !app.activeChainId() ||
+    !communityId ||
     isLoadingCommunity ||
     isContestDataLoading ||
     isLoadingTopics ||
@@ -144,7 +145,7 @@ export const AdminOnboardingSlider = () => {
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,
-    ].includes(app.activeChainId());
+    ].includes(communityId);
 
   useEffect(() => {
     setIsVisible(!isSliderHidden);
@@ -227,7 +228,7 @@ export const AdminOnboardingSlider = () => {
             onDismiss={(shouldDismissPermanently) => {
               setIsModalVisible(false);
               setShouldHideAdminOnboardingCardsForCommunity(
-                app.activeChainId(),
+                communityId,
                 shouldDismissPermanently,
               );
             }}

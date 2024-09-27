@@ -58,7 +58,7 @@ describe('EVM Chain Events End to End Tests', () => {
     anvil = await getAnvil();
     const currentBlock = Number((await sdk.getBlock()).number);
     // advance time to avoid test interaction issues
-    await sdk.safeAdvanceTime(currentBlock + 501);
+    await sdk.safeAdvanceTime(currentBlock + 502);
     await models.LastProcessedEvmBlock.destroy({
       where: {},
     });
@@ -88,6 +88,7 @@ describe('EVM Chain Events End to End Tests', () => {
       console.log(
         `Proposal created at block ${propCreatedResult.block} with id ${propCreatedResult.proposalId}`,
       );
+      await sdk.mineBlocks(10);
 
       expect(await models.Outbox.count()).to.equal(0);
       await verifyBlockNumber(contract.chain_node_id, null);
@@ -96,7 +97,10 @@ describe('EVM Chain Events End to End Tests', () => {
       clearInterval(intervalId);
 
       await delay(5000);
-      await verifyBlockNumber(contract.chain_node_id, propCreatedResult.block);
+      await verifyBlockNumber(
+        contract.chain_node_id,
+        propCreatedResult.block - 1,
+      );
 
       const events = await models.Outbox.findAll();
       expect(events.length).to.equal(1);

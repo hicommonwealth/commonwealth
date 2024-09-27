@@ -46,7 +46,6 @@ const removeDiscordBotConfig = async (
       transaction,
     });
     await models.Topic.update(
-      // @ts-expect-error StrictNullChecks
       { channel_id: null },
       {
         where: {

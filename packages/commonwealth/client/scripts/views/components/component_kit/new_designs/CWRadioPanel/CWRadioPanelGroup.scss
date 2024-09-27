@@ -1,0 +1,14 @@
+@import '../../../../../../styles/shared.scss';
+
+.RadioPanelGroup {
+  display: flex;
+  gap: 16px;
+
+  @include extraSmall {
+    flex-direction: column;
+
+    .RadioPanel {
+      width: 100%;
+    }
+  }
+}

@@ -25,11 +25,21 @@ export default (
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+        get() {
+          return (this.getDataValue(
+            'created_at',
+          ) as unknown as Date)!.toISOString();
+        },
       },
       updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+        get() {
+          return (this.getDataValue(
+            'updated_at',
+          ) as unknown as Date)!.toISOString();
+        },
       },
     },
     {

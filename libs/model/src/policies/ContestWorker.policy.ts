@@ -1,6 +1,6 @@
 import { Actor, events, logger, Policy } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { config, Contest, models } from '..';
+import { config, Contest, getChainNodeUrl, models } from '..';
 import { contestHelper } from '../services/commonProtocol';
 import { buildThreadContentUrl } from '../utils';
 
@@ -20,7 +20,9 @@ export function ContestWorker(): Policy<typeof inputs> {
           log.warn('ThreadCreated: payload does not contain topic ID');
           return;
         }
-        const { address: userAddress } = payload;
+        const { address: userAddress } = (await models.Address.findByPk(
+          payload.address_id,
+        ))!;
 
         const contentUrl = buildThreadContentUrl(
           payload.community_id!,
@@ -107,7 +109,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           content_id: number;
         }>(
           `
-            SELECT coalesce(cn.private_url, cn.url) as url, cm.contest_address, added.content_id
+            SELECT cn.private_url, cn.url, cm.contest_address, added.content_id
             FROM "Communities" c
             JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
             JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -164,7 +166,9 @@ export function ContestWorker(): Policy<typeof inputs> {
           );
         }
 
-        const chainNodeUrl = activeContestManagersWithoutVote[0]!.url;
+        const chainNodeUrl = getChainNodeUrl(
+          activeContestManagersWithoutVote[0]!,
+        );
 
         log.debug(
           `ThreadUpvoted: contest managers to process: ${JSON.stringify(

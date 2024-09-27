@@ -1,6 +1,6 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import React, { useState } from 'react';
-import Topic, { TopicAttributes } from '../../models/Topic';
+import Topic from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
@@ -20,7 +20,6 @@ import { openConfirmation } from './confirmation_modal';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import '../../../styles/modals/edit_topic_modal.scss';
-import useAppStatus from '../../hooks/useAppStatus';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -47,33 +46,23 @@ export const EditTopicModal = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
   const handleSaveChanges = async () => {
     setIsSaving(true);
 
-    const topicInfo: TopicAttributes = {
-      id,
-      description: description,
-      name: name,
-      community_id: app.activeChainId(),
-      // @ts-expect-error <StrictNullChecks/>
-      telegram: null,
-      featured_in_sidebar: featuredInSidebar,
-      featured_in_new_post: false,
-      default_offchain_template: '',
-      total_threads: topic.totalThreads || 0,
-    };
-
     try {
       await editTopic({
-        topic: new Topic(topicInfo),
-        isPWA: isAddedToHomeScreen,
+        topic_id: id!,
+        description: description,
+        name: name,
+        community_id: app.activeChainId()!,
+        telegram: null,
+        featured_in_sidebar: featuredInSidebar,
+        featured_in_new_post: false,
+        default_offchain_template: '',
       });
       if (noRedirect) {
         onModalClose();
@@ -104,9 +93,8 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
           onClick: async () => {
             await deleteTopic({
-              topicId: id,
-              topicName: name,
-              communityId: app.activeChainId(),
+              community_id: app.activeChainId() || '',
+              topic_id: id!,
             });
             if (noRedirect) {
               onModalClose();

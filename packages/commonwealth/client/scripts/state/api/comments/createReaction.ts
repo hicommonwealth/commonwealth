@@ -1,10 +1,11 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { signCommentReaction } from 'controllers/server/sessions';
 import Reaction from 'models/Reaction';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
@@ -17,20 +18,22 @@ interface CreateReactionProps {
   communityId: string;
   threadId: number;
   commentId: number;
+  commentMsgId: string;
 }
 
-const createReaction = async ({
+export const buildCreateCommentReactionInput = async ({
   address,
   reactionType = 'like',
   communityId,
   commentId,
+  commentMsgId,
 }: CreateReactionProps) => {
   const canvasSignedData = await signCommentReaction(address, {
-    comment_id: commentId,
+    comment_id: commentMsgId,
     like: reactionType === 'like',
   });
 
-  return await axios.post(`${SERVER_URL}/comments/${commentId}/reactions`, {
+  return {
     author_community_id: userStore.getState().activeAccount?.community?.id,
     community_id: communityId,
     address,
@@ -38,7 +41,8 @@ const createReaction = async ({
     jwt: userStore.getState().jwt,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
     comment_id: commentId,
-  });
+    comment_msg_id: commentMsgId,
+  };
 };
 
 const useCreateCommentReactionMutation = ({
@@ -60,21 +64,19 @@ const useCreateCommentReactionMutation = ({
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: createReaction,
-    onSuccess: async (response) => {
-      const reaction = response.data.result;
-
+  return trpc.comment.createCommentReaction.useMutation({
+    onSuccess: (newReaction) => {
       // update fetch comments query state
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData(key, () => {
         const tempComments = [...comments];
         const commentToUpdate = tempComments.find((x) => x.id === commentId);
-        reaction.Address.User = {
+        newReaction.Address!.User = {
           profile: commentToUpdate.profile,
         };
-        commentToUpdate.reactions.push(new Reaction(reaction));
+        // @ts-expect-error StrictNullChecks
+        commentToUpdate.reactions.push(new Reaction(newReaction));
         return tempComments;
       });
 
@@ -82,7 +84,7 @@ const useCreateCommentReactionMutation = ({
       userId &&
         markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);
 
-      return reaction;
+      return newReaction;
     },
     onError: (error) => {
       if (error instanceof AxiosError) {

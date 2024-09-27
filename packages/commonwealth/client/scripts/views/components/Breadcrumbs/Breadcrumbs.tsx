@@ -19,13 +19,15 @@ export const Breadcrumbs = () => {
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
+  const communityId = app.activeChainId() || '';
   const { data: linkedThreads } = useGetThreadsByIdQuery({
-    communityId: app.activeChainId(),
+    communityId,
     // @ts-expect-error StrictNullChecks
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
       // Only call when in discussion pages prevents unnecessary calls.
-      location.pathname.split('/')[1].toLowerCase() === 'discussion',
+      location.pathname.split('/')[1].toLowerCase() === 'discussion' &&
+      !!communityId,
   });
 
   const currentDiscussion = {
@@ -60,7 +62,7 @@ export const Breadcrumbs = () => {
   const pathnames = generateBreadcrumbs(
     location.pathname,
     navigate,
-    domain?.isCustomDomain ? app.activeChainId() : '',
+    domain?.isCustomDomain ? communityId : '',
     currentDiscussion,
     user?.userId,
   );

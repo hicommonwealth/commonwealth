@@ -1,0 +1,30 @@
+@import '../../../../../styles/shared';
+
+.Indicator {
+  // cover the parent
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  // needed so that drag operations don't get hijacked by the indicator which
+  // would prevent dropping images and markdown files into the editor.
+  pointer-events: none;
+
+  // the z-index is needed because the 'select' in MDXEditor has its own z-index
+  // which we have to sit on top of.
+  z-index: 10;
+
+  // set the background color to grey-ish so that we can indicate something
+  // is 'muted' here.
+  background-color: rgba(128, 128, 128, 0.2);
+
+  // needed so that the .inner progress indicator can be centered
+  display: flex;
+
+  .inner {
+    // center the contnts
+    margin: auto auto;
+  }
+}

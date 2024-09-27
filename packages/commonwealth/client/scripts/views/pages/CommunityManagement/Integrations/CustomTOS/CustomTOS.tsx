@@ -1,3 +1,4 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -14,10 +15,11 @@ import { ZodError } from 'zod';
 import './CustomTOS.scss';
 
 const CustomTOS = () => {
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
@@ -61,10 +63,12 @@ const CustomTOS = () => {
     setIsSaving(true);
 
     try {
-      await updateCommunity({
-        communityId: community?.id,
-        terms: terms.value || '',
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          terms: terms.value || '',
+        }),
+      );
 
       notifySuccess('TOS link updated!');
     } catch {

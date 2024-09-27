@@ -5,14 +5,14 @@ import {
   MembershipAttributes,
   MembershipInstance,
   OptionsWithBalances,
+  makeGetBalancesOptions,
   tokenBalanceCache,
+  validateGroupMembership,
 } from '@hicommonwealth/model';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
 import { config } from '../../config';
-import { makeGetBalancesOptions } from './makeGetBalancesOptions';
-import validateGroupMembership from './validateGroupMembership';
 
 /**
  * refreshMembershipsForAddress refreshes the memberships for the given address
@@ -31,7 +31,7 @@ export async function refreshMembershipsForAddress(
   const findAllQuery: FindOptions<MembershipAttributes> = {
     where: {
       group_id: {
-        [Op.in]: groups.map((g) => g.id),
+        [Op.in]: groups.map((g) => g.id!),
       },
       address_id: address.id!,
     },
@@ -56,9 +56,8 @@ export async function refreshMembershipsForAddress(
     // membership does not exist
     if (!membership) {
       membershipsToCreate.push({
-        group_id: group.id,
-        // @ts-expect-error StrictNullChecks
-        address_id: address.id,
+        group_id: group.id!,
+        address_id: address.id!,
         // @ts-expect-error StrictNullChecks
         last_checked: null,
       });
@@ -141,9 +140,8 @@ function computeMembership(
     group.metadata.required_requirements!,
   );
   return {
-    group_id: group.id,
-    // @ts-expect-error StrictNullChecks
-    address_id: address.id,
+    group_id: group.id!,
+    address_id: address.id!,
     reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };

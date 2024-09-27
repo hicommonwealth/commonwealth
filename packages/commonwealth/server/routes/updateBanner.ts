@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import type { CommunityBannerInstance, DB } from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model';
 import type { Response } from 'express';
 import type { TypedRequestBody } from '../types';
 import { success } from '../types';
@@ -9,11 +9,12 @@ enum UpdateBannerErrors {
   NoPermission = `You do not have permission to update banner`,
 }
 
-type UpdateBannerReq = Omit<CommunityBannerInstance, 'id'> & {
+type UpdateBannerReq = {
   community_id: string;
   banner_text: string;
 };
 
+// TODO in #9012: this route should be rolled into the updateCommunity route
 const updateBanner = async (
   models: DB,
   req: TypedRequestBody<UpdateBannerReq>,
@@ -36,24 +37,11 @@ const updateBanner = async (
 
   const banner_text = req.body?.banner_text || '';
 
-  // find or create
-  const [banner] = await models.CommunityBanner.findOrCreate({
-    where: {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-    },
-    defaults: {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      banner_text,
-    },
-  });
-  if (banner_text !== banner.banner_text) {
-    // update if need be
-    banner.banner_text = banner_text;
-    await banner.save();
+  if (community && banner_text !== community.banner_text) {
+    community.banner_text = banner_text;
+    await community.save();
   }
-  return success(res, banner.toJSON());
+  return success(res, { banner_text });
 };
 
 export default updateBanner;

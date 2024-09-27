@@ -7,8 +7,10 @@ import {
   NotificationsProviderSchedulesReturn,
   NotificationsProviderTriggerOptions,
 } from '@hicommonwealth/core';
+import { MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER } from '@hicommonwealth/shared';
 import { Knock, Schedule } from '@knocklabs/node';
 import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
+import _ from 'lodash';
 import { config } from '../config';
 
 const log = logger(import.meta);
@@ -65,20 +67,44 @@ export function KnockProvider(): NotificationsProvider {
         return config.PUSH_NOTIFICATIONS.KNOCK_APNS_CHANNEL_ID;
     }
   }
+
   return {
     name: 'KnockProvider',
     dispose: () => Promise.resolve(),
     async triggerWorkflow(
       options: NotificationsProviderTriggerOptions,
-    ): Promise<boolean> {
-      const runId = await knock.workflows.trigger(options.key, {
-        recipients: options.users,
-        data: options.data,
-        // TODO: disabled pending Knock support - UPDATE: PR merged in Knock SDK repo but await new release
-        // actor: options.actor,
+    ): Promise<PromiseSettledResult<{ workflow_run_id: string }>[]> {
+      // disable webhook workflow in all environments except production
+      // this is to prevent sending webhooks to real endpoints in all other env
+      if (options.key === 'webhooks' && !config.NOTIFICATIONS.WEBHOOKS.SEND) {
+        log.warn('Webhooks disabled');
+        return [];
+      }
+
+      const recipientChunks = _.chunk(
+        options.users,
+        MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER,
+      );
+      const triggerPromises = recipientChunks.map((chunk) => {
+        return knock.workflows.trigger(options.key, {
+          recipients: chunk,
+          data: options.data,
+          // TODO: disabled pending Knock support - UPDATE: PR merged in Knock SDK repo but await new release
+          // actor: options.actor,
+        });
       });
 
-      return !!runId;
+      const res = await Promise.allSettled(triggerPromises);
+      res.forEach((r) => {
+        if (r.status === 'rejected') {
+          log.error('KNOCK PROVIDER: Failed to trigger workflow', undefined, {
+            workflow_key: options.key,
+            data: options.data,
+            reason: JSON.stringify(r.reason),
+          });
+        }
+      });
+      return res;
     },
     async getMessages(
       options: NotificationsProviderGetMessagesOptions,
@@ -93,11 +119,18 @@ export function KnockProvider(): NotificationsProvider {
     },
 
     async getSchedules(options): Promise<NotificationsProviderSchedulesReturn> {
-      const res = await knock.users.getSchedules(options.user_id, {
-        // @ts-expect-error Knock SDK doesn't support this option, but it works since the Knock API supports it
-        workflow: options.workflow_id,
-      });
-      return formatScheduleResponse(res.entries);
+      try {
+        const res = await knock.users.getSchedules(options.user_id, {
+          // @ts-expect-error Knock SDK doesn't support this option, but it works since the Knock API supports it
+          workflow: options.workflow_id,
+        });
+        return formatScheduleResponse(res.entries);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        if ('status' in e && e.status === 404) {
+          return [];
+        } else throw e;
+      }
     },
 
     async createSchedules(options) {
@@ -111,6 +144,13 @@ export function KnockProvider(): NotificationsProvider {
     async deleteSchedules(options) {
       const res = await knock.workflows.deleteSchedules(options);
       return new Set(res.map((s) => s.id));
+    },
+
+    async identifyUser(options) {
+      return await knock.users.identify(
+        options.user_id,
+        options.user_properties,
+      );
     },
 
     async registerClientRegistrationToken(

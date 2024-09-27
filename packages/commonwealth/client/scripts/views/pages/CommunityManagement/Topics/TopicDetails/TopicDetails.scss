@@ -1,0 +1,49 @@
+@import '../../../../../../styles/shared';
+
+.TopicDetails {
+  header {
+    margin-bottom: 32px;
+
+    .subheader {
+      color: $neutral-500;
+    }
+  }
+
+  .content-container {
+    display: flex;
+
+    main {
+      width: 60%;
+
+      .CWTabsRow {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+    }
+
+    aside {
+      width: 40%;
+      padding: 22px 60px;
+    }
+  }
+
+  @include extraSmall {
+    header {
+      margin-bottom: 14px;
+    }
+
+    .content-container {
+      flex-direction: column-reverse;
+      gap: 16px;
+
+      main {
+        width: 100%;
+      }
+
+      aside {
+        padding: 0;
+        width: 100%;
+      }
+    }
+  }
+}

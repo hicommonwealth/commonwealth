@@ -8,7 +8,6 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import Web3 from 'web3';
 import {
   getEvents,
   getLogs,
@@ -28,8 +27,6 @@ import {
 } from './util';
 
 chai.use(chaiAsPromised);
-
-const web3 = new Web3();
 
 const compoundVotingDelayBlocks = 13140;
 const compoundVotingPeriodBlocks = 19710;
@@ -152,7 +149,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         expectAbi();
 
         expect(propQueuedResult.block).to.not.be.undefined;
-        await sdk.mineBlocks(501);
+        await sdk.mineBlocks(502);
 
         const { logs } = await getLogs({
           rpc: localRpc,
@@ -291,7 +288,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       }
 
       expect(events.length).to.equal(1);
-      expect(web3.utils.toChecksumAddress(events[0].rawLog.address)).to.equal(
+      expect(events[0].rawLog.address).to.equal(
         sdk.contractAddrs.compound.governance,
       );
       expect(events[0].eventSource.kind).to.equal('proposal-created');
@@ -306,7 +303,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         rpc: localRpc,
         maxBlockRange: 500,
         contracts: {
-          [sdk.contractAddrs.compound.governance]: {
+          [sdk.contractAddrs.compound.governance.toLowerCase()]: {
             abi,
             sources: [
               {
@@ -326,7 +323,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         propQueuedLog,
       ]);
       expect(events.length).to.equal(1);
-      expect(web3.utils.toChecksumAddress(events[0].rawLog.address)).to.equal(
+      expect(events[0].rawLog.address).to.equal(
         sdk.contractAddrs.compound.governance,
       );
       expect(events[0].eventSource.kind).to.equal('proposal-queued');
@@ -395,10 +392,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
         (e) => e.eventSource.kind === 'proposal-created',
       );
       expect(propCreatedEvent).to.exist;
-      expect(
-        // @ts-expect-error StrictNullChecks
-        web3.utils.toChecksumAddress(propCreatedEvent.rawLog.address),
-      ).to.equal(sdk.contractAddrs.compound.governance);
+      expect(propCreatedEvent!.rawLog.address).to.equal(
+        sdk.contractAddrs.compound.governance,
+      );
       // @ts-expect-error StrictNullChecks
       expect(propCreatedEvent.eventSource.kind).to.equal('proposal-created');
       // @ts-expect-error StrictNullChecks
@@ -412,14 +408,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
         (e) => e.eventSource.kind === 'proposal-queued',
       );
       expect(propQueuedEvent).to.exist;
-      expect(
-        // @ts-expect-error StrictNullChecks
-        web3.utils.toChecksumAddress(propQueuedEvent.rawLog.address),
-      ).to.equal(sdk.contractAddrs.compound.governance);
-      // @ts-expect-error StrictNullChecks
-      expect(propQueuedEvent.eventSource.kind).to.equal('proposal-queued');
-      // @ts-expect-error StrictNullChecks
-      expect(propQueuedEvent.rawLog.blockNumber).to.equal(
+      expect(propQueuedEvent!.rawLog.address).to.equal(
+        sdk.contractAddrs.compound.governance,
+      );
+      expect(propQueuedEvent!.eventSource.kind).to.equal('proposal-queued');
+      expect(propQueuedEvent!.rawLog.blockNumber).to.equal(
         propQueuedLog.blockNumber,
       );
       // @ts-expect-error StrictNullChecks

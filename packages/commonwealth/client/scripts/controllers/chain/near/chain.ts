@@ -1,6 +1,7 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import type ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type { NearAccount } from './account';
 
@@ -29,8 +30,8 @@ class NearChain implements IChainModule<any, NearAccount> {
     this._app = app;
   }
 
-  public init(chain: ChainInfo): Promise<void> {
-    const networkSuffix = chain.id.split('.').pop();
+  public init(chain: z.infer<typeof ExtendedCommunity>): Promise<void> {
+    const networkSuffix = chain?.id?.split('.').pop();
     this._networkId =
       chain.id === 'near-testnet' || networkSuffix === 'testnet'
         ? 'testnet'

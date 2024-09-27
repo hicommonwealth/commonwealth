@@ -48,7 +48,6 @@ const fetchProfileById = async ({
           ss58Prefix: a.Community.ss58_prefix || undefined,
         },
         walletId: a.wallet_id!,
-        walletSsoSource: a.wallet_sso_source!,
         ghostAddress: a.ghost_address,
       });
     } catch (err) {
@@ -101,7 +100,6 @@ const useFetchProfileByIdQuery = ({
                 address: a?.address,
                 ghostAddress: a?.ghost_address,
                 lastActive: a.last_active ? moment(a.last_active) : undefined,
-                walletSsoSource: a.wallet_sso_source!,
               }),
           ),
         });

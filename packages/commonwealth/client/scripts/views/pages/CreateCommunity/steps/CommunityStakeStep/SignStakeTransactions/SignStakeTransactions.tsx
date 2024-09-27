@@ -16,11 +16,13 @@ import useReserveCommunityNamespace from './useReserveCommunityNamespace';
 import './SignStakeTransactions.scss';
 
 const SignStakeTransactions = ({
-  goToSuccessStep,
   communityStakeData,
   selectedAddress,
   createdCommunityId,
   chainId,
+  isTopicFlow,
+  onSuccess,
+  onCancel,
 }: SignStakeTransactionsProps) => {
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
@@ -35,7 +37,7 @@ const SignStakeTransactions = ({
     useLaunchCommunityStake({
       namespace: communityStakeData.namespace,
       communityId: createdCommunityId,
-      goToSuccessStep,
+      goToSuccessStep: onSuccess,
       selectedAddress: selectedAddress.address,
       chainId,
     });
@@ -77,24 +79,26 @@ const SignStakeTransactions = ({
   };
 
   const handleCancel = () => {
-    openConfirmation({
-      title: 'Are you sure you want to cancel?',
-      description:
-        'Community Stake has not been enabled for your community yet',
-      buttons: [
-        {
-          label: 'Cancel',
-          buttonType: 'destructive',
-          buttonHeight: 'sm',
-          onClick: goToSuccessStep,
-        },
-        {
-          label: 'Continue',
-          buttonType: 'primary',
-          buttonHeight: 'sm',
-        },
-      ],
-    });
+    isTopicFlow
+      ? onCancel()
+      : openConfirmation({
+          title: 'Are you sure you want to cancel?',
+          description:
+            'Community Stake has not been enabled for your community yet',
+          buttons: [
+            {
+              label: 'Cancel',
+              buttonType: 'destructive',
+              buttonHeight: 'sm',
+              onClick: onCancel,
+            },
+            {
+              label: 'Continue',
+              buttonType: 'primary',
+              buttonHeight: 'sm',
+            },
+          ],
+        });
   };
 
   const cancelDisabled =
@@ -126,7 +130,7 @@ const SignStakeTransactions = ({
         <section className="action-buttons">
           <CWButton
             type="button"
-            label="Cancel"
+            label={isTopicFlow ? 'Back' : 'Cancel'}
             buttonWidth="wide"
             buttonType="secondary"
             disabled={cancelDisabled}

@@ -128,7 +128,7 @@ export const ManageRoles = ({
             <div className="role-row" key={address}>
               <User
                 userAddress={address}
-                userCommunityId={app.activeChainId()}
+                userCommunityId={app.activeChainId() || ''}
                 shouldShowPopover
                 shouldLinkProfile
                 shouldHideAvatar

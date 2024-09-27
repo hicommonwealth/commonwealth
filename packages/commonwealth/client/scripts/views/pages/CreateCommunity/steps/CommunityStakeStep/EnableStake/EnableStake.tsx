@@ -18,6 +18,7 @@ const EnableStake = ({
   onOptInEnablingStake,
   communityStakeData,
   chainId,
+  isTopicFlow,
 }: EnableStakeProps) => {
   const [namespaceError, setNamespaceError] = useState('');
 
@@ -116,7 +117,7 @@ const EnableStake = ({
         <section className="action-buttons">
           <CWButton
             type="button"
-            label="No"
+            label={isTopicFlow ? 'Back' : 'No'}
             buttonWidth="wide"
             buttonType="secondary"
             onClick={goToSuccessStep}

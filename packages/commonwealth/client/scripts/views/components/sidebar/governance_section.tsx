@@ -8,6 +8,7 @@ import { handleRedirectClicks } from 'helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { sidebarStore } from 'state/ui/sidebar';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { verifyCachedToggleTree } from './helpers';
@@ -53,17 +54,21 @@ export const GovernanceSection = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId()!,
+  });
+
   // Conditional Render Details
   const hasProposals =
     app.chain &&
     (app.chain.base === ChainBase.CosmosSDK ||
-      app.chain.meta?.snapshot?.length);
+      community?.snapshot_spaces?.length);
 
   const isNotOffchain = app.chain?.meta?.type !== ChainType.Offchain;
 
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
-    !!app.chain?.meta.snapshot?.length;
+    !!community?.snapshot_spaces?.length;
 
   const showProposals =
     isNotOffchain &&
@@ -123,6 +128,8 @@ export const GovernanceSection = () => {
     location,
   );
 
+  const communityId = app.activeChainId() || '';
+
   // ---------- Build Section Props ---------- //
 
   // Members
@@ -136,7 +143,7 @@ export const GovernanceSection = () => {
       !!matchesMembersRoute && (app.chain ? app.chain.serverLoaded : true),
     onClick: (e, toggle: boolean) => {
       resetSidebarState();
-      handleRedirectClicks(navigate, e, '/members', app.activeChainId(), () => {
+      handleRedirectClicks(navigate, e, '/members', communityId, () => {
         setGovernanceToggleTree('children.Members.toggledState', toggle);
       });
     },
@@ -158,13 +165,13 @@ export const GovernanceSection = () => {
       setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
       resetSidebarState();
       // Check if we have multiple snapshots for conditional redirect
-      const snapshotSpaces = app.chain?.meta?.snapshot;
+      const snapshotSpaces = community?.snapshot_spaces || [];
       if (snapshotSpaces.length > 1) {
         handleRedirectClicks(
           navigate,
           e,
           '/multiple-snapshots?action=select-space',
-          app.activeChainId(),
+          communityId,
           // @ts-expect-error <StrictNullChecks/>
           null,
         );
@@ -176,7 +183,7 @@ export const GovernanceSection = () => {
             `/snapshot/${snapshotSpaces[0]
               .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
               .trim()}`,
-            app.activeChainId(),
+            communityId,
             // @ts-expect-error <StrictNullChecks/>
             null,
           );
@@ -185,7 +192,7 @@ export const GovernanceSection = () => {
             navigate,
             e,
             `/snapshot/${snapshotSpaces}`,
-            app.activeChainId(),
+            communityId,
             // @ts-expect-error <StrictNullChecks/>
             null,
           );
@@ -205,15 +212,9 @@ export const GovernanceSection = () => {
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
       resetSidebarState();
-      handleRedirectClicks(
-        navigate,
-        e,
-        '/proposals',
-        app.activeChainId(),
-        () => {
-          setGovernanceToggleTree('children.Proposals.toggledState', toggle);
-        },
-      );
+      handleRedirectClicks(navigate, e, '/proposals', communityId, () => {
+        setGovernanceToggleTree('children.Proposals.toggledState', toggle);
+      });
     },
     isVisible: showProposals,
     isUpdated: true,

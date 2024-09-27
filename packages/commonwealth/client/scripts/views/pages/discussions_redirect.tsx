@@ -13,7 +13,7 @@ export default function DiscussionsRedirect() {
   useEffect(() => {
     if (!app.chain) return;
 
-    const view = app.chain.meta?.defaultOverview
+    const view = app.chain.meta?.default_summary_view
       ? DefaultPage.Overview
       : DefaultPage.Discussions;
 

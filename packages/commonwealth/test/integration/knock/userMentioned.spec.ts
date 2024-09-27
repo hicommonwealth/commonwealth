@@ -66,7 +66,6 @@ describe('userMentioned Event Handler', () => {
       deleted_at: null,
       pinned: false,
       read_only: false,
-      version_history: [],
       body: 'some body',
     });
   });
@@ -96,7 +95,9 @@ describe('userMentioned Event Handler', () => {
 
   test('should execute the triggerWorkflow function with the appropriate data', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox),
+    });
 
     const res = await processUserMentioned({
       name: EventNames.UserMentioned,
@@ -108,7 +109,6 @@ describe('userMentioned Event Handler', () => {
         // @ts-expect-error StrictNullChecks
         authorAddress: community!.Addresses[0].address,
         mentionedUserId: user!.id,
-        // @ts-expect-error StrictNullChecks
         communityId: community!.id,
         thread,
       },
@@ -141,7 +141,9 @@ describe('userMentioned Event Handler', () => {
 
   test('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
-    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+    notificationsProvider({
+      adapter: ThrowingSpyNotificationsProvider(sandbox),
+    });
 
     await expect(
       processUserMentioned({
@@ -154,7 +156,6 @@ describe('userMentioned Event Handler', () => {
           // @ts-expect-error StrictNullChecks
           authorAddress: community!.Addresses[0].address,
           mentionedUserId: user!.id,
-          // @ts-expect-error StrictNullChecks
           communityId: community!.id,
           thread,
         },

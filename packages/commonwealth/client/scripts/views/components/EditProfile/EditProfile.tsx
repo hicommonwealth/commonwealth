@@ -134,7 +134,6 @@ const EditProfile = () => {
                 // we don't get other community properties from api + they aren't needed here
               },
               walletId: a.wallet_id!,
-              walletSsoSource: a.wallet_sso_source!,
               ghostAddress: a.ghost_address,
             });
           } catch (err) {

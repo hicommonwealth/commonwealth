@@ -33,6 +33,7 @@
     "async-rwlock": "^1.1.1",
     "express": "^4.18.2",
     "hot-shots": "^9",
+    "lodash": "^4.17.21",
     "mixpanel": "^0.14.0",
     "moment": "^2.23.0",
     "node-fetch": "2",

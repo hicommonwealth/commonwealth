@@ -1,7 +1,7 @@
+import { config } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { RegisteredSubscription } from 'web3-eth';
 import { AbiItem } from 'web3-utils';
-import { config } from '../config';
 import erc_1155_abi from '../utils/abi/erc1155';
 import erc_721_abi from '../utils/abi/erc721';
 import { advanceTime, mineBlocks } from '../utils/chainUtil';
@@ -25,12 +25,12 @@ const testErc1155Bytecode =
 export class ChainTesting extends SdkBase {
   public contractAddrs = {
     compound: {
-      governance: '0xc0Da02939E1441F497fd74F78cE7Decb17B66529',
-      token: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
+      governance: '0xc0Da02939E1441F497fd74F78cE7Decb17B66529'.toLowerCase(),
+      token: '0xc00e94Cb662C3520282E6f5717214004A7f26888'.toLowerCase(),
     },
     aave: {
-      governance: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
-      token: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
+      governance: '0xEC568fffba86c094cf06b22134B23074DFE2252c'.toLowerCase(),
+      token: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9'.toLowerCase(),
     },
   };
 
@@ -244,7 +244,9 @@ export class ChainTesting extends SdkBase {
   }
 
   public async getChainSnapshot() {
-    const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+    const provider = new Web3.providers.HttpProvider(
+      config.TEST_EVM.PROVIDER_URL,
+    );
     const res = await provider.request({
       jsonrpc: '2.0',
       id: 1,
@@ -265,7 +267,9 @@ export class ChainTesting extends SdkBase {
       throw new Error(`Cannot re-use chain snapshot: ${snapshotId}`);
     }
 
-    const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+    const provider = new Web3.providers.HttpProvider(
+      config.TEST_EVM.PROVIDER_URL,
+    );
     const res = await provider.request({
       jsonrpc: '2.0',
       id: 1,

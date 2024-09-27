@@ -1,6 +1,7 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
-import ChainInfo from 'models/ChainInfo';
+import { z } from 'zod';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
@@ -20,7 +21,7 @@ type CommonProps = {
   emailNotificationInterval: EmailNotificationInterval | '';
   knockJWT: string;
   addresses: AddressInfo[];
-  activeCommunity: ChainInfo | null;
+  activeCommunity: z.infer<typeof ExtendedCommunity> | null;
   communities: UserCommunities[]; // basic info of user-joined communities with user-associated metadata per community
   accounts: Account[]; // contains full accounts list of the user - when in a active chain/community scope, only
   // contains accounts specific to that community

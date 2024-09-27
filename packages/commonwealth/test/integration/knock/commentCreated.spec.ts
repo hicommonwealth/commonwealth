@@ -85,7 +85,6 @@ describe('CommentCreated Event Handler', () => {
       topic_id: null,
       deleted_at: null,
       read_only: false,
-      version_history: [],
       pinned: false,
     });
     [rootComment] = await tester.seed('Comment', {
@@ -154,7 +153,9 @@ describe('CommentCreated Event Handler', () => {
 
   test('should do nothing if there are no relevant subscriptions', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox),
+    });
 
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
@@ -175,7 +176,9 @@ describe('CommentCreated Event Handler', () => {
 
   test('should execute the triggerWorkflow function with appropriate data for a root comment', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox),
+    });
 
     await tester.seed('ThreadSubscription', {
       // @ts-expect-error StrictNullChecks
@@ -218,7 +221,9 @@ describe('CommentCreated Event Handler', () => {
 
   test('should execute the triggerWorkflow function with appropriate data for a reply comment', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox),
+    });
 
     await tester.seed('CommentSubscription', {
       // @ts-expect-error StrictNullChecks
@@ -265,7 +270,9 @@ describe('CommentCreated Event Handler', () => {
 
   test('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
-    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+    notificationsProvider({
+      adapter: ThrowingSpyNotificationsProvider(sandbox),
+    });
 
     await tester.seed('ThreadSubscription', {
       // @ts-expect-error StrictNullChecks
@@ -285,7 +292,9 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not trigger workflow for mentioned users', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox),
+    });
 
     await tester.seed('CommentSubscription', {
       user_id: subscriber!.id,

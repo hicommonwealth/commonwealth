@@ -9,6 +9,10 @@ interface AddToHomeScreenPromptProps {
   displayDelayMilliseconds?: number;
 }
 
+function isDev() {
+  return ['localhost:8080', '127.0.0.1:8080'].includes(document.location.host);
+}
+
 export const AddToHomeScreenPrompt = ({
   isIOS,
   isAndroid,
@@ -51,6 +55,10 @@ export const AddToHomeScreenPrompt = ({
 
     setShowPrompt(false);
   };
+
+  if (isDev()) {
+    return null;
+  }
 
   return showPrompt ? (
     isIOS ? (

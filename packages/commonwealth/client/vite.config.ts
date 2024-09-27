@@ -32,6 +32,7 @@ export default defineConfig(({ mode }) => {
 
   // WARN: only used locally never in remote (Heroku) apps
   const featureFlags = {
+    'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST': JSON.stringify(env.FLAG_CONTEST),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
@@ -39,6 +40,9 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
       env.FLAG_FARCASTER_CONTEST,
+    ),
+    'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
+      env.FLAG_TOKENIZED_COMMUNITY,
     ),
   };
 
@@ -63,12 +67,13 @@ export default defineConfig(({ mode }) => {
     'process.env.DISCORD_CLIENT_ID':
       JSON.stringify(env.DISCORD_CLIENT_ID) ||
       JSON.stringify('1034502265664454776'),
+    'process.env.SNAPSHOT_HUB_URL': JSON.stringify(env.SNAPSHOT_HUB_URL),
     'process.env.COSMOS_REGISTRY_API': JSON.stringify(env.COSMOS_REGISTRY_API),
     'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
-    'process.env.ETH_ALCHEMY_API_KEY':
+    'process.env.ALCHEMY_PUBLIC_APP_KEY':
       (env.ETH_RPC || '').trim() === 'e2e-test' &&
       (env.NODE_ENV || '').trim() === 'test'
-        ? JSON.stringify(env.ETH_ALCHEMY_API_KEY)
+        ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
   };
 

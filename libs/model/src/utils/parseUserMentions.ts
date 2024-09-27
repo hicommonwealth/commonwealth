@@ -45,7 +45,7 @@ export const findMentionDiff = (
 export const uniqueMentions = (mentions: UserMention[]) =>
   findMentionDiff([], mentions);
 
-export const parseUserMentions = (text: string): UserMention[] => {
+export const parseUserMentions = (text?: string): UserMention[] => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   if (!text) return [];
   try {

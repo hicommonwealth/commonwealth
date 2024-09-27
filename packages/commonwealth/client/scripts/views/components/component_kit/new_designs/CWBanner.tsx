@@ -32,7 +32,7 @@ export type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
 
 interface CWBannerProps {
   type?: BannerType;
-  title: string;
+  title?: string;
   body?: string | ReactNode;
   buttons?: ButtonProps[];
   className?: string;
@@ -74,9 +74,11 @@ const CWBanner = ({
       )}
       <div className="content-container">
         <div>
-          <CWText type="b1" fontWeight="medium" className="header">
-            {title}
-          </CWText>
+          {title && (
+            <CWText type="b1" fontWeight="medium" className="header">
+              {title}
+            </CWText>
+          )}
           {body && (
             <div>
               <CWText type="b2" className="body">

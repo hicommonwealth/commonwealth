@@ -1,70 +1,44 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import Thread from 'client/scripts/models/Thread';
 import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
-import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
-import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
-import { userStore } from '../../ui/user';
+import { updateCommunityThreadCount } from '../communities/getCommuityById';
 import { removeThreadFromAllCaches } from './helpers/cache';
 
-interface DeleteThreadProps {
-  communityId: string;
-  threadId: number;
-  address: string;
-}
-
-const deleteThread = async ({
-  communityId,
-  threadId,
-  address,
-}: DeleteThreadProps) => {
+export const buildDeleteThreadInput = async (
+  address: string,
+  thread: Thread,
+) => {
   const canvasSignedData = await signDeleteThread(address, {
-    thread_id: threadId,
+    thread_id: thread.canvasMsgId,
   });
-
-  return await axios.delete(`${SERVER_URL}/threads/${threadId}`, {
-    data: {
-      author_community_id: communityId,
-      community_id: communityId,
-      address: address,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
-  });
+  return {
+    thread_id: thread.id,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+  };
 };
 
-interface UseDeleteThreadMutationProps {
-  communityId: string;
-  threadId: number;
-  currentStage: ThreadStage;
-}
-
-const useDeleteThreadMutation = ({
-  communityId,
-  threadId,
-  currentStage,
-}: UseDeleteThreadMutationProps) => {
+const useDeleteThreadMutation = (thread: Thread) => {
+  const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: deleteThread,
-    onSuccess: async (response) => {
-      removeThreadFromAllCaches(communityId, threadId);
+  return trpc.thread.deleteThread.useMutation({
+    onSuccess: (deleted) => {
+      removeThreadFromAllCaches(thread.communityId, thread.id);
 
-      // Update community level thread counters variables
-      EXCEPTION_CASE_threadCountersStore.setState(
-        ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
-          totalThreadsInCommunity: totalThreadsInCommunity - 1,
-          totalThreadsInCommunityForVoting:
-            currentStage === ThreadStage.Voting
-              ? totalThreadsInCommunityForVoting - 1
-              : totalThreadsInCommunityForVoting,
-        }),
-      );
+      // decrement communities thread count
+      if (thread.communityId) {
+        updateCommunityThreadCount(
+          thread.communityId,
+          'decrement',
+          thread.stage === ThreadStage.Voting,
+          utils,
+        );
+      }
 
-      return response.data;
+      return deleted;
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

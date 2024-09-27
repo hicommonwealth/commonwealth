@@ -4,7 +4,6 @@ import {
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
-  NotificationCategories,
   Role,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
@@ -140,7 +139,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Token,
           base: ChainBase.Ethereum,
-          has_chain_events_listener: false,
           chain_node_id: testnetNode.id!,
         },
         {
@@ -152,7 +150,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Token,
           base: ChainBase.Ethereum,
-          has_chain_events_listener: false,
           chain_node_id: mainnetNode.id!,
         },
         {
@@ -165,7 +162,6 @@ export const seedDb = async () => {
           description: 'sushi community description',
           type: ChainType.Token,
           base: ChainBase.Ethereum,
-          has_chain_events_listener: false,
           chain_node_id: mainnetNode.id!,
         },
         {
@@ -178,7 +174,6 @@ export const seedDb = async () => {
           type: ChainType.Chain,
           base: ChainBase.Substrate,
           ss58_prefix: 7,
-          has_chain_events_listener: false,
           chain_node_id: edgewareNode.id!,
         },
         {
@@ -191,7 +186,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Chain,
           base: ChainBase.Ethereum,
-          has_chain_events_listener: false,
           chain_node_id: mainnetNode.id!,
         },
         {
@@ -203,7 +197,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
-          has_chain_events_listener: false,
           chain_node_id: osmosisNode.id!,
           bech32_prefix: 'osmo',
         },
@@ -216,7 +209,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
-          has_chain_events_listener: false,
           chain_node_id: csdkBetaNode.id!,
           bech32_prefix: 'cosmos',
         },
@@ -229,7 +221,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
-          has_chain_events_listener: true,
           chain_node_id: csdkV1Node.id!,
           bech32_prefix: 'cosmos',
         },
@@ -243,7 +234,6 @@ export const seedDb = async () => {
           description: '',
           type: ChainType.DAO,
           base: ChainBase.Ethereum,
-          has_chain_events_listener: false,
           chain_node_id: 1263,
           namespace: 'IanSpace',
           namespace_address: ZERO_ADDRESS,
@@ -257,7 +247,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
-          has_chain_events_listener: true,
           chain_node_id: csdkBetaLocalNode.id!,
           bech32_prefix: 'cosmos',
         },
@@ -270,7 +259,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
-          has_chain_events_listener: true,
           chain_node_id: csdkV1LocalNode.id!,
           bech32_prefix: 'cosmos',
         },
@@ -283,7 +271,6 @@ export const seedDb = async () => {
           active: true,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
-          has_chain_events_listener: true,
           chain_node_id: ethermintLocalNode.id!,
           bech32_prefix: 'cosmos',
         },
@@ -296,62 +283,69 @@ export const seedDb = async () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         has_homepage: 'false' as any,
         collapsed_on_homepage: false,
-        has_chain_events_listener: false,
         directory_page_enabled: false,
       })),
     );
 
-    await models.Topic.bulkCreate([
-      {
-        community_id: 'sushi',
-        name: 'General',
-      },
-      {
-        community_id: 'edgeware',
-        name: 'General',
-      },
-      {
-        community_id: 'ethereum',
-        name: 'General',
-      },
-      {
-        community_id: 'alex',
-        name: 'General',
-      },
-      {
-        community_id: 'osmosis',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk-beta',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk',
-        name: 'General',
-      },
-      {
-        community_id: 'yearn',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk-beta-local',
-        name: 'General',
-      },
-      {
-        community_id: 'csdk-v1-local',
-        name: 'General',
-      },
-      {
-        community_id: 'evmos-dev-local',
-        name: 'General',
-      },
-      {
-        name: 'Test Topic',
-        description: 'A topic made for testing',
-        community_id: 'ethereum',
-      },
-    ]);
+    await models.Topic.bulkCreate(
+      [
+        {
+          community_id: 'sushi',
+          name: 'General',
+        },
+        {
+          community_id: 'edgeware',
+          name: 'General',
+        },
+        {
+          community_id: 'ethereum',
+          name: 'General',
+        },
+        {
+          community_id: 'alex',
+          name: 'General',
+        },
+        {
+          community_id: 'osmosis',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk-beta',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk',
+          name: 'General',
+        },
+        {
+          community_id: 'yearn',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk-beta-local',
+          name: 'General',
+        },
+        {
+          community_id: 'csdk-v1-local',
+          name: 'General',
+        },
+        {
+          community_id: 'evmos-dev-local',
+          name: 'General',
+        },
+        {
+          name: 'Test Topic',
+          description: 'A topic made for testing',
+          community_id: 'ethereum',
+        },
+      ].map((t) => ({
+        description: '',
+        ...t,
+        featured_in_sidebar: false,
+        featured_in_new_post: false,
+        group_ids: [],
+      })),
+    );
 
     const [alexContract, yearnContract, sushiContract] =
       await models.Contract.bulkCreate([
@@ -450,45 +444,6 @@ export const seedDb = async () => {
         is_banned: false,
       })),
     );
-
-    await models.NotificationCategory.bulkCreate([
-      {
-        name: NotificationCategories.NewThread,
-        description: 'someone makes a new thread',
-      },
-      {
-        name: NotificationCategories.NewComment,
-        description: 'someone makes a new comment',
-      },
-      {
-        name: NotificationCategories.NewMention,
-        description: 'someone @ mentions a user',
-      },
-      {
-        name: NotificationCategories.NewCollaboration,
-        description: 'someone collaborates with a user',
-      },
-      {
-        name: NotificationCategories.ChainEvent,
-        description: 'a chain event occurs',
-      },
-      {
-        name: NotificationCategories.NewReaction,
-        description: 'someone reacts to a post',
-      },
-      {
-        name: NotificationCategories.ThreadEdit,
-        description: 'someone edited a thread',
-      },
-      {
-        name: NotificationCategories.CommentEdit,
-        description: 'someone edited a comment',
-      },
-      {
-        name: NotificationCategories.SnapshotProposal,
-        description: 'Snapshot proposal notifications',
-      },
-    ]);
 
     return models;
   } catch (error) {

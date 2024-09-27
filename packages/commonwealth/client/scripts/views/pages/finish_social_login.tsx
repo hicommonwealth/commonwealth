@@ -1,9 +1,8 @@
 import { handleSocialLoginCallback } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import app, { initAppState } from 'state';
+import { initAppState } from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { authModal } from 'state/ui/modals/authModal';
 import useUserStore from 'state/ui/user';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
@@ -19,18 +18,12 @@ const validate = async (
   let redirectTo = params.get('redirectTo');
   if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
-  const authModalState = authModal.getState();
-
   try {
-    const isAttemptingToConnectAddressToCommunity =
-      isLoggedIn && app.activeChainId();
-    const { isAddressNew } = await handleSocialLoginCallback({
+    await handleSocialLoginCallback({
       // @ts-expect-error <StrictNullChecks/>
       chain,
       // @ts-expect-error <StrictNullChecks/>
       walletSsoSource,
-      returnEarlyIfNewAddress:
-        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
       isLoggedIn,
     });
     await initAppState();
@@ -41,15 +34,6 @@ const validate = async (
       setRoute(`/${chain}`);
     } else {
       setRoute('/');
-    }
-
-    // if SSO account address is not already present in db,
-    // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
-    // and the user isn't trying to link address to community,
-    // then open the user auth type guidance modal
-    // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-    if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
-      authModalState.validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
     }
   } catch (error) {
     return `Error: ${error.message}`;

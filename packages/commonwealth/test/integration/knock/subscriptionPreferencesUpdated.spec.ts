@@ -29,9 +29,6 @@ chai.use(chaiAsPromised);
 describe('subscriptionPreferencesUpdated', () => {
   let sandbox: sinon.SinonSandbox;
   let user: z.infer<typeof schemas.User> | undefined;
-  let subPreferences:
-    | z.infer<typeof schemas.SubscriptionPreference>
-    | undefined;
 
   beforeAll(async () => {
     [user] = await tester.seed('User', {
@@ -41,7 +38,7 @@ describe('subscriptionPreferencesUpdated', () => {
   });
 
   beforeEach(async () => {
-    [subPreferences] = await tester.seed('SubscriptionPreference', {
+    await tester.seed('SubscriptionPreference', {
       // @ts-expect-error StrictNullChecks
       user_id: user.id,
       email_notifications_enabled: false,
@@ -70,8 +67,8 @@ describe('subscriptionPreferencesUpdated', () => {
 
   test('should delete all exiting email schedules if emails are disabled', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox.stub().returns(
           Promise.resolve([
             { id: '1', workflow: WorkflowKeys.EmailRecap },
@@ -82,15 +79,12 @@ describe('subscriptionPreferencesUpdated', () => {
           .stub()
           .returns(Promise.resolve(new Set(['1', '2']))),
       }),
-    );
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         email_notifications_enabled: false,
         recap_email_enabled: true,
         digest_email_enabled: false,
@@ -126,12 +120,12 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox.stub().returns(Promise.resolve([])),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
       }),
-    );
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
@@ -184,8 +178,8 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox
           .stub()
           .returns(
@@ -193,15 +187,12 @@ describe('subscriptionPreferencesUpdated', () => {
           ),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
       }),
-    );
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: true,
       },
     });
@@ -230,8 +221,8 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox
           .stub()
           .returns(
@@ -242,15 +233,12 @@ describe('subscriptionPreferencesUpdated', () => {
           .stub()
           .returns(Promise.resolve(new Set(['1']))),
       }),
-    );
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: false,
       },
     });
@@ -284,23 +272,20 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getSchedulesStub: sandbox.stub().returns(Promise.resolve([])),
         createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
         deleteSchedulesStub: sandbox
           .stub()
           .returns(Promise.resolve(new Set(['1']))),
       }),
-    );
+    });
 
     const res = await processSubscriptionPreferencesUpdated({
       name: EventNames.SubscriptionPreferencesUpdated,
       payload: {
-        // @ts-expect-error StrictNullChecks
-        id: subPreferences.id!,
-        // @ts-expect-error StrictNullChecks
-        user_id: user.id!,
+        user_id: user!.id!,
         recap_email_enabled: false,
       },
     });

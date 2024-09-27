@@ -11,16 +11,22 @@
   border: 1px solid $neutral-300;
   background-color: $white;
   cursor: pointer;
-  transition: border, background-color 0.3s;
+  transition:
+    border,
+    background-color 0.3s;
+
+  &.active {
+    border-color: $primary-500;
+    background-color: $primary-50;
+  }
 
   &:hover {
     border: 1px solid $neutral-200;
     background-color: $neutral-100;
   }
-
-  @include extraSmall {
-    flex-direction: column;
-    align-items: start;
+  .radio-button {
+    width: fit-content;
+    min-width: 24px !important;
   }
 
   .chain-logo-container {
@@ -39,6 +45,25 @@
     .description {
       color: $neutral-500;
       margin-top: 8px;
+    }
+  }
+
+  @include extraSmall {
+    flex-direction: column;
+    align-items: start;
+
+    &.withRadio {
+      padding: 16px 12px;
+      gap: 8px;
+      flex-direction: row !important;
+      align-items: center !important;
+
+      .chain-logo-container {
+        img {
+          width: 36px;
+          height: 36px;
+        }
+      }
     }
   }
 }

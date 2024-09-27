@@ -1,12 +1,7 @@
-import {
-  ChainBase,
-  NotificationCategories,
-  WebhookCategory,
-} from '@hicommonwealth/shared';
+import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
-import app from 'state';
+import z from 'zod';
 import '../../../styles/modals/webhook_settings_modal.scss';
-import type Webhook from '../../models/Webhook';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
@@ -18,8 +13,11 @@ import {
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
-  updateWebhook: (webhook: Webhook, selectedCategories: Array<string>) => void;
-  webhook: Webhook;
+  updateWebhook: (
+    webhook: z.infer<typeof Webhook>,
+    selectedEvents: Array<z.infer<typeof WebhookSupportedEvents>>,
+  ) => void;
+  webhook: z.infer<typeof Webhook>;
 };
 
 export const WebhookSettingsModal = ({
@@ -27,42 +25,30 @@ export const WebhookSettingsModal = ({
   updateWebhook,
   webhook,
 }: WebhookSettingsModalProps) => {
-  const [selectedCategories, setSelectedCategories] = useState<
-    Array<WebhookCategory>
-  >(webhook.categories);
+  const [selectedEvents, setSelectedEvents] = useState<
+    Array<z.infer<typeof WebhookSupportedEvents>>
+  >(webhook.events);
 
-  let supportsChainEvents = false;
-  if (app.chain.base === ChainBase.CosmosSDK) {
-    supportsChainEvents = true;
-  }
-
-  const row = (label: string, values: WebhookCategory[]) => {
-    const allValuesPresent = values.every((v) =>
-      selectedCategories.includes(v),
-    );
-
-    const someValuesPresent =
-      values.length > 1 && values.some((v) => selectedCategories.includes(v));
+  const row = (
+    label: string,
+    value: z.infer<typeof WebhookSupportedEvents>,
+  ) => {
+    const eventIsSelected = selectedEvents.includes(value);
 
     return (
       <CWCheckbox
         className="checkbox"
         key={label}
         value=""
-        checked={allValuesPresent}
+        checked={eventIsSelected}
         label={label}
-        indeterminate={someValuesPresent && !allValuesPresent}
         onChange={() => {
-          if (allValuesPresent) {
-            setSelectedCategories((prevState) =>
-              prevState.filter((v) => !values.includes(v)),
+          if (eventIsSelected) {
+            setSelectedEvents((prevState) =>
+              prevState.filter((v) => v !== value),
             );
           } else {
-            values.forEach((v) => {
-              if (!selectedCategories.includes(v)) {
-                setSelectedCategories((prevState) => [...prevState, v]);
-              }
-            });
+            setSelectedEvents((prevState) => [...prevState, value]);
           }
         }}
       />
@@ -76,20 +62,11 @@ export const WebhookSettingsModal = ({
         <CWText>Which events should trigger this webhook?</CWText>
         <div className="checkbox-section">
           <CWText type="h5" fontWeight="semiBold">
-            Off-chain discussions
+            Discussions
           </CWText>
-          {row('New thread', [NotificationCategories.NewThread])}
-          {row('New comment', [NotificationCategories.NewComment])}
-          {row('New reaction', [NotificationCategories.NewReaction])}
+          {row('New Threads', 'ThreadCreated')}
+          {row('New Comments', 'CommentCreated')}
         </div>
-        {supportsChainEvents && (
-          <div className="checkbox-section">
-            <CWText type="h5" fontWeight="semiBold">
-              On-chain events
-            </CWText>
-            {row('Proposal Events', [NotificationCategories.ChainEvent])}
-          </div>
-        )}
       </CWModalBody>
       <CWModalFooter>
         <CWButton
@@ -102,7 +79,7 @@ export const WebhookSettingsModal = ({
           label="Save settings"
           buttonType="primary"
           buttonHeight="sm"
-          onClick={() => updateWebhook(webhook, selectedCategories)}
+          onClick={() => updateWebhook(webhook, selectedEvents)}
         />
       </CWModalFooter>
     </div>

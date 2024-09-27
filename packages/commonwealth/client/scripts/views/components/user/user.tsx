@@ -39,7 +39,7 @@ export const User = ({
   const loggedInUser = useUserStore();
 
   const { data: users } = useFetchProfilesByAddressesQuery({
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     profileAddresses: [userAddress],
     profileChainIds: [userCommunityId],
     apiCallEnabled: !!(userAddress && userCommunityId),
@@ -72,7 +72,7 @@ export const User = ({
     userCommunityId,
     true,
     undefined,
-    app.chain?.meta?.bech32Prefix,
+    app.chain?.meta?.bech32_prefix || '',
   );
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =

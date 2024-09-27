@@ -14,14 +14,28 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   contestEnabled: boolean;
+  farcasterContestEnabled: boolean;
+  tokenizedCommunityEnabled: boolean;
 };
 
 const Router = () => {
   const client = OpenFeature.getClient();
   const contestEnabled = client.getBooleanValue('contest', false);
 
+  const farcasterContestEnabled = client.getBooleanValue(
+    'farcasterContest',
+    false,
+  );
+
+  const tokenizedCommunityEnabled = client.getBooleanValue(
+    'tokenizedCommunity',
+    false,
+  );
+
   const flags = {
     contestEnabled,
+    farcasterContestEnabled,
+    tokenizedCommunityEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};

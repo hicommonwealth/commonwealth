@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { getDelta, sanitizeQuillText, updateTags } from '../utils';
+import { decodeContent, getDelta, updateTags } from '../utils';
 
 export function UpdateUser(): Command<typeof schemas.UpdateUser> {
   return {
@@ -34,12 +34,12 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           },
         })
       )?.toJSON();
-      if (!mustExist('User', user)) return;
+      mustExist('User', user);
 
-      const is_welcome_onboard_flow_complete =
-        user.is_welcome_onboard_flow_complete || (name && name !== DEFAULT_NAME)
-          ? true
-          : false;
+      const is_welcome_onboard_flow_complete = !!(
+        user.is_welcome_onboard_flow_complete ||
+        (name && name !== DEFAULT_NAME)
+      );
 
       const promotional_emails_enabled =
         payload.promotional_emails_enabled ??
@@ -53,7 +53,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           email,
           slug,
           name,
-          bio: rawBio && sanitizeQuillText(rawBio).toString(),
+          bio: rawBio && decodeContent(rawBio),
           website,
           avatar_url,
           socials,
@@ -94,6 +94,9 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                   },
                 },
               };
+              if (updates.profile.bio === '') {
+                updates.profile.bio = null;
+              }
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },
                 returning: true,

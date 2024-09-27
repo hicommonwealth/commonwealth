@@ -67,7 +67,6 @@ describe('Contest Worker Policy', () => {
       deleted_at: undefined,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
   });
 
@@ -95,18 +94,16 @@ describe('Contest Worker Policy', () => {
             title: threadTitle,
             created_by: address,
             canvas_signed_data: '',
-            canvas_hash: '',
+            canvas_msg_id: '',
             kind: '',
             stage: '',
             view_count: 0,
             reaction_count: 0,
             reaction_weights_sum: 0,
             comment_count: 0,
-            max_notif_id: 0,
             deleted_at: undefined,
             pinned: false,
             read_only: false,
-            version_history: [],
             topic_id: topicId,
           },
         },
@@ -166,7 +163,6 @@ describe('Contest Worker Policy', () => {
           address_id: addressId,
           reaction: 'like',
           thread_id: threadId,
-          comment_id: 0,
         },
       });
 

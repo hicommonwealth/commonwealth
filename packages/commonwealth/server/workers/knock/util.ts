@@ -50,3 +50,10 @@ export const getChainProposalUrl = (
 ) => {
   return getBaseUrl(customDomain) + `/${communityId}/proposal/${proposalId}`;
 };
+
+export const getProfileUrl = (
+  userId: number,
+  customDomain?: string | null,
+): string => {
+  return getBaseUrl(customDomain) + `/profile/id/${userId}`;
+};

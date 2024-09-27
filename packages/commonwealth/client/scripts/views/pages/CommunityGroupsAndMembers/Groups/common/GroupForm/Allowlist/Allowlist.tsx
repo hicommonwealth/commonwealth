@@ -84,15 +84,16 @@ const Allowlist = ({
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  const communityId = app.activeChainId() || '';
   const { data: memberships } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
+    communityId,
     address: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address,
   });
 
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
+    id: communityId,
+    enabled: !!communityId,
   });
   const isStakedCommunity = !!community?.namespace;
 

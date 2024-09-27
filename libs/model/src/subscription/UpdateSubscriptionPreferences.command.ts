@@ -6,13 +6,10 @@ import { z } from 'zod';
 import { models } from '../database';
 
 function getDifferences(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fullObject: Record<string, any>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  subsetObject: Record<string, any>,
+  fullObject: Record<string, unknown>,
+  subsetObject: Record<string, unknown>,
 ): Partial<z.infer<typeof SubscriptionPreference>> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const differences: Record<string, any> = {};
+  const differences: Record<string, unknown> = {};
   for (const key in subsetObject) {
     if (
       key !== 'id' &&
@@ -63,26 +60,19 @@ export function UpdateSubscriptionPreferences(): Command<
         if (result[1].length !== 1)
           throw new Error('Failed to update subscription preferences');
 
-        // for now only emit email preference updates
-        if (
-          'email_notifications_enabled' in preferenceUpdates ||
-          'digest_email_enabled' in preferenceUpdates ||
-          'recap_email_enabled' in preferenceUpdates
-        ) {
-          await emitEvent(
-            models.Outbox,
-            [
-              {
-                event_name: EventNames.SubscriptionPreferencesUpdated,
-                event_payload: {
-                  user_id: existingPreferences.user_id,
-                  ...preferenceUpdates,
-                },
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: EventNames.SubscriptionPreferencesUpdated,
+              event_payload: {
+                user_id: existingPreferences.user_id,
+                ...preferenceUpdates,
               },
-            ],
-            transaction,
-          );
-        }
+            },
+          ],
+          transaction,
+        );
       });
 
       return result![1][0].get({ plain: true });

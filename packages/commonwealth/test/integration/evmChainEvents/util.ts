@@ -162,30 +162,6 @@ export async function getTestUser() {
   return user;
 }
 
-export async function getTestSubscription(version?: 'v1' | 'v2') {
-  const chain = await getTestChain(version);
-  const user = await getTestUser();
-
-  const [sub, created] = await models.Subscription.findOrCreate({
-    where: {
-      subscriber_id: user.id,
-      category_id: 'chain-event',
-      community_id: chain.id,
-    },
-    // @ts-expect-error StrictNullChecks
-    defaults: {
-      is_active: true,
-      immediate_email: false,
-    },
-  });
-
-  if (!created && (!sub.is_active || sub.immediate_email)) {
-    await sub.update({ is_active: true, immediate_email: false });
-  }
-
-  return sub;
-}
-
 export async function getTestSignatures(version?: 'v1' | 'v2') {
   const chainNode = await getTestChainNode(version);
   const abi = await getTestAbi(version);

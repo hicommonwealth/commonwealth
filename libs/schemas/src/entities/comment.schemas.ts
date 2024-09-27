@@ -1,7 +1,16 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { Reaction } from './reaction.schemas';
 import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
+
+export const CommentVersionHistory = z.object({
+  id: PG_INT.optional(),
+  comment_id: PG_INT,
+  text: z.string(),
+  timestamp: z.date(),
+  content_url: z.string().nullish(),
+});
 
 export const Comment = z.object({
   id: PG_INT.optional(),
@@ -10,11 +19,10 @@ export const Comment = z.object({
   text: z.string(),
   plaintext: z.string(),
   parent_id: z.string().nullish(),
-  version_history: z.array(z.string()).optional(),
-  version_history_updated: z.boolean().optional(),
+  content_url: z.string().nullish(),
 
   canvas_signed_data: z.string().nullish(),
-  canvas_hash: z.string().nullish(),
+  canvas_msg_id: z.string().nullish(),
 
   created_by: z.string().nullish(),
   created_at: z.coerce.date().optional(),
@@ -36,13 +44,10 @@ export const Comment = z.object({
   reaction_count: PG_INT,
   reaction_weights_sum: PG_INT.optional(),
 
+  search: z.union([z.string(), z.record(z.any())]),
+
   Address: Address.nullish(),
   Thread: Thread.nullish(),
-});
-
-export const CommentVersionHistory = z.object({
-  id: PG_INT.optional(),
-  comment_id: PG_INT,
-  text: z.string(),
-  timestamp: z.date(),
+  Reaction: Reaction.nullish(),
+  CommentVersionHistories: z.array(CommentVersionHistory).nullish(),
 });

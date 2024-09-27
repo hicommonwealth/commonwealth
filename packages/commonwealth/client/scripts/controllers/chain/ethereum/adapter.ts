@@ -1,10 +1,11 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import type { IApp } from 'state';
-import type ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import IChainAdapter from '../../../models/IChainAdapter';
 
 // TODO: hook up underlyung functionality of this boilerplate
@@ -14,7 +15,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
 
-  constructor(meta: ChainInfo, app: IApp) {
+  constructor(meta: z.infer<typeof ExtendedCommunity>, app: IApp) {
     super(meta, app);
     this.chain = new EthereumChain(this.app);
     this.accounts = new EthereumAccounts(this.app);

@@ -10,8 +10,9 @@ module.exports = {
       process.env.NEW_ALCHEMY_PUBLIC_KEY || process.env.ETH_ALCHEMY_API_KEY;
 
     if (!privateKey || !publicKey) {
-      throw new Error(
-        'Must have ETH_ALCHEMY_API_KEY env var set in packages/commonwealth/.env to migrate!',
+      console.warn(
+        'ETH_ALCHEMY_API_KEY environment variable is not set in the .env.' +
+          'Some features may be unavailable',
       );
     }
 

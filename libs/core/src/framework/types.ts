@@ -1,10 +1,4 @@
-import z, {
-  ZodNumber,
-  ZodObject,
-  ZodSchema,
-  ZodString,
-  ZodUndefined,
-} from 'zod';
+import z, { ZodSchema, ZodUndefined } from 'zod';
 import { Events, events } from '../integration/events';
 
 /**
@@ -64,7 +58,6 @@ export type User = {
 export type Actor = {
   readonly user: Readonly<User>;
   readonly address?: string;
-  readonly addressId?: number;
 };
 
 /**
@@ -108,35 +101,15 @@ export class InvalidState extends Error {
 }
 
 /**
- * Command input schemas must include the aggregate id (by definition)
- * - We are currently violating this rule with some creation commands by
- * relying on the DB/ORM layer for the generation of new ids.
- * - Future refactoring to support other DB technologies (for scalability) might solve this
- */
-export type CommandInput = ZodObject<{
-  id: ZodString | ZodNumber;
-}>;
-
-/**
- * Command execution context
+ * Command/Query execution context
  * - `actor`: user actor
  * - `payload`: validated command payload
+ * - `auth`: authorization context
  */
-export type CommandContext<Input extends CommandInput> = {
+export type Context<Input extends ZodSchema, AuthContext> = {
   readonly actor: Actor;
   readonly payload: z.infer<Input>;
-};
-
-/**
- * Query execution context
- * - `actor`: user actor
- * - `payload`: validated query payload (filters)
- *
- * TODO: we can use this context to inject extra authorization filters before executing the query
- */
-export type QueryContext<Input extends ZodSchema> = {
-  readonly actor: Actor;
-  readonly payload: z.infer<Input>;
+  readonly auth?: AuthContext;
 };
 
 /**
@@ -150,29 +123,18 @@ export type EventContext<Name extends Events> = {
 };
 
 /**
- * Command handler - can be chained to authorize command actors
+ * Command/Query handler
  * @param context command execution context
- * @param state aggregate state, loaded and modified by domain rules (side effects)
- * @returns may return updated state when preloading aggreggate to verify authority
+ * @returns mutated state
  * @throws {@link InvalidActor} when unauthorized
  */
-export type CommandHandler<
-  Input extends CommandInput,
+export type Handler<
+  Input extends ZodSchema,
   Output extends ZodSchema,
+  AuthContext,
 > = (
-  context: CommandContext<Input>,
-  state?: Partial<z.infer<Output>>,
-) => Promise<Partial<z.infer<Output>> | void>;
-
-/**
- * Query handler - can be chained to authorize query actors
- * @param context query execution context
- * @returns query results
- * @throws {@link InvalidActor} when unauthorized
- */
-export type QueryHandler<Input extends ZodSchema, Output extends ZodSchema> = (
-  context: QueryContext<Input>,
-) => Promise<z.infer<Output> | undefined>;
+  context: Context<Input, AuthContext>,
+) => Promise<z.infer<Output> | undefined | void>;
 
 /**
  * Event handler
@@ -185,37 +147,22 @@ export type EventHandler<
 > = (context: EventContext<Name>) => Promise<Partial<z.infer<Output>> | void>;
 
 /**
- * Declarative metadata to "enforce" the conventional requirements of a command as a chain of responsibility.
+ * Declarative metadata to "enforce" the conventional requirements of a command or query as a chain of responsibility.
  * Decouples infrastructure concerns from core domain logic, allowing a simpler development and testing pattern.
  * - `schema`: zod schema of the command payload
  * - `auth`: authorization chain, may preload the aggregate when necessary
  * - `body`: function implementing core domain logic, and returning side effects (mutations)
  * - `secure`: true when user requires authentication
  */
-export type CommandMetadata<
-  Input extends CommandInput,
+export type Metadata<
+  Input extends ZodSchema,
   Output extends ZodSchema,
+  AuthContext,
 > = {
   readonly input: Input;
   readonly output: Output;
-  readonly auth: CommandHandler<Input, Output>[];
-  readonly body: CommandHandler<Input, Output>;
-  readonly secure?: boolean;
-  readonly authStrategy?: AuthStrategies;
-};
-
-/**
- * Declarative metadata to enforce the conventional requirements of a query as a chain of responsibility.
- * - `schema`: zod schema of the query payload (filters)
- * - `auth`: authorization chain, may inject more filters to the payload
- * - `body`: function implementing the query logic
- * - `secure`: true when user requires authentication
- */
-export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
-  readonly input: Input;
-  readonly output: Output;
-  readonly auth: QueryHandler<Input, Output>[];
-  readonly body: QueryHandler<Input, Output>;
+  readonly auth: Handler<Input, Output, AuthContext>[];
+  readonly body: Handler<Input, Output, AuthContext>;
   readonly secure?: boolean;
   readonly authStrategy?: AuthStrategies;
 };
@@ -245,15 +192,7 @@ export type EventsHandlerMetadata<
 };
 
 // =========== PUBLIC ARTIFACT FACTORY INTERFACE ===========
-export type CommandSchemas<
-  Input extends CommandInput,
-  Output extends ZodSchema,
-> = {
-  input: Input;
-  output: Output;
-};
-
-export type QuerySchemas<Input extends ZodSchema, Output extends ZodSchema> = {
+export type Schemas<Input extends ZodSchema, Output extends ZodSchema> = {
   input: Input;
   output: Output;
 };
@@ -261,17 +200,17 @@ export type QuerySchemas<Input extends ZodSchema, Output extends ZodSchema> = {
 /**
  * Command metadata
  */
-export type Command<Schema> =
-  Schema extends CommandSchemas<infer Input, infer Output>
-    ? CommandMetadata<Input, Output>
+export type Command<Schema, AuthContext = unknown> =
+  Schema extends Schemas<infer Input, infer Output>
+    ? Metadata<Input, Output, AuthContext>
     : never;
 
 /**
  * Query metadata
  */
-export type Query<Schema> =
-  Schema extends QuerySchemas<infer Input, infer Output>
-    ? QueryMetadata<Input, Output>
+export type Query<Schema, AuthContext = unknown> =
+  Schema extends Schemas<infer Input, infer Output>
+    ? Metadata<Input, Output, AuthContext>
     : never;
 
 /**

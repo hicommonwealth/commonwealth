@@ -103,6 +103,9 @@ export async function __getThreadsById(
           },
         ],
       },
+      {
+        model: this.models.ThreadVersionHistory,
+      },
     ],
   });
 

@@ -30,7 +30,7 @@ export const CreateContestManagerMetadata = {
     decimals: PG_INT.optional().default(
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
-    topic_ids: z.array(z.number()).optional(),
+    topic_ids: z.array(z.number()).max(1).optional(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
@@ -43,7 +43,7 @@ export const UpdateContestManagerMetadata = {
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
     image_url: z.string().optional(),
-    topic_ids: z.array(z.number()).optional(),
+    topic_ids: z.array(z.number()).max(1).optional(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),

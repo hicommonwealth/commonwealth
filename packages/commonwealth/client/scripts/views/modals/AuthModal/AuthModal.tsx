@@ -5,7 +5,6 @@ import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
 import { AuthTypes } from '../../components/AuthButton/types';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
-import { AuthTypeGuidanceModal } from './AuthTypeGuidanceModal';
 import { CreateAccountModal } from './CreateAccountModal';
 import { RevalidateSessionModal } from './RevalidateSessionModal';
 import { SignInModal } from './SignInModal';
@@ -53,13 +52,9 @@ const AuthModal = ({
       onSuccess: handleSuccess,
       showWalletsFor,
       onSignInClick: handleOnSignInClick,
-      onChangeModalType: (selectedType) => setModalType(selectedType),
     };
 
     switch (modalType) {
-      case AuthModalType.AccountTypeGuidance: {
-        return <AuthTypeGuidanceModal {...commonVariantProps} />;
-      }
       case AuthModalType.CreateAccount: {
         return <CreateAccountModal {...commonVariantProps} />;
       }

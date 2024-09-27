@@ -22,12 +22,3499 @@ import {
   DUMMY_BASE_URL,
   assertParamExists,
   createRequestFunction,
+  serializeDataIfNeeded,
+  setOAuthToObject,
   setSearchParams,
   toPathString,
 } from './common';
 // @ts-ignore
 import { BASE_PATH, BaseAPI, RequiredError, operationServerMap } from './base';
 
+/**
+ *
+ * @export
+ * @interface CreateComment200Response
+ */
+export interface CreateComment200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateComment200Response
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateComment200Response
+   */
+  thread_id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateComment200Response
+   */
+  address_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  text: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  plaintext: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  parent_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  canvas_signed_data?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  canvas_msg_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  created_by?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  deleted_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  marked_as_spam_at?: string | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerDiscordMeta}
+   * @memberof CreateComment200Response
+   */
+  discord_meta?: GetComments200ResponseResultsInnerDiscordMeta | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateComment200Response
+   */
+  reaction_count: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateComment200Response
+   */
+  reaction_weights_sum?: number;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerAddress}
+   * @memberof CreateComment200Response
+   */
+  Address?: GetComments200ResponseResultsInnerAddress | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerThread}
+   * @memberof CreateComment200Response
+   */
+  Thread?: GetComments200ResponseResultsInnerThread | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerReaction}
+   * @memberof CreateComment200Response
+   */
+  Reaction?: GetComments200ResponseResultsInnerReaction | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateComment200Response
+   */
+  community_id: string;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommentReactionRequest
+ */
+export interface CreateCommentReactionRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommentReactionRequest
+   */
+  comment_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentReactionRequest
+   */
+  comment_msg_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentReactionRequest
+   */
+  reaction: CreateCommentReactionRequestReactionEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentReactionRequest
+   */
+  canvas_signed_data?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentReactionRequest
+   */
+  canvas_msg_id?: string;
+}
+
+export const CreateCommentReactionRequestReactionEnum = {
+  Like: 'like',
+} as const;
+
+export type CreateCommentReactionRequestReactionEnum =
+  (typeof CreateCommentReactionRequestReactionEnum)[keyof typeof CreateCommentReactionRequestReactionEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommentRequest
+ */
+export interface CreateCommentRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommentRequest
+   */
+  thread_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentRequest
+   */
+  text: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommentRequest
+   */
+  parent_id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentRequest
+   */
+  parent_msg_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentRequest
+   */
+  canvas_signed_data?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommentRequest
+   */
+  canvas_msg_id?: string;
+  /**
+   *
+   * @type {CreateThreadRequestDiscordMeta}
+   * @memberof CreateCommentRequest
+   */
+  discord_meta?: CreateThreadRequestDiscordMeta;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200Response
+ */
+export interface CreateCommunity200Response {
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunity}
+   * @memberof CreateCommunity200Response
+   */
+  community: CreateCommunity200ResponseCommunity;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200Response
+   */
+  admin_address?: string;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunity
+ */
+export interface CreateCommunity200ResponseCommunity {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  name: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  chain_node_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  default_symbol?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  network?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  base: CreateCommunity200ResponseCommunityBaseEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  icon_url?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  active: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  type?: CreateCommunity200ResponseCommunityTypeEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  description?: string | null;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunitySocialLinksInner>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  social_links?: Array<CreateCommunity200ResponseCommunitySocialLinksInner>;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  ss58_prefix?: number | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  stages_enabled?: boolean;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  custom_stages?: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  custom_domain?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  block_explorer_ids?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  collapsed_on_homepage?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  default_summary_view?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  default_page?: CreateCommunity200ResponseCommunityDefaultPageEnum | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  has_homepage?: CreateCommunity200ResponseCommunityHasHomepageEnum | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  terms?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  admin_only_polling?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  bech32_prefix?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  hide_projects?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  token_name?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  ce_verbose?: boolean | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  discord_config_id?: number | null;
+  /**
+   *
+   * @type {any}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  category?: any | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  discord_bot_webhooks_enabled?: boolean | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  directory_page_enabled?: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  directory_page_chain_node_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  namespace?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  namespace_address?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  redirect?: string | null;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  snapshot_spaces?: Array<string>;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  include_in_digest_email?: boolean | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  profile_count?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  lifetime_thread_count?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  banner_text?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityAddressesInner>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  Addresses?: Array<CreateCommunity200ResponseCommunityAddressesInner>;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityCommunityStakesInner>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  CommunityStakes?: Array<CreateCommunity200ResponseCommunityCommunityStakesInner> | null;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityCommunityTagsInner>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  CommunityTags?: Array<CreateCommunity200ResponseCommunityCommunityTagsInner> | null;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityChainNode}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  ChainNode?: CreateCommunity200ResponseCommunityChainNode | null;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityTopicsInner>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  topics?: Array<CreateCommunity200ResponseCommunityTopicsInner>;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityGroupsInner>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  groups?: Array<CreateCommunity200ResponseCommunityGroupsInner>;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityContestManagersInner>}
+   * @memberof CreateCommunity200ResponseCommunity
+   */
+  contest_managers?: Array<CreateCommunity200ResponseCommunityContestManagersInner>;
+}
+
+export const CreateCommunity200ResponseCommunityBaseEnum = {
+  Cosmos: 'cosmos',
+  Substrate: 'substrate',
+  Ethereum: 'ethereum',
+  Near: 'near',
+  Solana: 'solana',
+} as const;
+
+export type CreateCommunity200ResponseCommunityBaseEnum =
+  (typeof CreateCommunity200ResponseCommunityBaseEnum)[keyof typeof CreateCommunity200ResponseCommunityBaseEnum];
+export const CreateCommunity200ResponseCommunityTypeEnum = {
+  Chain: 'chain',
+  Dao: 'dao',
+  Token: 'token',
+  Offchain: 'offchain',
+} as const;
+
+export type CreateCommunity200ResponseCommunityTypeEnum =
+  (typeof CreateCommunity200ResponseCommunityTypeEnum)[keyof typeof CreateCommunity200ResponseCommunityTypeEnum];
+export const CreateCommunity200ResponseCommunityDefaultPageEnum = {
+  DefaultAllDiscussionsView: 'default_all_discussions_view',
+  DefaultSummaryView: 'default_summary_view',
+  Homepage: 'homepage',
+} as const;
+
+export type CreateCommunity200ResponseCommunityDefaultPageEnum =
+  (typeof CreateCommunity200ResponseCommunityDefaultPageEnum)[keyof typeof CreateCommunity200ResponseCommunityDefaultPageEnum];
+export const CreateCommunity200ResponseCommunityHasHomepageEnum = {
+  True: 'true',
+  False: 'false',
+} as const;
+
+export type CreateCommunity200ResponseCommunityHasHomepageEnum =
+  (typeof CreateCommunity200ResponseCommunityHasHomepageEnum)[keyof typeof CreateCommunity200ResponseCommunityHasHomepageEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityAddressesInner
+ */
+export interface CreateCommunity200ResponseCommunityAddressesInner {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  user_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  verification_token?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  verification_token_expires?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  verified?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  last_active?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  ghost_address?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  wallet_id?: CreateCommunity200ResponseCommunityAddressesInnerWalletIdEnum | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  block_info?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  is_user_default?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  role?: CreateCommunity200ResponseCommunityAddressesInnerRoleEnum;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  is_banned?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  hex?: string | null;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityAddressesInnerUser}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  User?: CreateCommunity200ResponseCommunityAddressesInnerUser;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInner
+   */
+  updated_at?: string;
+}
+
+export const CreateCommunity200ResponseCommunityAddressesInnerWalletIdEnum = {
+  Magic: 'magic',
+  Polkadot: 'polkadot',
+  Metamask: 'metamask',
+  Walletconnect: 'walletconnect',
+  KeplrEthereum: 'keplr-ethereum',
+  Keplr: 'keplr',
+  Leap: 'leap',
+  Near: 'near',
+  Terrastation: 'terrastation',
+  TerraWalletconnect: 'terra-walletconnect',
+  CosmMetamask: 'cosm-metamask',
+  Phantom: 'phantom',
+  Coinbase: 'coinbase',
+} as const;
+
+export type CreateCommunity200ResponseCommunityAddressesInnerWalletIdEnum =
+  (typeof CreateCommunity200ResponseCommunityAddressesInnerWalletIdEnum)[keyof typeof CreateCommunity200ResponseCommunityAddressesInnerWalletIdEnum];
+export const CreateCommunity200ResponseCommunityAddressesInnerRoleEnum = {
+  Admin: 'admin',
+  Moderator: 'moderator',
+  Member: 'member',
+} as const;
+
+export type CreateCommunity200ResponseCommunityAddressesInnerRoleEnum =
+  (typeof CreateCommunity200ResponseCommunityAddressesInnerRoleEnum)[keyof typeof CreateCommunity200ResponseCommunityAddressesInnerRoleEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityAddressesInnerUser
+ */
+export interface CreateCommunity200ResponseCommunityAddressesInnerUser {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  email?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  isAdmin?: boolean | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  disableRichText?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  emailVerified?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  selected_community_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  emailNotificationInterval?: CreateCommunity200ResponseCommunityAddressesInnerUserEmailNotificationIntervalEnum;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  promotional_emails_enabled?: boolean | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  is_welcome_onboard_flow_complete?: boolean;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityAddressesInnerUserProfile}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  profile: CreateCommunity200ResponseCommunityAddressesInnerUserProfile;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner>}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  ProfileTags?: Array<CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner>;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUser
+   */
+  updated_at?: string;
+}
+
+export const CreateCommunity200ResponseCommunityAddressesInnerUserEmailNotificationIntervalEnum =
+  {
+    Weekly: 'weekly',
+    Never: 'never',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityAddressesInnerUserEmailNotificationIntervalEnum =
+  (typeof CreateCommunity200ResponseCommunityAddressesInnerUserEmailNotificationIntervalEnum)[keyof typeof CreateCommunity200ResponseCommunityAddressesInnerUserEmailNotificationIntervalEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+ */
+export interface CreateCommunity200ResponseCommunityAddressesInnerUserProfile {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  name?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  email?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  website?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  bio?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  avatar_url?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  slug?: string | null;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  socials?: Array<string> | null;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityAddressesInnerUserProfileBackgroundImage}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfile
+   */
+  background_image?: CreateCommunity200ResponseCommunityAddressesInnerUserProfileBackgroundImage | null;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityAddressesInnerUserProfileBackgroundImage
+ */
+export interface CreateCommunity200ResponseCommunityAddressesInnerUserProfileBackgroundImage {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfileBackgroundImage
+   */
+  url?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfileBackgroundImage
+   */
+  imageBehavior?: string | null;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner
+ */
+export interface CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner
+   */
+  user_id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner
+   */
+  tag_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityAddressesInnerUserProfileTagsInner
+   */
+  updated_at?: string;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityChainNode
+ */
+export interface CreateCommunity200ResponseCommunityChainNode {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  url?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  eth_chain_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  alt_wallet_url?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  private_url?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  balance_type?: CreateCommunity200ResponseCommunityChainNodeBalanceTypeEnum | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  name?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  description?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  ss58?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  bech32?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  slip44?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  cosmos_chain_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  cosmos_gov_version?: CreateCommunity200ResponseCommunityChainNodeCosmosGovVersionEnum | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  health?: CreateCommunity200ResponseCommunityChainNodeHealthEnum | null;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityChainNodeContractsInner>}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  contracts?: Array<CreateCommunity200ResponseCommunityChainNodeContractsInner> | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  block_explorer?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  max_ce_block_range?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNode
+   */
+  updated_at?: string;
+}
+
+export const CreateCommunity200ResponseCommunityChainNodeBalanceTypeEnum = {
+  Terra: 'terra',
+  Ethereum: 'ethereum',
+  Solana: 'solana',
+  Cosmos: 'cosmos',
+  Near: 'near',
+  Substrate: 'substrate',
+} as const;
+
+export type CreateCommunity200ResponseCommunityChainNodeBalanceTypeEnum =
+  (typeof CreateCommunity200ResponseCommunityChainNodeBalanceTypeEnum)[keyof typeof CreateCommunity200ResponseCommunityChainNodeBalanceTypeEnum];
+export const CreateCommunity200ResponseCommunityChainNodeCosmosGovVersionEnum =
+  {
+    V1: 'v1',
+    V1beta1: 'v1beta1',
+    V1beta1AttemptFailed: 'v1beta1-attempt-failed',
+    V1AttemptFailed: 'v1-attempt-failed',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityChainNodeCosmosGovVersionEnum =
+  (typeof CreateCommunity200ResponseCommunityChainNodeCosmosGovVersionEnum)[keyof typeof CreateCommunity200ResponseCommunityChainNodeCosmosGovVersionEnum];
+export const CreateCommunity200ResponseCommunityChainNodeHealthEnum = {
+  Failed: 'failed',
+  Healthy: 'healthy',
+} as const;
+
+export type CreateCommunity200ResponseCommunityChainNodeHealthEnum =
+  (typeof CreateCommunity200ResponseCommunityChainNodeHealthEnum)[keyof typeof CreateCommunity200ResponseCommunityChainNodeHealthEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityChainNodeContractsInner
+ */
+export interface CreateCommunity200ResponseCommunityChainNodeContractsInner {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  address: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  chain_node_id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  abi_id?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  decimals?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  token_name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  symbol?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  type: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  is_factory?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  nickname?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityChainNodeContractsInner
+   */
+  updated_at?: string;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityCommunityStakesInner
+ */
+export interface CreateCommunity200ResponseCommunityCommunityStakesInner {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  stake_id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  stake_token?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  vote_weight?: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  stake_enabled?: boolean;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner>}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  StakeTransactions?: Array<CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner> | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInner
+   */
+  updated_at?: string;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+ */
+export interface CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  transaction_hash: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  stake_id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  address: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  stake_amount: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  stake_price?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  stake_direction: CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInner
+   */
+  timestamp: number;
+}
+
+export const CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
+  {
+    Buy: 'buy',
+    Sell: 'sell',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
+  (typeof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum)[keyof typeof CreateCommunity200ResponseCommunityCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityCommunityTagsInner
+ */
+export interface CreateCommunity200ResponseCommunityCommunityTagsInner {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityTagsInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityTagsInner
+   */
+  tag_id: number;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityCommunityTagsInnerTag}
+   * @memberof CreateCommunity200ResponseCommunityCommunityTagsInner
+   */
+  Tag?: CreateCommunity200ResponseCommunityCommunityTagsInnerTag | null;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityCommunityTagsInnerTag
+ */
+export interface CreateCommunity200ResponseCommunityCommunityTagsInnerTag {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityCommunityTagsInnerTag
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityCommunityTagsInnerTag
+   */
+  name: string;
+}
+/**
+ * On-Chain Contest Manager
+ * @export
+ * @interface CreateCommunity200ResponseCommunityContestManagersInner
+ */
+export interface CreateCommunity200ResponseCommunityContestManagersInner {
+  /**
+   * On-Chain contest manager address
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  contest_address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  image_url?: string | null;
+  /**
+   * Provided by admin on creation when stake funds are not used
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  funding_token_address?: string | null;
+  /**
+   * Percentage of pool used for prizes in recurring contests
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  prize_percentage?: number | null;
+  /**
+   * Sorted array of percentages for prize, from first to last
+   * @type {Array<number>}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  payout_structure: Array<number>;
+  /**
+   * Recurring contest interval, 0 when one-off
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  interval: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  ticker?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  decimals?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  created_at: string;
+  /**
+   * Flags when contest policy is cancelled by admin
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  cancelled?: boolean | null;
+  /**
+   * Flags when the one-off contest has ended and rollover was completed
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  ended?: boolean | null;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityTopicsInner>}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  topics?: Array<CreateCommunity200ResponseCommunityTopicsInner> | null;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityContestManagersInnerContestsInner>}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInner
+   */
+  contests?: Array<CreateCommunity200ResponseCommunityContestManagersInnerContestsInner> | null;
+}
+/**
+ * On-Chain contest instance
+ * @export
+ * @interface CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+ */
+export interface CreateCommunity200ResponseCommunityContestManagersInnerContestsInner {
+  /**
+   * On-Chain contest manager address
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+   */
+  contest_address: string;
+  /**
+   * On-Chain contest id, 0 when one-off
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+   */
+  contest_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+   */
+  start_time: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+   */
+  end_time: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+   */
+  score_updated_at?: string | null;
+  /**
+   * Contest score, sorted from first to last
+   * @type {Array<CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner>}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+   */
+  score?: Array<CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner> | null;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner>}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInner
+   */
+  actions?: Array<CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner> | null;
+}
+/**
+ * On-Chain content related actions on contest instance
+ * @export
+ * @interface CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+ */
+export interface CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner {
+  /**
+   * On-Chain contest manager address
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  contest_address: string;
+  /**
+   * On-Chain contest id, 0 when one-off
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  contest_id: number;
+  /**
+   * On-Chain content id, 0 when adding
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  content_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  actor_address: string;
+  /**
+   * Type of content action
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  action: CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInnerActionEnum;
+  /**
+   * Content url
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  content_url?: string | null;
+  /**
+   * Thread id mapped from content url
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  thread_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  thread_title?: string | null;
+  /**
+   * Voting power of address when action was recorded
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  voting_power: number;
+  /**
+   * Date-time when action was recorded
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInner
+   */
+  created_at: string;
+}
+
+export const CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInnerActionEnum =
+  {
+    Added: 'added',
+    Upvoted: 'upvoted',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInnerActionEnum =
+  (typeof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInnerActionEnum)[keyof typeof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerActionsInnerActionEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner
+ */
+export interface CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner
+   */
+  creator_address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner
+   */
+  content_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner
+   */
+  votes: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner
+   */
+  prize: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityContestManagersInnerContestsInnerScoreInner
+   */
+  tickerPrize?: number;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInner
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInner {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInner
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityGroupsInnerMetadata}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInner
+   */
+  metadata: CreateCommunity200ResponseCommunityGroupsInnerMetadata;
+  /**
+   *
+   * @type {Array<CreateCommunity200ResponseCommunityGroupsInnerRequirementsInner>}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInner
+   */
+  requirements: Array<CreateCommunity200ResponseCommunityGroupsInnerRequirementsInner>;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInner
+   */
+  is_system_managed?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInner
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInner
+   */
+  updated_at?: string;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerMetadata
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerMetadata {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerMetadata
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerMetadata
+   */
+  description: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerMetadata
+   */
+  required_requirements?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerMetadata
+   */
+  membership_ttl?: number | null;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInner
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInner {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInner
+   */
+  rule: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerRuleEnum;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1Data}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInner
+   */
+  data: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1Data;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerRuleEnum =
+  {
+    Allow: 'allow',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerRuleEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerRuleEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerRuleEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf
+   */
+  rule: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfRuleEnum;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfData}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf
+   */
+  data: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfData;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfRuleEnum =
+  {
+    Threshold: 'threshold',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfRuleEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfRuleEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfRuleEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1 {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1
+   */
+  rule: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1RuleEnum;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1Data}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1
+   */
+  data: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1Data;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1RuleEnum =
+  {
+    Allow: 'allow',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1RuleEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1RuleEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1RuleEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1Data
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1Data {
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOf1Data
+   */
+  allow: Array<string>;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfData
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfData {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfData
+   */
+  threshold: string;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfData
+   */
+  source: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource
+   */
+  source_type: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource
+   */
+  evm_chain_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource
+   */
+  contract_address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource
+   */
+  token_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource
+   */
+  cosmos_chain_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSource
+   */
+  token_symbol: string;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
+  {
+    Cw721: 'cw721',
+    Cw20: 'cw20',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   */
+  source_type: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   */
+  evm_chain_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   */
+  contract_address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
+   */
+  token_id?: string | null;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
+  {
+    Erc20: 'erc20',
+    Erc721: 'erc721',
+    Erc1155: 'erc1155',
+    Spl: 'spl',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1 {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
+   */
+  source_type: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
+   */
+  evm_chain_id: number;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
+  {
+    EthNative: 'eth_native',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2 {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+   */
+  source_type: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+   */
+  cosmos_chain_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
+   */
+  token_symbol: string;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
+  {
+    CosmosNative: 'cosmos_native',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+ */
+export interface CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3 {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+   */
+  source_type: CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+   */
+  cosmos_chain_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
+   */
+  contract_address: string;
+}
+
+export const CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
+  {
+    Cw721: 'cw721',
+    Cw20: 'cw20',
+  } as const;
+
+export type CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
+  (typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum)[keyof typeof CreateCommunity200ResponseCommunityGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunitySocialLinksInner
+ */
+export interface CreateCommunity200ResponseCommunitySocialLinksInner {}
+/**
+ *
+ * @export
+ * @interface CreateCommunity200ResponseCommunityTopicsInner
+ */
+export interface CreateCommunity200ResponseCommunityTopicsInner {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  community_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  description?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  telegram?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  featured_in_sidebar?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  featured_in_new_post?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  default_offchain_template?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  order?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  channel_id?: string | null;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  group_ids?: Array<number>;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunity200ResponseCommunityTopicsInner
+   */
+  default_offchain_template_backup?: string | null;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunityDefaultResponse
+ */
+export interface CreateCommunityDefaultResponse {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityDefaultResponse
+   */
+  message: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityDefaultResponse
+   */
+  code: string;
+  /**
+   *
+   * @type {Array<CreateCommunityDefaultResponseIssuesInner>}
+   * @memberof CreateCommunityDefaultResponse
+   */
+  issues?: Array<CreateCommunityDefaultResponseIssuesInner>;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunityDefaultResponseIssuesInner
+ */
+export interface CreateCommunityDefaultResponseIssuesInner {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityDefaultResponseIssuesInner
+   */
+  message: string;
+}
+/**
+ *
+ * @export
+ * @interface CreateCommunityRequest
+ */
+export interface CreateCommunityRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  name: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunityRequest
+   */
+  chain_node_id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  description?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  icon_url?: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CreateCommunityRequest
+   */
+  social_links?: Array<string>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof CreateCommunityRequest
+   */
+  tags?: Array<string>;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateCommunityRequest
+   */
+  directory_page_enabled?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  type?: CreateCommunityRequestTypeEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  base: CreateCommunityRequestBaseEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  user_address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  alt_wallet_url?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunityRequest
+   */
+  eth_chain_id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  cosmos_chain_id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  address?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateCommunityRequest
+   */
+  decimals?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  bech32_prefix?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  token_name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  node_url: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  network: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  default_symbol: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  website?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  github?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  telegram?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  element?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateCommunityRequest
+   */
+  discord?: string;
+}
+
+export const CreateCommunityRequestTypeEnum = {
+  Chain: 'chain',
+  Dao: 'dao',
+  Token: 'token',
+  Offchain: 'offchain',
+} as const;
+
+export type CreateCommunityRequestTypeEnum =
+  (typeof CreateCommunityRequestTypeEnum)[keyof typeof CreateCommunityRequestTypeEnum];
+export const CreateCommunityRequestBaseEnum = {
+  Cosmos: 'cosmos',
+  Substrate: 'substrate',
+  Ethereum: 'ethereum',
+  Near: 'near',
+  Solana: 'solana',
+} as const;
+
+export type CreateCommunityRequestBaseEnum =
+  (typeof CreateCommunityRequestBaseEnum)[keyof typeof CreateCommunityRequestBaseEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateThread200Response
+ */
+export interface CreateThread200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThread200Response
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThread200Response
+   */
+  address_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  title: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  kind: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  stage: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  body?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  plaintext?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  url?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThread200Response
+   */
+  topic_id?: number | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateThread200Response
+   */
+  pinned?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThread200Response
+   */
+  view_count: number;
+  /**
+   *
+   * @type {Array<GetComments200ResponseResultsInnerThreadLinksInner>}
+   * @memberof CreateThread200Response
+   */
+  links?: Array<GetComments200ResponseResultsInnerThreadLinksInner> | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateThread200Response
+   */
+  read_only?: boolean | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateThread200Response
+   */
+  has_poll?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  canvas_signed_data?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  canvas_msg_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  last_edited?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  deleted_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  last_commented_on?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  marked_as_spam_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  archived_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  locked_at?: string | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerDiscordMeta}
+   * @memberof CreateThread200Response
+   */
+  discord_meta?: GetComments200ResponseResultsInnerDiscordMeta | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThread200Response
+   */
+  reaction_count: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThread200Response
+   */
+  reaction_weights_sum: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThread200Response
+   */
+  comment_count: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  activity_rank_date?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  created_by?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThread200Response
+   */
+  profile_name?: string | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerAddress}
+   * @memberof CreateThread200Response
+   */
+  Address?: GetComments200ResponseResultsInnerAddress | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerThreadTopic}
+   * @memberof CreateThread200Response
+   */
+  topic?: GetComments200ResponseResultsInnerThreadTopic | null;
+}
+/**
+ *
+ * @export
+ * @interface CreateThreadReaction200Response
+ */
+export interface CreateThreadReaction200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadReaction200Response
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadReaction200Response
+   */
+  address_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReaction200Response
+   */
+  reaction: CreateThreadReaction200ResponseReactionEnum;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadReaction200Response
+   */
+  thread_id?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadReaction200Response
+   */
+  comment_id?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadReaction200Response
+   */
+  proposal_id?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadReaction200Response
+   */
+  calculated_voting_weight?: number | null;
+  /**
+   *
+   * @type {any}
+   * @memberof CreateThreadReaction200Response
+   */
+  canvas_signed_data?: any | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReaction200Response
+   */
+  canvas_msg_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReaction200Response
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReaction200Response
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityAddressesInner}
+   * @memberof CreateThreadReaction200Response
+   */
+  Address?: CreateCommunity200ResponseCommunityAddressesInner;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReaction200Response
+   */
+  community_id: string;
+}
+
+export const CreateThreadReaction200ResponseReactionEnum = {
+  Like: 'like',
+} as const;
+
+export type CreateThreadReaction200ResponseReactionEnum =
+  (typeof CreateThreadReaction200ResponseReactionEnum)[keyof typeof CreateThreadReaction200ResponseReactionEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateThreadReactionRequest
+ */
+export interface CreateThreadReactionRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadReactionRequest
+   */
+  thread_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReactionRequest
+   */
+  thread_msg_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReactionRequest
+   */
+  reaction: CreateThreadReactionRequestReactionEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReactionRequest
+   */
+  canvas_signed_data?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadReactionRequest
+   */
+  canvas_msg_id?: string;
+}
+
+export const CreateThreadReactionRequestReactionEnum = {
+  Like: 'like',
+} as const;
+
+export type CreateThreadReactionRequestReactionEnum =
+  (typeof CreateThreadReactionRequestReactionEnum)[keyof typeof CreateThreadReactionRequestReactionEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateThreadRequest
+ */
+export interface CreateThreadRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CreateThreadRequest
+   */
+  topic_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  title: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  body: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  canvas_signed_data?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  canvas_msg_id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  kind: CreateThreadRequestKindEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  stage: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequest
+   */
+  url?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateThreadRequest
+   */
+  read_only: boolean;
+  /**
+   *
+   * @type {CreateThreadRequestDiscordMeta}
+   * @memberof CreateThreadRequest
+   */
+  discord_meta?: CreateThreadRequestDiscordMeta;
+}
+
+export const CreateThreadRequestKindEnum = {
+  Discussion: 'discussion',
+  Link: 'link',
+} as const;
+
+export type CreateThreadRequestKindEnum =
+  (typeof CreateThreadRequestKindEnum)[keyof typeof CreateThreadRequestKindEnum];
+
+/**
+ *
+ * @export
+ * @interface CreateThreadRequestDiscordMeta
+ */
+export interface CreateThreadRequestDiscordMeta {
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerDiscordMetaUser}
+   * @memberof CreateThreadRequestDiscordMeta
+   */
+  user: GetComments200ResponseResultsInnerDiscordMetaUser;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequestDiscordMeta
+   */
+  channel_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateThreadRequestDiscordMeta
+   */
+  message_id: string;
+}
+/**
+ *
+ * @export
+ * @interface GetComments200Response
+ */
+export interface GetComments200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200Response
+   */
+  limit: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200Response
+   */
+  page: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200Response
+   */
+  totalPages: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200Response
+   */
+  totalResults: number;
+  /**
+   *
+   * @type {Array<GetComments200ResponseResultsInner>}
+   * @memberof GetComments200Response
+   */
+  results: Array<GetComments200ResponseResultsInner>;
+}
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInner
+ */
+export interface GetComments200ResponseResultsInner {
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  thread_id: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  address_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  text: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  plaintext: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  parent_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  canvas_signed_data?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  canvas_msg_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  created_by?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  deleted_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  marked_as_spam_at?: string | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerDiscordMeta}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  discord_meta?: GetComments200ResponseResultsInnerDiscordMeta | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  reaction_count: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  reaction_weights_sum?: number;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerAddress}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  Address?: GetComments200ResponseResultsInnerAddress | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerThread}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  Thread?: GetComments200ResponseResultsInnerThread | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerReaction}
+   * @memberof GetComments200ResponseResultsInner
+   */
+  Reaction?: GetComments200ResponseResultsInnerReaction | null;
+}
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInnerAddress
+ */
+export interface GetComments200ResponseResultsInnerAddress {
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  address: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  user_id?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  verification_token?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  verification_token_expires?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  verified?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  last_active?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  ghost_address?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  wallet_id?: GetComments200ResponseResultsInnerAddressWalletIdEnum | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  block_info?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  is_user_default?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  role?: GetComments200ResponseResultsInnerAddressRoleEnum;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  is_banned?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  hex?: string | null;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityAddressesInnerUser}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  User?: CreateCommunity200ResponseCommunityAddressesInnerUser;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerAddress
+   */
+  updated_at?: string;
+}
+
+export const GetComments200ResponseResultsInnerAddressWalletIdEnum = {
+  Magic: 'magic',
+  Polkadot: 'polkadot',
+  Metamask: 'metamask',
+  Walletconnect: 'walletconnect',
+  KeplrEthereum: 'keplr-ethereum',
+  Keplr: 'keplr',
+  Leap: 'leap',
+  Near: 'near',
+  Terrastation: 'terrastation',
+  TerraWalletconnect: 'terra-walletconnect',
+  CosmMetamask: 'cosm-metamask',
+  Phantom: 'phantom',
+  Coinbase: 'coinbase',
+} as const;
+
+export type GetComments200ResponseResultsInnerAddressWalletIdEnum =
+  (typeof GetComments200ResponseResultsInnerAddressWalletIdEnum)[keyof typeof GetComments200ResponseResultsInnerAddressWalletIdEnum];
+export const GetComments200ResponseResultsInnerAddressRoleEnum = {
+  Admin: 'admin',
+  Moderator: 'moderator',
+  Member: 'member',
+} as const;
+
+export type GetComments200ResponseResultsInnerAddressRoleEnum =
+  (typeof GetComments200ResponseResultsInnerAddressRoleEnum)[keyof typeof GetComments200ResponseResultsInnerAddressRoleEnum];
+
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInnerDiscordMeta
+ */
+export interface GetComments200ResponseResultsInnerDiscordMeta {
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerDiscordMetaUser}
+   * @memberof GetComments200ResponseResultsInnerDiscordMeta
+   */
+  user: GetComments200ResponseResultsInnerDiscordMetaUser;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerDiscordMeta
+   */
+  channel_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerDiscordMeta
+   */
+  message_id: string;
+}
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInnerDiscordMetaUser
+ */
+export interface GetComments200ResponseResultsInnerDiscordMetaUser {
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerDiscordMetaUser
+   */
+  id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerDiscordMetaUser
+   */
+  username: string;
+}
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInnerReaction
+ */
+export interface GetComments200ResponseResultsInnerReaction {
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  address_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  reaction: GetComments200ResponseResultsInnerReactionReactionEnum;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  thread_id?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  comment_id?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  proposal_id?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  calculated_voting_weight?: number | null;
+  /**
+   *
+   * @type {any}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  canvas_signed_data?: any | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  canvas_msg_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {CreateCommunity200ResponseCommunityAddressesInner}
+   * @memberof GetComments200ResponseResultsInnerReaction
+   */
+  Address?: CreateCommunity200ResponseCommunityAddressesInner;
+}
+
+export const GetComments200ResponseResultsInnerReactionReactionEnum = {
+  Like: 'like',
+} as const;
+
+export type GetComments200ResponseResultsInnerReactionReactionEnum =
+  (typeof GetComments200ResponseResultsInnerReactionReactionEnum)[keyof typeof GetComments200ResponseResultsInnerReactionReactionEnum];
+
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInnerThread
+ */
+export interface GetComments200ResponseResultsInnerThread {
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  id?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  address_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  title: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  kind: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  stage: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  body?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  plaintext?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  url?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  topic_id?: number | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  pinned?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  community_id: string;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  view_count: number;
+  /**
+   *
+   * @type {Array<GetComments200ResponseResultsInnerThreadLinksInner>}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  links?: Array<GetComments200ResponseResultsInnerThreadLinksInner> | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  read_only?: boolean | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  has_poll?: boolean | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  canvas_signed_data?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  canvas_msg_id?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  created_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  updated_at?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  last_edited?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  deleted_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  last_commented_on?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  marked_as_spam_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  archived_at?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  locked_at?: string | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerDiscordMeta}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  discord_meta?: GetComments200ResponseResultsInnerDiscordMeta | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  reaction_count: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  reaction_weights_sum: number;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  comment_count: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  activity_rank_date?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  created_by?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  profile_name?: string | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerAddress}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  Address?: GetComments200ResponseResultsInnerAddress | null;
+  /**
+   *
+   * @type {GetComments200ResponseResultsInnerThreadTopic}
+   * @memberof GetComments200ResponseResultsInnerThread
+   */
+  topic?: GetComments200ResponseResultsInnerThreadTopic | null;
+}
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInnerThreadLinksInner
+ */
+export interface GetComments200ResponseResultsInnerThreadLinksInner {
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadLinksInner
+   */
+  source: GetComments200ResponseResultsInnerThreadLinksInnerSourceEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadLinksInner
+   */
+  identifier: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadLinksInner
+   */
+  title?: string | null;
+}
+
+export const GetComments200ResponseResultsInnerThreadLinksInnerSourceEnum = {
+  Snapshot: 'snapshot',
+  Proposal: 'proposal',
+  Thread: 'thread',
+  Web: 'web',
+  Template: 'template',
+} as const;
+
+export type GetComments200ResponseResultsInnerThreadLinksInnerSourceEnum =
+  (typeof GetComments200ResponseResultsInnerThreadLinksInnerSourceEnum)[keyof typeof GetComments200ResponseResultsInnerThreadLinksInnerSourceEnum];
+
+/**
+ *
+ * @export
+ * @interface GetComments200ResponseResultsInnerThreadTopic
+ */
+export interface GetComments200ResponseResultsInnerThreadTopic {
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  id?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  community_id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  description?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  telegram?: string | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  featured_in_sidebar?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  featured_in_new_post?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  default_offchain_template?: string | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  order?: number | null;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  channel_id?: string | null;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  group_ids?: Array<number>;
+  /**
+   *
+   * @type {string}
+   * @memberof GetComments200ResponseResultsInnerThreadTopic
+   */
+  default_offchain_template_backup?: string | null;
+}
 /**
  *
  * @export
@@ -76,7 +3563,7 @@ export interface GetCommunities200ResponseResultsInner {
    * @type {string}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  id?: string;
+  id: string;
   /**
    *
    * @type {string}
@@ -88,7 +3575,7 @@ export interface GetCommunities200ResponseResultsInner {
    * @type {number}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  chain_node_id: number;
+  chain_node_id?: number | null;
   /**
    *
    * @type {string}
@@ -133,10 +3620,10 @@ export interface GetCommunities200ResponseResultsInner {
   description?: string | null;
   /**
    *
-   * @type {Array<string>}
+   * @type {Array<CreateCommunity200ResponseCommunitySocialLinksInner>}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  social_links?: Array<string>;
+  social_links?: Array<CreateCommunity200ResponseCommunitySocialLinksInner>;
   /**
    *
    * @type {number}
@@ -173,12 +3660,6 @@ export interface GetCommunities200ResponseResultsInner {
    * @memberof GetCommunities200ResponseResultsInner
    */
   collapsed_on_homepage?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInner
-   */
-  has_chain_events_listener?: boolean;
   /**
    *
    * @type {boolean}
@@ -295,6 +3776,24 @@ export interface GetCommunities200ResponseResultsInner {
   include_in_digest_email?: boolean | null;
   /**
    *
+   * @type {number}
+   * @memberof GetCommunities200ResponseResultsInner
+   */
+  profile_count?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetCommunities200ResponseResultsInner
+   */
+  lifetime_thread_count?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetCommunities200ResponseResultsInner
+   */
+  banner_text?: string | null;
+  /**
+   *
    * @type {string}
    * @memberof GetCommunities200ResponseResultsInner
    */
@@ -307,46 +3806,52 @@ export interface GetCommunities200ResponseResultsInner {
   updated_at?: string;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerAddressesInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityAddressesInner>}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  Addresses?: Array<GetCommunities200ResponseResultsInnerAddressesInner>;
+  Addresses?: Array<CreateCommunity200ResponseCommunityAddressesInner>;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerCommunityStakesInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityCommunityStakesInner>}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  CommunityStakes?: Array<GetCommunities200ResponseResultsInnerCommunityStakesInner> | null;
+  CommunityStakes?: Array<CreateCommunity200ResponseCommunityCommunityStakesInner> | null;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerCommunityTagsInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityCommunityTagsInner>}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  CommunityTags?: Array<GetCommunities200ResponseResultsInnerCommunityTagsInner> | null;
+  CommunityTags?: Array<CreateCommunity200ResponseCommunityCommunityTagsInner> | null;
   /**
    *
-   * @type {GetCommunities200ResponseResultsInnerChainNode}
+   * @type {CreateCommunity200ResponseCommunityChainNode}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  ChainNode?: GetCommunities200ResponseResultsInnerChainNode;
+  ChainNode?: CreateCommunity200ResponseCommunityChainNode | null;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerTopicsInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityTopicsInner>}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  topics?: Array<GetCommunities200ResponseResultsInnerTopicsInner>;
+  topics?: Array<CreateCommunity200ResponseCommunityTopicsInner>;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerGroupsInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityGroupsInner>}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  groups?: Array<GetCommunities200ResponseResultsInnerGroupsInner>;
+  groups?: Array<CreateCommunity200ResponseCommunityGroupsInner>;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerContestManagersInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityContestManagersInner>}
    * @memberof GetCommunities200ResponseResultsInner
    */
-  contest_managers?: Array<GetCommunities200ResponseResultsInnerContestManagersInner>;
+  contest_managers?: Array<CreateCommunity200ResponseCommunityContestManagersInner>;
+  /**
+   *
+   * @type {number}
+   * @memberof GetCommunities200ResponseResultsInner
+   */
+  last_30_day_thread_count?: number | null;
 }
 
 export const GetCommunities200ResponseResultsInnerBaseEnum = {
@@ -358,7 +3863,7 @@ export const GetCommunities200ResponseResultsInnerBaseEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerBaseEnum =
-  typeof GetCommunities200ResponseResultsInnerBaseEnum[keyof typeof GetCommunities200ResponseResultsInnerBaseEnum];
+  (typeof GetCommunities200ResponseResultsInnerBaseEnum)[keyof typeof GetCommunities200ResponseResultsInnerBaseEnum];
 export const GetCommunities200ResponseResultsInnerTypeEnum = {
   Chain: 'chain',
   Dao: 'dao',
@@ -367,7 +3872,7 @@ export const GetCommunities200ResponseResultsInnerTypeEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerTypeEnum];
+  (typeof GetCommunities200ResponseResultsInnerTypeEnum)[keyof typeof GetCommunities200ResponseResultsInnerTypeEnum];
 export const GetCommunities200ResponseResultsInnerDefaultPageEnum = {
   DefaultAllDiscussionsView: 'default_all_discussions_view',
   DefaultSummaryView: 'default_summary_view',
@@ -375,1537 +3880,15 @@ export const GetCommunities200ResponseResultsInnerDefaultPageEnum = {
 } as const;
 
 export type GetCommunities200ResponseResultsInnerDefaultPageEnum =
-  typeof GetCommunities200ResponseResultsInnerDefaultPageEnum[keyof typeof GetCommunities200ResponseResultsInnerDefaultPageEnum];
+  (typeof GetCommunities200ResponseResultsInnerDefaultPageEnum)[keyof typeof GetCommunities200ResponseResultsInnerDefaultPageEnum];
 export const GetCommunities200ResponseResultsInnerHasHomepageEnum = {
   True: 'true',
   False: 'false',
 } as const;
 
 export type GetCommunities200ResponseResultsInnerHasHomepageEnum =
-  typeof GetCommunities200ResponseResultsInnerHasHomepageEnum[keyof typeof GetCommunities200ResponseResultsInnerHasHomepageEnum];
+  (typeof GetCommunities200ResponseResultsInnerHasHomepageEnum)[keyof typeof GetCommunities200ResponseResultsInnerHasHomepageEnum];
 
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerAddressesInner
- */
-export interface GetCommunities200ResponseResultsInnerAddressesInner {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  user_id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  verification_token: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  verification_token_expires?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  verified?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  last_active?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  ghost_address?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  wallet_id?: GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  block_info?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  is_user_default?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  role?: GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  wallet_sso_source?: GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  hex?: string | null;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerAddressesInnerUser}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  User?: GetCommunities200ResponseResultsInnerAddressesInnerUser;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInner
-   */
-  updated_at?: string;
-}
-
-export const GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum = {
-  Magic: 'magic',
-  Polkadot: 'polkadot',
-  Metamask: 'metamask',
-  Walletconnect: 'walletconnect',
-  KeplrEthereum: 'keplr-ethereum',
-  Keplr: 'keplr',
-  Leap: 'leap',
-  Near: 'near',
-  Terrastation: 'terrastation',
-  TerraWalletconnect: 'terra-walletconnect',
-  CosmMetamask: 'cosm-metamask',
-  Phantom: 'phantom',
-  Coinbase: 'coinbase',
-} as const;
-
-export type GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletIdEnum];
-export const GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum = {
-  Admin: 'admin',
-  Moderator: 'moderator',
-  Member: 'member',
-} as const;
-
-export type GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerRoleEnum];
-export const GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum =
-  {
-    Google: 'google',
-    Github: 'github',
-    Discord: 'discord',
-    Twitter: 'twitter',
-    Apple: 'apple',
-    Email: 'email',
-    Unknown: 'unknown',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerWalletSsoSourceEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerAddressesInnerUser
- */
-export interface GetCommunities200ResponseResultsInnerAddressesInnerUser {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  email?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  isAdmin?: boolean | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  disableRichText?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  emailVerified?: boolean | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  selected_community_id?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  emailNotificationInterval?: GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  promotional_emails_enabled?: boolean | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  is_welcome_onboard_flow_complete?: boolean;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerAddressesInnerUserProfile}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  profile: GetCommunities200ResponseResultsInnerAddressesInnerUserProfile;
-  /**
-   *
-   * @type {Array<GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner>}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  ProfileTags?: Array<GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner>;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUser
-   */
-  updated_at?: string;
-}
-
-export const GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum =
-  {
-    Weekly: 'weekly',
-    Never: 'never',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum =
-  typeof GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum[keyof typeof GetCommunities200ResponseResultsInnerAddressesInnerUserEmailNotificationIntervalEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
- */
-export interface GetCommunities200ResponseResultsInnerAddressesInnerUserProfile {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  name?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  email?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  website?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  bio?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  avatar_url?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  slug?: string | null;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  socials?: Array<string> | null;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerAddressesInnerUserProfileBackgroundImage}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfile
-   */
-  background_image?: GetCommunities200ResponseResultsInnerAddressesInnerUserProfileBackgroundImage | null;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerAddressesInnerUserProfileBackgroundImage
- */
-export interface GetCommunities200ResponseResultsInnerAddressesInnerUserProfileBackgroundImage {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfileBackgroundImage
-   */
-  url?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfileBackgroundImage
-   */
-  imageBehavior?: string | null;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner
- */
-export interface GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner
-   */
-  user_id: number;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner
-   */
-  tag_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerAddressesInnerUserProfileTagsInner
-   */
-  updated_at?: string;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerChainNode
- */
-export interface GetCommunities200ResponseResultsInnerChainNode {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  url: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  eth_chain_id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  alt_wallet_url?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  private_url?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  balance_type: GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  name: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  description?: string | null;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  ss58?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  bech32?: string | null;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  slip44?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  cosmos_chain_id?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  cosmos_gov_version?: GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  health?: GetCommunities200ResponseResultsInnerChainNodeHealthEnum | null;
-  /**
-   *
-   * @type {Array<GetCommunities200ResponseResultsInnerChainNodeContractsInner>}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  contracts?: Array<GetCommunities200ResponseResultsInnerChainNodeContractsInner> | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  block_explorer?: string | null;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  max_ce_block_range?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNode
-   */
-  updated_at?: string;
-}
-
-export const GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum = {
-  Terra: 'terra',
-  Ethereum: 'ethereum',
-  Solana: 'solana',
-  Cosmos: 'cosmos',
-  Near: 'near',
-  Substrate: 'substrate',
-} as const;
-
-export type GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerChainNodeBalanceTypeEnum];
-export const GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum =
-  {
-    V1: 'v1',
-    V1beta1: 'v1beta1',
-    V1beta1AttemptFailed: 'v1beta1-attempt-failed',
-    V1AttemptFailed: 'v1-attempt-failed',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum =
-  typeof GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum[keyof typeof GetCommunities200ResponseResultsInnerChainNodeCosmosGovVersionEnum];
-export const GetCommunities200ResponseResultsInnerChainNodeHealthEnum = {
-  Failed: 'failed',
-  Healthy: 'healthy',
-} as const;
-
-export type GetCommunities200ResponseResultsInnerChainNodeHealthEnum =
-  typeof GetCommunities200ResponseResultsInnerChainNodeHealthEnum[keyof typeof GetCommunities200ResponseResultsInnerChainNodeHealthEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerChainNodeContractsInner
- */
-export interface GetCommunities200ResponseResultsInnerChainNodeContractsInner {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  address: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  chain_node_id: number;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  abi_id?: number | null;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  decimals?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  token_name?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  symbol?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  type: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  is_factory?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  nickname?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerChainNodeContractsInner
-   */
-  updated_at?: string;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerCommunityStakesInner
- */
-export interface GetCommunities200ResponseResultsInnerCommunityStakesInner {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  stake_id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  stake_token?: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  vote_weight?: number;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  stake_enabled?: boolean;
-  /**
-   *
-   * @type {Array<GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner>}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  StakeTransactions?: Array<GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner> | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInner
-   */
-  updated_at?: string;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
- */
-export interface GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  transaction_hash: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  stake_id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  address: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  stake_amount: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  stake_price?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  stake_direction: GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInner
-   */
-  timestamp: number;
-}
-
-export const GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
-  {
-    Buy: 'buy',
-    Sell: 'sell',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum =
-  typeof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum[keyof typeof GetCommunities200ResponseResultsInnerCommunityStakesInnerStakeTransactionsInnerStakeDirectionEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerCommunityTagsInner
- */
-export interface GetCommunities200ResponseResultsInnerCommunityTagsInner {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityTagsInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityTagsInner
-   */
-  tag_id: number;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerCommunityTagsInnerTag}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityTagsInner
-   */
-  Tag?: GetCommunities200ResponseResultsInnerCommunityTagsInnerTag | null;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerCommunityTagsInnerTag
- */
-export interface GetCommunities200ResponseResultsInnerCommunityTagsInnerTag {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityTagsInnerTag
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerCommunityTagsInnerTag
-   */
-  name: string;
-}
-/**
- * On-Chain Contest Manager
- * @export
- * @interface GetCommunities200ResponseResultsInnerContestManagersInner
- */
-export interface GetCommunities200ResponseResultsInnerContestManagersInner {
-  /**
-   * On-Chain contest manager address
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  contest_address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  name: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  image_url?: string | null;
-  /**
-   * Provided by admin on creation when stake funds are not used
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  funding_token_address?: string | null;
-  /**
-   * Percentage of pool used for prizes in recurring contests
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  prize_percentage?: number | null;
-  /**
-   * Sorted array of percentages for prize, from first to last
-   * @type {Array<number>}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  payout_structure: Array<number>;
-  /**
-   * Recurring contest interval, 0 when one-off
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  interval: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  ticker?: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  decimals?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  created_at: string;
-  /**
-   * Flags when contest policy is cancelled by admin
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  cancelled?: boolean | null;
-  /**
-   * Flags when the one-off contest has ended and rollover was completed
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  ended?: boolean | null;
-  /**
-   *
-   * @type {Array<GetCommunities200ResponseResultsInnerTopicsInner>}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  topics?: Array<GetCommunities200ResponseResultsInnerTopicsInner> | null;
-  /**
-   *
-   * @type {Array<GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner>}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInner
-   */
-  contests?: Array<GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner> | null;
-}
-/**
- * On-Chain contest instance
- * @export
- * @interface GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
- */
-export interface GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner {
-  /**
-   * On-Chain contest manager address
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
-   */
-  contest_address: string;
-  /**
-   * On-Chain contest id, 0 when one-off
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
-   */
-  contest_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
-   */
-  start_time: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
-   */
-  end_time: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
-   */
-  score_updated_at?: string | null;
-  /**
-   * Contest score, sorted from first to last
-   * @type {Array<GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner>}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
-   */
-  score?: Array<GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner> | null;
-  /**
-   *
-   * @type {Array<GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner>}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInner
-   */
-  actions?: Array<GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner> | null;
-}
-/**
- * On-Chain content related actions on contest instance
- * @export
- * @interface GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
- */
-export interface GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner {
-  /**
-   * On-Chain contest manager address
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  contest_address: string;
-  /**
-   * On-Chain contest id, 0 when one-off
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  contest_id: number;
-  /**
-   * On-Chain content id, 0 when adding
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  content_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  actor_address: string;
-  /**
-   * Type of content action
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  action: GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum;
-  /**
-   * Content url
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  content_url?: string | null;
-  /**
-   * Thread id mapped from content url
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  thread_id?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  thread_title?: string | null;
-  /**
-   * Voting power of address when action was recorded
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  voting_power: number;
-  /**
-   * Date-time when action was recorded
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInner
-   */
-  created_at: string;
-}
-
-export const GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum =
-  {
-    Added: 'added',
-    Upvoted: 'upvoted',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum =
-  typeof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum[keyof typeof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerActionsInnerActionEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner
- */
-export interface GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner
-   */
-  creator_address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner
-   */
-  content_id: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner
-   */
-  votes: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner
-   */
-  prize: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerContestManagersInnerContestsInnerScoreInner
-   */
-  tickerPrize?: number;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInner
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInner {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInner
-   */
-  id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerGroupsInnerMetadata}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInner
-   */
-  metadata: GetCommunities200ResponseResultsInnerGroupsInnerMetadata;
-  /**
-   *
-   * @type {Array<GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInner>}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInner
-   */
-  requirements: Array<GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInner>;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInner
-   */
-  is_system_managed?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInner
-   */
-  created_at?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInner
-   */
-  updated_at?: string;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerMetadata
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerMetadata {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerMetadata
-   */
-  name: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerMetadata
-   */
-  description: string;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerMetadata
-   */
-  required_requirements?: number | null;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerMetadata
-   */
-  membership_ttl?: number | null;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInner
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInner {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInner
-   */
-  rule: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1Data}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInner
-   */
-  data: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1Data;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum =
-  {
-    Allow: 'allow',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerRuleEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf
-   */
-  rule: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfData}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf
-   */
-  data: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfData;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum =
-  {
-    Threshold: 'threshold',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfRuleEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1 {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1
-   */
-  rule: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1Data}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1
-   */
-  data: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1Data;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum =
-  {
-    Allow: 'allow',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1RuleEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1Data
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1Data {
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOf1Data
-   */
-  allow: Array<string>;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfData
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfData {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfData
-   */
-  threshold: string;
-  /**
-   *
-   * @type {GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfData
-   */
-  source: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource;
-}
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource
-   */
-  source_type: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource
-   */
-  evm_chain_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource
-   */
-  contract_address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource
-   */
-  token_id?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource
-   */
-  cosmos_chain_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSource
-   */
-  token_symbol: string;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
-  {
-    Cw721: 'cw721',
-    Cw20: 'cw20',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceSourceTypeEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
-   */
-  source_type: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
-   */
-  evm_chain_id: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
-   */
-  contract_address: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf
-   */
-  token_id?: string | null;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
-  {
-    Erc20: 'erc20',
-    Erc721: 'erc721',
-    Erc1155: 'erc1155',
-    Spl: 'spl',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOfSourceTypeEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1 {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
-   */
-  source_type: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1
-   */
-  evm_chain_id: number;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
-  {
-    EthNative: 'eth_native',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf1SourceTypeEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2 {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
-   */
-  source_type: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
-   */
-  cosmos_chain_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2
-   */
-  token_symbol: string;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
-  {
-    CosmosNative: 'cosmos_native',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf2SourceTypeEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
- */
-export interface GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3 {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
-   */
-  source_type: GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
-   */
-  cosmos_chain_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3
-   */
-  contract_address: string;
-}
-
-export const GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
-  {
-    Cw721: 'cw721',
-    Cw20: 'cw20',
-  } as const;
-
-export type GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum =
-  typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum[keyof typeof GetCommunities200ResponseResultsInnerGroupsInnerRequirementsInnerAnyOfDataSourceAnyOf3SourceTypeEnum];
-
-/**
- *
- * @export
- * @interface GetCommunities200ResponseResultsInnerTopicsInner
- */
-export interface GetCommunities200ResponseResultsInnerTopicsInner {
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  id?: number;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  name?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  community_id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  description?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  telegram?: string | null;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  featured_in_sidebar?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  featured_in_new_post?: boolean;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  default_offchain_template?: string | null;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  order?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  channel_id?: string | null;
-  /**
-   *
-   * @type {Array<number>}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  group_ids?: Array<number>;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunities200ResponseResultsInnerTopicsInner
-   */
-  default_offchain_template_backup?: string | null;
-}
-/**
- *
- * @export
- * @interface GetCommunitiesDefaultResponse
- */
-export interface GetCommunitiesDefaultResponse {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunitiesDefaultResponse
-   */
-  message: string;
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunitiesDefaultResponse
-   */
-  code: string;
-  /**
-   *
-   * @type {Array<GetCommunitiesDefaultResponseIssuesInner>}
-   * @memberof GetCommunitiesDefaultResponse
-   */
-  issues?: Array<GetCommunitiesDefaultResponseIssuesInner>;
-}
-/**
- *
- * @export
- * @interface GetCommunitiesDefaultResponseIssuesInner
- */
-export interface GetCommunitiesDefaultResponseIssuesInner {
-  /**
-   *
-   * @type {string}
-   * @memberof GetCommunitiesDefaultResponseIssuesInner
-   */
-  message: string;
-}
 /**
  *
  * @export
@@ -1917,7 +3900,7 @@ export interface GetCommunity200Response {
    * @type {string}
    * @memberof GetCommunity200Response
    */
-  id?: string;
+  id: string;
   /**
    *
    * @type {string}
@@ -1929,7 +3912,7 @@ export interface GetCommunity200Response {
    * @type {number}
    * @memberof GetCommunity200Response
    */
-  chain_node_id: number;
+  chain_node_id?: number | null;
   /**
    *
    * @type {string}
@@ -1974,10 +3957,10 @@ export interface GetCommunity200Response {
   description?: string | null;
   /**
    *
-   * @type {Array<string>}
+   * @type {Array<CreateCommunity200ResponseCommunitySocialLinksInner>}
    * @memberof GetCommunity200Response
    */
-  social_links?: Array<string>;
+  social_links?: Array<CreateCommunity200ResponseCommunitySocialLinksInner>;
   /**
    *
    * @type {number}
@@ -2014,12 +3997,6 @@ export interface GetCommunity200Response {
    * @memberof GetCommunity200Response
    */
   collapsed_on_homepage?: boolean;
-  /**
-   *
-   * @type {boolean}
-   * @memberof GetCommunity200Response
-   */
-  has_chain_events_listener?: boolean;
   /**
    *
    * @type {boolean}
@@ -2136,6 +4113,24 @@ export interface GetCommunity200Response {
   include_in_digest_email?: boolean | null;
   /**
    *
+   * @type {number}
+   * @memberof GetCommunity200Response
+   */
+  profile_count?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof GetCommunity200Response
+   */
+  lifetime_thread_count?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof GetCommunity200Response
+   */
+  banner_text?: string | null;
+  /**
+   *
    * @type {string}
    * @memberof GetCommunity200Response
    */
@@ -2148,58 +4143,52 @@ export interface GetCommunity200Response {
   updated_at?: string;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerAddressesInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityAddressesInner>}
    * @memberof GetCommunity200Response
    */
-  Addresses?: Array<GetCommunities200ResponseResultsInnerAddressesInner>;
+  Addresses?: Array<CreateCommunity200ResponseCommunityAddressesInner>;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerCommunityStakesInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityCommunityStakesInner>}
    * @memberof GetCommunity200Response
    */
-  CommunityStakes?: Array<GetCommunities200ResponseResultsInnerCommunityStakesInner> | null;
+  CommunityStakes?: Array<CreateCommunity200ResponseCommunityCommunityStakesInner> | null;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerCommunityTagsInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityCommunityTagsInner>}
    * @memberof GetCommunity200Response
    */
-  CommunityTags?: Array<GetCommunities200ResponseResultsInnerCommunityTagsInner> | null;
+  CommunityTags?: Array<CreateCommunity200ResponseCommunityCommunityTagsInner> | null;
   /**
    *
-   * @type {GetCommunities200ResponseResultsInnerChainNode}
+   * @type {CreateCommunity200ResponseCommunityChainNode}
    * @memberof GetCommunity200Response
    */
-  ChainNode?: GetCommunities200ResponseResultsInnerChainNode;
+  ChainNode?: CreateCommunity200ResponseCommunityChainNode | null;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerTopicsInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityTopicsInner>}
    * @memberof GetCommunity200Response
    */
-  topics?: Array<GetCommunities200ResponseResultsInnerTopicsInner>;
+  topics?: Array<CreateCommunity200ResponseCommunityTopicsInner>;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerGroupsInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityGroupsInner>}
    * @memberof GetCommunity200Response
    */
-  groups?: Array<GetCommunities200ResponseResultsInnerGroupsInner>;
+  groups?: Array<CreateCommunity200ResponseCommunityGroupsInner>;
   /**
    *
-   * @type {Array<GetCommunities200ResponseResultsInnerContestManagersInner>}
+   * @type {Array<CreateCommunity200ResponseCommunityContestManagersInner>}
    * @memberof GetCommunity200Response
    */
-  contest_managers?: Array<GetCommunities200ResponseResultsInnerContestManagersInner>;
+  contest_managers?: Array<CreateCommunity200ResponseCommunityContestManagersInner>;
   /**
    *
    * @type {number}
    * @memberof GetCommunity200Response
    */
   numVotingThreads: number;
-  /**
-   *
-   * @type {number}
-   * @memberof GetCommunity200Response
-   */
-  numTotalThreads: number;
   /**
    *
    * @type {Array<GetCommunity200ResponseAdminsAndModsInner>}
@@ -2223,7 +4212,7 @@ export const GetCommunity200ResponseBaseEnum = {
 } as const;
 
 export type GetCommunity200ResponseBaseEnum =
-  typeof GetCommunity200ResponseBaseEnum[keyof typeof GetCommunity200ResponseBaseEnum];
+  (typeof GetCommunity200ResponseBaseEnum)[keyof typeof GetCommunity200ResponseBaseEnum];
 export const GetCommunity200ResponseTypeEnum = {
   Chain: 'chain',
   Dao: 'dao',
@@ -2232,7 +4221,7 @@ export const GetCommunity200ResponseTypeEnum = {
 } as const;
 
 export type GetCommunity200ResponseTypeEnum =
-  typeof GetCommunity200ResponseTypeEnum[keyof typeof GetCommunity200ResponseTypeEnum];
+  (typeof GetCommunity200ResponseTypeEnum)[keyof typeof GetCommunity200ResponseTypeEnum];
 export const GetCommunity200ResponseDefaultPageEnum = {
   DefaultAllDiscussionsView: 'default_all_discussions_view',
   DefaultSummaryView: 'default_summary_view',
@@ -2240,14 +4229,14 @@ export const GetCommunity200ResponseDefaultPageEnum = {
 } as const;
 
 export type GetCommunity200ResponseDefaultPageEnum =
-  typeof GetCommunity200ResponseDefaultPageEnum[keyof typeof GetCommunity200ResponseDefaultPageEnum];
+  (typeof GetCommunity200ResponseDefaultPageEnum)[keyof typeof GetCommunity200ResponseDefaultPageEnum];
 export const GetCommunity200ResponseHasHomepageEnum = {
   True: 'true',
   False: 'false',
 } as const;
 
 export type GetCommunity200ResponseHasHomepageEnum =
-  typeof GetCommunity200ResponseHasHomepageEnum[keyof typeof GetCommunity200ResponseHasHomepageEnum];
+  (typeof GetCommunity200ResponseHasHomepageEnum)[keyof typeof GetCommunity200ResponseHasHomepageEnum];
 
 /**
  *
@@ -2275,7 +4264,7 @@ export const GetCommunity200ResponseAdminsAndModsInnerRoleEnum = {
 } as const;
 
 export type GetCommunity200ResponseAdminsAndModsInnerRoleEnum =
-  typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum[keyof typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum];
+  (typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum)[keyof typeof GetCommunity200ResponseAdminsAndModsInnerRoleEnum];
 
 /**
  *
@@ -2400,6 +4389,736 @@ export interface GetMembers200ResponseResultsInnerAddressesInner {
  * @interface GetMembersMembershipsParameter
  */
 export interface GetMembersMembershipsParameter {}
+/**
+ *
+ * @export
+ * @interface UpdateCommentRequest
+ */
+export interface UpdateCommentRequest {
+  /**
+   *
+   * @type {number}
+   * @memberof UpdateCommentRequest
+   */
+  comment_id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof UpdateCommentRequest
+   */
+  text: string;
+  /**
+   *
+   * @type {number}
+   * @memberof UpdateCommentRequest
+   */
+  thread_id?: number;
+  /**
+   *
+   * @type {CreateThreadRequestDiscordMeta}
+   * @memberof UpdateCommentRequest
+   */
+  discord_meta?: CreateThreadRequestDiscordMeta;
+}
+
+/**
+ * CommentApi - axios parameter creator
+ * @export
+ */
+export const CommentApiAxiosParamCreator = function (
+  configuration?: Configuration,
+) {
+  return {
+    /**
+     *
+     * @param {CreateCommentRequest} createCommentRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createComment: async (
+      createCommentRequest: CreateCommentRequest,
+      address?: string,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createCommentRequest' is not null or undefined
+      assertParamExists(
+        'createComment',
+        'createCommentRequest',
+        createCommentRequest,
+      );
+      const localVarPath = `/CreateComment`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createCommentRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {CreateCommentReactionRequest} createCommentReactionRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createCommentReaction: async (
+      createCommentReactionRequest: CreateCommentReactionRequest,
+      address?: string,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createCommentReactionRequest' is not null or undefined
+      assertParamExists(
+        'createCommentReaction',
+        'createCommentReactionRequest',
+        createCommentReactionRequest,
+      );
+      const localVarPath = `/CreateCommentReaction`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createCommentReactionRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {number} threadId
+     * @param {string} [address]
+     * @param {number | null} [limit]
+     * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
+     * @param {string} [orderBy]
+     * @param {GetCommentsOrderDirectionEnum} [orderDirection]
+     * @param {number} [commentId]
+     * @param {boolean} [includeUser]
+     * @param {boolean} [includeReactions]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getComments: async (
+      threadId: number,
+      address?: string,
+      limit?: number | null,
+      cursor?: number | null,
+      orderBy?: string,
+      orderDirection?: GetCommentsOrderDirectionEnum,
+      commentId?: number,
+      includeUser?: boolean,
+      includeReactions?: boolean,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'threadId' is not null or undefined
+      assertParamExists('getComments', 'threadId', threadId);
+      const localVarPath = `/GetComments`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      if (limit !== undefined) {
+        localVarQueryParameter['limit'] = limit;
+      }
+
+      if (cursor !== undefined) {
+        localVarQueryParameter['cursor'] = cursor;
+      }
+
+      if (orderBy !== undefined) {
+        localVarQueryParameter['order_by'] = orderBy;
+      }
+
+      if (orderDirection !== undefined) {
+        localVarQueryParameter['order_direction'] = orderDirection;
+      }
+
+      if (threadId !== undefined) {
+        localVarQueryParameter['thread_id'] = threadId;
+      }
+
+      if (commentId !== undefined) {
+        localVarQueryParameter['comment_id'] = commentId;
+      }
+
+      if (includeUser !== undefined) {
+        localVarQueryParameter['include_user'] = includeUser;
+      }
+
+      if (includeReactions !== undefined) {
+        localVarQueryParameter['include_reactions'] = includeReactions;
+      }
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {UpdateCommentRequest} updateCommentRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateComment: async (
+      updateCommentRequest: UpdateCommentRequest,
+      address?: string,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'updateCommentRequest' is not null or undefined
+      assertParamExists(
+        'updateComment',
+        'updateCommentRequest',
+        updateCommentRequest,
+      );
+      const localVarPath = `/UpdateComment`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        updateCommentRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+  };
+};
+
+/**
+ * CommentApi - functional programming interface
+ * @export
+ */
+export const CommentApiFp = function (configuration?: Configuration) {
+  const localVarAxiosParamCreator = CommentApiAxiosParamCreator(configuration);
+  return {
+    /**
+     *
+     * @param {CreateCommentRequest} createCommentRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createComment(
+      createCommentRequest: CreateCommentRequest,
+      address?: string,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<CreateComment200Response>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createComment(
+        createCommentRequest,
+        address,
+        options,
+      );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['CommentApi.createComment']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {CreateCommentReactionRequest} createCommentReactionRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createCommentReaction(
+      createCommentReactionRequest: CreateCommentReactionRequest,
+      address?: string,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<CreateThreadReaction200Response>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.createCommentReaction(
+          createCommentReactionRequest,
+          address,
+          options,
+        );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['CommentApi.createCommentReaction']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {number} threadId
+     * @param {string} [address]
+     * @param {number | null} [limit]
+     * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
+     * @param {string} [orderBy]
+     * @param {GetCommentsOrderDirectionEnum} [orderDirection]
+     * @param {number} [commentId]
+     * @param {boolean} [includeUser]
+     * @param {boolean} [includeReactions]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getComments(
+      threadId: number,
+      address?: string,
+      limit?: number | null,
+      cursor?: number | null,
+      orderBy?: string,
+      orderDirection?: GetCommentsOrderDirectionEnum,
+      commentId?: number,
+      includeUser?: boolean,
+      includeReactions?: boolean,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<GetComments200Response>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getComments(
+        threadId,
+        address,
+        limit,
+        cursor,
+        orderBy,
+        orderDirection,
+        commentId,
+        includeUser,
+        includeReactions,
+        options,
+      );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['CommentApi.getComments']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {UpdateCommentRequest} updateCommentRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async updateComment(
+      updateCommentRequest: UpdateCommentRequest,
+      address?: string,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<CreateComment200Response>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.updateComment(
+        updateCommentRequest,
+        address,
+        options,
+      );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['CommentApi.updateComment']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+  };
+};
+
+/**
+ * CommentApi - factory interface
+ * @export
+ */
+export const CommentApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance,
+) {
+  const localVarFp = CommentApiFp(configuration);
+  return {
+    /**
+     *
+     * @param {CreateCommentRequest} createCommentRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createComment(
+      createCommentRequest: CreateCommentRequest,
+      address?: string,
+      options?: any,
+    ): AxiosPromise<CreateComment200Response> {
+      return localVarFp
+        .createComment(createCommentRequest, address, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {CreateCommentReactionRequest} createCommentReactionRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createCommentReaction(
+      createCommentReactionRequest: CreateCommentReactionRequest,
+      address?: string,
+      options?: any,
+    ): AxiosPromise<CreateThreadReaction200Response> {
+      return localVarFp
+        .createCommentReaction(createCommentReactionRequest, address, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {number} threadId
+     * @param {string} [address]
+     * @param {number | null} [limit]
+     * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
+     * @param {string} [orderBy]
+     * @param {GetCommentsOrderDirectionEnum} [orderDirection]
+     * @param {number} [commentId]
+     * @param {boolean} [includeUser]
+     * @param {boolean} [includeReactions]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getComments(
+      threadId: number,
+      address?: string,
+      limit?: number | null,
+      cursor?: number | null,
+      orderBy?: string,
+      orderDirection?: GetCommentsOrderDirectionEnum,
+      commentId?: number,
+      includeUser?: boolean,
+      includeReactions?: boolean,
+      options?: any,
+    ): AxiosPromise<GetComments200Response> {
+      return localVarFp
+        .getComments(
+          threadId,
+          address,
+          limit,
+          cursor,
+          orderBy,
+          orderDirection,
+          commentId,
+          includeUser,
+          includeReactions,
+          options,
+        )
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {UpdateCommentRequest} updateCommentRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateComment(
+      updateCommentRequest: UpdateCommentRequest,
+      address?: string,
+      options?: any,
+    ): AxiosPromise<CreateComment200Response> {
+      return localVarFp
+        .updateComment(updateCommentRequest, address, options)
+        .then((request) => request(axios, basePath));
+    },
+  };
+};
+
+/**
+ * CommentApi - object-oriented interface
+ * @export
+ * @class CommentApi
+ * @extends {BaseAPI}
+ */
+export class CommentApi extends BaseAPI {
+  /**
+   *
+   * @param {CreateCommentRequest} createCommentRequest
+   * @param {string} [address]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof CommentApi
+   */
+  public createComment(
+    createCommentRequest: CreateCommentRequest,
+    address?: string,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return CommentApiFp(this.configuration)
+      .createComment(createCommentRequest, address, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {CreateCommentReactionRequest} createCommentReactionRequest
+   * @param {string} [address]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof CommentApi
+   */
+  public createCommentReaction(
+    createCommentReactionRequest: CreateCommentReactionRequest,
+    address?: string,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return CommentApiFp(this.configuration)
+      .createCommentReaction(createCommentReactionRequest, address, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {number} threadId
+   * @param {string} [address]
+   * @param {number | null} [limit]
+   * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
+   * @param {string} [orderBy]
+   * @param {GetCommentsOrderDirectionEnum} [orderDirection]
+   * @param {number} [commentId]
+   * @param {boolean} [includeUser]
+   * @param {boolean} [includeReactions]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof CommentApi
+   */
+  public getComments(
+    threadId: number,
+    address?: string,
+    limit?: number | null,
+    cursor?: number | null,
+    orderBy?: string,
+    orderDirection?: GetCommentsOrderDirectionEnum,
+    commentId?: number,
+    includeUser?: boolean,
+    includeReactions?: boolean,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return CommentApiFp(this.configuration)
+      .getComments(
+        threadId,
+        address,
+        limit,
+        cursor,
+        orderBy,
+        orderDirection,
+        commentId,
+        includeUser,
+        includeReactions,
+        options,
+      )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {UpdateCommentRequest} updateCommentRequest
+   * @param {string} [address]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof CommentApi
+   */
+  public updateComment(
+    updateCommentRequest: UpdateCommentRequest,
+    address?: string,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return CommentApiFp(this.configuration)
+      .updateComment(updateCommentRequest, address, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+}
+
+/**
+ * @export
+ */
+export const GetCommentsOrderDirectionEnum = {
+  Asc: 'ASC',
+  Desc: 'DESC',
+} as const;
+export type GetCommentsOrderDirectionEnum =
+  (typeof GetCommentsOrderDirectionEnum)[keyof typeof GetCommentsOrderDirectionEnum];
 
 /**
  * CommunityApi - axios parameter creator
@@ -2411,30 +5130,104 @@ export const CommunityApiAxiosParamCreator = function (
   return {
     /**
      *
-     * @param {string} [addressId]
+     * @param {CreateCommunityRequest} createCommunityRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createCommunity: async (
+      createCommunityRequest: CreateCommunityRequest,
+      address?: string,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createCommunityRequest' is not null or undefined
+      assertParamExists(
+        'createCommunity',
+        'createCommunityRequest',
+        createCommunityRequest,
+      );
+      const localVarPath = `/CreateCommunity`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createCommunityRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {string} [address]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
      * @param {GetCommunitiesOrderByEnum} [orderBy]
      * @param {GetCommunitiesOrderDirectionEnum} [orderDirection]
+     * @param {GetCommunitiesRelevanceByEnum} [relevanceBy]
+     * @param {GetCommunitiesNetworkEnum} [network]
      * @param {GetCommunitiesBaseEnum} [base]
      * @param {Array<number>} [tagIds]
      * @param {boolean} [includeNodeInfo]
      * @param {boolean} [stakeEnabled]
      * @param {boolean} [hasGroups]
+     * @param {boolean} [includeLast30DayThreadCount]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     getCommunities: async (
-      addressId?: string,
+      address?: string,
       limit?: number | null,
       cursor?: number | null,
       orderBy?: GetCommunitiesOrderByEnum,
       orderDirection?: GetCommunitiesOrderDirectionEnum,
+      relevanceBy?: GetCommunitiesRelevanceByEnum,
+      network?: GetCommunitiesNetworkEnum,
       base?: GetCommunitiesBaseEnum,
       tagIds?: Array<number>,
       includeNodeInfo?: boolean,
       stakeEnabled?: boolean,
       hasGroups?: boolean,
+      includeLast30DayThreadCount?: boolean,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       const localVarPath = `/GetCommunities`;
@@ -2469,6 +5262,14 @@ export const CommunityApiAxiosParamCreator = function (
         localVarQueryParameter['order_direction'] = orderDirection;
       }
 
+      if (relevanceBy !== undefined) {
+        localVarQueryParameter['relevance_by'] = relevanceBy;
+      }
+
+      if (network !== undefined) {
+        localVarQueryParameter['network'] = network;
+      }
+
       if (base !== undefined) {
         localVarQueryParameter['base'] = base;
       }
@@ -2489,8 +5290,13 @@ export const CommunityApiAxiosParamCreator = function (
         localVarQueryParameter['has_groups'] = hasGroups;
       }
 
-      if (addressId != null) {
-        localVarHeaderParameter['address_id'] = String(addressId);
+      if (includeLast30DayThreadCount !== undefined) {
+        localVarQueryParameter['include_last_30_day_thread_count'] =
+          includeLast30DayThreadCount;
+      }
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -2510,14 +5316,14 @@ export const CommunityApiAxiosParamCreator = function (
     /**
      *
      * @param {string} id
-     * @param {string} [addressId]
+     * @param {string} [address]
      * @param {boolean} [includeNodeInfo]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     getCommunity: async (
       id: string,
-      addressId?: string,
+      address?: string,
       includeNodeInfo?: boolean,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
@@ -2547,8 +5353,8 @@ export const CommunityApiAxiosParamCreator = function (
         localVarQueryParameter['include_node_info'] = includeNodeInfo;
       }
 
-      if (addressId != null) {
-        localVarHeaderParameter['address_id'] = String(addressId);
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -2568,7 +5374,7 @@ export const CommunityApiAxiosParamCreator = function (
     /**
      *
      * @param {string} communityId
-     * @param {string} [addressId]
+     * @param {string} [address]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
      * @param {GetMembersOrderByEnum} [orderBy]
@@ -2584,7 +5390,7 @@ export const CommunityApiAxiosParamCreator = function (
      */
     getMembers: async (
       communityId: string,
-      addressId?: string,
+      address?: string,
       limit?: number | null,
       cursor?: number | null,
       orderBy?: GetMembersOrderByEnum,
@@ -2661,8 +5467,8 @@ export const CommunityApiAxiosParamCreator = function (
         localVarQueryParameter['allowedAddresses'] = allowedAddresses;
       }
 
-      if (addressId != null) {
-        localVarHeaderParameter['address_id'] = String(addressId);
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -2692,30 +5498,71 @@ export const CommunityApiFp = function (configuration?: Configuration) {
   return {
     /**
      *
-     * @param {string} [addressId]
+     * @param {CreateCommunityRequest} createCommunityRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createCommunity(
+      createCommunityRequest: CreateCommunityRequest,
+      address?: string,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<CreateCommunity200Response>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createCommunity(
+        createCommunityRequest,
+        address,
+        options,
+      );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['CommunityApi.createCommunity']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {string} [address]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
      * @param {GetCommunitiesOrderByEnum} [orderBy]
      * @param {GetCommunitiesOrderDirectionEnum} [orderDirection]
+     * @param {GetCommunitiesRelevanceByEnum} [relevanceBy]
+     * @param {GetCommunitiesNetworkEnum} [network]
      * @param {GetCommunitiesBaseEnum} [base]
      * @param {Array<number>} [tagIds]
      * @param {boolean} [includeNodeInfo]
      * @param {boolean} [stakeEnabled]
      * @param {boolean} [hasGroups]
+     * @param {boolean} [includeLast30DayThreadCount]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async getCommunities(
-      addressId?: string,
+      address?: string,
       limit?: number | null,
       cursor?: number | null,
       orderBy?: GetCommunitiesOrderByEnum,
       orderDirection?: GetCommunitiesOrderDirectionEnum,
+      relevanceBy?: GetCommunitiesRelevanceByEnum,
+      network?: GetCommunitiesNetworkEnum,
       base?: GetCommunitiesBaseEnum,
       tagIds?: Array<number>,
       includeNodeInfo?: boolean,
       stakeEnabled?: boolean,
       hasGroups?: boolean,
+      includeLast30DayThreadCount?: boolean,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (
@@ -2724,16 +5571,19 @@ export const CommunityApiFp = function (configuration?: Configuration) {
       ) => AxiosPromise<GetCommunities200Response>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getCommunities(
-        addressId,
+        address,
         limit,
         cursor,
         orderBy,
         orderDirection,
+        relevanceBy,
+        network,
         base,
         tagIds,
         includeNodeInfo,
         stakeEnabled,
         hasGroups,
+        includeLast30DayThreadCount,
         options,
       );
       const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
@@ -2752,14 +5602,14 @@ export const CommunityApiFp = function (configuration?: Configuration) {
     /**
      *
      * @param {string} id
-     * @param {string} [addressId]
+     * @param {string} [address]
      * @param {boolean} [includeNodeInfo]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async getCommunity(
       id: string,
-      addressId?: string,
+      address?: string,
       includeNodeInfo?: boolean,
       options?: RawAxiosRequestConfig,
     ): Promise<
@@ -2770,7 +5620,7 @@ export const CommunityApiFp = function (configuration?: Configuration) {
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getCommunity(
         id,
-        addressId,
+        address,
         includeNodeInfo,
         options,
       );
@@ -2790,7 +5640,7 @@ export const CommunityApiFp = function (configuration?: Configuration) {
     /**
      *
      * @param {string} communityId
-     * @param {string} [addressId]
+     * @param {string} [address]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
      * @param {GetMembersOrderByEnum} [orderBy]
@@ -2806,7 +5656,7 @@ export const CommunityApiFp = function (configuration?: Configuration) {
      */
     async getMembers(
       communityId: string,
-      addressId?: string,
+      address?: string,
       limit?: number | null,
       cursor?: number | null,
       orderBy?: GetMembersOrderByEnum,
@@ -2826,7 +5676,7 @@ export const CommunityApiFp = function (configuration?: Configuration) {
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getMembers(
         communityId,
-        addressId,
+        address,
         limit,
         cursor,
         orderBy,
@@ -2868,44 +5718,69 @@ export const CommunityApiFactory = function (
   return {
     /**
      *
-     * @param {string} [addressId]
+     * @param {CreateCommunityRequest} createCommunityRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createCommunity(
+      createCommunityRequest: CreateCommunityRequest,
+      address?: string,
+      options?: any,
+    ): AxiosPromise<CreateCommunity200Response> {
+      return localVarFp
+        .createCommunity(createCommunityRequest, address, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} [address]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
      * @param {GetCommunitiesOrderByEnum} [orderBy]
      * @param {GetCommunitiesOrderDirectionEnum} [orderDirection]
+     * @param {GetCommunitiesRelevanceByEnum} [relevanceBy]
+     * @param {GetCommunitiesNetworkEnum} [network]
      * @param {GetCommunitiesBaseEnum} [base]
      * @param {Array<number>} [tagIds]
      * @param {boolean} [includeNodeInfo]
      * @param {boolean} [stakeEnabled]
      * @param {boolean} [hasGroups]
+     * @param {boolean} [includeLast30DayThreadCount]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     getCommunities(
-      addressId?: string,
+      address?: string,
       limit?: number | null,
       cursor?: number | null,
       orderBy?: GetCommunitiesOrderByEnum,
       orderDirection?: GetCommunitiesOrderDirectionEnum,
+      relevanceBy?: GetCommunitiesRelevanceByEnum,
+      network?: GetCommunitiesNetworkEnum,
       base?: GetCommunitiesBaseEnum,
       tagIds?: Array<number>,
       includeNodeInfo?: boolean,
       stakeEnabled?: boolean,
       hasGroups?: boolean,
+      includeLast30DayThreadCount?: boolean,
       options?: any,
     ): AxiosPromise<GetCommunities200Response> {
       return localVarFp
         .getCommunities(
-          addressId,
+          address,
           limit,
           cursor,
           orderBy,
           orderDirection,
+          relevanceBy,
+          network,
           base,
           tagIds,
           includeNodeInfo,
           stakeEnabled,
           hasGroups,
+          includeLast30DayThreadCount,
           options,
         )
         .then((request) => request(axios, basePath));
@@ -2913,25 +5788,25 @@ export const CommunityApiFactory = function (
     /**
      *
      * @param {string} id
-     * @param {string} [addressId]
+     * @param {string} [address]
      * @param {boolean} [includeNodeInfo]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     getCommunity(
       id: string,
-      addressId?: string,
+      address?: string,
       includeNodeInfo?: boolean,
       options?: any,
     ): AxiosPromise<GetCommunity200Response> {
       return localVarFp
-        .getCommunity(id, addressId, includeNodeInfo, options)
+        .getCommunity(id, address, includeNodeInfo, options)
         .then((request) => request(axios, basePath));
     },
     /**
      *
      * @param {string} communityId
-     * @param {string} [addressId]
+     * @param {string} [address]
      * @param {number | null} [limit]
      * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
      * @param {GetMembersOrderByEnum} [orderBy]
@@ -2947,7 +5822,7 @@ export const CommunityApiFactory = function (
      */
     getMembers(
       communityId: string,
-      addressId?: string,
+      address?: string,
       limit?: number | null,
       cursor?: number | null,
       orderBy?: GetMembersOrderByEnum,
@@ -2963,7 +5838,7 @@ export const CommunityApiFactory = function (
       return localVarFp
         .getMembers(
           communityId,
-          addressId,
+          address,
           limit,
           cursor,
           orderBy,
@@ -2990,45 +5865,72 @@ export const CommunityApiFactory = function (
 export class CommunityApi extends BaseAPI {
   /**
    *
-   * @param {string} [addressId]
+   * @param {CreateCommunityRequest} createCommunityRequest
+   * @param {string} [address]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof CommunityApi
+   */
+  public createCommunity(
+    createCommunityRequest: CreateCommunityRequest,
+    address?: string,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return CommunityApiFp(this.configuration)
+      .createCommunity(createCommunityRequest, address, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} [address]
    * @param {number | null} [limit]
    * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
    * @param {GetCommunitiesOrderByEnum} [orderBy]
    * @param {GetCommunitiesOrderDirectionEnum} [orderDirection]
+   * @param {GetCommunitiesRelevanceByEnum} [relevanceBy]
+   * @param {GetCommunitiesNetworkEnum} [network]
    * @param {GetCommunitiesBaseEnum} [base]
    * @param {Array<number>} [tagIds]
    * @param {boolean} [includeNodeInfo]
    * @param {boolean} [stakeEnabled]
    * @param {boolean} [hasGroups]
+   * @param {boolean} [includeLast30DayThreadCount]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof CommunityApi
    */
   public getCommunities(
-    addressId?: string,
+    address?: string,
     limit?: number | null,
     cursor?: number | null,
     orderBy?: GetCommunitiesOrderByEnum,
     orderDirection?: GetCommunitiesOrderDirectionEnum,
+    relevanceBy?: GetCommunitiesRelevanceByEnum,
+    network?: GetCommunitiesNetworkEnum,
     base?: GetCommunitiesBaseEnum,
     tagIds?: Array<number>,
     includeNodeInfo?: boolean,
     stakeEnabled?: boolean,
     hasGroups?: boolean,
+    includeLast30DayThreadCount?: boolean,
     options?: RawAxiosRequestConfig,
   ) {
     return CommunityApiFp(this.configuration)
       .getCommunities(
-        addressId,
+        address,
         limit,
         cursor,
         orderBy,
         orderDirection,
+        relevanceBy,
+        network,
         base,
         tagIds,
         includeNodeInfo,
         stakeEnabled,
         hasGroups,
+        includeLast30DayThreadCount,
         options,
       )
       .then((request) => request(this.axios, this.basePath));
@@ -3037,7 +5939,7 @@ export class CommunityApi extends BaseAPI {
   /**
    *
    * @param {string} id
-   * @param {string} [addressId]
+   * @param {string} [address]
    * @param {boolean} [includeNodeInfo]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
@@ -3045,19 +5947,19 @@ export class CommunityApi extends BaseAPI {
    */
   public getCommunity(
     id: string,
-    addressId?: string,
+    address?: string,
     includeNodeInfo?: boolean,
     options?: RawAxiosRequestConfig,
   ) {
     return CommunityApiFp(this.configuration)
-      .getCommunity(id, addressId, includeNodeInfo, options)
+      .getCommunity(id, address, includeNodeInfo, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
   /**
    *
    * @param {string} communityId
-   * @param {string} [addressId]
+   * @param {string} [address]
    * @param {number | null} [limit]
    * @param {number | null} [cursor] required for tRPC useInfiniteQuery hook, equivalent to page number
    * @param {GetMembersOrderByEnum} [orderBy]
@@ -3074,7 +5976,7 @@ export class CommunityApi extends BaseAPI {
    */
   public getMembers(
     communityId: string,
-    addressId?: string,
+    address?: string,
     limit?: number | null,
     cursor?: number | null,
     orderBy?: GetMembersOrderByEnum,
@@ -3090,7 +5992,7 @@ export class CommunityApi extends BaseAPI {
     return CommunityApiFp(this.configuration)
       .getMembers(
         communityId,
-        addressId,
+        address,
         limit,
         cursor,
         orderBy,
@@ -3112,10 +6014,11 @@ export class CommunityApi extends BaseAPI {
  */
 export const GetCommunitiesOrderByEnum = {
   ProfileCount: 'profile_count',
-  ThreadCount: 'lifetime_thread_count',
+  LifetimeThreadCount: 'lifetime_thread_count',
+  Last30DayThreadCount: 'last_30_day_thread_count',
 } as const;
 export type GetCommunitiesOrderByEnum =
-  typeof GetCommunitiesOrderByEnum[keyof typeof GetCommunitiesOrderByEnum];
+  (typeof GetCommunitiesOrderByEnum)[keyof typeof GetCommunitiesOrderByEnum];
 /**
  * @export
  */
@@ -3124,7 +6027,38 @@ export const GetCommunitiesOrderDirectionEnum = {
   Desc: 'DESC',
 } as const;
 export type GetCommunitiesOrderDirectionEnum =
-  typeof GetCommunitiesOrderDirectionEnum[keyof typeof GetCommunitiesOrderDirectionEnum];
+  (typeof GetCommunitiesOrderDirectionEnum)[keyof typeof GetCommunitiesOrderDirectionEnum];
+/**
+ * @export
+ */
+export const GetCommunitiesRelevanceByEnum = {
+  TagIds: 'tag_ids',
+  Membership: 'membership',
+} as const;
+export type GetCommunitiesRelevanceByEnum =
+  (typeof GetCommunitiesRelevanceByEnum)[keyof typeof GetCommunitiesRelevanceByEnum];
+/**
+ * @export
+ */
+export const GetCommunitiesNetworkEnum = {
+  Ethereum: 'ethereum',
+  Erc20: 'erc20',
+  Erc721: 'erc721',
+  Erc1155: 'erc1155',
+  Edgeware: 'edgeware',
+  Osmosis: 'osmosis',
+  Injective: 'injective',
+  Solana: 'solana',
+  Terra: 'terra',
+  Near: 'near',
+  Stargaze: 'stargaze',
+  Compound: 'compound',
+  Evmos: 'evmos',
+  Kava: 'kava',
+  Kyve: 'kyve',
+} as const;
+export type GetCommunitiesNetworkEnum =
+  (typeof GetCommunitiesNetworkEnum)[keyof typeof GetCommunitiesNetworkEnum];
 /**
  * @export
  */
@@ -3136,7 +6070,7 @@ export const GetCommunitiesBaseEnum = {
   Solana: 'solana',
 } as const;
 export type GetCommunitiesBaseEnum =
-  typeof GetCommunitiesBaseEnum[keyof typeof GetCommunitiesBaseEnum];
+  (typeof GetCommunitiesBaseEnum)[keyof typeof GetCommunitiesBaseEnum];
 /**
  * @export
  */
@@ -3145,7 +6079,7 @@ export const GetMembersOrderByEnum = {
   Name: 'name',
 } as const;
 export type GetMembersOrderByEnum =
-  typeof GetMembersOrderByEnum[keyof typeof GetMembersOrderByEnum];
+  (typeof GetMembersOrderByEnum)[keyof typeof GetMembersOrderByEnum];
 /**
  * @export
  */
@@ -3154,4 +6088,322 @@ export const GetMembersOrderDirectionEnum = {
   Desc: 'DESC',
 } as const;
 export type GetMembersOrderDirectionEnum =
-  typeof GetMembersOrderDirectionEnum[keyof typeof GetMembersOrderDirectionEnum];
+  (typeof GetMembersOrderDirectionEnum)[keyof typeof GetMembersOrderDirectionEnum];
+
+/**
+ * ThreadApi - axios parameter creator
+ * @export
+ */
+export const ThreadApiAxiosParamCreator = function (
+  configuration?: Configuration,
+) {
+  return {
+    /**
+     *
+     * @param {CreateThreadRequest} createThreadRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createThread: async (
+      createThreadRequest: CreateThreadRequest,
+      address?: string,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createThreadRequest' is not null or undefined
+      assertParamExists(
+        'createThread',
+        'createThreadRequest',
+        createThreadRequest,
+      );
+      const localVarPath = `/CreateThread`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createThreadRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {CreateThreadReactionRequest} createThreadReactionRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createThreadReaction: async (
+      createThreadReactionRequest: CreateThreadReactionRequest,
+      address?: string,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createThreadReactionRequest' is not null or undefined
+      assertParamExists(
+        'createThreadReaction',
+        'createThreadReactionRequest',
+        createThreadReactionRequest,
+      );
+      const localVarPath = `/CreateThreadReaction`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication oauth2 required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        'oauth2',
+        [],
+        configuration,
+      );
+
+      if (address != null) {
+        localVarHeaderParameter['address'] = String(address);
+      }
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createThreadReactionRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+  };
+};
+
+/**
+ * ThreadApi - functional programming interface
+ * @export
+ */
+export const ThreadApiFp = function (configuration?: Configuration) {
+  const localVarAxiosParamCreator = ThreadApiAxiosParamCreator(configuration);
+  return {
+    /**
+     *
+     * @param {CreateThreadRequest} createThreadRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createThread(
+      createThreadRequest: CreateThreadRequest,
+      address?: string,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<CreateThread200Response>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createThread(
+        createThreadRequest,
+        address,
+        options,
+      );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['ThreadApi.createThread']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {CreateThreadReactionRequest} createThreadReactionRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createThreadReaction(
+      createThreadReactionRequest: CreateThreadReactionRequest,
+      address?: string,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<CreateThreadReaction200Response>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.createThreadReaction(
+          createThreadReactionRequest,
+          address,
+          options,
+        );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap['ThreadApi.createThreadReaction']?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+  };
+};
+
+/**
+ * ThreadApi - factory interface
+ * @export
+ */
+export const ThreadApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance,
+) {
+  const localVarFp = ThreadApiFp(configuration);
+  return {
+    /**
+     *
+     * @param {CreateThreadRequest} createThreadRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createThread(
+      createThreadRequest: CreateThreadRequest,
+      address?: string,
+      options?: any,
+    ): AxiosPromise<CreateThread200Response> {
+      return localVarFp
+        .createThread(createThreadRequest, address, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {CreateThreadReactionRequest} createThreadReactionRequest
+     * @param {string} [address]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createThreadReaction(
+      createThreadReactionRequest: CreateThreadReactionRequest,
+      address?: string,
+      options?: any,
+    ): AxiosPromise<CreateThreadReaction200Response> {
+      return localVarFp
+        .createThreadReaction(createThreadReactionRequest, address, options)
+        .then((request) => request(axios, basePath));
+    },
+  };
+};
+
+/**
+ * ThreadApi - object-oriented interface
+ * @export
+ * @class ThreadApi
+ * @extends {BaseAPI}
+ */
+export class ThreadApi extends BaseAPI {
+  /**
+   *
+   * @param {CreateThreadRequest} createThreadRequest
+   * @param {string} [address]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ThreadApi
+   */
+  public createThread(
+    createThreadRequest: CreateThreadRequest,
+    address?: string,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return ThreadApiFp(this.configuration)
+      .createThread(createThreadRequest, address, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {CreateThreadReactionRequest} createThreadReactionRequest
+   * @param {string} [address]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ThreadApi
+   */
+  public createThreadReaction(
+    createThreadReactionRequest: CreateThreadReactionRequest,
+    address?: string,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return ThreadApiFp(this.configuration)
+      .createThreadReaction(createThreadReactionRequest, address, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+}

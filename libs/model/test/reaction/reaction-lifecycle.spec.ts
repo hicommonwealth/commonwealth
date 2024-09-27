@@ -53,7 +53,6 @@ describe('Reactions lifecycle', () => {
         deleted_at: undefined, // so we can find it!
         pinned: false,
         read_only: false,
-        version_history: [],
       },
       //{ mock: true, log: true },
     );
@@ -68,7 +67,7 @@ describe('Reactions lifecycle', () => {
       thread_id: threadId,
       reaction: 'like',
       canvas_signed_data: '',
-      canvas_hash: '',
+      canvas_msg_id: '',
       calculated_voting_weight: 0,
     });
 

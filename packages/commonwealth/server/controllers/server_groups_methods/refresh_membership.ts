@@ -54,7 +54,7 @@ export async function __refreshMembership(
   const topics = await this.models.Topic.findAll({
     where: {
       group_ids: {
-        [Op.overlap]: groups.map((g) => g.id),
+        [Op.overlap]: groups.map((g) => g.id!),
       },
     },
     attributes: ['id', 'group_ids'],
@@ -64,8 +64,7 @@ export async function __refreshMembership(
   const results = memberships.map((membership) => ({
     groupId: membership.group_id,
     topicIds: topics
-      // @ts-expect-error StrictNullChecks
-      .filter((t) => t.group_ids.includes(membership.group_id))
+      .filter((t) => t.group_ids!.includes(membership.group_id))
       .map((t) => t.id),
     allowed: !membership.reject_reason,
     rejectReason: membership.reject_reason,

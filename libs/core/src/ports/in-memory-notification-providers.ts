@@ -9,6 +9,7 @@ export function SpyNotificationsProvider(
     getSchedulesStub?: sinon.SinonStub;
     createSchedulesStub?: sinon.SinonStub;
     deleteSchedulesStub?: sinon.SinonStub;
+    identifyUserStub?: sinon.SinonStub;
     registerClientRegistrationToken?: sinon.SinonStub;
     unregisterClientRegistrationToken?: sinon.SinonStub;
   },
@@ -17,8 +18,7 @@ export function SpyNotificationsProvider(
     name: 'SpyNotificationsProvider',
     dispose: sandbox.stub().returns(Promise.resolve()),
     triggerWorkflow:
-      stubs?.triggerWorkflowStub ||
-      sandbox.stub().returns(Promise.resolve(true)),
+      stubs?.triggerWorkflowStub || sandbox.stub().returns(Promise.resolve([])),
     getMessages:
       stubs?.getMessagesStub || sandbox.stub().returns(Promise.resolve([])),
     getSchedules:
@@ -27,6 +27,9 @@ export function SpyNotificationsProvider(
       stubs?.createSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
     deleteSchedules:
       stubs?.deleteSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+    identifyUser:
+      stubs?.identifyUserStub ||
+      sandbox.stub().returns(Promise.resolve({ id: '' })),
     registerClientRegistrationToken:
       stubs?.registerClientRegistrationToken ||
       sandbox.stub().returns(Promise.resolve(true)),
@@ -46,6 +49,7 @@ export function ThrowingSpyNotificationsProvider(
     getSchedulesStub?: sinon.SinonStub;
     createSchedulesStub?: sinon.SinonStub;
     deleteSchedulesStub?: sinon.SinonStub;
+    identifyUserStub?: sinon.SinonStub;
     registerClientRegistrationToken?: sinon.SinonStub;
     unregisterClientRegistrationToken?: sinon.SinonStub;
   },
@@ -63,6 +67,8 @@ export function ThrowingSpyNotificationsProvider(
       stubs?.createSchedulesStub || sandbox.stub().rejects(ProviderError),
     deleteSchedules:
       stubs?.deleteSchedulesStub || sandbox.stub().rejects(ProviderError),
+    identifyUser:
+      stubs?.identifyUserStub || sandbox.stub().rejects(ProviderError),
     registerClientRegistrationToken:
       stubs?.registerClientRegistrationToken ||
       sandbox.stub().rejects(ProviderError),

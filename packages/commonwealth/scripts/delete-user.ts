@@ -18,12 +18,6 @@ async function deleteUser(user_id: number) {
       },
       transaction,
     });
-    await models.NotificationsRead.destroy({
-      where: {
-        user_id,
-      },
-      transaction,
-    });
     await models.StarredCommunity.destroy({
       where: {
         user_id,
@@ -39,12 +33,6 @@ async function deleteUser(user_id: number) {
     await models.ThreadSubscription.destroy({
       where: {
         user_id,
-      },
-      transaction,
-    });
-    await models.Subscription.destroy({
-      where: {
-        subscriber_id: user_id,
       },
       transaction,
     });

@@ -69,6 +69,27 @@ export async function seed<T extends schemas.Aggregates>(
   return [records.at(0) as any, records];
 }
 
+/**
+ * Seeds multiple aggregates and returns record indexed by keys
+ */
+export async function seedRecord<T extends schemas.Aggregates, K>(
+  name: T,
+  keys: Readonly<Array<keyof K>>,
+  valuesFn: (key: keyof K) => DeepPartial<z.infer<(typeof schemas)[T]>>,
+): Promise<Record<keyof K, z.infer<(typeof schemas)[T]>>> {
+  const values = await Promise.all(
+    keys.map(async (key) => {
+      const [value] = await seed(name, valuesFn(key));
+      return [key, value];
+    }),
+  );
+  return values.reduce(
+    (record, [key, value]) =>
+      Object.assign(record, { [key!.toString()]: value }),
+    {} as Record<keyof K, z.infer<(typeof schemas)[T]>>,
+  );
+}
+
 async function _seed(
   model: ModelStatic<Model>,
   values: State,

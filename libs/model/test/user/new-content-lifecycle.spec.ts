@@ -73,7 +73,6 @@ describe('New Content lifecycle', () => {
       community_id: address1.community_id,
       pinned: false,
       read_only: false,
-      version_history: [],
       body: 'Sample 1',
     });
     await seed('Thread', {
@@ -81,7 +80,6 @@ describe('New Content lifecycle', () => {
       community_id: address1.community_id,
       pinned: false,
       read_only: false,
-      version_history: [],
       body: 'Sample 2',
     });
 

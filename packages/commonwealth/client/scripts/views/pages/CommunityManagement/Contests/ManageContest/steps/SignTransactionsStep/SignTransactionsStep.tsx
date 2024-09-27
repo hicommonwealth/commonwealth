@@ -76,8 +76,8 @@ const SignTransactionsStep = ({
   const devContest = useFlag('contestDev');
 
   const signTransaction = async () => {
-    const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
-    const chainRpc = app?.chain?.meta?.ChainNode?.url;
+    const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+    const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
       ? ONE_HOUR_IN_SECONDS
@@ -142,7 +142,7 @@ const SignTransactionsStep = ({
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
-        id: app.activeChainId(),
+        id: app.activeChainId() || '',
         image_url: contestFormData?.contestImage,
         funding_token_address: exchangeToken,
         prize_percentage: isContestRecurring
@@ -152,7 +152,7 @@ const SignTransactionsStep = ({
         interval: isContestRecurring ? contestInterval : 0,
         topic_ids: contestFormData?.toggledTopicList
           .filter((t) => t.checked)
-          .map((t) => t.id),
+          .map((t) => t.id!),
       });
 
       onSetLaunchContestStep('ContestLive');

@@ -117,13 +117,20 @@ export function buildPaginatedResponse<T>(
   options: {
     limit?: number;
     offset?: number;
+    cursor?: number;
   },
 ): TypedPaginatedResult<T> {
   const limit = options.limit || 10;
+  let page;
+  if (options.offset !== undefined) {
+    page = Math.floor(options.offset! / limit) + 1;
+  } else {
+    page = Math.floor(options.cursor! / limit) + 1;
+  }
   return {
     results: items,
     limit: options.limit!,
-    page: Math.floor(options.offset! / limit) + 1,
+    page,
     // account for off-by-one-error if final page would be empty when adding 1
     totalPages:
       Math.floor(totalResults / limit) + (totalResults % limit === 0 ? 0 : 1),

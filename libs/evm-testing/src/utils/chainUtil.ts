@@ -1,10 +1,12 @@
+import { config } from '@hicommonwealth/model';
 import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
 import Web3 from 'web3';
-import { config } from '../config';
 import getProvider from './getProvider';
 
 export async function advanceTime(seconds: number, blocks = 1) {
-  const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+  const provider = new Web3.providers.HttpProvider(
+    config.TEST_EVM.PROVIDER_URL,
+  );
 
   const web3 = getProvider();
   let block = await web3.eth.getBlock('latest');
@@ -32,7 +34,9 @@ export async function advanceTime(seconds: number, blocks = 1) {
 }
 
 export async function mineBlocks(blocks: number) {
-  const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
+  const provider = new Web3.providers.HttpProvider(
+    config.TEST_EVM.PROVIDER_URL,
+  );
 
   // mine blocks
   const res = await provider.request({
@@ -55,8 +59,8 @@ export async function getAnvil(
 ): Promise<Anvil> {
   const anvil = createAnvil({
     forkUrl: protocolFork
-      ? `https://base-sepolia.g.alchemy.com/v2/${config.EVM.BASESEP_ALCHEMY_API_KEY}`
-      : `https://eth-mainnet.g.alchemy.com/v2/${config.EVM.ETH_ALCHEMY_API_KEY}`,
+      ? `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`
+      : `https://eth-mainnet.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`,
     silent: false,
     port: 8545,
     autoImpersonate: true,

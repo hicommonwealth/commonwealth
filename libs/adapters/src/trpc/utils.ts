@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { Request, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import { OpenAPIV3 } from 'openapi-types';
 import swaggerUi from 'swagger-ui-express';
 import {
@@ -14,19 +14,28 @@ import {
 const log = logger(import.meta);
 
 const logError = (path: string | undefined, error: TRPCError) => {
-  const msg = `${error.code}: [${error.cause?.name ?? error.name}] ${path}: ${
-    error.cause?.message ?? error.message
-  }`;
+  const errorName = error.cause?.name ?? error.name;
+  const errorMessage = error.cause?.message ?? error.message;
+  const msg = `${error.code}: [${errorName}] ${path}: ${errorMessage}`;
+  const issues =
+    error.cause && 'issues' in error.cause && Array.isArray(error.cause.issues)
+      ? error.cause.issues.map((i) => i.code)
+      : [];
+  const fingerprint = [error.code, errorName, path, ...issues].join('-');
+
   error.code === 'INTERNAL_SERVER_ERROR'
-    ? log.error(msg, error.cause)
-    : log.warn(msg);
+    ? log.error(msg, error.cause, { fingerprint })
+    : log.warn(msg, { fingerprint });
 };
 
 // used for TRPC like routes (Internal)
 export const toExpress = (router: OpenApiRouter) =>
   createExpressMiddleware({
     router,
-    createContext: ({ req }: { req: Request }) => ({ req }),
+    createContext: ({ req, res }: { req: Request; res: Response }) => ({
+      req,
+      res,
+    }),
     onError: ({ path, error }) => logError(path, error),
   });
 
@@ -34,7 +43,10 @@ export const toExpress = (router: OpenApiRouter) =>
 const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
-    createContext: ({ req }: { req: Request }) => ({ req }),
+    createContext: ({ req, res }: { req: Request; res: Response }) => ({
+      req,
+      res,
+    }),
     onError: ({ path, error }: { path: string; error: TRPCError }) =>
       logError(path, error),
     responseMeta: undefined,

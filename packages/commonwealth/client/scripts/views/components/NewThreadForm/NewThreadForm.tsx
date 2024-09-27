@@ -1,10 +1,11 @@
+import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -52,17 +53,18 @@ export const NewThreadForm = () => {
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
-  const { isAddedToHomeScreen } = useAppStatus();
+  useAppStatus();
 
+  const communityId = app.activeChainId() || '';
   const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeContestData: contestsEnabled,
+    apiEnabled: !!communityId,
   });
 
   const { isContestAvailable } = useCommunityContests();
 
   const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
-  const communityId = app.chain.id;
   const hasTopics = sortedTopics?.length;
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
   const topicsForSelector = hasTopics ? sortedTopics : [];
@@ -87,6 +89,7 @@ export const NewThreadForm = () => {
   const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
 
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const contestTopicError = threadTopic?.activeContestManagers?.length
     ? threadTopic?.activeContestManagers
@@ -103,21 +106,22 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeTopics: true,
+    enabled: !!communityId,
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
+    communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
-    communityId: app.activeChainId(),
+    communityId,
   });
 
-  const chainRpc = app?.chain?.meta?.ChainNode?.url;
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
 
   const { data: userEthBalance } = useGetUserEthBalanceQuery({
     chainRpc,
@@ -135,12 +139,15 @@ export const NewThreadForm = () => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
 
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    membership.topicIds.includes(threadTopic?.id),
+  const isTopicGated = !!(memberships || []).find(
+    (membership) =>
+      threadTopic?.id && membership.topicIds.includes(threadTopic.id),
   );
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      membership.topicIds.includes(threadTopic?.id) && membership.isAllowed,
+      threadTopic?.id &&
+      membership.topicIds.includes(threadTopic?.id) &&
+      membership.isAllowed,
   );
   const gatedGroupNames = groups
     .filter((group) =>
@@ -172,20 +179,19 @@ export const NewThreadForm = () => {
     setIsSaving(true);
 
     try {
-      const thread = await createThread({
+      const input = await buildCreateThreadInput({
         address: user.activeAccount?.address || '',
         kind: threadKind,
-        stage: app.chain.meta?.customStages
-          ? parseCustomStages(app.chain.meta?.customStages)[0]
+        stage: app.chain.meta?.custom_stages
+          ? parseCustomStages(app.chain.meta?.custom_stages)[0]
           : ThreadStage.Discussion,
-        communityId: app.activeChainId(),
+        communityId,
         title: threadTitle,
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        authorProfile: user.activeAccount?.profile as MinimumProfile,
-        isPWA: isAddedToHomeScreen,
       });
+      const thread = await createThread(input);
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
@@ -193,6 +199,7 @@ export const NewThreadForm = () => {
       navigate(`/discussion/${thread.id}`);
     } catch (err) {
       if (err instanceof SessionKeyError) {
+        checkForSessionKeyRevalidationErrors(err);
         return;
       }
 
@@ -203,7 +210,7 @@ export const NewThreadForm = () => {
         return;
       }
 
-      console.error(err.response.data.error || err?.message);
+      console.error(err?.message);
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
@@ -359,7 +366,7 @@ export const NewThreadForm = () => {
 
               <MessageRow
                 hasFeedback={walletBalanceError}
-                statusMessage={`Ensure that your connected wallet has at least 
+                statusMessage={`Ensure that your connected wallet has at least
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"
               />

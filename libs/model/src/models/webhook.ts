@@ -1,17 +1,9 @@
-import { WebhookCategory } from '@hicommonwealth/shared';
+import { Webhook } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import type { CommunityAttributes } from './community';
+import z from 'zod';
 import type { ModelInstance } from './types';
 
-export type WebhookAttributes = {
-  url: string;
-  categories: WebhookCategory[];
-  id?: number;
-  community_id: string;
-  created_at?: Date;
-  updated_at?: Date;
-  Community?: CommunityAttributes;
-};
+export type WebhookAttributes = z.infer<typeof Webhook>;
 
 export type WebhookInstance = ModelInstance<WebhookAttributes>;
 
@@ -27,8 +19,9 @@ export default (
         primaryKey: true,
       },
       url: { type: Sequelize.STRING, allowNull: false },
+      destination: { type: Sequelize.STRING, allowNull: false },
       community_id: { type: Sequelize.STRING, allowNull: false },
-      categories: {
+      events: {
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: [],

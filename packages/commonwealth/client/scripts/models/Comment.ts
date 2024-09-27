@@ -1,10 +1,18 @@
-import { VersionHistory } from 'models/Thread';
+import { getDecodedString } from '@hicommonwealth/shared';
 import type momentType from 'moment';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import AddressInfo from './AddressInfo';
 import type { IUniqueId } from './interfaces';
 import { addressToUserProfile, UserProfile } from './MinimumProfile';
 import Reaction from './Reaction';
+
+export interface CommentVersionHistory {
+  id: number;
+  thread_id: number;
+  address: string;
+  body: string;
+  timestamp: Moment;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class Comment<T extends IUniqueId> {
@@ -20,7 +28,7 @@ export class Comment<T extends IUniqueId> {
   public readonly authorChain?: string;
   public readonly parentComment: number;
   public readonly threadId: number;
-  public readonly versionHistory: VersionHistory[];
+  public readonly versionHistory: CommentVersionHistory[];
   public readonly lastEdited: string;
   public markedAsSpamAt: momentType.Moment;
   public readonly deleted: boolean;
@@ -28,7 +36,7 @@ export class Comment<T extends IUniqueId> {
   public readonly parentId: number;
 
   public readonly canvasSignedData: string;
-  public readonly canvasHash: string;
+  public readonly canvasMsgId: string;
   public readonly discord_meta: any;
 
   public readonly profile: UserProfile;
@@ -39,7 +47,6 @@ export class Comment<T extends IUniqueId> {
     author,
     community_id,
     Address,
-    Thread,
     thread_id,
     parent_id,
     plaintext,
@@ -50,34 +57,15 @@ export class Comment<T extends IUniqueId> {
     authorChain,
     last_edited,
     canvas_signed_data,
-    canvas_hash,
-    version_history,
+    canvas_msg_id,
+    CommentVersionHistories,
     marked_as_spam_at,
     discord_meta,
   }) {
-    const versionHistory = version_history
-      ? version_history.map((v) => {
-          if (!v) return;
-          let history;
-          try {
-            history = JSON.parse(v || '{}');
-            history.author =
-              typeof history.author === 'string'
-                ? JSON.parse(history.author)
-                : typeof history.author === 'object'
-                ? history.author
-                : null;
-            history.timestamp = moment(history.timestamp);
-          } catch (e) {
-            console.log(e);
-          }
-          return history;
-        })
-      : [];
-
-    this.communityId = community_id ?? Thread?.community_id;
+    const versionHistory = CommentVersionHistories;
+    this.communityId = community_id;
     this.author = Address?.address || author;
-    this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
+    this.text = deleted_at?.length > 0 ? '[deleted]' : getDecodedString(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
     this.versionHistory = versionHistory;
     this.threadId = thread_id;
@@ -89,13 +77,13 @@ export class Comment<T extends IUniqueId> {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
-      : null;
+        ? versionHistory[0].timestamp
+        : null;
     // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.length > 0 ? true : false;
     this.canvasSignedData = canvas_signed_data;
-    this.canvasHash = canvas_hash;
+    this.canvasMsgId = canvas_msg_id;
     this.reactions = (reactions || []).map((r) => new Reaction(r));
     this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = thread_id;

@@ -22,20 +22,23 @@ const AdminsAndModerators = () => {
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
+  const communityId = app.activeChainId() || '';
   const {
     data: { admins: returnedAdmins, mods: returnedMods } = {},
     isLoading: isFetchAdminQueryLoading,
     refetch: refetchAdminData,
   } = useFetchAdminQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const { data: searchResults, refetch } = useSearchProfilesQuery({
-    communityId: app.activeChainId(),
+    communityId,
     searchTerm: debouncedSearchTerm,
     limit: 100,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
+    enabled: !!communityId,
   });
 
   const roleData = useMemo(() => {
@@ -84,7 +87,10 @@ const AdminsAndModerators = () => {
     }
 
     if (newRole.role === 'admin' || newRole.role === 'moderator') {
-      adminsAndMods.push(newRole);
+      adminsAndMods.push({
+        address: newRole.address,
+        role: newRole.role,
+      });
 
       if (newRole.role === 'admin') {
         setAdmins([...admins, newRole]);

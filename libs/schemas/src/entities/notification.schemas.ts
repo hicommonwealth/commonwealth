@@ -70,7 +70,7 @@ export const ThreadSubscription = z.object({
         }),
       }),
     )
-    .optional(),
+    .nullish(),
 });
 
 export const CommentSubscription = z.object({
@@ -110,7 +110,7 @@ export const CommentSubscription = z.object({
               }),
             }),
           )
-          .optional(),
+          .nullish(),
       }),
     )
     .optional(),
@@ -120,8 +120,8 @@ export const CommunityAlert = z
   .object({
     user_id: PG_INT,
     community_id: z.string(),
-    created_at: z.coerce.date().optional(),
-    updated_at: z.coerce.date().optional(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional(),
   })
   .merge(
     z.object({

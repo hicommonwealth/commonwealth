@@ -16,7 +16,6 @@ import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
-import ChainInfo from '../models/ChainInfo';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
 import SubLayout from './Sublayout';
@@ -95,9 +94,9 @@ const LayoutComponent = ({
       if (shouldSelectChain) {
         setIsLoading(true);
         setCommunityToLoad(providedCommunityScope);
-        const communityFromTRPCResponse = ChainInfo.fromTRPCResponse(
-          community as z.infer<typeof ExtendedCommunity>,
-        );
+        const communityFromTRPCResponse = community as z.infer<
+          typeof ExtendedCommunity
+        >;
         if (await loadCommunityChainInfo(communityFromTRPCResponse)) {
           // Update default community on server and app, if logged in
           if (user.isLoggedIn) {

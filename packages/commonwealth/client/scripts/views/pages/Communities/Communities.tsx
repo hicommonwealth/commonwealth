@@ -13,23 +13,18 @@ import { z } from 'zod';
 import { useFetchEthUsdRateQuery } from '../../../state/api/communityStake/index';
 import { trpc } from '../../../utils/trpcClient';
 import { NewCommunityCard } from '../../components/CommunityCard';
-import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import './Communities.scss';
+import { FiltersDrawer } from './FiltersDrawer/FiltersDrawer';
+import { CommunityFilters } from './FiltersDrawer/types';
 import { getCommunityCountsString } from './helpers';
-
-const communityNetworks: string[] = Object.keys(ChainNetwork).filter(
-  (val) => val === 'ERC20',
-); // We only are allowing ERC20 for now
-
-const communityBases = Object.keys(ChainBase) as ChainBase[];
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 type ExtendedCommunitySliceType = [
@@ -45,12 +40,7 @@ const CommunitiesPage = () => {
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
-  const [filters, setFilters] = useState<{
-    withNetwork?: ChainNetwork;
-    withChainBase?: ChainBase;
-    withStakeEnabled?: boolean;
-    withTagsIds?: number[];
-  }>({
+  const [filters, setFilters] = useState<CommunityFilters>({
     withChainBase: undefined,
     withStakeEnabled: undefined,
     withTagsIds: undefined,
@@ -74,7 +64,9 @@ const CommunitiesPage = () => {
     order_by: 'lifetime_thread_count',
     order_direction: 'DESC',
     base: filters.withChainBase ? ChainBase[filters.withChainBase] : undefined,
-    network: filters.withNetwork,
+    network: filters.withNetwork
+      ? ChainNetwork[filters.withNetwork]
+      : undefined,
     stake_enabled: filters.withStakeEnabled,
     cursor: 1,
     tag_ids: filters.withTagsIds,
@@ -88,6 +80,8 @@ const CommunitiesPage = () => {
   const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
     useFetchEthUsdRateQuery();
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const isLoading =
     isLoadingTags ||
@@ -110,15 +104,43 @@ const CommunitiesPage = () => {
     return twoCommunitiesPerEntry;
   }, [communities?.pages]);
 
+  const removeStakeFilter = () => {
+    setFilters({
+      ...filters,
+      withStakeEnabled: false,
+    });
+  };
+
+  const removeTagFilter = (tagId: number) => {
+    setFilters({
+      ...filters,
+      withTagsIds: [...(filters.withTagsIds || [])].filter(
+        (id) => tagId !== id,
+      ),
+    });
+  };
+
+  const removeChainBaseFilter = () => {
+    setFilters({
+      ...filters,
+      withChainBase: undefined,
+    });
+  };
+
+  const removeChainNetworkFilter = () => {
+    setFilters({
+      ...filters,
+      withNetwork: undefined,
+    });
+  };
+
   return (
     // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
       <div className="CommunitiesPage">
         <div className="header-section">
           <div className="description">
-            <CWText type="h2" fontWeight="semiBold">
-              Explore communities
-            </CWText>
+            <CWText type="h2">Explore communities</CWText>
             <div className="actions">
               <CWText type="caption" className="communities-count">
                 {!isLoading && communities?.pages?.[0]?.totalResults
@@ -131,90 +153,47 @@ const CommunitiesPage = () => {
             </div>
           </div>
           <div className="filters">
-            <CWIcon iconName="funnelSimple" />
             <CWButton
-              label="Stake"
-              buttonHeight="sm"
-              buttonType={filters.withStakeEnabled ? 'primary' : 'secondary'}
-              onClick={() =>
-                setFilters((f) => ({
-                  ...f,
-                  withStakeEnabled: !f.withStakeEnabled,
-                }))
-              }
-              iconLeft="coins"
+              label="Filters"
+              iconRight="funnelSimple"
+              onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
             />
-            <CWDivider isVertical />
-            {(tags || [])
-              .filter((t) => ['dao', 'defi'].includes(t.name.toLowerCase()))
-              .map((tag) => {
-                return (
-                  <CWButton
-                    key={tag.name}
-                    label={tag.name}
-                    buttonHeight="sm"
-                    buttonType={
-                      filters.withTagsIds?.includes(tag.id)
-                        ? 'primary'
-                        : 'secondary'
-                    }
-                    onClick={() => {
-                      setFilters((f) => ({
-                        ...f,
-                        withTagsIds: (f.withTagsIds || [])?.includes(tag.id)
-                          ? [...(f.withTagsIds || [])].filter(
-                              (id) => id !== tag.id,
-                            )
-                          : [...(f.withTagsIds || []), tag.id],
-                      }));
-                    }}
-                  />
-                );
-              })}
-            <CWDivider isVertical />
-            {communityNetworks.map((network) => {
-              return (
-                <CWButton
-                  key={network}
-                  label={network}
-                  buttonHeight="sm"
-                  buttonType={
-                    filters.withNetwork === ChainNetwork[network]
-                      ? 'primary'
-                      : 'secondary'
-                  }
-                  onClick={() => {
-                    setFilters((f) => ({
-                      ...f,
-                      withNetwork:
-                        filters.withNetwork === ChainNetwork[network]
-                          ? undefined
-                          : ChainNetwork[network],
-                    }));
-                  }}
+            {filters.withNetwork && (
+              <CWTag
+                label={filters.withNetwork}
+                type="filter"
+                onClick={() => removeChainNetworkFilter()}
+              />
+            )}
+            {filters.withChainBase && (
+              <CWTag
+                label={filters.withChainBase}
+                type="filter"
+                onClick={() => removeChainBaseFilter()}
+              />
+            )}
+            {filters.withStakeEnabled && (
+              <CWTag
+                label="Stake"
+                type="filter"
+                onClick={() => removeStakeFilter()}
+              />
+            )}
+            {filters.withTagsIds &&
+              filters.withTagsIds.map((id) => (
+                <CWTag
+                  key={id}
+                  type="filter"
+                  label={(tags || []).find((t) => t.id === id)?.name || ''}
+                  onClick={() => removeTagFilter(id)}
                 />
-              );
-            })}
-            <CWDivider isVertical />
-            {communityBases.map((base) => {
-              return (
-                <CWButton
-                  key={base}
-                  label={base}
-                  buttonHeight="sm"
-                  buttonType={
-                    filters.withChainBase === base ? 'primary' : 'secondary'
-                  }
-                  onClick={() => {
-                    setFilters((f) => ({
-                      ...f,
-                      withChainBase:
-                        f.withChainBase === base ? undefined : base,
-                    }));
-                  }}
-                />
-              );
-            })}
+              ))}
+            <FiltersDrawer
+              isOpen={isFilterDrawerOpen}
+              onClose={() => setIsFilterDrawerOpen(false)}
+              filters={filters}
+              onFiltersChange={(newFilters) => setFilters(newFilters)}
+            />
           </div>
         </div>
         {isLoading && communitiesList.length === 0 ? (
@@ -288,7 +267,8 @@ const CommunitiesPage = () => {
                       ? ` for the applied filters.`
                       : '.'}
                     <br />
-                    Create a new community <Link to="/communities">here</Link>.
+                    Create a new community{' '}
+                    <Link to="/createCommunity">here</Link>.
                   </CWText>
                 </section>
               ),
