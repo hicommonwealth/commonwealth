@@ -230,7 +230,9 @@ export type ModelSeeder = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createSubscription: (args: SubscriptionArgs) => Promise<any>;
   createCommunity: (
-    args: z.infer<(typeof schemas.CreateCommunity)['input']>,
+    args: z.infer<(typeof schemas.CreateCommunity)['input']> & {
+      address: string;
+    },
     jwt: string,
   ) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
@@ -634,7 +636,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
-      .set('address', args.user_address)
+      .set('address', args.address)
       .send({
         jwt,
         ...args,

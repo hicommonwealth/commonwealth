@@ -76,7 +76,6 @@ describe('Update Community/Chain Tests', () => {
       id: 'tester',
       name: 'tester community',
       chain_node_id: node!.id!,
-      user_address: loggedInAddr!,
       description: 'Tester community community',
       type: ChainType.Offchain,
       base: ChainBase.Ethereum,
@@ -87,7 +86,7 @@ describe('Update Community/Chain Tests', () => {
     };
 
     const created = await server.seeder.createCommunity(
-      communityArgs,
+      { ...communityArgs, address: loggedInAddr!.address },
       jwtToken,
     );
     expect(created.name).to.be.equal(communityArgs.name);
