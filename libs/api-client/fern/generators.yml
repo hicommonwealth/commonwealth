@@ -6,7 +6,7 @@ groups:
         version: 0.39.3
         output:
           location: local-file-system
-          path: ../src/sdks/typescript
+          path: ../src/
         config:
           outputEsm: true
 api:
