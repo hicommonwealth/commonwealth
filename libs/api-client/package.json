@@ -29,7 +29,8 @@
     "publish": "npm publish",
     "run-test": "tsx ./test/index.ts",
     "check-types": "tsc --noEmit",
-    "generate-client": "openapi-generator-cli generate -i http://localhost:8080/api/v1/openapi.json -g typescript-axios -o ./src"
+    "fern-init": "fern init --openapi http://localhost:8080/api/v1/openapi.json --org Common",
+    "generate-client-fern": "fern init --openapi http://localhost:8080/api/v1/openapi.json && fern check && fern add fern-typescript-node-sdk --group sdk && fern generate --group sdk"
   },
   "keywords": [
     "commonwealth",
