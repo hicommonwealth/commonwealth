@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-
+import app from 'state';
+import { useTokenMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
-
+import './ManageContest.scss';
 import {
   ContestLiveStep,
   DetailsFormStep,
@@ -12,8 +13,6 @@ import {
 } from './steps';
 import { LaunchContestStep } from './types';
 import useManageContestForm from './useManageContestForm';
-
-import './ManageContest.scss';
 
 interface ManageContestProps {
   contestAddress?: string;
@@ -36,6 +35,13 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     contestAddress,
   });
 
+  const chainId = app.chain.meta.ChainNode?.id || 0;
+  const { data: tokenMetadata } = useTokenMetadataQuery({
+    tokenId: contestFormData?.fundingTokenAddress || '',
+    chainId,
+    apiEnabled: !!contestFormData?.fundingTokenAddress,
+  });
+
   if (
     !user.isLoggedIn ||
     !stakeEnabled ||
@@ -44,6 +50,8 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   ) {
     return <PageNotFound />;
   }
+
+  const fundingTokenTicker = tokenMetadata?.symbol || 'ETH';
 
   const getCurrentStep = () => {
     switch (launchContestStep) {
@@ -65,6 +73,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
             // @ts-expect-error <StrictNullChecks/>
             contestFormData={contestFormData}
             onSetCreatedContestAddress={setCreatedContestAddress}
+            fundingTokenTicker={fundingTokenTicker}
           />
         );
 
@@ -73,6 +82,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
           <ContestLiveStep
             createdContestAddress={createdContestAddress}
             isFarcasterContest={!!contestFormData?.farcasterContestDuration}
+            fundingTokenTicker={fundingTokenTicker}
           />
         );
     }
