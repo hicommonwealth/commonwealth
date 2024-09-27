@@ -39,6 +39,9 @@ export const User = z.object({
     .optional(),
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+  hashed_api_key: z.string().max(255).nullish(),
+  api_key_salt: z.string().max(255).nullish(),
+
   profile: UserProfile,
 
   ProfileTags: z.array(ProfileTags).optional(),
