@@ -2,7 +2,6 @@ import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import AddressInfo from 'models/AddressInfo';
 import React from 'react';
 import {
   BaseMixpanelPayload,
@@ -26,14 +25,12 @@ interface CommunityInformationStepProps {
   handleGoBack: () => void;
   handleContinue: () => void;
   tokenInfo?: TokenInfo;
-  selectedAddress?: AddressInfo;
 }
 
 const CommunityInformationStep = ({
   handleGoBack,
   handleContinue,
   tokenInfo,
-  selectedAddress,
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
