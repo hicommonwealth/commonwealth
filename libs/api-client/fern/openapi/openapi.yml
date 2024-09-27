@@ -10428,6 +10428,7 @@ paths:
                 - body
                 - kind
                 - stage
+                - read_only
               additionalProperties: false
       parameters:
         - in: header
