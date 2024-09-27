@@ -29,8 +29,7 @@
     "publish": "npm publish",
     "run-test": "tsx ./test/index.ts",
     "check-types": "tsc --noEmit",
-    "fern-init": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh",
-    "generate-client-fern": "fern generate"
+    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate"
   },
   "keywords": [
     "commonwealth",

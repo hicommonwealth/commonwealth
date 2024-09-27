@@ -10,6 +10,7 @@ import { UpdateCommentResponseThreadReactionsItem } from './UpdateCommentRespons
 import { UpdateCommentResponseThreadSearch } from './UpdateCommentResponseThreadSearch';
 import { UpdateCommentResponseThreadThreadVersionHistoriesItem } from './UpdateCommentResponseThreadThreadVersionHistoriesItem';
 import { UpdateCommentResponseThreadTopic } from './UpdateCommentResponseThreadTopic';
+
 export const UpdateCommentResponseThread = core.serialization.object({
   id: core.serialization.number().optional(),
   addressId: core.serialization.property(

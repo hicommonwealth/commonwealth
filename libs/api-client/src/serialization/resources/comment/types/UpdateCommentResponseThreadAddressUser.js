@@ -5,6 +5,7 @@ import * as core from '../../../../core';
 import { UpdateCommentResponseThreadAddressUserEmailNotificationInterval } from './UpdateCommentResponseThreadAddressUserEmailNotificationInterval';
 import { UpdateCommentResponseThreadAddressUserProfile } from './UpdateCommentResponseThreadAddressUserProfile';
 import { UpdateCommentResponseThreadAddressUserProfileTagsItem } from './UpdateCommentResponseThreadAddressUserProfileTagsItem';
+
 export const UpdateCommentResponseThreadAddressUser = core.serialization.object(
   {
     id: core.serialization.number().optional(),
