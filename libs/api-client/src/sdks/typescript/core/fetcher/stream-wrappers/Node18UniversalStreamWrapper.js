@@ -1,4 +1,3 @@
-'use strict';
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -32,9 +31,7 @@ var __awaiter =
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.Node18UniversalStreamWrapper = void 0;
-class Node18UniversalStreamWrapper {
+export class Node18UniversalStreamWrapper {
   constructor(readableStream) {
     this.readableStream = readableStream;
     this.reader = this.readableStream.getReader();
@@ -269,4 +266,3 @@ class Node18UniversalStreamWrapper {
     };
   }
 }
-exports.Node18UniversalStreamWrapper = Node18UniversalStreamWrapper;

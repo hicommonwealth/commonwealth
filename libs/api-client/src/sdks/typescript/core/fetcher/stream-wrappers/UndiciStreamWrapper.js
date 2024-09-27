@@ -1,4 +1,3 @@
-'use strict';
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -32,9 +31,7 @@ var __awaiter =
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.UndiciStreamWrapper = void 0;
-class UndiciStreamWrapper {
+export class UndiciStreamWrapper {
   constructor(readableStream) {
     this.readableStream = readableStream;
     this.reader = this.readableStream.getReader();
@@ -245,4 +242,3 @@ class UndiciStreamWrapper {
     };
   }
 }
-exports.UndiciStreamWrapper = UndiciStreamWrapper;

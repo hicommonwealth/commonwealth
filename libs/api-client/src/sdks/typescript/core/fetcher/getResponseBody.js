@@ -1,4 +1,3 @@
-'use strict';
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -32,17 +31,15 @@ var __awaiter =
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.getResponseBody = void 0;
-const chooseStreamWrapper_1 = require('./stream-wrappers/chooseStreamWrapper');
-function getResponseBody(response, responseType) {
+import { chooseStreamWrapper } from './stream-wrappers/chooseStreamWrapper';
+export function getResponseBody(response, responseType) {
   return __awaiter(this, void 0, void 0, function* () {
     if (response.body != null && responseType === 'blob') {
       return yield response.blob();
     } else if (response.body != null && responseType === 'sse') {
       return response.body;
     } else if (response.body != null && responseType === 'streaming') {
-      return (0, chooseStreamWrapper_1.chooseStreamWrapper)(response.body);
+      return chooseStreamWrapper(response.body);
     } else if (response.body != null && responseType === 'text') {
       return yield response.text();
     } else {
@@ -67,4 +64,3 @@ function getResponseBody(response, responseType) {
     }
   });
 }
-exports.getResponseBody = getResponseBody;

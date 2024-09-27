@@ -1,20 +1,16 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.anySignal = exports.getTimeoutSignal = void 0;
 const TIMEOUT = 'timeout';
-function getTimeoutSignal(timeoutMs) {
+export function getTimeoutSignal(timeoutMs) {
   const controller = new AbortController();
   const abortId = setTimeout(() => controller.abort(TIMEOUT), timeoutMs);
   return { signal: controller.signal, abortId };
 }
-exports.getTimeoutSignal = getTimeoutSignal;
 /**
  * Returns an abort signal that is getting aborted when
  * at least one of the specified abort signals is aborted.
  *
  * Requires at least node.js 18.
  */
-function anySignal(...args) {
+export function anySignal(...args) {
   // Allowing signals to be passed either as array
   // of signals or as multiple arguments.
   const signals = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
@@ -43,4 +39,3 @@ function anySignal(...args) {
   }
   return controller.signal;
 }
-exports.anySignal = anySignal;

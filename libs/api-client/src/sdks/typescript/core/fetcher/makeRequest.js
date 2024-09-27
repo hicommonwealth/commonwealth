@@ -1,4 +1,3 @@
-'use strict';
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -32,10 +31,8 @@ var __awaiter =
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.makeRequest = void 0;
-const signals_1 = require('./signals');
-const makeRequest = (
+import { anySignal, getTimeoutSignal } from './signals';
+export const makeRequest = (
   fetchFn,
   url,
   method,
@@ -51,7 +48,7 @@ const makeRequest = (
     // Add timeout signal
     let timeoutAbortId = undefined;
     if (timeoutMs != null) {
-      const { signal, abortId } = (0, signals_1.getTimeoutSignal)(timeoutMs);
+      const { signal, abortId } = getTimeoutSignal(timeoutMs);
       timeoutAbortId = abortId;
       signals.push(signal);
     }
@@ -59,7 +56,7 @@ const makeRequest = (
     if (abortSignal != null) {
       signals.push(abortSignal);
     }
-    let newSignals = (0, signals_1.anySignal)(signals);
+    let newSignals = anySignal(signals);
     const response = yield fetchFn(url, {
       method: method,
       headers,
@@ -74,4 +71,3 @@ const makeRequest = (
     }
     return response;
   });
-exports.makeRequest = makeRequest;

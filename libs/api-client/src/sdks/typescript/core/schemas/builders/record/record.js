@@ -1,18 +1,15 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.record = void 0;
-const Schema_1 = require('../../Schema');
-const entries_1 = require('../../utils/entries');
-const getErrorMessageForIncorrectType_1 = require('../../utils/getErrorMessageForIncorrectType');
-const isPlainObject_1 = require('../../utils/isPlainObject');
-const maybeSkipValidation_1 = require('../../utils/maybeSkipValidation');
-const schema_utils_1 = require('../schema-utils');
-function record(keySchema, valueSchema) {
+import { SchemaType } from '../../Schema';
+import { entries } from '../../utils/entries';
+import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
+import { isPlainObject } from '../../utils/isPlainObject';
+import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
+import { getSchemaUtils } from '../schema-utils';
+export function record(keySchema, valueSchema) {
   const baseSchema = {
     parse: (raw, opts) => {
       return validateAndTransformRecord({
         value: raw,
-        isKeyNumeric: keySchema.getType() === Schema_1.SchemaType.NUMBER,
+        isKeyNumeric: keySchema.getType() === SchemaType.NUMBER,
         transformKey: (key) => {
           var _a;
           return keySchema.parse(
@@ -54,7 +51,7 @@ function record(keySchema, valueSchema) {
     json: (parsed, opts) => {
       return validateAndTransformRecord({
         value: parsed,
-        isKeyNumeric: keySchema.getType() === Schema_1.SchemaType.NUMBER,
+        isKeyNumeric: keySchema.getType() === SchemaType.NUMBER,
         transformKey: (key) => {
           var _a;
           return keySchema.json(
@@ -93,17 +90,13 @@ function record(keySchema, valueSchema) {
           opts === null || opts === void 0 ? void 0 : opts.breadcrumbsPrefix,
       });
     },
-    getType: () => Schema_1.SchemaType.RECORD,
+    getType: () => SchemaType.RECORD,
   };
   return Object.assign(
-    Object.assign(
-      {},
-      (0, maybeSkipValidation_1.maybeSkipValidation)(baseSchema),
-    ),
-    (0, schema_utils_1.getSchemaUtils)(baseSchema),
+    Object.assign({}, maybeSkipValidation(baseSchema)),
+    getSchemaUtils(baseSchema),
   );
 }
-exports.record = record;
 function validateAndTransformRecord({
   value,
   isKeyNumeric,
@@ -111,22 +104,18 @@ function validateAndTransformRecord({
   transformValue,
   breadcrumbsPrefix = [],
 }) {
-  if (!(0, isPlainObject_1.isPlainObject)(value)) {
+  if (!isPlainObject(value)) {
     return {
       ok: false,
       errors: [
         {
           path: breadcrumbsPrefix,
-          message: (0,
-          getErrorMessageForIncorrectType_1.getErrorMessageForIncorrectType)(
-            value,
-            'object',
-          ),
+          message: getErrorMessageForIncorrectType(value, 'object'),
         },
       ],
     };
   }
-  return (0, entries_1.entries)(value).reduce(
+  return entries(value).reduce(
     (accPromise, [stringKey, value]) => {
       // skip nullish keys
       if (value == null) {

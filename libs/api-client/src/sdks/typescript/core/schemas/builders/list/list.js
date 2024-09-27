@@ -1,11 +1,8 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.list = void 0;
-const Schema_1 = require('../../Schema');
-const getErrorMessageForIncorrectType_1 = require('../../utils/getErrorMessageForIncorrectType');
-const maybeSkipValidation_1 = require('../../utils/maybeSkipValidation');
-const schema_utils_1 = require('../schema-utils');
-function list(schema) {
+import { SchemaType } from '../../Schema';
+import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
+import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
+import { getSchemaUtils } from '../schema-utils';
+export function list(schema) {
   const baseSchema = {
     parse: (raw, opts) =>
       validateAndTransformArray(raw, (item, index) => {
@@ -43,28 +40,20 @@ function list(schema) {
           }),
         );
       }),
-    getType: () => Schema_1.SchemaType.LIST,
+    getType: () => SchemaType.LIST,
   };
   return Object.assign(
-    Object.assign(
-      {},
-      (0, maybeSkipValidation_1.maybeSkipValidation)(baseSchema),
-    ),
-    (0, schema_utils_1.getSchemaUtils)(baseSchema),
+    Object.assign({}, maybeSkipValidation(baseSchema)),
+    getSchemaUtils(baseSchema),
   );
 }
-exports.list = list;
 function validateAndTransformArray(value, transformItem) {
   if (!Array.isArray(value)) {
     return {
       ok: false,
       errors: [
         {
-          message: (0,
-          getErrorMessageForIncorrectType_1.getErrorMessageForIncorrectType)(
-            value,
-            'list',
-          ),
+          message: getErrorMessageForIncorrectType(value, 'list'),
           path: [],
         },
       ],

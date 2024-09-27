@@ -1,8 +1,5 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.isPlainObject = void 0;
 // borrowed from https://github.com/lodash/lodash/blob/master/isPlainObject.js
-function isPlainObject(value) {
+export function isPlainObject(value) {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -15,4 +12,3 @@ function isPlainObject(value) {
   }
   return Object.getPrototypeOf(value) === proto;
 }
-exports.isPlainObject = isPlainObject;

@@ -1,10 +1,7 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.transform = exports.optional = exports.getSchemaUtils = void 0;
-const Schema_1 = require('../../Schema');
-const JsonError_1 = require('./JsonError');
-const ParseError_1 = require('./ParseError');
-function getSchemaUtils(schema) {
+import { SchemaType } from '../../Schema';
+import { JsonError } from './JsonError';
+import { ParseError } from './ParseError';
+export function getSchemaUtils(schema) {
   return {
     optional: () => optional(schema),
     transform: (transformer) => transform(schema, transformer),
@@ -13,22 +10,21 @@ function getSchemaUtils(schema) {
       if (parsed.ok) {
         return parsed.value;
       }
-      throw new ParseError_1.ParseError(parsed.errors);
+      throw new ParseError(parsed.errors);
     },
     jsonOrThrow: (parsed, opts) => {
       const raw = schema.json(parsed, opts);
       if (raw.ok) {
         return raw.value;
       }
-      throw new JsonError_1.JsonError(raw.errors);
+      throw new JsonError(raw.errors);
     },
   };
 }
-exports.getSchemaUtils = getSchemaUtils;
 /**
  * schema utils are defined in one file to resolve issues with circular imports
  */
-function optional(schema) {
+export function optional(schema) {
   const baseSchema = {
     parse: (raw, opts) => {
       if (raw == null) {
@@ -57,15 +53,14 @@ function optional(schema) {
       }
       return schema.json(parsed, opts);
     },
-    getType: () => Schema_1.SchemaType.OPTIONAL,
+    getType: () => SchemaType.OPTIONAL,
   };
   return Object.assign(
     Object.assign({}, baseSchema),
     getSchemaUtils(baseSchema),
   );
 }
-exports.optional = optional;
-function transform(schema, transformer) {
+export function transform(schema, transformer) {
   const baseSchema = {
     parse: (raw, opts) => {
       const parsed = schema.parse(raw, opts);
@@ -88,4 +83,3 @@ function transform(schema, transformer) {
     getSchemaUtils(baseSchema),
   );
 }
-exports.transform = transform;

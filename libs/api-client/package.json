@@ -30,7 +30,7 @@
     "run-test": "tsx ./test/index.ts",
     "check-types": "tsc --noEmit",
     "fern-init": "fern init --openapi http://localhost:8080/api/v1/openapi.json --org Common",
-    "generate-client-fern": "fern init --openapi http://localhost:8080/api/v1/openapi.json && fern check && fern add fern-typescript-node-sdk --group sdk && fern generate --group sdk"
+    "generate-client-fern": "fern generate"
   },
   "keywords": [
     "commonwealth",
@@ -40,11 +40,11 @@
   "author": "common.xyz",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.3.4",
-    "moment": "^2.23.0"
+    "moment": "^2.23.0",
+    "qs": "^6.13.0",
+    "url-join": "^5.0.0"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.13.4",
     "@types/moment": "^2.13.0",
     "tsx": "^4.7.2"
   }

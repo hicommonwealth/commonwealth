@@ -1,4 +1,3 @@
-'use strict';
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -32,9 +31,7 @@ var __awaiter =
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.Supplier = void 0;
-exports.Supplier = {
+export const Supplier = {
   get: (supplier) =>
     __awaiter(void 0, void 0, void 0, function* () {
       if (typeof supplier === 'function') {

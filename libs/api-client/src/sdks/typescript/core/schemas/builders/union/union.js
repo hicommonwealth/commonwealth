@@ -1,4 +1,3 @@
-'use strict';
 var __rest =
   (this && this.__rest) ||
   function (s, e) {
@@ -16,17 +15,15 @@ var __rest =
       }
     return t;
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.union = void 0;
-const Schema_1 = require('../../Schema');
-const getErrorMessageForIncorrectType_1 = require('../../utils/getErrorMessageForIncorrectType');
-const isPlainObject_1 = require('../../utils/isPlainObject');
-const keys_1 = require('../../utils/keys');
-const maybeSkipValidation_1 = require('../../utils/maybeSkipValidation');
-const enum_1 = require('../enum');
-const object_like_1 = require('../object-like');
-const schema_utils_1 = require('../schema-utils');
-function union(discriminant, union) {
+import { SchemaType } from '../../Schema';
+import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
+import { isPlainObject } from '../../utils/isPlainObject';
+import { keys } from '../../utils/keys';
+import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
+import { enum_ } from '../enum';
+import { getObjectLikeUtils } from '../object-like';
+import { getSchemaUtils } from '../schema-utils';
+export function union(discriminant, union) {
   const rawDiscriminant =
     typeof discriminant === 'string'
       ? discriminant
@@ -35,7 +32,7 @@ function union(discriminant, union) {
     typeof discriminant === 'string'
       ? discriminant
       : discriminant.parsedDiscriminant;
-  const discriminantValueSchema = (0, enum_1.enum_)((0, keys_1.keys)(union));
+  const discriminantValueSchema = enum_(keys(union));
   const baseSchema = {
     parse: (raw, opts) => {
       return transformAndValidateUnion({
@@ -111,20 +108,16 @@ function union(discriminant, union) {
           opts === null || opts === void 0 ? void 0 : opts.breadcrumbsPrefix,
       });
     },
-    getType: () => Schema_1.SchemaType.UNION,
+    getType: () => SchemaType.UNION,
   };
   return Object.assign(
     Object.assign(
-      Object.assign(
-        {},
-        (0, maybeSkipValidation_1.maybeSkipValidation)(baseSchema),
-      ),
-      (0, schema_utils_1.getSchemaUtils)(baseSchema),
+      Object.assign({}, maybeSkipValidation(baseSchema)),
+      getSchemaUtils(baseSchema),
     ),
-    (0, object_like_1.getObjectLikeUtils)(baseSchema),
+    getObjectLikeUtils(baseSchema),
   );
 }
-exports.union = union;
 function transformAndValidateUnion({
   value,
   discriminant,
@@ -135,17 +128,13 @@ function transformAndValidateUnion({
   transformAdditionalProperties,
   breadcrumbsPrefix = [],
 }) {
-  if (!(0, isPlainObject_1.isPlainObject)(value)) {
+  if (!isPlainObject(value)) {
     return {
       ok: false,
       errors: [
         {
           path: breadcrumbsPrefix,
-          message: (0,
-          getErrorMessageForIncorrectType_1.getErrorMessageForIncorrectType)(
-            value,
-            'object',
-          ),
+          message: getErrorMessageForIncorrectType(value, 'object'),
         },
       ],
     };

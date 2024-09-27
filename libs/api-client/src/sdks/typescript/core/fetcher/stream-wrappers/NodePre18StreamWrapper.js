@@ -1,4 +1,3 @@
-'use strict';
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -66,9 +65,7 @@ var __asyncValues =
       }, reject);
     }
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.NodePre18StreamWrapper = void 0;
-class NodePre18StreamWrapper {
+export class NodePre18StreamWrapper {
   constructor(readableStream) {
     this.readableStream = readableStream;
   }
@@ -175,4 +172,3 @@ class NodePre18StreamWrapper {
     };
   }
 }
-exports.NodePre18StreamWrapper = NodePre18StreamWrapper;

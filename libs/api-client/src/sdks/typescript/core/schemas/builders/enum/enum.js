@@ -1,14 +1,10 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.enum_ = void 0;
-const Schema_1 = require('../../Schema');
-const createIdentitySchemaCreator_1 = require('../../utils/createIdentitySchemaCreator');
-const getErrorMessageForIncorrectType_1 = require('../../utils/getErrorMessageForIncorrectType');
-function enum_(values) {
+import { SchemaType } from '../../Schema';
+import { createIdentitySchemaCreator } from '../../utils/createIdentitySchemaCreator';
+import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
+export function enum_(values) {
   const validValues = new Set(values);
-  const schemaCreator = (0,
-  createIdentitySchemaCreator_1.createIdentitySchemaCreator)(
-    Schema_1.SchemaType.ENUM,
+  const schemaCreator = createIdentitySchemaCreator(
+    SchemaType.ENUM,
     (value, { allowUnrecognizedEnumValues, breadcrumbsPrefix = [] } = {}) => {
       if (typeof value !== 'string') {
         return {
@@ -16,11 +12,7 @@ function enum_(values) {
           errors: [
             {
               path: breadcrumbsPrefix,
-              message: (0,
-              getErrorMessageForIncorrectType_1.getErrorMessageForIncorrectType)(
-                value,
-                'string',
-              ),
+              message: getErrorMessageForIncorrectType(value, 'string'),
             },
           ],
         };
@@ -31,11 +23,7 @@ function enum_(values) {
           errors: [
             {
               path: breadcrumbsPrefix,
-              message: (0,
-              getErrorMessageForIncorrectType_1.getErrorMessageForIncorrectType)(
-                value,
-                'enum',
-              ),
+              message: getErrorMessageForIncorrectType(value, 'enum'),
             },
           ],
         };
@@ -48,4 +36,3 @@ function enum_(values) {
   );
   return schemaCreator();
 }
-exports.enum_ = enum_;

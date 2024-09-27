@@ -1,7 +1,4 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.SchemaType = void 0;
-exports.SchemaType = {
+export const SchemaType = {
   DATE: 'date',
   ENUM: 'enum',
   LIST: 'list',

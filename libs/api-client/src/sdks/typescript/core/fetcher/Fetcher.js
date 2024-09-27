@@ -1,4 +1,3 @@
-'use strict';
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -32,15 +31,13 @@ var __awaiter =
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.fetcher = exports.fetcherImpl = void 0;
-const createRequestUrl_1 = require('./createRequestUrl');
-const getFetchFn_1 = require('./getFetchFn');
-const getRequestBody_1 = require('./getRequestBody');
-const getResponseBody_1 = require('./getResponseBody');
-const makeRequest_1 = require('./makeRequest');
-const requestWithRetries_1 = require('./requestWithRetries');
-function fetcherImpl(args) {
+import { createRequestUrl } from './createRequestUrl';
+import { getFetchFn } from './getFetchFn';
+import { getRequestBody } from './getRequestBody';
+import { getResponseBody } from './getResponseBody';
+import { makeRequest } from './makeRequest';
+import { requestWithRetries } from './requestWithRetries';
+export function fetcherImpl(args) {
   return __awaiter(this, void 0, void 0, function* () {
     const headers = {};
     if (args.body !== undefined && args.contentType != null) {
@@ -53,20 +50,17 @@ function fetcherImpl(args) {
         }
       }
     }
-    const url = (0, createRequestUrl_1.createRequestUrl)(
-      args.url,
-      args.queryParameters,
-    );
-    let requestBody = yield (0, getRequestBody_1.getRequestBody)({
+    const url = createRequestUrl(args.url, args.queryParameters);
+    let requestBody = yield getRequestBody({
       body: args.body,
       type: args.requestType === 'json' ? 'json' : 'other',
     });
-    const fetchFn = yield (0, getFetchFn_1.getFetchFn)();
+    const fetchFn = yield getFetchFn();
     try {
-      const response = yield (0, requestWithRetries_1.requestWithRetries)(
+      const response = yield requestWithRetries(
         () =>
           __awaiter(this, void 0, void 0, function* () {
-            return (0, makeRequest_1.makeRequest)(
+            return makeRequest(
               fetchFn,
               url,
               args.method,
@@ -80,10 +74,7 @@ function fetcherImpl(args) {
           }),
         args.maxRetries,
       );
-      let responseBody = yield (0, getResponseBody_1.getResponseBody)(
-        response,
-        args.responseType,
-      );
+      let responseBody = yield getResponseBody(response, args.responseType);
       if (response.status >= 200 && response.status < 400) {
         return {
           ok: true,
@@ -135,5 +126,4 @@ function fetcherImpl(args) {
     }
   });
 }
-exports.fetcherImpl = fetcherImpl;
-exports.fetcher = fetcherImpl;
+export const fetcher = fetcherImpl;
