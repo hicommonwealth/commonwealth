@@ -57,7 +57,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
           : address;
       const hex =
         community.base === ChainBase.CosmosSDK
-          ? await bech32ToHex(address)
+          ? bech32ToHex(address)
           : undefined;
 
       // TODO: can we remove this assertion? Seems like a migration step that was left behind

@@ -1,7 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import AddressInfo from 'models/AddressInfo';
 import React from 'react';
 import {
   BaseMixpanelPayload,
@@ -22,7 +21,6 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import './CommunityInformationStep.scss';
 
 interface CommunityInformationStepProps {
-  selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
   handleContinue: (communityId: string, communityName: string) => void;
@@ -30,7 +28,6 @@ interface CommunityInformationStepProps {
 }
 
 const CommunityInformationStep = ({
-  selectedAddress,
   selectedCommunity,
   handleGoBack,
   handleContinue,
