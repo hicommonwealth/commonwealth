@@ -96,6 +96,12 @@ router.use(async (req: Request, response: Response, next: NextFunction) => {
       address: req.headers['address'],
       verified: { [Op.ne]: null },
     },
+    include: [
+      {
+        model: models.User,
+        required: true,
+      },
+    ],
   });
   if (!address || !address.user_id) throw new Error('Address not found');
 
@@ -114,6 +120,10 @@ router.use(async (req: Request, response: Response, next: NextFunction) => {
   req.user = models.User.build({
     ...address.User!,
   });
+
+  // record access in background - best effort
+  apiKeyRecord.updated_at = new Date();
+  void apiKeyRecord.save();
 
   return next();
 });
