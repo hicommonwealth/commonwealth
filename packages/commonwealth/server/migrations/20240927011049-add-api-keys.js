@@ -11,8 +11,8 @@ module.exports = {
           references: {
             model: 'Users',
             key: 'id',
-            onDelete: 'CASCADE',
           },
+          onDelete: 'CASCADE',
         },
         hashed_api_key: { type: Sequelize.STRING, allowNull: false },
         salt: { type: Sequelize.STRING, allowNull: false },
