@@ -42,7 +42,6 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
-    user_address: z.string(), // why not use actor's address?
 
     // hidden optional params
     token_name: z.string().optional(),
@@ -280,22 +279,14 @@ export const RefreshCommunityMemberships = {
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
-    address: z.string(),
   }),
   output: z.object({
     community_id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    base_address: z.string(),
     address_id: z.number(),
     encoded_address: z.string(),
-    verification_token: z.string(),
-    addresses: z.array(
-      z.object({
-        id: PG_INT,
-        address: z.string(),
-        wallet_id: z.nativeEnum(WalletId).nullish(),
-        community_id: z.string(),
-        base: z.nativeEnum(ChainBase),
-        ss58Prefix: PG_INT.nullish(),
-      }),
-    ),
+    wallet_id: z.nativeEnum(WalletId).optional(),
+    ss58Prefix: z.number().optional(),
   }),
 };

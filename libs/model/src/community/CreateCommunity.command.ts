@@ -1,16 +1,16 @@
-import { fromBech32, toHex } from '@cosmjs/encoding';
-import { Actor, InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
   ChainNetwork,
   ChainType,
   DefaultPage,
+  bech32ToHex,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { z } from 'zod';
 import { models } from '../database';
 import { mustBeSuperAdmin, mustExist } from '../middleware/guards';
+import { findBaseAddress } from '../utils/findBaseAddress';
 
 export const CreateCommunityErrors = {
   CommunityNameExists:
@@ -25,91 +25,6 @@ export const CreateCommunityErrors = {
   // eslint-disable-next-line max-len
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
-
-type Payload = z.infer<typeof schemas.CreateCommunity.input>;
-
-// TODO: refactor after addresses are normalized
-async function findBaseAdminAddress(
-  { user }: Actor,
-  { base, type, user_address }: Payload,
-) {
-  if (user_address)
-    return await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: user.id,
-        address: user_address,
-      },
-      include: [
-        {
-          model: models.Community,
-          where: { base },
-          required: true,
-        },
-      ],
-    });
-
-  if (base === ChainBase.NEAR)
-    throw new InvalidInput(CreateCommunityErrors.InvalidBase);
-
-  if (base === ChainBase.Ethereum)
-    return await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: user.id,
-        address: {
-          [Op.startsWith]: '0x',
-        },
-      },
-      include: [
-        {
-          model: models.Community,
-          where: { base },
-          required: true,
-        },
-      ],
-    });
-
-  if (base === ChainBase.Solana)
-    return await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: user.id,
-        address: {
-          // This is the regex formatting for solana addresses per their website
-          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}',
-        },
-      },
-      include: [
-        {
-          model: models.Community,
-          where: { base },
-          required: true,
-        },
-      ],
-    });
-
-  // Onchain community can be created by Admin only,
-  // but we allow offchain cmty to have any creator as admin:
-  // if signed in with Keplr or Magic:
-  if (base === ChainBase.CosmosSDK && type === ChainType.Offchain)
-    return await models.Address.scope('withPrivateData').findOne({
-      where: { user_id: user.id },
-      include: [
-        {
-          model: models.Community,
-          where: { base },
-          required: true,
-        },
-      ],
-    });
-}
-
-export function bech32ToHex(address: string) {
-  try {
-    const encodedData = fromBech32(address).data;
-    return toHex(encodedData);
-  } catch (e) {
-    console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
-  }
-}
 
 function baseToNetwork(n: ChainBase): ChainNetwork {
   switch (n) {
@@ -169,10 +84,9 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const baseCommunity = await models.Community.findOne({ where: { base } });
       mustExist('Chain Base', baseCommunity);
 
-      const admin_address = await findBaseAdminAddress(actor, payload);
-
+      const admin_address = await findBaseAddress(actor, base, type);
       mustExist(
-        `User address ${payload.user_address} in ${base} community`,
+        `User address ${actor.address} in ${base} community`,
         admin_address,
       );
 

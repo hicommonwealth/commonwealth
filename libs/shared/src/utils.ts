@@ -331,7 +331,7 @@ export function getDecodedString(str: string) {
  * their siblings on standard Cosmos derivation paths.
  * e.g. evmos hex != osmo hex, but evmos hex == inj hex
  */
-export async function bech32ToHex(address: string) {
+export function bech32ToHex(address: string) {
   try {
     const encodedData = fromBech32(address).data;
     return toHex(encodedData);

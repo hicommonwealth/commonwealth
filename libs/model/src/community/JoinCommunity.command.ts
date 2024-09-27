@@ -1,12 +1,10 @@
 import { InvalidActor, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase, addressSwapper, bech32ToHex } from '@hicommonwealth/shared';
-import crypto from 'crypto';
-import { Op } from 'sequelize';
-import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { assertAddressOwnership, incrementProfileCount } from '../utils';
+import { findBaseAddress } from '../utils/findBaseAddress';
 
 export const JoinCommunityErrors = {
   NotVerifiedAddressOrUser: 'Not verified address or user',
@@ -19,10 +17,26 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
     ...schemas.JoinCommunity,
     auth: [],
     body: async ({ actor, payload }) => {
-      // TODO: should we pass address as input when already in header/auth context?
-      const { community_id, address } = payload;
+      const { community_id } = payload;
+      const address = actor.address!;
 
-      // TODO: @timolegros is this still needed?
+      const community = await models.Community.findOne({
+        where: { id: community_id },
+      });
+      mustExist('Community', community);
+
+      const baseAddress = await findBaseAddress(
+        actor,
+        community.base,
+        community.type,
+      );
+      if (!baseAddress)
+        throw new InvalidActor(
+          actor,
+          JoinCommunityErrors.NotVerifiedAddressOrUser,
+        );
+
+      // ----- Injective-specific address validation ----- @jnaviask
       const isInjectiveAddress = address.slice(0, 3) === 'inj';
       if (community_id === 'injective') {
         if (!isInjectiveAddress)
@@ -33,60 +47,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
         throw new InvalidInput(
           JoinCommunityErrors.CannotJoinWithInjectiveAddress,
         );
-
-      const community = await models.Community.findOne({
-        where: { id: community_id },
-      });
-      mustExist('Community', community);
-
-      // TODO: @timolegros is this still needed? Address should be authenticated already
-      // check if the original address is verified and owned by the user
-      const originalAddress = await models.Address.scope(
-        'withPrivateData',
-      ).findOne({
-        where: {
-          address,
-          user_id: actor.user.id,
-          verified: { [Op.ne]: null },
-        },
-      });
-      if (!originalAddress)
-        throw new InvalidActor(
-          actor,
-          JoinCommunityErrors.NotVerifiedAddressOrUser,
-        );
-
-      // TODO: @timolegros is this still needed? Address should be authenticated already
-      // check if the original address's token is expired. refer edge case 1)
-      let verification_token = originalAddress.verification_token;
-      let verification_token_expires =
-        originalAddress.verification_token_expires;
-      const isOriginalTokenValid =
-        verification_token_expires &&
-        +verification_token_expires <= +new Date();
-      if (!isOriginalTokenValid) {
-        const communities = await models.Community.findAll({
-          where: { base: community.base },
-        });
-        verification_token = crypto.randomBytes(18).toString('hex');
-        verification_token_expires = new Date(
-          +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
-        );
-        await models.Address.update(
-          {
-            verification_token,
-            verification_token_expires,
-          },
-          {
-            where: {
-              user_id: actor.user.id,
-              address,
-              community_id: { [Op.in]: communities.map((ch) => ch.id) },
-            },
-          },
-        );
-      }
-
+      // ----- Cosmos-specific address validation -----
       const encoded_address =
         community.base === ChainBase.Substrate
           ? addressSwapper({
@@ -99,14 +60,17 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
           ? await bech32ToHex(address)
           : undefined;
 
-      const _address = await models.sequelize.transaction(
+      // TODO: can we remove this assertion? Seems like a migration step that was left behind
+      await assertAddressOwnership(encoded_address);
+
+      const address_id = await models.sequelize.transaction(
         async (transaction) => {
           const found = await models.Address.scope('withPrivateData').findOne({
             where: { community_id, address: encoded_address },
             transaction,
           });
 
-          if (!found || !found.verified)
+          if (!found)
             await incrementProfileCount(
               community.id,
               actor.user.id!,
@@ -114,34 +78,33 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             );
 
           if (found) {
-            // refer edge case 2)
+            // LEGACY NOTES: refer edge case 2)
             // either if the existing address is owned by someone else or this user,
             // we can just update with userId. this covers both edge case (1) & (2)
             // Address.updateWithTokenProvided
             await models.Address.update(
               {
                 user_id: actor.user.id,
-                verification_token,
-                verification_token_expires,
                 last_active: new Date(),
-                verified: originalAddress.verified,
+                verified: baseAddress.verified,
                 hex,
               },
-              { where: { id: found.id }, transaction, returning: true },
+              { where: { id: found.id }, transaction },
             );
-            return found;
+            return found.id!;
           }
 
-          return await models.Address.create(
+          const created = await models.Address.create(
             {
               user_id: actor.user.id,
-              address: encoded_address,
+              address: encoded_address, // TODO: @timolegros would this allow addresses from incompatible chains to join?
               community_id,
               hex,
-              verification_token,
-              verification_token_expires,
-              verified: originalAddress.verified,
-              wallet_id: originalAddress.wallet_id,
+              verified: baseAddress.verified,
+              verification_token: baseAddress.verification_token,
+              verification_token_expires:
+                baseAddress.verification_token_expires,
+              wallet_id: baseAddress.wallet_id,
               last_active: new Date(),
               role: 'member',
               is_user_default: false,
@@ -150,32 +113,18 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             },
             { transaction },
           );
+          return created.id!;
         },
       );
 
-      // @timolegros why is this asseertion after the transaction?
-      await assertAddressOwnership(encoded_address);
-
-      const addresses = await models.Address.findAll({
-        where: { user_id: actor.user.id },
-        include: {
-          model: models.Community,
-          attributes: ['id', 'base', 'ss58_prefix'],
-        },
-      });
       return {
         community_id,
-        address_id: _address.id!,
+        base: community.base,
+        base_address: baseAddress.address,
+        address_id,
         encoded_address,
-        verification_token: verification_token!,
-        addresses: addresses.map((a) => ({
-          id: a.id!,
-          address: a.address,
-          wallet_id: a.wallet_id,
-          community_id: a.community_id,
-          base: a.Community!.base!,
-          ss58Prefix: a.Community!.ss58_prefix,
-        })),
+        wallet_id: baseAddress.wallet_id ?? undefined,
+        ss58Prefix: community.ss58_prefix ?? undefined,
       };
     },
   };

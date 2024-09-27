@@ -53,9 +53,22 @@ function buildCreateGroupPayload(community_id: string, topics: number[] = []) {
 }
 
 describe('Community lifecycle', () => {
-  let ethNode: ChainNodeAttributes, edgewareNode: ChainNodeAttributes;
-  let community: CommunityAttributes;
-  let superAdminActor: Actor, adminActor: Actor, memberActor: Actor;
+  let ethNode: ChainNodeAttributes,
+    edgewareNode: ChainNodeAttributes,
+    cosmosNode: ChainNodeAttributes,
+    substrateNode: ChainNodeAttributes;
+  let community: CommunityAttributes,
+    cosmos_community: CommunityAttributes,
+    cosmos_community_non_evm: CommunityAttributes,
+    substrate_community: CommunityAttributes;
+  let superAdminActor: Actor,
+    ethAdminActor: Actor,
+    cosmosAdminActor: Actor,
+    substrateAdminActor: Actor,
+    ethActor: Actor,
+    cosmosActor: Actor,
+    cosmosNonEvmActor: Actor,
+    substrateActor: Actor;
   const custom_domain = 'custom';
 
   beforeAll(async () => {
@@ -64,10 +77,31 @@ describe('Community lifecycle', () => {
       name: 'Edgeware Mainnet',
       eth_chain_id: null,
     });
+
+    const [_cosmosNode] = await seed('ChainNode', {
+      name: 'Cosmos Mainnet',
+      eth_chain_id: null,
+      cosmos_chain_id: '1',
+    });
+
+    const [_substrateNode] = await seed('ChainNode', {
+      name: 'Substrate Mainnet',
+      eth_chain_id: null,
+      cosmos_chain_id: null,
+    });
+
+    ethNode = _ethNode!;
+    edgewareNode = _edgewareNode!;
+    cosmosNode = _cosmosNode!;
+    substrateNode = _substrateNode!;
+
     const [superadmin] = await seed('User', { isAdmin: true });
     const [admin] = await seed('User', { isAdmin: false });
     const [member] = await seed('User', { isAdmin: false });
-    const [base] = await seed('Community', {
+    const [cosmosMember] = await seed('User', { isAdmin: false });
+    const [substrateMember] = await seed('User', { isAdmin: false });
+
+    const [ethBase] = await seed('Community', {
       chain_node_id: _ethNode!.id!,
       base: ChainBase.Ethereum,
       active: true,
@@ -88,32 +122,140 @@ describe('Community lifecycle', () => {
           role: 'member',
           user_id: member!.id,
           verified: true,
+          address: '0x0000000000000000000000000000000000000000', // base evm address
         },
       ],
       custom_domain,
     });
 
-    ethNode = _ethNode!;
-    edgewareNode = _edgewareNode!;
+    const [cosmosBase] = await seed('Community', {
+      chain_node_id: _cosmosNode!.id!,
+      base: ChainBase.CosmosSDK,
+      active: true,
+      lifetime_thread_count: 0,
+      profile_count: 1,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: admin!.id,
+          verified: true,
+        },
+        {
+          role: 'member',
+          user_id: cosmosMember!.id,
+          verified: true,
+          address: 'osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6', // base cosmos address
+        },
+        {
+          role: 'member',
+          user_id: member!.id,
+          verified: true,
+          address: '0x0000000000000000000000000000000000000000', // base evm address
+        },
+      ],
+    });
+
+    const [cosmosNonEvmBase] = await seed('Community', {
+      chain_node_id: _cosmosNode!.id!,
+      base: ChainBase.CosmosSDK,
+      active: true,
+      lifetime_thread_count: 0,
+      profile_count: 1,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: admin!.id,
+          verified: true,
+        },
+        {
+          role: 'member',
+          user_id: cosmosMember!.id,
+          verified: true,
+          address: 'osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6', // base cosmos address
+        },
+      ],
+    });
+
+    const [substrateBase] = await seed('Community', {
+      chain_node_id: _substrateNode!.id!,
+      base: ChainBase.Substrate,
+      active: true,
+      lifetime_thread_count: 0,
+      profile_count: 1,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: admin!.id,
+          verified: true,
+        },
+        {
+          role: 'member',
+          user_id: substrateMember!.id,
+          verified: true,
+          address: 'base-substrate-address', // base substrate address
+        },
+      ],
+    });
+
     superAdminActor = {
       user: {
         id: superadmin!.id!,
         email: superadmin!.email!,
         isAdmin: superadmin!.isAdmin!,
       },
-      address: base?.Addresses?.at(0)?.address,
+      address: ethBase?.Addresses?.at(0)?.address,
     };
-    adminActor = {
+    ethAdminActor = {
       user: { id: admin!.id!, email: admin!.email!, isAdmin: admin!.isAdmin! },
-      address: base?.Addresses?.at(1)?.address,
+      address: ethBase?.Addresses?.at(1)?.address,
     };
-    memberActor = {
+    cosmosAdminActor = {
+      user: {
+        id: admin!.id!,
+        email: admin!.email!,
+        isAdmin: admin!.isAdmin!,
+      },
+      address: cosmosBase?.Addresses?.at(0)?.address,
+    };
+    substrateAdminActor = {
+      user: {
+        id: admin!.id!,
+        email: admin!.email!,
+        isAdmin: admin!.isAdmin!,
+      },
+      address: substrateBase?.Addresses?.at(0)?.address,
+    };
+    ethActor = {
       user: {
         id: member!.id!,
         email: member!.email!,
         isAdmin: member!.isAdmin!,
       },
-      address: base?.Addresses?.at(2)?.address,
+      address: ethBase?.Addresses?.at(2)?.address,
+    };
+    cosmosActor = {
+      user: {
+        id: cosmosMember!.id!,
+        email: cosmosMember!.email!,
+        isAdmin: cosmosMember!.isAdmin!,
+      },
+      address: cosmosBase?.Addresses?.at(1)?.address,
+    };
+    cosmosNonEvmActor = {
+      user: {
+        id: cosmosMember!.id!,
+        email: cosmosMember!.email!,
+        isAdmin: cosmosMember!.isAdmin!,
+      },
+      address: cosmosNonEvmBase?.Addresses?.at(1)?.address,
+    };
+    substrateActor = {
+      user: {
+        id: substrateMember!.id!,
+        email: substrateMember!.email!,
+        isAdmin: substrateMember!.isAdmin!,
+      },
+      address: substrateBase?.Addresses?.at(1)?.address,
     };
   });
 
@@ -121,40 +263,104 @@ describe('Community lifecycle', () => {
     await dispose()();
   });
 
-  test('should create community', async () => {
-    const name = chance.name();
-    const result = await command(CreateCommunity(), {
-      actor: adminActor,
-      payload: {
-        id: name,
-        type: ChainType.Offchain,
-        name,
-        default_symbol: name.substring(0, 8).replace(' ', ''),
-        base: ChainBase.Ethereum,
-        social_links: [],
-        user_address: adminActor.address!,
-        directory_page_enabled: false,
-        tags: [],
-        chain_node_id: ethNode.id!,
-      },
+  describe('create', () => {
+    test('should create ethereum community', async () => {
+      const eth_name = chance.name();
+      const eth_result = await command(CreateCommunity(), {
+        actor: ethAdminActor,
+        payload: {
+          id: eth_name,
+          type: ChainType.Offchain,
+          name: eth_name,
+          default_symbol: eth_name.substring(0, 8).replace(' ', ''),
+          base: ChainBase.Ethereum,
+          social_links: [],
+          directory_page_enabled: false,
+          tags: [],
+          chain_node_id: ethNode.id!,
+        },
+      });
+      expect(eth_result?.community?.id).toBe(eth_name);
+      expect(eth_result?.admin_address).toBe(ethAdminActor.address);
+      community = eth_result!.community! as CommunityAttributes;
     });
 
-    expect(result?.community?.id).toBe(name);
-    expect(result?.admin_address).toBe(adminActor.address);
-    // connect results
-    community = result!.community! as CommunityAttributes;
+    test('should create cosmos community (evm compatible)', async () => {
+      const cosmos_name = chance.name() + '-' + chance.natural();
+      const cosmos_result = await command(CreateCommunity(), {
+        actor: cosmosAdminActor,
+        payload: {
+          id: cosmos_name,
+          type: ChainType.Offchain,
+          name: cosmos_name,
+          default_symbol: cosmos_name.substring(0, 8).replace(' ', ''),
+          base: ChainBase.CosmosSDK,
+          social_links: [],
+          directory_page_enabled: false,
+          tags: [],
+          chain_node_id: cosmosNode.id!,
+        },
+      });
+      expect(cosmos_result?.community?.id).toBe(cosmos_name);
+      expect(cosmos_result?.admin_address).toBe(cosmosAdminActor.address);
+      cosmos_community = cosmos_result!.community! as CommunityAttributes;
+    });
 
-    // create super admin address
-    await models.Address.create({
-      user_id: superAdminActor.user.id,
-      address: superAdminActor.address!,
-      community_id: community.id,
-      is_user_default: true,
-      role: 'admin',
-      last_active: new Date(),
-      ghost_address: false,
-      is_banned: false,
-      verification_token: '123',
+    test('should create cosmos community (non-evm compatible)', async () => {
+      const cosmos_name = chance.name() + '-' + chance.natural();
+      const cosmos_result = await command(CreateCommunity(), {
+        actor: cosmosAdminActor,
+        payload: {
+          id: cosmos_name,
+          type: ChainType.Offchain,
+          name: cosmos_name,
+          default_symbol: cosmos_name.substring(0, 8).replace(' ', ''),
+          base: ChainBase.CosmosSDK,
+          social_links: [],
+          directory_page_enabled: false,
+          tags: [],
+          chain_node_id: cosmosNode.id!,
+        },
+      });
+      expect(cosmos_result?.community?.id).toBe(cosmos_name);
+      expect(cosmos_result?.admin_address).toBe(cosmosAdminActor.address);
+      cosmos_community_non_evm = cosmos_result!
+        .community! as CommunityAttributes;
+    });
+
+    test('should create substrate community', async () => {
+      const substrate_name = chance.name() + '-' + chance.natural();
+      const substrate_result = await command(CreateCommunity(), {
+        actor: substrateAdminActor,
+        payload: {
+          id: substrate_name,
+          type: ChainType.Offchain,
+          name: substrate_name,
+          default_symbol: substrate_name.substring(0, 8).replace(' ', ''),
+          base: ChainBase.Substrate,
+          social_links: [],
+          directory_page_enabled: false,
+          tags: [],
+          chain_node_id: substrateNode.id!,
+        },
+      });
+      expect(substrate_result?.community?.id).toBe(substrate_name);
+      expect(substrate_result?.admin_address).toBe(substrateAdminActor.address);
+      substrate_community = substrate_result!.community! as CommunityAttributes;
+    });
+
+    test('should create super admin address', async () => {
+      await models.Address.create({
+        user_id: superAdminActor.user.id,
+        address: superAdminActor.address!,
+        community_id: community.id,
+        is_user_default: true,
+        role: 'admin',
+        last_active: new Date(),
+        ghost_address: false,
+        is_banned: false,
+        verification_token: '123',
+      });
     });
   });
 
@@ -170,7 +376,7 @@ describe('Community lifecycle', () => {
     test('should create group when none exists', async () => {
       const payload = buildCreateGroupPayload(community.id);
       const results = await command(CreateGroup(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload,
       });
       expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
@@ -187,12 +393,12 @@ describe('Community lifecycle', () => {
     test('should fail group creation when group with same id found', async () => {
       const payload = buildCreateGroupPayload(community.id);
       await command(CreateGroup(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload,
       });
       await expect(() =>
         command(CreateGroup(), {
-          actor: adminActor,
+          actor: ethAdminActor,
           payload,
         }),
       ).rejects.toThrow(InvalidState);
@@ -201,7 +407,7 @@ describe('Community lifecycle', () => {
     test('should fail group creation when sending invalid topics', async () => {
       await expect(
         command(CreateGroup(), {
-          actor: adminActor,
+          actor: ethAdminActor,
           payload: buildCreateGroupPayload(community.id, [1, 2, 3]),
         }),
       ).rejects.toThrow(CreateGroupErrors.InvalidTopics);
@@ -209,12 +415,12 @@ describe('Community lifecycle', () => {
 
     test('should delete group', async () => {
       const created = await command(CreateGroup(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload: buildCreateGroupPayload(community.id),
       });
       const group_id = created!.groups!.at(0)!.id!;
       const deleted = await command(DeleteGroup(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload: { community_id: community.id, group_id },
       });
       expect(deleted?.community_id).toBe(community.id);
@@ -237,7 +443,7 @@ describe('Community lifecycle', () => {
 
     test('should throw when trying to delete group that is system managed', async () => {
       const created = await command(CreateGroup(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload: {
           ...buildCreateGroupPayload(community.id),
         },
@@ -249,7 +455,7 @@ describe('Community lifecycle', () => {
       );
       await expect(() =>
         command(DeleteGroup(), {
-          actor: adminActor,
+          actor: ethAdminActor,
           payload: { community_id: community.id, group_id },
         }),
       ).rejects.toThrow(DeleteGroupErrors.SystemManaged);
@@ -259,7 +465,7 @@ describe('Community lifecycle', () => {
       await expect(async () => {
         for (let i = 0; i <= MAX_GROUPS_PER_COMMUNITY; i++) {
           await command(CreateGroup(), {
-            actor: adminActor,
+            actor: ethAdminActor,
             payload: buildCreateGroupPayload(community.id),
           });
         }
@@ -271,7 +477,7 @@ describe('Community lifecycle', () => {
     test('should throw when creating a topic as a non-admin', async () => {
       await expect(() =>
         command(CreateTopic(), {
-          actor: memberActor,
+          actor: ethActor,
           payload: {
             community_id: community.id,
             name: 'abc',
@@ -332,7 +538,7 @@ describe('Community lifecycle', () => {
     test('should throw when updating topic as non-admin', async () => {
       await expect(() =>
         command(UpdateTopic(), {
-          actor: memberActor,
+          actor: ethActor,
           payload: {
             topic_id: createdTopic.id!,
             community_id: community.id,
@@ -369,7 +575,7 @@ describe('Community lifecycle', () => {
         },
       }))!;
       const response = await command(DeleteTopic(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload: { community_id: community.id, topic_id: topic!.id! },
       });
       expect(response?.topic_id).to.equal(topic.id);
@@ -389,7 +595,7 @@ describe('Community lifecycle', () => {
 
       await expect(
         command(DeleteTopic(), {
-          actor: memberActor,
+          actor: ethActor,
           payload: { community_id: community.id, topic_id: topic!.id! },
         }),
       ).rejects.toThrow(InvalidActor);
@@ -408,7 +614,7 @@ describe('Community lifecycle', () => {
 
     test('should update community', async () => {
       const updated = await command(UpdateCommunity(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload: {
           ...baseRequest,
           id: community.id,
@@ -426,7 +632,7 @@ describe('Community lifecycle', () => {
 
     test('should remove directory', async () => {
       const updated = await command(UpdateCommunity(), {
-        actor: adminActor,
+        actor: ethAdminActor,
         payload: {
           ...baseRequest,
           id: community.id,
@@ -445,7 +651,7 @@ describe('Community lifecycle', () => {
     test('should throw if snapshot not found', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor: adminActor,
+          actor: ethAdminActor,
           payload: {
             ...baseRequest,
             id: community.id,
@@ -458,7 +664,7 @@ describe('Community lifecycle', () => {
     test('should throw if namespace present but no transaction hash', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor: adminActor,
+          actor: ethAdminActor,
           payload: {
             ...baseRequest,
             id: community.id,
@@ -472,7 +678,7 @@ describe('Community lifecycle', () => {
     test('should throw if actor is not admin', async () => {
       await expect(() =>
         command(UpdateCommunity(), {
-          actor: memberActor,
+          actor: ethActor,
           payload: {
             ...baseRequest,
             id: community.id,
@@ -508,22 +714,6 @@ describe('Community lifecycle', () => {
   });
 
   describe('joining', () => {
-    test('should join community', async () => {
-      const address = await command(JoinCommunity(), {
-        actor: memberActor,
-        payload: {
-          community_id: community.id,
-          address: memberActor.address!,
-        },
-      });
-      expect(address?.encoded_address).toBe(memberActor.address);
-      const members = await query(GetMembers(), {
-        actor: superAdminActor,
-        payload: { community_id: community.id, limit: 10, cursor: 1 },
-      });
-      expect(members?.results.length).toBe(3);
-    });
-
     test('should throw when not verified', async () => {
       const [member] = await seed('User', { isAdmin: false });
       const actor = {
@@ -539,8 +729,117 @@ describe('Community lifecycle', () => {
           actor,
           payload: {
             community_id: community.id,
-            address: actor.address,
           },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+
+    test('should join Ethereum community with evm compatible address', async () => {
+      const address = await command(JoinCommunity(), {
+        actor: ethActor,
+        payload: {
+          community_id: community.id,
+        },
+      });
+      expect(address?.encoded_address).toBe(ethActor.address);
+      const members = await query(GetMembers(), {
+        actor: superAdminActor,
+        payload: { community_id: community.id, limit: 10, cursor: 1 },
+      });
+      expect(members?.results.length).toBe(3);
+    });
+
+    test('should throw when joining Ethereum community with cosmos address', async () => {
+      await expect(
+        command(JoinCommunity(), {
+          actor: cosmosActor,
+          payload: { community_id: community.id },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+
+    test('should throw when joining Ethereum community with substrate address', async () => {
+      await expect(
+        command(JoinCommunity(), {
+          actor: substrateActor,
+          payload: { community_id: community.id },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+
+    test('should join CosmosSDK (evm compatible) community with cosmos address', async () => {
+      const cosmos_address = await command(JoinCommunity(), {
+        actor: cosmosActor,
+        payload: { community_id: cosmos_community.id },
+      });
+      expect(cosmos_address?.encoded_address).toBe(cosmosActor.address);
+    });
+
+    test('should join CosmosSDK (evm compatible) community with evm address', async () => {
+      const evm_address = await command(JoinCommunity(), {
+        actor: ethActor,
+        payload: { community_id: cosmos_community.id },
+      });
+      expect(evm_address?.encoded_address).toBe(ethActor.address);
+    });
+
+    test('should throw when joining CosmosSDK (evm compatible) community with substrate address', async () => {
+      await expect(
+        command(JoinCommunity(), {
+          actor: substrateActor,
+          payload: { community_id: cosmos_community.id },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+
+    test('should join CosmosSDK (non-evm compatible) community with cosmos address', async () => {
+      const address = await command(JoinCommunity(), {
+        actor: cosmosNonEvmActor,
+        payload: { community_id: cosmos_community_non_evm.id },
+      });
+      expect(address?.encoded_address).toBe(cosmosNonEvmActor.address);
+    });
+
+    test('should throw when joining CosmosSDK (non-evm compatible) community with evm address', async () => {
+      await expect(
+        command(JoinCommunity(), {
+          actor: ethActor,
+          payload: { community_id: cosmos_community_non_evm.id },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+
+    test('should throw when joining CosmosSDK (non-evm compatible) community with substrate address', async () => {
+      await expect(
+        command(JoinCommunity(), {
+          actor: substrateActor,
+          payload: { community_id: cosmos_community_non_evm.id },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+
+    test('should join Substrate community with substrate address', async () => {
+      const address = await command(JoinCommunity(), {
+        actor: substrateActor,
+        payload: { community_id: substrate_community.id },
+      });
+      expect(address?.encoded_address).toBe(substrateActor.address);
+    });
+
+    test('should throw when joining Substrate community with evm address', async () => {
+      await expect(
+        command(JoinCommunity(), {
+          actor: ethActor,
+          payload: { community_id: substrate_community.id },
+        }),
+      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+
+    test('should throw when joining Substrate community with cosmos address', async () => {
+      await expect(
+        command(JoinCommunity(), {
+          actor: cosmosActor,
+          payload: { community_id: substrate_community.id },
         }),
       ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
     });

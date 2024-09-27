@@ -60,12 +60,6 @@ const CommunityInformationStep = ({
   const handleSubmit = async (
     values: CommunityInformationFormSubmitValues & { communityId: string },
   ) => {
-    // this condition will never be fulfilled but adding this to avoid typescript errors
-    if (!selectedAddress) {
-      notifyError('No address selected');
-      return;
-    }
-
     const nodes = fetchCachedNodes();
     const baseNode = nodes?.find(
       (n) => n.ethChainId === commonProtocol.ValidChains.Base,
@@ -83,9 +77,7 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        userAddress: selectedAddress.address,
         chainNodeId: baseNode.ethChainId,
-        isPWA: isAddedToHomeScreen,
         tokenName: tokenInfo?.name || '',
       });
       await createCommunityMutation(input);
