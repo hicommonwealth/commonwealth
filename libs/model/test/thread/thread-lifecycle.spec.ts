@@ -141,6 +141,7 @@ describe('Thread lifecycle', () => {
           user_id: users[role].id,
           role: role === 'admin' ? 'admin' : 'member',
           is_banned: role === 'banned',
+          verified: true,
         };
       }),
       groups: [{ id: threadGroupId }, { id: commentGroupId }],
