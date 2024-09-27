@@ -1,6 +1,10 @@
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
-import { useCreateApiKeyMutation, useGetApiKeyQuery } from 'state/api/user';
+import {
+  useCreateApiKeyMutation,
+  useDeleteApiKeyMutation,
+  useGetApiKeyQuery,
+} from 'state/api/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { openConfirmation } from '../../modals/confirmation_modal';
@@ -8,6 +12,7 @@ import ProfileSection from './Section';
 
 const ManageApiKey = () => {
   const { mutateAsync: createApiKey } = useCreateApiKeyMutation();
+  const { mutateAsync: deleteApiKey } = useDeleteApiKeyMutation();
   const useGetApiKey = useGetApiKeyQuery();
 
   const openConfirmationModal = (api_key: string) => {
@@ -42,6 +47,16 @@ const ManageApiKey = () => {
         type="button"
         buttonType="destructive"
         buttonWidth="wide"
+        onClick={() => {
+          deleteApiKey({})
+            .then(() => {
+              notifySuccess('API key deleted');
+            })
+            .catch((err) => {
+              console.error(err);
+              notifyError('Failed to delete API key');
+            });
+        }}
       />
     </div>
   );
@@ -67,7 +82,6 @@ const ManageApiKey = () => {
 
   return (
     <ProfileSection title="Api Key" description="Manage your Common API key">
-      {/*{createKeyUI}*/}
       {useGetApiKey.data?.hashed_api_key ? existingKeyUI : createKeyUI}
     </ProfileSection>
   );

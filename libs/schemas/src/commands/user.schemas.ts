@@ -34,5 +34,7 @@ export const GetApiKey = {
 
 export const DeleteApiKey = {
   input: z.object({}),
-  output: z.object({}),
+  output: z.object({
+    deleted: z.boolean(),
+  }),
 };
