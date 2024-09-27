@@ -72,7 +72,8 @@ const ManageApiKey = () => {
             .then((res) => {
               openConfirmationModal(res.api_key);
             })
-            .catch(() => {
+            .catch((err) => {
+              console.error(err);
               notifyError('Failed to create an API key');
             });
         }}
