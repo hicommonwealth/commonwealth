@@ -1,6 +1,7 @@
 import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 import { emitEvent } from '../utils';
 
 // This webhook processes the cast action event:
@@ -34,14 +35,24 @@ export function FarcasterActionWebhook(): Command<
           `contest manager ${contestManager.contest_address} not associated with any topics`,
         );
       }
+
+      const address = (await models.Address.findOne({
+        where: {
+          address: payload.address,
+          community_id: contestManager.community_id,
+        },
+      }))!;
+      mustExist('Address', address);
+      const { id: address_id } = address;
+
       await emitEvent(models.Outbox, [
         {
           event_name: EventNames.ThreadUpvoted,
           event_payload: {
-            address: payload.address,
-            address_id: 0,
+            address_id: address_id!,
             reaction: 'like',
-            communityId: contestManager.community_id,
+            community_id: contestManager.community_id,
+            thread_id: 0,
             topicId: contestTopic.topic_id,
             contestManagers: [contestManager.toJSON()],
           },

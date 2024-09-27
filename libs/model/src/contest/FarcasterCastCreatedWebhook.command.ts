@@ -11,6 +11,16 @@ export function FarcasterCastCreatedWebhook(): Command<
     ...schemas.FarcasterCastCreatedWebhook,
     auth: [],
     body: async ({ payload }) => {
+      console.log('PAYLOAD: ', payload);
+
+      if (payload.data.embeds.length === 0) {
+        // not const embed
+        return;
+      }
+
+      const url = new URL(payload.data.embeds[0].url);
+      console.log('url pathname: ', url.pathname);
+
       // append frame hash to Contest Manager
       await models.sequelize.query(
         `
@@ -24,10 +34,12 @@ export function FarcasterCastCreatedWebhook(): Command<
         {
           replacements: {
             newHash: payload.data.hash,
-            farcasterFrameUrl: payload.data.root_parent_url,
+            farcasterFrameUrl: url.pathname,
           },
         },
       );
+
+      return { status: 'ok' };
     },
   };
 }

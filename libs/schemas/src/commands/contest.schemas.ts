@@ -77,30 +77,15 @@ export const PerformContestRollovers = {
 
 export const FarcasterCastCreatedWebhook = {
   input: z.object({
-    id: z.string(), // TODO: remove this
-    address: z.string(),
-    frame_url: z.string(),
-    button_index: z.number(),
-    cast_id: z.object({
-      fid: z.number(),
-      hash: z.string(),
-    }),
-  }),
-  output: z.object({}),
-};
-
-export const FarcasterActionWebhook = {
-  input: z.object({
-    id: z.string(), // TODO: remove this
     created_at: z.number(),
-    type: z.literal('cast.created'),
+    type: z.string(),
     data: z.object({
       object: z.string(),
       hash: z.string(),
       thread_hash: z.string(),
       parent_hash: z.string().nullable(),
-      parent_url: z.string(),
-      root_parent_url: z.string(),
+      parent_url: z.string().nullable(),
+      root_parent_url: z.string().nullable(),
       parent_author: z.object({
         fid: z.number().nullable(),
       }),
@@ -110,25 +95,58 @@ export const FarcasterActionWebhook = {
         custody_address: z.string(),
         username: z.string(),
         display_name: z.string(),
-        pfp_url: z.string(),
-        profile: z.any().nullish(), // TODO: Adjust this based on the actual structure of the "profile" object
+        pfp_url: z.string().url(),
+        profile: z.object({
+          bio: z.object({
+            text: z.string(),
+          }),
+        }),
         follower_count: z.number(),
         following_count: z.number(),
-        verifications: z.array(z.string()),
+        verifications: z.array(z.unknown()),
+        verified_addresses: z.object({
+          eth_addresses: z.array(z.string()),
+          sol_addresses: z.array(z.string()),
+        }),
         active_status: z.string(),
+        power_badge: z.boolean(),
       }),
       text: z.string(),
       timestamp: z.string(),
-      embeds: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "embeds" array
+      embeds: z.array(
+        z.object({
+          url: z.string().url(),
+          metadata: z.object({
+            content_type: z.string(),
+            content_length: z.string(),
+            _status: z.string(),
+            image: z.object({
+              width_px: z.number(),
+              height_px: z.number(),
+            }),
+          }),
+        }),
+      ),
       reactions: z.object({
-        likes: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "likes" array
-        recasts: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "recasts" array
+        likes_count: z.number(),
+        recasts_count: z.number(),
+        likes: z.array(z.unknown()),
+        recasts: z.array(z.unknown()),
       }),
       replies: z.object({
         count: z.number(),
       }),
-      mentioned_profiles: z.array(z.any()), // TODO: Adjust this based on the actual structure of the "mentioned_profiles" array
+      channel: z.string().nullable(),
+      mentioned_profiles: z.array(z.unknown()),
+      event_timestamp: z.string(),
     }),
   }),
+  output: z.object({
+    status: z.literal('ok'),
+  }),
+};
+
+export const FarcasterActionWebhook = {
+  input: z.object({}),
   output: z.object({}),
 };

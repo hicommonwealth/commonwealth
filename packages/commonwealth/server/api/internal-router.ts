@@ -1,7 +1,6 @@
-import { express, trpc } from '@hicommonwealth/adapters';
-import { Contest } from '@hicommonwealth/model';
+import { trpc } from '@hicommonwealth/adapters';
 import cors from 'cors';
-import { Router, raw } from 'express';
+import { Router } from 'express';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
@@ -45,51 +44,6 @@ const trpcRouter = trpc.router(api);
 export type API = typeof trpcRouter;
 
 router.use('/trpc', trpc.toExpress(trpcRouter));
-
-router.post(
-  '/farcaster/CastCreated',
-  raw({ type: '*/*', limit: '10mb', inflate: true }),
-  (req, _, next) => {
-    // TODO: verify frame signature message
-    return next();
-  },
-  // parse body as JSON (native express.json middleware doesn't work here)
-  (req, _, next) => {
-    req.body = JSON.parse(req.body);
-    next();
-  },
-  express.command(Contest.FarcasterCastCreatedWebhook()),
-);
-
-router.post(
-  '/farcaster/ReplyCastCreated',
-  raw({ type: '*/*', limit: '10mb', inflate: true }),
-  (req, _, next) => {
-    // TODO: verify frame signature message
-    return next();
-  },
-  // parse body as JSON (native express.json middleware doesn't work here)
-  (req, _, next) => {
-    req.body = JSON.parse(req.body);
-    next();
-  },
-  express.command(Contest.FarcasterReplyCastCreatedWebhook()),
-);
-
-router.post(
-  '/farcaster/action',
-  raw({ type: '*/*', limit: '10mb', inflate: true }),
-  (req, _, next) => {
-    // TODO: verify frame signature message
-    return next();
-  },
-  // parse body as JSON (native express.json middleware doesn't work here)
-  (req, _, next) => {
-    req.body = JSON.parse(req.body);
-    next();
-  },
-  express.command(Contest.FarcasterActionWebhook()),
-);
 
 if (config.NODE_ENV !== 'production') {
   router.use(cors());
