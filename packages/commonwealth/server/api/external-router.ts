@@ -1,7 +1,10 @@
 import { express, trpc } from '@hicommonwealth/adapters';
+import { models } from '@hicommonwealth/model';
 import cors from 'cors';
-import { Router } from 'express';
+import { createHash } from 'crypto';
+import { NextFunction, Request, Response, Router } from 'express';
 import passport from 'passport';
+import { Op } from 'sequelize';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
@@ -72,7 +75,51 @@ router.use(cors(), express.statsMiddleware);
  */
 if (config.NODE_ENV === 'test')
   router.use(passport.authenticate('jwt', { session: false }));
+
 // ===============================================================================
+
+function getSaltedApiKeyHash(apiKey: string, salt: string): string {
+  return createHash('sha256')
+    .update(apiKey + salt)
+    .digest('hex');
+}
+
+// API Key Authentication
+router.use(async (req: Request, response: Response, next: NextFunction) => {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey) throw new Error('Missing API key');
+  if (typeof apiKey !== 'string') throw new Error('Invalid API key');
+
+  const address = await models.Address.findOne({
+    attributes: ['id'],
+    where: {
+      address: req.headers['address'],
+      verified: { [Op.ne]: null },
+    },
+    include: [
+      {
+        model: models.User.scope('withPrivateData'),
+        required: true,
+      },
+    ],
+  });
+
+  if (!address) throw new Error('Address not found');
+
+  if (!address.User!.hashed_api_key || !address.User!.api_key_salt)
+    throw new Error('No API key associated with given address');
+
+  const hashedApiKey = getSaltedApiKeyHash(apiKey, address.User!.api_key_salt);
+
+  if (hashedApiKey !== address.User!.hashed_api_key)
+    throw new Error('UNAUTHENTICATED');
+
+  req.user = models.User.build({
+    ...address.User!,
+  });
+
+  return next();
+});
 
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {
