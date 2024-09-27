@@ -66,7 +66,10 @@ const useFundContestForm = ({
     ethChainId,
   });
 
-  const contestTokenBalance = String(contestBalanceData);
+  const contestTokenBalance =
+    tokenMetadata?.decimals && contestBalanceData
+      ? String(contestBalanceData / Math.pow(10, tokenMetadata?.decimals))
+      : String(contestBalanceData);
 
   const newContestTokenBalance = calculateNewContractBalance(
     contestTokenBalance,
