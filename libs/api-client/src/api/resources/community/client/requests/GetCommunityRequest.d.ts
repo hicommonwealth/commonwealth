@@ -8,6 +8,6 @@
  *     }
  */
 export interface GetCommunityRequest {
-  id: string;
-  includeNodeInfo?: boolean;
+    id: string;
+    includeNodeInfo?: boolean;
 }

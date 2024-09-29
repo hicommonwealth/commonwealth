@@ -9,6 +9,6 @@
  *     }
  */
 export interface DeleteTopicRequest {
-  communityId: string;
-  topicId: number;
+    communityId: string;
+    topicId: number;
 }

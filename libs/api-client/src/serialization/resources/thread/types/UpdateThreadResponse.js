@@ -10,7 +10,6 @@ import { UpdateThreadResponseReactionsItem } from './UpdateThreadResponseReactio
 import { UpdateThreadResponseSearch } from './UpdateThreadResponseSearch';
 import { UpdateThreadResponseThreadVersionHistoriesItem } from './UpdateThreadResponseThreadVersionHistoriesItem';
 import { UpdateThreadResponseTopic } from './UpdateThreadResponseTopic';
-
 export const UpdateThreadResponse = core.serialization.object({
   id: core.serialization.number().optional(),
   addressId: core.serialization.property(

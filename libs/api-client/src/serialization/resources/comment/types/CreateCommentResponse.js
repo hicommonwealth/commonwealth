@@ -8,7 +8,6 @@ import { CreateCommentResponseDiscordMeta } from './CreateCommentResponseDiscord
 import { CreateCommentResponseReaction } from './CreateCommentResponseReaction';
 import { CreateCommentResponseSearch } from './CreateCommentResponseSearch';
 import { CreateCommentResponseThread } from './CreateCommentResponseThread';
-
 export const CreateCommentResponse = core.serialization.object({
   id: core.serialization.number().optional(),
   threadId: core.serialization.property(

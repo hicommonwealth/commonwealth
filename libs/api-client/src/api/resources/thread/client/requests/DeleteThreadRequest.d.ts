@@ -8,7 +8,7 @@
  *     }
  */
 export interface DeleteThreadRequest {
-  threadId: number;
-  canvasSignedData?: string;
-  canvasMsgId?: string;
+    threadId: number;
+    canvasSignedData?: string;
+    canvasMsgId?: string;
 }

@@ -10,7 +10,6 @@ import { GetCommentsResponseResultsItemThreadReactionsItem } from './GetComments
 import { GetCommentsResponseResultsItemThreadSearch } from './GetCommentsResponseResultsItemThreadSearch';
 import { GetCommentsResponseResultsItemThreadThreadVersionHistoriesItem } from './GetCommentsResponseResultsItemThreadThreadVersionHistoriesItem';
 import { GetCommentsResponseResultsItemThreadTopic } from './GetCommentsResponseResultsItemThreadTopic';
-
 export const GetCommentsResponseResultsItemThread = core.serialization.object({
   id: core.serialization.number().optional(),
   addressId: core.serialization.property(

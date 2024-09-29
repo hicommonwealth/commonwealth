@@ -11,7 +11,6 @@ var __awaiter =
             resolve(value);
           });
     }
-
     return new (P || (P = Promise))(function (resolve, reject) {
       function fulfilled(value) {
         try {
@@ -20,7 +19,6 @@ var __awaiter =
           reject(e);
         }
       }
-
       function rejected(value) {
         try {
           step(generator['throw'](value));
@@ -28,13 +26,11 @@ var __awaiter =
           reject(e);
         }
       }
-
       function step(result) {
         result.done
           ? resolve(result.value)
           : adopt(result.value).then(fulfilled, rejected);
       }
-
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
@@ -43,12 +39,10 @@ import * as core from '../../../../core';
 import * as environments from '../../../../environments';
 import * as errors from '../../../../errors/index';
 import * as serializers from '../../../../serialization/index';
-
 export class Comment {
   constructor(_options = {}) {
     this._options = _options;
   }
-
   /**
    * @param {CommonApi.GetCommentsRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -162,7 +156,6 @@ export class Comment {
       }
     });
   }
-
   /**
    * @param {CommonApi.CreateCommentRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -246,7 +239,6 @@ export class Comment {
       }
     });
   }
-
   /**
    * @param {CommonApi.UpdateCommentRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -330,7 +322,6 @@ export class Comment {
       }
     });
   }
-
   /**
    * @param {CommonApi.DeleteCommentRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -413,7 +404,6 @@ export class Comment {
       }
     });
   }
-
   _getCustomAuthorizationHeaders() {
     return __awaiter(this, void 0, void 0, function* () {
       const apiKeyValue = yield core.Supplier.get(this._options.apiKey);

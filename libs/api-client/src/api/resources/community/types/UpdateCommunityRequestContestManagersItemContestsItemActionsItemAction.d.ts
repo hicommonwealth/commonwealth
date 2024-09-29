@@ -4,9 +4,8 @@
 /**
  * Type of content action
  */
-export declare type UpdateCommunityRequestContestManagersItemContestsItemActionsItemAction =
-  'added' | 'upvoted';
+export declare type UpdateCommunityRequestContestManagersItemContestsItemActionsItemAction = "added" | "upvoted";
 export declare const UpdateCommunityRequestContestManagersItemContestsItemActionsItemAction: {
-  readonly Added: 'added';
-  readonly Upvoted: 'upvoted';
+    readonly Added: "added";
+    readonly Upvoted: "upvoted";
 };

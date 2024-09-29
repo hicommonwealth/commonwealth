@@ -8,8 +8,8 @@
  *     }
  */
 export interface CreateCommentReactionRequest {
-  commentId: number;
-  commentMsgId?: string;
-  canvasSignedData?: string;
-  canvasMsgId?: string;
+    commentId: number;
+    commentMsgId?: string;
+    canvasSignedData?: string;
+    canvasMsgId?: string;
 }

@@ -10,7 +10,6 @@ import { CreateThreadResponseReactionsItem } from './CreateThreadResponseReactio
 import { CreateThreadResponseSearch } from './CreateThreadResponseSearch';
 import { CreateThreadResponseThreadVersionHistoriesItem } from './CreateThreadResponseThreadVersionHistoriesItem';
 import { CreateThreadResponseTopic } from './CreateThreadResponseTopic';
-
 export const CreateThreadResponse = core.serialization.object({
   id: core.serialization.number().optional(),
   addressId: core.serialization.property(

@@ -1,4 +1,1 @@
-export declare const string: () => import('../../Schema').Schema<
-  string,
-  string
->;
+export declare const string: () => import("../../Schema").Schema<string, string>;

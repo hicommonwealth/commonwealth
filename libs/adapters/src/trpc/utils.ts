@@ -10,6 +10,7 @@ import {
   type GenerateOpenApiDocumentOptions,
   type OpenApiRouter,
 } from 'trpc-swagger';
+import { config } from '../config';
 
 const log = logger(import.meta);
 
@@ -70,7 +71,14 @@ export function useOAS(
   { title, path, version }: Options,
 ) {
   router.get('/openapi.json', (req, res) => {
-    const baseUrl = req.protocol + '://' + req.get('host') + path;
+    let baseUrl = req.protocol + '://' + req.get('host') + path;
+
+    // Used in CI to generate an SDK where the default environment is the production
+    // API url so the user does not need to hardcode it when using the client
+    if (config.GENERATE_PRODUCTION_SDK) {
+      baseUrl = `https://commonwealth.im${path}`;
+    }
+
     return res.json(
       toOpenApiDocument(trpcRouter, {
         title,

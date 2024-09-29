@@ -5,7 +5,6 @@ import * as core from '../../../../core';
 import { GetCommentsResponseResultsItemAddressUserEmailNotificationInterval } from './GetCommentsResponseResultsItemAddressUserEmailNotificationInterval';
 import { GetCommentsResponseResultsItemAddressUserProfile } from './GetCommentsResponseResultsItemAddressUserProfile';
 import { GetCommentsResponseResultsItemAddressUserProfileTagsItem } from './GetCommentsResponseResultsItemAddressUserProfileTagsItem';
-
 export const GetCommentsResponseResultsItemAddressUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

@@ -1,3 +1,3 @@
-export { CreateThreadRequest } from './CreateThreadRequest';
-export { DeleteThreadRequest } from './DeleteThreadRequest';
-export { UpdateThreadRequest } from './UpdateThreadRequest';
+export { CreateThreadRequest } from "./CreateThreadRequest";
+export { UpdateThreadRequest } from "./UpdateThreadRequest";
+export { DeleteThreadRequest } from "./DeleteThreadRequest";

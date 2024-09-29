@@ -5,7 +5,7 @@
  * X-Ref to topics in contest
  */
 export interface UpdateCommentResponseThreadTopicContestTopicsItem {
-  contestAddress: string;
-  topicId: number;
-  createdAt: Date;
+    contestAddress: string;
+    topicId: number;
+    createdAt: Date;
 }

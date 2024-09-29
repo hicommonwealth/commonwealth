@@ -8,5 +8,5 @@
  *     }
  */
 export interface DeleteCommentRequest {
-  commentId: number;
+    commentId: number;
 }

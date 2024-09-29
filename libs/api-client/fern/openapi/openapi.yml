@@ -3,7 +3,7 @@ info:
   title: Common API
   version: 0.0.1
 servers:
-  - url: http://localhost:3000/api/v1
+  - url: https://commonwealth.im/api/v1
 paths:
   /GetCommunities:
     get:
