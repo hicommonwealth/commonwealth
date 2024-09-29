@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "build": "Generated SDK is prebuilt",
+    "build": "echo Generated SDK is prebuilt",
     "clean": "rm -rf build && rm -rf coverage",
     "publish": "npm publish",
     "run-test": "tsx ./test/index.ts",
