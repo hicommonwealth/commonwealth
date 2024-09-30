@@ -1,3 +1,6 @@
+/* eslint-disable no-warning-comments */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { command } from '@hicommonwealth/core';
 import { User, models, tester } from '@hicommonwealth/model';
 import { User as UserSchema } from '@hicommonwealth/schemas';

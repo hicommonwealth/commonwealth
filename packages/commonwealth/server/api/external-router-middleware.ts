@@ -122,7 +122,7 @@ export function addRateLimiterMiddleware() {
     (p) => `/${p[0].toUpperCase()}${p.substring(1)}`,
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
   router.use(async (req: Request, res: Response, next: NextFunction) => {
     if (communityPaths.includes(req.path)) {
       return tierOneRateLimiter(req, res, next);
