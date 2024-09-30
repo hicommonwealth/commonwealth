@@ -17,15 +17,24 @@ export const ScrollContainer = memo(function ScrollContainer(
 ) {
   const containerRef = useRef<HTMLElement | null>();
 
-  const [scrollActive, setScrollActive] = useState(false);
+  const [scrollActiveRight, setScrollActiveRight] = useState(false);
 
   const handleRenderUpdate = useCallback(() => {
     const el = containerRef.current;
     if (el) {
-      console.log('FIXME: clientWidth: ', el.clientWidth);
-      console.log('FIXME: scrollWidth: ', el.scrollWidth);
+      console.log('FIXME: scroll: ', {
+        scrollLeft: el.scrollLeft,
+        scrollWidth: el.scrollWidth,
+        clientWidth: el.clientWidth,
+      });
 
-      setScrollActive(el.clientWidth < el.scrollWidth);
+      if (el.clientWidth < el.scrollWidth) {
+        setScrollActiveRight(
+          Math.floor(el.scrollLeft + el.clientWidth) < el.scrollWidth,
+        );
+      } else {
+        setScrollActiveRight(false);
+      }
     }
   }, []);
 
@@ -33,7 +42,6 @@ export const ScrollContainer = memo(function ScrollContainer(
     (element: HTMLElement | null) => {
       containerRef.current = element;
       handleRenderUpdate();
-      element?.addEventListener('scroll', () => console.log('FIXME scroll'));
     },
     [handleRenderUpdate],
   );
@@ -48,11 +56,13 @@ export const ScrollContainer = memo(function ScrollContainer(
 
   return (
     <div className="ScrollContainer">
-      <div className="Inner" ref={handleRef}>
+      <div className="Inner" onScroll={handleRenderUpdate} ref={handleRef}>
         {props.children}
       </div>
 
-      {scrollActive && <div className="OverflowIndicatorRight">&nbsp;</div>}
+      {scrollActiveRight && (
+        <div className="OverflowIndicatorRight">&nbsp;</div>
+      )}
     </div>
   );
 });
