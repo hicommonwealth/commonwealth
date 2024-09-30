@@ -29,7 +29,7 @@ describe('API KeyAuthentication', () => {
       promotional_emails_enabled: false,
       profile: {},
     });
-    const [_community] = await tester.seed('Community', {
+    await tester.seed('Community', {
       chain_node_id: node!.id!,
       active: true,
       profile_count: 1,
