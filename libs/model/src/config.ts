@@ -7,6 +7,8 @@ const {
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
+  DISCORD_CLIENT_ID,
+  DISCORD_TOKEN,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
@@ -136,6 +138,10 @@ export const config = configure(
       MEMBERSHIP_REFRESH_TTL_SECONDS ?? DEFAULTS.MEMBERSHIP_REFRESH_TTL_SECONDS,
       10,
     ),
+    DISCORD: {
+      CLIENT_ID: DISCORD_CLIENT_ID,
+      BOT_TOKEN: DISCORD_TOKEN,
+    },
   },
   z.object({
     DB: z.object({
@@ -233,5 +239,31 @@ export const config = configure(
     }),
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
+    DISCORD: z.object({
+      CLIENT_ID: z
+        .string()
+        .optional()
+        .refine(
+          (data) =>
+            !(
+              ['production', 'frick', 'beta', 'demo'].includes(
+                target.APP_ENV,
+              ) && !data
+            ),
+          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
+        ),
+      BOT_TOKEN: z
+        .string()
+        .optional()
+        .refine(
+          (data) =>
+            !(
+              ['production', 'frick', 'beta', 'demo'].includes(
+                target.APP_ENV,
+              ) && !data
+            ),
+          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
+        ),
+    }),
   }),
 );

@@ -15,8 +15,6 @@ const {
   GENERATE_IMAGE_RATE_LIMIT,
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
-  DISCORD_CLIENT_ID,
-  DISCORD_TOKEN,
   CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
@@ -71,10 +69,6 @@ export const config = configure(
         model_config.APP_ENV === 'production'
           ? TELEGRAM_BOT_TOKEN
           : TELEGRAM_BOT_TOKEN_DEV,
-    },
-    DISCORD: {
-      CLIENT_ID: DISCORD_CLIENT_ID,
-      BOT_TOKEN: DISCORD_TOKEN,
     },
     CLOUDFLARE: {
       ZONE_ID: CF_ZONE_ID,
@@ -150,32 +144,6 @@ export const config = configure(
         .refine(
           (data) => !(model_config.APP_ENV === 'production' && !data),
           'TELEGRAM_BOT_TOKEN is required in production',
-        ),
-    }),
-    DISCORD: z.object({
-      CLIENT_ID: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                model_config.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
-        ),
-      BOT_TOKEN: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                model_config.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
         ),
     }),
     CLOUDFLARE: z.object({
