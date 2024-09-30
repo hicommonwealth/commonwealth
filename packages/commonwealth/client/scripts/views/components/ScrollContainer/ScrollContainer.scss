@@ -4,14 +4,15 @@
   .Inner {
     display: flex;
     overflow-x: auto;
-    overflow-y: hidden; /* Disable vertical scrolling */
-    white-space: nowrap; /* Prevent line breaks for horizontal alignment */
+    overflow-y: hidden;
+    white-space: nowrap;
 
-    scrollbar-width: none; /* For Firefox */
-    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    // disable the scrollbars for IE + Firefox
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 
+    // disable the scrollbar for Chrome.
     ::-webkit-scrollbar {
-      // for chrome
       display: none;
     }
   }
@@ -19,7 +20,12 @@
   .OverflowIndicatorLeft,
   .OverflowIndicatorRight {
     position: absolute;
-    width: 30px;
+    width: 50px;
+    height: 100%;
+
+    // needed so that the overflow indicator doesn't swallow scrolling
+    // events menta for the main Inner div.
+    pointer-events: none;
   }
 
   .OverflowIndicatorLeft {

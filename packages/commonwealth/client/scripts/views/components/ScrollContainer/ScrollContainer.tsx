@@ -23,12 +23,6 @@ export const ScrollContainer = memo(function ScrollContainer(
   const handleRenderUpdate = useCallback(() => {
     const el = containerRef.current;
     if (el) {
-      console.log('FIXME: scroll: ', {
-        scrollLeft: el.scrollLeft,
-        scrollWidth: el.scrollWidth,
-        clientWidth: el.clientWidth,
-      });
-
       if (el.clientWidth < el.scrollWidth) {
         setScrollActiveLeft(el.scrollLeft !== 0);
         setScrollActiveRight(
@@ -55,8 +49,6 @@ export const ScrollContainer = memo(function ScrollContainer(
       window.removeEventListener('resize', handleRenderUpdate);
     };
   }, [handleRenderUpdate]);
-
-  console.log('FIXME: ', { scrollActiveLeft, scrollActiveRight });
 
   return (
     <div className="ScrollContainer">

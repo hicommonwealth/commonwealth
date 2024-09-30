@@ -1,21 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollContainer } from 'views/components/ScrollContainer/ScrollContainer';
+import {
+  CWTab,
+  CWTabsRow,
+} from 'views/components/component_kit/new_designs/CWTabs';
 
 export const Test = () => {
+  const [selected, setSelected] = useState(1);
+
   return (
     <div>
       <ScrollContainer>
-        <div style={{ display: 'flex' }}>
-          <div>Child1</div>
-          <div>Child2</div>
-          <div>Child3</div>
-          <div>Child4</div>
-          <div>Child5</div>
-          <div>Child6</div>
-          <div>Child7</div>
-          <div>Child8</div>
-          <div>Child9</div>
-        </div>
+        <CWTabsRow>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((current) => (
+            <CWTab
+              key={current}
+              label={'Tab' + current}
+              isSelected={current === selected}
+              onClick={() => setSelected(current)}
+            />
+          ))}
+        </CWTabsRow>
       </ScrollContainer>
     </div>
   );
