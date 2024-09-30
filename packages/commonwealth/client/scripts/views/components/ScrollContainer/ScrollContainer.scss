@@ -16,14 +16,27 @@
     }
   }
 
+  .OverflowIndicatorLeft,
   .OverflowIndicatorRight {
     position: absolute;
+    width: 30px;
+  }
+
+  .OverflowIndicatorLeft {
+    background: linear-gradient(
+      to left,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 1) 100%
+    );
+    left: 0;
+  }
+
+  .OverflowIndicatorRight {
     background: linear-gradient(
       to right,
       rgba(255, 255, 255, 0) 0%,
       rgba(255, 255, 255, 1) 100%
     );
-    width: 30px;
     right: 0;
   }
 }

@@ -17,6 +17,7 @@ export const ScrollContainer = memo(function ScrollContainer(
 ) {
   const containerRef = useRef<HTMLElement | null>();
 
+  const [scrollActiveLeft, setScrollActiveLeft] = useState(false);
   const [scrollActiveRight, setScrollActiveRight] = useState(false);
 
   const handleRenderUpdate = useCallback(() => {
@@ -29,6 +30,7 @@ export const ScrollContainer = memo(function ScrollContainer(
       });
 
       if (el.clientWidth < el.scrollWidth) {
+        setScrollActiveLeft(el.scrollLeft !== 0);
         setScrollActiveRight(
           Math.floor(el.scrollLeft + el.clientWidth) < el.scrollWidth,
         );
@@ -54,8 +56,12 @@ export const ScrollContainer = memo(function ScrollContainer(
     };
   }, [handleRenderUpdate]);
 
+  console.log('FIXME: ', { scrollActiveLeft, scrollActiveRight });
+
   return (
     <div className="ScrollContainer">
+      {scrollActiveLeft && <div className="OverflowIndicatorLeft">&nbsp;</div>}
+
       <div className="Inner" onScroll={handleRenderUpdate} ref={handleRef}>
         {props.children}
       </div>
