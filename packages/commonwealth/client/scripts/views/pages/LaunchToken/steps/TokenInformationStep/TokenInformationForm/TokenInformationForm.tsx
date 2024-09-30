@@ -76,7 +76,7 @@ const TokenInformationForm = ({
   });
 
   const handleSubmit = useCallback(
-    async (values: FormSubmitValues) => {
+    (values: FormSubmitValues) => {
       // get address from user
       if (!selectedAddress) {
         openAddressSelectionModal();

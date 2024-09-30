@@ -29,7 +29,7 @@ const SignTokenTransactions = ({
     communityId: createdCommunityId,
   });
 
-  const handleSign = () => {
+  const handleSign = async () => {
     try {
       // 1. Attempt Launch token on chain
       const payload = {
@@ -39,12 +39,15 @@ const SignTokenTransactions = ({
         symbol: tokenInfo.symbol.trim(),
         walletAddress: selectedAddress.address,
       };
-      launchToken(payload);
+      await launchToken(payload);
 
       // 2. TODO: Store `tokenInfo` on db - needs api
 
       // update community to reference the created token
-      updateCommunity({ id: createdCommunityId, token_name: payload.name });
+      await updateCommunity({
+        id: createdCommunityId,
+        token_name: payload.name,
+      });
 
       onSuccess();
     } catch (e) {
@@ -65,7 +68,9 @@ const SignTokenTransactions = ({
         actionButton: {
           label: 'Sign',
           disabled: false,
-          onClick: handleSign,
+          onClick: () => {
+            handleSign().catch(console.error);
+          },
         },
         errorText: tokenLaunchError
           ? 'Something went wrong when creating the token'
