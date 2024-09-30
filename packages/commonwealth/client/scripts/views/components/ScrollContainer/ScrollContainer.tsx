@@ -3,6 +3,7 @@ import React, {
   ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -20,9 +21,13 @@ export const ScrollContainer = memo(function ScrollContainer(
   const [scrollActiveLeft, setScrollActiveLeft] = useState(false);
   const [scrollActiveRight, setScrollActiveRight] = useState(false);
 
+  const [indicatorHeight, setIndicatorHeight] = useState(0);
+
   const handleRenderUpdate = useCallback(() => {
     const el = containerRef.current;
     if (el) {
+      setIndicatorHeight(el.clientHeight);
+
       if (el.clientWidth < el.scrollWidth) {
         setScrollActiveLeft(el.scrollLeft !== 0);
         setScrollActiveRight(
@@ -50,16 +55,30 @@ export const ScrollContainer = memo(function ScrollContainer(
     };
   }, [handleRenderUpdate]);
 
+  const indicatorProps = useMemo(() => {
+    return {
+      style: {
+        height: indicatorHeight,
+      },
+    };
+  }, [indicatorHeight]);
+
   return (
     <div className="ScrollContainer">
-      {scrollActiveLeft && <div className="OverflowIndicatorLeft">&nbsp;</div>}
+      {scrollActiveLeft && (
+        <div className="OverflowIndicatorLeft" {...indicatorProps}>
+          &nbsp;
+        </div>
+      )}
 
       <div className="Inner" onScroll={handleRenderUpdate} ref={handleRef}>
         {props.children}
       </div>
 
       {scrollActiveRight && (
-        <div className="OverflowIndicatorRight">&nbsp;</div>
+        <div className="OverflowIndicatorRight" {...indicatorProps}>
+          &nbsp;
+        </div>
       )}
     </div>
   );

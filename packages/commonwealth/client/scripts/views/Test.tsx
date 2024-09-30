@@ -9,7 +9,7 @@ export const Test = () => {
   const [selected, setSelected] = useState(1);
 
   return (
-    <div>
+    <div style={{ overflow: 'auto' }}>
       <ScrollContainer>
         <CWTabsRow>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((current) => (
