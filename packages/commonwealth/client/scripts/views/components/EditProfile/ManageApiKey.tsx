@@ -29,8 +29,10 @@ const ManageApiKey = () => {
           label: 'Close',
           buttonType: 'secondary',
           buttonHeight: 'sm',
-          onClick: async () => {
-            await useGetApiKey.refetch();
+          onClick: () => {
+            useGetApiKey.refetch().catch((err) => {
+              console.error(err);
+            });
           },
         },
       ],
