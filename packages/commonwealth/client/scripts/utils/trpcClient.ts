@@ -13,10 +13,16 @@ export const trpcClient = trpc.createClient({
       url: BASE_API_PATH,
       async headers() {
         const user = userStore.getState();
+
+        const isCreateCommunityFlow =
+          window.location.pathname.includes('/createCommunity');
+
+        const address = isCreateCommunityFlow
+          ? user.createCommunityAddress
+          : (user.activeAccount?.address ?? user.addresses?.at(0)?.address);
         return {
           authorization: user.jwt || '',
-          address:
-            user.activeAccount?.address ?? user.addresses?.at(0)?.address,
+          address,
         };
       },
     }),

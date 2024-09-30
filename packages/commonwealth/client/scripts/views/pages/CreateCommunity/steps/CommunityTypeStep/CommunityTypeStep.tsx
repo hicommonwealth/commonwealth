@@ -76,7 +76,12 @@ const CommunityTypeStep = ({
     const pickedAddress = user.addresses.find(
       ({ addressId }) => String(addressId) === address,
     );
-    pickedAddress && setSelectedAddress(pickedAddress);
+    if (pickedAddress) {
+      setSelectedAddress(pickedAddress);
+      user.setData({
+        createCommunityAddress: pickedAddress.address,
+      });
+    }
     handleContinue();
   };
 

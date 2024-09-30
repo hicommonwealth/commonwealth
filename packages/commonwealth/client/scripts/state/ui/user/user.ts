@@ -26,6 +26,8 @@ type CommonProps = {
   accounts: Account[]; // contains full accounts list of the user - when in a active chain/community scope, only
   // contains accounts specific to that community
   activeAccount: Account | null;
+  createCommunityAddress: string | ''; // special case: this address is passed to trpc client when a specific address
+  // is selected for creating a community
   jwt: string | null;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
@@ -47,6 +49,7 @@ export const userStore = createStore<UserStoreProps>()(
     knockJWT: '',
     addresses: [],
     activeCommunity: null,
+    createCommunityAddress: '',
     communities: [],
     accounts: [],
     activeAccount: null,
