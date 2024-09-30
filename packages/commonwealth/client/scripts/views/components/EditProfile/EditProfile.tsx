@@ -2,6 +2,7 @@ import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
+import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -63,6 +64,8 @@ const EditProfile = () => {
     initialLinks: [],
     linkValidation: linkValidationSchema.optional,
   });
+
+  const enableApiKeyManagement = useFlag('manageApiKeys');
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags();
@@ -391,7 +394,7 @@ const EditProfile = () => {
                 onTagClick={toggleTagFromSelection}
               />
             </ProfileSection>
-            <ManageApiKey />
+            {enableApiKeyManagement ? <ManageApiKey /> : <div></div>}
             {actionButtons}
           </CWForm>
         </div>
