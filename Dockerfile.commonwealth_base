@@ -36,7 +36,7 @@ ENV NODE_ENV=production
 COPY --from=build /prod/snapshot-listener /prod/snapshot-listener
 WORKDIR /prod/snapshot-listener
 COPY ./scripts/datadog-entrypoint.sh /prod/snapshot-listener
-RUN chmod +x /prod/commonwealth/datadog-entrypoint.sh
+RUN chmod +x /prod/snapshot-listener/datadog-entrypoint.sh
 ENV PORT=$PORT
 
 FROM base AS discord-bot
@@ -44,5 +44,5 @@ ENV NODE_ENV=production
 COPY --from=build /prod/discord-bot /prod/discord-bot
 WORKDIR /prod/discord-bot
 COPY ./scripts/datadog-entrypoint.sh /prod/discord-bot
-RUN chmod +x /prod/commonwealth/datadog-entrypoint.sh
+RUN chmod +x /prod/discord-bot/datadog-entrypoint.sh
 ENV PORT=$PORT
