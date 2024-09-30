@@ -86,7 +86,7 @@ describe('Update Community/Chain Tests', () => {
     };
 
     const created = await server.seeder.createCommunity(
-      { ...communityArgs, address: loggedInAddr!.address },
+      { ...communityArgs, address: result.address },
       jwtToken,
     );
     expect(created.name).to.be.equal(communityArgs.name);
