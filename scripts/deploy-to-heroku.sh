@@ -73,5 +73,5 @@ fi
 docker build . --target snapshot-listener -t snapshot-listener -f Dockerfile.commonwealth_base
 deploy_heroku_app "./packages/snapshot-listener/deploy/dockerfiles" ${snapshot_listener_app_name}
 
-docker build . --target discord_bot -t discord-bot -f Dockerfile.commonwealth_base
+docker build . --target discord-bot -t discord-bot -f Dockerfile.commonwealth_base
 deploy_heroku_app "./packages/discord-bot/deploy/dockerfiles" ${discord_bot_app_name}

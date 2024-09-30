@@ -1,3 +1,3 @@
 FROM snapshot-listener
 RUN apt-get update && apt-get install
-CMD ./datadog-entrypoint.sh NODE_ENV=production node --import=extensionless/register ./build/scripts/releasePhaseEnvCheck.js
+CMD NODE_ENV=production ./datadog-entrypoint.sh node --import=extensionless/register ./build/scripts/releasePhaseEnvCheck.js
