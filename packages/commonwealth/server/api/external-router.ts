@@ -8,47 +8,55 @@ import * as community from './community';
 import * as thread from './threads';
 
 const {
-  createCommunity,
-  updateCommunity,
   getCommunities,
   getCommunity,
   getMembers,
+  createCommunity,
+  updateCommunity,
+  createTopic,
+  updateTopic,
   deleteTopic,
+  createGroup,
+  updateGroup,
   deleteGroup,
 } = community.trpcRouter;
 const {
   createThread,
   updateThread,
-  createThreadReaction,
   deleteThread,
+  createThreadReaction,
   deleteReaction,
 } = thread.trpcRouter;
 const {
-  createComment,
-  createCommentReaction,
-  updateComment,
   getComments,
+  createComment,
+  updateComment,
   deleteComment,
+  createCommentReaction,
 } = comment.trpcRouter;
 
 const api = {
-  createCommunity,
-  updateCommunity,
   getCommunities,
   getCommunity,
   getMembers,
-  deleteTopic,
-  deleteGroup,
   getComments,
+  createCommunity,
+  updateCommunity,
+  createTopic,
+  updateTopic,
+  deleteTopic,
+  createGroup,
+  updateGroup,
+  deleteGroup,
   createThread,
   updateThread,
-  createThreadReaction,
   deleteThread,
-  deleteReaction,
   createComment,
   updateComment,
-  createCommentReaction,
   deleteComment,
+  createThreadReaction,
+  createCommentReaction,
+  deleteReaction,
 };
 
 const PATH = '/api/v1';

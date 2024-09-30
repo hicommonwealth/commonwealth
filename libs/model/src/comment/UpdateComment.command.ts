@@ -11,6 +11,7 @@ import {
   parseUserMentions,
   quillToPlain,
   uniqueMentions,
+  uploadIfLarge,
 } from '../utils';
 
 export function UpdateComment(): Command<
@@ -37,15 +38,29 @@ export function UpdateComment(): Command<
           uniqueMentions(parseUserMentions(text)),
         );
 
+        const { contentUrl } = await uploadIfLarge('comments', text);
+
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
-            { text, plaintext, search: getCommentSearchVector(text) },
+            // TODO: text should be set to truncatedBody once client renders content_url
+            {
+              text,
+              plaintext,
+              search: getCommentSearchVector(text),
+              content_url: contentUrl,
+            },
             { where: { id: comment.id }, transaction },
           );
 
           await models.CommentVersionHistory.create(
-            { comment_id: comment.id!, text, timestamp: new Date() },
+            {
+              comment_id: comment.id!,
+              // TODO: text should be set to truncatedBody once client renders content_url
+              text,
+              timestamp: new Date(),
+              content_url: contentUrl,
+            },
             { transaction },
           );
 

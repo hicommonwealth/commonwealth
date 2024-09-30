@@ -15,11 +15,13 @@ import './ContestLiveStep.scss';
 interface ContestLiveStepProps {
   createdContestAddress: string;
   isFarcasterContest: boolean;
+  fundingTokenTicker: string;
 }
 
 const ContestLiveStep = ({
   createdContestAddress,
   isFarcasterContest,
+  fundingTokenTicker,
 }: ContestLiveStepProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -66,6 +68,7 @@ const ContestLiveStep = ({
         onClose={() => setIsDrawerOpen(false)}
         isOpen={isDrawerOpen}
         contestAddress={createdContestAddress}
+        fundingTokenTicker={fundingTokenTicker}
       />
     </>
   );

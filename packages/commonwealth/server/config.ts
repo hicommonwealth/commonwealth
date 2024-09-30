@@ -16,10 +16,7 @@ const {
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
   ADDRESS_TOKEN_EXPIRES_IN,
-  MEMBERSHIP_REFRESH_BATCH_SIZE,
-  MEMBERSHIP_REFRESH_TTL_SECONDS,
-  DISCORD_CLIENT_ID,
-  DISCORD_TOKEN,
+
   CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
@@ -33,8 +30,6 @@ const NO_PRERENDER = _NO_PRERENDER;
 
 const DEFAULTS = {
   GENERATE_IMAGE_RATE_LIMIT: '10',
-  MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
-  MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: '60',
   SESSION_SECRET: 'my secret',
   MAGIC_SUPPORTED_BASES: [ChainBase.Ethereum],
@@ -53,14 +48,6 @@ export const config = configure(
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(
       GENERATE_IMAGE_RATE_LIMIT ?? DEFAULTS.GENERATE_IMAGE_RATE_LIMIT,
-      10,
-    ),
-    MEMBERSHIP_REFRESH_BATCH_SIZE: parseInt(
-      MEMBERSHIP_REFRESH_BATCH_SIZE ?? DEFAULTS.MEMBERSHIP_REFRESH_BATCH_SIZE,
-      10,
-    ),
-    MEMBERSHIP_REFRESH_TTL_SECONDS: parseInt(
-      MEMBERSHIP_REFRESH_TTL_SECONDS ?? DEFAULTS.MEMBERSHIP_REFRESH_TTL_SECONDS,
       10,
     ),
     CW_BOT_KEY,
@@ -89,10 +76,6 @@ export const config = configure(
         model_config.APP_ENV === 'production'
           ? TELEGRAM_BOT_TOKEN
           : TELEGRAM_BOT_TOKEN_DEV,
-    },
-    DISCORD: {
-      CLIENT_ID: DISCORD_CLIENT_ID,
-      BOT_TOKEN: DISCORD_TOKEN,
     },
     CLOUDFLARE: {
       ZONE_ID: CF_ZONE_ID,
@@ -125,8 +108,6 @@ export const config = configure(
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
-    MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
-    MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
     CW_BOT_KEY: z
       .string()
       .optional()
@@ -171,32 +152,6 @@ export const config = configure(
         .refine(
           (data) => !(model_config.APP_ENV === 'production' && !data),
           'TELEGRAM_BOT_TOKEN is required in production',
-        ),
-    }),
-    DISCORD: z.object({
-      CLIENT_ID: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                model_config.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
-        ),
-      BOT_TOKEN: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                model_config.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
         ),
     }),
     CLOUDFLARE: z.object({

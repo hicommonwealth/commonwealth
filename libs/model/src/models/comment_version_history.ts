@@ -24,6 +24,7 @@ export default (
       comment_id: { type: Sequelize.INTEGER, allowNull: false },
       text: { type: Sequelize.TEXT, allowNull: false },
       timestamp: { type: Sequelize.DATE, allowNull: false },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'CommentVersionHistories',

@@ -1319,6 +1319,9 @@ importers:
       react-error-boundary:
         specifier: ^3.1.4
         version: 3.1.4(react@18.3.1)
+      react-farcaster-embed:
+        specifier: ^1.8.4
+        version: 1.8.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-helmet-async:
         specifier: ^2.0.4
         version: 2.0.5(react@18.3.1)
@@ -11081,6 +11084,15 @@ packages:
     engines: {node: '> 8.0.0'}
     hasBin: true
 
+  linkify-react@4.1.3:
+    resolution: {integrity: sha512-rhI3zM/fxn5BfRPHfi4r9N7zgac4vOIxub1wHIWXLA5ENTMs+BGaIaFO1D1PhmxgwhIKmJz3H7uCP0Dg5JwSlA==}
+    peerDependencies:
+      linkifyjs: ^4.0.0
+      react: '>= 15.0.0'
+
+  linkifyjs@4.1.3:
+    resolution: {integrity: sha512-auMesunaJ8yfkHvK4gfg1K0SaKX/6Wn9g2Aac/NwX+l5VdmFZzo/hdPGxEOETj+ryRa4/fiOPjeeKURSAJx1sg==}
+
   listhen@1.7.2:
     resolution: {integrity: sha512-7/HamOm5YD9Wb7CFgAZkKgVPA96WwhcTQoqtm2VTZGVbVVn3IWKRBTgrU7cchA3Q8k9iCsG8Osoi9GX4JsGM9g==}
     hasBin: true
@@ -12954,6 +12966,12 @@ packages:
     peerDependencies:
       react: '>=16.13.1'
 
+  react-farcaster-embed@1.8.4:
+    resolution: {integrity: sha512-iGAMksUgb9+n1ZQhjEz/Bggf+kMLwS3tWHQimxqH73msHPoQdD4ODlhavC75bqEWhU/wRoDw5O3sYkvkHn7uNw==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+
   react-fast-compare@3.2.2:
     resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==}
 
@@ -13632,6 +13650,9 @@ packages:
   serve-static@1.15.0:
     resolution: {integrity: sha512-XGuRDNjXUijsUL0vl6nSD7cwURuzEgglbOaFuZM9g3kwDXOWVTck0jLzjPzGD+TazWbboZYu52/9/XPdUgne9g==}
     engines: {node: '>= 0.8.0'}
+
+  server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
 
   set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
@@ -29711,6 +29732,13 @@ snapshots:
     dependencies:
       chalk: 2.4.2
 
+  linkify-react@4.1.3(linkifyjs@4.1.3)(react@18.3.1):
+    dependencies:
+      linkifyjs: 4.1.3
+      react: 18.3.1
+
+  linkifyjs@4.1.3: {}
+
   listhen@1.7.2:
     dependencies:
       '@parcel/watcher': 2.4.1
@@ -32170,6 +32198,14 @@ snapshots:
       '@babel/runtime': 7.24.5
       react: 18.3.1
 
+  react-farcaster-embed@1.8.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      linkify-react: 4.1.3(linkifyjs@4.1.3)(react@18.3.1)
+      linkifyjs: 4.1.3
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      server-only: 0.0.1
+
   react-fast-compare@3.2.2: {}
 
   react-helmet-async@2.0.5(react@18.3.1):
@@ -33025,6 +33061,8 @@ snapshots:
       send: 0.18.0
     transitivePeerDependencies:
       - supports-color
+
+  server-only@0.0.1: {}
 
   set-blocking@2.0.0: {}
 
