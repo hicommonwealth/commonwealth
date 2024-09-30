@@ -814,9 +814,15 @@ importers:
       '@canvas-js/signatures':
         specifier: ^0.10.10
         version: 0.10.10
+      '@cosmjs/encoding':
+        specifier: 0.32.3
+        version: 0.32.3
       '@ipld/dag-json':
         specifier: ^10.2.0
         version: 10.2.0
+      '@polkadot/util':
+        specifier: 12.6.2
+        version: 12.6.2
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -1464,9 +1470,6 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../../libs/shared
-      '@polkadot/util':
-        specifier: 12.6.2
-        version: 12.6.2
       '@polkadot/util-crypto':
         specifier: 12.6.2
         version: 12.6.2(@polkadot/util@12.6.2)
@@ -1540,9 +1543,6 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../../libs/shared
-      '@polkadot/util':
-        specifier: 12.6.2
-        version: 12.6.2
       '@polkadot/util-crypto':
         specifier: 12.6.2
         version: 12.6.2(@polkadot/util@12.6.2)
@@ -1560,7 +1560,7 @@ importers:
         version: 2.7.0
       sequelize:
         specifier: ^6.32.1
-        version: 6.37.3(pg@8.11.5)
+        version: 6.37.3
       zod:
         specifier: ^3.22.4
         version: 3.23.6
@@ -25471,7 +25471,7 @@ snapshots:
 
   axios@1.6.8:
     dependencies:
-      follow-redirects: 1.15.6(debug@4.3.4)
+      follow-redirects: 1.15.6
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -26592,6 +26592,10 @@ snapshots:
   debug@2.6.9:
     dependencies:
       ms: 2.0.0
+
+  debug@4.3.4:
+    dependencies:
+      ms: 2.1.2
 
   debug@4.3.4(supports-color@8.1.1):
     dependencies:
@@ -28110,6 +28114,8 @@ snapshots:
       react: 18.3.1
     transitivePeerDependencies:
       - encoding
+
+  follow-redirects@1.15.6: {}
 
   follow-redirects@1.15.6(debug@4.3.4):
     optionalDependencies:
@@ -33050,11 +33056,32 @@ snapshots:
 
   sequelize-pool@7.1.0: {}
 
+  sequelize@6.37.3:
+    dependencies:
+      '@types/debug': 4.1.12
+      '@types/validator': 13.11.9
+      debug: 4.3.4
+      dottie: 2.0.6
+      inflection: 1.13.4
+      lodash: 4.17.21
+      moment: 2.30.1
+      moment-timezone: 0.5.45
+      pg-connection-string: 2.6.4
+      retry-as-promised: 7.0.4
+      semver: 7.6.0
+      sequelize-pool: 7.1.0
+      toposort-class: 1.0.1
+      uuid: 8.3.2
+      validator: 13.11.0
+      wkx: 0.5.0
+    transitivePeerDependencies:
+      - supports-color
+
   sequelize@6.37.3(pg@8.11.5):
     dependencies:
       '@types/debug': 4.1.12
       '@types/validator': 13.11.9
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.4
       dottie: 2.0.6
       inflection: 1.13.4
       lodash: 4.17.21
