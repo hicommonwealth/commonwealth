@@ -1,0 +1,15 @@
+.ScrollContainer {
+  display: flex;
+  overflow: hidden;
+
+  .OverflowIndicatorRight {
+    position: absolute;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 1) 100%
+    );
+    width: 300px;
+    right: 0;
+  }
+}

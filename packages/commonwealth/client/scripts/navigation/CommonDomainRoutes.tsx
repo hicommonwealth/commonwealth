@@ -2,6 +2,7 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { Test } from 'views/Test';
 import { RouteFeatureFlags } from './Router';
 
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
@@ -619,6 +620,7 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
+  <Route key="/test/*" path="/test/*" element={<Test />} />,
 ];
 
 export default CommonDomainRoutes;
