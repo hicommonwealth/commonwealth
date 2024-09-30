@@ -21,9 +21,9 @@ const CallbackPage = () => {
     if (state && guildId && !failed) {
       const stateJSON = JSON.parse(decodeURI(state));
       setDiscordBotConfig({
-        communityId: stateJSON.cw_chain_id,
-        guildId,
-        verificationToken: stateJSON.verification_token,
+        community_id: stateJSON.cw_chain_id,
+        guild_id: guildId,
+        verification_token: stateJSON.verification_token,
       })
         .then((res) => {
           const idParam = res.discordConfigId

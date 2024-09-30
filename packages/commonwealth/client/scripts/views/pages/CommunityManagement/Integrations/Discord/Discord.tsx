@@ -61,7 +61,7 @@ const Discord = () => {
     community?.discord_bot_webhooks_enabled,
   );
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
-    chainId: communityId,
+    community_id: communityId,
     apiEnabled: !!communityId,
   });
   const { data: topics = [], refetch: refetchTopics } = useFetchTopicsQuery({
@@ -87,7 +87,10 @@ const Discord = () => {
 
     try {
       const verificationToken = uuidv4();
-      await createDiscordBotConfig({ verificationToken });
+      await createDiscordBotConfig({
+        verification_token: verificationToken,
+        community_id: communityId,
+      });
 
       const redirectURL = encodeURI(
         !domain?.isCustomDomain
@@ -121,7 +124,7 @@ const Discord = () => {
       return;
     try {
       await removeDiscordBotConfig({
-        communityId,
+        community_id: communityId,
       });
 
       if (queryParams.has('discordConfigId')) {
