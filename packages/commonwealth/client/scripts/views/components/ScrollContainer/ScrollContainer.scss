@@ -1,6 +1,20 @@
 .ScrollContainer {
   display: flex;
-  overflow: hidden;
+
+  .Inner {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden; /* Disable vertical scrolling */
+    white-space: nowrap; /* Prevent line breaks for horizontal alignment */
+
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+
+    ::-webkit-scrollbar {
+      // for chrome
+      display: none;
+    }
+  }
 
   .OverflowIndicatorRight {
     position: absolute;
@@ -9,7 +23,7 @@
       rgba(255, 255, 255, 0) 0%,
       rgba(255, 255, 255, 1) 100%
     );
-    width: 300px;
+    width: 30px;
     right: 0;
   }
 }

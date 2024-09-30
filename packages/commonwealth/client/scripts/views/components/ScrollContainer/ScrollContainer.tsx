@@ -47,8 +47,10 @@ export const ScrollContainer = memo(function ScrollContainer(
   }, [handleRenderUpdate]);
 
   return (
-    <div className="ScrollContainer" ref={handleRef}>
-      {props.children}
+    <div className="ScrollContainer">
+      <div className="Inner" ref={handleRef}>
+        {props.children}
+      </div>
 
       {scrollActive && <div className="OverflowIndicatorRight">&nbsp;</div>}
     </div>
