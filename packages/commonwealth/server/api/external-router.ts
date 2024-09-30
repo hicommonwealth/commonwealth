@@ -79,8 +79,7 @@ if (config.NODE_ENV === 'test')
 
 // ===============================================================================
 
-// API Key Authentication
-router.use(apiKeyAuthMiddleware);
+if (config.NODE_ENV !== 'test') router.use(apiKeyAuthMiddleware);
 
 if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
   addRateLimiterMiddleware();

@@ -27,10 +27,15 @@ export async function apiKeyAuthMiddleware(
   if (!apiKey) throw new AppError('Unauthorized', 401);
   if (typeof apiKey !== 'string') throw new AppError('Unauthorized', 401);
 
+  const addressHeader = req.headers['address'];
+  if (!addressHeader) throw new AppError('Unauthorized', 401);
+  if (typeof addressHeader !== 'string')
+    throw new AppError('Unauthorized', 401);
+
   const address = await models.Address.findOne({
     attributes: ['user_id'],
     where: {
-      address: req.headers['address'],
+      address: addressHeader,
       verified: { [Op.ne]: null },
     },
   });
@@ -53,6 +58,7 @@ export async function apiKeyAuthMiddleware(
       id: address.user_id,
     },
   });
+  // redundant since Address.user_id is checked but added for typing
   if (!user) throw new AppError('Unauthorized', 401);
 
   req.user = user;
