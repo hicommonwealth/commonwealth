@@ -41,6 +41,9 @@ jobs:
 
       - uses: actions/checkout@v2
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Deploy to Heroku
         run: |
           chmod +x ./scripts/deploy-to-heroku.sh
