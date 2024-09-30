@@ -78,7 +78,8 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen
     ) {
       if (proposal.status === 'DepositPeriod') {
         const chain = app.chain as Cosmos;
@@ -115,7 +116,8 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen
     ) {
       try {
         await proposal.voteTx(new CosmosVote(user, 'No'));
@@ -139,7 +141,8 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen
     ) {
       proposal
         .voteTx(new CosmosVote(user, 'Abstain'))
@@ -157,7 +160,8 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen
     ) {
       proposal
         .voteTx(new CosmosVote(user, 'NoWithVeto'))
