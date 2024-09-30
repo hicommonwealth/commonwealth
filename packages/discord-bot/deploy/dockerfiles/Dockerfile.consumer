@@ -1,2 +1,2 @@
 FROM discord-bot
-CMD NODE_ENV=production ./datadog-entrypoint.sh node --import=extensionless/register ./build/discord-consumer/discordConsumer.js
+CMD NODE_ENV=production ./datadog-entrypoint.sh node --import=extensionless/register ./build/src/discord-consumer/discordConsumer.js
