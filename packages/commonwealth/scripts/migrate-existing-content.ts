@@ -1,6 +1,7 @@
-import { dispose, logger } from '@hicommonwealth/core';
-import { models, uploadIfLarge } from '@hicommonwealth/model';
-import { Op, QueryTypes } from 'sequelize';
+import { R2BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage, dispose, logger } from '@hicommonwealth/core';
+import { R2_ADAPTER_KEY, models, uploadIfLarge } from '@hicommonwealth/model';
+import { QueryTypes } from 'sequelize';
 
 const log = logger(import.meta);
 const BATCH_SIZE = 10;
@@ -11,18 +12,27 @@ async function migrateCommentVersionHistory(lastId = 0) {
   while (true) {
     const transaction = await models.sequelize.transaction();
     try {
-      const commentVersions = await models.CommentVersionHistory.findAll({
-        attributes: ['id', 'text'],
-        where: {
-          id: {
-            [Op.gt]: lastVersionHistoryId,
+      const commentVersions = await models.sequelize.query<{
+        id: number;
+        text: string;
+      }>(
+        `
+          SELECT id, text
+          FROM "CommentVersionHistories"
+          WHERE id > :lastId
+            AND LENGTH(text) > 2000 AND content_url IS NULL
+          ORDER BY id
+          LIMIT :batchSize FOR UPDATE;
+      `,
+        {
+          transaction,
+          replacements: {
+            lastId: lastVersionHistoryId,
+            batchSize: BATCH_SIZE,
           },
+          type: QueryTypes.SELECT,
         },
-        order: [['id', 'ASC']],
-        limit: BATCH_SIZE,
-        lock: transaction.LOCK.UPDATE,
-        transaction,
-      });
+      );
 
       if (commentVersions.length === 0) {
         await transaction.rollback();
@@ -68,6 +78,7 @@ async function migrateCommentVersionHistory(lastId = 0) {
       await transaction.rollback();
       break;
     }
+    break;
   }
 }
 
@@ -94,18 +105,27 @@ async function migrateThreadVersionHistory(lastId: number = 0) {
   while (true) {
     const transaction = await models.sequelize.transaction();
     try {
-      const threadVersions = await models.ThreadVersionHistory.findAll({
-        attributes: ['id', 'body'],
-        where: {
-          id: {
-            [Op.gt]: lastVersionHistoryId,
+      const threadVersions = await models.sequelize.query<{
+        id: number;
+        body: string;
+      }>(
+        `
+          SELECT id, body
+          FROM "ThreadVersionHistories"
+          WHERE id > :lastId
+            AND LENGTH(body) > 2000 AND content_url IS NULL
+          ORDER BY id
+          LIMIT :batchSize FOR UPDATE;
+      `,
+        {
+          transaction,
+          replacements: {
+            lastId: lastVersionHistoryId,
+            batchSize: BATCH_SIZE,
           },
+          type: QueryTypes.SELECT,
         },
-        order: [['id', 'ASC']],
-        limit: BATCH_SIZE,
-        lock: transaction.LOCK.UPDATE,
-        transaction,
-      });
+      );
 
       if (threadVersions.length === 0) {
         await transaction.rollback();
@@ -177,6 +197,12 @@ async function updateThreads() {
 }
 
 async function main() {
+  blobStorage({
+    key: R2_ADAPTER_KEY,
+    adapter: R2BlobStorage(),
+    isDefault: false,
+  });
+
   const acceptedArgs = ['threads', 'comments'];
 
   if (!acceptedArgs.includes(process.argv[2])) {
