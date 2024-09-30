@@ -60,7 +60,7 @@ deploy_heroku_app() {
   heroku container:release ${process_types} -a ${app_name}
 }
 
-docker build . --target commonwealth -t commonewalth -f Dockerfile.commonwealth_base
+docker build . --target commonwealth -t commonwealth -f Dockerfile.commonwealth_base
 deploy_heroku_app "./packages/commonwealth/deploy/dockerfiles" ${app_name}
 
 snapshot_listener_app_name=snapshot-listener-staging
