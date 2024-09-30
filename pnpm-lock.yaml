@@ -1479,6 +1479,9 @@ importers:
       discord.js:
         specifier: ^14.16.2
         version: 14.16.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      extensionless:
+        specifier: ^1.9.9
+        version: 1.9.9
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -1552,6 +1555,9 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.19.2
+      extensionless:
+        specifier: ^1.9.9
+        version: 1.9.9
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -1560,7 +1566,7 @@ importers:
         version: 2.7.0
       sequelize:
         specifier: ^6.32.1
-        version: 6.37.3
+        version: 6.37.3(pg@8.11.5)
       zod:
         specifier: ^3.22.4
         version: 3.23.6
@@ -9420,6 +9426,9 @@ packages:
 
   extensionless@1.9.6:
     resolution: {integrity: sha512-40F6zThJu1MxaT1A1pJ/2SHlU1BPYYnQNHt0j2ZlPuxxm2ddMcNc1D7uS/LGc4K3VwMEMaZLkCdHWaKk0LnQXA==}
+
+  extensionless@1.9.9:
+    resolution: {integrity: sha512-fz0cWfLA4pgc2nwmg6lc2UH+g+NlFuD63VWqp8n1wGAZSSbPNoARkA54BxXRjYCYW9LvhBnA3NyJaGS2KudkWw==}
 
   external-editor@3.1.0:
     resolution: {integrity: sha512-hMQ4CX1p1izmuLYyZqLMO/qGNw10wSv9QDCPfzXfyFrOaCSSoRfqE1Kf1s5an66J5JZC62NewG+mK49jOCtQew==}
@@ -25471,7 +25480,7 @@ snapshots:
 
   axios@1.6.8:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -26592,10 +26601,6 @@ snapshots:
   debug@2.6.9:
     dependencies:
       ms: 2.0.0
-
-  debug@4.3.4:
-    dependencies:
-      ms: 2.1.2
 
   debug@4.3.4(supports-color@8.1.1):
     dependencies:
@@ -27872,6 +27877,8 @@ snapshots:
 
   extensionless@1.9.6: {}
 
+  extensionless@1.9.9: {}
+
   external-editor@3.1.0:
     dependencies:
       chardet: 0.7.0
@@ -28114,8 +28121,6 @@ snapshots:
       react: 18.3.1
     transitivePeerDependencies:
       - encoding
-
-  follow-redirects@1.15.6: {}
 
   follow-redirects@1.15.6(debug@4.3.4):
     optionalDependencies:
@@ -33056,32 +33061,11 @@ snapshots:
 
   sequelize-pool@7.1.0: {}
 
-  sequelize@6.37.3:
-    dependencies:
-      '@types/debug': 4.1.12
-      '@types/validator': 13.11.9
-      debug: 4.3.4
-      dottie: 2.0.6
-      inflection: 1.13.4
-      lodash: 4.17.21
-      moment: 2.30.1
-      moment-timezone: 0.5.45
-      pg-connection-string: 2.6.4
-      retry-as-promised: 7.0.4
-      semver: 7.6.0
-      sequelize-pool: 7.1.0
-      toposort-class: 1.0.1
-      uuid: 8.3.2
-      validator: 13.11.0
-      wkx: 0.5.0
-    transitivePeerDependencies:
-      - supports-color
-
   sequelize@6.37.3(pg@8.11.5):
     dependencies:
       '@types/debug': 4.1.12
       '@types/validator': 13.11.9
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       dottie: 2.0.6
       inflection: 1.13.4
       lodash: 4.17.21
