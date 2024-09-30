@@ -83,6 +83,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
             createdContestAddress={createdContestAddress}
             isFarcasterContest={!!contestFormData?.farcasterContestDuration}
             fundingTokenTicker={fundingTokenTicker}
+            fundingTokenAddress={contestFormData?.fundingTokenAddress || ''}
           />
         );
     }
