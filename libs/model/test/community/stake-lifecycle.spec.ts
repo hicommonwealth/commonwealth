@@ -48,7 +48,7 @@ describe('Stake lifecycle', () => {
           role: 'admin',
           user_id: user!.id,
           is_banned: false,
-          verified: true,
+          verified: new Date(),
         },
       ],
       CommunityStakes: [
@@ -71,7 +71,7 @@ describe('Stake lifecycle', () => {
           ...community_with_stake!.Addresses!.at(0)!,
           id: undefined,
           is_banned: false,
-          verified: true,
+          verified: new Date(),
         },
       ],
     });
@@ -85,7 +85,7 @@ describe('Stake lifecycle', () => {
           ...community_with_stake!.Addresses!.at(0)!,
           id: undefined,
           is_banned: false,
-          verified: true,
+          verified: new Date(),
         },
       ],
     });

@@ -111,17 +111,17 @@ describe('Community lifecycle', () => {
         {
           role: 'member',
           user_id: superadmin!.id,
-          verified: true,
+          verified: new Date(),
         },
         {
           role: 'admin',
           user_id: admin!.id,
-          verified: true,
+          verified: new Date(),
         },
         {
           role: 'member',
           user_id: member!.id,
-          verified: true,
+          verified: new Date(),
           address: '0x0000000000000000000000000000000000000000', // base evm address
         },
       ],
@@ -138,18 +138,18 @@ describe('Community lifecycle', () => {
         {
           role: 'admin',
           user_id: admin!.id,
-          verified: true,
+          verified: new Date(),
         },
         {
           role: 'member',
           user_id: cosmosMember!.id,
-          verified: true,
+          verified: new Date(),
           address: 'osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6', // base cosmos address
         },
         {
           role: 'member',
           user_id: member!.id,
-          verified: true,
+          verified: new Date(),
           address: '0x0000000000000000000000000000000000000000', // base evm address
         },
       ],
@@ -165,12 +165,12 @@ describe('Community lifecycle', () => {
         {
           role: 'admin',
           user_id: admin!.id,
-          verified: true,
+          verified: new Date(),
         },
         {
           role: 'member',
           user_id: cosmosMember!.id,
-          verified: true,
+          verified: new Date(),
           address: 'osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6', // base cosmos address
         },
       ],
@@ -186,12 +186,12 @@ describe('Community lifecycle', () => {
         {
           role: 'admin',
           user_id: admin!.id,
-          verified: true,
+          verified: new Date(),
         },
         {
           role: 'member',
           user_id: substrateMember!.id,
-          verified: true,
+          verified: new Date(),
           address: 'base-substrate-address', // base substrate address
         },
       ],

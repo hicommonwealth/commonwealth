@@ -16,6 +16,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
   return {
     ...schemas.JoinCommunity,
     auth: [],
+    secure: true,
     body: async ({ actor, payload }) => {
       const { community_id } = payload;
       const address = actor.address!;
