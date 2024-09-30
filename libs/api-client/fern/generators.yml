@@ -9,6 +9,5 @@ groups:
           path: ../src/
         config:
           outputEsm: true
-          useBrandedStringAliases: true
 api:
   path: openapi/openapi.yml
