@@ -56,7 +56,7 @@ export function UpdateCustomDomain(): Command<
       );
 
       const magicRequestRedirectUrl = await fetch(
-        `https://api.magic.link/v2/api/magic_client/redirect_url/allowlist/add`,
+        `https://api.magic.link/v1/api/magic_client/redirect_url/allowlist/add`,
         {
           method: 'POST',
           headers: {
