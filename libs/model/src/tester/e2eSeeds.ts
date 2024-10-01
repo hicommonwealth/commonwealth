@@ -173,7 +173,6 @@ export const e2eTestEntities = async function (
                   user_id: i < 2 ? -1 : -2,
                   address: addresses[i],
                   community_id: 'cmntest',
-                  verification_token: '',
                   verified: new Date(),
                 },
               })

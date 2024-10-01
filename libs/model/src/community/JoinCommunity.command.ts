@@ -94,9 +94,6 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               user_id: actor.user.id,
               address: selectedAddress.address,
               verified: selectedAddress.verified,
-              verification_token: selectedAddress.verification_token,
-              verification_token_expires:
-                selectedAddress.verification_token_expires,
               wallet_id: selectedAddress.wallet_id,
               hex,
               last_active: new Date(),

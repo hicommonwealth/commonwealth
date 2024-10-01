@@ -8,10 +8,8 @@ import {
   bech32ToHex,
 } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
-import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -139,30 +137,20 @@ const createAddress = async (
     }));
 
   if (existingAddress) {
-    // address already exists on another user, only take ownership if
-    // unverified and expired
-    const expiration = existingAddress.verification_token_expires;
-    const isExpired = expiration && +expiration <= +new Date();
+    // address already exists on another user, only take ownership if unverified
     const isDisowned = existingAddress.user_id == null;
     const isCurrUser = user && existingAddress.user_id === user.id;
     // if owned by someone else, generate a token but don't replace user until verification
     // if you own it, or if it's unverified, associate with address immediately
     const updatedId =
-      user &&
-      ((!existingAddress.verified && isExpired) || isDisowned || isCurrUser)
+      user && (!existingAddress.verified || isDisowned || isCurrUser)
         ? user.id
         : null;
 
     // Address.updateWithToken
-    const verification_token = crypto.randomBytes(18).toString('hex');
-    const verification_token_expires = new Date(
-      +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
-    );
     if (updatedId) {
       existingAddress.user_id = updatedId;
     }
-    existingAddress.verification_token = verification_token;
-    existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
     existingAddress.block_info = req.body.block_info;
 
@@ -179,12 +167,6 @@ const createAddress = async (
       joined_community: false,
     });
   } else {
-    // address doesn't exist, add it to the database
-    // Address.createWithToken
-    const verification_token = crypto.randomBytes(18).toString('hex');
-    const verification_token_expires = new Date(
-      +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
-    );
     const last_active = new Date();
     let user_id = user ? user.id : null;
 
@@ -198,8 +180,6 @@ const createAddress = async (
       community_id: req.body.community_id!,
       address: encodedAddress,
       hex: addressHex!,
-      verification_token,
-      verification_token_expires,
       block_info: req.body.block_info,
       last_active,
       wallet_id: req.body.wallet_id,

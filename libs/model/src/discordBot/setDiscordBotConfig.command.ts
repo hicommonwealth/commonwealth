@@ -94,8 +94,6 @@ export function SetDiscordBotConfig(): Command<
               address: DISCORD_BOT_ADDRESS,
               community_id,
               role: 'admin',
-              verification_token: '123456',
-              verification_token_expires: new Date(2030, 1, 1),
               verified: new Date(),
               last_active: new Date(),
               ghost_address: false,

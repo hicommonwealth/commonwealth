@@ -57,13 +57,6 @@ const processAddress = async (
     throw new AppError(Errors.WrongWallet);
   }
 
-  // check whether the token has expired
-  // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
-  const expiration = addressInstance.verification_token_expires;
-  if (expiration && +expiration <= +new Date()) {
-    throw new AppError(Errors.ExpiredToken);
-  }
-
   // verify the signature matches the session information = verify ownership
   try {
     await verifySessionSignature(
@@ -81,7 +74,6 @@ const processAddress = async (
 
   if (!user?.id) {
     // user is not logged in
-    addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
@@ -93,7 +85,6 @@ const processAddress = async (
     }
   } else {
     // user is already logged in => verify the newly created address
-    addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     addressInstance.user_id = user.id;
   }

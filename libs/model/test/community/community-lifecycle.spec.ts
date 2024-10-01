@@ -306,7 +306,6 @@ describe('Community lifecycle', () => {
         last_active: new Date(),
         ghost_address: false,
         is_banned: false,
-        verification_token: '123',
       });
     });
   });

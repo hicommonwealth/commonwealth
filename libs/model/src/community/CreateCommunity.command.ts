@@ -154,9 +154,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               base === ChainBase.CosmosSDK
                 ? bech32ToHex(admin_address.address)
                 : undefined,
-            verification_token: admin_address.verification_token,
-            verification_token_expires:
-              admin_address.verification_token_expires,
             verified: admin_address.verified,
             wallet_id: admin_address.wallet_id,
             is_user_default: true,

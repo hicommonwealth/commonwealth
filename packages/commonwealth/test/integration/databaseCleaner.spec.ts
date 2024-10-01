@@ -160,7 +160,6 @@ describe('DatabaseCleaner Tests', async () => {
         user_id: oldUser.id,
         address: '0x1234',
         community_id: 'ethereum',
-        verification_token: 'blah',
         last_active: Sequelize.literal(`NOW() - INTERVAL '13 months'`) as any,
       });
 
@@ -175,7 +174,6 @@ describe('DatabaseCleaner Tests', async () => {
         user_id: newUser.id,
         address: '0x2345',
         community_id: 'ethereum',
-        verification_token: 'blah',
         last_active: Sequelize.literal(`NOW()`) as any,
       });
 

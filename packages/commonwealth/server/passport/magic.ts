@@ -63,8 +63,6 @@ async function createMagicAddressInstances(
         address,
         community_id,
         user_id,
-        verification_token: decodedMagicToken.claim.tid, // to prevent re-use
-        verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
         role: 'member',
@@ -85,11 +83,6 @@ async function createMagicAddressInstances(
       throw new ServerError('Address owned by somebody else!');
     }
 
-    if (!created) {
-      // Update used magic token to prevent replay attacks
-      addressInstance.verification_token = decodedMagicToken.claim.tid;
-      await addressInstance.save({ transaction: t });
-    }
     addressInstances.push(addressInstance);
   }
   return addressInstances;
@@ -305,7 +298,6 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
   await models.Address.update(
     {
       user_id: loggedInUser?.id,
-      verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
       where: {
@@ -385,22 +377,6 @@ async function magicLoginRoute(
 
   // replay attack check
   const didTokenId = decodedMagicToken.claim.tid; // single-use token id
-
-  // The same didToken is used for potentially two addresses at the same time
-  // (ex: Eth and cosmos for Cosmos sign-in),
-  // but if a single one is found we reject the token replay
-  const usedMagicToken = await models.Address.findOne({
-    where: {
-      verification_token: didTokenId,
-    },
-  });
-
-  if (usedMagicToken) {
-    log.warn('Replay attack detected.');
-    throw new Error(
-      `Replay attack detected for user ${decodedMagicToken.publicAddress}.`,
-    );
-  }
 
   // validate community if provided (i.e. logging in on community page)
   if (req.body.community_id) {

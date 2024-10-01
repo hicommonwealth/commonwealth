@@ -32,6 +32,7 @@ const generateSchemas = async () => {
       Threads: ['body_backup'],
       Topics: ['default_offchain_template_backup'],
       GroupPermissions: ['allowed_actions'],
+      Addresses: ['verification_token', 'verification_token_expires'],
     },
     ignore_constraints: {},
   });

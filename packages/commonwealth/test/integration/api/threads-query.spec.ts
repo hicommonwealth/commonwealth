@@ -34,9 +34,7 @@ describe('Thread queries', () => {
       await models.Address.findOrCreate({
         where: {
           address: 'JhgYcbJOdWHLVFHJKLPhC12',
-          // @ts-expect-error StrictNullChecks
-          community_id: chain.id,
-          verification_token: 'fgdfgd',
+          community_id: chain?.id,
         },
       })
     )[0];

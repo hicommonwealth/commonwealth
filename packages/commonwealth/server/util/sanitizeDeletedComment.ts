@@ -12,7 +12,6 @@ export function sanitizeDeletedComment(
       id: 0,
       address: '0xdeleted000000000001111122222333334444455',
       community_id: '',
-      verification_token: '',
       role: 'member',
       is_user_default: false,
       ghost_address: false,
