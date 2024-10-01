@@ -59,7 +59,6 @@ describe('Community lifecycle', () => {
     substrateNode: ChainNodeAttributes;
   let community: CommunityAttributes,
     cosmos_community: CommunityAttributes,
-    cosmos_community_non_evm: CommunityAttributes,
     substrate_community: CommunityAttributes;
   let superAdminActor: Actor,
     ethAdminActor: Actor,
