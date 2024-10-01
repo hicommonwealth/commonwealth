@@ -31,8 +31,11 @@ export const ScrollContainer = memo(function ScrollContainer(
 
       if (el.clientWidth < el.scrollWidth) {
         setScrollActiveLeft(el.scrollLeft !== 0);
+
+        // the scroll left can be a fractional pixel so sometimes the difference is off
+        // by one pixel, so we try to accept that as well
         setScrollActiveRight(
-          Math.floor(el.scrollLeft + el.clientWidth) < el.scrollWidth,
+          el.scrollWidth - Math.floor(el.scrollLeft + el.clientWidth) > 1,
         );
       } else {
         setScrollActiveRight(false);
@@ -64,10 +67,15 @@ export const ScrollContainer = memo(function ScrollContainer(
     };
   }, [indicatorHeight]);
 
+  console.log('FIXME: scrollActiveRight: ', scrollActiveRight);
+
   return (
     <div className="ScrollContainer">
       {scrollActiveLeft && (
-        <div className="OverflowIndicatorLeft" {...indicatorProps}>
+        <div
+          className="OverflowIndicator OverflowIndicatorLeft"
+          {...indicatorProps}
+        >
           &nbsp;
         </div>
       )}
