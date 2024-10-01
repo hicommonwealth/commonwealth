@@ -12,6 +12,16 @@ console.log(
   config.DB.NO_SSL,
 );
 
+console.log(
+  'dialect options are',
+  config.NODE_ENV !== 'production' || config.DB.NO_SSL
+    ? { requestTimeout: 40000 }
+    : config.DB.URI ===
+        'postgresql://commonwealth:edgeware@localhost/commonwealth'
+      ? { requestTimeout: 40000, ssl: false }
+      : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
+);
+
 export const sequelize = new Sequelize(config.DB.URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
