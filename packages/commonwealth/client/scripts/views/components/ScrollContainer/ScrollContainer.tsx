@@ -8,7 +8,6 @@ import React, {
   useState,
 } from 'react';
 import { OverflowIndicator } from 'views/components/ScrollContainer/OverflowIndicator';
-import { OverflowIndicatorLeft } from 'views/components/ScrollContainer/OverflowIndicatorLeft';
 import './ScrollContainer.scss';
 
 type ScrollContainerProps = Readonly<{
@@ -86,7 +85,11 @@ export const ScrollContainer = memo(function ScrollContainer(
   return (
     <div className="ScrollContainer">
       {scrollActiveLeft && (
-        <OverflowIndicatorLeft onClick={handleScrollLeft} {...indicatorProps} />
+        <OverflowIndicator
+          dir="left"
+          onClick={handleScrollLeft}
+          {...indicatorProps}
+        />
       )}
 
       <div className="Inner" onScroll={handleRenderUpdate} ref={handleRef}>
