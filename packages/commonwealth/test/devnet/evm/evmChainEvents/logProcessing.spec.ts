@@ -28,6 +28,7 @@ const namespaceDeployedLog = {
   topics: [
     '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
   ],
+  // eslint-disable-next-line max-len
   data: '0x0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000001363657465737431373237373734373236393138000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
   blockHash:
     '0x5aa2154c16dca3b09a11a8a6f06154b2263c1185f3ef7edb99e8f5099d95083b',
@@ -267,9 +268,12 @@ describe('EVM Chain Events Log Processing Tests', () => {
         (e) => e.eventSource.kind === 'DeployedNamespace',
       );
       expect(deployedNamespaceEvent).toBeTruthy();
-      expect(deployedNamespaceEvent!.rawLog.address).to.equal(
-        namespaceFactoryAddress,
-      );
+      expect(
+        equalEvmAddresses(
+          deployedNamespaceEvent!.rawLog.address,
+          namespaceFactoryAddress,
+        ),
+      ).toBeTruthy();
       const communityStakeBuyEvent = result.events.find(
         (e) => e.eventSource.kind === 'Trade',
       );
