@@ -18,9 +18,9 @@ const launchToken = async ({
   walletAddress,
 }: LaunchTokenProps) => {
   const launchPad = new LaunchpadBondingCurve(
-    '',
     commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
     commonProtocol.factoryContracts[ethChainId].launchpad,
+    '',
     chainRpc,
   );
 

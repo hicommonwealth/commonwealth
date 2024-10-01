@@ -34,7 +34,7 @@ export const factoryContracts: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
     launchpad: '0x5045238a20f07acb34dd1265bb240eab8c8db7a9',
-    lpBondingCurve: '0x7Cc4d8902e3Ca342825D35b9C4ddb064582a910d',
+    lpBondingCurve: '0x8E506c3D1Ba9e0c00B1f0bC6C3457bbfB1Fe6464',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
