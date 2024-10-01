@@ -283,9 +283,8 @@ export const JoinCommunity = {
   output: z.object({
     community_id: z.string(),
     base: z.nativeEnum(ChainBase),
-    base_address: z.string(),
     address_id: z.number(),
-    encoded_address: z.string(),
+    address: z.string(),
     wallet_id: z.nativeEnum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),

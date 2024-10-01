@@ -67,7 +67,6 @@ describe('Community lifecycle', () => {
     substrateAdminActor: Actor,
     ethActor: Actor,
     cosmosActor: Actor,
-    cosmosNonEvmActor: Actor,
     substrateActor: Actor;
   const custom_domain = 'custom';
 
@@ -155,27 +154,6 @@ describe('Community lifecycle', () => {
       ],
     });
 
-    const [cosmosNonEvmBase] = await seed('Community', {
-      chain_node_id: _cosmosNode!.id!,
-      base: ChainBase.CosmosSDK,
-      active: true,
-      lifetime_thread_count: 0,
-      profile_count: 1,
-      Addresses: [
-        {
-          role: 'admin',
-          user_id: admin!.id,
-          verified: new Date(),
-        },
-        {
-          role: 'member',
-          user_id: cosmosMember!.id,
-          verified: new Date(),
-          address: 'osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6', // base cosmos address
-        },
-      ],
-    });
-
     const [substrateBase] = await seed('Community', {
       chain_node_id: _substrateNode!.id!,
       base: ChainBase.Substrate,
@@ -241,14 +219,6 @@ describe('Community lifecycle', () => {
       },
       address: cosmosBase?.Addresses?.at(1)?.address,
     };
-    cosmosNonEvmActor = {
-      user: {
-        id: cosmosMember!.id!,
-        email: cosmosMember!.email!,
-        isAdmin: cosmosMember!.isAdmin!,
-      },
-      address: cosmosNonEvmBase?.Addresses?.at(1)?.address,
-    };
     substrateActor = {
       user: {
         id: substrateMember!.id!,
@@ -285,7 +255,7 @@ describe('Community lifecycle', () => {
       community = eth_result!.community! as CommunityAttributes;
     });
 
-    test('should create cosmos community (evm compatible)', async () => {
+    test('should create cosmos community', async () => {
       const cosmos_name = chance.name() + '-' + chance.natural();
       const cosmos_result = await command(CreateCommunity(), {
         actor: cosmosAdminActor,
@@ -304,28 +274,6 @@ describe('Community lifecycle', () => {
       expect(cosmos_result?.community?.id).toBe(cosmos_name);
       expect(cosmos_result?.admin_address).toBe(cosmosAdminActor.address);
       cosmos_community = cosmos_result!.community! as CommunityAttributes;
-    });
-
-    test('should create cosmos community (non-evm compatible)', async () => {
-      const cosmos_name = chance.name() + '-' + chance.natural();
-      const cosmos_result = await command(CreateCommunity(), {
-        actor: cosmosAdminActor,
-        payload: {
-          id: cosmos_name,
-          type: ChainType.Offchain,
-          name: cosmos_name,
-          default_symbol: cosmos_name.substring(0, 8).replace(' ', ''),
-          base: ChainBase.CosmosSDK,
-          social_links: [],
-          directory_page_enabled: false,
-          tags: [],
-          chain_node_id: cosmosNode.id!,
-        },
-      });
-      expect(cosmos_result?.community?.id).toBe(cosmos_name);
-      expect(cosmos_result?.admin_address).toBe(cosmosAdminActor.address);
-      cosmos_community_non_evm = cosmos_result!
-        .community! as CommunityAttributes;
     });
 
     test('should create substrate community', async () => {
@@ -741,7 +689,7 @@ describe('Community lifecycle', () => {
           community_id: community.id,
         },
       });
-      expect(address?.encoded_address).toBe(ethActor.address);
+      expect(address?.address).toBe(ethActor.address);
       const members = await query(GetMembers(), {
         actor: superAdminActor,
         payload: { community_id: community.id, limit: 10, cursor: 1 },
@@ -767,54 +715,27 @@ describe('Community lifecycle', () => {
       ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
     });
 
-    test('should join CosmosSDK (evm compatible) community with cosmos address', async () => {
+    test('should join CosmosSDK community with cosmos address', async () => {
       const cosmos_address = await command(JoinCommunity(), {
         actor: cosmosActor,
         payload: { community_id: cosmos_community.id },
       });
-      expect(cosmos_address?.encoded_address).toBe(cosmosActor.address);
+      expect(cosmos_address?.address).toBe(cosmosActor.address);
     });
 
-    test('should join CosmosSDK (evm compatible) community with evm address', async () => {
+    test('should join CosmosSDK community with evm address', async () => {
       const evm_address = await command(JoinCommunity(), {
         actor: ethActor,
         payload: { community_id: cosmos_community.id },
       });
-      expect(evm_address?.encoded_address).toBe(ethActor.address);
+      expect(evm_address?.address).toBe(ethActor.address);
     });
 
-    test('should throw when joining CosmosSDK (evm compatible) community with substrate address', async () => {
+    test('should throw when joining CosmosSDK community with substrate address', async () => {
       await expect(
         command(JoinCommunity(), {
           actor: substrateActor,
           payload: { community_id: cosmos_community.id },
-        }),
-      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
-    });
-
-    test('should join CosmosSDK (non-evm compatible) community with cosmos address', async () => {
-      const address = await command(JoinCommunity(), {
-        actor: cosmosNonEvmActor,
-        payload: { community_id: cosmos_community_non_evm.id },
-      });
-      expect(address?.encoded_address).toBe(cosmosNonEvmActor.address);
-    });
-
-    // TODO: figure out how to determine if a community is evm compatible
-    test.skip('should throw when joining CosmosSDK (non-evm compatible) community with evm address', async () => {
-      await expect(
-        command(JoinCommunity(), {
-          actor: ethActor,
-          payload: { community_id: cosmos_community_non_evm.id },
-        }),
-      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
-    });
-
-    test('should throw when joining CosmosSDK (non-evm compatible) community with substrate address', async () => {
-      await expect(
-        command(JoinCommunity(), {
-          actor: substrateActor,
-          payload: { community_id: cosmos_community_non_evm.id },
         }),
       ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
     });
@@ -824,7 +745,7 @@ describe('Community lifecycle', () => {
         actor: substrateActor,
         payload: { community_id: substrate_community.id },
       });
-      expect(address?.encoded_address).toBe(substrateActor.address);
+      expect(address?.address).toBe(substrateActor.address);
     });
 
     test('should throw when joining Substrate community with evm address', async () => {

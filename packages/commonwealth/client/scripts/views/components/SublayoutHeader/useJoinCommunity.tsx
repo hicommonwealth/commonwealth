@@ -102,11 +102,15 @@ const useJoinCommunity = () => {
     activeChainId?: string;
   }) => {
     try {
-      const res = await joinCommunity({
+      const {
+        address: joinedAddress,
+        address_id,
+        base,
+        ss58Prefix,
+        wallet_id,
+      } = await joinCommunity({
         community_id: community.id,
       });
-
-      const { encoded_address, address_id, base, ss58Prefix, wallet_id } = res;
 
       // update addresses and user communities
       user.setData({
@@ -137,7 +141,7 @@ const useJoinCommunity = () => {
       });
 
       // set verification token for the newly created account
-      const account = app?.chain?.accounts?.get?.(encoded_address);
+      const account = app?.chain?.accounts?.get?.(joinedAddress);
 
       // set active address if in a community
       if (activeChainId) {

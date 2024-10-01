@@ -10,7 +10,7 @@ import {
 import { Op } from 'sequelize';
 import { models } from '../database';
 import { mustBeSuperAdmin, mustExist } from '../middleware/guards';
-import { findBaseAddress } from '../utils/findBaseAddress';
+import { findCompatibleAddress } from '../utils/findBaseAddress';
 
 export const CreateCommunityErrors = {
   CommunityNameExists:
@@ -84,7 +84,12 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const baseCommunity = await models.Community.findOne({ where: { base } });
       mustExist('Chain Base', baseCommunity);
 
-      const admin_address = await findBaseAddress(actor, base, type);
+      const admin_address = await findCompatibleAddress(
+        actor.user.id!,
+        actor.address!,
+        base,
+        type,
+      );
       mustExist(
         `User address ${actor.address} in ${base} community`,
         admin_address,
