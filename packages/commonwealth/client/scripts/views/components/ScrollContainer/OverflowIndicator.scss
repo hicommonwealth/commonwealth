@@ -16,21 +16,24 @@
   background-color: rgb(255, 255, 255);
 }
 
-.OverflowIndicatorLeft {
-  background: linear-gradient(
-    to left,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 1) 100%
-  );
-  left: 0;
-}
-
 .OverflowIndicator .Gradient {
   width: 75px;
 
   // needed so that the overflow indicator doesn't swallow scrolling
   // events menta for the main Inner div.
   pointer-events: none;
+}
+
+.OverflowIndicatorLeft .Gradient {
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
+.OverflowIndicatorLeft {
+  left: 0;
 }
 
 .OverflowIndicatorRight .Gradient {
