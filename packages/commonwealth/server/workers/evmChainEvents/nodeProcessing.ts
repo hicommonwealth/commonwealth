@@ -51,23 +51,25 @@ export async function processChainNode(
     const currentBlock = await provider.getBlockNumber();
 
     let startBlockNum: number;
-    // @ts-expect-error StrictNullChecks
-    if (lastProcessedBlock?.block_number < currentBlock) {
-      // @ts-expect-error StrictNullChecks
-      startBlockNum = lastProcessedBlock?.block_number + 1;
-    } else if (lastProcessedBlock?.block_number === undefined) {
+    if (!lastProcessedBlock) {
       startBlockNum = currentBlock - 10;
+    } else if (lastProcessedBlock.block_number === currentBlock - 1) {
+      // last processed block number is the same as the most recent block
+      // that EVM CE will process (-1 to avoid chain the majority of re-orgs)
+      return;
+    } else if (lastProcessedBlock.block_number + 1 <= currentBlock - 1) {
+      // the next block evm ce is ready to process is less than or equal to
+      // the most recent block that EVM CE will process
+      startBlockNum = lastProcessedBlock.block_number + 1;
     } else {
-      // the last processed block is the same as the current block
-      // this occurs if the poll interval is shorter than the block time
+      // the next block evm ce is ready to process is greater than the most
+      // recent available block minus 1
       return;
     }
 
     const allEvents: EvmEvent[] = [];
     const migratedData = await migrateEvents(evmSource, startBlockNum);
-    // @ts-expect-error StrictNullChecks
-    if (migratedData?.events?.length > 0)
-      // @ts-expect-error StrictNullChecks
+    if (migratedData && migratedData?.events?.length > 0)
       allEvents.push(...migratedData.events);
 
     const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
