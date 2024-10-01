@@ -65,6 +65,7 @@ export async function getAnvil(
     port: 8545,
     autoImpersonate: true,
     startTimeout: 10_000,
+    stopTimeout: 10_000,
     ...options,
   });
   await anvil.start();
