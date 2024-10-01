@@ -48,12 +48,15 @@
     left: 0;
   }
 
-  .OverflowIndicatorRight {
+  .OverflowIndicatorRight .Gradient {
     background: linear-gradient(
       to right,
       rgba(255, 255, 255, 0) 0%,
       rgba(255, 255, 255, 1) 100%
     );
+  }
+
+  .OverflowIndicatorRight {
     right: 0;
   }
 }
