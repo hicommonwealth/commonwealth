@@ -1,6 +1,8 @@
-import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
+import { EventNames, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Op } from 'sequelize';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 import { emitEvent } from '../utils';
 
 // This webhook processes the "cast.created" event
@@ -13,28 +15,32 @@ export function FarcasterReplyCastCreatedWebhook(): Command<
     ...schemas.FarcasterCastCreatedWebhook,
     auth: [],
     body: async ({ payload }) => {
-      // map FC CastCreated to CW ThreadCreated
+      // console.log('REPLY: ', payload);
+
+      mustExist('Parent Hash', payload.data.parent_hash);
+
       const contestManager = await models.ContestManager.findOne({
         where: {
-          farcaster_frame_url: payload.data.root_parent_url,
+          cancelled: false,
+          ended: {
+            [Op.not]: true,
+          },
+          farcaster_frame_hashes: {
+            [Op.contains]: [payload.data.parent_hash!],
+          },
         },
       });
-      if (!contestManager) {
-        throw new InvalidState(
-          `contest manager not found for frame: ${payload.data.root_parent_url}`,
-        );
-      }
-      // assuming farcaster contest only has 1 topic
+      mustExist('Contest Manager', contestManager);
+
+      console.log(contestManager);
+
       const contestTopic = await models.ContestTopic.findOne({
         where: {
           contest_address: contestManager.contest_address,
         },
       });
-      if (!contestTopic) {
-        throw new InvalidState(
-          `contest manager ${contestManager.contest_address} not associated with any topics`,
-        );
-      }
+      mustExist('Contest Topic', contestTopic);
+
       await emitEvent(models.Outbox, [
         {
           event_name: EventNames.ThreadCreated,
@@ -44,14 +50,18 @@ export function FarcasterReplyCastCreatedWebhook(): Command<
             community_id: contestManager.community_id,
             topic_id: contestTopic.topic_id,
             title: 'Farcaster Contest Reply',
+            body: payload.data.text,
             kind: 'discussion',
             stage: 'active',
             view_count: 0,
             reaction_count: 0,
             reaction_weights_sum: 0,
             comment_count: 0,
-            max_notif_id: 0,
-            contestManagers: [contestManager.toJSON()],
+            contestManagers: [
+              {
+                contest_address: contestManager.contest_address,
+              },
+            ],
           },
         },
       ]);

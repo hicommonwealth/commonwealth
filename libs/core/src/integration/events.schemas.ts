@@ -20,6 +20,7 @@ import {
 import { EventMetadata } from './util.schemas';
 
 export const ThreadCreated = Thread.omit({ search: true }).extend({
+  address: z.string().nullish(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
