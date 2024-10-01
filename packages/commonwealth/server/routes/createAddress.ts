@@ -193,25 +193,20 @@ const createAddress = async (
       user_id = existingAddressWithHex.user_id;
     }
 
-    const newObj = await models.sequelize.transaction(async (transaction) => {
-      return models.Address.create(
-        {
-          user_id,
-          community_id: req.body.community_id!,
-          address: encodedAddress,
-          hex: addressHex,
-          verification_token,
-          verification_token_expires,
-          block_info: req.body.block_info,
-          last_active,
-          wallet_id: req.body.wallet_id,
-          role: 'member',
-          is_user_default: false,
-          ghost_address: false,
-          is_banned: false,
-        },
-        { transaction },
-      );
+    const newObj = await models.Address.create({
+      user_id,
+      community_id: req.body.community_id!,
+      address: encodedAddress,
+      hex: addressHex!,
+      verification_token,
+      verification_token_expires,
+      block_info: req.body.block_info,
+      last_active,
+      wallet_id: req.body.wallet_id,
+      role: 'member',
+      is_user_default: false,
+      ghost_address: false,
+      is_banned: false,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

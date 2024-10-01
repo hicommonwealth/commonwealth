@@ -5,6 +5,10 @@ import passport from 'passport';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
+import {
+  addRateLimiterMiddleware,
+  apiKeyAuthMiddleware,
+} from './external-router-middleware';
 import * as thread from './threads';
 
 const {
@@ -74,7 +78,14 @@ router.use(cors(), express.statsMiddleware);
  */
 if (config.NODE_ENV === 'test')
   router.use(passport.authenticate('jwt', { session: false }));
+
 // ===============================================================================
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+if (config.NODE_ENV !== 'test') router.use(apiKeyAuthMiddleware);
+
+if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
+  addRateLimiterMiddleware();
+}
 
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {

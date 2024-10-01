@@ -4,6 +4,7 @@ import {
   safeTruncateBody,
   type AbiType,
 } from '@hicommonwealth/shared';
+import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
 import {
   Model,
@@ -237,4 +238,10 @@ export async function uploadIfLarge(
     });
     return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
   } else return { contentUrl: null, truncatedBody: null };
+}
+
+export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
+  return createHash('sha256')
+    .update(apiKey + salt)
+    .digest('hex');
 }

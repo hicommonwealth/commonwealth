@@ -44,6 +44,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
       env.FLAG_TOKENIZED_COMMUNITY,
     ),
+    'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
+      env.FLAG_MANAGE_API_KEYS,
+    ),
   };
 
   const config = {
