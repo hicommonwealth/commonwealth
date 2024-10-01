@@ -31,8 +31,11 @@ export const ScrollContainer = memo(function ScrollContainer(
 
       if (el.clientWidth < el.scrollWidth) {
         setScrollActiveLeft(el.scrollLeft !== 0);
+
+        // the scroll left can be a fractional pixel so sometimes the difference is off
+        // by one pixel, so we try to accept that as well
         setScrollActiveRight(
-          Math.floor(el.scrollLeft + el.clientWidth) < el.scrollWidth,
+          el.scrollWidth - Math.floor(el.scrollLeft + el.clientWidth) > 1,
         );
       } else {
         setScrollActiveRight(false);
@@ -64,10 +67,28 @@ export const ScrollContainer = memo(function ScrollContainer(
     };
   }, [indicatorHeight]);
 
+  const handleScroll = useCallback((dir: -1 | 1) => {
+    const el = containerRef.current;
+    if (el) {
+      el.scrollLeft = (el.scrollLeft + el.scrollWidth / 2) * dir;
+    }
+  }, []);
+
+  const handleScrollLeft = useCallback(() => {
+    handleScroll(-1);
+  }, [handleScroll]);
+
+  const handleScrollRight = useCallback(() => {
+    handleScroll(1);
+  }, [handleScroll]);
+
   return (
     <div className="ScrollContainer">
       {scrollActiveLeft && (
-        <div className="OverflowIndicatorLeft" {...indicatorProps}>
+        <div
+          className="OverflowIndicator OverflowIndicatorLeft"
+          {...indicatorProps}
+        >
           &nbsp;
         </div>
       )}
@@ -76,7 +97,9 @@ export const ScrollContainer = memo(function ScrollContainer(
         {props.children}
       </div>
 
-      {scrollActiveRight && <IndicatorRight {...indicatorProps} />}
+      {scrollActiveRight && (
+        <IndicatorRight onClick={handleScrollRight} {...indicatorProps} />
+      )}
     </div>
   );
 });

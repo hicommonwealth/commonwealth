@@ -22,10 +22,6 @@
     position: absolute;
     width: 50px;
     height: 100%;
-
-    // needed so that the overflow indicator doesn't swallow scrolling
-    // events menta for the main Inner div.
-    pointer-events: none;
   }
 
   .OverflowIndicator button {
@@ -46,6 +42,14 @@
       rgba(255, 255, 255, 1) 100%
     );
     left: 0;
+  }
+
+  .OverflowIndicator .Gradient {
+    width: 75px;
+
+    // needed so that the overflow indicator doesn't swallow scrolling
+    // events menta for the main Inner div.
+    pointer-events: none;
   }
 
   .OverflowIndicatorRight .Gradient {
