@@ -72,7 +72,11 @@ export async function processChainNode(
     if (migratedData && migratedData?.events?.length > 0)
       allEvents.push(...migratedData.events);
 
-    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
+    const { events, lastBlockNum } = await getEvents(
+      evmSource,
+      startBlockNum,
+      currentBlock - 1,
+    );
     allEvents.push(...events);
 
     await models.sequelize.transaction(async (transaction) => {

@@ -40,12 +40,11 @@ export async function getLogs({
   maxBlockRange: number;
   contractAddresses: string[];
   startingBlockNum: number;
-  endingBlockNum?: number;
+  endingBlockNum: number;
 }): Promise<{ logs: Log[]; lastBlockNum: number }> {
   let startBlock = startingBlockNum;
   let endBlock = endingBlockNum;
   const provider = getProvider(rpc);
-  if (!endBlock) endBlock = (await provider.getBlockNumber()) - 1;
 
   if (startBlock > endBlock) {
     logger.error(
@@ -169,7 +168,7 @@ export async function parseLogs(
 export async function getEvents(
   evmSource: EvmSource,
   startingBlockNum: number,
-  endingBlockNum?: number,
+  endingBlockNum: number,
 ): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
   const { logs, lastBlockNum } = await getLogs({
     rpc: evmSource.rpc,
