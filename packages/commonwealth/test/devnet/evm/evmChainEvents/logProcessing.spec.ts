@@ -278,9 +278,12 @@ describe('EVM Chain Events Log Processing Tests', () => {
         (e) => e.eventSource.kind === 'Trade',
       );
       expect(communityStakeBuyEvent).toBeTruthy();
-      expect(communityStakeBuyEvent!.rawLog.address).to.equal(
-        communityStakeAddress,
-      );
+      expect(
+        equalEvmAddresses(
+          communityStakeBuyEvent!.rawLog.address,
+          communityStakeAddress,
+        ),
+      ).toBeTruthy();
 
       result = await getEvents(
         evmSource,
@@ -292,9 +295,12 @@ describe('EVM Chain Events Log Processing Tests', () => {
         (e) => e.eventSource.kind === 'Trade',
       );
       expect(communityStakeSellEvent).toBeTruthy();
-      expect(communityStakeSellEvent!.rawLog.address).to.equal(
-        communityStakeAddress,
-      );
+      expect(
+        equalEvmAddresses(
+          communityStakeSellEvent!.rawLog.address,
+          communityStakeAddress,
+        ),
+      ).toBeTruthy();
     });
   });
 });
