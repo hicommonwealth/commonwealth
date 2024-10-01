@@ -17,8 +17,8 @@
     }
   }
 
-  .OverflowIndicatorLeft,
-  .OverflowIndicatorRight {
+  .OverflowIndicator {
+    display: flex;
     position: absolute;
     width: 50px;
     height: 100%;
@@ -26,6 +26,17 @@
     // needed so that the overflow indicator doesn't swallow scrolling
     // events menta for the main Inner div.
     pointer-events: none;
+  }
+
+  .OverflowIndicator button {
+    margin-left: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    outline: none;
+    border: none;
+    cursor: pointer;
+
+    background-color: rgb(255, 255, 255);
   }
 
   .OverflowIndicatorLeft {
