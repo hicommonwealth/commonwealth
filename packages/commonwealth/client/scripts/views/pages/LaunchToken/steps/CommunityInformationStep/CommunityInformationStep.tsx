@@ -68,7 +68,7 @@ const CommunityInformationStep = ({
 
     const nodes = fetchCachedNodes();
     const baseNode = nodes?.find(
-      (n) => n.ethChainId === commonProtocol.ValidChains.Base,
+      (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
     );
     if (!baseNode || !baseNode.ethChainId) {
       notifyError('Could not find base chain node');
