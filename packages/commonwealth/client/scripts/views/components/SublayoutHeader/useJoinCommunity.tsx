@@ -1,4 +1,5 @@
 import { addressSwapper, ChainBase } from '@hicommonwealth/shared';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { setActiveAccount } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
@@ -158,7 +159,7 @@ const useJoinCommunity = () => {
         }
       }
     } catch (err) {
-      console.error(err);
+      notifyError(err.message);
     }
   };
 
