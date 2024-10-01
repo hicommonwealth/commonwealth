@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { IndicatorRight } from 'views/components/ScrollContainer/IndicatorRight';
 import './ScrollContainer.scss';
 
 type ScrollContainerProps = Readonly<{
@@ -75,11 +76,7 @@ export const ScrollContainer = memo(function ScrollContainer(
         {props.children}
       </div>
 
-      {scrollActiveRight && (
-        <div className="OverflowIndicatorRight" {...indicatorProps}>
-          &nbsp;
-        </div>
-      )}
+      {scrollActiveRight && <IndicatorRight {...indicatorProps} />}
     </div>
   );
 });
