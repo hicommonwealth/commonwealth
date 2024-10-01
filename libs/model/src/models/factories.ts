@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
 import Address from './address';
+import ApiKey from './api_key';
 import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
@@ -45,6 +46,7 @@ import Webhook from './webhook';
 
 export const Factories = {
   Address,
+  ApiKey,
   ChainNode,
   Collaboration,
   Comment,
