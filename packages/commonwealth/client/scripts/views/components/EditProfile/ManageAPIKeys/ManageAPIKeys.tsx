@@ -35,6 +35,7 @@ const ManageApiKey = () => {
                 <CWIconButton
                   iconName="copyNew"
                   buttonSize="med"
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onClick={() => saveToClipboard(res.api_key, true)}
                 />
               </div>
