@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
-import ManageApiKey from 'views/components/EditProfile/ManageApiKey';
+import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import { PageNotFound } from '../../pages/404';
@@ -394,7 +394,7 @@ const EditProfile = () => {
                 onTagClick={toggleTagFromSelection}
               />
             </ProfileSection>
-            {enableApiKeyManagement ? <ManageApiKey /> : <div></div>}
+            {enableApiKeyManagement ? <ManageApiKey /> : <></>}
             {actionButtons}
           </CWForm>
         </div>
