@@ -40,7 +40,7 @@ export const startCanvasNode = async () => {
 
   const app = await Canvas.initialize({
     topic: contractTopic,
-    config,
+    path: config,
     contract,
     signers: getSessionSigners(),
     bootstrapList: [],
