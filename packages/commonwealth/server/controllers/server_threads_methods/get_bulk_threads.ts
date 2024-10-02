@@ -235,7 +235,6 @@ export async function __getBulkThreads(
               'id', COM.id,
               'address', A.address,
               'text', COM.text,
-              'plainText', COM.plainText,
               'created_at', COM.created_at::text,
               'updated_at', COM.updated_at::text,
               'deleted_at', COM.deleted_at::text,
