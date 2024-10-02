@@ -1,0 +1,7 @@
+@import '../MarkdownEditor/layout';
+
+.MarkdownViewer {
+  .mdxeditor-root-contenteditable {
+    outline: none;
+  }
+}

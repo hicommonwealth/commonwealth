@@ -1,8 +1,9 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
@@ -95,6 +96,7 @@ export default (
         type: Sequelize.TSVECTOR,
         allowNull: false,
       },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -163,20 +165,9 @@ export default (
   );
 
 export function getThreadSearchVector(title: string, body: string) {
-  let decodedTitle = title;
-  let decodedBody = body;
-  try {
-    decodedTitle = decodeURIComponent(title);
-    // eslint-disable-next-line no-empty
-  } catch {}
-
-  try {
-    decodedBody = decodeURIComponent(body);
-    // eslint-disable-next-line no-empty
-  } catch {}
   return Sequelize.fn(
     'to_tsvector',
     'english',
-    decodedTitle + ' ' + decodedBody,
+    getDecodedString(title) + ' ' + getDecodedString(body),
   );
 }

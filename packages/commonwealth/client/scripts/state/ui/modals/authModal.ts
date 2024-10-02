@@ -27,13 +27,14 @@ export const authModal = createStore<AuthModalStore>()(
         error instanceof SessionKeyError && error;
 
       if (sessionKeyValidationError) {
-        set((state) => {
-          return {
-            ...state,
-            sessionKeyValidationError: sessionKeyValidationError,
-            authModalType: AuthModalType.RevalidateSession,
-          };
-        });
+        console.log('session key validation error');
+        // set((state) => {
+        //   return {
+        //     ...state,
+        //     sessionKeyValidationError: sessionKeyValidationError,
+        //     authModalType: AuthModalType.RevalidateSession,
+        //   };
+        // });
       }
     },
   })),

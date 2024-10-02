@@ -1,6 +1,7 @@
 import {
   buyToken,
   getPrice,
+  launchToken,
   sellToken,
   transferLiquidity,
 } from '../../../../../../libs/shared/src/commonProtocol';
@@ -14,6 +15,23 @@ class LaunchpadBondingCurve extends ContractBase {
   constructor(bondingCurveAddress: string, tokenAddress: string, rpc: string) {
     super(bondingCurveAddress, LPBondingCurveAbi, rpc);
     this.tokenAddress = tokenAddress;
+  }
+
+  async launchToken(name: string, symbol: string, walletAddress: string) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+
+    const txReceipt = await launchToken(
+      this.contract,
+      name,
+      symbol,
+      [], // TODO 9207: where do shares come from?
+      [], // TODO 9207: where do holders come from?
+      0, // TODO 9207: where does totalSupply come from?
+      walletAddress,
+    );
+    return txReceipt;
   }
 
   async buyToken(amountEth: number, walletAddress: string) {

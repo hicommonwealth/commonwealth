@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router-dom';
 
 import 'components/Profile/ProfileHeader.scss';
 
-import { DEFAULT_NAME, renderQuillDeltaToText } from '@hicommonwealth/shared';
+import {
+  DEFAULT_NAME,
+  getDecodedString,
+  renderQuillDeltaToText,
+} from '@hicommonwealth/shared';
 import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type NewProfile from '../../../models/NewProfile';
@@ -28,7 +32,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const hasBio = () => {
     try {
       if (!bio || bio.trim().length === 0) return false;
-      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(bio)));
+      return renderQuillDeltaToText(JSON.parse(getDecodedString(bio)));
     } catch {
       return true;
     }

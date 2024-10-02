@@ -65,7 +65,7 @@ type InputFormValidationProps = {
   customError?: string;
 };
 
-type TextInputProps = BaseTextInputProps &
+export type TextInputProps = BaseTextInputProps &
   InputStyleProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement> &

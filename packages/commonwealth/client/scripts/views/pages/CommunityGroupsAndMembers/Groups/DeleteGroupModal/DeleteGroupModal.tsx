@@ -3,7 +3,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
 import { useDeleteGroupMutation } from 'state/api/groups';
-import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
@@ -34,13 +33,11 @@ export const DeleteGroupModal = ({
   const { mutateAsync: deleteGroup } = useDeleteGroupMutation({
     communityId,
   });
-  const user = useUserStore();
 
   const handleDelete = async () => {
     await deleteGroup({
-      address: user.activeAccount?.address || '',
-      communityId,
-      groupId: groupId,
+      community_id: communityId,
+      group_id: groupId,
     })
       .then(() => {
         notifySuccess('Group deleted');

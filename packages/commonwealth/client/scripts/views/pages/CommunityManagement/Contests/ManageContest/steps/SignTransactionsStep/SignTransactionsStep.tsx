@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 
 import { commonProtocol, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import useAppStatus from 'hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
 import app from 'state';
 import {
   useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleContestOnchainMutation,
 } from 'state/api/contests';
+import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -17,28 +25,19 @@ import {
   ActionStepProps,
   ActionStepsProps,
 } from 'views/pages/CreateCommunity/components/ActionSteps/types';
-
 import {
   ContestFeeType,
   ContestFormData,
   ContestRecurringType,
   LaunchContestStep,
 } from '../../types';
-
-import useAppStatus from 'client/scripts/hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
-import {
-  BaseMixpanelPayload,
-  MixpanelContestEvents,
-} from 'shared/analytics/types';
-import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
   contestFormData: ContestFormData;
   onSetCreatedContestAddress: (address: string) => void;
+  fundingTokenTicker: string;
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
@@ -48,6 +47,7 @@ const SignTransactionsStep = ({
   onSetLaunchContestStep,
   contestFormData,
   onSetCreatedContestAddress,
+  fundingTokenTicker,
 }: SignTransactionsStepProps) => {
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
@@ -152,7 +152,8 @@ const SignTransactionsStep = ({
         interval: isContestRecurring ? contestInterval : 0,
         topic_ids: contestFormData?.toggledTopicList
           .filter((t) => t.checked)
-          .map((t) => t.id),
+          .map((t) => t.id!),
+        ticker: fundingTokenTicker,
       });
 
       onSetLaunchContestStep('ContestLive');

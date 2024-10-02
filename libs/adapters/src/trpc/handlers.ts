@@ -41,8 +41,11 @@ const trpcerror = (error: unknown): TRPCError => {
  * Builds tRPC command POST endpoint
  * @param factory command factory
  * @param tag command tag used for OpenAPI spec grouping
- * @param track analytics tracking metadata as tuple of [event, output mapper] or (input,output) => Promise<[event, data]|undefined>
- * @param commit output middleware to commit actions to canvas (input,output) => undefined
+ * @param track analytics tracking middleware as:
+ * - tuple of `[event, output mapper]`
+ * - or `(input,output) => Promise<[event, data]|undefined>`
+ * @param commit output middleware (best effort), mainly used to commit actions to canvas
+ * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
  * @returns tRPC mutation procedure
  */
 export const command = <
