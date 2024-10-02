@@ -139,12 +139,16 @@ export const NewThreadForm = () => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
 
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    membership.topicIds.includes(threadTopic?.id),
+  const isTopicGated = !!(memberships || []).find(
+    (membership) =>
+      threadTopic?.id && membership.topicIds.includes(threadTopic.id),
   );
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      membership.topicIds.includes(threadTopic?.id) && membership.isAllowed,
+      threadTopic.id &&
+      threadTopic?.id &&
+      membership.topicIds.includes(threadTopic?.id) &&
+      membership.isAllowed,
   );
   const gatedGroupNames = groups
     .filter((group) =>
