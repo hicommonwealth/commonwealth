@@ -11,6 +11,7 @@ import {
 } from 'shared/analytics/types';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
+import { useCreateTokenMutation } from 'state/api/token';
 import useUserStore from 'state/ui/user';
 import {
   CWCoverImageUploader,
@@ -65,6 +66,8 @@ const TokenInformationForm = ({
 
   const { mutateAsync: launchToken } = useLaunchTokenMutation();
 
+  const { mutateAsync: createToken } = useCreateTokenMutation();
+
   const openAddressSelectionModal = useCallback(() => {
     if (selectedAddress) {
       setIsAuthModalOpen(false);
@@ -106,13 +109,27 @@ const TokenInformationForm = ({
         name: values.tokenName.trim(),
         symbol: values.tokenTicker.trim(),
         walletAddress: selectedAddress.address,
-        // TODO 9207: where to store values.tokenDescription and values.tokenImageURL
       };
       await launchToken(payload).catch(console.error);
 
+      await createToken({
+        base: ChainBase.Ethereum,
+        chain_node_id: baseNode.id,
+        name: payload.name,
+        symbol: payload.symbol,
+        icon_url: values?.tokenImageURL?.trim(),
+        description: values?.tokenDescription?.trim(),
+      });
+
       onSubmit(values);
     },
-    [openAddressSelectionModal, selectedAddress, onSubmit, launchToken],
+    [
+      openAddressSelectionModal,
+      selectedAddress,
+      onSubmit,
+      launchToken,
+      createToken,
+    ],
   );
 
   useEffect(() => {
