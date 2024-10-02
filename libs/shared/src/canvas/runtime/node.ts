@@ -6,7 +6,6 @@ import { contract, contractTopic } from './contract';
 export const CANVAS_TOPIC = contractTopic;
 
 export const startCanvasNode = async () => {
-  console.log('===starting canvas node');
   let path =
     process.env.FEDERATION_POSTGRES_DB_URL ??
     (process.env.APP_ENV === 'local'
@@ -17,14 +16,31 @@ export const startCanvasNode = async () => {
   const listen =
     process.env.FEDERATION_LISTEN_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
 
+  let pgConnectionConfig = {};
+
+  if (path) {
+    const url = new URL(path);
+
+    pgConnectionConfig = {
+      user: url.username,
+      host: url.hostname,
+      database: url.pathname.slice(1), // remove the leading '/'
+      password: url.password,
+      port: url.port ? parseInt(url.port) : 5432,
+      ssl: false,
+    };
+  }
+
   if (process.env.NODE_ENV === 'production') {
-    path += '?sslmode=require';
-    console.log('===adding ssl mode to path');
+    pgConnectionConfig.ssl = {
+      rejectUnauthorized: false,
+    };
+    console.log('===SSL configured with rejectUnauthorized: false');
   }
 
   const app = await Canvas.initialize({
     topic: contractTopic,
-    path,
+    path: pgConnectionConfig,
     contract,
     signers: getSessionSigners(),
     bootstrapList: [],

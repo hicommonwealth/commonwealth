@@ -1,2 +1,4 @@
 FROM commonwealth
+RUN apt-get update && \
+    apt-get install -y vim
 CMD NODE_ENV=production ./datadog-entrypoint.sh node --import=extensionless/register --enable-source-maps ./build/server.js
