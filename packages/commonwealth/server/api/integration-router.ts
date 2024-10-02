@@ -1,5 +1,11 @@
 import { express } from '@hicommonwealth/adapters';
-import { ChainEvents, Comment, Thread, models } from '@hicommonwealth/model';
+import {
+  ChainEvents,
+  Comment,
+  Snapshot,
+  Thread,
+  models,
+} from '@hicommonwealth/model';
 import { RequestHandler, Router, raw } from 'express';
 import DatabaseValidationService from 'server/middleware/databaseValidationService';
 
@@ -106,6 +112,11 @@ function build(validator: DatabaseValidationService) {
     isBotUser,
     withCommentId,
     express.command(Comment.DeleteComment()),
+  );
+
+  router.post(
+    '/snapshot/webhook',
+    express.command(Snapshot.CreateSnapshotProposal()),
   );
 
   return router;
