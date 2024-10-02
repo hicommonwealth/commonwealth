@@ -80,6 +80,15 @@ export function CreateSnapshotProposal(): Command<
         throw new InvalidInput(Errors.FailedParsing);
       }
 
+      const associatedCommunity = await models.Community.findOne({
+        where: {
+          snapshot_spaces: {
+            [Op.contains]: [payload.space],
+          },
+        },
+      });
+      if (!associatedCommunity) return { success: true };
+
       const response = await fetchNewSnapshotProposal(parsedId);
       const proposal = response.data.proposal;
       if (!proposal) {
@@ -92,15 +101,6 @@ export function CreateSnapshotProposal(): Command<
         log.error(Errors.SpaceNotDefined, undefined, { response });
         throw new InvalidState(Errors.SpaceNotDefined);
       }
-
-      const associatedCommunity = await models.Community.findOne({
-        where: {
-          snapshot_spaces: {
-            [Op.contains]: [space],
-          },
-        },
-      });
-      if (!associatedCommunity) return { success: true };
 
       await emitEvent(models.Outbox, [
         {
