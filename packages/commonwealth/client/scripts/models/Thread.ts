@@ -10,7 +10,7 @@ import moment, { Moment } from 'moment';
 import { z } from 'zod';
 import Comment from './Comment';
 import type { ReactionType } from './Reaction';
-import Topic from './Topic';
+import type Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
@@ -382,7 +382,7 @@ export class Thread implements IUniqueId {
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
     // @ts-expect-error StrictNullChecks
-    this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
+    this.topic = topic ?? null;
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
