@@ -501,8 +501,9 @@ export const HeaderWithFilters = ({
             address={contest!.contest_address!}
             name={contest!.name!}
             imageUrl={contest.image_url}
-            topics={contest!.topics!}
-            score={score!}
+            // @ts-expect-error <StrictNullChecks/>
+            topics={contest.topics}
+            score={score}
             decimals={contest.decimals}
             ticker={contest.ticker}
             finishDate={end_time ? moment(end_time).toISOString() : ''}

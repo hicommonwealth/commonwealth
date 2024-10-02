@@ -55,7 +55,7 @@ export const EditTopicModal = ({
 
     try {
       await editTopic({
-        topic_id: id,
+        topic_id: id!,
         description: description,
         name: name,
         community_id: app.activeChainId()!,
@@ -94,7 +94,7 @@ export const EditTopicModal = ({
           onClick: async () => {
             await deleteTopic({
               community_id: app.activeChainId() || '',
-              topic_id: id,
+              topic_id: id!,
             });
             if (noRedirect) {
               onModalClose();

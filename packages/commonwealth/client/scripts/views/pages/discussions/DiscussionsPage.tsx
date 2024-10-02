@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -18,6 +19,7 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
+import { formatAddressShort } from 'helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -33,10 +35,13 @@ import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
+import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
+
+const ETH_CHAIN_NODE_ID = 37;
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -81,7 +86,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
+  const topicObj = topics?.find(({ name }) => name === topicName);
+  const topicId = topicObj?.id;
 
   const user = useUserStore();
 
@@ -102,6 +108,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const isOnArchivePage =
     location.pathname ===
     (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
+
+  const { data: tokenMetadata } = useTokenMetadataQuery({
+    tokenId: topicObj?.tokenAddress || '',
+    chainId: ETH_CHAIN_NODE_ID,
+  });
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -163,8 +174,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useManageDocumentTitle('Discussions');
 
-  // TODO in upcoming PR add check if topic is weighted with ERC20 method
-  const isTopicWeighted = weightedVotingEnabled && topicId;
+  const isTopicWeighted =
+    weightedVotingEnabled &&
+    topicId &&
+    topicObj.weightedVoting === TopicWeightedVoting.ERC20;
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
@@ -193,13 +206,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
+          const isTopicGated = !!(memberships || []).find(
+            (membership) =>
+              thread?.topic?.id &&
+              membership.topicIds.includes(thread.topic.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
+              thread?.topic?.id &&
+              membership.topicIds.includes(thread.topic.id) &&
               membership.isAllowed,
           );
 
@@ -264,10 +280,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               <AdminOnboardingSlider />
               {isTopicWeighted && (
                 <TokenBanner
-                  name="Token"
-                  ticker="TKN"
-                  popover={{ title: 'Token', body: 'TKN' }}
-                  voteWeight={5}
+                  name={tokenMetadata?.name}
+                  ticker={topicObj?.tokenSymbol}
+                  avatarUrl={tokenMetadata?.logo}
+                  popover={{
+                    title: tokenMetadata?.name,
+                    body: formatAddressShort(topicObj.tokenAddress!, 6, 6),
+                  }}
                 />
               )}
 

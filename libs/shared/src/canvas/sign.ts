@@ -64,11 +64,12 @@ export async function sign(
       });
 
       if (!savedSessionMessage) {
-        throw new SessionKeyError({
-          name: 'Authentication Error',
-          message: `No session found for ${did}`,
-          address: walletAddress,
-        });
+        return null;
+        // throw new SessionKeyError({
+        //   name: 'Authentication Error',
+        //   message: `No session found for ${did}`,
+        //   address: walletAddress,
+        // });
       }
       const { payload: session, signer: messageSigner } = savedSessionMessage;
 

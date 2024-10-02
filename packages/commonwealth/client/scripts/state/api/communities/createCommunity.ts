@@ -13,6 +13,7 @@ interface CreateCommunityProps {
   socialLinks: string[];
   userAddress: string;
   isPWA?: boolean;
+  tokenName?: string;
 }
 
 export const buildCreateCommunityInput = ({
@@ -23,6 +24,7 @@ export const buildCreateCommunityInput = ({
   iconUrl,
   socialLinks,
   userAddress,
+  tokenName,
   chainNodeId,
 }: CreateCommunityProps) => {
   const nameToSymbol = name.toUpperCase().slice(0, 4);
@@ -36,6 +38,7 @@ export const buildCreateCommunityInput = ({
     user_address: userAddress,
     type: ChainType.Offchain,
     default_symbol: nameToSymbol,
+    token_name: tokenName,
     chain_node_id: chainNodeId,
   };
 };

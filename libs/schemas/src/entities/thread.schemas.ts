@@ -12,6 +12,7 @@ export const ThreadVersionHistory = z.object({
     .describe('Address of the creator of the post or the collaborator'),
   body: z.string(),
   timestamp: z.date(),
+  content_url: z.string().nullish(),
 });
 
 export const Thread = z.object({
@@ -28,6 +29,7 @@ export const Thread = z.object({
   community_id: z.string(),
   view_count: PG_INT,
   links: z.object(linksSchema).array().nullish(),
+  content_url: z.string().nullish(),
 
   read_only: z.boolean().nullish(),
 

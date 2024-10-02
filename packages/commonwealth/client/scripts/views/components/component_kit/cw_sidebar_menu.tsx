@@ -176,6 +176,10 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               item.type === 'community' ? item.community?.isStarred : false,
           };
 
+          if (item.type === 'element') {
+            return item.element;
+          }
+
           return (
             <CWSidebarMenuItem
               key={`${i}-${
@@ -212,6 +216,8 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             },
           } as MenuItem,
         ].map((item: MenuItem, i) => {
+          if (item.type === 'element') return <></>;
+
           return (
             <CWSidebarMenuItem
               key={i}

@@ -7,6 +7,8 @@ const {
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
+  DISCORD_CLIENT_ID,
+  DISCORD_TOKEN,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
@@ -30,6 +32,8 @@ const {
   FLAG_FARCASTER_CONTEST,
   ALCHEMY_PRIVATE_APP_KEY,
   ALCHEMY_PUBLIC_APP_KEY,
+  MEMBERSHIP_REFRESH_BATCH_SIZE,
+  MEMBERSHIP_REFRESH_TTL_SECONDS,
 } = process.env;
 
 const NAME =
@@ -41,6 +45,8 @@ const DEFAULTS = {
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
   DEFAULT_COMMONWEALTH_LOGO:
     'https://s3.amazonaws.com/assets.commonwealth.im/common-white.png',
+  MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
+  MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
 };
 
 export const config = configure(
@@ -117,6 +123,18 @@ export const config = configure(
     COSMOS: {
       COSMOS_REGISTRY_API:
         COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro',
+    },
+    MEMBERSHIP_REFRESH_BATCH_SIZE: parseInt(
+      MEMBERSHIP_REFRESH_BATCH_SIZE ?? DEFAULTS.MEMBERSHIP_REFRESH_BATCH_SIZE,
+      10,
+    ),
+    MEMBERSHIP_REFRESH_TTL_SECONDS: parseInt(
+      MEMBERSHIP_REFRESH_TTL_SECONDS ?? DEFAULTS.MEMBERSHIP_REFRESH_TTL_SECONDS,
+      10,
+    ),
+    DISCORD: {
+      CLIENT_ID: DISCORD_CLIENT_ID,
+      BOT_TOKEN: DISCORD_TOKEN,
     },
   },
   z.object({
@@ -211,6 +229,34 @@ export const config = configure(
     }),
     COSMOS: z.object({
       COSMOS_REGISTRY_API: z.string(),
+    }),
+    MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
+    MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
+    DISCORD: z.object({
+      CLIENT_ID: z
+        .string()
+        .optional()
+        .refine(
+          (data) =>
+            !(
+              ['production', 'frick', 'beta', 'demo'].includes(
+                target.APP_ENV,
+              ) && !data
+            ),
+          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
+        ),
+      BOT_TOKEN: z
+        .string()
+        .optional()
+        .refine(
+          (data) =>
+            !(
+              ['production', 'frick', 'beta', 'demo'].includes(
+                target.APP_ENV,
+              ) && !data
+            ),
+          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
+        ),
     }),
   }),
 );

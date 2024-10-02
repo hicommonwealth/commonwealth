@@ -195,7 +195,9 @@ export const DiscussionSection = ({
   for (const topic of topics) {
     if (topic.featured_in_sidebar) {
       const topicInvolvedInActiveContest =
-        contestsEnabled && topicIdsIncludedInContest.includes(topic.id);
+        contestsEnabled &&
+        topic?.id &&
+        topicIdsIncludedInContest.includes(topic.id);
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
