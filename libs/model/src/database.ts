@@ -32,7 +32,7 @@ export const sequelize = new Sequelize(config.DB.URI, {
       : config.DB.URI ===
           'postgresql://commonwealth:edgeware@localhost/commonwealth'
         ? { requestTimeout: 40000, ssl: false }
-        : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
+        : { requestTimeout: 40000, ssl: true },
   pool: {
     max: 10,
     min: 0,
