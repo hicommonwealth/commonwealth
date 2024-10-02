@@ -105,33 +105,23 @@ const DiscordEventBase = z.object({
   imageUrls: z.array(z.string()),
 });
 
-export const DiscordThreadCreated = DiscordEventBase.extend({
-  action: z.literal('thread-create'),
-});
+export const DiscordThreadCreated = DiscordEventBase;
 
-export const DiscordThreadBodyUpdated = DiscordEventBase.extend({
-  action: z.literal('thread-body-update'),
-});
+export const DiscordThreadBodyUpdated = DiscordEventBase;
 
 export const DiscordThreadTitleUpdated = DiscordEventBase.pick({
   user: true,
   title: true,
   message_id: true,
   parent_channel_id: true,
-}).extend({
-  action: z.literal('thread-title-update'),
 });
 
 export const DiscordThreadCommentCreated = DiscordEventBase.omit({
   title: true,
-}).extend({
-  action: z.literal('comment-create'),
 });
 
 export const DiscordThreadCommentUpdated = DiscordEventBase.omit({
   title: true,
-}).extend({
-  action: z.literal('comment-update'),
 });
 
 // TODO: Discord differentiates Thread body from the thread itself
@@ -139,15 +129,11 @@ export const DiscordThreadCommentUpdated = DiscordEventBase.omit({
 //  which will lead to errors
 export const DiscordThreadCommentDeleted = DiscordEventBase.omit({
   title: true,
-}).extend({
-  action: z.literal('comment-delete'),
 });
 
 export const DiscordThreadDeleted = DiscordEventBase.pick({
   message_id: true,
   parent_channel_id: true,
-}).extend({
-  action: z.literal('thread-delete'),
 });
 
 const ChainEventCreatedBase = z.object({

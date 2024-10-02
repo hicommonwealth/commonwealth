@@ -1,12 +1,18 @@
 import {
+  getRabbitMQConfig,
   HotShotsStats,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
-  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { Broker, broker, logger, stats } from '@hicommonwealth/core';
+import {
+  Broker,
+  broker,
+  EventNames,
+  logger,
+  stats,
+} from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
@@ -76,7 +82,7 @@ async function startDiscordListener() {
   // event types can be found here: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
 
   client.on('threadDelete', async (thread: ThreadChannel) => {
-    await handleThreadChannel(controller, thread, 'thread-delete');
+    await handleThreadChannel(thread, EventNames.DiscordThreadDeleted);
   });
 
   // only used for thread title updates - thread body are handled through the 'messageUpdate' event
@@ -84,24 +90,28 @@ async function startDiscordListener() {
     'threadUpdate',
     async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
       await handleThreadChannel(
-        controller,
         newThread,
-        'thread-title-update',
+        EventNames.DiscordThreadTitleUpdated,
         oldThread,
       );
     },
   );
 
   client.on('messageDelete', async (message) => {
-    await handleMessage(controller, client, message, 'comment-delete');
+    await handleMessage(
+      client,
+      message,
+      EventNames.DiscordThreadCommentDeleted,
+    );
   });
 
   client.on('messageUpdate', async (_, newMessage) => {
     await handleMessage(
-      controller,
       client,
       newMessage,
-      newMessage.nonce ? 'comment-update' : 'thread-body-update',
+      newMessage.nonce
+        ? EventNames.DiscordThreadCommentUpdated
+        : EventNames.DiscordThreadBodyUpdated,
     );
   });
 
@@ -114,10 +124,11 @@ async function startDiscordListener() {
     // since the id of the event is not the id of the actual post/thread.
     if (message.type === MessageType.Default) {
       await handleMessage(
-        controller,
         client,
         message,
-        message.nonce ? 'comment-create' : 'thread-create',
+        message.nonce
+          ? EventNames.DiscordThreadCommentCreated
+          : EventNames.DiscordThreadCreated,
       );
     }
   });

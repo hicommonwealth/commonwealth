@@ -1,10 +1,5 @@
-import {
-  Broker,
-  BrokerPublications,
-  EventContext,
-  logger,
-} from '@hicommonwealth/core';
-import { DiscordAction } from '@hicommonwealth/model';
+import { EventNames, logger } from '@hicommonwealth/core';
+import { emitEvent, models } from '@hicommonwealth/model';
 import {
   Client,
   Message,
@@ -16,20 +11,29 @@ import { getForumLinkedTopic, getImageUrls } from './util';
 
 const log = logger(import.meta);
 
+/**
+ * Used to process the following message types: thread-create, comment-create,
+ * thread-body-update, comment-update, and comment-delete
+ * @param client
+ * @param message
+ * @param action
+ */
 export async function handleMessage(
-  controller: Broker,
   client: Client,
   message:
     | OmitPartialGroupDMChannel<Message<boolean> | PartialMessage>
     | Message<boolean>
     | PartialMessage,
-  action: DiscordAction,
+  action:
+    | EventNames.DiscordThreadCreated
+    | EventNames.DiscordThreadBodyUpdated
+    | EventNames.DiscordThreadCommentCreated
+    | EventNames.DiscordThreadCommentUpdated
+    | EventNames.DiscordThreadCommentDeleted,
 ) {
   log.info(
     `Discord message received from channel ID: ${message.channelId} with action: ${action}`,
   );
-  let event: EventContext<'DiscordMessageCreated'>;
-
   try {
     // 1. Filter for designated forum channels
     const channel = client.channels.cache.get(message.channelId);
@@ -42,58 +46,71 @@ export async function handleMessage(
     const topicId = await getForumLinkedTopic(parent_id);
     if (!topicId) return;
 
+    if (!message.author?.id) {
+      log.error('Missing author id', undefined, { message });
+      return;
+    }
+    if (!message.content) {
+      log.error('Missing content', undefined, { message });
+      return;
+    }
+    if (!message.guildId) {
+      log.error('Missing guild id', undefined, { message });
+      return;
+    }
+
     // 2. Figure out if message is comment or thread
-    event = {
-      name: 'DiscordMessageCreated',
-      payload: {
-        user: {
-          id: message.author?.id ?? null,
-          username: message.author?.username ?? null,
-        },
-        // If title is nothing == comment. channel_id will correspond to the thread channel id.
-        content: message.content ?? null,
-        message_id: message.id ?? null,
-        channel_id: message.channelId ?? null,
-        parent_channel_id: parent_id ?? null,
-        guild_id: message.guildId ?? null,
-        imageUrls: getImageUrls(message),
-        action, // Indicates how the consumer should handle the message
+    const eventPayload = {
+      user: {
+        id: message.author?.id,
+        username: message.author?.username,
       },
+      // If title is nothing == comment. channel_id will correspond to the thread channel id.
+      content: message.content,
+      message_id: message.id,
+      channel_id: message.channelId,
+      parent_channel_id: parent_id,
+      guild_id: message.guildId,
+      imageUrls: getImageUrls(message),
     };
 
-    if (!message.nonce) event.payload.title = channel.name;
+    if (
+      EventNames.DiscordThreadCreated === action ||
+      EventNames.DiscordThreadBodyUpdated === action
+    ) {
+      await emitEvent(models.Outbox, [
+        {
+          event_name: action,
+          event_payload: {
+            ...eventPayload,
+            title: channel.name,
+          },
+        },
+      ]);
+    } else {
+      await emitEvent(models.Outbox, [
+        {
+          event_name: action,
+          event_payload: eventPayload,
+        },
+      ]);
+    }
   } catch (error) {
     log.error(`Error Processing Discord Message`, error);
     return;
   }
-
-  // 3. Publish the message to RabbitMQ queue
-  const result = await controller.publish(
-    BrokerPublications.DiscordListener,
-    event,
-  );
-
-  if (!result) {
-    log.error(`Failed to publish event`, undefined, {
-      event,
-    });
-  }
-
-  log.info(`Event published`, {
-    event,
-  });
 }
 
 export async function handleThreadChannel(
-  controller: Broker,
   thread: ThreadChannel,
-  action: DiscordAction,
+  action:
+    | EventNames.DiscordThreadDeleted
+    | EventNames.DiscordThreadTitleUpdated,
   oldThread?: ThreadChannel,
 ) {
   log.info(
     `Discord Thread Channel Event received from channel ID: ${thread.id} with action: ${action}`,
   );
-  let event: EventContext<'DiscordMessageCreated'> | undefined;
   try {
     // only handle public channels in the Discord forum
     // https://discord.com/developers/docs/resources/channel#channel-object-channel-types
@@ -103,53 +120,51 @@ export async function handleThreadChannel(
     const topicId = await getForumLinkedTopic(thread.parentId!);
     if (!topicId) return;
 
-    if (action === 'thread-delete') {
-      event = {
-        name: 'DiscordMessageCreated',
-        payload: {
-          message_id: thread.id,
-          parent_channel_id: thread.parentId!,
-          action,
+    if (action === EventNames.DiscordThreadDeleted) {
+      await emitEvent(models.Outbox, [
+        {
+          event_name: EventNames.DiscordThreadDeleted,
+          event_payload: {
+            message_id: thread.id,
+            parent_channel_id: thread.parentId!,
+          },
         },
-      };
+      ]);
     } else {
       if (!oldThread) return;
 
       if (thread.name !== oldThread.name) {
         const owner = await thread.fetchOwner();
-        event = {
-          name: 'DiscordMessageCreated',
-          payload: {
-            user: {
-              id: owner?.user?.id,
-              username: owner?.user?.username,
+        if (!owner?.user?.id) {
+          log.error('Missing author id', undefined, { owner });
+          return;
+        }
+        if (!owner?.user?.username) {
+          log.error('Missing author username', undefined, { owner });
+          return;
+        }
+        if (!thread.parentId) {
+          log.error('Missing parent id', undefined, { owner });
+          return;
+        }
+
+        await emitEvent(models.Outbox, [
+          {
+            event_name: EventNames.DiscordThreadTitleUpdated,
+            event_payload: {
+              user: {
+                id: owner?.user?.id,
+                username: owner?.user?.username,
+              },
+              message_id: thread.id,
+              parent_channel_id: thread.parentId,
+              title: thread.name,
             },
-            message_id: thread.id,
-            parent_channel_id: thread.parentId,
-            title: thread.name,
-            action,
           },
-        };
+        ]);
       }
     }
   } catch (e) {
     log.error(`Error Processing Discord Message`, e);
-  }
-
-  if (event) {
-    const result = await controller.publish(
-      BrokerPublications.DiscordListener,
-      event,
-    );
-
-    if (!result) {
-      log.error('Failed to publish event', undefined, {
-        event,
-      });
-    }
-
-    log.info(`Event published`, {
-      event,
-    });
   }
 }
