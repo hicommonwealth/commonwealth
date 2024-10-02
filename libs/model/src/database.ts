@@ -6,13 +6,6 @@ import { buildDb } from './models';
 const log = logger(import.meta);
 
 console.log(
-  '==== running in mode',
-  config.NODE_ENV,
-  config.DB.URI,
-  config.DB.NO_SSL,
-);
-
-console.log(
   'dialect options are',
   config.NODE_ENV !== 'production' || config.DB.NO_SSL
     ? { requestTimeout: 40000 }
@@ -40,7 +33,5 @@ export const sequelize = new Sequelize(config.DB.URI, {
     idle: 40000,
   },
 });
-
-console.log('====Finished database setup');
 
 export const models = buildDb(sequelize);
