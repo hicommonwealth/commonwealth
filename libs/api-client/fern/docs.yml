@@ -1,0 +1,8 @@
+instances:
+  - url: https://Common.docs.buildwithfern.com
+title: Common | Documentation
+navigation:
+  - api: API Reference
+colors:
+  accentPrimary: '#ffffff'
+  background: '#000000'

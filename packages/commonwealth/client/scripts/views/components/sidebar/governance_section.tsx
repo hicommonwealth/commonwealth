@@ -54,8 +54,10 @@ export const GovernanceSection = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
+  const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId()!,
+    id: communityId,
+    enabled: !!communityId,
   });
 
   // Conditional Render Details
@@ -127,8 +129,6 @@ export const GovernanceSection = () => {
     [{ path: '/members' }, { path: ':scope/members' }],
     location,
   );
-
-  const communityId = app.activeChainId() || '';
 
   // ---------- Build Section Props ---------- //
 

@@ -48,6 +48,7 @@ export enum Tag {
   Wallet = 'Wallet',
   Webhook = 'Webhook',
   SuperAdmin = 'SuperAdmin',
+  DiscordBot = 'DiscordBot',
 }
 
 export type Commit<Input extends ZodSchema, Output extends ZodSchema> = (
@@ -205,6 +206,9 @@ const authenticate = async (
   req: Request,
   authStrategy: AuthStrategies = { name: 'jwt' },
 ) => {
+  // User is already authenticated. Authentication overridden at router level e.g. external-router.ts
+  if (req.user) return;
+
   try {
     if (authStrategy.name === 'authtoken') {
       switch (req.headers['authorization']) {

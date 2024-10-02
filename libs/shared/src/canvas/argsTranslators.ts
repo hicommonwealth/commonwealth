@@ -3,15 +3,19 @@ import { deserializeCanvas, serializeCanvas } from './utils';
 
 export const fromCanvasSignedDataApiArgs = (
   data: CanvasSignedDataApiArgs,
-): CanvasSignResult => ({
-  canvasSignedData: deserializeCanvas(data.canvas_signed_data),
-  canvasMsgId: data.canvas_msg_id,
-});
+): CanvasSignResult => {
+  return {
+    canvasSignedData: data.canvas_signed_data
+      ? deserializeCanvas(data.canvas_signed_data)
+      : undefined,
+    canvasMsgId: data.canvas_msg_id,
+  };
+};
 
 export const toCanvasSignedDataApiArgs = (
   data: null | undefined | CanvasSignResult,
 ): CanvasSignedDataApiArgs | undefined => {
-  if (!data) {
+  if (!data || !data.canvasSignedData || !data.canvasMsgId) {
     return;
   }
 
