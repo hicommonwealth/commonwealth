@@ -29,8 +29,8 @@ export const MarkdownEditorPage = () => {
 
   if (mode === 'desktop') {
     return (
-      <div className="MarkdownEditorPage">
-        <div className="desktop">
+      <div className="MarkdownEditorPage MarkdownEditorPageDesktop">
+        <div className="DesktopInner">
           <Inner mode={mode} />
         </div>
       </div>
