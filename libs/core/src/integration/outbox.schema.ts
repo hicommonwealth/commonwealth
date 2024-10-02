@@ -107,4 +107,16 @@ export const Outbox = z.union([
       event_payload: events.CommentUpvoted,
     })
     .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.FarcasterCastCreated),
+      event_payload: events.FarcasterCastCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.FarcasterReplyCastCreated),
+      event_payload: events.FarcasterReplyCastCreated,
+    })
+    .merge(BaseOutboxProperties),
 ]);

@@ -20,9 +20,6 @@ export function ContestWorker(): Policy<typeof inputs> {
           log.warn('ThreadCreated: payload does not contain topic ID');
           return;
         }
-        const { address: userAddress } = (await models.Address.findByPk(
-          payload.address_id,
-        ))!;
 
         const contentUrl = buildThreadContentUrl(
           payload.community_id!,
@@ -51,7 +48,7 @@ export function ContestWorker(): Policy<typeof inputs> {
             // on the latest contest
             const userPostsInContest = c.actions.filter(
               (action) =>
-                action.actor_address === userAddress &&
+                action.actor_address === payload.address &&
                 action.action === 'added',
             );
             const quotaReached =
@@ -77,7 +74,7 @@ export function ContestWorker(): Policy<typeof inputs> {
         const results = await contestHelper.addContentBatch(
           chainNodeUrl!,
           addressesToProcess,
-          userAddress,
+          payload.address!,
           contentUrl,
         );
 
@@ -96,9 +93,15 @@ export function ContestWorker(): Policy<typeof inputs> {
         }
       },
       ThreadUpvoted: async ({ payload }) => {
-        const { communityId, topicId, address: userAddress } = payload;
+        // use address is used instead of address_id because the address
+        // may belong to a non-CW user (e.g. Farcaster)
+        const { community_id, topicId, address: userAddress } = payload;
         if (!topicId) {
           log.warn('ThreadUpvoted: thread does not contain topic ID');
+          return;
+        }
+        if (!userAddress) {
+          log.warn('ThreadUpvoted: address must be included');
           return;
         }
 
@@ -154,7 +157,7 @@ export function ContestWorker(): Policy<typeof inputs> {
               thread_id: payload.thread_id!,
               actor_address: userAddress,
               topic_id: topicId,
-              community_id: communityId,
+              community_id,
             },
           },
         );

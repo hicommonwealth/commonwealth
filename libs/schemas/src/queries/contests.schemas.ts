@@ -77,5 +77,5 @@ export const FarcasterAction = {
   input: z.object({
     contest_address: z.string(),
   }),
-  output: z.array(ContestLogEntry),
+  output: z.void(),
 };
