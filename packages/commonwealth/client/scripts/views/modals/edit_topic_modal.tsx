@@ -21,7 +21,6 @@ import { openConfirmation } from './confirmation_modal';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
 import '../../../styles/modals/edit_topic_modal.scss';
-import useAppStatus from '../../hooks/useAppStatus';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import { createDeltaFromText } from '../components/react_quill_editor/utils';
 
@@ -56,30 +55,13 @@ export const EditTopicModal = ({
   );
   const [name, setName] = useState<string>(nameProp);
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
-  const descriptionInsertString = description.ops?.[0].insert;
-
   const handleSaveChanges = async () => {
     setIsSaving(true);
-
-    const topicInfo: TopicAttributes = {
-      id,
-      description: descriptionInsertString,
-      name: name,
-      community_id: app.activeChainId(),
-      // @ts-expect-error <StrictNullChecks/>
-      telegram: null,
-      featured_in_sidebar: featuredInSidebar,
-      featured_in_new_post: false,
-      default_offchain_template: '',
-      total_threads: topic.totalThreads || 0,
-    };
 
     try {
       await editTopic({
         topic_id: id!,
-        description: description,
+        description: JSON.stringify(description),
         name: name,
         community_id: app.activeChainId()!,
         telegram: null,
