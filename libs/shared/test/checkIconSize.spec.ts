@@ -1,6 +1,6 @@
-import { getFileSizeBytes } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { describe, test } from 'vitest';
+import { getFileSizeBytes } from '../src/utils';
 
 describe('checkIconSize', () => {
   test("should return zero if url provided doesn't exist", async () => {
