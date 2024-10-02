@@ -1,6 +1,6 @@
 import { InvalidActor, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, addressSwapper, bech32ToHex } from '@hicommonwealth/shared';
+import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { incrementProfileCount } from '../utils';
@@ -38,8 +38,8 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
         actor.user.id!,
         address,
         community.base,
-        community.type,
       );
+
       if (!selectedAddress)
         throw new InvalidActor(
           actor,
@@ -58,12 +58,6 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
           JoinCommunityErrors.CannotJoinWithInjectiveAddress,
         );
 
-      // ----- Cosmos-specific hex decoding -----
-      const hex =
-        community.base === ChainBase.CosmosSDK
-          ? bech32ToHex(address)
-          : undefined;
-
       const address_id = await models.sequelize.transaction(
         async (transaction) => {
           // update membership if address already joined this community
@@ -81,7 +75,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
                 user_id: actor.user.id,
                 last_active: new Date(),
                 verified: selectedAddress.verified,
-                hex,
+                hex: selectedAddress.hex,
               },
               { where: { id: found.id }, transaction },
             );
@@ -98,7 +92,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               verification_token_expires:
                 selectedAddress.verification_token_expires,
               wallet_id: selectedAddress.wallet_id,
-              hex,
+              hex: selectedAddress.hex,
               last_active: new Date(),
               role: 'member',
               is_user_default: false,

@@ -18,7 +18,7 @@ export async function findCompatibleAddress(
   user_id: number,
   address: string,
   base: ChainBase,
-  type: ChainType,
+  type: ChainType = ChainType.Offchain, // when joining we don't need to check the type
 ) {
   // First try to find if the current actor's address is compatible with the given base,
   // and use it to create or join the community

@@ -103,6 +103,8 @@ const useJoinCommunity = () => {
     activeChainId?: string;
   }) => {
     try {
+      user.setData({ addressSelectorSelectedAddress: address });
+
       const {
         address: joinedAddress,
         address_id,
@@ -112,6 +114,8 @@ const useJoinCommunity = () => {
       } = await joinCommunity({
         community_id: community.id,
       });
+
+      user.setData({ addressSelectorSelectedAddress: undefined });
 
       // update addresses and user communities
       user.setData({

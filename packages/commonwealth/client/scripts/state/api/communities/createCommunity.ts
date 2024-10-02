@@ -1,6 +1,7 @@
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { initAppState } from 'state';
+import useUserStore from '../../ui/user';
 
 interface CreateCommunityProps {
   id: string;
@@ -39,8 +40,10 @@ export const buildCreateCommunityInput = ({
 };
 
 const useCreateCommunityMutation = () => {
+  const user = useUserStore();
   return trpc.community.createCommunity.useMutation({
     onSuccess: async () => {
+      user.setData({ addressSelectorSelectedAddress: undefined });
       await initAppState(false);
     },
   });
