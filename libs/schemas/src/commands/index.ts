@@ -9,6 +9,7 @@ export * from './load-testing.schemas';
 export * from './subscription.schemas';
 export * from './super-admin.schemas';
 export * from './thread.schemas';
+export * from './token.schemas';
 export * from './user.schemas';
 export * from './wallet.schemas';
 export * from './webhook.schemas';
