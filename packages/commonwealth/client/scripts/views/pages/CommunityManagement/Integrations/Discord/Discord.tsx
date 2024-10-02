@@ -117,6 +117,7 @@ const Discord = () => {
       notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionStatus, createDiscordBotConfig, domain?.isCustomDomain]);
 
   const onDisconnect = useCallback(async () => {
