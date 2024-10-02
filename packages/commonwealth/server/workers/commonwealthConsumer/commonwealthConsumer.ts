@@ -23,7 +23,9 @@ import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreated
 
 const log = logger(import.meta);
 
-stats(HotShotsStats());
+stats({
+  adapter: HotShotsStats(),
+});
 
 let isServiceHealthy = false;
 
@@ -55,7 +57,9 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       ),
     );
     await rmqAdapter.init();
-    broker(rmqAdapter);
+    broker({
+      adapter: rmqAdapter,
+    });
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(

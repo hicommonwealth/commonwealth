@@ -24,6 +24,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { ContestType } from 'views/pages/CommunityManagement/Contests/types';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -32,6 +33,7 @@ import {
   ContestRecurringType,
   LaunchContestStep,
 } from '../../types';
+import './DetailsFormStep.scss';
 import PayoutRow from './PayoutRow';
 import useContestTopics from './useContestTopics';
 import {
@@ -44,8 +46,6 @@ import {
   prizePercentageOptions,
 } from './utils';
 import { detailsFormValidationSchema } from './validation';
-
-import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
   contestAddress?: string;
@@ -93,6 +93,18 @@ const DetailsFormStep = ({
   });
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
+
+  const chainId = app.chain.meta.ChainNode?.id || 0;
+  const {
+    tokenValue,
+    setTokenValue,
+    getTokenError,
+    debouncedTokenValue,
+    tokenMetadata,
+    tokenMetadataLoading,
+  } = useTokenFinder({
+    chainId: chainId,
+  });
 
   const editMode = !!contestAddress;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
@@ -181,7 +193,9 @@ const DetailsFormStep = ({
           contest_address: contestAddress,
           name: values.contestName,
           image_url: values.contestImage,
-          topic_ids: toggledTopicList.filter((t) => t.checked).map((t) => t.id),
+          topic_ids: toggledTopicList
+            .filter((t) => t.checked)
+            .map((t) => t.id!),
         });
 
         goBack();
@@ -374,7 +388,13 @@ const DetailsFormStep = ({
                           to fund your contest (eg: USDT, $degen etc). Leave
                           blank if using a native token
                         </CWText>
-                        <CWTextInput
+                        <TokenFinder
+                          debouncedTokenValue={debouncedTokenValue}
+                          tokenMetadataLoading={tokenMetadataLoading}
+                          tokenMetadata={tokenMetadata}
+                          tokenValue={tokenValue}
+                          setTokenValue={setTokenValue}
+                          tokenError={getTokenError()}
                           containerClassName="funding-token-address-input"
                           name="fundingTokenAddress"
                           hookToForm

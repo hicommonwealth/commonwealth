@@ -11,6 +11,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import type {
+  ComponentMenuItem,
   DefaultMenuItem,
   DividerMenuItem,
   HeaderMenuItem,
@@ -19,7 +20,8 @@ import type {
 export type PopoverMenuItem =
   | DividerMenuItem
   | HeaderMenuItem
-  | DefaultMenuItem;
+  | DefaultMenuItem
+  | ComponentMenuItem;
 
 type PopoverMenuProps = {
   menuItems: Array<PopoverMenuItem>;

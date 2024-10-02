@@ -1,3 +1,5 @@
+import AddressInfo from 'models/AddressInfo';
+
 export type FormSubmitValues = {
   tokenChain: string;
   tokenName: string;
@@ -7,6 +9,8 @@ export type FormSubmitValues = {
 };
 
 export type TokenInformationFormProps = {
-  onSubmit: () => void;
+  onSubmit: (values: FormSubmitValues) => void;
   onCancel: () => void;
+  selectedAddress?: AddressInfo;
+  onAddressSelected: (address: AddressInfo) => void;
 };

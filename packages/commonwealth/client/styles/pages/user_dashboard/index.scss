@@ -55,6 +55,12 @@
       }
     }
 
+    .featured-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
     .Divider {
       margin-top: 8px;
       min-width: 100%;

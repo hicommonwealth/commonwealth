@@ -12,7 +12,7 @@ import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
-import { decodeThreadContentUrl } from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl } from '../utils';
 
 const log = logger(import.meta);
 
@@ -168,9 +168,12 @@ type ContestDetails = {
 async function getContestDetails(
   contest_address: string,
 ): Promise<ContestDetails | undefined> {
-  const [result] = await models.sequelize.query<ContestDetails>(
+  const [result] = await models.sequelize.query<
+    ContestDetails & { private_url: string }
+  >(
     `
-        select coalesce(cn.private_url, cn.url) as url,
+        select cn.private_url,
+               cn.url,
                cm.prize_percentage,
                cm.payout_structure
         from "ContestManagers" cm
@@ -184,7 +187,12 @@ async function getContestDetails(
       replacements: { contest_address },
     },
   );
-  return result;
+
+  return {
+    url: getChainNodeUrl(result),
+    prize_percentage: result.prize_percentage,
+    payout_structure: result.payout_structure,
+  };
 }
 
 /**

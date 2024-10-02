@@ -51,7 +51,7 @@ export const EditBody = (props: EditBodyProps) => {
     communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic.id!,
   });
 
   const cancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
