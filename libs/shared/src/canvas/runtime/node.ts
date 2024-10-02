@@ -1,4 +1,5 @@
 import { Canvas } from '@canvas-js/core';
+import { ConnectionConfig } from 'pg';
 
 import { getSessionSigners } from '../signers';
 import { contract, contractTopic } from './contract';
@@ -6,7 +7,7 @@ import { contract, contractTopic } from './contract';
 export const CANVAS_TOPIC = contractTopic;
 
 export const startCanvasNode = async () => {
-  let path =
+  const path =
     process.env.FEDERATION_POSTGRES_DB_URL ??
     (process.env.APP_ENV === 'local'
       ? undefined
@@ -16,7 +17,7 @@ export const startCanvasNode = async () => {
   const listen =
     process.env.FEDERATION_LISTEN_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
 
-  let pgConnectionConfig = {};
+  let pgConnectionConfig: ConnectionConfig = {};
 
   if (path) {
     const url = new URL(path);
