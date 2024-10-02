@@ -91,6 +91,7 @@ const ManageContest = lazy(
   () => import('views/pages/CommunityManagement/Contests/ManageContest'),
 );
 const Contests = lazy(() => import('views/pages/Contests'));
+const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -446,6 +447,13 @@ const CommonDomainRoutes = ({
           key="/:scope/contests"
           path="/:scope/contests"
           element={withLayout(Contests, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/contests/:contestAddress"
+          path="/:scope/contests/:contestAddress"
+          element={withLayout(ContestPage, {
             scoped: true,
           })}
         />,

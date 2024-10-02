@@ -182,7 +182,6 @@ const CommunityProfileForm = () => {
       setFormKey((key) => key + 1);
 
       notifySuccess('Community updated!');
-      app.sidebarRedraw.emit('redraw');
     } catch {
       notifyError('Failed to update community!');
     } finally {

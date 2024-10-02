@@ -40,7 +40,7 @@ export const buildCreateThreadInput = async ({
   });
   return {
     community_id: communityId,
-    topic_id: topic.id,
+    topic_id: topic.id!,
     title: title,
     body: body ?? '',
     kind,

@@ -45,7 +45,7 @@ export const ChangeThreadTopicModal = ({
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic.id!,
   });
 
   const handleSaveChanges = async () => {

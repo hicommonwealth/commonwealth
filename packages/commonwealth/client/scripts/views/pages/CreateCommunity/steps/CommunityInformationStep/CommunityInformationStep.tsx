@@ -1,8 +1,6 @@
-import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import AddressInfo from 'models/AddressInfo';
 import React from 'react';
 import {
   BaseMixpanelPayload,
@@ -23,7 +21,6 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import './CommunityInformationStep.scss';
 
 interface CommunityInformationStepProps {
-  selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
   handleContinue: (communityId: string, communityName: string) => void;
@@ -31,7 +28,6 @@ interface CommunityInformationStepProps {
 }
 
 const CommunityInformationStep = ({
-  selectedAddress,
   selectedCommunity,
   handleGoBack,
   handleContinue,
@@ -65,17 +61,7 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        nodeUrl: selectedChainNode!.nodeUrl!,
-        altWalletUrl: selectedChainNode!.altWalletUrl!,
-        userAddress: selectedAddress.address,
-        ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
-          ethChainId: values?.chain?.value,
-        }),
-        ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
-          cosmosChainId: values?.chain?.value,
-          bech32Prefix: selectedChainNode?.bech32Prefix,
-        }),
-        isPWA: isAddedToHomeScreen,
+        chainNodeId: selectedChainNode!.id!,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);

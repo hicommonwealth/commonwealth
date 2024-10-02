@@ -82,7 +82,6 @@ const verifySessionSignature = async (
           );
 
           await incrementProfileCount(
-            models,
             addressModel.community_id!,
             userEntity!.id!,
             transaction,
@@ -99,12 +98,7 @@ const verifySessionSignature = async (
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     addressModel.user_id = user_id;
-    await incrementProfileCount(
-      models,
-      addressModel.community_id!,
-      user_id,
-      undefined,
-    );
+    await incrementProfileCount(addressModel.community_id!, user_id, undefined);
   }
   await addressModel.save();
 };

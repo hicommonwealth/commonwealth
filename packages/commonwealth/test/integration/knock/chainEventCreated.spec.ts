@@ -125,7 +125,9 @@ describe('chainEventCreated Event Handler', () => {
 
     test('should do nothing if there are no relevant subscriptions', async () => {
       sandbox = sinon.createSandbox();
-      const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+      const provider = notificationsProvider({
+        adapter: SpyNotificationsProvider(sandbox),
+      });
 
       const res = await processChainEventCreated({
         name: EventNames.ChainEventCreated,
@@ -143,7 +145,9 @@ describe('chainEventCreated Event Handler', () => {
 
     test('should execute triggerWorkflow with the appropriate data', async () => {
       sandbox = sinon.createSandbox();
-      const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+      const provider = notificationsProvider({
+        adapter: SpyNotificationsProvider(sandbox),
+      });
 
       await tester.seed('Address', {
         community_id: community!.id,
@@ -179,7 +183,9 @@ describe('chainEventCreated Event Handler', () => {
 
     test('should throw if triggerWorkflow fails', async () => {
       sandbox = sinon.createSandbox();
-      notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+      notificationsProvider({
+        adapter: ThrowingSpyNotificationsProvider(sandbox),
+      });
 
       await tester.seed('Address', {
         community_id: community!.id,
@@ -221,7 +227,9 @@ describe('chainEventCreated Event Handler', () => {
 
     test('should do nothing if there are no relevant subscriptions', async () => {
       sandbox = sinon.createSandbox();
-      const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+      const provider = notificationsProvider({
+        adapter: SpyNotificationsProvider(sandbox),
+      });
 
       const res = await processChainEventCreated({
         name: EventNames.ChainEventCreated,
@@ -243,7 +251,9 @@ describe('chainEventCreated Event Handler', () => {
 
     test('should execute triggerWorkflow with the appropriate data', async () => {
       sandbox = sinon.createSandbox();
-      const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+      const provider = notificationsProvider({
+        adapter: SpyNotificationsProvider(sandbox),
+      });
 
       await tester.seed('CommunityAlert', {
         community_id: community!.id,
@@ -283,7 +293,9 @@ describe('chainEventCreated Event Handler', () => {
 
     test('should throw if triggerWorkflow fails', async () => {
       sandbox = sinon.createSandbox();
-      notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+      notificationsProvider({
+        adapter: ThrowingSpyNotificationsProvider(sandbox),
+      });
 
       await tester.seed('CommunityAlert', {
         community_id: community!.id,

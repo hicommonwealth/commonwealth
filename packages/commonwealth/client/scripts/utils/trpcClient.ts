@@ -12,9 +12,13 @@ export const trpcClient = trpc.createClient({
     httpBatchLink({
       url: BASE_API_PATH,
       async headers() {
+        const user = userStore.getState();
         return {
-          authorization: userStore.getState().jwt || '',
-          address: userStore.getState().activeAccount?.address,
+          authorization: user.jwt || '',
+          address:
+            user.addressSelectorSelectedAddress ??
+            user.activeAccount?.address ??
+            user.addresses?.at(0)?.address,
         };
       },
     }),

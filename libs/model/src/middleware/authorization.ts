@@ -149,11 +149,26 @@ async function buildAuth(
       address: actor.address,
       community_id: auth.community_id,
       role: { [Op.in]: roles },
+      verified: { [Op.ne]: null },
+      // TODO: check verification token expiration
     },
     order: [['role', 'DESC']],
   });
-  if (!auth.address)
-    throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+  if (!auth.address) {
+    if (!actor.user.isAdmin)
+      throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+    // simulate non-member super admins
+    auth.address = await models.Address.findOne({
+      where: {
+        user_id: actor.user.id,
+        address: actor.address,
+      },
+    });
+    if (!auth.address)
+      throw new InvalidActor(actor, `Super admin address not found`);
+  }
 
   auth.is_author = auth.address!.id === auth.author_address_id;
 
