@@ -6,6 +6,7 @@ import { contract, contractTopic } from './contract';
 export const CANVAS_TOPIC = contractTopic;
 
 export const startCanvasNode = async () => {
+  console.log('===starting canvas node');
   let path =
     process.env.FEDERATION_POSTGRES_DB_URL ??
     (process.env.APP_ENV === 'local'
