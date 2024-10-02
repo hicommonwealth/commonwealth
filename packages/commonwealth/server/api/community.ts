@@ -120,4 +120,10 @@ export const trpcRouter = trpc.router({
     Community.RefreshCommunityMemberships,
     trpc.Tag.Community,
   ),
+  joinCommunity: trpc.command(Community.JoinCommunity, trpc.Tag.Community, [
+    MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+    (result) => ({
+      community: result.community_id,
+    }),
+  ]),
 });

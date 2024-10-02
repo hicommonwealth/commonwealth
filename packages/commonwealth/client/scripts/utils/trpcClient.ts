@@ -16,7 +16,9 @@ export const trpcClient = trpc.createClient({
         return {
           authorization: user.jwt || '',
           address:
-            user.activeAccount?.address ?? user.addresses?.at(0)?.address,
+            user.addressSelectorSelectedAddress ??
+            user.activeAccount?.address ??
+            user.addresses?.at(0)?.address,
         };
       },
     }),
