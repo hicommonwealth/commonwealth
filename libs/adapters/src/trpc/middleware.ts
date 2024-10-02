@@ -48,7 +48,14 @@ export enum Tag {
   Wallet = 'Wallet',
   Webhook = 'Webhook',
   SuperAdmin = 'SuperAdmin',
+  DiscordBot = 'DiscordBot',
 }
+
+export type Commit<Input extends ZodSchema, Output extends ZodSchema> = (
+  input: z.infer<Input>,
+  output: z.infer<Output>,
+  ctx: Context,
+) => Promise<[string, Record<string, unknown>] | undefined | void>;
 
 /**
  * Supports two options to track analytics
@@ -137,6 +144,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
   md: Metadata<Input, Output>,
   tag: Tag,
   track?: Track<Input, Output>,
+  commit?: Commit<Input, Output>,
 ) => {
   const secure = isSecure(md);
   return trpc.procedure
@@ -168,7 +176,10 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
       }
       track &&
         result.ok &&
-        void trackAnalytics(track, ctx, rawInput, result.data);
+        void trackAnalytics(track, ctx, rawInput, result.data).catch(log.error);
+      commit &&
+        result.ok &&
+        void commit(rawInput, result.data, ctx).catch(log.error);
       return result;
     })
     .meta({
@@ -195,6 +206,9 @@ const authenticate = async (
   req: Request,
   authStrategy: AuthStrategies = { name: 'jwt' },
 ) => {
+  // User is already authenticated. Authentication overridden at router level e.g. external-router.ts
+  if (req.user) return;
+
   try {
     if (authStrategy.name === 'authtoken') {
       switch (req.headers['authorization']) {

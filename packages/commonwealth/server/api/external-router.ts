@@ -5,32 +5,62 @@ import passport from 'passport';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
+import {
+  addRateLimiterMiddleware,
+  apiKeyAuthMiddleware,
+} from './external-router-middleware';
 import * as thread from './threads';
 
 const {
-  createCommunity,
-  updateCommunity,
   getCommunities,
   getCommunity,
   getMembers,
-} = community.trpcRouter;
-const { createThread, updateThread, createThreadReaction } = thread.trpcRouter;
-const { createComment, createCommentReaction, updateComment, getComments } =
-  comment.trpcRouter;
-
-const api = {
   createCommunity,
   updateCommunity,
+  createTopic,
+  updateTopic,
+  deleteTopic,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+} = community.trpcRouter;
+const {
+  createThread,
+  updateThread,
+  deleteThread,
+  createThreadReaction,
+  deleteReaction,
+} = thread.trpcRouter;
+const {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+  createCommentReaction,
+} = comment.trpcRouter;
+
+const api = {
   getCommunities,
   getCommunity,
   getMembers,
   getComments,
+  createCommunity,
+  updateCommunity,
+  createTopic,
+  updateTopic,
+  deleteTopic,
+  createGroup,
+  updateGroup,
+  deleteGroup,
   createThread,
   updateThread,
-  createThreadReaction,
+  deleteThread,
   createComment,
   updateComment,
+  deleteComment,
+  createThreadReaction,
   createCommentReaction,
+  deleteReaction,
 };
 
 const PATH = '/api/v1';
@@ -46,7 +76,14 @@ router.use(cors(), express.statsMiddleware);
  */
 if (config.NODE_ENV === 'test')
   router.use(passport.authenticate('jwt', { session: false }));
+
 // ===============================================================================
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+if (config.NODE_ENV !== 'test') router.use(apiKeyAuthMiddleware);
+
+if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
+  addRateLimiterMiddleware();
+}
 
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {

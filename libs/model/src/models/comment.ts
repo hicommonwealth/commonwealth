@@ -1,5 +1,6 @@
 import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -63,6 +64,7 @@ export default (
         type: Sequelize.TSVECTOR,
         allowNull: false,
       },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       hooks: {
@@ -119,12 +121,5 @@ export default (
   );
 
 export function getCommentSearchVector(body: string) {
-  let decodedBody = body;
-
-  try {
-    decodedBody = decodeURIComponent(body);
-    // eslint-disable-next-line no-empty
-  } catch {}
-
-  return Sequelize.fn('to_tsvector', 'english', decodedBody);
+  return Sequelize.fn('to_tsvector', 'english', getDecodedString(body));
 }

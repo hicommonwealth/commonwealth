@@ -1,3 +1,6 @@
+import { ChainBase } from '@hicommonwealth/shared';
+import { setActiveAccount } from 'client/scripts/controllers/app/login';
+import Account from 'client/scripts/models/Account';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
@@ -48,6 +51,17 @@ const useReserveCommunityNamespace = ({
         state: 'loading',
         errorText: '',
       });
+
+      // set active account so that updateCommunity works
+      await setActiveAccount(
+        new Account({
+          community: {
+            id: communityId,
+            base: ChainBase.Ethereum, // namespaces only support EVM
+          },
+          address: userAddress,
+        }),
+      );
 
       const txReceipt = await namespaceFactory.deployNamespace(
         namespace,

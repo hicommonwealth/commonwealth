@@ -77,9 +77,9 @@ export class RejectedMember extends InvalidActor {
  * and authorized by prefilling the authorization context.
  *
  * Currenlty, the waterfall is:
- * 1. by comment_id
- * 3. or by thread_id
- * 2. or by community_id (community_id or id)
+ * by comment_id
+ *   or by thread_id
+       or by community_id (community_id or id)
  *
  * TODO: Find ways to cache() by args to avoid db trips
  *
@@ -152,8 +152,21 @@ async function buildAuth(
     },
     order: [['role', 'DESC']],
   });
-  if (!auth.address)
-    throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+  if (!auth.address) {
+    if (!actor.user.isAdmin)
+      throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+    // simulate non-member super admins
+    auth.address = await models.Address.findOne({
+      where: {
+        user_id: actor.user.id,
+        address: actor.address,
+      },
+    });
+    if (!auth.address)
+      throw new InvalidActor(actor, `Super admin address not found`);
+  }
 
   auth.is_author = auth.address!.id === auth.author_address_id;
 
@@ -250,16 +263,19 @@ export const isSuperAdmin: AuthHandler = async (ctx) => {
  *
  * @param roles specific community roles - all by default
  * @param action specific group permission action
+ * @param author when true, rejects members that are not the author
  * @param collaborators authorize thread collaborators
  * @throws InvalidActor when not authorized
  */
 export function isAuthorized({
   roles = ['admin', 'moderator', 'member'],
   action,
+  author = false,
   collaborators = false,
 }: {
   roles?: Role[];
   action?: GroupPermissionAction;
+  author?: boolean;
   collaborators?: boolean;
 }): AuthHandler {
   return async (ctx) => {
@@ -292,7 +308,10 @@ export function isAuthorized({
       throw new InvalidActor(ctx.actor, 'Not authorized collaborator');
     }
 
+    if (author && auth.address?.role === 'member')
+      throw new InvalidActor(ctx.actor, 'Not authorized author');
+
     // at this point, the address is either a moderator or member
-    // without any action or collaboration requirements
+    // without any security requirements for action, author, or collaboration
   };
 }

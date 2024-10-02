@@ -29,6 +29,7 @@ const featureFlags = {
   farcasterContest: buildFlag(process.env.FLAG_FARCASTER_CONTEST),
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   tokenizedCommunity: buildFlag(process.env.FLAG_TOKENIZED_COMMUNITY),
+  manageApiKeys: buildFlag(process.env.FLAG_MANAGE_API_KEYS),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

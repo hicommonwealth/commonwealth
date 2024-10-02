@@ -1,4 +1,5 @@
 import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
+import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/comments/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
@@ -76,17 +77,18 @@ export const CommentReactionButton = ({
         notifyError('Failed to update reaction count');
         return;
       }
-      deleteCommentReaction({
+      const input = await buildDeleteCommentReactionInput({
         communityId,
         address: user.activeAccount?.address,
         commentMsgId: comment.canvasMsgId,
         reactionId: foundReaction.id,
-      }).catch((err) => {
+      });
+      deleteCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
           checkForSessionKeyRevalidationErrors(err);
           return;
         }
-        console.error(err.response.data.error || err?.message);
+        console.error(err?.message);
         notifyError('Failed to update reaction count');
       });
     } else {
@@ -102,7 +104,7 @@ export const CommentReactionButton = ({
           checkForSessionKeyRevalidationErrors(err);
           return;
         }
-        console.error(err?.responseJSON?.error || err?.message);
+        console.error(err?.message);
         notifyError('Failed to save reaction');
       });
     }

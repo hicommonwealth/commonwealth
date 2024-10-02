@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { Thread, ThreadAttributes, type DB } from '@hicommonwealth/model';
-import { slugify } from '@hicommonwealth/shared';
+import { getDecodedString, slugify } from '@hicommonwealth/shared';
 import { Feed } from 'feed';
 import { GetBulkThreadsResult } from '../controllers/server_threads_methods/get_bulk_threads';
 import { ServerControllers } from '../routing/router';
@@ -137,7 +137,7 @@ export const getFeedHandler = async (
     });
 
     bulkThreads.threads.forEach((thread) => {
-      const title = thread.title;
+      const title = getDecodedString(thread.title);
       const slug = slugify(title);
       feed.addItem({
         title: title,
@@ -159,7 +159,6 @@ export const getFeedHandler = async (
     // res.setHeader('content-type', 'text/xml.');
     res.setHeader('content-type', 'application/atom+xml.');
 
-    console.log(feed.atom1());
     res.write(feed.atom1());
   }
   res.end();

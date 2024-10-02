@@ -16,7 +16,7 @@ import './TokenBanner.scss';
 interface TokenBannerProps {
   avatarUrl?: string;
   name?: string;
-  ticker?: string;
+  ticker?: string | null;
   value?: number;
   change?: number;
   isLoading?: boolean;

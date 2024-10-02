@@ -6,7 +6,7 @@
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
   "type": "module",
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@9.10.0",
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "docker-build-commonwealth": "docker build . --target commonwealth --tag commonwealth:latest",

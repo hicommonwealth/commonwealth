@@ -6,36 +6,35 @@ const ActiveContestManagers = z.object({
   contest_manager: schemas.ContestManager,
 });
 
-export type TopicAttributes = {
-  name: string;
-  id: number;
-  description: string;
-  telegram?: string;
-  community_id?: string;
-  featured_in_sidebar?: boolean;
-  featured_in_new_post?: boolean;
-  order?: number;
-  default_offchain_template?: string;
-  total_threads: number;
-  channel_id?: string;
+type TopicAttributesBase = z.infer<typeof schemas.Topic>;
+
+type TopicAttributesExtended = TopicAttributesBase & {
   active_contest_managers: Array<z.infer<typeof ActiveContestManagers>>;
+  total_threads: number;
 };
 
+export type TopicAttributes = TopicAttributesExtended;
+
 class Topic {
-  public readonly name: string;
-  public readonly id: number;
-  public readonly description: string;
-  public readonly telegram?: string;
-  public readonly communityId: string;
-  public readonly channelId?: string;
-  public readonly featuredInSidebar?: boolean;
-  public readonly featuredInNewPost?: boolean;
-  public order?: number;
-  public readonly defaultOffchainTemplate?: string;
-  public totalThreads?: number;
-  public readonly activeContestManagers: Array<
-    z.infer<typeof ActiveContestManagers>
-  >;
+  public readonly name: TopicAttributes['name'];
+  public readonly id: TopicAttributes['id'];
+  public readonly description: TopicAttributes['description'];
+  public readonly telegram: TopicAttributes['telegram'];
+  public readonly communityId: TopicAttributes['community_id'];
+  public readonly channelId: TopicAttributes['channel_id'];
+  public readonly featuredInSidebar: TopicAttributes['featured_in_sidebar'];
+  public readonly featuredInNewPost: TopicAttributes['featured_in_new_post'];
+  public order: TopicAttributes['order'];
+  public readonly defaultOffchainTemplate: TopicAttributes['default_offchain_template'];
+  public totalThreads: TopicAttributes['total_threads'];
+  public readonly activeContestManagers: TopicAttributes['active_contest_managers'];
+  public readonly chainNodeId: TopicAttributes['chain_node_id'];
+  public readonly groupIds: TopicAttributes['group_ids'];
+  public readonly defaultOffchainTemplateBackup: TopicAttributes['default_offchain_template_backup'];
+  public readonly weightedVoting: TopicAttributes['weighted_voting'];
+  public readonly tokenAddress: TopicAttributes['token_address'];
+  public readonly tokenSymbol: TopicAttributes['token_symbol'];
+  public readonly voteWeightMultiplier: TopicAttributes['vote_weight_multiplier'];
 
   constructor({
     name,
@@ -50,12 +49,18 @@ class Topic {
     total_threads,
     channel_id,
     active_contest_managers,
+    chain_node_id,
+    group_ids,
+    default_offchain_template_backup,
+    weighted_voting,
+    token_address,
+    token_symbol,
+    vote_weight_multiplier,
   }: TopicAttributes) {
     this.name = name;
     this.id = id;
     this.description = description;
     this.telegram = telegram;
-    // @ts-expect-error StrictNullChecks
     this.communityId = community_id;
     this.featuredInSidebar = featured_in_sidebar;
     this.featuredInNewPost = featured_in_new_post;
@@ -64,6 +69,13 @@ class Topic {
     this.totalThreads = total_threads || 0;
     this.channelId = channel_id;
     this.activeContestManagers = active_contest_managers || [];
+    this.chainNodeId = chain_node_id;
+    this.groupIds = group_ids;
+    this.defaultOffchainTemplateBackup = default_offchain_template_backup;
+    this.weightedVoting = weighted_voting;
+    this.tokenAddress = token_address;
+    this.tokenSymbol = token_symbol;
+    this.voteWeightMultiplier = vote_weight_multiplier;
   }
 }
 

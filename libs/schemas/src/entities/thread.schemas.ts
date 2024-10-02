@@ -4,6 +4,17 @@ import { Reaction } from './reaction.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
+export const ThreadVersionHistory = z.object({
+  id: PG_INT.optional(),
+  thread_id: PG_INT,
+  address: z
+    .string()
+    .describe('Address of the creator of the post or the collaborator'),
+  body: z.string(),
+  timestamp: z.date(),
+  content_url: z.string().nullish(),
+});
+
 export const Thread = z.object({
   id: PG_INT.optional(),
   address_id: PG_INT,
@@ -17,6 +28,7 @@ export const Thread = z.object({
   community_id: z.string(),
   view_count: PG_INT.optional(),
   links: z.object(linksSchema).array().nullish(),
+  content_url: z.string().nullish(),
 
   read_only: z.boolean().nullish(),
 
@@ -52,14 +64,5 @@ export const Thread = z.object({
   topic: Topic.nullish(),
   collaborators: Address.array().nullish(),
   reactions: Reaction.array().nullish(),
-});
-
-export const ThreadVersionHistory = z.object({
-  id: PG_INT.optional(),
-  thread_id: PG_INT,
-  address: z
-    .string()
-    .describe('Address of the creator of the post or the collaborator'),
-  body: z.string(),
-  timestamp: z.date(),
+  ThreadVersionHistories: z.array(ThreadVersionHistory).nullish(),
 });

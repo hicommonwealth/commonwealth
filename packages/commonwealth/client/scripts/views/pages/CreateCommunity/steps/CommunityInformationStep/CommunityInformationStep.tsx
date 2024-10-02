@@ -1,4 +1,3 @@
-import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -65,17 +64,9 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        nodeUrl: selectedChainNode!.nodeUrl!,
-        altWalletUrl: selectedChainNode!.altWalletUrl!,
         userAddress: selectedAddress.address,
-        ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
-          ethChainId: values?.chain?.value,
-        }),
-        ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
-          cosmosChainId: values?.chain?.value,
-          bech32Prefix: selectedChainNode?.bech32Prefix,
-        }),
         isPWA: isAddedToHomeScreen,
+        chainNodeId: selectedChainNode!.id!,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);

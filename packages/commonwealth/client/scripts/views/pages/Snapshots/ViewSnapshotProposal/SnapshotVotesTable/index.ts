@@ -1,0 +1,1 @@
+export { SnapshotVotesTable } from './SnapshotVotesTable';

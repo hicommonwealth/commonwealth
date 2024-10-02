@@ -88,9 +88,11 @@
 
     .CWSelectList {
       min-width: 202px;
-      margin-left: -20px;
-      margin-right: -18px;
 
+      .SelectList {
+        min-height: 24px !important;
+        max-height: 24px !important;
+      }
       .SelectList:not(:focus):not(:focus-within) {
         border-color: transparent !important;
       }

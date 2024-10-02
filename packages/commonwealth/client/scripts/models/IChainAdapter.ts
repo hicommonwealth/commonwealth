@@ -73,7 +73,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async deinit(): Promise<void> {
     this._apiInitialized = false;
     this.app.isModuleReady = false;
-    if (this.app.snapshot) this.app.snapshot.deinit();
     this._loaded = false;
     console.log(`Stopping ${this.meta.id}...`);
 

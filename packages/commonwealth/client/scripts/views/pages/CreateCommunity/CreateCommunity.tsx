@@ -59,7 +59,6 @@ const CreateCommunity = () => {
           <CommunityInformationStep
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
-            // @ts-expect-error <StrictNullChecks/>
             handleSelectedChainId={setSelectedChainId}
             handleGoBack={() => onChangeStep(false)}
             handleContinue={handleCompleteCommunityInformationStep}

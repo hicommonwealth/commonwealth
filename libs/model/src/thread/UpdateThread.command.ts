@@ -20,6 +20,7 @@ import {
   emitMentions,
   findMentionDiff,
   parseUserMentions,
+  uploadIfLarge,
 } from '../utils';
 
 export const UpdateThreadErrors = {
@@ -177,14 +178,10 @@ export function UpdateThread(): Command<
     ...schemas.UpdateThread,
     auth: [isAuthorized({ collaborators: true })],
     body: async ({ actor, payload, auth }) => {
-      const { address, topic_id } = mustBeAuthorizedThread(actor, auth);
-      const { thread_id, discord_meta } = payload;
-
-      // find by discord_meta first if present
-      const thread = await models.Thread.findOne({
-        where: discord_meta ? { discord_meta } : { id: thread_id },
-      });
-      if (!thread) throw new InvalidInput(UpdateThreadErrors.ThreadNotFound);
+      const { address, thread, thread_id } = mustBeAuthorizedThread(
+        actor,
+        auth,
+      );
 
       const content = getContentPatch(thread, payload);
       const adminPatch = getAdminOrModeratorPatch(actor, auth!, payload);
@@ -207,15 +204,15 @@ export function UpdateThread(): Command<
         collaboratorsPatch.remove.length > 0
       ) {
         const found = await models.ContestTopic.findOne({
-          where: { topic_id },
-          include: [
-            {
-              model: models.ContestManager,
-              required: true,
-            },
-          ],
+          where: { topic_id: thread.topic_id! },
         });
         if (found) throw new InvalidInput(UpdateThreadErrors.ContestLock);
+      }
+
+      let contentUrl: string | null = thread.content_url ?? null;
+      if (content.body) {
+        const result = await uploadIfLarge('threads', content.body);
+        contentUrl = result.contentUrl;
       }
 
       // == mutation transaction boundary ==
@@ -231,11 +228,13 @@ export function UpdateThread(): Command<
             : {};
         await thread.update(
           {
+            // TODO: body should be set to truncatedBody once client renders content_url
             ...content,
             ...adminPatch,
             ...ownerPatch,
             last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
             ...searchUpdate,
+            content_url: contentUrl,
           },
           { transaction },
         );
@@ -260,10 +259,6 @@ export function UpdateThread(): Command<
           });
         }
 
-        // TODO: we can encapsulate address activity in authorization middleware
-        address.last_active = new Date();
-        await address.save({ transaction });
-
         if (content.body) {
           const currentVersion = await models.ThreadVersionHistory.findOne({
             where: { thread_id },
@@ -279,8 +274,10 @@ export function UpdateThread(): Command<
               {
                 thread_id,
                 address: address.address,
+                // TODO: body should be set to truncatedBody once client renders content_url
                 body: content.body,
                 timestamp: new Date(),
+                content_url: contentUrl,
               },
               { transaction },
             );

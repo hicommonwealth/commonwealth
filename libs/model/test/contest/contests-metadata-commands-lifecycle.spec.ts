@@ -55,6 +55,7 @@ describe('Contests metadata commands lifecycle', () => {
       {
         id: community_id,
         namespace,
+        namespace_address: '0x123',
         chain_node_id: chain!.id,
         lifetime_thread_count: 0,
         profile_count: 2,
@@ -97,6 +98,14 @@ describe('Contests metadata commands lifecycle', () => {
             funding_token_address,
             decimals,
             cancelled: false,
+          },
+        ],
+        CommunityStakes: [
+          {
+            stake_id: 1,
+            stake_token: 'XYZ',
+            vote_weight: 3,
+            stake_enabled: true,
           },
         ],
       },

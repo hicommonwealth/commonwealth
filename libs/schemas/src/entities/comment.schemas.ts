@@ -4,12 +4,21 @@ import { Reaction } from './reaction.schemas';
 import { Thread } from './thread.schemas';
 import { Address } from './user.schemas';
 
+export const CommentVersionHistory = z.object({
+  id: PG_INT.optional(),
+  comment_id: PG_INT,
+  text: z.string(),
+  timestamp: z.date(),
+  content_url: z.string().nullish(),
+});
+
 export const Comment = z.object({
   id: PG_INT.optional(),
   thread_id: PG_INT,
   address_id: PG_INT,
   text: z.string(),
   parent_id: z.string().nullish(),
+  content_url: z.string().nullish(),
 
   canvas_signed_data: z.string().nullish(),
   canvas_msg_id: z.string().nullish(),
@@ -39,11 +48,5 @@ export const Comment = z.object({
   Address: Address.nullish(),
   Thread: Thread.nullish(),
   Reaction: Reaction.nullish(),
-});
-
-export const CommentVersionHistory = z.object({
-  id: PG_INT.optional(),
-  comment_id: PG_INT,
-  text: z.string(),
-  timestamp: z.date(),
+  CommentVersionHistories: z.array(CommentVersionHistory).nullish(),
 });

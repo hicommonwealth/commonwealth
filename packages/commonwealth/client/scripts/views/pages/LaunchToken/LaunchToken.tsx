@@ -13,7 +13,14 @@ import { CreateTokenCommunityStep, getFormSteps } from './utils';
 
 const LaunchToken = () => {
   const navigate = useCommonNavigate();
-  const { createTokenCommunityStep, onChangeStep } = useCreateCommunity();
+  const {
+    createTokenCommunityStep,
+    onChangeStep,
+    createdTokenInfo,
+    selectedAddress,
+    setSelectedAddress,
+    setCreatedTokenInfo,
+  } = useCreateCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -33,7 +40,18 @@ const LaunchToken = () => {
         return (
           <TokenInformationStep
             handleGoBack={() => navigate('/')} // redirect to home
-            handleContinue={() => onChangeStep(true)}
+            handleContinue={(tokenInfo) => {
+              setCreatedTokenInfo({
+                name: tokenInfo.tokenName,
+                symbol: tokenInfo.tokenTicker,
+                description: tokenInfo.tokenDescription,
+                imageURL: tokenInfo.tokenImageURL,
+              });
+
+              onChangeStep(true);
+            }}
+            onAddressSelected={(address) => setSelectedAddress(address)}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.CommunityInformation:
@@ -41,6 +59,8 @@ const LaunchToken = () => {
           <CommunityInformationStep
             handleGoBack={() => onChangeStep(false)}
             handleContinue={() => onChangeStep(true)}
+            tokenInfo={createdTokenInfo}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.SignatureLaunch:

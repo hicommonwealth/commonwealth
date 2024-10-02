@@ -3,6 +3,7 @@ export * as ChainEvents from './chain-events';
 export * as Comment from './comment';
 export * as Community from './community';
 export * as Contest from './contest';
+export * as DiscordBot from './discordBot';
 export * as Email from './emails';
 export * as Feed from './feed';
 export * as LoadTest from './load-testing';
