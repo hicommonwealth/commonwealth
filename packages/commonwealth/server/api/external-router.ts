@@ -57,7 +57,6 @@ const api = {
   deleteGroup,
   createThread,
   updateThread,
-  createThreadReaction,
   getThreads,
   deleteThread,
   getTopics,
