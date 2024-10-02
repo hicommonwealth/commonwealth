@@ -5,7 +5,7 @@ import {
   MIN_SCHEMA_INT,
   getFileSizeBytes,
 } from '@hicommonwealth/shared';
-import { ZodObject, z } from 'zod';
+import { z } from 'zod';
 
 export const paginationSchema = {
   limit: z.coerce
@@ -39,14 +39,6 @@ export const linksSchema = {
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 
 export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
-
-// turns id: number | undefined -> number. Gets around sequelize restrictions
-export const strict = <T extends ZodObject<any>>(schema: T): ZodObject<any> => {
-  return z.object({
-    ...schema.shape,
-    id: z.number(),
-  });
-};
 
 export const ETHERS_BIG_NUMBER = z.object({
   hex: z.string().regex(/^0x[0-9a-fA-F]+$/),
