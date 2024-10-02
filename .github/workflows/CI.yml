@@ -185,6 +185,12 @@ jobs:
       - name: Build server
         run: pnpm -F commonwealth build
 
+
+      - name: Test continue-on-error
+        run: |
+          false
+        continue-on-error: true
+
       - name: Run serial e2e tests
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
