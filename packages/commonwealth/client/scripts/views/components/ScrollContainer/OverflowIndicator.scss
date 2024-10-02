@@ -20,11 +20,7 @@
 }
 
 .OverflowIndicator .Gradient {
-  width: 75px;
-
-  // needed so that the overflow indicator doesn't swallow scrolling
-  // events menta for the main Inner div.
-  pointer-events: none;
+  width: 100%;
 }
 
 .OverflowIndicatorLeft .Gradient {
