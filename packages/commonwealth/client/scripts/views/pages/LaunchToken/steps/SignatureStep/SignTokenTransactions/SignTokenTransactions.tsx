@@ -39,7 +39,6 @@ const SignTokenTransactions = ({
         symbol: tokenInfo.symbol.trim(),
         walletAddress: selectedAddress.address,
       };
-      console.log('payload => ', payload);
       await launchToken(payload);
 
       // 2. TODO: Store `tokenInfo` on db - needs api
