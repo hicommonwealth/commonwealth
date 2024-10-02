@@ -41,4 +41,6 @@ export const sequelize = new Sequelize(config.DB.URI, {
   },
 });
 
+console.log('====Finished database setup');
+
 export const models = buildDb(sequelize);
