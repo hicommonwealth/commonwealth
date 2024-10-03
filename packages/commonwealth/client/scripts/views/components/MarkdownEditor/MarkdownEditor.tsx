@@ -289,6 +289,12 @@ export const MarkdownEditor = memo(function MarkdownEditor(
 
   const handleRef = useCallback(
     (methods: MDXEditorMethods) => {
+      if (methods && mdxEditorRef.current === null) {
+        // on startup, the mdx editor places the cursor at the END of the
+        // document when loading content but this doesn't make a ton of sense.
+        methods.focus(undefined, { defaultSelection: 'rootStart' });
+      }
+
       mdxEditorRef.current = methods;
       onMarkdownEditorMethods?.(methods);
     },
@@ -352,6 +358,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                     mode === 'mobile' ? (
                       <ToolbarForMobile
                         SubmitButton={SubmitButton}
+                        onImage={imageUploadHandlerWithMarkdownInsertion}
                         focus={doFocus}
                       />
                     ) : (

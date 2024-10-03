@@ -18,10 +18,12 @@ type ToolbarForMobileProps = Readonly<{
    * toolbar.
    */
   focus?: () => void;
+
+  onImage?: (file: File) => void;
 }>;
 
 export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
-  const { SubmitButton, focus } = props;
+  const { SubmitButton, focus, onImage } = props;
 
   const adjustForKeyboard = useCallback(() => {
     if (!window.visualViewport) {
@@ -51,7 +53,6 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
   const preventKeyboardDeactivation = useCallback(
     (event: React.MouseEvent) => {
       event.stopPropagation();
-      event.preventDefault();
 
       focus?.();
     },
@@ -72,7 +73,7 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <CreateLink />
       <ListsToggle />
       <Separator />
-      <ImageButton />
+      <ImageButton onImage={onImage} />
       <div className="end">{SubmitButton && <SubmitButton />}</div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 
 import { DEFAULT_ICON_SIZE } from 'views/components/MarkdownEditor/utils/iconComponentFor';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -13,7 +13,9 @@ type FileUploadButtonProps = Readonly<{
   text?: string;
 }>;
 
-export const FileUploadButton = (props: FileUploadButtonProps) => {
+export const FileUploadButton = memo(function FileUploadButton(
+  props: FileUploadButtonProps,
+) {
   const { onFile, accept, iconName, text } = props;
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -54,4 +56,4 @@ export const FileUploadButton = (props: FileUploadButtonProps) => {
       </button>
     </div>
   );
-};
+});
