@@ -1,12 +1,10 @@
-import { events, logger, Policy } from '@hicommonwealth/core';
+import { events, Policy } from '@hicommonwealth/core';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { mustExist } from '../middleware/guards';
 import { buildFarcasterWebhookName } from '../utils/buildFarcasterWebhookName';
 import { createOnchainContestContent } from './utils';
-
-const log = logger(import.meta);
 
 const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
 
