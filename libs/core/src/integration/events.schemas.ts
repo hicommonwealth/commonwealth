@@ -1,5 +1,6 @@
 import {
   Comment,
+  FarcasterCast,
   PG_INT,
   Reaction,
   SubscriptionPreference,
@@ -31,7 +32,7 @@ export const ThreadUpvoted = Reaction.omit({
   address: z.string().nullish(),
   thread_id: PG_INT,
   community_id: z.string(),
-  topicId: z.number().optional(),
+  topic_id: z.number().optional(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const CommentCreated = Comment.omit({ search: true }).extend({
@@ -249,11 +250,10 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ user_id: true }));
 
-export const FarcasterCastCreated = EventMetadata.extend({
-  cast_hash: z.string(),
-  frame_url: z.string(),
-}).describe('When a farcaster contest cast has been posted');
+export const FarcasterCastCreated = FarcasterCast.describe(
+  'When a farcaster contest cast has been posted',
+);
 
-export const FarcasterReplyCastCreated = EventMetadata.extend({
-  parent_cast_hash: z.string(),
-}).describe('When a reply is posted to a farcaster contest cast');
+export const FarcasterReplyCastCreated = FarcasterCast.describe(
+  'When a reply is posted to a farcaster contest cast',
+);

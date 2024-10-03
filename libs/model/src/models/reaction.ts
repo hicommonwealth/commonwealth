@@ -74,6 +74,7 @@ export default (
                     event_name: EventNames.ThreadUpvoted,
                     event_payload: {
                       ...reaction.toJSON(),
+                      topic_id: thread.topic_id!,
                       address: address?.address,
                       community_id: thread.community_id,
                       contestManagers,
