@@ -22,7 +22,7 @@ export function getImageUrls(
 export async function getForumLinkedTopic(forumId: string) {
   return await models.Topic.findOne({
     where: {
-      id: forumId,
+      channel_id: forumId,
     },
   });
 }
