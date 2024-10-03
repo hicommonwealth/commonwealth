@@ -149,6 +149,8 @@ async function buildAuth(
       address: actor.address,
       community_id: auth.community_id,
       role: { [Op.in]: roles },
+      verified: { [Op.ne]: null },
+      // TODO: check verification token expiration
     },
     order: [['role', 'DESC']],
   });

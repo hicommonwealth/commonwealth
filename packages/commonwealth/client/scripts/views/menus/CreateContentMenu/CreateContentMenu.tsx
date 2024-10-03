@@ -1,5 +1,4 @@
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -8,7 +7,6 @@ import type { NavigateOptions, To } from 'react-router-dom';
 import app from 'state';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
-import { CreateDiscordBotConfigProps } from 'state/api/discord/createDiscordBotConfing';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -44,12 +42,9 @@ const getCreateContentMenuItems = (
     options?: NavigateOptions & { action?: string },
     prefix?: null | string,
   ) => void,
-  createDiscordBotConfig?: UseMutateAsyncFunction<
-    void,
-    unknown,
-    CreateDiscordBotConfigProps,
-    string
-  >,
+  createDiscordBotConfig?: ReturnType<
+    typeof useCreateDiscordBotConfigMutation
+  >['mutateAsync'],
 ): PopoverMenuItem[] => {
   const showSnapshotOptions =
     userStore.getState() && !!app.chain?.meta?.snapshot_spaces?.length;
@@ -121,7 +116,10 @@ const getCreateContentMenuItems = (
           iconLeft: 'discord',
           onClick: () => {
             const verificationToken = uuidv4();
-            createDiscordBotConfig?.({ verificationToken })
+            createDiscordBotConfig!({
+              verification_token: verificationToken,
+              community_id: app.activeChainId()!,
+            })
               .then(() => {
                 window.open(
                   `https://discord.com/oauth2/authorize?client_id=${

@@ -7,6 +7,8 @@ const {
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
+  DISCORD_CLIENT_ID,
+  DISCORD_TOKEN,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
@@ -14,6 +16,7 @@ const {
   INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
+  ADDRESS_TOKEN_EXPIRES_IN,
   ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
   ALCHEMY_BASE_SEPOLIA_WEBHOOK_SIGNING_KEY,
   ALCHEMY_ETH_SEPOLIA_WEBHOOK_SIGNING_KEY,
@@ -41,6 +44,7 @@ const NAME =
 
 const DEFAULTS = {
   JWT_SECRET: 'my secret',
+  ADDRESS_TOKEN_EXPIRES_IN: '10',
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
   DEFAULT_COMMONWEALTH_LOGO:
@@ -90,6 +94,10 @@ export const config = configure(
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
       SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
+      ADDRESS_TOKEN_EXPIRES_IN: parseInt(
+        ADDRESS_TOKEN_EXPIRES_IN ?? DEFAULTS.ADDRESS_TOKEN_EXPIRES_IN,
+        10,
+      ),
     },
     ALCHEMY: {
       BASE_WEBHOOK_SIGNING_KEY: ALCHEMY_BASE_WEBHOOK_SIGNING_KEY,
@@ -134,6 +142,10 @@ export const config = configure(
       MEMBERSHIP_REFRESH_TTL_SECONDS ?? DEFAULTS.MEMBERSHIP_REFRESH_TTL_SECONDS,
       10,
     ),
+    DISCORD: {
+      CLIENT_ID: DISCORD_CLIENT_ID,
+      BOT_TOKEN: DISCORD_TOKEN,
+    },
   },
   z.object({
     DB: z.object({
@@ -183,6 +195,7 @@ export const config = configure(
       .object({
         JWT_SECRET: z.string(),
         SESSION_EXPIRY_MILLIS: z.number().int(),
+        ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
       })
       .refine(
         (data) => {
@@ -232,5 +245,31 @@ export const config = configure(
     }),
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
+    DISCORD: z.object({
+      CLIENT_ID: z
+        .string()
+        .optional()
+        .refine(
+          (data) =>
+            !(
+              ['production', 'frick', 'beta', 'demo'].includes(
+                target.APP_ENV,
+              ) && !data
+            ),
+          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
+        ),
+      BOT_TOKEN: z
+        .string()
+        .optional()
+        .refine(
+          (data) =>
+            !(
+              ['production', 'frick', 'beta', 'demo'].includes(
+                target.APP_ENV,
+              ) && !data
+            ),
+          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
+        ),
+    }),
   }),
 );

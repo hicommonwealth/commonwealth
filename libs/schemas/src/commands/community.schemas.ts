@@ -6,6 +6,7 @@ import {
   ChainType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import {
@@ -41,7 +42,6 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
-    user_address: z.string(), // why not use actor's address?
 
     // hidden optional params
     token_name: z.string().optional(),
@@ -273,5 +273,19 @@ export const RefreshCommunityMemberships = {
     community_id: z.string(),
     created: z.number(),
     updated: z.number(),
+  }),
+};
+
+export const JoinCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    address_id: z.number(),
+    address: z.string(),
+    wallet_id: z.nativeEnum(WalletId).optional(),
+    ss58Prefix: z.number().optional(),
   }),
 };

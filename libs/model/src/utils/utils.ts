@@ -4,6 +4,7 @@ import {
   safeTruncateBody,
   type AbiType,
 } from '@hicommonwealth/shared';
+import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
 import {
   Model,
@@ -15,7 +16,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { isAddress } from 'web3-validator';
 import { config } from '../config';
-import { OutboxAttributes } from '../models';
+import type { OutboxAttributes } from '../models/outbox';
 
 const log = logger(import.meta);
 
@@ -237,4 +238,10 @@ export async function uploadIfLarge(
     });
     return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
   } else return { contentUrl: null, truncatedBody: null };
+}
+
+export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
+  return createHash('sha256')
+    .update(apiKey + salt)
+    .digest('hex');
 }

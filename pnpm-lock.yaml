@@ -427,16 +427,16 @@ importers:
 
   libs/api-client:
     dependencies:
-      axios:
-        specifier: ^1.3.4
-        version: 1.6.8
       moment:
         specifier: ^2.23.0
         version: 2.30.1
+      qs:
+        specifier: ^6.13.0
+        version: 6.13.0
+      url-join:
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
-      '@openapitools/openapi-generator-cli':
-        specifier: ^2.13.4
-        version: 2.13.4
       '@types/moment':
         specifier: ^2.13.0
         version: 2.13.0
@@ -505,7 +505,7 @@ importers:
         version: 6.11.4
       web3:
         specifier: ^4.7.0
-        version: 4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+        version: 4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-core:
         specifier: ^4.3.2
         version: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -543,9 +543,6 @@ importers:
       '@hicommonwealth/schemas':
         specifier: workspace:*
         version: link:../schemas
-      '@hicommonwealth/shared':
-        specifier: workspace:*
-        version: link:../shared
       dotenv:
         specifier: ^16.0.3
         version: 16.4.5
@@ -1175,6 +1172,9 @@ importers:
       express-http-to-https:
         specifier: ^1.1.4
         version: 1.1.4
+      express-rate-limit:
+        specifier: ^7.4.0
+        version: 7.4.0(express@4.19.2)
       express-session:
         specifier: ^1.17.0
         version: 1.18.0
@@ -1304,6 +1304,9 @@ importers:
       quill-mention:
         specifier: ^2.2.7
         version: 2.2.7
+      rate-limit-redis:
+        specifier: ^4.2.0
+        version: 4.2.0(express-rate-limit@7.4.0(express@4.19.2))
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -4214,19 +4217,19 @@ packages:
   '@multiformats/multiaddr@12.3.0':
     resolution: {integrity: sha512-JQ8Gc/jgucqqvEaDTFN/AvxlYDHEE7lgEWLMYW7hKZkWggER+GvG/tVxUgUxIP8M0vFpvEHKKHE0lKzyMsgi8Q==}
 
-  '@nestjs/axios@3.0.2':
-    resolution: {integrity: sha512-Z6GuOUdNQjP7FX+OuV2Ybyamse+/e0BFdTWBX5JxpBDKA+YkdLynDgG6HTF04zy6e9zPa19UX0WA2VDoehwhXQ==}
+  '@nestjs/axios@3.0.3':
+    resolution: {integrity: sha512-h6TCn3yJwD6OKqqqfmtRS5Zo4E46Ip2n+gK1sqwzNBC+qxQ9xpCu+ODVRFur6V3alHSCSBxb3nNtt73VEdluyA==}
     peerDependencies:
       '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
       axios: ^1.3.1
       rxjs: ^6.0.0 || ^7.0.0
 
-  '@nestjs/common@10.3.0':
-    resolution: {integrity: sha512-DGv34UHsZBxCM3H5QGE2XE/+oLJzz5+714JQjBhjD9VccFlQs3LRxo/epso4l7nJIiNlZkPyIUC8WzfU/5RTsQ==}
+  '@nestjs/common@10.4.3':
+    resolution: {integrity: sha512-4hbLd3XIJubHSylYd/1WSi4VQvG68KM/ECYpMDqA3k3J1/T17SAg40sDoq3ZoO5OZgU0xuNyjuISdOTjs11qVg==}
     peerDependencies:
       class-transformer: '*'
       class-validator: '*'
-      reflect-metadata: ^0.1.12
+      reflect-metadata: ^0.1.12 || ^0.2.0
       rxjs: ^7.1.0
     peerDependenciesMeta:
       class-transformer:
@@ -4234,14 +4237,14 @@ packages:
       class-validator:
         optional: true
 
-  '@nestjs/core@10.3.0':
-    resolution: {integrity: sha512-N06P5ncknW/Pm8bj964WvLIZn2gNhHliCBoAO1LeBvNImYkecqKcrmLbY49Fa1rmMfEM3MuBHeDys3edeuYAOA==}
+  '@nestjs/core@10.4.3':
+    resolution: {integrity: sha512-6OQz+5C8mT8yRtfvE5pPCq+p6w5jDot+oQku1KzQ24ABn+lay1KGuJwcKZhdVNuselx+8xhdMxknZTA8wrGLIg==}
     peerDependencies:
       '@nestjs/common': ^10.0.0
       '@nestjs/microservices': ^10.0.0
       '@nestjs/platform-express': ^10.0.0
       '@nestjs/websockets': ^10.0.0
-      reflect-metadata: ^0.1.12
+      reflect-metadata: ^0.1.12 || ^0.2.0
       rxjs: ^7.1.0
     peerDependenciesMeta:
       '@nestjs/microservices':
@@ -4463,9 +4466,9 @@ packages:
   '@open-draft/deferred-promise@2.2.0':
     resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
 
-  '@openapitools/openapi-generator-cli@2.13.4':
-    resolution: {integrity: sha512-4JKyrk55ohQK2FcuZbPdNvxdyXD14jjOIvE8hYjJ+E1cHbRbfXQXbYnjTODFE52Gx8eAxz8C9icuhDYDLn7nww==}
-    engines: {node: '>=10.0.0'}
+  '@openapitools/openapi-generator-cli@2.13.13':
+    resolution: {integrity: sha512-uioqbxB6TfiLoOEE3T8kqTn/ffaRzOwS3ATMQnoMvh2lwADKMT6bDLfE3YO3XTEj+HflXcsLXQGK6PLiqa8Mmw==}
+    engines: {node: '>=16'}
     hasBin: true
 
   '@openfeature/core@1.1.0':
@@ -7707,6 +7710,9 @@ packages:
   axios@1.7.5:
     resolution: {integrity: sha512-fZu86yCo+svH3uqJ/yTdQ0QHpQu5oL+/QE+QPSv6BZSkDAoky9vytxp7u5qk83OJFS3kEBcesWni9WTZAv3tSw==}
 
+  axios@1.7.7:
+    resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
+
   babel-core@7.0.0-bridge.0:
     resolution: {integrity: sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==}
     peerDependencies:
@@ -9412,6 +9418,12 @@ packages:
     peerDependencies:
       express: ^4.19.2
 
+  express-rate-limit@7.4.0:
+    resolution: {integrity: sha512-v1204w3cXu5gCDmAvgvzI6qjzZzoMWKnyVDk3ACgfswTQLYiGen+r8w0VnXnGMmzEN/g8fwIQ4JrFFd4ZP6ssg==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      express: 4 || 5 || ^5.0.0-beta.1
+
   express-session@1.18.0:
     resolution: {integrity: sha512-m93QLWr0ju+rOwApSsyso838LQwgfs44QtOP/WBiwtAgPIo/SAh1a5c6nn2BR6mFNZehTpqKDESzP+fRHVbxwQ==}
     engines: {node: '>= 0.8.0'}
@@ -9869,6 +9881,10 @@ packages:
     engines: {node: '>=12'}
     deprecated: Glob versions prior to v9 are no longer supported
 
+  glob@9.3.5:
+    resolution: {integrity: sha512-e1LleDykUz2Iu+MTYdkSsuWX8lvAjAcs0Xef0lNIu0S2wOAzuTxCJtcd9S3cijlwYF18EsU3rzb8jPVobxDh9Q==}
+    engines: {node: '>=16 || 14 >=14.17'}
+
   global-directory@4.0.1:
     resolution: {integrity: sha512-wHTUcDUoZ1H5/0iVqEudYW4/kAlN5cZ3j/bXn0Dpbizl9iaUVeWSHqiOjsgk6OW2bkLclbBjzewBz6weQ1zA2Q==}
     engines: {node: '>=18'}
@@ -10161,10 +10177,6 @@ packages:
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
-
-  https-proxy-agent@7.0.4:
-    resolution: {integrity: sha512-wlwpilI7YdjSkWaQ/7omYBMTliDcmCN8OLihO6I9B86g06lMyAoqgoDpV0XqoaPOKj+0DIdAvnsWfyAAhmimcg==}
-    engines: {node: '>= 14'}
 
   https-proxy-agent@7.0.5:
     resolution: {integrity: sha512-1e4Wqeblerz+tMKPIq2EMGiiWW1dIjZOksyHWSUm1rmuvw/how9hBHZ38lAGj5ID4Ik6EdkOw7NmWPy6LAwalw==}
@@ -11673,6 +11685,10 @@ packages:
     resolution: {integrity: sha512-nLDxIFRyhDblz3qMuq+SoRZED4+miJ/G+tdDrjkkkRnjAsBexeGpgjLEQ0blJy7rHhR2b93rhQY4SvyWu9v03g==}
     engines: {node: '>=10'}
 
+  minimatch@8.0.4:
+    resolution: {integrity: sha512-W0Wvr9HyFXZRGIDgCicunpQ299OKXs9RgZfaukz4qAW/pJhcpUfupc9c+OObPOFueNy8VSrZgEmDtk6Kh4WzDA==}
+    engines: {node: '>=16 || 14 >=14.17'}
+
   minimatch@9.0.1:
     resolution: {integrity: sha512-0jWhJpD/MdhPXwPuiRkCbfYfSKp2qnn2eOc279qI7f+osl/l+prKSrvhg157zSYvx/1nmgn2NqdT6k2Z7zSH9w==}
     engines: {node: '>=16 || 14 >=14.17'}
@@ -11695,6 +11711,10 @@ packages:
 
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
+
+  minipass@4.2.8:
+    resolution: {integrity: sha512-fNzuVyifolSLFL4NzpF+wEF4qrgqaaKX0haXPQEdQ7NKAN+WecoKMHV09YcuL/DHxrUsYQOK3MiuDf7Ip2OXfQ==}
+    engines: {node: '>=8'}
 
   minipass@7.1.0:
     resolution: {integrity: sha512-oGZRv2OT1lO2UF1zUcwdTb3wqUwI0kBGTgt/T7OdSj6M6N5m3o5uPf0AIW6lVxGGoiWUR7e2AwTE+xiwK8WQig==}
@@ -12364,8 +12384,8 @@ packages:
   path-to-regexp@0.1.7:
     resolution: {integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==}
 
-  path-to-regexp@3.2.0:
-    resolution: {integrity: sha512-jczvQbCUS7XmS7o+y1aEO9OBVFeZBQ1MDSEqmO7xSoPgOPoowY/SxLpZ6Vh97/8qHZOteiCKb7gkG9gA2ZUxJA==}
+  path-to-regexp@3.3.0:
+    resolution: {integrity: sha512-qyCH421YQPS2WFDxDjftfc1ZR5WKQzVzqsp4n9M2kQhVOo/ByahFoUNJfl58kOcEGfQ//7weFTDhm+ss8Ecxgw==}
 
   path-to-regexp@6.2.2:
     resolution: {integrity: sha512-GQX3SSMokngb36+whdpRXE+3f9V8UzyAorlYvOGx87ufGHehNTn5lCxrKtLyZ4Yl/wEKnNnr98ZzOwwDZV5ogw==}
@@ -12825,6 +12845,10 @@ packages:
     resolution: {integrity: sha512-zWmv4RSuB9r2mYQw3zxQuHWeU+42aKi1wWig/j4ele4ygELZ7PEO6MM7rim9oAQH2A5MWfsAVf/jPvTPgCbvUQ==}
     engines: {node: '>=0.6'}
 
+  qs@6.13.0:
+    resolution: {integrity: sha512-+38qI9SOr8tfZ4QmJNplMUxqjbe7LKvvZgWdExBOmd+egZTtjLB67Gu0HRX3u/XOq7UU2Nx6nsjvS16Z9uwfpg==}
+    engines: {node: '>=0.6'}
+
   qs@6.5.3:
     resolution: {integrity: sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==}
     engines: {node: '>=0.6'}
@@ -12936,6 +12960,12 @@ packages:
     engines: {node: '>=10.0.0'}
     peerDependencies:
       amqplib: '>=0.5.5'
+
+  rate-limit-redis@4.2.0:
+    resolution: {integrity: sha512-wV450NQyKC24NmPosJb2131RoczLdfIJdKCReNwtVpm5998U8SgKrAZrIHaN/NfQgqOHaan8Uq++B4sa5REwjA==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      express-rate-limit: '>= 6'
 
   raw-body@2.5.2:
     resolution: {integrity: sha512-8zGqypfENjCIqGhgXToC8aB2r7YrBX+AQAfIPs/Mlk+BtPTztOvTS01NRW/3Eh60J+a48lt8qsCzirQ6loCVfA==}
@@ -14781,6 +14811,10 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
+  url-join@5.0.0:
+    resolution: {integrity: sha512-n2huDr9h9yzd6exQVnH/jU5mr+Pfx08LRXXZhkLLetAMESRj+anQsTAh940iMrIetKAmry9coFuZQ2jY8/p3WA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
 
@@ -15798,8 +15832,8 @@ snapshots:
       '@aws-crypto/sha1-browser': 3.0.0
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-bucket-endpoint': 3.577.0
@@ -15856,11 +15890,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sso-oidc@3.577.0':
+  '@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -15899,6 +15933,7 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.2
     transitivePeerDependencies:
+      - '@aws-sdk/client-sts'
       - aws-crt
 
   '@aws-sdk/client-sso@3.577.0':
@@ -15944,11 +15979,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sts@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
+  '@aws-sdk/client-sts@3.577.0':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -15987,7 +16022,6 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.2
     transitivePeerDependencies:
-      - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
   '@aws-sdk/core@3.576.0':
@@ -16021,7 +16055,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-process': 3.577.0
       '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
@@ -16078,7 +16112,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-web-identity@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/types': 3.0.0
@@ -16216,7 +16250,7 @@ snapshots:
 
   '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
@@ -20311,37 +20345,37 @@ snapshots:
       uint8-varint: 2.0.4
       uint8arrays: 5.1.0
 
-  '@nestjs/axios@3.0.2(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1)':
+  '@nestjs/axios@3.0.3(@nestjs/common@10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.7.7)(rxjs@7.8.1)':
     dependencies:
-      '@nestjs/common': 10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)
-      axios: 1.6.8
+      '@nestjs/common': 10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1)
+      axios: 1.7.7
       rxjs: 7.8.1
 
-  '@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)':
+  '@nestjs/common@10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1)':
     dependencies:
       iterare: 1.2.1
       reflect-metadata: 0.1.13
       rxjs: 7.8.1
-      tslib: 2.6.2
+      tslib: 2.7.0
       uid: 2.0.2
 
-  '@nestjs/core@10.3.0(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(reflect-metadata@0.1.13)(rxjs@7.8.1)':
+  '@nestjs/core@10.4.3(@nestjs/common@10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1))(reflect-metadata@0.1.13)(rxjs@7.8.1)':
     dependencies:
-      '@nestjs/common': 10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)
+      '@nestjs/common': 10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nuxtjs/opencollective': 0.3.2
       fast-safe-stringify: 2.1.1
       iterare: 1.2.1
-      path-to-regexp: 3.2.0
+      path-to-regexp: 3.3.0
       reflect-metadata: 0.1.13
       rxjs: 7.8.1
-      tslib: 2.6.2
+      tslib: 2.7.0
       uid: 2.0.2
     transitivePeerDependencies:
       - encoding
 
   '@neynar/nodejs-sdk@1.55.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)':
     dependencies:
-      '@openapitools/openapi-generator-cli': 2.13.4
+      '@openapitools/openapi-generator-cli': 2.13.13
       axios: 1.7.5
       semver: 7.6.0
       viem: 2.21.16(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
@@ -20518,26 +20552,26 @@ snapshots:
 
   '@open-draft/deferred-promise@2.2.0': {}
 
-  '@openapitools/openapi-generator-cli@2.13.4':
+  '@openapitools/openapi-generator-cli@2.13.13':
     dependencies:
-      '@nestjs/axios': 3.0.2(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1)
-      '@nestjs/common': 10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)
-      '@nestjs/core': 10.3.0(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(reflect-metadata@0.1.13)(rxjs@7.8.1)
+      '@nestjs/axios': 3.0.3(@nestjs/common@10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.7.7)(rxjs@7.8.1)
+      '@nestjs/common': 10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1)
+      '@nestjs/core': 10.4.3(@nestjs/common@10.4.3(reflect-metadata@0.1.13)(rxjs@7.8.1))(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nuxtjs/opencollective': 0.3.2
-      axios: 1.6.8
+      axios: 1.7.7
       chalk: 4.1.2
       commander: 8.3.0
       compare-versions: 4.1.4
       concurrently: 6.5.1
       console.table: 0.10.0
       fs-extra: 10.1.0
-      glob: 7.2.3
-      https-proxy-agent: 7.0.4
+      glob: 9.3.5
+      https-proxy-agent: 7.0.5
       inquirer: 8.2.6
       lodash: 4.17.21
       reflect-metadata: 0.1.13
       rxjs: 7.8.1
-      tslib: 2.6.2
+      tslib: 2.7.0
     transitivePeerDependencies:
       - '@nestjs/microservices'
       - '@nestjs/platform-express'
@@ -25139,12 +25173,6 @@ snapshots:
     optionalDependencies:
       zod: 3.23.6
 
-  abitype@0.7.1(typescript@5.4.5)(zod@3.23.8):
-    dependencies:
-      typescript: 5.4.5
-    optionalDependencies:
-      zod: 3.23.8
-
   abitype@0.8.11(typescript@5.4.5)(zod@3.23.6):
     dependencies:
       typescript: 5.4.5
@@ -25215,7 +25243,7 @@ snapshots:
 
   agent-base@7.1.1:
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -25553,6 +25581,14 @@ snapshots:
       - debug
 
   axios@1.7.5:
+    dependencies:
+      follow-redirects: 1.15.6(debug@4.3.4)
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
+  axios@1.7.7:
     dependencies:
       follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
@@ -27873,6 +27909,10 @@ snapshots:
       '@ipld/dag-json': 10.2.2
       express: 4.19.2
 
+  express-rate-limit@7.4.0(express@4.19.2):
+    dependencies:
+      express: 4.19.2
+
   express-session@1.18.0:
     dependencies:
       cookie: 0.6.0
@@ -28423,6 +28463,13 @@ snapshots:
       minimatch: 5.0.1
       once: 1.4.0
 
+  glob@9.3.5:
+    dependencies:
+      fs.realpath: 1.0.0
+      minimatch: 8.0.4
+      minipass: 4.2.8
+      path-scurry: 1.10.2
+
   global-directory@4.0.1:
     dependencies:
       ini: 4.1.1
@@ -28778,13 +28825,6 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.3.5
-    transitivePeerDependencies:
-      - supports-color
-
-  https-proxy-agent@7.0.4:
-    dependencies:
-      agent-base: 7.1.1
       debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
@@ -30781,6 +30821,10 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.1
 
+  minimatch@8.0.4:
+    dependencies:
+      brace-expansion: 2.0.1
+
   minimatch@9.0.1:
     dependencies:
       brace-expansion: 2.0.1
@@ -30804,6 +30848,8 @@ snapshots:
       kind-of: 6.0.3
 
   minimist@1.2.8: {}
+
+  minipass@4.2.8: {}
 
   minipass@7.1.0: {}
 
@@ -31582,7 +31628,7 @@ snapshots:
 
   path-to-regexp@0.1.7: {}
 
-  path-to-regexp@3.2.0: {}
+  path-to-regexp@3.3.0: {}
 
   path-to-regexp@6.2.2: {}
 
@@ -32111,6 +32157,10 @@ snapshots:
     dependencies:
       side-channel: 1.0.6
 
+  qs@6.13.0:
+    dependencies:
+      side-channel: 1.0.6
+
   qs@6.5.3: {}
 
   query-string@5.1.1:
@@ -32241,6 +32291,10 @@ snapshots:
       xregexp: 5.1.1
     transitivePeerDependencies:
       - supports-color
+
+  rate-limit-redis@4.2.0(express-rate-limit@7.4.0(express@4.19.2)):
+    dependencies:
+      express-rate-limit: 7.4.0(express@4.19.2)
 
   raw-body@2.5.2:
     dependencies:
@@ -34460,6 +34514,8 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
+  url-join@5.0.0: {}
+
   url-parse@1.5.10:
     dependencies:
       querystringify: 2.2.0
@@ -34929,17 +34985,6 @@ snapshots:
       - typescript
       - zod
 
-  web3-eth-abi@4.2.1(typescript@5.4.5)(zod@3.23.8):
-    dependencies:
-      abitype: 0.7.1(typescript@5.4.5)(zod@3.23.8)
-      web3-errors: 1.1.4
-      web3-types: 1.6.0
-      web3-utils: 4.2.3
-      web3-validator: 2.0.5
-    transitivePeerDependencies:
-      - typescript
-      - zod
-
   web3-eth-accounts@4.1.2:
     dependencies:
       '@ethereumjs/rlp': 4.0.1
@@ -34950,11 +34995,11 @@ snapshots:
       web3-utils: 4.2.3
       web3-validator: 2.0.5
 
-  web3-eth-contract@4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
+  web3-eth-contract@4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
       web3-types: 1.6.0
       web3-utils: 4.2.3
@@ -34966,12 +35011,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-contract@4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+  web3-eth-contract@4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
       web3-types: 1.6.0
       web3-utils: 4.2.3
       web3-validator: 2.0.5
@@ -34998,13 +35043,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
+  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
-      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-types: 1.6.0
       web3-utils: 4.2.3
@@ -35016,13 +35061,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+  web3-eth-ens@4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-types: 1.6.0
       web3-utils: 4.2.3
@@ -35064,10 +35109,10 @@ snapshots:
       web3-utils: 4.2.3
       web3-validator: 2.0.5
 
-  web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
+  web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-rpc-methods: 1.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-types: 1.6.0
       web3-utils: 4.2.3
@@ -35079,10 +35124,10 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+  web3-eth-personal@4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-rpc-methods: 1.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-types: 1.6.0
       web3-utils: 4.2.3
@@ -35109,7 +35154,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth@4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
+  web3-eth@4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       setimmediate: 1.0.5
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -35129,12 +35174,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3-eth@4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+  web3-eth@4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
     dependencies:
       setimmediate: 1.0.5
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
+      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
       web3-eth-accounts: 4.1.2
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -35297,17 +35342,17 @@ snapshots:
       web3-types: 1.6.0
       zod: 3.23.6
 
-  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
+  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
       web3-eth-accounts: 4.1.2
-      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
-      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
+      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-eth-iban: 4.0.7
-      web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-providers-http: 4.1.0
       web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -35322,17 +35367,17 @@ snapshots:
       - utf-8-validate
       - zod
 
-  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8):
+  web3@4.8.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6):
     dependencies:
       web3-core: 4.3.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-errors: 1.1.4
-      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.8)
+      web3-eth: 4.6.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-abi: 4.2.1(typescript@5.4.5)(zod@3.23.6)
       web3-eth-accounts: 4.1.2
-      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
-      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-contract: 4.4.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      web3-eth-ens: 4.2.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-eth-iban: 4.0.7
-      web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.8)
+      web3-eth-personal: 4.0.8(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       web3-net: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       web3-providers-http: 4.1.0
       web3-providers-ws: 4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)

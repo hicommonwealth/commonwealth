@@ -1,24 +1,20 @@
 // Quick and dirty api-client test
-import { CommunityApi, Configuration } from '@hicommonwealth/api-client';
+import { CommonApiClient } from '@hicommonwealth/api-client';
 
 async function main() {
-  const config = new Configuration({
-    accessToken: '',
-    basePath: 'http://localhost:8080/api/v1',
+  const client = new CommonApiClient({
+    apiKey: '',
+    address: '',
   });
-
-  const client = new CommunityApi(config);
-  const members = await client.getMembers(
-    'sushi',
-    undefined,
-    10,
-    1,
-    'last_active',
-    'DESC',
-    undefined,
-    true,
-  );
-  console.log(members.data.results);
+  const members = await client.community.getMembers({
+    communityId: 'sushi',
+    limit: '10',
+    cursor: '1',
+    orderBy: 'last_active',
+    orderDirection: 'DESC',
+    includeRoles: true,
+  });
+  console.log(members);
 }
 
 void main();

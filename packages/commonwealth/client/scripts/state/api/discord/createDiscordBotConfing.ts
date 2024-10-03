@@ -1,27 +1,7 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import app from 'state';
-import { SERVER_URL } from 'state/api/config';
-import { userStore } from '../../ui/user';
-
-export interface CreateDiscordBotConfigProps {
-  verificationToken: string;
-}
-
-const createDiscordBotConfig = async ({
-  verificationToken,
-}: CreateDiscordBotConfigProps) => {
-  await axios.post(`${SERVER_URL}/createDiscordBotConfig`, {
-    community_id: app.activeChainId(),
-    verification_token: verificationToken,
-    jwt: userStore.getState().jwt,
-  });
-};
+import { trpc } from 'utils/trpcClient';
 
 const useCreateDiscordBotConfigMutation = () => {
-  return useMutation({
-    mutationFn: createDiscordBotConfig,
-  });
+  return trpc.discordBot.createDiscordBotConfig.useMutation();
 };
 
 export default useCreateDiscordBotConfigMutation;

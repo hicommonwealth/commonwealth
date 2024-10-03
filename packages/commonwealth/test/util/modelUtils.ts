@@ -180,10 +180,8 @@ export interface SubscriptionArgs {
 
 export interface JoinCommunityArgs {
   jwt: string;
-  address_id: number;
   address: string;
   chain: string;
-  originChain: string;
 }
 
 export interface SetSiteAdminArgs {
@@ -232,7 +230,9 @@ export type ModelSeeder = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createSubscription: (args: SubscriptionArgs) => Promise<any>;
   createCommunity: (
-    args: z.infer<(typeof schemas.CreateCommunity)['input']>,
+    args: z.infer<(typeof schemas.CreateCommunity)['input']> & {
+      address: string;
+    },
     jwt: string,
   ) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
@@ -636,7 +636,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
-      .set('address', args.user_address)
+      .set('address', args.address)
       .send({
         jwt,
         ...args,
@@ -645,16 +645,16 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {
-    const { jwt, address, chain, originChain } = args;
+    const { jwt, address, chain } = args;
     try {
       await chai.request
         .agent(app)
-        .post('/api/linkExistingAddressToCommunity')
+        .post('/api/v1/JoinCommunity')
         .set('Accept', 'application/json')
+        .set('address', address)
         .send({
-          address,
           community_id: chain,
-          originChain,
+          address,
           jwt,
         });
     } catch (e) {

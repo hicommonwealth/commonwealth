@@ -22,7 +22,6 @@ import getAddressProfile, {
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
-import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
@@ -58,10 +57,6 @@ import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import createDiscordBotConfig from '../routes/discord/createDiscordBotConfig';
-import getDiscordChannels from '../routes/discord/getDiscordChannels';
-import removeDiscordBotConfig from '../routes/discord/removeDiscordBotConfig';
-import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 
 import * as controllers from '../controller';
@@ -199,14 +194,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     deleteAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/linkExistingAddressToCommunity',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    linkExistingAddressToCommunity.bind(this, models),
   );
   registerRoute(
     router,
@@ -565,38 +552,6 @@ function setupRouter(
     'post',
     '/updateCommunityCustomDomain',
     updateCommunityCustomDomain.bind(this, models),
-  );
-
-  // Discord Bot
-  registerRoute(
-    router,
-    'post',
-    '/createDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    createDiscordBotConfig.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/setDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    setDiscordBotConfig.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/getDiscordChannels',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    getDiscordChannels.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/removeDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    removeDiscordBotConfig.bind(this, models),
   );
 
   registerRoute(

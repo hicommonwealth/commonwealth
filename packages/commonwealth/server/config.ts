@@ -15,10 +15,6 @@ const {
   GENERATE_IMAGE_RATE_LIMIT,
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
-  ADDRESS_TOKEN_EXPIRES_IN,
-
-  DISCORD_CLIENT_ID,
-  DISCORD_TOKEN,
   CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
@@ -36,7 +32,6 @@ const DEFAULTS = {
   SESSION_SECRET: 'my secret',
   MAGIC_SUPPORTED_BASES: [ChainBase.Ethereum],
   MAGIC_DEFAULT_CHAIN: ChainBase.Ethereum,
-  ADDRESS_TOKEN_EXPIRES_IN: '10',
   MESSAGE_RELAYER_TIMEOUT_MS: '200',
   MESSAGE_RELAYER_PREFETCH: '50',
   EVM_CE_POLL_INTERVAL: '120000',
@@ -65,10 +60,6 @@ export const config = configure(
         DEFAULTS.MAGIC_SUPPORTED_BASES,
       MAGIC_DEFAULT_CHAIN:
         (MAGIC_DEFAULT_CHAIN as ChainBase) ?? DEFAULTS.MAGIC_DEFAULT_CHAIN,
-      ADDRESS_TOKEN_EXPIRES_IN: parseInt(
-        ADDRESS_TOKEN_EXPIRES_IN ?? DEFAULTS.ADDRESS_TOKEN_EXPIRES_IN,
-        10,
-      ),
     },
     SENDGRID: {
       API_KEY: SENDGRID_API_KEY,
@@ -78,10 +69,6 @@ export const config = configure(
         model_config.APP_ENV === 'production'
           ? TELEGRAM_BOT_TOKEN
           : TELEGRAM_BOT_TOKEN_DEV,
-    },
-    DISCORD: {
-      CLIENT_ID: DISCORD_CLIENT_ID,
-      BOT_TOKEN: DISCORD_TOKEN,
     },
     CLOUDFLARE: {
       ZONE_ID: CF_ZONE_ID,
@@ -140,7 +127,6 @@ export const config = configure(
         ),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
-      ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
     }),
     SENDGRID: z.object({
       API_KEY: z
@@ -158,32 +144,6 @@ export const config = configure(
         .refine(
           (data) => !(model_config.APP_ENV === 'production' && !data),
           'TELEGRAM_BOT_TOKEN is required in production',
-        ),
-    }),
-    DISCORD: z.object({
-      CLIENT_ID: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                model_config.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
-        ),
-      BOT_TOKEN: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                model_config.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
         ),
     }),
     CLOUDFLARE: z.object({
