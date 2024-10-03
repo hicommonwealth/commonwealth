@@ -1,38 +1,74 @@
-import { events, Policy } from '@hicommonwealth/core';
-import { DISCORD_BOT_ADDRESS } from '@hicommonwealth/shared';
-import axios from 'axios';
+import { Actor, Policy, command, events } from '@hicommonwealth/core';
+import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { config } from '../config';
+import { CreateComment, DeleteComment, UpdateComment } from '../comment';
 import { models } from '../database';
+import { CreateThread, DeleteThread, UpdateThread } from '../thread';
 
-const inputs = {
-  DiscordThreadCreated: events.DiscordThreadCreated,
+let actor: Actor;
+
+async function getActor() {
+  if (actor) return actor;
+
+  const userInstance = await models.User.findOne({
+    where: { email: DISCORD_BOT_EMAIL },
+  });
+  if (!userInstance) throw new Error('DiscordBot user not found!');
+
+  actor = {
+    user: {
+      id: userInstance.id!,
+      email: userInstance.email!,
+      isAdmin: userInstance.isAdmin!,
+    },
+    address: DISCORD_BOT_ADDRESS,
+  };
+  return actor;
+}
+
+const ThreadEventInputs = {
   DiscordThreadBodyUpdated: events.DiscordThreadBodyUpdated,
   DiscordThreadTitleUpdated: events.DiscordThreadTitleUpdated,
   DiscordThreadDeleted: events.DiscordThreadDeleted,
   DiscordThreadCommentCreated: events.DiscordThreadCommentCreated,
+};
+
+async function getThread(
+  payload: z.infer<(typeof ThreadEventInputs)[keyof typeof ThreadEventInputs]>,
+) {
+  return await models.Thread.findOne({
+    attributes: ['id'],
+    where: {
+      discord_meta: {
+        message_id: payload.message_id,
+      },
+    },
+  });
+}
+
+const CommentEventInputs = {
   DiscordThreadCommentUpdated: events.DiscordThreadCommentUpdated,
   DiscordThreadCommentDeleted: events.DiscordThreadCommentDeleted,
 };
 
-type InputWOThreadDelete = Omit<
-  typeof inputs,
-  'DiscordThreadDeleted'
->[keyof Omit<typeof inputs, 'DiscordThreadDeleted'>];
-
-function getSharedData(payload: z.infer<InputWOThreadDelete>) {
-  return {
-    auth: config.DISCORD.BOT_KEY,
-    address: DISCORD_BOT_ADDRESS,
-    discord_meta: {
-      message_id: payload.message_id,
-      channel_id: payload.parent_channel_id,
-      user: payload.user,
+async function getComment(
+  payload: z.infer<
+    (typeof CommentEventInputs)[keyof typeof CommentEventInputs]
+  >,
+) {
+  return await models.Comment.findOne({
+    attributes: ['id'],
+    where: {
+      discord_meta: { message_id: payload.message_id },
     },
-  };
+  });
 }
 
-const bot_path = `${config.SERVER_URL}/api/integration/bot`;
+const inputs = {
+  ...ThreadEventInputs,
+  ...CommentEventInputs,
+  DiscordThreadCreated: events.DiscordThreadCreated,
+};
 
 export function DiscordBotPolicy(): Policy<typeof inputs> {
   return {
@@ -46,63 +82,101 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
         });
         if (!topic) return;
 
-        await axios.post(`${bot_path}/threads`, {
-          ...getSharedData(payload),
-          community_id: topic.community_id,
-          topic_id: topic.id,
-          title: payload.title,
-          body:
-            `[Go to Discord post](https://discord.com/channels/${payload.guild_id}/${payload.channel_id}) \n\n` +
-            payload.content +
-            payload.imageUrls.map((url) => `\n\n![image](${url})`).join(''),
-          stage: 'discussion',
-          kind: 'discussion',
-          read_only: false,
+        await command(CreateThread(), {
+          actor: await getActor(),
+          payload: {
+            community_id: topic.community_id,
+            topic_id: topic.id!,
+            title: payload.title,
+            body:
+              '[Go to Discord post](https://discord.com/channels/' +
+              `${payload.guild_id}/${payload.channel_id}) \n\n` +
+              payload.content +
+              payload.imageUrls.map((url) => `\n\n![image](${url})`).join(''),
+            stage: 'discussion',
+            kind: 'discussion',
+            read_only: false,
+          },
         });
       },
       DiscordThreadBodyUpdated: async ({ payload }) => {
-        await axios.patch(`${bot_path}/threads/${payload.message_id}`, {
-          ...getSharedData(payload),
-          body:
-            '[Go to Discord post](https://discord.com/channels/' +
-            `${payload.guild_id}/${payload.channel_id}) \n\n` +
-            payload.content +
-            payload.imageUrls.map((url) => `\n\n![image](${url})`).join(''),
+        const thread = await getThread(payload);
+        if (!thread) {
+          return;
+        }
+
+        await command(UpdateThread(), {
+          actor: await getActor(),
+          payload: {
+            thread_id: thread.id!,
+            body:
+              '[Go to Discord post](https://discord.com/channels/' +
+              `${payload.guild_id}/${payload.channel_id}) \n\n` +
+              payload.content +
+              payload.imageUrls.map((url) => `\n\n![image](${url})`).join(''),
+          },
         });
       },
       DiscordThreadTitleUpdated: async ({ payload }) => {
-        await axios.patch(`${bot_path}/threads/${payload.message_id}`, {
-          ...getSharedData(payload),
-          title: payload.title,
+        const thread = await getThread(payload);
+        if (!thread) {
+          return;
+        }
+
+        await command(UpdateThread(), {
+          actor: await getActor(),
+          payload: {
+            thread_id: thread.id!,
+            title: payload.title,
+          },
         });
       },
       DiscordThreadDeleted: async ({ payload }) => {
-        await axios.delete(`${bot_path}/threads/${payload.message_id}`, {
-          data: {
-            auth: config.DISCORD.BOT_KEY,
-            address: DISCORD_BOT_ADDRESS,
-            discord_meta: {
-              message_id: payload.message_id,
-              channel_id: payload.parent_channel_id,
-            },
+        const thread = await getThread(payload);
+        if (!thread) {
+          return;
+        }
+
+        await command(DeleteThread(), {
+          actor: await getActor(),
+          payload: {
+            thread_id: thread.id!,
           },
         });
       },
       DiscordThreadCommentCreated: async ({ payload }) => {
-        await axios.post(`${bot_path}/threads/${payload.channel_id}/comments`, {
-          ...getSharedData(payload),
-          text: payload.content,
+        const thread = await getThread(payload);
+        if (!thread) return;
+
+        await command(CreateComment(), {
+          actor: await getActor(),
+          payload: {
+            thread_id: thread.id!,
+            text: payload.content,
+          },
         });
       },
       DiscordThreadCommentUpdated: async ({ payload }) => {
-        await axios.patch(`${bot_path}/comments/${payload.message_id}`, {
-          ...getSharedData(payload),
-          text: payload.content,
+        const comment = await getComment(payload);
+        if (!comment) return;
+
+        await command(UpdateComment(), {
+          actor: await getActor(),
+          payload: {
+            comment_id: comment.id!,
+            text: payload.content,
+          },
         });
       },
       DiscordThreadCommentDeleted: async ({ payload }) => {
-        await axios.delete(`${bot_path}/comments/${payload.message_id}`, {
-          data: getSharedData(payload),
+        const comment = await getComment(payload);
+        if (!comment) return;
+
+        await command(DeleteComment(), {
+          actor: await getActor(),
+          payload: {
+            comment_id: comment.id!,
+          },
         });
       },
     },
