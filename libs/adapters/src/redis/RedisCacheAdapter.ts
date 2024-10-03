@@ -425,4 +425,9 @@ export class RedisCache implements Cache {
       this._log.error('An error occurred while flushing redis', e as Error);
     }
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async sendCommand(args: string[]): Promise<any> {
+    return await this._client.sendCommand(args);
+  }
 }

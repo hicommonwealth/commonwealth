@@ -57,7 +57,6 @@ const CreateCommunity = () => {
       case CreateCommunityStep.CommunityInformation:
         return (
           <CommunityInformationStep
-            selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
             handleSelectedChainId={setSelectedChainId}
             handleGoBack={() => onChangeStep(false)}

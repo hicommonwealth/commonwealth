@@ -74,13 +74,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         const updated = await models.sequelize.transaction(
           async (transaction) => {
             if (update_tags)
-              await updateTags(
-                tag_ids!,
-                models,
-                user.id!,
-                'user_id',
-                transaction,
-              );
+              await updateTags(tag_ids!, user.id!, 'user_id', transaction);
             if (update_user) {
               // TODO: utility to deep merge deltas
               const updates = {

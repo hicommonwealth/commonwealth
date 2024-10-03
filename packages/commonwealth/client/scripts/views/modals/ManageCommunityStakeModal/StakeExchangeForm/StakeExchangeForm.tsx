@@ -148,11 +148,13 @@ const StakeExchangeForm = ({
         }),
       });
 
+      user.setData({ addressSelectorSelectedAddress: selectedAddress?.value });
       await createStakeTransaction.mutateAsync({
         id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: communityId,
       });
+      user.setData({ addressSelectorSelectedAddress: undefined });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
