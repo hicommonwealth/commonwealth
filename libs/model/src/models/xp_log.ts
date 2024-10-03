@@ -16,7 +16,9 @@ export default (sequelize: Sequelize.Sequelize) =>
       xp_points: { type: Sequelize.INTEGER, allowNull: false },
     },
     {
-      timestamps: false,
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: false,
       tableName: 'XpLogs',
       underscored: true,
     },
