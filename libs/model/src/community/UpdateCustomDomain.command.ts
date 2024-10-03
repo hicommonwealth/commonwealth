@@ -59,7 +59,7 @@ export function UpdateCustomDomain(): Command<
         magicResponse.status === 'failed' &&
         magicResponse.error_code != 'ALREADY_WHITELISTED_DOMAIN'
       ) {
-        throw new AppError(magicResponse);
+        throw new AppError(magicResponse.message);
       }
 
       response = await fetch(url, {
