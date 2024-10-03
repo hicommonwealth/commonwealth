@@ -77,7 +77,7 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
       DiscordThreadCreated: async ({ payload }) => {
         const topic = await models.Topic.findOne({
           where: {
-            id: payload.parent_channel_id,
+            channel_id: payload.parent_channel_id,
           },
         });
         if (!topic) return;
@@ -96,6 +96,14 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
             stage: 'discussion',
             kind: 'discussion',
             read_only: false,
+            discord_meta: {
+              user: {
+                id: payload.user.id,
+                username: payload.user.username,
+              },
+              channel_id: payload.parent_channel_id,
+              message_id: payload.message_id,
+            },
           },
         });
       },
@@ -153,6 +161,14 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
           payload: {
             thread_id: thread.id!,
             text: payload.content,
+            discord_meta: {
+              user: {
+                id: payload.user.id,
+                username: payload.user.username,
+              },
+              channel_id: payload.parent_channel_id,
+              message_id: payload.message_id,
+            },
           },
         });
       },
