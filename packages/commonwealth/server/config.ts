@@ -17,7 +17,6 @@ const {
   MAGIC_DEFAULT_CHAIN,
   ADDRESS_TOKEN_EXPIRES_IN,
 
-  CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
   MESSAGE_RELAYER_PREFETCH,
@@ -50,7 +49,6 @@ export const config = configure(
       GENERATE_IMAGE_RATE_LIMIT ?? DEFAULTS.GENERATE_IMAGE_RATE_LIMIT,
       10,
     ),
-    CW_BOT_KEY,
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: parseInt(
       ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS ??
         DEFAULTS.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
@@ -108,18 +106,6 @@ export const config = configure(
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
-    CW_BOT_KEY: z
-      .string()
-      .optional()
-      .refine(
-        (data) =>
-          !(
-            ['frick', 'production', 'beta', 'demo'].includes(
-              model_config.APP_ENV,
-            ) && !data
-          ),
-        'CW_BOT_KEY is required in frick, production, beta (QA), and demo',
-      ),
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
       SESSION_SECRET: z

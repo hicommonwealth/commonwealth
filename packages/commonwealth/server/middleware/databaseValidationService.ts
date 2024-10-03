@@ -54,7 +54,7 @@ export default class DatabaseValidationService {
     res: Response,
     next: NextFunction,
   ) => {
-    if (req.body.auth !== config.CW_BOT_KEY) {
+    if (req.body.auth !== config.DISCORD.BOT_KEY) {
       return next(new AppError('Approved Bot Only Endpoint'));
     }
     req.user = (await this.models.User.findOne({
