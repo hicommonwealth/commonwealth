@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 
 // This webhook processes the cast action event:
 // https://docs.farcaster.xyz/reference/actions/spec#actions-specification
-export function FarcasterActionWebhook(): Command<
+export function FarcasterUpvoteAction(): Command<
   typeof schemas.FarcasterCastCreatedWebhook
 > {
   return {

@@ -79,3 +79,17 @@ export const FarcasterAction = {
   }),
   output: z.void(),
 };
+
+export const GetFarcasterUpvoteActionMetadata = {
+  input: z.any(),
+  output: z.object({
+    name: z.string(),
+    icon: z.string(),
+    description: z.string(),
+    aboutUrl: z.string().url(),
+    action: z.object({
+      type: z.literal('post'),
+      postUrl: z.string().url(),
+    }),
+  }),
+};

@@ -75,36 +75,23 @@ function build(validator: DatabaseValidationService) {
   // Farcaster webhooks
   router.post(
     '/farcaster/CastCreated',
-    (req, _, next) => {
-      console.log('CastCreated BODY: ', JSON.stringify(req.body, null, 2));
-      next();
-    },
     express.command(Contest.FarcasterCastCreatedWebhook()),
   );
 
   router.post(
     '/farcaster/ReplyCastCreated',
-    (req, _, next) => {
-      console.log('ReplyCastCreated BODY: ', JSON.stringify(req.body, null, 2));
-      next();
-    },
     express.command(Contest.FarcasterReplyCastCreatedWebhook()),
   );
 
-  // router.post(
-  //   '/farcaster/action',
-  //   raw({ type: '*/*', limit: '10mb', inflate: true }),
-  //   (req, _, next) => {
-  //     // TODO: verify frame signature message
-  //     return next();
-  //   },
-  //   // parse body as JSON (native express.json middleware doesn't work here)
-  //   (req, _, next) => {
-  //     req.body = JSON.parse(req.body);
-  //     next();
-  //   },
-  //   express.command(Contest.FarcasterActionWebhook()),
-  // );
+  router.get(
+    '/farcaster/CastUpvoteAction',
+    express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+  );
+
+  router.post(
+    '/farcaster/CastUpvoteAction',
+    express.command(Contest.FarcasterUpvoteAction()),
+  );
 
   // Discord BOT integration
   router.post(
