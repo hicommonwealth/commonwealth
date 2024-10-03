@@ -34,7 +34,7 @@ function getSharedData(payload: z.infer<InputWOThreadDelete>) {
 
 const bot_path = `${config.SERVER_URL}/api/integration/bot`;
 
-export function DiscordBot(): Policy<typeof inputs> {
+export function DiscordBotPolicy(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
