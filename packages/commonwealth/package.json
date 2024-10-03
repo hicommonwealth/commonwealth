@@ -52,6 +52,7 @@
     "start-api": "tsx watch --max-old-space-size=4096 server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 tsx server.ts",
     "start-consumer": "tsx server/workers/commonwealthConsumer/commonwealthConsumer.ts",
+    "start-discord-listener": "tsx server/workers/discordBot/discordListener.ts",
     "start-evm-ce": "tsx server/workers/evmChainEvents/startEvmPolling.ts",
     "start-knock": "tsx server/workers/knock/knockWorker.ts",
     "start-message-relayer": "tsx ./server/workers/messageRelayer/messageRelayer.ts",
