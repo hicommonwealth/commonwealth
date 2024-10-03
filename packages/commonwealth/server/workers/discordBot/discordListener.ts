@@ -1,18 +1,9 @@
 import {
-  getRabbitMQConfig,
   HotShotsStats,
-  RabbitMQAdapter,
-  RascalConfigServices,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import {
-  Broker,
-  broker,
-  EventNames,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
@@ -47,24 +38,6 @@ log.info(
 
 async function startDiscordListener() {
   config.APP_ENV === 'local' && console.log(config);
-
-  let controller: Broker;
-  try {
-    const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(
-        config.BROKER.RABBITMQ_URI,
-        RascalConfigServices.DiscobotService,
-      ),
-    );
-    await rmqAdapter.init();
-    broker({
-      adapter: rmqAdapter,
-    });
-    controller = rmqAdapter;
-  } catch (e) {
-    log.error('Broker setup failed', e instanceof Error ? e : undefined);
-    throw e;
-  }
 
   const client = new Client({
     intents: [
