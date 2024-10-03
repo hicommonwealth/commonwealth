@@ -103,6 +103,16 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     DiscordBotPolicy(),
   );
 
+  if (!discordBotSubRes) {
+    log.fatal(
+      'Failed to subscribe to discord bot policy. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.DiscordBotPolicy,
+      },
+    );
+  }
+
   if (!chainEventSubRes) {
     log.fatal(
       'Failed to subscribe to chain-events. Requires restart!',

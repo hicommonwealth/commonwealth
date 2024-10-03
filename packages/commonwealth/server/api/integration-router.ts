@@ -1,11 +1,10 @@
 import { express } from '@hicommonwealth/adapters';
 import { ChainEvents } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
-import DatabaseValidationService from 'server/middleware/databaseValidationService';
 
 const PATH = '/api/integration';
 
-function build(validator: DatabaseValidationService) {
+function build() {
   const router = Router();
   router.use(express.statsMiddleware);
 
