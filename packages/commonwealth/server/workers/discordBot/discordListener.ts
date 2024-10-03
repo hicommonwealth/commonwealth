@@ -23,6 +23,7 @@ let isServiceHealthy = false;
 
 startHealthCheckLoop({
   service: ServiceKey.DiscordBotListener,
+  // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {
     if (!isServiceHealthy) {
       throw new Error('service not healthy');
@@ -54,6 +55,7 @@ async function startDiscordListener() {
 
   // event types can be found here: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('threadDelete', async (thread: ThreadChannel) => {
     await handleThreadChannel(thread, EventNames.DiscordThreadDeleted);
   });
@@ -61,6 +63,7 @@ async function startDiscordListener() {
   // only used for thread title updates - thread body are handled through the 'messageUpdate' event
   client.on(
     'threadUpdate',
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
       await handleThreadChannel(
         newThread,
@@ -70,6 +73,7 @@ async function startDiscordListener() {
     },
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('messageDelete', async (message) => {
     await handleMessage(
       client,
@@ -78,6 +82,7 @@ async function startDiscordListener() {
     );
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('messageUpdate', async (_, newMessage) => {
     await handleMessage(
       client,
@@ -88,6 +93,7 @@ async function startDiscordListener() {
     );
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('messageCreate', async (message) => {
     // this conditional prevents handling of messages like ChannelNameChanged which
     // are emitted inside a thread but which we do not want to replicate in the CW thread.
