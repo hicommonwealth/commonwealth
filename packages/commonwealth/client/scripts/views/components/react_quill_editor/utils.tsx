@@ -11,7 +11,7 @@ export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
 // createDeltaFromText returns a new DeltaStatic object from a string
 export const createDeltaFromText = (
-  str: string,
+  str: string | DeltaStatic,
   isMarkdown?: boolean,
 ): SerializableDeltaStatic => {
   return {
@@ -51,8 +51,8 @@ export const getTextFromDelta = (delta: DeltaStatic): string => {
         typeof op.insert === 'string'
           ? op.insert
           : op.insert.twitter
-          ? '(tweet)'
-          : '(image)\n';
+            ? '(tweet)'
+            : '(image)\n';
       return acc + text;
     }, '');
 };
