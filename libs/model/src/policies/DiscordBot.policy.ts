@@ -5,6 +5,24 @@ import { CreateComment, DeleteComment, UpdateComment } from '../comment';
 import { models } from '../database';
 import { CreateThread, DeleteThread, UpdateThread } from '../thread';
 
+const ThreadEventInputs = {
+  DiscordThreadBodyUpdated: events.DiscordThreadBodyUpdated,
+  DiscordThreadTitleUpdated: events.DiscordThreadTitleUpdated,
+  DiscordThreadDeleted: events.DiscordThreadDeleted,
+};
+
+const CommentEventInputs = {
+  DiscordThreadCommentUpdated: events.DiscordThreadCommentUpdated,
+  DiscordThreadCommentDeleted: events.DiscordThreadCommentDeleted,
+};
+
+const inputs = {
+  ...ThreadEventInputs,
+  ...CommentEventInputs,
+  DiscordThreadCreated: events.DiscordThreadCreated,
+  DiscordThreadCommentCreated: events.DiscordThreadCommentCreated,
+};
+
 let actor: Actor;
 
 async function getActor() {
@@ -26,13 +44,6 @@ async function getActor() {
   return actor;
 }
 
-const ThreadEventInputs = {
-  DiscordThreadBodyUpdated: events.DiscordThreadBodyUpdated,
-  DiscordThreadTitleUpdated: events.DiscordThreadTitleUpdated,
-  DiscordThreadDeleted: events.DiscordThreadDeleted,
-  DiscordThreadCommentCreated: events.DiscordThreadCommentCreated,
-};
-
 async function getThread(
   payload: z.infer<(typeof ThreadEventInputs)[keyof typeof ThreadEventInputs]>,
 ) {
@@ -43,13 +54,9 @@ async function getThread(
         message_id: payload.message_id,
       },
     },
+    logging: console.log,
   });
 }
-
-const CommentEventInputs = {
-  DiscordThreadCommentUpdated: events.DiscordThreadCommentUpdated,
-  DiscordThreadCommentDeleted: events.DiscordThreadCommentDeleted,
-};
 
 async function getComment(
   payload: z.infer<
@@ -63,12 +70,6 @@ async function getComment(
     },
   });
 }
-
-const inputs = {
-  ...ThreadEventInputs,
-  ...CommentEventInputs,
-  DiscordThreadCreated: events.DiscordThreadCreated,
-};
 
 export function DiscordBotPolicy(): Policy<typeof inputs> {
   return {
@@ -153,8 +154,19 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
         });
       },
       DiscordThreadCommentCreated: async ({ payload }) => {
-        const thread = await getThread(payload);
-        if (!thread) return;
+        // don't use getThread because this is a special case
+        // thread_id = channel_id instead of message_id
+        const thread = await models.Thread.findOne({
+          attributes: ['id'],
+          where: {
+            discord_meta: {
+              message_id: payload.channel_id,
+            },
+          },
+        });
+        if (!thread) {
+          return;
+        }
 
         await command(CreateComment(), {
           actor: await getActor(),
