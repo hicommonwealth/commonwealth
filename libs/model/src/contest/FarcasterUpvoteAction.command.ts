@@ -4,10 +4,10 @@ import * as schemas from '@hicommonwealth/schemas';
 // This webhook processes the cast action event:
 // https://docs.farcaster.xyz/reference/actions/spec#actions-specification
 export function FarcasterUpvoteAction(): Command<
-  typeof schemas.FarcasterCastCreatedWebhook
+  typeof schemas.FarcasterUpvoteAction
 > {
   return {
-    ...schemas.FarcasterCastCreatedWebhook,
+    ...schemas.FarcasterUpvoteAction,
     auth: [],
     body: async ({ payload }) => {
       // // map FC Action to CW ThreadUpvoted

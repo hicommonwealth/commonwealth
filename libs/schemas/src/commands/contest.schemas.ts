@@ -148,7 +148,7 @@ export const FarcasterCastCreatedWebhook = {
   }),
 };
 
-export const FarcasterActionWebhook = {
+export const FarcasterUpvoteAction = {
   input: z.object({}),
   output: z.object({}),
 };

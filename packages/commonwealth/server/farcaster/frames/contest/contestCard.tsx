@@ -1,4 +1,3 @@
-import { models } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
 import React from 'react';
@@ -31,49 +30,7 @@ const PrizeRow = ({ index, prize }: { index: number; prize: number }) => {
   );
 };
 
-export const contestCard = frames(async (ctx) => {
-  // extract contest address from request url
-  const [, contestAddress] = ctx.url.pathname.split('/contests/');
-
-  const contestManager = await models.ContestManager.findOne({
-    where: {
-      contest_address: contestAddress,
-      farcaster_frame_url: `/api/farcaster/contests/${contestAddress}`,
-    },
-  });
-  if (!contestManager) {
-    return {
-      title: 'Invalid Contest',
-      image: (
-        <div
-          style={{
-            backgroundColor: '#2A2432',
-            color: 'white',
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-            lineHeight: '0.5',
-          }}
-        >
-          <p style={{ fontSize: '32px' }}>
-            Contest at address {`"${contestAddress}"`} does not exist.
-          </p>
-        </div>
-      ),
-    };
-  }
-
-  // associate frame cast with contest manager
-  if (!contestManager?.farcaster_frame_hashes?.includes(contestAddress)) {
-    contestManager.farcaster_frame_hashes = [
-      ...(contestManager.farcaster_frame_hashes || []),
-      contestAddress,
-    ];
-    await contestManager.save();
-  }
-
+export const contestCard = frames(async () => {
   // here we would need to be able to fetch data related to contest eg
   // image, title, description, prizes
   // check designs https://www.figma.com/design/NNqlhNPHvn0O96TCBIi6WU/Contests?node-id=960-3689&t=8ogN11dhaRqJP8ET-1
@@ -81,7 +38,7 @@ export const contestCard = frames(async (ctx) => {
   const prizes = [0.005, 0.003, 0.001];
 
   return {
-    title: contestManager.name,
+    title: 'Contest Title',
     image: (
       <div
         style={{
@@ -100,7 +57,7 @@ export const contestCard = frames(async (ctx) => {
             fontSize: '56px',
           }}
         >
-          {contestManager.name}
+          Contest Title
         </p>
 
         <p style={{ fontSize: '32px' }}>This is contest description.</p>

@@ -12,8 +12,8 @@ farcasterRouter.get('/game', startGame);
 farcasterRouter.post('/game', startGame);
 farcasterRouter.post('/result', resultGame);
 
-farcasterRouter.get('/contests/:contestAddress', contestCard);
-farcasterRouter.post('/contests/:contestAddress', contestCard);
+farcasterRouter.get('/contestCard', contestCard);
+farcasterRouter.post('/contestCard', contestCard);
 farcasterRouter.post('/viewLeaderboard', viewLeaderboard);
 farcasterRouter.post('/checkEligibility', checkEligibility);
 

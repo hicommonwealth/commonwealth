@@ -7,6 +7,7 @@ import {
   models,
 } from '@hicommonwealth/model';
 import { RequestHandler, Router, raw } from 'express';
+import farcasterRouter from 'server/farcaster/router';
 import DatabaseValidationService from 'server/middleware/databaseValidationService';
 
 const PATH = '/api/integration';
@@ -85,13 +86,26 @@ function build(validator: DatabaseValidationService) {
 
   router.get(
     '/farcaster/CastUpvoteAction',
+    (req, res, next) => {
+      console.log(`GET CastUpvoteAction: ${JSON.stringify(req.body, null, 2)}`);
+      next();
+    },
     express.query(Contest.GetFarcasterUpvoteActionMetadata()),
   );
 
   router.post(
     '/farcaster/CastUpvoteAction',
+    (req, res, next) => {
+      console.log(
+        `POST CastUpvoteAction: ${JSON.stringify(req.body, null, 2)}`,
+      );
+      next();
+    },
     express.command(Contest.FarcasterUpvoteAction()),
   );
+
+  // Farcaster frames
+  router.use('/farcaster', farcasterRouter);
 
   // Discord BOT integration
   router.post(
