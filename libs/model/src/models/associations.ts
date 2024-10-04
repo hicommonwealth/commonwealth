@@ -12,6 +12,7 @@ export const buildAssociations = (db: DB) => {
     })
     .withMany(db.Wallets)
     .withOne(db.ApiKey, {
+      targetKey: 'id',
       onDelete: 'CASCADE',
     });
 
@@ -66,7 +67,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     })
     .withOne(db.DiscordBotConfig, {
-      targeyKey: 'discord_config_id',
+      targetKey: 'discord_config_id',
       onDelete: 'CASCADE',
     })
     .withOne(db.User, {

@@ -26,12 +26,12 @@ export type AliasOptions<One extends State, Many extends State> = {
 /**
  * One to one association options
  * @param foreignKey foreign key to source - defaults to source_pk
- * @param targeyKey foreign key to target - defalts to target_pk
+ * @param targetKey foreign key to target - defalts to target_pk
  * @param as association alias - defaults to model name
  */
 export type OneToOneOptions<Source extends State, Target extends State> = {
   foreignKey?: keyof Target & string;
-  targeyKey?: keyof Source & string;
+  targetKey?: keyof Source & string;
   as?: keyof Target & string;
 } & RuleOptions;
 
@@ -80,42 +80,43 @@ export type FkMap = {
 /**
  * Model association methods
  */
-export type Associable<M> = M extends ModelStatic<infer Source>
-  ? {
-      /**
-       * Builds on-to-one association between two models
-       * @param this source model with FK to target
-       * @param target target model with FK to source
-       * @param options one-to-one options
-       */
-      withOne: <Target extends State>(
-        target: ModelStatic<Model<Target>>,
-        options?: OneToOneOptions<Attributes<Source>, Target>,
-      ) => Associable<M>;
+export type Associable<M> =
+  M extends ModelStatic<infer Source>
+    ? {
+        /**
+         * Builds on-to-one association between two models
+         * @param this source model with FK to target
+         * @param target target model with FK to source
+         * @param options one-to-one options
+         */
+        withOne: <Target extends State>(
+          target: ModelStatic<Model<Target>>,
+          options?: OneToOneOptions<Attributes<Source>, Target>,
+        ) => Associable<M>;
 
-      /**
-       * Builds on-to-many association between parent/child models
-       * @param this parent model with PK
-       * @param child child model with FK
-       * @param options one-to-many options
-       */
-      withMany: <Child extends State>(
-        child: ModelStatic<Model<Child>>,
-        options?: OneToManyOptions<Attributes<Source>, Child>,
-      ) => Associable<M>;
+        /**
+         * Builds on-to-many association between parent/child models
+         * @param this parent model with PK
+         * @param child child model with FK
+         * @param options one-to-many options
+         */
+        withMany: <Child extends State>(
+          child: ModelStatic<Model<Child>>,
+          options?: OneToManyOptions<Attributes<Source>, Child>,
+        ) => Associable<M>;
 
-      /**
-       * Builds many-to-many association between three models (A->X<-B)
-       * @param this cross-reference model with FKs to A and B
-       * @param a X->A options
-       * @param b X->B options
-       */
-      withManyToMany: <A extends State, B extends State>(
-        a: ManyToManyOptions<Attributes<Source>, A>,
-        b: ManyToManyOptions<Attributes<Source>, B>,
-      ) => Associable<M>;
+        /**
+         * Builds many-to-many association between three models (A->X<-B)
+         * @param this cross-reference model with FKs to A and B
+         * @param a X->A options
+         * @param b X->B options
+         */
+        withManyToMany: <A extends State, B extends State>(
+          a: ManyToManyOptions<Attributes<Source>, A>,
+          b: ManyToManyOptions<Attributes<Source>, B>,
+        ) => Associable<M>;
 
-      // unsupported composite foreign key maps
-      _fks: FkMap[];
-    }
-  : never;
+        // unsupported composite foreign key maps
+        _fks: FkMap[];
+      }
+    : never;

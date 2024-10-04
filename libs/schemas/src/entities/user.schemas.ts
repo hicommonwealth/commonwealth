@@ -51,6 +51,7 @@ export const User = z.object({
   profile: UserProfile,
 
   ProfileTags: z.array(ProfileTags).optional(),
+  ApiKey: ApiKey.optional(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
