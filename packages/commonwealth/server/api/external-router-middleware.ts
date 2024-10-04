@@ -32,40 +32,50 @@ export async function apiKeyAuthMiddleware(
   if (typeof addressHeader !== 'string')
     throw new AppError('Unauthorized', 401);
 
-  const address = await models.Address.findOne({
+  const addressInstance = await models.Address.findOne({
     attributes: ['user_id'],
     where: {
       address: addressHeader,
       verified: { [Op.ne]: null },
     },
+    include: [
+      {
+        model: models.User,
+        required: true,
+        include: [
+          {
+            model: models.ApiKey,
+            required: true,
+          },
+        ],
+      },
+    ],
   });
-  if (!address || !address.user_id) throw new AppError('Unauthorized', 401);
+  if (!addressInstance || !addressInstance.user_id)
+    throw new AppError('Unauthorized', 401);
+  const address = addressInstance.get({ plain: true })!;
 
-  const apiKeyRecord = await models.ApiKey.findOne({
-    where: {
-      user_id: address.user_id,
-    },
-  });
-  if (!apiKeyRecord) throw new AppError('Unauthorized', 401);
-
+  const apiKeyRecord = address.User!.ApiKey!;
   const hashedApiKey = getSaltedApiKeyHash(apiKey, apiKeyRecord.salt);
 
   if (hashedApiKey !== apiKeyRecord.hashed_api_key)
     throw new AppError('Unauthorized', 401);
 
-  const user = await models.User.findOne({
-    where: {
-      id: address.user_id,
-    },
-  });
-  // redundant since Address.user_id is checked but added for typing
-  if (!user) throw new AppError('Unauthorized', 401);
+  const user = address.User!;
+  delete user.ApiKey;
 
-  req.user = user;
+  req.user = models.User.build(user);
 
   // record access in background - best effort
   apiKeyRecord.updated_at = new Date();
-  void apiKeyRecord.save();
+  void models.ApiKey.update(
+    {
+      updated_at: new Date(),
+    },
+    {
+      where: { user_id: apiKeyRecord.user_id },
+    },
+  );
 
   return next();
 }
