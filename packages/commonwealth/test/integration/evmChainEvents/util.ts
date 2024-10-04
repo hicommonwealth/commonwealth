@@ -1,9 +1,14 @@
+import {
+  communityStakesAbi,
+  namespaceFactoryAbi,
+} from '@hicommonwealth/evm-testing';
 import { hashAbi, models } from '@hicommonwealth/model';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
+  commonProtocol,
 } from '@hicommonwealth/shared';
 import {
   rawCompoundAbi,
@@ -13,39 +18,47 @@ import {
   compoundPropCreatedSignature,
   compoundPropQueuedSignature,
   localRpc,
-  sdk,
 } from '../../devnet/evm/evmChainEvents/util';
 
 export const testChainId = 'compound-test';
 export const testChainIdV2 = 'dydx-test';
-export const testAbiNickname = 'FeiDAO';
-export const testAbiNicknameV2 = 'DydxGovernor';
+export const testAbiNickname = 'NamespaceFactory';
+export const testAbiNicknameV2 = 'CommunityStakes';
 
 export async function getTestChainNode(version?: 'v1' | 'v2') {
-  let rpc: string, name: string;
-  if (!version || version === 'v1') {
-    rpc = localRpc;
-    name = 'Test Node';
-  } else {
-    rpc = 'http://localhost:8546';
-    name = 'Test Node 2';
+  let url = localRpc;
+  let name = 'Local Base Sepolia';
+  let eth_chain_id = commonProtocol.ValidChains.SepoliaBase;
+
+  if (version === 'v2') {
+    url = 'http://localhost:8546';
+    name = 'Local Ethereum Sepolia';
+    eth_chain_id = commonProtocol.ValidChains.Sepolia;
   }
 
-  const [chainNode] = await models.ChainNode.findOrCreate({
+  const chainNode = await models.ChainNode.findOne({
     where: {
-      url: rpc,
-      balance_type: BalanceType.Ethereum,
-    },
-    // @ts-expect-error StrictNullChecks
-    defaults: {
-      name,
+      eth_chain_id: eth_chain_id,
     },
   });
 
-  return chainNode;
+  if (chainNode) {
+    chainNode.url = url;
+    chainNode.name = name;
+    chainNode.balance_type = BalanceType.Ethereum;
+    await chainNode.save();
+    return chainNode;
+  }
+
+  return await models.ChainNode.create({
+    url,
+    balance_type: BalanceType.Ethereum,
+    name,
+    eth_chain_id,
+  });
 }
 
-export async function getTestChain(version?: 'v1' | 'v2') {
+export async function getTestCommunity(version?: 'v1' | 'v2') {
   const chainNode = await getTestChainNode(version);
 
   let chainId: string, name: string, defaultSymbol: string;
@@ -92,10 +105,10 @@ export async function getTestChain(version?: 'v1' | 'v2') {
 export async function getTestAbi(version?: 'v1' | 'v2') {
   let hash: string, nickname: string;
   if (!version || version === 'v1') {
-    hash = hashAbi(rawCompoundAbi);
+    hash = hashAbi(namespaceFactoryAbi);
     nickname = testAbiNickname;
   } else {
-    hash = hashAbi(rawDydxAbi);
+    hash = hashAbi(communityStakesAbi);
     nickname = testAbiNicknameV2;
   }
   const existingAbi = await models.ContractAbi.findOne({
@@ -120,9 +133,10 @@ export async function getTestContract(version?: 'v1' | 'v2') {
 
   let address: string;
   if (!version || version === 'v1') {
-    address = sdk.contractAddrs.compound.governance;
+    address = commonProtocol.factoryContracts[chainNode.eth_chain_id!].factory;
   } else {
-    address = '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2';
+    address =
+      commonProtocol.factoryContracts[chainNode.eth_chain_id!].communityStake;
   }
 
   const [contract] = await models.Contract.findOrCreate({
@@ -138,7 +152,7 @@ export async function getTestContract(version?: 'v1' | 'v2') {
 
 export async function getTestCommunityContract(version?: 'v1' | 'v2') {
   const contract = await getTestContract(version);
-  const chain = await getTestChain(version);
+  const chain = await getTestCommunity(version);
 
   const [communityContract] = await models.CommunityContract.findOrCreate({
     where: {
@@ -168,9 +182,11 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
 
   let contractAddress: string;
   if (!version || version === 'v1') {
-    contractAddress = sdk.contractAddrs.compound.governance;
+    contractAddress =
+      commonProtocol.factoryContracts[chainNode.eth_chain_id!].factory;
   } else {
-    contractAddress = '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2';
+    contractAddress =
+      commonProtocol.factoryContracts[chainNode.eth_chain_id!].communityStake;
   }
 
   // signatures are the same for v1 and v2

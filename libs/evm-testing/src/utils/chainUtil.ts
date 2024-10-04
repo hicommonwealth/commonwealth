@@ -54,13 +54,14 @@ export async function mineBlocks(blocks: number) {
 }
 
 export async function getAnvil(
+  forkEthChainId: 84532 | 1,
   options: CreateAnvilOptions = {},
-  protocolFork?: boolean,
 ): Promise<Anvil> {
   const anvil = createAnvil({
-    forkUrl: protocolFork
-      ? `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`
-      : `https://eth-mainnet.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`,
+    forkUrl:
+      forkEthChainId === 84532
+        ? `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`
+        : `https://eth-mainnet.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`,
     silent: false,
     port: 8545,
     autoImpersonate: true,

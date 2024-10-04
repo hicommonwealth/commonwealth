@@ -41,14 +41,18 @@ const namespaceDeployedLog = {
   removed: false,
 };
 const namespaceFactoryAddress =
-  commonProtocol.factoryContracts[84532].factory.toLowerCase();
+  commonProtocol.factoryContracts[
+    commonProtocol.ValidChains.SepoliaBase
+  ].factory.toLowerCase();
 const namespaceDeployedSignature =
   '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5';
 const namespaceFactory = new NamespaceFactory();
 const namespaceName = `cetest${new Date().getTime()}`;
 
 const communityStakeAddress =
-  commonProtocol.factoryContracts[84532].communityStake.toLowerCase();
+  commonProtocol.factoryContracts[
+    commonProtocol.ValidChains.SepoliaBase
+  ].communityStake.toLowerCase();
 const communityStakeTradeSignature =
   '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e';
 const communityStake = new CommunityStake();
@@ -57,10 +61,10 @@ describe('EVM Chain Events Log Processing Tests', () => {
   let namespaceDeployedBlock: number;
   let communityStakeBuyBlock: number;
   let communityStakeSellBlock: number;
-  let anvil: Anvil;
+  let anvil: Anvil | undefined;
 
   beforeAll(async () => {
-    anvil = await getAnvil({}, true);
+    anvil = await getAnvil(commonProtocol.ValidChains.SepoliaBase);
 
     let res = await namespaceFactory.deployNamespace(namespaceName);
     namespaceDeployedBlock = res.block;
@@ -76,7 +80,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
   });
 
   afterAll(async () => {
-    await anvil.stop();
+    await anvil?.stop();
     await dispose()();
   });
 
@@ -131,7 +135,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
         const emptyRes = await getLogs({
           rpc: localRpc,
           maxBlockRange: 10,
-          contractAddresses: [commonProtocol.factoryContracts[84532].factory],
+          contractAddresses: [
+            commonProtocol.factoryContracts[
+              commonProtocol.ValidChains.SepoliaBase
+            ].factory,
+          ],
           startingBlockNum: namespaceDeployedBlock - 11,
           endingBlockNum: namespaceDeployedBlock - 1,
         });
@@ -141,7 +149,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
         const res = await getLogs({
           rpc: localRpc,
           maxBlockRange: 500,
-          contractAddresses: [commonProtocol.factoryContracts[84532].factory],
+          contractAddresses: [
+            commonProtocol.factoryContracts[
+              commonProtocol.ValidChains.SepoliaBase
+            ].factory,
+          ],
           startingBlockNum: namespaceDeployedBlock,
           endingBlockNum: namespaceDeployedBlock,
         });
