@@ -21,7 +21,8 @@ const updateSiteAdmin = async (
   req: TypedRequestBody<PromoteUserReq>,
   res: Response,
 ) => {
-  let { address, siteAdmin } = req.body;
+  let { address } = req.body;
+  const { siteAdmin } = req.body;
 
   if (!address) {
     throw new AppError(PromoteUserErrors.NoUser);
