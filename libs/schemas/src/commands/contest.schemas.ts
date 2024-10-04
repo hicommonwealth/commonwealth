@@ -112,15 +112,6 @@ export const FarcasterCast = z.object({
   embeds: z.array(
     z.object({
       url: z.string().url(),
-      metadata: z.object({
-        content_type: z.string(),
-        content_length: z.string(),
-        _status: z.string(),
-        image: z.object({
-          width_px: z.number(),
-          height_px: z.number(),
-        }),
-      }),
     }),
   ),
   reactions: z.object({

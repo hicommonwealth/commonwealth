@@ -45,6 +45,7 @@ export default (
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
       },
+      neynar_webhook_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'ContestManagers',
