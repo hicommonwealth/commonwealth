@@ -10,7 +10,7 @@ import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
 import { renderQuillDelta } from './render_quill_delta';
-import { countLinesQuill, getTextFromDelta } from './utils';
+import { getTextFromDelta } from './utils';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
@@ -32,10 +32,10 @@ type LinkProps = {
 export const QuillFormattedText = ({
   doc,
   hideFormatting,
-  cutoffLines,
   openLinksInNewTab,
   searchTerm,
   customShowMoreButton,
+  maxChars,
 }: QuillFormattedTextProps) => {
   const navigate = useCommonNavigate();
 
@@ -46,17 +46,17 @@ export const QuillFormattedText = ({
     if (userExpand) {
       return false;
     }
-    return cutoffLines && cutoffLines < countLinesQuill(doc);
-  }, [cutoffLines, doc, userExpand]);
+    return maxChars && maxChars < doc.length;
+  }, [maxChars, doc, userExpand]);
 
   const truncatedDoc: DeltaStatic = useMemo(() => {
     if (isTruncated) {
       return {
-        ops: [...(doc?.ops || []).slice(0, cutoffLines)],
+        ops: [...((doc?.ops || []).slice(0, maxChars) + '...')],
       } as DeltaStatic;
     }
     return doc;
-  }, [cutoffLines, doc, isTruncated]);
+  }, [maxChars, doc, isTruncated]);
 
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally

@@ -209,7 +209,7 @@ export const ThreadCard = ({
             <CWText type="b1" className="content-body">
               <QuillRenderer
                 doc={bodyText}
-                cutoffLines={4}
+                maxChars={500}
                 customShowMoreButton={
                   <CWText type="b1" className="show-more-btn">
                     Show more

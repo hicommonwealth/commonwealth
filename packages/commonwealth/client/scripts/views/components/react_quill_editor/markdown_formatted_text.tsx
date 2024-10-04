@@ -21,7 +21,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
-import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
+import { fetchTwitterEmbedInfo } from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -61,9 +61,9 @@ export const MarkdownFormattedText = ({
   doc,
   hideFormatting,
   searchTerm,
-  cutoffLines,
   customClass,
   customShowMoreButton,
+  maxChars,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -73,16 +73,15 @@ export const MarkdownFormattedText = ({
     if (userExpand) {
       return false;
     }
-    return cutoffLines && cutoffLines < countLinesMarkdown(doc);
-  }, [userExpand, cutoffLines, doc]);
+    return maxChars && maxChars < doc.length;
+  }, [userExpand, maxChars, doc]);
 
   const truncatedDoc = useMemo(() => {
     if (isTruncated) {
-      const numChars = doc.split('\n', cutoffLines).join('\n').length;
-      return doc.slice(0, numChars);
+      return doc.slice(0, maxChars) + '...'; // Truncate and append '...'
     }
     return doc;
-  }, [cutoffLines, doc, isTruncated]);
+  }, [doc, isTruncated, maxChars]);
 
   const unsanitizedHTML = marked.parse(truncatedDoc);
 
