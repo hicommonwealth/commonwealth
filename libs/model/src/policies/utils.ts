@@ -28,6 +28,17 @@ export async function createOnchainContestContent(payload: {
 
   const addressesToProcess = activeContestManagers
     .filter((c) => {
+      console.log('ACTIONS:', c.actions);
+      // if a projection exists with the same content url, don't add it onchain again
+      const duplicatePosts = c.actions.filter(
+        (action) =>
+          action.action === 'added' &&
+          action.content_url === payload.content_url,
+      );
+      if (duplicatePosts.length > 0) {
+        log.warn('createContestContent: duplicate content found by url');
+        return false;
+      }
       // only process contest managers for which
       // the user has not exceeded the post limit
       // on the latest contest

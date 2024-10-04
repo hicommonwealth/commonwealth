@@ -30,12 +30,14 @@ const PrizeRow = ({ index, prize }: { index: number; prize: number }) => {
   );
 };
 
-export const contestCard = frames(async () => {
+export const contestCard = frames(async (ctx) => {
   // here we would need to be able to fetch data related to contest eg
   // image, title, description, prizes
   // check designs https://www.figma.com/design/NNqlhNPHvn0O96TCBIi6WU/Contests?node-id=960-3689&t=8ogN11dhaRqJP8ET-1
 
   const prizes = [0.005, 0.003, 0.001];
+
+  const contest_address = ctx.url.pathname.split('/')[1];
 
   return {
     title: 'Contest Title',
@@ -60,6 +62,8 @@ export const contestCard = frames(async () => {
           Contest Title
         </p>
 
+        <p style={{ fontSize: '32px' }}>{contest_address}</p>
+
         <p style={{ fontSize: '32px' }}>This is contest description.</p>
         <p style={{ fontSize: '42px' }}>Current Prizes</p>
 
@@ -76,11 +80,15 @@ export const contestCard = frames(async () => {
       <Button
         key="leaderboard"
         action="post"
-        target="/viewLeaderboard?fromMain=true"
+        target={`${contest_address}/viewLeaderboard?fromMain=true`}
       >
         View Leaderboard
       </Button>,
-      <Button key="eligibility" action="post" target="/checkEligibility">
+      <Button
+        key="eligibility"
+        action="post"
+        target={`/${contest_address}/checkEligibility`}
+      >
         Check Eligibility
       </Button>,
     ],

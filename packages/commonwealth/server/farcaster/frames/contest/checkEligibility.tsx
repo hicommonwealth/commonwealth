@@ -3,7 +3,7 @@ import React from 'react';
 import { frames } from '../../config';
 import { circleCheckIcon, circleXIcon, fakeApiCall } from '../../utils';
 
-export const checkEligibility = frames(async () => {
+export const checkEligibility = frames(async (ctx) => {
   let eligible: boolean;
 
   try {
@@ -18,6 +18,8 @@ export const checkEligibility = frames(async () => {
   const description = eligible
     ? 'Reply to this cast or quote this frame to be entered into the contest.'
     : 'In order to enter this contest you must connect an Ethereum wallet to your Farcaster account.';
+
+  const contest_address = ctx.url.pathname.split('/')[1];
 
   return {
     image: (
@@ -50,7 +52,11 @@ export const checkEligibility = frames(async () => {
       </div>
     ),
     buttons: [
-      <Button key="back" action="post" target="/contestCard">
+      <Button
+        key="back"
+        action="post"
+        target={`/${contest_address}/contestCard`}
+      >
         Back
       </Button>,
     ],

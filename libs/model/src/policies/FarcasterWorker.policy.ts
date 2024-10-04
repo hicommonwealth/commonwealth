@@ -11,6 +11,7 @@ const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
 const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
   FarcasterReplyCastCreated: events.FarcasterReplyCastCreated,
+  FarcasterVoteCreated: events.FarcasterVoteCreated,
 };
 
 export function FarcasterWorker(): Policy<typeof inputs> {
@@ -19,9 +20,14 @@ export function FarcasterWorker(): Policy<typeof inputs> {
     body: {
       FarcasterCastCreated: async ({ payload }) => {
         const frame_url = new URL(payload.embeds[0].url).pathname;
+        console.log('FRAME URL: ', frame_url);
 
         const contestManager = await models.ContestManager.findOne({
           where: {
+            cancelled: false,
+            ended: {
+              [Op.not]: true,
+            },
             farcaster_frame_url: frame_url,
           },
         });
@@ -84,6 +90,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           content_url,
         });
       },
+      FarcasterVoteCreated: async ({ payload }) => {},
     },
   };
 }

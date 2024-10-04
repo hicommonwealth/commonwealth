@@ -14,6 +14,9 @@ export function FarcasterCastCreatedWebhook(): Command<
       if (payload.data.embeds.length === 0) {
         throw new InvalidInput('embed must exist');
       }
+      if (!payload.data.embeds[0].url.includes('/farcaster/contests/0x')) {
+        throw new InvalidInput('invalid embed');
+      }
 
       await emitEvent(
         models.Outbox,

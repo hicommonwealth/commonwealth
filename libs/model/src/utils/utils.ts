@@ -75,9 +75,15 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 
 // returns community ID and thread ID from content url
 export function decodeThreadContentUrl(contentUrl: string): {
-  communityId: string;
-  threadId: number;
+  communityId: string | null;
+  threadId: number | null;
 } {
+  if (contentUrl.startsWith('/farcaster/')) {
+    return {
+      communityId: null,
+      threadId: null,
+    };
+  }
   if (!contentUrl.includes('/discussion/')) {
     throw new Error(`invalid content url: ${contentUrl}`);
   }

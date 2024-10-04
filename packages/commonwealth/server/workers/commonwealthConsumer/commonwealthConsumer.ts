@@ -16,7 +16,7 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { Contest, ContestWorker } from '@hicommonwealth/model';
+import { Contest, ContestWorker, FarcasterWorker } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
@@ -38,6 +38,17 @@ startHealthCheckLoop({
     }
   },
 });
+
+function checkSubscriptionResponse(
+  subRes: boolean,
+  topic: BrokerSubscriptions,
+) {
+  if (!subRes) {
+    log.fatal(`Failed to subscribe to ${topic}. Requires restart!`, undefined, {
+      topic,
+    });
+  }
+}
 
 // CommonwealthConsumer is a server that consumes (and processes) RabbitMQ messages
 // from external apps or services (like the Snapshot Service). It exists because we
@@ -72,6 +83,7 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     BrokerSubscriptions.ChainEvent,
     ChainEventPolicy(),
   );
+  checkSubscriptionResponse(chainEventSubRes, BrokerSubscriptions.ChainEvent);
 
   const contestWorkerSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ContestWorkerPolicy,
@@ -88,41 +100,29 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       },
     },
   );
+  checkSubscriptionResponse(
+    contestWorkerSubRes,
+    BrokerSubscriptions.ContestWorkerPolicy,
+  );
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ContestProjection,
     Contest.Contests(),
   );
+  checkSubscriptionResponse(
+    contestProjectionsSubRes,
+    BrokerSubscriptions.ContestProjection,
+  );
 
-  if (!chainEventSubRes) {
-    log.fatal(
-      'Failed to subscribe to chain-events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.ChainEvent,
-      },
-    );
-  }
-
-  if (!contestWorkerSubRes) {
-    log.fatal(
-      'Failed to subscribe to contest worker events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.ContestWorkerPolicy,
-      },
-    );
-  }
-
-  if (!contestProjectionsSubRes) {
-    log.fatal(
-      'Failed to subscribe to contest projection events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.ContestProjection,
-      },
-    );
-  }
+  const farcasterWorkerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.FarcasterWorkerPolicy,
+    FarcasterWorker(),
+    buildRetryStrategy(undefined, 20_000),
+  );
+  checkSubscriptionResponse(
+    farcasterWorkerSubRes,
+    BrokerSubscriptions.FarcasterWorkerPolicy,
+  );
 }
 
 function startRolloverLoop() {

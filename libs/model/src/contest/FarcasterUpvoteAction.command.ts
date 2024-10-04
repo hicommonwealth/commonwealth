@@ -10,6 +10,9 @@ export function FarcasterUpvoteAction(): Command<
     ...schemas.FarcasterUpvoteAction,
     auth: [],
     body: async ({ payload }) => {
+      return {
+        msg: 'HELLOEEZ!',
+      };
       // // map FC Action to CW ThreadUpvoted
       // const contestManager = await models.ContestManager.findOne({
       //   where: {

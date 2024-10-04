@@ -77,6 +77,7 @@ export function getRabbitMQConfig(
       RascalQueues.NotificationsSettings,
       RascalQueues.ContestWorkerPolicy,
       RascalQueues.ContestProjection,
+      RascalQueues.FarcasterWorkerPolicy,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
@@ -84,6 +85,7 @@ export function getRabbitMQConfig(
       RascalBindings.NotificationsSettings,
       RascalBindings.ContestWorkerPolicy,
       RascalBindings.ContestProjection,
+      RascalBindings.FarcasterWorkerPolicy,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
@@ -94,6 +96,7 @@ export function getRabbitMQConfig(
       RascalSubscriptions.NotificationsSettings,
       RascalSubscriptions.ContestWorkerPolicy,
       RascalSubscriptions.ContestProjection,
+      RascalSubscriptions.FarcasterWorkerPolicy,
     ]);
   } else if (service === RascalConfigServices.DiscobotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [

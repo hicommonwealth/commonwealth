@@ -257,3 +257,5 @@ export const FarcasterCastCreated = FarcasterCast.describe(
 export const FarcasterReplyCastCreated = FarcasterCast.describe(
   'When a reply is posted to a farcaster contest cast',
 );
+
+export const FarcasterVoteCreated = z.any();

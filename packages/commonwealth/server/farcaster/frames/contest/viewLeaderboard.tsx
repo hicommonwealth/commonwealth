@@ -22,6 +22,8 @@ export const viewLeaderboard = frames(async (ctx) => {
   const noEntries = leaderboardEntries.length === 0;
   const entry = leaderboardEntries[0];
 
+  const contest_address = ctx.url.pathname.split('/')[1];
+
   return {
     image: (
       <div
@@ -94,11 +96,19 @@ export const viewLeaderboard = frames(async (ctx) => {
                     ◀
                   </Button>,
                 ]),
-            <Button key="next" action="post" target="/viewLeaderboard?next">
+            <Button
+              key="next"
+              action="post"
+              target={`/${contest_address}/viewLeaderboard?next`}
+            >
               ▶
             </Button>,
           ]),
-      <Button key="view-cast" action="post" target="/contestCard">
+      <Button
+        key="view-cast"
+        action="post"
+        target={`/${contest_address}/contestCard`}
+      >
         View Cast
       </Button>,
     ],

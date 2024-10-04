@@ -73,6 +73,9 @@ function build(validator: DatabaseValidationService) {
     express.command(ChainEvents.ChainEventCreated()),
   );
 
+  // Farcaster frames
+  router.use('/farcaster/contests', farcasterRouter);
+
   // Farcaster webhooks
   router.post(
     '/farcaster/CastCreated',
@@ -103,9 +106,6 @@ function build(validator: DatabaseValidationService) {
     },
     express.command(Contest.FarcasterUpvoteAction()),
   );
-
-  // Farcaster frames
-  router.use('/farcaster', farcasterRouter);
 
   // Discord BOT integration
   router.post(
