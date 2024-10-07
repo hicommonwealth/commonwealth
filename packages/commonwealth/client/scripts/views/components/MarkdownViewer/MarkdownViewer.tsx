@@ -15,7 +15,7 @@ import React, { memo, ReactNode, useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { useMarkdownEditorErrorHandler } from 'views/components/MarkdownEditor/useMarkdownEditorErrorHandler';
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
-import { useComputeMarkdownWithCutoff } from 'views/components/MarkdownViewer/UseComputeMarkdownWithCutoff';
+import { useComputeMarkdownWithCutoff } from 'views/components/MarkdownViewer/useComputeMarkdownWithCutoff';
 
 import clsx from 'clsx';
 import './MarkdownViewer.scss';
