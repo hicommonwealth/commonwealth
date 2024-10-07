@@ -289,7 +289,7 @@ export function UpdateThread(): Command<
               parseUserMentions(content.body),
             );
             mentions &&
-              (await emitMentions(models, transaction, {
+              (await emitMentions(transaction, {
                 authorAddressId: address.id!,
                 authorUserId: actor.user.id!,
                 authorAddress: address.address,

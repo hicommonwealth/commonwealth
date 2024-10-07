@@ -44,6 +44,7 @@ import User from './user';
 import Vote from './vote';
 import Wallets from './wallets';
 import Webhook from './webhook';
+import XpLog from './xp_log';
 
 export const Factories = {
   Address,
@@ -89,6 +90,7 @@ export const Factories = {
   Webhook,
   Wallets,
   Token,
+  XpLog,
 };
 
 export type DB = {

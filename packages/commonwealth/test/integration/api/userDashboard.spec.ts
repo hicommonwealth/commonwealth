@@ -106,10 +106,8 @@ describe('User Dashboard API', () => {
     // make second user join alex community
     const communityArgs: JoinCommunityArgs = {
       jwt: userJWT2,
-      address_id: userAddressId2,
       address: userAddress2,
       chain,
-      originChain: chain2,
     };
     const res = await server.seeder.joinCommunity(communityArgs);
     expect(res).to.equal(true);
@@ -203,10 +201,8 @@ describe('User Dashboard API', () => {
       // make second user join alex community
       const communityArgs: JoinCommunityArgs = {
         jwt: userJWT,
-        address_id: userAddressId,
         address: userAddress,
         chain: chain2,
-        originChain: chain,
       };
       const communityCreated = await server.seeder.joinCommunity(communityArgs);
       expect(communityCreated).to.equal(true);
