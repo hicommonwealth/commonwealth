@@ -16,3 +16,7 @@ export const DISCORD_BOT_ADDRESS = '0xdiscordbot';
 export const DEFAULT_NAME = 'Anonymous';
 
 export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
+
+export const MIN_CHARS_TO_SHOW_MORE = 500;
+export const MAIDEN_CHARS_TO_SHOW_MORE = 1000;
+export const MAX_CHARS_TO_SHOW_MORE = 5000;

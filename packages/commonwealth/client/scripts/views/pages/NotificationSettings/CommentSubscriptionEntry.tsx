@@ -1,5 +1,6 @@
 import { CommentSubscription } from '@hicommonwealth/schemas';
 import {
+  MIN_CHARS_TO_SHOW_MORE,
   getDecodedString,
   getThreadUrl,
   safeTruncateBody,
@@ -114,7 +115,7 @@ export const CommentSubscriptionEntry = (
         <CWText type="h4" fontWeight="semiBold">
           <QuillRenderer
             doc={safeTruncateBody(decodeURI(comment.text))}
-            cutoffLines={4}
+            maxChars={MIN_CHARS_TO_SHOW_MORE}
             customShowMoreButton={<></>}
           />
         </CWText>

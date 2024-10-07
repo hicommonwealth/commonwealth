@@ -1,3 +1,4 @@
+import { MIN_CHARS_TO_SHOW_MORE } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { getBrowserInfo } from 'helpers/browser';
@@ -209,7 +210,7 @@ export const ThreadCard = ({
             <CWText type="b1" className="content-body">
               <QuillRenderer
                 doc={bodyText}
-                maxChars={500}
+                maxChars={MIN_CHARS_TO_SHOW_MORE}
                 customShowMoreButton={
                   <CWText type="b1" className="show-more-btn">
                     Show more

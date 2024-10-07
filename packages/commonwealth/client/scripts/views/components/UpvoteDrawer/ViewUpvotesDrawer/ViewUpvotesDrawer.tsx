@@ -1,3 +1,4 @@
+import { MAIDEN_CHARS_TO_SHOW_MORE } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -142,7 +143,10 @@ export const ViewUpvotesDrawer = ({
               />
             </div>
             <div className="upvoted-content-body">
-              <QuillRenderer doc={contentBody} cutoffLines={10} />
+              <QuillRenderer
+                doc={contentBody}
+                maxChars={MAIDEN_CHARS_TO_SHOW_MORE}
+              />
             </div>
           </div>
           {reactorData?.length > 0 && isOpen ? (
