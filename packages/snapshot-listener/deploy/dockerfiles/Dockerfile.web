@@ -1,2 +1,2 @@
 FROM snapshot-listener
-CMD NODE_ENV=production ./datadog-entrypoint.sh node --import=extensionless/register --enable-source-maps ./build/src/index.js
+CMD NODE_ENV=production ./datadog-entrypoint.sh node --import=extensionless/register --max_old_space_size=$(./scripts/get-max-old-space-size.sh) --enable-source-maps ./build/src/index.js

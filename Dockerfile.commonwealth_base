@@ -29,6 +29,8 @@ COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
 COPY ./scripts/datadog-entrypoint.sh /prod/commonwealth
 RUN chmod +x /prod/commonwealth/datadog-entrypoint.sh
+COPY ./scripts/get-max-old-space-size.sh /prod/commonwealth
+RUN chmod +x /prod/commonwealth/get-max-old-space-size.sh
 ENV PORT=$PORT
 
 FROM base AS snapshot-listener
@@ -37,6 +39,8 @@ COPY --from=build /prod/snapshot-listener /prod/snapshot-listener
 WORKDIR /prod/snapshot-listener
 COPY ./scripts/datadog-entrypoint.sh /prod/snapshot-listener
 RUN chmod +x /prod/snapshot-listener/datadog-entrypoint.sh
+COPY ./scripts/get-max-old-space-size.sh /prod/commonwealth
+RUN chmod +x /prod/commonwealth/get-max-old-space-size.sh
 ENV PORT=$PORT
 
 FROM base AS discord-bot
@@ -45,4 +49,6 @@ COPY --from=build /prod/discord-bot /prod/discord-bot
 WORKDIR /prod/discord-bot
 COPY ./scripts/datadog-entrypoint.sh /prod/discord-bot
 RUN chmod +x /prod/discord-bot/datadog-entrypoint.sh
+COPY ./scripts/get-max-old-space-size.sh /prod/commonwealth
+RUN chmod +x /prod/commonwealth/get-max-old-space-size.sh
 ENV PORT=$PORT
