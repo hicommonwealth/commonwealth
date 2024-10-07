@@ -10,7 +10,7 @@ export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
-  chain_node?: ChainNodeAttributes;
+  ChainNode?: ChainNodeAttributes;
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 
