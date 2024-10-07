@@ -11,8 +11,9 @@ import {
 } from 'shared/analytics/types';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
-import { useCreateTokenMutation } from 'state/api/token';
+import { useCreateTokenMutation, useFetchTokensQuery } from 'state/api/token';
 import useUserStore from 'state/ui/user';
+import { useDebounce } from 'usehooks-ts';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -55,6 +56,7 @@ const TokenInformationForm = ({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+  const [tokenName, setTokenName] = useState<string>();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -67,6 +69,24 @@ const TokenInformationForm = ({
   const { mutateAsync: launchToken } = useLaunchTokenMutation();
 
   const { mutateAsync: createToken } = useCreateTokenMutation();
+
+  const debouncedSearchTerm = useDebounce<string | undefined>(tokenName, 500);
+
+  const { data: tokensList } = useFetchTokensQuery({
+    cursor: 1,
+    limit: 50,
+    search: debouncedSearchTerm,
+    enabled: !!debouncedSearchTerm,
+  });
+
+  const isTokenNameTaken =
+    tokensList && debouncedSearchTerm
+      ? !!tokensList.pages[0].results.find(
+          ({ name }) =>
+            name.toLowerCase().trim() ===
+            debouncedSearchTerm.toLowerCase().trim(),
+        )
+      : false;
 
   const openAddressSelectionModal = useCallback(() => {
     if (selectedAddress) {
@@ -85,6 +105,8 @@ const TokenInformationForm = ({
 
   const handleSubmit = useCallback(
     async (values: FormSubmitValues) => {
+      if (isTokenNameTaken) return;
+
       // get address from user
       if (!selectedAddress) {
         openAddressSelectionModal();
@@ -124,6 +146,7 @@ const TokenInformationForm = ({
       onSubmit(values);
     },
     [
+      isTokenNameTaken,
       openAddressSelectionModal,
       selectedAddress,
       onSubmit,
@@ -215,6 +238,8 @@ const TokenInformationForm = ({
         label="Token name"
         placeholder="Name your token"
         fullWidth
+        onInput={(e) => setTokenName(e.target.value?.trim())}
+        customError={isTokenNameTaken ? 'Token name is already taken' : ''}
       />
 
       <CWTextInput
