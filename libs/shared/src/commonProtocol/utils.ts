@@ -1,8 +1,5 @@
-export const calculateVoteWeight = (
-  stakeBalance: string,
-  voteWeight: number,
-) => {
-  return parseInt(stakeBalance, 10) * voteWeight;
+export const calculateVoteWeight = (balance: string, voteWeight: number) => {
+  return parseInt(balance, 10) * voteWeight;
 };
 
 export enum Denominations {

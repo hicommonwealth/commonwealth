@@ -10,11 +10,12 @@ import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
-interface IuseCreateThreadReactionMutation {
+interface IUseCreateThreadReactionMutation {
   threadId: number;
+  threadMsgId: string;
   communityId: string;
 }
-interface CreateReactionProps extends IuseCreateThreadReactionMutation {
+interface CreateReactionProps extends IUseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
   isPWA?: boolean;
@@ -24,14 +25,16 @@ export const buildCreateThreadReactionInput = async ({
   address,
   reactionType = 'like',
   threadId,
+  threadMsgId,
 }: CreateReactionProps) => {
   const canvasSignedData = await signThreadReaction(address, {
-    thread_id: threadId,
+    thread_id: threadMsgId,
     like: reactionType === 'like',
   });
   return {
     author_community_id: userStore.getState().activeAccount?.community?.id,
     thread_id: threadId,
+    thread_msg_id: threadMsgId,
     community_id: app.chain.id,
     address,
     reaction: reactionType,
@@ -43,7 +46,7 @@ export const buildCreateThreadReactionInput = async ({
 const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
-}: IuseCreateThreadReactionMutation) => {
+}: IUseCreateThreadReactionMutation) => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 

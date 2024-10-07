@@ -40,7 +40,6 @@ type StatusResp = {
   };
   communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
-  enforceSessionKeys?: boolean;
 };
 
 export const getUserStatus = async (models: DB, user: UserInstance) => {
@@ -73,32 +72,32 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // get starred communities for user
   const userCommunities = await sequelize.query<StarredCommunityResponse>(
     `
-      SELECT 
-        id, 
-        icon_url, 
+      SELECT
+        id,
+        icon_url,
         name,
-        CASE 
+        CASE
           WHEN sc.community_id IS NOT NULL THEN TRUE
           ELSE FALSE
         END AS is_starred
-      FROM 
+      FROM
         "Communities" c
-      LEFT JOIN 
-        "StarredCommunities" sc 
-      ON 
-        c.id = sc.community_id 
+      LEFT JOIN
+        "StarredCommunities" sc
+      ON
+        c.id = sc.community_id
         AND sc.user_id = :user_id
-      WHERE 
+      WHERE
         id IN (
-          SELECT 
+          SELECT
             a.community_id
-          FROM 
+          FROM
             "Addresses" a
-          WHERE 
-            a.verified IS NOT NULL 
-            AND a.last_active IS NOT NULL 
+          WHERE
+            a.verified IS NOT NULL
+            AND a.last_active IS NOT NULL
             AND a.user_id = :user_id
-          GROUP BY 
+          GROUP BY
             a.community_id
         );
     `,
@@ -141,7 +140,6 @@ export const status = async (
     if (!reqUser) {
       return success(res, {
         evmTestEnv: config.TEST_EVM.ETH_RPC,
-        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     } else {
       // user is logged in
@@ -176,7 +174,6 @@ export const status = async (
         },
         communityWithRedirects: communityWithRedirects || [],
         evmTestEnv: config.TEST_EVM.ETH_RPC,
-        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
       });
     }
   } catch (error) {

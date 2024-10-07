@@ -1,5 +1,7 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -9,6 +11,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import { CreateTopicStep } from 'views/pages/CommunityManagement/Topics/utils';
 import useGetCommunityByIdQuery from '../../../../state/api/communities/getCommuityById';
 import { PageNotFound } from '../../404';
@@ -21,11 +24,13 @@ import Status from './Status';
 interface StakeIntegrationProps {
   isTopicFlow?: boolean;
   onTopicFlowStepChange?: (step: CreateTopicStep) => void;
+  onCreateTopic: (props: HandleCreateTopicProps) => Promise<void>;
 }
 
 const StakeIntegration = ({
   isTopicFlow,
   onTopicFlowStepChange,
+  onCreateTopic,
 }: StakeIntegrationProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -37,8 +42,7 @@ const StakeIntegration = ({
   });
 
   const handleStepChange = () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    refetchStakeQuery();
+    refetchStakeQuery().catch(console.error);
     navigate(`/manage/integrations`);
   };
 
@@ -60,9 +64,14 @@ const StakeIntegration = ({
   );
 
   const createTopicHandler = () => {
-    console.log('create topic');
-    // TODO temp solution - will be integrated in upcoming PR
-    navigate('/discussions');
+    onCreateTopic({
+      stake: {
+        weightedVoting: TopicWeightedVoting.Stake,
+      },
+    }).catch((err) => {
+      notifyError('Failed to create topic');
+      console.log(err);
+    });
   };
 
   return (

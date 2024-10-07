@@ -3,6 +3,7 @@ import React from 'react';
 
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { Skeleton } from '../../Skeleton';
 import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
@@ -17,13 +18,19 @@ const SidebarHeader = ({
 }) => {
   const navigate = useCommonNavigate();
 
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
   return (
     <div className="SidebarHeader">
       <CWCommunityAvatar
         showSkeleton={!app?.chain?.meta}
         community={{
-          iconUrl: app?.chain?.meta?.icon_url || '',
-          name: app?.chain?.meta?.name || '',
+          iconUrl: community?.icon_url || '',
+          name: community?.name || '',
         }}
         onClick={() =>
           app.chain.id &&
@@ -39,7 +46,7 @@ const SidebarHeader = ({
           navigateToCommunity({ navigate, path: '', chain: app.chain.id })
         }
       >
-        {app?.chain?.meta?.name || <Skeleton width="70%" />}
+        {community?.name || <Skeleton width="70%" />}
       </CWText>
 
       {isInsideCommunity && (

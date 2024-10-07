@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';
@@ -34,6 +35,8 @@ export const EditBody = (props: EditBodyProps) => {
     threadUpdatedCallback,
   } = props;
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   const threadBody =
     shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
   const body = deserializeDelta(threadBody);
@@ -44,10 +47,11 @@ export const EditBody = (props: EditBodyProps) => {
   const user = useUserStore();
 
   const { mutateAsync: editThread } = useEditThreadMutation({
+    threadMsgId: thread.canvasMsgId,
     communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic.id!,
   });
 
   const cancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -97,6 +101,7 @@ export const EditBody = (props: EditBodyProps) => {
           newBody: JSON.stringify(contentDelta) || thread.body,
           newTitle: title || thread.title,
           threadId: thread.id,
+          threadMsgId: thread.canvasMsgId,
           authorProfile: user.activeAccount?.profile,
           address: user.activeAccount?.address || '',
           communityId: app.activeChainId() || '',
@@ -107,6 +112,7 @@ export const EditBody = (props: EditBodyProps) => {
         threadUpdatedCallback(title, newBody);
       } catch (err) {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         console.error(err?.responseJSON?.error || err?.message);

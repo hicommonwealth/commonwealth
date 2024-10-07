@@ -125,7 +125,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
       this._chainId = chainId;
       client.disconnect();
 
-      const decimals = getChainDecimals(app.chain.id || '', app.chain.base);
+      const decimals = getChainDecimals(app.chain?.id || '', app.chain?.base);
 
       try {
         await window.wallet.enable(this._chainId);

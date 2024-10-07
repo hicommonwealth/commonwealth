@@ -27,6 +27,7 @@ class LaunchpadBondingCurve extends ContractBase {
     this.launchpadFactoryAddress = launchpadFactoryAddress;
   }
 
+
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
@@ -38,19 +39,24 @@ class LaunchpadBondingCurve extends ContractBase {
     ) as unknown as Contract<typeof LaunchpadFactory>;
   }
 
-  async launchToken(name: string, symbol: string, walletAddress: string) {
+  async launchToken(
+    name: string,
+    symbol: string,
+    walletAddress: string,
+    chainId: string,
+  ) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
 
     const txReceipt = await launchToken(
       this.launchpadFactory,
       name,
       symbol,
-      [7000, 1250, 1500, 750], // 9181 parameters
+      [7000, 1250, 1000, 750], // 9181 parameters
       // should include at community treasury at [0] and contest creation util at [1] curr tbd
       [walletAddress, walletAddress],
-      1_000_000_000e18, // Default 1B tokens
+      this.web3.utils.toWei(1e9, 'ether'), // Default 1B tokens
       walletAddress,
     );
     return txReceipt;

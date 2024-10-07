@@ -1,0 +1,47 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - staging
+      - frick
+      - frack
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Heroku app name based on branch
+        id: set-heroku-app-name
+        run: |
+          BRANCH_NAME=${GITHUB_REF##*/}
+          case $BRANCH_NAME in
+            frick)
+              APP_NAME="commonwealth-frick"
+              ;;
+            frack)
+              APP_NAME="commonwealth-frack"
+              ;;
+            staging)
+              APP_NAME="commonwealth-beta"
+              ;;
+            demo)
+              APP_NAME="commonwealth-demo"
+              ;;
+            production)
+              APP_NAME="commonwealthapp"
+              ;;
+            *)
+              echo "Branch $BRANCH_NAME is not configured for deployment."
+              exit 1
+              ;;
+          esac
+          echo "HEROKU_APP_NAME=$APP_NAME" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v2
+
+      - name: Deploy to Heroku
+        run: |
+          chmod +x ./scripts/deploy-to-heroku.sh
+          ./scripts/deploy-to-heroku.sh "${{ secrets.HEROKU_EMAIL }}" "${{ secrets.HEROKU_API_TOKEN }}" "${{ env.HEROKU_APP_NAME }}"

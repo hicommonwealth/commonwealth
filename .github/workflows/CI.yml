@@ -12,9 +12,11 @@ env:
   USES_DOCKER_PGSQL: true
   PORT: 8080
   REDIS_URL: redis://localhost:6379
-  ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
   ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
   GITHUB_BASE_REF: ${{ github.base_ref }}
+  FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
   pull_request:
@@ -186,7 +188,7 @@ jobs:
       - name: Run serial e2e tests
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
-          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
 
       - name: Archive code coverage results
@@ -511,5 +513,3 @@ jobs:
         with:
           parallel-finished: true
           carryforward: "cosmos-devnet-test-coverage"
-
-

@@ -83,7 +83,6 @@ const Directory = () => {
       );
 
       notifySuccess('Updated community directory');
-      app.sidebarRedraw.emit('redraw');
     } catch {
       notifyError('Failed to update community directory!');
     } finally {

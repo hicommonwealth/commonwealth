@@ -18,13 +18,18 @@ const launchToken = async ({
   walletAddress,
 }: LaunchTokenProps) => {
   const launchPad = new LaunchpadBondingCurve(
-    '',
     commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
     commonProtocol.factoryContracts[ethChainId].launchpad,
+    '',
     chainRpc,
   );
 
-  return await launchPad.launchToken(name, symbol, walletAddress);
+  return await launchPad.launchToken(
+    name,
+    symbol,
+    walletAddress,
+    `${ethChainId}`,
+  );
 };
 
 const useLaunchTokenMutation = () => {

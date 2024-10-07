@@ -34,13 +34,10 @@ describe('Thread Patch Update', () => {
   const chain = 'ethereum';
 
   let adminJWT: string;
-  // the adminAddress with the chain and chain id prefix - this is used by canvas
-  let adminCanvasAddress: string;
   let adminAddress: string;
 
   let userJWT: string;
-  // the userAddress with the chain and chain id prefix - this is used by canvas
-  let canvasAddress: string;
+  let userDid: `did:${string}`;
   let userAddress: string;
   let userSession: {
     session: Session;
@@ -58,8 +55,7 @@ describe('Thread Patch Update', () => {
       'Alice',
     );
     {
-      adminCanvasAddress = adminRes.address;
-      adminAddress = adminCanvasAddress.split(':')[2];
+      adminAddress = adminRes.address;
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
         config.AUTH.JWT_SECRET,
@@ -79,8 +75,8 @@ describe('Thread Patch Update', () => {
       'Alice',
     );
     {
-      canvasAddress = userRes.address;
-      userAddress = canvasAddress.split(':')[2];
+      userAddress = userRes.address;
+      userDid = userRes.did;
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
         config.AUTH.JWT_SECRET,
@@ -108,7 +104,8 @@ describe('Thread Patch Update', () => {
     test('should update thread attributes as owner', async () => {
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: canvasAddress,
+        address: userAddress,
+        did: userDid,
         jwt: userJWT,
         title: 'test1',
         body: 'body1',
@@ -149,7 +146,8 @@ describe('Thread Patch Update', () => {
     test('should not allow non-admin to set pinned or spam', async () => {
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: canvasAddress,
+        address: userAddress,
+        did: userDid,
         jwt: userJWT,
         title: 'test2',
         body: 'body2',
@@ -192,7 +190,8 @@ describe('Thread Patch Update', () => {
       // non-admin creates thread
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: canvasAddress,
+        address: userAddress,
+        did: userDid,
         jwt: userJWT,
         title: 'test2',
         body: 'body1',

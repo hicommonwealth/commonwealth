@@ -1,7 +1,7 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { trpc } from 'client/scripts/utils/trpcClient';
-import { signComment } from 'controllers/server/sessions';
+import { signUpdateComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
 import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
@@ -13,24 +13,21 @@ import useFetchCommentsQuery from './fetchComments';
 interface EditCommentProps {
   profile: UserProfile;
   communityId: string;
-  parentCommentId: number | null;
-  threadId: number;
   commentId: number;
+  commentMsgId: string;
   updatedBody: string;
 }
 
 export const buildUpdateCommentInput = async ({
   profile,
   communityId,
-  parentCommentId,
-  threadId,
   commentId,
+  commentMsgId,
   updatedBody,
 }: EditCommentProps) => {
-  const canvasSignedData = await signComment(profile.address, {
-    thread_id: threadId,
+  const canvasSignedData = await signUpdateComment(profile.address, {
+    comment_id: commentMsgId,
     body: updatedBody,
-    parent_comment_id: parentCommentId,
   });
 
   return {

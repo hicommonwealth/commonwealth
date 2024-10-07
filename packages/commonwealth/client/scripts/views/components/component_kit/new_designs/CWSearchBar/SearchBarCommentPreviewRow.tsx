@@ -7,6 +7,7 @@ import { renderTruncatedHighlights } from '../../../react_quill_editor/highlight
 import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
 import { CWText } from '../../cw_text';
 
+import { getDecodedString } from '@hicommonwealth/shared';
 import './SearchBarCommentPreviewRow.scss';
 
 interface SearchBarCommentPreviewRowProps {
@@ -20,7 +21,7 @@ export const SearchBarCommentPreviewRow: FC<
 > = ({ searchResult, searchTerm, onSearchItemClick }) => {
   const navigate = useCommonNavigate();
 
-  const title = decodeURIComponent(searchResult.title);
+  const title = getDecodedString(searchResult.title);
   const content = searchResult.text;
 
   const handleClick = () => {

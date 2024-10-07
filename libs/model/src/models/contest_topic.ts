@@ -3,7 +3,8 @@ import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-type ContestTopic = ModelInstance<z.infer<typeof ContestTopicSchema>>;
+type ContestTopicAttributes = z.infer<typeof ContestTopicSchema>;
+type ContestTopic = ModelInstance<ContestTopicAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,

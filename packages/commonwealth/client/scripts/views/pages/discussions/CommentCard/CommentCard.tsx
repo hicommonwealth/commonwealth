@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 
 import {
@@ -15,7 +15,6 @@ import {
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
 import type Comment from 'models/Comment';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -117,25 +116,21 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  const { data: config } = useFetchConfigurationQuery();
-
-  const doVerify = useCallback(async () => {
+  useEffect(() => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
         comment.canvasSignedData,
       );
-      await verify(canvasSignedData);
-      setVerifiedCanvasSignedData(canvasSignedData);
-    } catch (err) {
-      // ignore invalid signed comments
+      if (!canvasSignedData) return;
+      verify(canvasSignedData)
+        .then(() => {
+          setVerifiedCanvasSignedData(canvasSignedData);
+        })
+        .catch(() => null);
+    } catch (error) {
+      // ignore errors or missing data
     }
   }, [comment.canvasSignedData]);
-
-  useEffect(() => {
-    if (!config?.enforceSessionKeys) return;
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    doVerify();
-  }, [config?.enforceSessionKeys, doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);

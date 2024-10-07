@@ -1,4 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
+import { command } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
@@ -19,7 +20,6 @@ export const trpcRouter = trpc.router({
     async (input, output) => {
       const { directory_page_enabled } = input;
       if (directory_page_enabled === undefined) return undefined;
-      // track directory page enabled/disabled events
       const event = directory_page_enabled
         ? MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_ENABLED
         : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
@@ -51,9 +51,41 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
-  createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
-    MixpanelCommunityInteractionEvent.CREATE_GROUP,
-  ]),
+  createGroup: trpc.command(
+    Community.CreateGroup,
+    trpc.Tag.Community,
+    [
+      MixpanelCommunityInteractionEvent.CREATE_GROUP,
+      (result) => ({ community: result.id }),
+    ],
+    async (_, output, ctx) => {
+      await command(Community.RefreshCommunityMemberships(), {
+        actor: ctx.actor,
+        payload: {
+          community_id: output.id!,
+          group_id: output.groups?.at(0)?.id,
+        },
+      });
+    },
+  ),
+  updateGroup: trpc.command(
+    Community.UpdateGroup,
+    trpc.Tag.Community,
+    [
+      MixpanelCommunityInteractionEvent.UPDATE_GROUP,
+      (result) => ({ community: result.community_id }),
+    ],
+    async (input, output, ctx) => {
+      if (input.requirements?.length || input.metadata?.required_requirements)
+        await command(Community.RefreshCommunityMemberships(), {
+          actor: ctx.actor,
+          payload: {
+            community_id: output.community_id!,
+            group_id: output.id,
+          },
+        });
+    },
+  ),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
@@ -67,4 +99,31 @@ export const trpcRouter = trpc.router({
     Community.UpdateCustomDomain,
     trpc.Tag.Community,
   ),
+  createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
+    MixpanelCommunityInteractionEvent.CREATE_TOPIC,
+    (result) => ({
+      community: result.topic.community_id,
+      userId: result.user_id,
+    }),
+  ]),
+  updateTopic: trpc.command(Community.UpdateTopic, trpc.Tag.Community, [
+    MixpanelCommunityInteractionEvent.UPDATE_TOPIC,
+    (result) => ({
+      community: result.topic.community_id,
+      userId: result.user_id,
+    }),
+  ]),
+  deleteTopic: trpc.command(Community.DeleteTopic, trpc.Tag.Community),
+  deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
+  deleteCommunity: trpc.command(Community.DeleteCommunity, trpc.Tag.Community),
+  refreshCommunityMemberships: trpc.command(
+    Community.RefreshCommunityMemberships,
+    trpc.Tag.Community,
+  ),
+  joinCommunity: trpc.command(Community.JoinCommunity, trpc.Tag.Community, [
+    MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+    (result) => ({
+      community: result.community_id,
+    }),
+  ]),
 });

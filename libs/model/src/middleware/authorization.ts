@@ -72,10 +72,21 @@ export class RejectedMember extends InvalidActor {
 /**
  * Builds authorization context
  *
- * @param actor command actor
- * @param payload command payload
- * @param auth authorization context
- * @param roles roles filter
+ * TODO: Keep developing this pattern for other entities!
+ * The idea is that authorized requests could include aggregate ids that should be pre-loaded
+ * and authorized by prefilling the authorization context.
+ *
+ * Currenlty, the waterfall is:
+ * by comment_id
+ *   or by thread_id
+       or by community_id (community_id or id)
+ *
+ * TODO: Find ways to cache() by args to avoid db trips
+ *
+ * @param ctx execution context
+ * @param roles community roles filter when authorizing specific roles
+ * @param collaborators flag to include thread collaborators when preloading threads
+ * @returns authorization context
  */
 async function buildAuth(
   ctx: Context<ZodSchema, AuthContext>,
@@ -86,80 +97,85 @@ async function buildAuth(
   if (!actor.address)
     throw new InvalidActor(ctx.actor, 'Must provide an address');
 
-  /*
-   * Address authorization conventions: => TODO: keep developing this pattern and encapsulate
-   *
-   * The idea is that authorized requests must include an entity id that can be mapped to
-   * a community (community_id), and optionally a topic (topic_id) for gating auth middleware.
-   *
-   * TODO: More efficient to just context cache the loaded entities right here
-   * instead of just adding (caching) the ids in the payload (add to actor?)
-   *
-   * TODO: Find ways to cache() by args to avoid db trips
-   *
-   * 1. Find by community_id when payload contains community_id or id
-   * 2. Find by thread_id when payload contains thread_id
-   * 3. Find by comment_id when payload contains comment_id
-   */
-  const auth: AuthContext = { address: null, is_author: false };
+  const { id, community_id, topic_id, thread_id, comment_id } = payload;
+  const auth: AuthContext = {
+    address: null,
+    is_author: false,
+    community_id: community_id || id,
+    topic_id,
+    thread_id,
+    comment_id,
+  };
   (ctx as { auth: AuthContext }).auth = auth;
 
-  auth.community_id =
-    ('community_id' in payload && payload.community_id) || payload.id;
-  auth.topic_id = 'topic_id' in payload && payload.topic_id;
-  if (!auth.community_id) {
-    auth.thread_id = 'thread_id' in payload && payload.thread_id;
-    if (!auth.thread_id) {
-      auth.comment_id = 'comment_id' in payload && payload.comment_id;
-      if (!auth.comment_id)
-        throw new InvalidInput('Must provide community, thread, or comment id');
-      auth.comment = await models.Comment.findOne({
-        where: { id: auth.comment_id },
-        include: [
-          {
-            model: models.Thread,
-            required: true,
-          },
-        ],
-      });
-      if (!auth.comment)
-        throw new InvalidInput('Must provide a valid comment id');
-      auth.community_id = auth.comment.Thread!.community_id;
-      auth.topic_id = auth.comment.Thread!.topic_id;
-      auth.thread_id = auth.comment.Thread!.id;
-      auth.author_address_id = auth.comment.address_id;
-    } else {
-      const include = collaborators
-        ? {
-            model: models.Address,
-            as: 'collaborators',
-            required: false,
-          }
-        : undefined;
-      auth.thread = await models.Thread.findOne({
-        where: { id: auth.thread_id },
-        include,
-      });
-      if (!auth.thread)
-        throw new InvalidInput('Must provide a valid thread id');
-      auth.community_id = auth.thread.community_id;
-      auth.topic_id = auth.thread.topic_id;
-      auth.author_address_id = auth.thread.address_id;
-    }
-  }
+  if (auth.comment_id) {
+    auth.comment = await models.Comment.findOne({
+      where: { id: auth.comment_id },
+      include: [
+        {
+          model: models.Thread,
+          required: true,
+        },
+      ],
+    });
+    if (!auth.comment)
+      throw new InvalidInput('Must provide a valid comment id');
+    auth.community_id = auth.comment.Thread!.community_id;
+    auth.topic_id = auth.comment.Thread!.topic_id;
+    auth.thread_id = auth.comment.Thread!.id;
+    auth.author_address_id = auth.comment.address_id;
+  } else if (auth.thread_id) {
+    const include = collaborators
+      ? {
+          model: models.Address,
+          as: 'collaborators',
+          required: false,
+        }
+      : undefined;
+    auth.thread = await models.Thread.findOne({
+      where: { id: auth.thread_id },
+      include,
+    });
+    if (!auth.thread) throw new InvalidInput('Must provide a valid thread id');
+    auth.community_id = auth.thread.community_id;
+    auth.topic_id = auth.thread.topic_id;
+    auth.author_address_id = auth.thread.address_id;
+  } else if (!auth.community_id)
+    throw new InvalidInput('Must provide a community id');
+
   auth.address = await models.Address.findOne({
     where: {
       user_id: actor.user.id,
       address: actor.address,
       community_id: auth.community_id,
       role: { [Op.in]: roles },
+      verified: { [Op.ne]: null },
+      // TODO: check verification token expiration
     },
     order: [['role', 'DESC']],
   });
-  if (!auth.address)
-    throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+  if (!auth.address) {
+    if (!actor.user.isAdmin)
+      throw new InvalidActor(actor, `User is not ${roles} in the community`);
+
+    // simulate non-member super admins
+    auth.address = await models.Address.findOne({
+      where: {
+        user_id: actor.user.id,
+        address: actor.address,
+      },
+    });
+    if (!auth.address)
+      throw new InvalidActor(actor, `Super admin address not found`);
+  }
 
   auth.is_author = auth.address!.id === auth.author_address_id;
+
+  // fire and forget address activity tracking
+  auth.address.last_active = new Date();
+  void auth.address.save();
+
   return auth;
 }
 
@@ -249,16 +265,19 @@ export const isSuperAdmin: AuthHandler = async (ctx) => {
  *
  * @param roles specific community roles - all by default
  * @param action specific group permission action
+ * @param author when true, rejects members that are not the author
  * @param collaborators authorize thread collaborators
  * @throws InvalidActor when not authorized
  */
 export function isAuthorized({
   roles = ['admin', 'moderator', 'member'],
   action,
+  author = false,
   collaborators = false,
 }: {
   roles?: Role[];
   action?: GroupPermissionAction;
+  author?: boolean;
   collaborators?: boolean;
 }): AuthHandler {
   return async (ctx) => {
@@ -291,7 +310,10 @@ export function isAuthorized({
       throw new InvalidActor(ctx.actor, 'Not authorized collaborator');
     }
 
+    if (author && auth.address?.role === 'member')
+      throw new InvalidActor(ctx.actor, 'Not authorized author');
+
     // at this point, the address is either a moderator or member
-    // without any action or collaboration requirements
+    // without any security requirements for action, author, or collaboration
   };
 }

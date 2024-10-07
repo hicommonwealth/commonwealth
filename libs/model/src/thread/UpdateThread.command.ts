@@ -10,13 +10,19 @@ import { z } from 'zod';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
-import type { ThreadAttributes, ThreadInstance } from '../models/thread';
 import {
+  ThreadAttributes,
+  ThreadInstance,
+  getThreadSearchVector,
+} from '../models/thread';
+import {
+  decodeContent,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
   quillToPlain,
   sanitizeQuillText,
+  uploadIfLarge,
 } from '../utils';
 
 export const UpdateThreadErrors = {
@@ -34,7 +40,7 @@ function getContentPatch(
     title,
     body,
     url,
-    canvas_hash,
+    canvas_msg_id,
     canvas_signed_data,
   }: z.infer<typeof schemas.UpdateThread.input>,
 ) {
@@ -43,14 +49,14 @@ function getContentPatch(
   typeof title !== 'undefined' && (patch.title = title);
 
   if (typeof body !== 'undefined' && thread.kind === 'discussion') {
-    patch.body = sanitizeQuillText(body);
-    patch.plaintext = quillToPlain(patch.body);
+    patch.body = decodeContent(body);
+    patch.plaintext = quillToPlain(sanitizeQuillText(body));
   }
 
   typeof url !== 'undefined' && thread.kind === 'link' && (patch.url = url);
 
   if (Object.keys(patch).length > 0) {
-    patch.canvas_hash = canvas_hash;
+    patch.canvas_msg_id = canvas_msg_id;
     patch.canvas_signed_data = canvas_signed_data;
   }
   return patch;
@@ -175,14 +181,10 @@ export function UpdateThread(): Command<
     ...schemas.UpdateThread,
     auth: [isAuthorized({ collaborators: true })],
     body: async ({ actor, payload, auth }) => {
-      const { address, topic_id } = mustBeAuthorizedThread(actor, auth);
-      const { thread_id, discord_meta } = payload;
-
-      // find by discord_meta first if present
-      const thread = await models.Thread.findOne({
-        where: discord_meta ? { discord_meta } : { id: thread_id },
-      });
-      if (!thread) throw new InvalidInput(UpdateThreadErrors.ThreadNotFound);
+      const { address, thread, thread_id } = mustBeAuthorizedThread(
+        actor,
+        auth,
+      );
 
       const content = getContentPatch(thread, payload);
       const adminPatch = getAdminOrModeratorPatch(actor, auth!, payload);
@@ -205,25 +207,37 @@ export function UpdateThread(): Command<
         collaboratorsPatch.remove.length > 0
       ) {
         const found = await models.ContestTopic.findOne({
-          where: { topic_id },
-          include: [
-            {
-              model: models.ContestManager,
-              required: true,
-            },
-          ],
+          where: { topic_id: thread.topic_id! },
         });
         if (found) throw new InvalidInput(UpdateThreadErrors.ContestLock);
       }
 
+      let contentUrl: string | null = thread.content_url ?? null;
+      if (content.body) {
+        const result = await uploadIfLarge('threads', content.body);
+        contentUrl = result.contentUrl;
+      }
+
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
+        const searchUpdate =
+          content.title || content.body
+            ? {
+                search: getThreadSearchVector(
+                  content.title || thread.title,
+                  content.body || thread.body || '',
+                ),
+              }
+            : {};
         await thread.update(
           {
+            // TODO: body should be set to truncatedBody once client renders content_url
             ...content,
             ...adminPatch,
             ...ownerPatch,
             last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
+            ...searchUpdate,
+            content_url: contentUrl,
           },
           { transaction },
         );
@@ -248,33 +262,34 @@ export function UpdateThread(): Command<
           });
         }
 
-        // TODO: we can encapsulate address activity in authorization middleware
-        address.last_active = new Date();
-        await address.save({ transaction });
-
         if (content.body) {
           const currentVersion = await models.ThreadVersionHistory.findOne({
             where: { thread_id },
             order: [['timestamp', 'DESC']],
             transaction,
           });
+          const decodedThreadVersionBody = currentVersion?.body
+            ? decodeContent(currentVersion?.body)
+            : '';
           // if the modification was different from the original body, create a version history for it
-          if (currentVersion?.body !== content.body) {
+          if (decodedThreadVersionBody !== content.body) {
             await models.ThreadVersionHistory.create(
               {
                 thread_id,
                 address: address.address,
+                // TODO: body should be set to truncatedBody once client renders content_url
                 body: content.body,
                 timestamp: new Date(),
+                content_url: contentUrl,
               },
               { transaction },
             );
             const mentions = findMentionDiff(
-              parseUserMentions(currentVersion?.body),
-              parseUserMentions(decodeURIComponent(content.body)),
+              parseUserMentions(decodedThreadVersionBody),
+              parseUserMentions(content.body),
             );
             mentions &&
-              (await emitMentions(models, transaction, {
+              (await emitMentions(transaction, {
                 authorAddressId: address.id!,
                 authorUserId: actor.user.id!,
                 authorAddress: address.address,
