@@ -1,10 +1,16 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import { AppError, logger } from '@hicommonwealth/core';
-import { getSaltedApiKeyHash, models } from '@hicommonwealth/model';
+import { AppError, cache, CacheNamespaces, logger } from '@hicommonwealth/core';
+import {
+  buildApiKeySaltCacheKey,
+  getSaltedApiKeyHash,
+  models,
+} from '@hicommonwealth/model';
+import { User } from '@hicommonwealth/schemas';
 import { NextFunction, Request, Response } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { RedisStore } from 'rate-limit-redis';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
@@ -32,48 +38,73 @@ export async function apiKeyAuthMiddleware(
   if (typeof addressHeader !== 'string')
     throw new AppError('Unauthorized', 401);
 
-  const addressInstance = await models.Address.findOne({
-    attributes: ['user_id'],
-    where: {
-      address: addressHeader,
-      verified: { [Op.ne]: null },
-    },
-    include: [
-      {
-        model: models.User,
-        required: true,
-        include: [
-          {
-            model: models.ApiKey,
-            required: true,
-          },
-        ],
+  let user: z.infer<typeof User> | undefined;
+  const salt = await cache().getKey(
+    CacheNamespaces.Api_key_auth,
+    buildApiKeySaltCacheKey(addressHeader),
+  );
+  if (salt) {
+    const hashedApiKey = getSaltedApiKeyHash(apiKey, salt);
+    const res = await cache().getKey(
+      CacheNamespaces.Api_key_auth,
+      hashedApiKey,
+    );
+    if (res) user = JSON.parse(res);
+  }
+
+  if (!user) {
+    const addressInstance = await models.Address.findOne({
+      attributes: ['user_id'],
+      where: {
+        address: addressHeader,
+        verified: { [Op.ne]: null },
       },
-    ],
-  });
-  if (!addressInstance || !addressInstance.user_id)
-    throw new AppError('Unauthorized', 401);
-  const address = addressInstance.get({ plain: true })!;
+      include: [
+        {
+          model: models.User,
+          required: true,
+          include: [
+            {
+              model: models.ApiKey,
+              required: true,
+            },
+          ],
+        },
+      ],
+    });
+    if (!addressInstance || !addressInstance.user_id)
+      throw new AppError('Unauthorized', 401);
+    const address = addressInstance.get({ plain: true })!;
 
-  const apiKeyRecord = address.User!.ApiKey!;
-  const hashedApiKey = getSaltedApiKeyHash(apiKey, apiKeyRecord.salt);
+    const apiKeyRecord = address.User!.ApiKey!;
+    const hashedApiKey = getSaltedApiKeyHash(apiKey, apiKeyRecord.salt);
 
-  if (hashedApiKey !== apiKeyRecord.hashed_api_key)
-    throw new AppError('Unauthorized', 401);
+    if (hashedApiKey !== apiKeyRecord.hashed_api_key)
+      throw new AppError('Unauthorized', 401);
 
-  const user = address.User!;
-  delete user.ApiKey;
+    user = address.User!;
+    delete user.ApiKey;
+
+    // cache for 2 minutes
+    await cache().setKeys(
+      CacheNamespaces.Api_key_auth,
+      {
+        [buildApiKeySaltCacheKey(addressHeader)]: apiKeyRecord.salt,
+        [hashedApiKey]: JSON.stringify(user),
+      },
+      120,
+    );
+  }
 
   req.user = models.User.build(user);
 
   // record access in background - best effort
-  apiKeyRecord.updated_at = new Date();
   void models.ApiKey.update(
     {
       updated_at: new Date(),
     },
     {
-      where: { user_id: apiKeyRecord.user_id },
+      where: { user_id: user.id! },
     },
   );
 
