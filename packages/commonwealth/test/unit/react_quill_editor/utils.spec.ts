@@ -24,12 +24,11 @@ describe('react quill editor unit tests', () => {
     });
 
     test('should convert text to delta (richtext) – bad input case', () => {
-      const text = null;
+      const text = '';
       const expectedDelta = {
         ops: [{ insert: '' }],
         ___isMarkdown: false,
       } as any as SerializableDeltaStatic;
-      // @ts-expect-error StrictNullChecks
       const result = createDeltaFromText(text);
       assert.deepEqual(result, expectedDelta);
     });
