@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { CreateGroupResponseTermsZero } from './CreateGroupResponseTermsZero';
+
 export const CreateGroupResponseTerms = core.serialization.undiscriminatedUnion(
   [CreateGroupResponseTermsZero, core.serialization.string()],
 );

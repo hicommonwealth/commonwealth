@@ -8,6 +8,7 @@ import { GetCommentsResponseResultsItemDiscordMeta } from './GetCommentsResponse
 import { GetCommentsResponseResultsItemReaction } from './GetCommentsResponseResultsItemReaction';
 import { GetCommentsResponseResultsItemSearch } from './GetCommentsResponseResultsItemSearch';
 import { GetCommentsResponseResultsItemThread } from './GetCommentsResponseResultsItemThread';
+
 export const GetCommentsResponseResultsItem = core.serialization.object({
   id: core.serialization.number().optional(),
   threadId: core.serialization.property(

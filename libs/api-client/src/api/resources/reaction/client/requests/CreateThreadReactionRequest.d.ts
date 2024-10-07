@@ -8,8 +8,8 @@
  *     }
  */
 export interface CreateThreadReactionRequest {
-    threadId: number;
-    threadMsgId?: string;
-    canvasSignedData?: string;
-    canvasMsgId?: string;
+  threadId: number;
+  threadMsgId?: string;
+  canvasSignedData?: string;
+  canvasMsgId?: string;
 }

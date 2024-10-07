@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { GetCommentsResponseResultsItemThreadDiscordMetaUser } from './GetCommentsResponseResultsItemThreadDiscordMetaUser';
+
 export const GetCommentsResponseResultsItemThreadDiscordMeta =
   core.serialization.object({
     user: GetCommentsResponseResultsItemThreadDiscordMetaUser,

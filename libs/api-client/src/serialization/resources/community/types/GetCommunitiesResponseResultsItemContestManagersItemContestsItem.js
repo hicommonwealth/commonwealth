@@ -4,6 +4,7 @@
 import * as core from '../../../../core';
 import { GetCommunitiesResponseResultsItemContestManagersItemContestsItemActionsItem } from './GetCommunitiesResponseResultsItemContestManagersItemContestsItemActionsItem';
 import { GetCommunitiesResponseResultsItemContestManagersItemContestsItemScoreItem } from './GetCommunitiesResponseResultsItemContestManagersItemContestsItemScoreItem';
+
 export const GetCommunitiesResponseResultsItemContestManagersItemContestsItem =
   core.serialization.object({
     contestAddress: core.serialization.property(
