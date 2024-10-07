@@ -269,6 +269,7 @@ export class Thread implements IUniqueId {
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
+  public contentUrl: string | null;
 
   public readonly profile: UserProfile;
 
@@ -323,6 +324,7 @@ export class Thread implements IUniqueId {
     associatedContests,
     recentComments,
     ContestActions,
+    content_url,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -370,6 +372,7 @@ export class Thread implements IUniqueId {
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
     ContestActions: ContestActionT[];
+    content_url: string | null;
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
@@ -434,6 +437,7 @@ export class Thread implements IUniqueId {
       associatedContests,
       ContestActions,
     );
+    this.contentUrl = content_url;
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({

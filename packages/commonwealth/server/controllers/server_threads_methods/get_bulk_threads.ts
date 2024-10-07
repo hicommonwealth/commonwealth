@@ -118,7 +118,7 @@ export async function __getBulkThreads(
             ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
         ),
         top_threads AS (
-        SELECT id, title, url, body, kind, stage, read_only, discord_meta,
+        SELECT id, title, url, body, kind, stage, read_only, discord_meta, content_url,
             pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
             has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
             marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
