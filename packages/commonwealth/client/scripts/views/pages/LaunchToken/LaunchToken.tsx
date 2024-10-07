@@ -25,6 +25,8 @@ const LaunchToken = () => {
     setDraftTokenInfo,
     createdCommunityId,
     setCreatedCommunityId,
+    isTokenLaunched,
+    setIsTokenLaunched,
   } = useCreateCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -69,6 +71,7 @@ const LaunchToken = () => {
               onChangeStep(true);
             }}
             tokenInfo={draftTokenInfo}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.SignatureLaunch:
@@ -81,7 +84,9 @@ const LaunchToken = () => {
             createdCommunityId={createdCommunityId}
             baseNode={baseNode}
             tokenInfo={draftTokenInfo}
-            goToSuccessStep={() => {
+            goToSuccessStep={(isLaunched) => {
+              setIsTokenLaunched(isLaunched);
+
               onChangeStep(true);
             }}
             selectedAddress={selectedAddress}
@@ -91,7 +96,12 @@ const LaunchToken = () => {
         // this condition will never be triggered, adding this to avoid typescript errors
         if (!createdCommunityId) return <></>;
 
-        return <SuccessStep communityId={createdCommunityId} withToken />;
+        return (
+          <SuccessStep
+            communityId={createdCommunityId}
+            withToken={isTokenLaunched}
+          />
+        );
     }
   };
 

@@ -14,10 +14,13 @@ const useCreateCommunity = () => {
   ) as NodeInfo; // this is expected to exist
 
   const [createTokenCommunityStep, setCreateTokenCommunityStep] =
-    useState<CreateTokenCommunityStep>(CreateTokenCommunityStep.Success);
+    useState<CreateTokenCommunityStep>(
+      CreateTokenCommunityStep.TokenInformation,
+    );
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>();
   const [draftTokenInfo, setDraftTokenInfo] = useState<TokenInfo>();
   const [createdCommunityId, setCreatedCommunityId] = useState<string>();
+  const [isTokenLaunched, setIsTokenLaunched] = useState(false);
 
   const onChangeStep = (forward: boolean) => {
     handleChangeStep(
@@ -37,6 +40,8 @@ const useCreateCommunity = () => {
     setDraftTokenInfo,
     createdCommunityId,
     setCreatedCommunityId,
+    isTokenLaunched,
+    setIsTokenLaunched,
   };
 };
 
