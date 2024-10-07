@@ -18,8 +18,10 @@ const SidebarHeader = ({
 }) => {
   const navigate = useCommonNavigate();
 
+  const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId()!,
+    id: communityId,
+    enabled: !!communityId,
   });
 
   return (

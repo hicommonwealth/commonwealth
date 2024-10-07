@@ -2,7 +2,6 @@ import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import AddressInfo from 'models/AddressInfo';
 import React from 'react';
 import {
   BaseMixpanelPayload,
@@ -26,14 +25,12 @@ interface CommunityInformationStepProps {
   handleGoBack: () => void;
   handleContinue: (communityId: string) => void;
   tokenInfo?: TokenInfo;
-  selectedAddress?: AddressInfo;
 }
 
 const CommunityInformationStep = ({
   handleGoBack,
   handleContinue,
   tokenInfo,
-  selectedAddress,
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -60,12 +57,6 @@ const CommunityInformationStep = ({
   const handleSubmit = async (
     values: CommunityInformationFormSubmitValues & { communityId: string },
   ) => {
-    // this condition will never be fulfilled but adding this to avoid typescript errors
-    if (!selectedAddress) {
-      notifyError('No address selected');
-      return;
-    }
-
     const nodes = fetchCachedNodes();
     const baseNode = nodes?.find(
       (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
@@ -83,9 +74,7 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        userAddress: selectedAddress.address,
         chainNodeId: baseNode.id,
-        isPWA: isAddedToHomeScreen,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId);

@@ -68,7 +68,6 @@ const LaunchToken = () => {
               onChangeStep(true);
             }}
             tokenInfo={draftTokenInfo}
-            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.SignatureLaunch:

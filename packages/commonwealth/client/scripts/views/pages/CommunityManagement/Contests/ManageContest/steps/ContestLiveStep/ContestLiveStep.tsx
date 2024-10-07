@@ -16,12 +16,14 @@ interface ContestLiveStepProps {
   createdContestAddress: string;
   isFarcasterContest: boolean;
   fundingTokenTicker: string;
+  fundingTokenAddress: string;
 }
 
 const ContestLiveStep = ({
   createdContestAddress,
   isFarcasterContest,
   fundingTokenTicker,
+  fundingTokenAddress,
 }: ContestLiveStepProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -69,6 +71,7 @@ const ContestLiveStep = ({
         isOpen={isDrawerOpen}
         contestAddress={createdContestAddress}
         fundingTokenTicker={fundingTokenTicker}
+        fundingTokenAddress={fundingTokenAddress}
       />
     </>
   );

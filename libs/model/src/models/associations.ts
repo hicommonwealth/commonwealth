@@ -10,7 +10,9 @@ export const buildAssociations = (db: DB) => {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Wallets);
+    .withMany(db.Wallets)
+    .withMany(db.XpLog, { onDelete: 'CASCADE' })
+    .withOne(db.ApiKey, { onDelete: 'CASCADE' });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
