@@ -27,7 +27,6 @@ class LaunchpadBondingCurve extends ContractBase {
     this.launchpadFactoryAddress = launchpadFactoryAddress;
   }
 
-
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
