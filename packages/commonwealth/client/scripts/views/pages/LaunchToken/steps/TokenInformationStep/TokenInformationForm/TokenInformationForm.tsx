@@ -1,5 +1,4 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
-import { notifyError } from 'controllers/app/notifications';
+import { ChainBase } from '@hicommonwealth/shared';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -9,9 +8,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
-import { useLaunchTokenMutation } from 'state/api/launchPad';
-import { fetchCachedNodes } from 'state/api/nodes';
-import { useCreateTokenMutation, useFetchTokensQuery } from 'state/api/token';
+import { useFetchTokensQuery } from 'state/api/token';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import {
@@ -60,16 +57,6 @@ const TokenInformationForm = ({
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const { trackAnalytics } = useBrowserAnalyticsTrack<
-    MixpanelLoginPayload | BaseMixpanelPayload
-  >({
-    onAction: true,
-  });
-
-  const { mutateAsync: launchToken } = useLaunchTokenMutation();
-
-  const { mutateAsync: createToken } = useCreateTokenMutation();
-
   const debouncedSearchTerm = useDebounce<string | undefined>(tokenName, 500);
 
   const { data: tokensList } = useFetchTokensQuery({
@@ -88,6 +75,12 @@ const TokenInformationForm = ({
         )
       : false;
 
+  const { trackAnalytics } = useBrowserAnalyticsTrack<
+    MixpanelLoginPayload | BaseMixpanelPayload
+  >({
+    onAction: true,
+  });
+
   const openAddressSelectionModal = useCallback(() => {
     if (selectedAddress) {
       setIsAuthModalOpen(false);
@@ -104,7 +97,7 @@ const TokenInformationForm = ({
   });
 
   const handleSubmit = useCallback(
-    async (values: FormSubmitValues) => {
+    (values: FormSubmitValues) => {
       if (isTokenNameTaken) return;
 
       // get address from user
@@ -114,45 +107,9 @@ const TokenInformationForm = ({
         return;
       }
 
-      // get base chain node info
-      const nodes = fetchCachedNodes();
-      const baseNode = nodes?.find(
-        (n) => n.ethChainId === commonProtocol.ValidChains.Base,
-      );
-      if (!baseNode || !baseNode.ethChainId) {
-        notifyError('Could not find base chain node');
-        return;
-      }
-
-      // call endpoint
-      const payload = {
-        chainRpc: baseNode.url,
-        ethChainId: baseNode.ethChainId,
-        name: values.tokenName.trim(),
-        symbol: values.tokenTicker.trim(),
-        walletAddress: selectedAddress.address,
-      };
-      await launchToken(payload).catch(console.error);
-
-      await createToken({
-        base: ChainBase.Ethereum,
-        chain_node_id: baseNode.id,
-        name: payload.name,
-        symbol: payload.symbol,
-        icon_url: values?.tokenImageURL?.trim(),
-        description: values?.tokenDescription?.trim(),
-      });
-
-      onSubmit(values);
+      onSubmit(values); // token gets created with signature step, this info is only used to generate community details
     },
-    [
-      isTokenNameTaken,
-      openAddressSelectionModal,
-      selectedAddress,
-      onSubmit,
-      launchToken,
-      createToken,
-    ],
+    [isTokenNameTaken, openAddressSelectionModal, selectedAddress, onSubmit],
   );
 
   useEffect(() => {
