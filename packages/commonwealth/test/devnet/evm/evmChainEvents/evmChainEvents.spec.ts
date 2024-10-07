@@ -33,7 +33,8 @@ import {
   ContractSources,
   EvmSource,
 } from '../../../../server/workers/evmChainEvents/types';
-import { localRpc } from './util';
+
+const localRpc = 'http://localhost:8545';
 
 const namespaceDeployedLog = {
   address: '0xd8a357847caba76133d5f2cb51317d3c74609710',
