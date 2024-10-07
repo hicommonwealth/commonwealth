@@ -1,5 +1,6 @@
 import {
   Comment,
+  FarcasterAction,
   FarcasterCast,
   PG_INT,
   Reaction,
@@ -258,4 +259,6 @@ export const FarcasterReplyCastCreated = FarcasterCast.describe(
   'When a reply is posted to a farcaster contest cast',
 );
 
-export const FarcasterVoteCreated = z.any();
+export const FarcasterVoteCreated = FarcasterAction.extend({
+  contest_address: z.string(),
+}).describe('When a farcaster action is initiated on a cast reply');

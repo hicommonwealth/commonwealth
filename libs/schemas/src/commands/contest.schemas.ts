@@ -128,6 +128,24 @@ export const FarcasterCast = z.object({
   event_timestamp: z.string(),
 });
 
+export const FarcasterAction = z.object({
+  untrustedData: z.object({
+    fid: z.number(),
+    url: z.string().url(),
+    messageHash: z.string(),
+    timestamp: z.number(),
+    network: z.number(),
+    buttonIndex: z.number(),
+    castId: z.object({
+      fid: z.number(),
+      hash: z.string(),
+    }),
+  }),
+  trustedData: z.object({
+    messageBytes: z.string(),
+  }),
+});
+
 export const FarcasterCastCreatedWebhook = {
   input: z.object({
     created_at: z.number(),
@@ -140,8 +158,24 @@ export const FarcasterCastCreatedWebhook = {
 };
 
 export const FarcasterUpvoteAction = {
-  input: z.any(),
+  input: z.object({
+    untrustedData: z.object({
+      fid: z.number(),
+      url: z.string().url(),
+      messageHash: z.string(),
+      timestamp: z.number(),
+      network: z.number(),
+      buttonIndex: z.number(),
+      castId: z.object({
+        fid: z.number(),
+        hash: z.string(),
+      }),
+    }),
+    trustedData: z.object({
+      messageBytes: z.string(),
+    }),
+  }),
   output: z.object({
-    msg: z.string(),
+    message: z.string(),
   }),
 };

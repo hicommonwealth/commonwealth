@@ -73,13 +73,6 @@ export const GetThreadContestManagers = {
   ),
 };
 
-export const FarcasterAction = {
-  input: z.object({
-    contest_address: z.string(),
-  }),
-  output: z.void(),
-};
-
 export const GetFarcasterUpvoteActionMetadata = {
   input: z.any(),
   output: z.object({

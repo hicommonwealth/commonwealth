@@ -3,6 +3,7 @@ import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { mustExist } from '../middleware/guards';
+import { buildFarcasterContentUrl } from '../utils/buildFarcasterContentUrl';
 import { buildFarcasterWebhookName } from '../utils/buildFarcasterWebhookName';
 import { createOnchainContestContent } from './utils';
 
@@ -22,6 +23,9 @@ export function FarcasterWorker(): Policy<typeof inputs> {
     body: {
       FarcasterCastCreated: async ({ payload }) => {
         const frame_url = new URL(payload.embeds[0].url).pathname;
+        const contest_address = frame_url
+          .split('/')
+          .find((str) => str.startsWith('0x'));
 
         const contestManager = await models.ContestManager.findOne({
           where: {
@@ -31,7 +35,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             ended: {
               [Op.not]: true,
             },
-            farcaster_frame_url: frame_url,
+            contest_address,
           },
         });
         mustExist('Contest Manager', contestManager);
@@ -113,7 +117,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         mustExist('Contest Topic', contestTopic);
 
         // create onchain content from reply cast
-        const content_url = `/farcaster/${payload.hash}`;
+        const content_url = buildFarcasterContentUrl(payload.hash);
         await createOnchainContestContent({
           community_id: contestManager.community_id,
           topic_id: contestTopic.topic_id,
@@ -121,7 +125,34 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           content_url,
         });
       },
-      FarcasterVoteCreated: async ({ payload }) => {},
+      FarcasterVoteCreated: async ({ payload }) => {
+        const contestManager = await models.ContestManager.findOne({
+          where: {
+            cancelled: {
+              [Op.not]: true,
+            },
+            ended: {
+              [Op.not]: true,
+            },
+            contest_address: payload.contest_address,
+          },
+        });
+        mustExist('Contest Manager', contestManager);
+
+        const contestTopic = await models.ContestTopic.findOne({
+          where: {
+            contest_address: contestManager.contest_address,
+          },
+        });
+        mustExist('Contest Topic', contestTopic);
+
+        await createOnchainContestContent({
+          community_id: contestManager.community_id,
+          topic_id: contestTopic.topic_id,
+          author_address: payload.author.custody_address,
+          content_url,
+        });
+      },
     },
   };
 }

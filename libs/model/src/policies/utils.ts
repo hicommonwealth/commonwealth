@@ -28,7 +28,6 @@ export async function createOnchainContestContent(payload: {
 
   const addressesToProcess = activeContestManagers
     .filter((c) => {
-      console.log('ACTIONS:', c.actions);
       // if a projection exists with the same content url, don't add it onchain again
       const duplicatePosts = c.actions.filter(
         (action) =>
