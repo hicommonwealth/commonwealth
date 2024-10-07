@@ -8,6 +8,9 @@ import {
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import './ToolbarForMobile.scss';
 
 type ToolbarForMobileProps = Readonly<{
@@ -24,6 +27,8 @@ type ToolbarForMobileProps = Readonly<{
 
 export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
   const { SubmitButton, focus, onImage } = props;
+
+  const headingsPopoverProps = usePopover();
 
   const adjustForKeyboard = useCallback(() => {
     if (!window.visualViewport) {
@@ -54,20 +59,71 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
     (event: React.MouseEvent) => {
       event.stopPropagation();
 
-      focus?.();
+      console.log('FIXME 101: preventKeyboardDeactivation');
+
+      if (focus) {
+        console.log('FIXME: calling focus');
+        focus?.();
+      } else {
+        console.warn('No focus');
+      }
     },
     [focus],
   );
+  //
+  // const handleKeyboardFocusForBody = useCallback(() => {
+  //   console.log('FIXME102: handleKeyboardFocusForBody');
+  //
+  //   setTimeout(() => {
+  //     console.log('FIXME103: handleKeyboardFocusForBody');
+  //   }, 0);
+  //
+  // }, []);
+  //
+  // useEffect(() => {
+  //   window.addEventListener('mousedown', handleKeyboardFocusForBody, {capture: true});
+  //
+  //   return () => {
+  //     window.removeEventListener('mousedown', handleKeyboardFocusForBody, {capture: true});
+  //   };
+  // }, [handleKeyboardFocusForBody]);
 
   return (
     <div
       className="ToolbarForMobile"
-      onClick={preventKeyboardDeactivation}
+      // onClick={preventKeyboardDeactivation}
       onMouseDown={preventKeyboardDeactivation}
+      onPointerDown={preventKeyboardDeactivation}
+      onMouseDownCapture={preventKeyboardDeactivation}
     >
-      <div className="mdxeditor-block-type-select">
+      {/*<Select*/}
+      {/*  selected="asdf"*/}
+      {/*  options={[*/}
+      {/*    {*/}
+      {/*      id: '1',*/}
+      {/*      label: '1',*/}
+      {/*    },*/}
+      {/*  ]}*/}
+      {/*></Select>*/}
+
+      <div
+        className="mdxeditor-block-type-select"
+        onClick={() => console.log('click')}
+      >
         <BlockTypeSelect />
       </div>
+
+      <button onClick={headingsPopoverProps.handleInteraction}>headings</button>
+
+      <CWPopover
+        body={
+          <div>
+            <BoldItalicUnderlineToggles />
+          </div>
+        }
+        {...headingsPopoverProps}
+      />
+
       {/*<UndoRedo />*/}
       <BoldItalicUnderlineToggles />
       <CreateLink />

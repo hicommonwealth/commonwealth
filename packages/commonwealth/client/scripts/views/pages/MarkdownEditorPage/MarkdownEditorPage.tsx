@@ -8,9 +8,9 @@ import {
 
 import './MarkdownEditorPage.scss';
 
+import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
 import overview from 'views/components/MarkdownEditor/markdown/editor_overview.md?raw';
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
-import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
 import { useMarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 
 function useParams() {

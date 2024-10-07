@@ -284,6 +284,8 @@ export const MarkdownEditor = memo(function MarkdownEditor(
   const doFocus = useCallback(() => {
     if (mdxEditorRef.current) {
       mdxEditorRef.current.focus();
+    } else {
+      console.warn('No markdown editor ref');
     }
   }, []);
 
