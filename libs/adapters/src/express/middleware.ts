@@ -1,14 +1,5 @@
-import {
-  AnalyticsOptions,
-  INVALID_ACTOR_ERROR,
-  INVALID_INPUT_ERROR,
-  User,
-  analytics,
-  config,
-  stats,
-} from '@hicommonwealth/core';
+import { AnalyticsOptions, User, analytics, stats } from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
-import { BadRequest, InternalServerError, Unauthorized } from './http';
 
 /**
  * Captures traffic and latency
@@ -33,42 +24,6 @@ export const statsMiddleware = (
     console.error(err); // don't use logger port here
   }
   next();
-};
-
-/**
- * Express error response handler
- */
-export const errorMiddleware = (
-  error: Error,
-  _: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
-  console.error(error); // don't use logger port here
-  if (res.headersSent) return next(error);
-
-  let response = InternalServerError(
-    typeof error === 'string' ? error : 'Oops, something went wrong!',
-  );
-  if (error instanceof Error) {
-    const { name, message, stack } = error;
-    switch (name) {
-      case INVALID_INPUT_ERROR:
-        response = BadRequest(message, 'details' in error && error.details);
-        break;
-
-      case INVALID_ACTOR_ERROR:
-        response = Unauthorized(message);
-        break;
-
-      default:
-        response = InternalServerError(
-          message,
-          config.NODE_ENV !== 'production' ? stack : undefined,
-        );
-    }
-  }
-  res.status(response.status).send(response);
 };
 
 /**

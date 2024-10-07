@@ -11,6 +11,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     })
     .withMany(db.Wallets)
+    .withMany(db.XpLog, { onDelete: 'CASCADE' })
     .withOne(db.ApiKey, {
       targetKey: 'id',
       onDelete: 'CASCADE',
