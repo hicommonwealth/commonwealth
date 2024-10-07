@@ -1,4 +1,3 @@
-import { delay } from '@hicommonwealth/shared';
 import { config } from '../config';
 import { logger, rollbar } from '../logging';
 import { ExitCode } from './enums';
@@ -71,8 +70,9 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     }
 
     // validate key at runtime to prevent confusing keys e.g.
-    // key = 'S3' for R2 adapter
-    if (options.key) {
+    // key = 'S3' for R2 adapter.
+    // skip key checks during tests to allow mocking adapters with specific keys
+    if (options.key && config.NODE_ENV !== 'test') {
       const parts = options.key.split('.');
       if (parts.length !== 3) throw InvalidKey(options.key);
       if (parts[0] !== factory.name) throw InvalidKey(options.key);
@@ -144,7 +144,7 @@ const disposeAndExit = async (
 ): Promise<void> => {
   // don't kill process when errors are caught in production
   if (code === 'ERROR' && config.NODE_ENV === 'production') {
-    if (forceExit) await delay(1_000);
+    if (forceExit) await new Promise((resolve) => setTimeout(resolve, 1_000));
     else return;
   }
 

@@ -1,5 +1,10 @@
-import { EventPairs, logger } from '@hicommonwealth/core';
-import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
+import { blobStorage, EventPairs, logger } from '@hicommonwealth/core';
+import {
+  getThreadUrl,
+  safeTruncateBody,
+  type AbiType,
+} from '@hicommonwealth/shared';
+import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
 import {
   Model,
@@ -8,9 +13,10 @@ import {
   Sequelize,
   Transaction,
 } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 import { isAddress } from 'web3-validator';
 import { config } from '../config';
-import { OutboxAttributes } from '../models';
+import type { OutboxAttributes } from '../models/outbox';
 
 const log = logger(import.meta);
 
@@ -198,4 +204,44 @@ export function getChainNodeUrl({
   if (!private_url || private_url === '')
     return buildChainNodeUrl(url, 'public');
   return buildChainNodeUrl(private_url, 'private');
+}
+
+export const R2_ADAPTER_KEY = 'blobStorageFactory.R2BlobStorage.Main';
+
+/**
+ * Limits content in the Threads.body and Comments.text columns to 2k characters (2kB)
+ * Anything over this character limit is stored in Cloudflare R2.
+ * 55% of threads and 90% of comments are shorter than this.
+ * Anything over 2kB is TOASTed by Postgres so this limit prevents TOAST.
+ */
+const CONTENT_CHAR_LIMIT = 2_000;
+
+/**
+ * Uploads content to the appropriate R2 bucket if the content exceeds the
+ * preview limit (CONTENT_CHAR_LIMIT),
+ */
+export async function uploadIfLarge(
+  type: 'threads' | 'comments',
+  content: string,
+): Promise<{
+  contentUrl: string | null;
+  truncatedBody: string | null;
+}> {
+  if (content.length > CONTENT_CHAR_LIMIT) {
+    const { url } = await blobStorage({
+      key: R2_ADAPTER_KEY,
+    }).upload({
+      key: `${uuidv4()}.md`,
+      bucket: type,
+      content: content,
+      contentType: 'text/markdown',
+    });
+    return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
+  } else return { contentUrl: null, truncatedBody: null };
+}
+
+export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
+  return createHash('sha256')
+    .update(apiKey + salt)
+    .digest('hex');
 }

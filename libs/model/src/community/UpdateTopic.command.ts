@@ -4,7 +4,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '..';
 import { AuthContext, isAuthorized } from '../middleware';
 import { mustBeAuthorized, mustExist } from '../middleware/guards';
-import { sanitizeQuillText } from '../utils';
+import { decodeContent, sanitizeQuillText } from '../utils';
 
 const Errors = {
   DefaultTemplateRequired: 'Default Template required',
@@ -32,6 +32,8 @@ export function UpdateTopic(): Command<
         featured_in_new_post,
       } = payload;
 
+      const decodedDescription = decodeContent(description ?? '');
+
       let default_community_template =
         payload.default_offchain_template?.trim();
       if (featured_in_new_post && !default_community_template) {
@@ -45,8 +47,8 @@ export function UpdateTopic(): Command<
       if (typeof name !== 'undefined') {
         topic.name = name;
       }
-      if (typeof description !== 'undefined') {
-        topic.description = description;
+      if (typeof decodedDescription !== 'undefined') {
+        topic.description = decodedDescription;
       }
       if (typeof telegram !== 'undefined') {
         topic.telegram = telegram || '';

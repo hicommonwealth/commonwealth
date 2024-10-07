@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
 import Address from './address';
+import ApiKey from './api_key';
 import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
@@ -42,9 +43,11 @@ import User from './user';
 import Vote from './vote';
 import Wallets from './wallets';
 import Webhook from './webhook';
+import XpLog from './xp_log';
 
 export const Factories = {
   Address,
+  ApiKey,
   ChainNode,
   Collaboration,
   Comment,
@@ -85,6 +88,7 @@ export const Factories = {
   Vote,
   Webhook,
   Wallets,
+  XpLog,
 };
 
 export type DB = {

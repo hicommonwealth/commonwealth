@@ -1,7 +1,7 @@
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import { linkExistingAddressToChainOrCommunity } from 'client/scripts/controllers/app/login';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { initAppState } from 'state';
+import useUserStore from '../../ui/user';
 
 interface CreateCommunityProps {
   id: string;
@@ -11,8 +11,6 @@ interface CreateCommunityProps {
   description: string;
   iconUrl: string;
   socialLinks: string[];
-  userAddress: string;
-  isPWA?: boolean;
   tokenName?: string;
 }
 
@@ -23,7 +21,6 @@ export const buildCreateCommunityInput = ({
   description,
   iconUrl,
   socialLinks,
-  userAddress,
   tokenName,
   chainNodeId,
 }: CreateCommunityProps) => {
@@ -35,7 +32,6 @@ export const buildCreateCommunityInput = ({
     description,
     icon_url: iconUrl,
     social_links: socialLinks,
-    user_address: userAddress,
     type: ChainType.Offchain,
     default_symbol: nameToSymbol,
     token_name: tokenName,
@@ -44,15 +40,10 @@ export const buildCreateCommunityInput = ({
 };
 
 const useCreateCommunityMutation = () => {
+  const user = useUserStore();
   return trpc.community.createCommunity.useMutation({
-    onSuccess: async (output) => {
-      if (output.admin_address) {
-        await linkExistingAddressToChainOrCommunity(
-          output.admin_address,
-          output.community.id,
-          output.community.id,
-        );
-      }
+    onSuccess: async () => {
+      user.setData({ addressSelectorSelectedAddress: undefined });
       await initAppState(false);
     },
   });

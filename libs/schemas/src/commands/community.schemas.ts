@@ -6,9 +6,16 @@ import {
   ChainType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, Group, StakeTransaction, Topic } from '../entities';
+import {
+  Community,
+  Group,
+  Requirement,
+  StakeTransaction,
+  Topic,
+} from '../entities';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -35,7 +42,6 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
-    user_address: z.string(), // why not use actor's address?
 
     // hidden optional params
     token_name: z.string().optional(),
@@ -210,6 +216,34 @@ export const DeleteTopic = {
   }),
 };
 
+const GroupMetadata = z.object({
+  name: z.string(),
+  description: z.string(),
+  required_requirements: PG_INT.nullish(),
+  membership_ttl: PG_INT.optional(),
+});
+
+export const CreateGroup = {
+  input: z.object({
+    community_id: z.string(),
+    metadata: GroupMetadata,
+    requirements: z.array(Requirement).optional(),
+    topics: z.array(PG_INT).optional(),
+  }),
+  output: Community.extend({ groups: z.array(Group).optional() }).partial(),
+};
+
+export const UpdateGroup = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT,
+    metadata: GroupMetadata.optional(),
+    requirements: z.array(Requirement).optional(),
+    topics: z.array(PG_INT).optional(),
+  }),
+  output: Group.partial(),
+};
+
 export const DeleteGroup = {
   input: z.object({
     community_id: z.string(),
@@ -218,5 +252,40 @@ export const DeleteGroup = {
   output: z.object({
     community_id: z.string(),
     group_id: PG_INT,
+  }),
+};
+
+export const DeleteCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+  }),
+};
+
+export const RefreshCommunityMemberships = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT.optional(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    created: z.number(),
+    updated: z.number(),
+  }),
+};
+
+export const JoinCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    address_id: z.number(),
+    address: z.string(),
+    wallet_id: z.nativeEnum(WalletId).optional(),
+    ss58Prefix: z.number().optional(),
   }),
 };
