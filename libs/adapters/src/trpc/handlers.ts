@@ -2,6 +2,7 @@ import {
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  INVALID_STATE_ERROR,
   command as coreCommand,
   query as coreQuery,
   handleEvent,
@@ -18,6 +19,7 @@ const trpcerror = (error: unknown): TRPCError => {
     const { name, message, ...other } = error;
     switch (name) {
       case INVALID_INPUT_ERROR:
+      case INVALID_STATE_ERROR:
         return new TRPCError({ code: 'BAD_REQUEST', message, ...other });
 
       case INVALID_ACTOR_ERROR:

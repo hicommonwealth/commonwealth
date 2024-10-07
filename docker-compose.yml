@@ -51,8 +51,8 @@ services:
       - with-app
     container_name: commonwealth
     build:
-      context: . # Assuming Dockerfile is in the same directory as this docker-compose.yml
-      dockerfile: Dockerfile # Name of the Dockerfile
+      context: .
+      dockerfile: ./Dockerfile.web
     ports:
       - '8080:8080'
     environment:

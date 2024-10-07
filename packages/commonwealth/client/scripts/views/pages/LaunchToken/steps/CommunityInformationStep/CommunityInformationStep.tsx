@@ -23,7 +23,7 @@ import { generateCommunityNameFromToken } from './utils';
 
 interface CommunityInformationStepProps {
   handleGoBack: () => void;
-  handleContinue: () => void;
+  handleContinue: (communityId: string) => void;
   tokenInfo?: TokenInfo;
 }
 
@@ -59,7 +59,7 @@ const CommunityInformationStep = ({
   ) => {
     const nodes = fetchCachedNodes();
     const baseNode = nodes?.find(
-      (n) => n.ethChainId === commonProtocol.ValidChains.Base,
+      (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
     );
     if (!baseNode || !baseNode.ethChainId) {
       notifyError('Could not find base chain node');
@@ -74,11 +74,10 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        chainNodeId: baseNode.ethChainId,
-        tokenName: tokenInfo?.name || '',
+        chainNodeId: baseNode.id,
       });
       await createCommunityMutation(input);
-      handleContinue();
+      handleContinue(values.communityId);
     } catch (err) {
       notifyError(err.message);
     }

@@ -1,4 +1,11 @@
-import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import {
+  AppError,
+  InvalidActor,
+  InvalidInput,
+  InvalidState,
+  ServerError,
+  logger,
+} from '@hicommonwealth/core';
 import type { Express, NextFunction, Request, Response } from 'express';
 
 // Handle server and application errors.
@@ -39,15 +46,23 @@ export const setupErrorHandlers = (app: Express) => {
         // Use external facing error message
         error: 'Server error, please try again later.',
       });
-    } else if (error instanceof AppError) {
-      log.warn(error.message, {
-        error,
-        reqContext,
-      }); // just warn, to avoid overloading rollbar with bots and attacks
-      res.status(error.status).send({
-        status: error.status,
-        error: error.message,
-      });
+    }
+    // next section of 400-type errors
+    // just warn, to avoid overloading rollbar with bots and attacks
+    else if (error instanceof AppError) {
+      log.warn(error.message, { error, reqContext });
+      res
+        .status(error.status)
+        .send({ status: error.status, error: error.message });
+    } else if (error instanceof InvalidActor) {
+      log.warn(error.message, { error, reqContext });
+      res.status(401).send({ status: 401, error: error.message });
+    } else if (error instanceof InvalidInput) {
+      log.warn(error.message, { error, reqContext });
+      res.status(400).send({ status: 400, error: error.message });
+    } else if (error instanceof InvalidState) {
+      log.warn(error.message, { error, reqContext });
+      res.status(400).send({ status: 400, error: error.message });
     } else {
       if (error?.status < 500) {
         log.warn(error.message || 'Unknown client error', {
