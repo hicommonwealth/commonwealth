@@ -1,0 +1,43 @@
+@import '../../../../../../../styles/shared';
+
+$form-width: 596px;
+
+.SignTokenTransactions {
+  display: flex;
+
+  .header {
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    max-width: 596px;
+    margin-right: 110px;
+
+    @include smallInclusive {
+      margin-right: unset;
+    }
+
+    .description {
+      color: $neutral-500;
+    }
+
+    .Divider {
+      margin-block: 8px;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  .CWBanner {
+    display: flex !important;
+    max-width: $form-width !important;
+
+    .content-container {
+      max-width: calc($form-width - 70px) !important;
+    }
+  }
+}
