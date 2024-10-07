@@ -12,8 +12,8 @@ const SignatureStep = ({
   return (
     <div className="SignatureStep">
       <SignTokenTransactions
-        onSuccess={goToSuccessStep}
-        onCancel={goToSuccessStep}
+        onSuccess={() => goToSuccessStep(true)}
+        onCancel={() => goToSuccessStep(false)}
         selectedAddress={selectedAddress}
         createdCommunityId={createdCommunityId}
         baseNode={baseNode}

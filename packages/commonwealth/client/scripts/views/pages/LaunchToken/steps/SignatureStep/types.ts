@@ -16,7 +16,7 @@ type BaseProps = {
 };
 
 export type SignatureStepProps = {
-  goToSuccessStep: () => void;
+  goToSuccessStep: (isLaunched: boolean) => void;
 } & BaseProps;
 
 export type SignTokenTransactionsProps = {

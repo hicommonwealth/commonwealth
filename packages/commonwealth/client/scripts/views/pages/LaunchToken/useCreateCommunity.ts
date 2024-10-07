@@ -20,6 +20,7 @@ const useCreateCommunity = () => {
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>();
   const [draftTokenInfo, setDraftTokenInfo] = useState<TokenInfo>();
   const [createdCommunityId, setCreatedCommunityId] = useState<string>();
+  const [isTokenLaunched, setIsTokenLaunched] = useState(false);
 
   const onChangeStep = (forward: boolean) => {
     handleChangeStep(
@@ -39,6 +40,8 @@ const useCreateCommunity = () => {
     setDraftTokenInfo,
     createdCommunityId,
     setCreatedCommunityId,
+    isTokenLaunched,
+    setIsTokenLaunched,
   };
 };
 

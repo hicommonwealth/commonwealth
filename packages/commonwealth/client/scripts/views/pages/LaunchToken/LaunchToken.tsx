@@ -8,6 +8,7 @@ import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrac
 import './LaunchToken.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';
 import SignatureStep from './steps/SignatureStep';
+import SuccessStep from './steps/SuccessStep';
 import TokenInformationStep from './steps/TokenInformationStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateTokenCommunityStep, getFormSteps } from './utils';
@@ -24,6 +25,8 @@ const LaunchToken = () => {
     setDraftTokenInfo,
     createdCommunityId,
     setCreatedCommunityId,
+    isTokenLaunched,
+    setIsTokenLaunched,
   } = useCreateCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -68,6 +71,7 @@ const LaunchToken = () => {
               onChangeStep(true);
             }}
             tokenInfo={draftTokenInfo}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.SignatureLaunch:
@@ -80,8 +84,22 @@ const LaunchToken = () => {
             createdCommunityId={createdCommunityId}
             baseNode={baseNode}
             tokenInfo={draftTokenInfo}
-            goToSuccessStep={() => {}} // TODO 8707: show success screen here - create ticket
+            goToSuccessStep={(isLaunched) => {
+              setIsTokenLaunched(isLaunched);
+
+              onChangeStep(true);
+            }}
             selectedAddress={selectedAddress}
+          />
+        );
+      case CreateTokenCommunityStep.Success:
+        // this condition will never be triggered, adding this to avoid typescript errors
+        if (!createdCommunityId) return <></>;
+
+        return (
+          <SuccessStep
+            communityId={createdCommunityId}
+            withToken={isTokenLaunched}
           />
         );
     }
