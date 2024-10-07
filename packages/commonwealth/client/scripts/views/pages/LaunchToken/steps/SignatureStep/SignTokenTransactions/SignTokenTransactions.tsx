@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
+import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
@@ -18,6 +19,8 @@ const SignTokenTransactions = ({
   onSuccess,
   onCancel,
 }: SignTokenTransactionsProps) => {
+  const user = useUserStore();
+
   const {
     mutateAsync: launchToken,
     isLoading: isCreatingToken,
@@ -31,6 +34,13 @@ const SignTokenTransactions = ({
 
   const handleSign = async () => {
     try {
+      // this condition will never be triggered, adding this to avoid typescript errors
+      if (selectedAddress?.address) {
+        user.setData({
+          addressSelectorSelectedAddress: selectedAddress.address,
+        });
+      }
+
       // 1. Attempt Launch token on chain
       const payload = {
         chainRpc: baseNode.url,
@@ -47,6 +57,10 @@ const SignTokenTransactions = ({
       await updateCommunity({
         id: createdCommunityId,
         token_name: payload.name,
+      });
+
+      user.setData({
+        addressSelectorSelectedAddress: undefined,
       });
 
       onSuccess();
