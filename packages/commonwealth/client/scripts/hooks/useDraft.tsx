@@ -1,11 +1,14 @@
 const MAX_DRAFT_SIZE = 1024 * 1024 * 4;
 
 type DraftOpts = {
-  keyVersion?: string;
+  keyVersion: string;
 };
 
-export function useDraft<T>(key: string, opts: DraftOpts = {}) {
-  const keyVersion = opts.keyVersion ?? 'v2';
+export function useDraft<T>(
+  key: string,
+  opts: DraftOpts = { keyVersion: 'v2' },
+) {
+  const keyVersion = opts.keyVersion;
   const prefix = `cw-draft-${keyVersion}`;
 
   const fullKey = `${prefix}-${key}`;
