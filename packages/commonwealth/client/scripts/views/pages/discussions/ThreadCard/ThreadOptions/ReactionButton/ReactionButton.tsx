@@ -115,7 +115,6 @@ export const ReactionButton = ({
         threadId: thread.id,
         threadMsgId: thread.canvasMsgId,
         reactionType: 'like',
-        isPWA: isAddedToHomeScreen,
       });
       createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
