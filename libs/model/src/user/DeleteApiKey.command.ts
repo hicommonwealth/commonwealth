@@ -1,5 +1,4 @@
 import { cache, CacheNamespaces, type Command } from '@hicommonwealth/core';
-import { buildApiKeySaltCacheKey } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { Sequelize } from 'sequelize';
 import { models } from '../database';
@@ -29,15 +28,8 @@ export function DeleteApiKey(): Command<typeof schemas.DeleteApiKey> {
       ).map((a) => a.address!);
 
       for (const address of addresses) {
-        await cache().deleteKey(
-          CacheNamespaces.Api_key_auth,
-          buildApiKeySaltCacheKey(address),
-        );
+        await cache().deleteKey(CacheNamespaces.Api_key_auth, address);
       }
-      await cache().deleteKey(
-        CacheNamespaces.Api_key_auth,
-        apiKey.hashed_api_key,
-      );
 
       const numDeleted = await models.ApiKey.destroy({
         where: {

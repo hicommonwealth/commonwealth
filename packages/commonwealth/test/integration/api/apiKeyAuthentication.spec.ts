@@ -9,12 +9,7 @@ import {
   dispose,
   disposeAdapter,
 } from '@hicommonwealth/core';
-import {
-  buildApiKeySaltCacheKey,
-  models,
-  tester,
-  User,
-} from '@hicommonwealth/model';
+import { models, tester, User } from '@hicommonwealth/model';
 import { ApiKey, User as UserSchema } from '@hicommonwealth/schemas';
 import { NextFunction, Request, Response } from 'express';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -264,7 +259,7 @@ describe('API KeyAuthentication', () => {
             else return Promise.resolve(null);
           },
           setKeys: (
-            namespace,
+            namespace: string,
             data: { [key: string]: string },
             duration?: number,
           ) => {
@@ -275,6 +270,18 @@ describe('API KeyAuthentication', () => {
               cacheStore[`${namespace}_${key}`] = { value: data[key], expires };
             }
             return Promise.resolve(['OK']);
+          },
+          setKey: (
+            namespace: string,
+            key: string,
+            value: string,
+            duration?: number,
+          ) => {
+            const expires = duration
+              ? new Date().getTime() + duration * 1_000
+              : null;
+            cacheStore[`${namespace}_${key}`] = { value, expires };
+            return Promise.resolve(true);
           },
         } as Cache,
       });
@@ -313,17 +320,14 @@ describe('API KeyAuthentication', () => {
       expect(next).toHaveBeenCalledOnce();
 
       expect(
-        await cache().getKey(
-          CacheNamespaces.Api_key_auth,
-          buildApiKeySaltCacheKey(address),
-        ),
-      ).to.equal(userApiKeyInstance.salt);
-      expect(
-        await cache().getKey(
-          CacheNamespaces.Api_key_auth,
-          userApiKeyInstance.hashed_api_key,
-        ),
-      ).to.equal(JSON.stringify(publicUser));
+        await cache().getKey(CacheNamespaces.Api_key_auth, address),
+      ).to.equal(
+        JSON.stringify({
+          hashedApiKey: userApiKeyInstance.hashed_api_key,
+          salt: userApiKeyInstance.salt,
+          user: publicUser,
+        }),
+      );
 
       // delete DB records
       await models.Address.destroy({

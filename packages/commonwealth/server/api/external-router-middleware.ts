@@ -1,10 +1,6 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { AppError, cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import {
-  buildApiKeySaltCacheKey,
-  getSaltedApiKeyHash,
-  models,
-} from '@hicommonwealth/model';
+import { getSaltedApiKeyHash, models } from '@hicommonwealth/model';
 import { User } from '@hicommonwealth/schemas';
 import { NextFunction, Request, Response } from 'express';
 import { rateLimit } from 'express-rate-limit';
@@ -39,17 +35,23 @@ export async function apiKeyAuthMiddleware(
     throw new AppError('Unauthorized', 401);
 
   let user: z.infer<typeof User> | undefined;
-  const salt = await cache().getKey(
+  const cacheRes = await cache().getKey(
     CacheNamespaces.Api_key_auth,
-    buildApiKeySaltCacheKey(addressHeader),
+    addressHeader.toLowerCase(),
   );
-  if (salt) {
-    const hashedApiKey = getSaltedApiKeyHash(apiKey, salt);
-    const res = await cache().getKey(
-      CacheNamespaces.Api_key_auth,
-      hashedApiKey,
-    );
-    if (res) user = JSON.parse(res);
+  if (cacheRes) {
+    const cachedAuth: {
+      hashedApiKey: string;
+      salt: string;
+      user: z.infer<typeof User>;
+    } = JSON.parse(cacheRes);
+
+    const hashedApiKey = getSaltedApiKeyHash(apiKey, cachedAuth.salt);
+    if (hashedApiKey !== cachedAuth.hashedApiKey) {
+      throw new AppError('Unauthorized', 401);
+    }
+
+    user = cachedAuth.user;
   }
 
   if (!user) {
@@ -86,27 +88,19 @@ export async function apiKeyAuthMiddleware(
     delete user.ApiKey;
 
     // cache for 2 minutes
-    await cache().setKeys(
+    await cache().setKey(
       CacheNamespaces.Api_key_auth,
-      {
-        [buildApiKeySaltCacheKey(addressHeader)]: apiKeyRecord.salt,
-        [hashedApiKey]: JSON.stringify(user),
-      },
+      addressHeader.toLowerCase(),
+      JSON.stringify({
+        hashedApiKey,
+        salt: apiKeyRecord.salt,
+        user,
+      }),
       120,
     );
   }
 
   req.user = models.User.build(user);
-
-  // record access in background - best effort
-  void models.ApiKey.update(
-    {
-      updated_at: new Date(),
-    },
-    {
-      where: { user_id: user.id! },
-    },
-  );
 
   return next();
 }
