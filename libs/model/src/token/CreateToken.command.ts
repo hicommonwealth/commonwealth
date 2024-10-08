@@ -32,7 +32,6 @@ export function CreateToken(): Command<
         icon_url,
         community_id,
         launchpad_contract_address,
-        // , uniswap_pool_address
       } = payload;
 
       const token = await models.Token.findOne({
