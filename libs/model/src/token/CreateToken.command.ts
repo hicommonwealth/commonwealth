@@ -65,9 +65,7 @@ export function CreateToken(): Command<
         // uniswap_pool_address, - TODO: add when uniswap integration is done
       });
 
-      return {
-        token: createdToken!.toJSON(),
-      };
+      return createdToken!.toJSON();
     },
   };
 }
