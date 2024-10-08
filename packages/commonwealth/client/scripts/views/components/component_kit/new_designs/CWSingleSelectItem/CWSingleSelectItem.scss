@@ -1,0 +1,18 @@
+@import '../../../../../../styles/shared.scss';
+.custom-single-value {
+  display: flex;
+  width: 97%;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 4px;
+  cursor: pointer;
+
+  .inner-container {
+    display: flex;
+
+    .check-icon {
+      fill: $green-600;
+      margin-right: 8px;
+    }
+  }
+}

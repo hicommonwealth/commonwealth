@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
+import { notifySuccess } from 'client/scripts/controllers/app/notifications';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -302,6 +303,12 @@ const StakeExchangeForm = ({
     ? false
     : numberOfStakeToExchange >= stakeBalance;
 
+  const handleClickCopyClipboard = (address: string) => {
+    navigator.clipboard.writeText(address).then(() => {
+      notifySuccess('successfully copy to clipboard');
+    });
+  };
+
   return (
     <div className="StakeExchangeForm">
       <CWModalBody>
@@ -329,6 +336,8 @@ const StakeExchangeForm = ({
           isSearchable={false}
           options={addressOptions}
           onChange={onSetSelectedAddress}
+          handleClickCopyClipboard={handleClickCopyClipboard}
+          showIcon={true}
         />
 
         <div className="current-balance-row">
