@@ -64,7 +64,7 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
-    .withMany(db.Token, {
+    .withOne(db.Token, {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     })
