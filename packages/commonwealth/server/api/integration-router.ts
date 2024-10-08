@@ -4,6 +4,7 @@ import {
   Comment,
   Contest,
   Thread,
+  config,
   models,
 } from '@hicommonwealth/model';
 import { RequestHandler, Router, raw } from 'express';
@@ -73,39 +74,31 @@ function build(validator: DatabaseValidationService) {
     express.command(ChainEvents.ChainEventCreated()),
   );
 
-  // Farcaster frames
-  router.use('/farcaster/contests', farcasterRouter);
+  if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
+    // Farcaster frames
+    router.use('/farcaster/contests', farcasterRouter);
 
-  // Farcaster webhooks
-  router.post(
-    '/farcaster/CastCreated',
-    express.command(Contest.FarcasterCastCreatedWebhook()),
-  );
+    // Farcaster webhooks/actions
+    router.post(
+      '/farcaster/CastCreated',
+      express.command(Contest.FarcasterCastCreatedWebhook()),
+    );
 
-  router.post(
-    '/farcaster/ReplyCastCreated',
-    express.command(Contest.FarcasterReplyCastCreatedWebhook()),
-  );
+    router.post(
+      '/farcaster/ReplyCastCreated',
+      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
+    );
 
-  router.get(
-    '/farcaster/CastUpvoteAction',
-    (req, res, next) => {
-      console.log(`GET CastUpvoteAction: ${JSON.stringify(req.body, null, 2)}`);
-      next();
-    },
-    express.query(Contest.GetFarcasterUpvoteActionMetadata()),
-  );
+    router.get(
+      '/farcaster/CastUpvoteAction',
+      express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+    );
 
-  router.post(
-    '/farcaster/CastUpvoteAction',
-    (req, res, next) => {
-      console.log(
-        `POST CastUpvoteAction: ${JSON.stringify(req.body, null, 2)}`,
-      );
-      next();
-    },
-    express.command(Contest.FarcasterUpvoteAction()),
-  );
+    router.post(
+      '/farcaster/CastUpvoteAction',
+      express.command(Contest.FarcasterUpvoteAction()),
+    );
+  }
 
   // Discord BOT integration
   router.post(

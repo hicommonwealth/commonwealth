@@ -5,7 +5,7 @@ import { config, models } from '..';
 import { mustExist } from '../middleware/guards';
 import { buildFarcasterContentUrl } from '../utils/buildFarcasterContentUrl';
 import { buildFarcasterWebhookName } from '../utils/buildFarcasterWebhookName';
-import { createOnchainContestContent } from './utils';
+import { createOnchainContestContent, createOnchainContestVote } from './utils';
 
 const log = logger(import.meta);
 
@@ -146,10 +146,20 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
         mustExist('Contest Topic', contestTopic);
 
-        await createOnchainContestContent({
+        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+
+        const { users } = await client.fetchBulkUsers([
+          payload.untrustedData.fid,
+        ]);
+        mustExist('Farcaster User', users[0]);
+
+        const content_url = buildFarcasterContentUrl(
+          payload.untrustedData.castId.hash,
+        );
+        await createOnchainContestVote({
           community_id: contestManager.community_id,
           topic_id: contestTopic.topic_id,
-          author_address: payload.author.custody_address,
+          author_address: users[0].custody_address,
           content_url,
         });
       },
