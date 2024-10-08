@@ -5,7 +5,7 @@ export const QuillPage = () => {
   return (
     <ReactQuillEditor
       contentDelta=""
-      tooltipLabel="thisis the tooltip"
+      tooltipLabel="this is the tooltip"
       isDisabled={true}
       setContentDelta={() => console.log('got delta')}
     />

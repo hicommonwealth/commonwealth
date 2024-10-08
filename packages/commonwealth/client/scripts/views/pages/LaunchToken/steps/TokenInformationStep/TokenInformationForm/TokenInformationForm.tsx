@@ -1,5 +1,4 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
-import { notifyError } from 'controllers/app/notifications';
+import { ChainBase } from '@hicommonwealth/shared';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -9,8 +8,6 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
-import { useLaunchTokenMutation } from 'state/api/launchPad';
-import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import {
   CWCoverImageUploader,
@@ -63,8 +60,6 @@ const TokenInformationForm = ({
     onAction: true,
   });
 
-  const { mutateAsync: launchToken } = useLaunchTokenMutation();
-
   const openAddressSelectionModal = useCallback(() => {
     if (selectedAddress) {
       setIsAuthModalOpen(false);
@@ -81,7 +76,7 @@ const TokenInformationForm = ({
   });
 
   const handleSubmit = useCallback(
-    async (values: FormSubmitValues) => {
+    (values: FormSubmitValues) => {
       // get address from user
       if (!selectedAddress) {
         openAddressSelectionModal();
@@ -89,30 +84,9 @@ const TokenInformationForm = ({
         return;
       }
 
-      // get base chain node info
-      const nodes = fetchCachedNodes();
-      const baseNode = nodes?.find(
-        (n) => n.ethChainId === commonProtocol.ValidChains.Base,
-      );
-      if (!baseNode || !baseNode.ethChainId) {
-        notifyError('Could not find base chain node');
-        return;
-      }
-
-      // call endpoint
-      const payload = {
-        chainRpc: baseNode.url,
-        ethChainId: baseNode.ethChainId,
-        name: values.tokenName.trim(),
-        symbol: values.tokenTicker.trim(),
-        walletAddress: selectedAddress.address,
-        // TODO 9207: where to store values.tokenDescription and values.tokenImageURL
-      };
-      await launchToken(payload).catch(console.error);
-
-      onSubmit(values);
+      onSubmit(values); // token gets created with signature step, this info is only used to generate community details
     },
-    [openAddressSelectionModal, selectedAddress, onSubmit, launchToken],
+    [openAddressSelectionModal, selectedAddress, onSubmit],
   );
 
   useEffect(() => {

@@ -1,0 +1,5 @@
+FROM commonwealth
+RUN apt-get update && apt-get install -y curl # Needed for heroku
+CMD node --import=extensionless/register build/server/scripts/releasePhaseEnvCheck.js && \
+  npx sequelize-cli db:migrate --config server/sequelize.json && \
+  node --import=extensionless/register build/server/scripts/purgeCloudflareCache.js
