@@ -25,7 +25,7 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
     ? await createFromProtobuf(Buffer.from(config.PEER_ID, 'base64'))
     : await createEd25519PeerId();
 
-  let pgConnectionConfig: ConnectionConfig = {};
+  let pgConnectionConfig: ConnectionConfig | undefined = undefined;
 
   if (path) {
     const url = new URL(path);
@@ -40,7 +40,7 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
     };
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && pgConnectionConfig) {
     pgConnectionConfig.ssl = {
       rejectUnauthorized: false,
     };
@@ -49,7 +49,7 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
   const app = await Canvas.initialize({
     peerId,
     topic: contractTopic,
-    path: pgConnectionConfig,
+    path: pgConnectionConfig!,
     contract,
     signers: getSessionSigners(),
     bootstrapList: [],

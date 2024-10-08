@@ -1,11 +1,7 @@
-@import '../../../../styles/shared';
+@import '../../../../../styles/shared';
 
-.DesktopEditorFooter {
-  color: $neutral-500;
-
+.FileUploadButton {
   display: flex;
-  padding: 8px;
-
   user-select: none;
 
   .Item {
@@ -27,23 +23,9 @@
     color: $neutral-500;
   }
 
-  .SubmitButtonItem {
-    margin-left: auto;
-    background-color: $neutral-200;
-
-    button {
-      border: none;
-      font-size: 1.2em;
-      padding: 8px 16px;
-      cursor: pointer;
-      border-radius: 8px;
-      display: inline-block;
-    }
-  }
-
   .IconAndText {
     display: flex;
-    gap: 8px;
+    gap: 4px;
 
     div {
       margin: auto auto;
