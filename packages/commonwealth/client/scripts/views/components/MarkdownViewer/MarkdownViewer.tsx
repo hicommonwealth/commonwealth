@@ -11,30 +11,44 @@ import {
   tablePlugin,
   thematicBreakPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { memo } from 'react';
-import { useEditorErrorHandler } from 'views/components/MarkdownEditor/useEditorErrorHandler';
+import React, { memo, ReactNode, useState } from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { useMarkdownEditorErrorHandler } from 'views/components/MarkdownEditor/useMarkdownEditorErrorHandler';
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
+import { useComputeMarkdownWithCutoff } from 'views/components/MarkdownViewer/useComputeMarkdownWithCutoff';
 
+import clsx from 'clsx';
 import './MarkdownViewer.scss';
 
 export type MarkdownStr = string;
 
 export type MarkdownViewerProps = Readonly<{
-  markdown: MarkdownStr;
+  className?: string;
+  markdown: MarkdownStr | undefined;
+  cutoffLines?: number;
+  customShowMoreButton?: ReactNode;
 }>;
 
 export const MarkdownViewer = memo(function MarkdownViewer(
   props: MarkdownViewerProps,
 ) {
-  const { markdown } = props;
+  const { customShowMoreButton, className } = props;
 
-  const errorHandler = useEditorErrorHandler();
+  const errorHandler = useMarkdownEditorErrorHandler();
+
+  const toggleDisplay = () => setUserExpand(!userExpand);
+
+  const [truncated, truncatedMarkdown, initialMarkdown] =
+    useComputeMarkdownWithCutoff(props.markdown ?? '', props.cutoffLines);
+
+  const [userExpand, setUserExpand] = useState<boolean>(false);
 
   return (
-    <div className="MarkdownViewer">
+    <div className={clsx('MarkdownViewer', className)}>
       <MDXEditor
+        key={'user-expand' + userExpand}
         onError={errorHandler}
-        markdown={markdown ?? ''}
+        markdown={userExpand ? initialMarkdown : truncatedMarkdown}
         placeholder=""
         readOnly={true}
         plugins={[
@@ -52,6 +66,19 @@ export const MarkdownViewer = memo(function MarkdownViewer(
           frontmatterPlugin(),
         ]}
       />
+
+      {truncated && !userExpand && (
+        <>
+          {customShowMoreButton || (
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div className="show-more-text">Show More</div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 });

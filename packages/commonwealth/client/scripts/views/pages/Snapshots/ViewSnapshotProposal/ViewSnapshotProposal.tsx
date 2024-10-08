@@ -17,23 +17,22 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import AddressInfo from 'models/AddressInfo';
 import { LinkSource } from 'models/Thread';
 import app from 'state';
-import { useGetThreadsByLinkQuery } from 'state/api/threads';
-import useUserStore from 'state/ui/user';
-import { CWContentPage } from 'views/components/component_kit/CWContentPage';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import {
-  ActiveProposalPill,
-  ClosedProposalPill,
-} from 'views/components/proposal_pills';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
-
 import {
   useGetSnapshotProposalsQuery,
   useGetSnapshotSpaceQuery,
 } from 'state/api/snapshots';
-import { SnapshotInformationCard } from './SnapshotInformationCard';
-import { SnapshotPollCardContainer } from './SnapshotPollCard';
-import { SnapshotVotesTable } from './SnapshotVotesTable';
+import { useGetThreadsByLinkQuery } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
+import { CWContentPage } from 'views/components/component_kit/CWContentPage';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
+import {
+  ActiveProposalPill,
+  ClosedProposalPill,
+} from 'views/components/proposal_pills';
+import { SnapshotInformationCard } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotInformationCard';
+import { SnapshotPollCardContainer } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
+import { SnapshotVotesTable } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotVotesTable';
 
 type ViewSnapshotProposalProps = {
   identifier: string;
@@ -174,7 +173,7 @@ const ViewSnapshotProposal = ({
             <ClosedProposalPill proposalState={proposal.state} />
           )
         }
-        body={() => <QuillRenderer doc={proposal.body} />}
+        body={() => <MarkdownViewerWithFallback markdown={proposal.body} />}
         subBody={
           votes.length > 0 && (
             <SnapshotVotesTable

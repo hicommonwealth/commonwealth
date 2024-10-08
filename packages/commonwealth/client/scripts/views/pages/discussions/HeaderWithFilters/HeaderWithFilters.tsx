@@ -12,12 +12,12 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
@@ -250,9 +250,9 @@ export const HeaderWithFilters = ({
       </div>
 
       {selectedTopic?.description && (
-        <QuillRenderer
-          doc={selectedTopic.description}
-          customClass="subheader-text"
+        <MarkdownViewerUsingQuillOrNewEditor
+          markdown={selectedTopic.description}
+          className="subheader-text"
         />
       )}
 

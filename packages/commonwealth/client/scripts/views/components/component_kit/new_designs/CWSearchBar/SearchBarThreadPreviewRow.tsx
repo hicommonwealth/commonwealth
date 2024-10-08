@@ -4,11 +4,12 @@ import React, { FC } from 'react';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { ThreadResult } from '../../../../pages/search/helpers';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
-import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
 import { User } from '../../../user/user';
 import { CWText } from '../../cw_text';
 
 import { getDecodedString } from '@hicommonwealth/shared';
+// eslint-disable-next-line max-len
+import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
 import './SearchBarThreadPreviewRow.scss';
 
 interface SearchBarThreadPreviewRowProps {
@@ -55,11 +56,10 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <CWText type="caption" className="excerpt-text" fontWeight="medium">
-          <QuillRenderer
-            hideFormatting={true}
-            doc={content}
-            searchTerm={searchTerm}
-            containerClass="SearchQuillRenderer"
+          <MarkdownHitHighlighterWithFallback
+            markdown={content}
+            searchTerm={searchTerm ?? ''}
+            className="SearchQuillRenderer"
           />
         </CWText>
       </div>
