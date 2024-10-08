@@ -10,7 +10,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
@@ -98,24 +97,11 @@ export const ThreadCard = ({
       enabled: !!thread.communityId && !showSkeleton,
     });
 
-  const { data: contentUrlBody, isLoading: isLoadingContentBody } =
-    useGetContentByUrlQuery({
-      contentUrl: thread.contentUrl || '',
-      enabled: !!thread.contentUrl,
-    });
-
-  if (
-    showSkeleton ||
-    isLoadingCommunity ||
-    !community ||
-    (isLoadingContentBody && !!thread.contentUrl)
-  ) {
+  if (showSkeleton || isLoadingCommunity || !community) {
     return (
       <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
     );
   }
-
-  const threadBodyToDisplay = contentUrlBody || thread.plaintext;
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -133,14 +119,14 @@ export const ThreadCard = ({
   const stageLabel = threadStageToLabel(thread.stage);
 
   // Future Ref: this fixes https://github.com/hicommonwealth/commonwealth/issues/8611 for iOS mobile
-  // where quill renders broken/cut-off/overlapping threadBodyToDisplay in cases when there are multiple
-  // <p/> tags in the quill delta for threadBodyToDisplay or if threadBodyToDisplay has \n characters which
+  // where quill renders broken/cut-off/overlapping thread.plaintext in cases when there are multiple
+  // <p/> tags in the quill delta for thread.plaintext or if thread.plaintext has \n characters which
   // iOS devices don't seem to render correctly.
   // Not updating it for desktop per a previous issue where markdown wasn't rendered correctly in
   // preview because of .slice()'d  content.
   const bodyText = getBrowserInfo().isMobile
-    ? threadBodyToDisplay.replaceAll(/\n/g, '').slice(0, 150)
-    : threadBodyToDisplay;
+    ? thread.plaintext.replaceAll(/\n/g, '').slice(0, 150)
+    : thread.plaintext;
 
   return (
     <>
