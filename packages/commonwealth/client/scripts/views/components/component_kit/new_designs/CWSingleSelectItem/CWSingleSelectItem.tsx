@@ -10,10 +10,10 @@ type CustomSingleValueProps = {
   showIcon?: boolean;
 };
 
-interface OptionProps {
+type OptionProps = {
   value: string;
   label: string;
-}
+};
 
 export const CWSingleSelectItem = (
   props: SingleValueProps<OptionProps> & CustomSingleValueProps,
@@ -28,14 +28,18 @@ export const CWSingleSelectItem = (
 
   return (
     <div className="custom-single-value">
-      <div className="inner-container">
-        <CWIcon
-          className="check-icon"
-          iconSize="small"
-          iconName="checkCircleFilled"
-        />
-        {formatAddressShort(data.label, 6)}
-      </div>
+      {extraProp && (
+        <div className="inner-container">
+          <CWIcon
+            className="check-icon"
+            iconSize="small"
+            iconName="checkCircleFilled"
+          />
+          {formatAddressShort(data.label, 6)}
+        </div>
+      )}
+      {!extraProp && <span>{data.label}</span>}
+
       {extraProp && <CopySimple size={20} onMouseDown={handleClickToCopy} />}
     </div>
   );
