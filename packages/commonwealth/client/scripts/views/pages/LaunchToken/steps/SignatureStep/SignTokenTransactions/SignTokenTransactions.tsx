@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import React from 'react';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
@@ -63,6 +63,10 @@ const SignTokenTransactions = ({
         symbol: payload.symbol,
         icon_url: tokenInfo?.imageURL?.trim() || '',
         description: tokenInfo?.description?.trim() || '',
+        community_id: createdCommunityId,
+        launchpad_contract_address:
+          // this will always exist, adding 0 to avoid typescript issues
+          commonProtocol.factoryContracts[baseNode.ethChainId || 0].launchpad,
       });
 
       // 3. update community to reference the created token

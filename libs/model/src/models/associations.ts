@@ -64,6 +64,10 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
+    .withMany(db.Token, {
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    })
     .withOne(db.DiscordBotConfig, {
       targeyKey: 'discord_config_id',
       onDelete: 'CASCADE',

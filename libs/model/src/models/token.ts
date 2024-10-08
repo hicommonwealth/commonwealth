@@ -27,6 +27,9 @@ export default (
       chain_node_id: { type: Sequelize.INTEGER },
       base: { type: Sequelize.STRING, allowNull: false },
       author_address: { type: Sequelize.STRING, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      launchpad_contract_address: { type: Sequelize.STRING, allowNull: false },
+      uniswap_pool_address: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'Tokens',

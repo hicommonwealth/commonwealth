@@ -11,6 +11,9 @@ export const CreateToken = {
     description: z.string().nullish(),
     chain_node_id: PG_INT,
     base: z.nativeEnum(ChainBase),
+    community_id: z.string(),
+    launchpad_contract_address: z.string(),
+    uniswap_pool_address: z.string().nullish(),
   }),
   output: z.object({
     token: Token,

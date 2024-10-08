@@ -11,6 +11,9 @@ export const Token = z.object({
   chain_node_id: PG_INT,
   base: z.nativeEnum(ChainBase),
   author_address: z.string(),
+  community_id: z.string(),
+  launchpad_contract_address: z.string(),
+  uniswap_pool_address: z.string().optional(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),

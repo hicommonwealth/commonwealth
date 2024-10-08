@@ -19,16 +19,27 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
     ...schemas.CreateToken,
     auth: [],
     body: async ({ actor, payload }) => {
-      const { base, chain_node_id, name, symbol, description, icon_url } =
-        payload;
+      const {
+        base,
+        chain_node_id,
+        name,
+        symbol,
+        description,
+        icon_url,
+        community_id,
+        launchpad_contract_address,
+        // , uniswap_pool_address
+      } = payload;
 
       const token = await models.Token.findOne({
         where: { name },
       });
       if (token) throw new InvalidInput(CreateTokenErrors.TokenNameExists);
 
-      const baseCommunity = await models.Community.findOne({ where: { base } });
-      mustExist('Chain Base', baseCommunity);
+      const baseCommunity = await models.Community.findOne({
+        where: { base, id: community_id },
+      });
+      mustExist('Community Chain Base', baseCommunity);
 
       const node = await models.ChainNode.findOne({
         where: { id: chain_node_id },
@@ -46,6 +57,9 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         description,
         icon_url,
         author_address: actor.address || '', // TODO: can `actor.address` be undefined?
+        community_id,
+        launchpad_contract_address,
+        // uniswap_pool_address, - TODO: add when uniswap integration is done
       });
 
       return {
