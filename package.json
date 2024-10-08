@@ -9,7 +9,7 @@
   "packageManager": "pnpm@9.10.0",
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "docker-build-commonwealth": "docker build . --target commonwealth --tag commonwealth:latest",
+    "docker-build-commonwealth": "docker build -f Dockerfile.commonwealth_base --tag commonwealth:latest .",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F commonwealth db-all",
@@ -125,7 +125,6 @@
     "prettier-plugin-organize-imports": "^4.0.0",
     "process": "^0.11.10",
     "readline-sync": "^1.4.10",
-    "sequelize-cli": "^6.2.0",
     "sharp": "^0.31.2",
     "sinon": "^15.0.4",
     "source-map-support": "^0.5.21",

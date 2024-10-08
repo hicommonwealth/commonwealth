@@ -188,7 +188,7 @@ jobs:
       - name: Run serial e2e tests
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
-          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
 
       - name: Archive code coverage results

@@ -3,6 +3,7 @@ import {
   createEd25519PeerId,
   createFromProtobuf,
 } from '@libp2p/peer-id-factory';
+import { ConnectionConfig } from 'pg';
 
 import { getSessionSigners } from '../signers';
 import { contract, contractTopic } from './contract';
@@ -24,10 +25,31 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
     ? await createFromProtobuf(Buffer.from(config.PEER_ID, 'base64'))
     : await createEd25519PeerId();
 
+  let pgConnectionConfig: ConnectionConfig | undefined = undefined;
+
+  if (path) {
+    const url = new URL(path);
+
+    pgConnectionConfig = {
+      user: url.username,
+      host: url.hostname,
+      database: url.pathname.slice(1), // remove the leading '/'
+      password: url.password,
+      port: url.port ? parseInt(url.port) : 5432,
+      ssl: false,
+    };
+  }
+
+  if (process.env.NODE_ENV === 'production' && pgConnectionConfig) {
+    pgConnectionConfig.ssl = {
+      rejectUnauthorized: false,
+    };
+  }
+
   const app = await Canvas.initialize({
     peerId,
     topic: contractTopic,
-    path,
+    path: pgConnectionConfig!,
     contract,
     signers: getSessionSigners(),
     bootstrapList: [],

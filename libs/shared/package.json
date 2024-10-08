@@ -30,7 +30,9 @@
     "@canvas-js/gossiplog": "^0.10.10",
     "@canvas-js/interfaces": "^0.10.10",
     "@canvas-js/signatures": "^0.10.10",
+    "@cosmjs/encoding": "0.32.3",
     "@ipld/dag-json": "^10.2.0",
+    "@polkadot/util": "12.6.2",
     "@libp2p/peer-id-factory": "^4.2.4",
     "moment": "^2.23.0",
     "safe-stable-stringify": "^2.4.2"
