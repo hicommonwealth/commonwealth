@@ -108,7 +108,7 @@ export const ThreadCard = ({
     showSkeleton ||
     isLoadingCommunity ||
     !community ||
-    isLoadingContentBody
+    (isLoadingContentBody && !!thread.contentUrl)
   ) {
     return (
       <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />

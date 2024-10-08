@@ -154,6 +154,7 @@ export interface ThreadVersionHistory {
   address: string;
   body: string;
   timestamp: string;
+  content_url: string;
 }
 
 export interface IThreadCollaborator {
@@ -204,6 +205,7 @@ type RecentComment = {
   profile_name?: string;
   profile_avatar_url?: string;
   user_id: string;
+  content_url?: string | null;
 };
 
 export enum LinkSource {
@@ -471,6 +473,7 @@ export class Thread implements IUniqueId {
           reaction_weights_sum: 0,
           canvas_signed_data: null,
           canvas_msg_id: null,
+          content_url: rc.content_url || null,
         }),
     );
     this.latestActivity = last_commented_on

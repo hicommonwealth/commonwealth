@@ -6,6 +6,7 @@ import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
@@ -13,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
 import {
   useFetchGroupsQuery,
@@ -120,7 +122,49 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const thread = data?.[0];
+
+  const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
+    string | null
+  >(null);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      thread?.contentUrl && setContentUrlBodyToFetch(thread?.contentUrl);
+    },
+    shouldRun: !!thread?.contentUrl,
+  });
+
+  const { data: contentUrlBody, isLoading: isLoadingContentBody } =
+    useGetContentByUrlQuery({
+      contentUrl: contentUrlBodyToFetch || '',
+      enabled: !!contentUrlBodyToFetch,
+    });
+
   const [threadBody, setThreadBody] = useState(thread?.body);
+
+  useEffect(() => {
+    if (
+      contentUrlBodyToFetch &&
+      contentUrlBodyToFetch !== thread?.contentUrl &&
+      contentUrlBody
+    ) {
+      setThreadBody(contentUrlBody);
+    }
+  }, [contentUrlBody, contentUrlBodyToFetch, thread?.contentUrl]);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      thread?.body && setThreadBody(thread?.body);
+    },
+    shouldRun: !!thread?.body,
+  });
+
+  useRunOnceOnCondition({
+    callback: () => {
+      contentUrlBody && setThreadBody(contentUrlBody);
+    },
+    shouldRun: !isLoadingContentBody && !!thread?.contentUrl,
+  });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -219,7 +263,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta || isLoading) {
+  if (
+    !app.chain?.meta ||
+    isLoading ||
+    (isLoadingContentBody && thread?.contentUrl)
+  ) {
     return (
       <CWPageLayout>
         <CWContentPage
@@ -272,6 +320,24 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
   const canComment = !!user.activeAccount && !isRestrictedMembership;
+
+  const handleVersionHistoryChange = (versionId: number) => {
+    const foundVersion = (thread?.versionHistory || []).find(
+      (version) => version.id === versionId,
+    );
+
+    if (!foundVersion?.content_url) {
+      setThreadBody(foundVersion?.body || '');
+      return;
+    }
+
+    if (contentUrlBodyToFetch === foundVersion.content_url && contentUrlBody) {
+      setThreadBody(contentUrlBody);
+      return;
+    }
+
+    setContentUrlBodyToFetch(foundVersion.content_url);
+  };
 
   const handleNewSnapshotChange = async ({
     id,
@@ -369,9 +435,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : thread?.title;
   const ogDescription =
     // @ts-expect-error <StrictNullChecks/>
-    getMetaDescription(thread?.body || '')?.length > 155
-      ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
-      : getMetaDescription(thread?.body || '');
+    getMetaDescription(threadBody || '')?.length > 155
+      ? `${getMetaDescription(threadBody || '')?.slice?.(0, 152)}...`
+      : getMetaDescription(threadBody || '');
   const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
   return (
@@ -539,7 +605,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             setIsEditingBody(false);
           }}
           hasPendingEdits={!!editsToSave}
-          setThreadBody={setThreadBody}
+          onChangeVersionHistoryNumber={handleVersionHistoryChange}
           body={(threadOptionsComp) => (
             <div className="thread-content">
               {isEditingBody ? (
@@ -564,11 +630,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </>
               ) : (
                 <>
-                  <QuillRenderer
-                    // @ts-expect-error <StrictNullChecks/>
-                    doc={threadBody ?? thread?.body}
-                    cutoffLines={50}
-                  />
+                  <QuillRenderer doc={threadBody || ''} cutoffLines={50} />
                   {/* @ts-expect-error StrictNullChecks*/}
                   {thread.readOnly || fromDiscordBot ? (
                     <>

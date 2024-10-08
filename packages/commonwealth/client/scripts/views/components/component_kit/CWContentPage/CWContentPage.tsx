@@ -78,7 +78,7 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
-  setThreadBody?: (body: string) => void;
+  onChangeVersionHistoryNumber?: (id: number) => void;
   editingDisabled?: boolean;
 };
 
@@ -116,7 +116,7 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
-  setThreadBody,
+  onChangeVersionHistoryNumber,
   editingDisabled,
 }: ContentPageProps) => {
   const navigate = useNavigate();
@@ -211,7 +211,7 @@ export const CWContentPage = ({
         isHot={isHot(thread)}
         profile={thread?.profile}
         versionHistory={thread?.versionHistory}
-        changeContentText={setThreadBody}
+        onChangeVersionHistoryNumber={onChangeVersionHistoryNumber}
       />
     </div>
   );
