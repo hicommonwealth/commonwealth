@@ -10,10 +10,10 @@ import {
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import useUserStore from 'state/ui/user';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type NewProfile from '../../../models/NewProfile';
 import { CWText } from '../component_kit/cw_text';
-import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { SocialAccounts } from '../social_accounts';
 
 type ProfileHeaderProps = {
@@ -71,7 +71,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
           <div>
             <CWText type="h4">Bio</CWText>
             <CWText className="bio">
-              <QuillRenderer doc={bio} />
+              <MarkdownViewerWithFallback markdown={bio} />
             </CWText>
           </div>
         )}

@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -18,7 +19,6 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
@@ -207,8 +207,8 @@ export const ThreadCard = ({
               )}
             </div>
             <CWText type="b1" className="content-body">
-              <QuillRenderer
-                doc={bodyText}
+              <MarkdownViewerUsingQuillOrNewEditor
+                markdown={bodyText}
                 cutoffLines={4}
                 customShowMoreButton={
                   <CWText type="b1" className="show-more-btn">

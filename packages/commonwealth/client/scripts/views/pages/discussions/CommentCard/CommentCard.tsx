@@ -13,6 +13,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import type Comment from 'models/Comment';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { SharePopover } from 'views/components/SharePopover';
 import {
@@ -27,7 +28,6 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
@@ -260,7 +260,7 @@ export const CommentCard = ({
         <div className="comment-content">
           {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
-            <QuillRenderer doc={commentText} />
+            <MarkdownViewerWithFallback markdown={commentText} />
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">

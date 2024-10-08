@@ -28,7 +28,8 @@ import {
 import useUserStore from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
@@ -55,7 +56,6 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { getTextFromDelta } from '../../components/react_quill_editor/';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
@@ -630,7 +630,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </>
               ) : (
                 <>
-                  <QuillRenderer doc={threadBody || ''} cutoffLines={50} />
+                  <MarkdownViewerUsingQuillOrNewEditor
+                    markdown={threadBody || ''}
+                    cutoffLines={50}
+                  />
+
                   {/* @ts-expect-error StrictNullChecks*/}
                   {thread.readOnly || fromDiscordBot ? (
                     <>
