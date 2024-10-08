@@ -1,7 +1,7 @@
 import { ChainType } from '@hicommonwealth/shared';
-import { trpc } from 'client/scripts/utils/trpcClient';
 import { initAppState } from 'state';
-import { userStore } from '../../ui/user';
+import { trpc } from 'utils/trpcClient';
+import useUserStore, { userStore } from '../../ui/user';
 import { invalidateAllQueriesForCommunity } from './getCommuityById';
 
 interface UpdateCommunityProps {
@@ -96,11 +96,15 @@ const useUpdateCommunityMutation = ({
   communityId,
   reInitAppOnSuccess,
 }: UseUpdateCommunityMutationProps) => {
+  const user = useUserStore();
+
   return trpc.community.updateCommunity.useMutation({
     onSuccess: async () => {
       // since this is the main chain/community object affecting
       // some other features, better to re-fetch on update.
       await invalidateAllQueriesForCommunity(communityId);
+
+      user.setData({ addressSelectorSelectedAddress: undefined });
 
       if (reInitAppOnSuccess) {
         await initAppState(false);

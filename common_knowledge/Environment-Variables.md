@@ -18,7 +18,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [COSMOS_GOV_V1](#cosmos_gov_v1)
 - [COSMOS_PROXY_REFERER](#cosmos_proxy_referer)
 - [COSMOS_REGISTRY_API](#cosmos_registry_api)
-- [CW_BOT_KEY](#cw_bot_key)
 - [DATABASE_CLEAN_HOUR](#database_clean_hour)
 - [DATABASE_LOG_TRACE](#database_log_trace)
 - [DATABASE_URI](#database_uri)
@@ -121,10 +120,6 @@ Owner: Mark Hagelberg.
 Community-maintained data source for Cosmos ecosystem blockchains. Pulls from a [GitHub repo](https://github.com/cosmos/chain-registry/) as its source of truth. As of 231212, this should be `https://cosmoschains.thesilverfox.pro` by default.
 
 Owner: Mark Hagelberg.
-
-## CW_BOT_KEY
-
-Required for Common bots, e.g. Discobot. In development, can be set to any random identifier string, but must match the value of `CW_BOT_KEY` set in Discobot's .env file.
 
 ## DATABASE_CLEAN_HOUR
 
