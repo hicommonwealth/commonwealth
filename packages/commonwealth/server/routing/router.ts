@@ -22,7 +22,6 @@ import getAddressProfile, {
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
-import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
@@ -152,10 +151,7 @@ function setupRouter(
   // API routes
   app.use(api.internal.PATH, useragent.express(), api.internal.router);
   app.use(api.external.PATH, useragent.express(), api.external.router);
-  app.use(
-    api.integration.PATH,
-    api.integration.build(databaseValidationService),
-  );
+  app.use(api.integration.PATH, api.integration.build());
 
   registerRoute(
     router,
@@ -194,14 +190,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     deleteAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/linkExistingAddressToCommunity',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    linkExistingAddressToCommunity.bind(this, models),
   );
   registerRoute(
     router,

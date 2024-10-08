@@ -19,7 +19,10 @@ import {
 import { openConfirmation } from './confirmation_modal';
 
 import { notifySuccess } from 'controllers/app/notifications';
+import { DeltaStatic } from 'quill';
 import '../../../styles/modals/edit_topic_modal.scss';
+import { ReactQuillEditor } from '../components/react_quill_editor';
+import { createDeltaFromText } from '../components/react_quill_editor/utils';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -44,7 +47,9 @@ export const EditTopicModal = ({
   const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [description, setDescription] = useState<string>(descriptionProp);
+  const [description, setDescription] = useState<DeltaStatic>(
+    createDeltaFromText(descriptionProp),
+  );
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
     featuredInSidebarProp,
   );
@@ -56,7 +61,7 @@ export const EditTopicModal = ({
     try {
       await editTopic({
         topic_id: id!,
-        description: description,
+        description: JSON.stringify(description),
         name: name,
         community_id: app.activeChainId()!,
         telegram: null,
@@ -138,14 +143,12 @@ export const EditTopicModal = ({
             return ['success', 'Valid topic name'];
           }}
         />
-        <CWTextInput
-          label="Description"
-          name="description"
-          tabIndex={2}
-          value={description}
-          onInput={(e) => {
-            setDescription(e.target.value);
-          }}
+        <ReactQuillEditor
+          className="editor"
+          placeholder="Enter a description (Limit of 250 characters)"
+          contentDelta={description}
+          setContentDelta={setDescription}
+          fromManageTopic
         />
         <CWCheckbox
           label="Featured in Sidebar"

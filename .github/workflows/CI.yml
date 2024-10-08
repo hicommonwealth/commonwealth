@@ -188,7 +188,7 @@ jobs:
       - name: Run serial e2e tests
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
-          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
 
       - name: Archive code coverage results
@@ -346,7 +346,6 @@ jobs:
           chmod -R 755 ./libs/model/coverage/lcov.info
           chmod -R 755 ./libs/sitemaps/coverage/lcov.info
           chmod -R 755 ./packages/commonwealth/coverage/lcov.info
-          chmod -R 755 ./packages/discord-bot/coverage/lcov.info
           chmod -R 755 ./packages/scripts/coverage/lcov.info
           chmod -R 755 ./packages/snapshot-listener/coverage/lcov.info
 
@@ -355,7 +354,7 @@ jobs:
         with:
           flag-name: unit-test-coverage
           parallel: true
-          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/discord-bot/coverage/lcov.info packages/scripts/coverage/lcov.info packages/snapshot-listener/coverage/lcov.info
+          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/scripts/coverage/lcov.info packages/snapshot-listener/coverage/lcov.info
 
       - name: Run integration tests
         run: pnpm -F commonwealth test-integration --allowOnly=false

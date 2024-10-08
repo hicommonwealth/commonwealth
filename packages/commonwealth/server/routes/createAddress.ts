@@ -1,12 +1,16 @@
 import { AppError } from '@hicommonwealth/core';
 import type { AddressAttributes, DB } from '@hicommonwealth/model';
 import { AddressInstance } from '@hicommonwealth/model';
-import { ChainBase, WalletId, addressSwapper } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  WalletId,
+  addressSwapper,
+  bech32ToHex,
+} from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -73,7 +77,7 @@ const createAddress = async (
 
   // test / convert address as needed
   let encodedAddress = (req.body.address as string).trim();
-  let addressHex: string;
+  let addressHex: string | undefined;
   let existingAddressWithHex: AddressInstance;
   try {
     if (community.base === ChainBase.Substrate) {
@@ -86,8 +90,7 @@ const createAddress = async (
       // cosmos or injective
       const { words } = bech32.decode(req.body.address, 50);
       encodedAddress = bech32.encode(community.bech32_prefix, words);
-      // @ts-expect-error StrictNullChecks
-      addressHex = await bech32ToHex(req.body.address);
+      addressHex = bech32ToHex(req.body.address);
 
       // check all addresses for matching hex
       const existingHexes = await models.Address.scope(
@@ -163,7 +166,6 @@ const createAddress = async (
     existingAddress.last_active = new Date();
     existingAddress.block_info = req.body.block_info;
 
-    // @ts-expect-error StrictNullChecks
     existingAddress.hex = addressHex;
 
     // we update addresses with the wallet used to sign in
