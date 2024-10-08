@@ -39,4 +39,3 @@ Use the [.env.example](../../.env.example) file to get yourself set up.
 ## Further Information
 
 For more information, see our [Knowledge Base directory](../../knowledge_base/_TOC.md).
-
