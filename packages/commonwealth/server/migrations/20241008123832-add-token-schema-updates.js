@@ -16,19 +16,6 @@ module.exports = {
         { transaction: t },
       );
 
-      await queryInterface.addConstraint('Tokens', {
-        type: 'foreign key',
-        fields: ['community_id'],
-        name: 'fk_Tokens_community_id',
-        references: {
-          table: 'Communities',
-          fields: ['id'],
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-        transaction: t,
-      });
-
       await queryInterface.addColumn(
         'Tokens',
         'launchpad_contract_address',
@@ -53,11 +40,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeConstraint(
-        'Tokens',
-        'fk_Tokens_community_id',
-        { transaction: t },
-      );
       queryInterface.removeColumn('Tokens', 'community_id', { transaction: t });
       queryInterface.removeColumn('Tokens', 'launchpad_contract_address', {
         transaction: t,
