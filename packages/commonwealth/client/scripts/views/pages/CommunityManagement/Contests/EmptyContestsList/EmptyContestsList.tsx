@@ -13,27 +13,44 @@ interface EmptyContestsListProps {
   isStakeEnabled: boolean;
   isContestAvailable: boolean;
   onSetContestSelectionView?: () => void;
+  hasWeightedTopic: boolean;
 }
 
 const EmptyContestsList = ({
   isStakeEnabled,
   isContestAvailable,
   onSetContestSelectionView,
+  hasWeightedTopic,
 }: EmptyContestsListProps) => {
   const navigate = useCommonNavigate();
   const farcasterContestEnabled = useFlag('farcasterContest');
 
   return (
     <div className="EmptyContestsList">
-      {!isStakeEnabled ? (
+      {(farcasterContestEnabled ? !hasWeightedTopic : !isStakeEnabled) ? (
         <EmptyCard
           img={shape2Url}
-          title="You must enable Community Stake"
-          subtitle="Contests require Community Stake..."
-          button={{
-            label: 'Enable Community Stake',
-            handler: () => navigate('/manage/integrations'),
-          }}
+          title={
+            farcasterContestEnabled
+              ? 'You must have at least one topic with weighted voting enabled to run contest'
+              : 'You must enable Community Stake'
+          }
+          subtitle={
+            farcasterContestEnabled
+              ? 'Setting up a contest just takes a few minutes and can be a huge boost to your community.'
+              : 'Contests require Community Stake...'
+          }
+          button={
+            farcasterContestEnabled
+              ? {
+                  label: 'Create a topic',
+                  handler: () => navigate('/manage/topics'),
+                }
+              : {
+                  label: 'Enable Community Stake',
+                  handler: () => navigate('/manage/integrations'),
+                }
+          }
         />
       ) : !isContestAvailable ? (
         <EmptyCard

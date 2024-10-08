@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import app from 'state';
 import { useTokenMetadataQuery } from 'state/api/tokens';
@@ -22,6 +23,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
+  const farcasterContestEnabled = useFlag('farcasterContest');
 
   const user = useUserStore();
 
@@ -44,7 +46,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
 
   if (
     !user.isLoggedIn ||
-    !stakeEnabled ||
+    (farcasterContestEnabled ? false : !stakeEnabled) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     contestNotFound
   ) {
