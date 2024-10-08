@@ -2,6 +2,7 @@ import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../database';
+import { AuthContext, isAuthorized } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
 export const CreateTokenErrors = {
@@ -14,10 +15,13 @@ export const CreateTokenErrors = {
   InvalidNode: 'RPC url returned invalid response. Check your node url',
 };
 
-export function CreateToken(): Command<typeof schemas.CreateToken> {
+export function CreateToken(): Command<
+  typeof schemas.CreateToken,
+  AuthContext
+> {
   return {
     ...schemas.CreateToken,
-    auth: [],
+    auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ actor, payload }) => {
       const {
         base,
@@ -56,7 +60,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         symbol,
         description,
         icon_url,
-        author_address: actor.address || '', // TODO: can `actor.address` be undefined?
+        author_address: actor.address || '',
         community_id,
         launchpad_contract_address,
         // uniswap_pool_address, - TODO: add when uniswap integration is done
