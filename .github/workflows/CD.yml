@@ -3,9 +3,10 @@ name: Build Docker Image
 on:
   push:
     branches:
-      - staging
       - frick
       - frack
+      - beta
+      - demo
       - production
 
 jobs:
@@ -23,7 +24,7 @@ jobs:
             frack)
               APP_NAME="commonwealth-frack"
               ;;
-            staging)
+            beta)
               APP_NAME="commonwealth-beta"
               ;;
             demo)
