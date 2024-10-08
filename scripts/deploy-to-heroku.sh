@@ -64,14 +64,9 @@ docker build . --target commonwealth -t commonwealth -f Dockerfile.commonwealth_
 deploy_heroku_app "./packages/commonwealth/deploy/dockerfiles" ${app_name}
 
 snapshot_listener_app_name=snapshot-listener-staging
-discord_bot_app_name=discobot-listener-staging
 if [ "${app_name}" == "commonwealthapp" ]; then
   snapshot_listener_app_name="snapshot-listener"
-  discord_bot_app_name="discobot-listener"
 fi
 
 docker build . --target snapshot-listener -t snapshot-listener -f Dockerfile.commonwealth_base
 deploy_heroku_app "./packages/snapshot-listener/deploy/dockerfiles" ${snapshot_listener_app_name}
-
-docker build . --target discord-bot -t discord-bot -f Dockerfile.commonwealth_base
-deploy_heroku_app "./packages/discord-bot/deploy/dockerfiles" ${discord_bot_app_name}
