@@ -9,7 +9,7 @@ export function GetFarcasterUpvoteActionMetadata(): Query<
     ...schemas.GetFarcasterUpvoteActionMetadata,
     auth: [],
     secure: false,
-    body: async ({ payload }) => {
+    body: async () => {
       return {
         name: 'Upvote Content',
         icon: 'thumbsup',
