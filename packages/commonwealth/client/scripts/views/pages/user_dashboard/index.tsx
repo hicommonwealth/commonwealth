@@ -47,7 +47,12 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  user.setData({ isOnPWA: isAddedToHomeScreen });
+  //this prevents rerender when user is updated
+  useEffect(() => {
+    if (user.isOnPWA !== isAddedToHomeScreen) {
+      user.setData({ isOnPWA: isAddedToHomeScreen });
+    }
+  }, [isAddedToHomeScreen, user.isOnPWA, user]);
 
   useBrowserAnalyticsTrack({
     payload: {
