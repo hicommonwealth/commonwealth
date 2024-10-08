@@ -16,7 +16,12 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { Contest, ContestWorker, FarcasterWorker } from '@hicommonwealth/model';
+import {
+  Contest,
+  ContestWorker,
+  DiscordBotPolicy,
+  FarcasterWorker,
+} from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
@@ -122,6 +127,15 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   checkSubscriptionResponse(
     farcasterWorkerSubRes,
     BrokerSubscriptions.FarcasterWorkerPolicy,
+  );
+
+  const discordBotSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.DiscordBotPolicy,
+    DiscordBotPolicy(),
+  );
+  checkSubscriptionResponse(
+    discordBotSubRes,
+    BrokerSubscriptions.DiscordBotPolicy,
   );
 }
 

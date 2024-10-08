@@ -18,6 +18,14 @@ export enum EventNames {
   ThreadUpvoted = 'ThreadUpvoted',
   UserMentioned = 'UserMentioned',
 
+  DiscordThreadCreated = 'DiscordThreadCreated',
+  DiscordThreadBodyUpdated = 'DiscordThreadBodyUpdated',
+  DiscordThreadTitleUpdated = 'DiscordThreadTitleUpdated',
+  DiscordThreadDeleted = 'DiscordThreadDeleted',
+  DiscordThreadCommentCreated = 'DiscordThreadCommentCreated',
+  DiscordThreadCommentUpdated = 'DiscordThreadCommentUpdated',
+  DiscordThreadCommentDeleted = 'DiscordThreadCommentDeleted',
+
   // Contests
   RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
   OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
@@ -100,4 +108,32 @@ export type EventPairs =
   | {
       event_name: EventNames.FarcasterVoteCreated;
       event_payload: z.infer<typeof events.FarcasterVoteCreated>;
+    }
+  | {
+      event_name: EventNames.DiscordThreadCreated;
+      event_payload: z.infer<typeof events.DiscordThreadCreated>;
+    }
+  | {
+      event_name: EventNames.DiscordThreadTitleUpdated;
+      event_payload: z.infer<typeof events.DiscordThreadTitleUpdated>;
+    }
+  | {
+      event_name: EventNames.DiscordThreadBodyUpdated;
+      event_payload: z.infer<typeof events.DiscordThreadBodyUpdated>;
+    }
+  | {
+      event_name: EventNames.DiscordThreadCommentCreated;
+      event_payload: z.infer<typeof events.DiscordThreadCommentCreated>;
+    }
+  | {
+      event_name: EventNames.DiscordThreadCommentUpdated;
+      event_payload: z.infer<typeof events.DiscordThreadCommentUpdated>;
+    }
+  | {
+      event_name: EventNames.DiscordThreadCommentDeleted;
+      event_payload: z.infer<typeof events.DiscordThreadCommentDeleted>;
+    }
+  | {
+      event_name: EventNames.DiscordThreadDeleted;
+      event_payload: z.infer<typeof events.DiscordThreadDeleted>;
     };

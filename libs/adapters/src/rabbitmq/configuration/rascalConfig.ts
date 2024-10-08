@@ -91,10 +91,6 @@ export function getAllRascalConfigs(
   };
 
   const allExchanges: Record<keyof OmittedRascalExchanges, ExchangeConfig> = {
-    [RascalExchanges.Discobot]: {
-      type: 'fanout',
-      ...exchangeConfig,
-    },
     [RascalExchanges.MessageRelayer]: {
       type: 'topic',
       ...exchangeConfig,
@@ -102,7 +98,7 @@ export function getAllRascalConfigs(
   };
 
   const allQueues: Record<keyof OmittedRascalQueue, QueueConfig> = {
-    [RascalQueues.DiscordListener]: {
+    [RascalQueues.DiscordBotPolicy]: {
       ...queueConfig,
       options: {
         arguments: queueOptions,
@@ -153,11 +149,19 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.ChainEvent,
     },
-    [RascalBindings.DiscordListener]: {
-      source: RascalExchanges.Discobot,
-      destination: RascalQueues.DiscordListener,
+    [RascalBindings.DiscordBotPolicy]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.DiscordBotPolicy,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.DiscordListener,
+      bindingKeys: [
+        RascalRoutingKeys.DiscordThreadCreated,
+        RascalRoutingKeys.DiscordThreadTitleUpdated,
+        RascalRoutingKeys.DiscordThreadBodyUpdated,
+        RascalRoutingKeys.DiscordThreadDeleted,
+        RascalRoutingKeys.DiscordThreadCommentCreated,
+        RascalRoutingKeys.DiscordThreadCommentUpdated,
+        RascalRoutingKeys.DiscordThreadCommentDeleted,
+      ],
     },
     [RascalBindings.NotificationsProvider]: {
       source: RascalExchanges.MessageRelayer,
@@ -212,11 +216,6 @@ export function getAllRascalConfigs(
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
-    [RascalPublications.DiscordListener]: {
-      exchange: RascalExchanges.Discobot,
-      routingKey: RascalRoutingKeys.DiscordListener,
-      ...publicationConfig,
-    },
     [RascalPublications.MessageRelayer]: {
       exchange: RascalExchanges.MessageRelayer,
       ...publicationConfig,
@@ -224,10 +223,6 @@ export function getAllRascalConfigs(
   };
 
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
-    [RascalSubscriptions.DiscordListener]: {
-      queue: RascalQueues.DiscordListener,
-      ...subscriptionConfig,
-    },
     [RascalSubscriptions.ChainEvent]: {
       queue: RascalQueues.ChainEvent,
       ...subscriptionConfig,
@@ -246,6 +241,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.FarcasterWorkerPolicy]: {
       queue: RascalQueues.FarcasterWorkerPolicy,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.DiscordBotPolicy]: {
+      queue: RascalQueues.DiscordBotPolicy,
       ...subscriptionConfig,
     },
     [RascalSubscriptions.NotificationsSettings]: {

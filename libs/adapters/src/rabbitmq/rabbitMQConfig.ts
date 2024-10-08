@@ -9,11 +9,8 @@ import {
   RascalSubscriptions,
 } from './types';
 
-// TODO: Move configs to specific services
-
 export enum RascalConfigServices {
   CommonwealthService = 'commonwealth',
-  DiscobotService = 'discobot',
 }
 
 /**
@@ -78,6 +75,7 @@ export function getRabbitMQConfig(
       RascalQueues.ContestWorkerPolicy,
       RascalQueues.ContestProjection,
       RascalQueues.FarcasterWorkerPolicy,
+      RascalQueues.DiscordBotPolicy,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
@@ -86,6 +84,7 @@ export function getRabbitMQConfig(
       RascalBindings.ContestWorkerPolicy,
       RascalBindings.ContestProjection,
       RascalBindings.FarcasterWorkerPolicy,
+      RascalBindings.DiscordBotPolicy,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
@@ -97,20 +96,7 @@ export function getRabbitMQConfig(
       RascalSubscriptions.ContestWorkerPolicy,
       RascalSubscriptions.ContestProjection,
       RascalSubscriptions.FarcasterWorkerPolicy,
-    ]);
-  } else if (service === RascalConfigServices.DiscobotService) {
-    copyConfigs(allExchanges, vhostConfig.exchanges, [
-      RascalExchanges.Discobot,
-    ]);
-    copyConfigs(allQueues, vhostConfig.queues, [RascalQueues.DiscordListener]);
-    copyConfigs(allBindings, vhostConfig.bindings, [
-      RascalBindings.DiscordListener,
-    ]);
-    copyConfigs(allPublications, vhostConfig.publications, [
-      RascalPublications.DiscordListener,
-    ]);
-    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
-      RascalSubscriptions.DiscordListener,
+      RascalSubscriptions.DiscordBotPolicy,
     ]);
   }
 
