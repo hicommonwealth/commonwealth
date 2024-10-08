@@ -70,7 +70,11 @@ export async function getVotingWeight(
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
-    const { chain_node, token_address, vote_weight_multiplier } = topic;
+    const {
+      ChainNode: chain_node,
+      token_address,
+      vote_weight_multiplier,
+    } = topic;
     mustExist('Topic Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const balances = await tokenBalanceCache.getBalances({

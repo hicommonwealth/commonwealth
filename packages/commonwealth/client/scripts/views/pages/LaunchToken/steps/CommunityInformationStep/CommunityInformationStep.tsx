@@ -13,6 +13,7 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import { fetchCachedNodes } from 'state/api/nodes';
+import useUserStore from 'state/ui/user';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -24,7 +25,7 @@ import { generateCommunityNameFromToken } from './utils';
 
 interface CommunityInformationStepProps {
   handleGoBack: () => void;
-  handleContinue: () => void;
+  handleContinue: (communityId: string) => void;
   tokenInfo?: TokenInfo;
   selectedAddress?: AddressInfo;
 }
@@ -35,6 +36,7 @@ const CommunityInformationStep = ({
   tokenInfo,
   selectedAddress,
 }: CommunityInformationStepProps) => {
+  const user = useUserStore();
   const { isAddedToHomeScreen } = useAppStatus();
 
   const initialValues = {
@@ -60,15 +62,9 @@ const CommunityInformationStep = ({
   const handleSubmit = async (
     values: CommunityInformationFormSubmitValues & { communityId: string },
   ) => {
-    // this condition will never be fulfilled but adding this to avoid typescript errors
-    if (!selectedAddress) {
-      notifyError('No address selected');
-      return;
-    }
-
     const nodes = fetchCachedNodes();
     const baseNode = nodes?.find(
-      (n) => n.ethChainId === commonProtocol.ValidChains.Base,
+      (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
     );
     if (!baseNode || !baseNode.ethChainId) {
       notifyError('Could not find base chain node');
@@ -76,6 +72,13 @@ const CommunityInformationStep = ({
     }
 
     try {
+      // this condition will never be triggered, adding this to avoid typescript errors
+      if (selectedAddress?.address) {
+        user.setData({
+          addressSelectorSelectedAddress: selectedAddress.address,
+        });
+      }
+
       const input = buildCreateCommunityInput({
         id: values.communityId,
         name: values.communityName,
@@ -83,13 +86,10 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        userAddress: selectedAddress.address,
-        chainNodeId: baseNode.ethChainId,
-        isPWA: isAddedToHomeScreen,
-        tokenName: tokenInfo?.name || '',
+        chainNodeId: baseNode.id,
       });
       await createCommunityMutation(input);
-      handleContinue();
+      handleContinue(values.communityId);
     } catch (err) {
       notifyError(err.message);
     }
