@@ -134,11 +134,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(
-            values,
-            isAddedToHomeScreen,
-            allowedAddresses,
-          );
+          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
           const input = buildUpdateGroupInput({
             ...payload,
             groupId: groupId,
