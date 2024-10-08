@@ -14,7 +14,5 @@ export const CreateToken = {
     community_id: z.string(),
     launchpad_contract_address: z.string(),
   }),
-  output: z.object({
-    token: Token,
-  }),
+  output: Token,
 };
