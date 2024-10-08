@@ -45,19 +45,6 @@ function storeActiveAccount(account: Account) {
     user.setData({ accounts: [...user.accounts, account] });
 }
 
-export function linkExistingAddressToChainOrCommunity(
-  address: string,
-  community: string,
-  originChain: string,
-) {
-  return axios.post(`${SERVER_URL}/linkExistingAddressToCommunity`, {
-    address,
-    community_id: community,
-    originChain, // not used
-    jwt: userStore.getState().jwt,
-  });
-}
-
 export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
   try {

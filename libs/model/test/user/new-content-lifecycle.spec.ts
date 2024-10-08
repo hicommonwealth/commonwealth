@@ -23,13 +23,13 @@ describe('New Content lifecycle', () => {
         {
           role: 'member',
           user_id: user1!.id,
-          verified: true,
+          verified: new Date(),
           last_active: new Date().toISOString(),
         },
         {
           role: 'member',
           user_id: user2!.id,
-          verified: true,
+          verified: new Date(),
           last_active: new Date().toISOString(),
         },
       ],

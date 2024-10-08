@@ -1,0 +1,19 @@
+.ScrollContainer {
+  display: flex;
+
+  .Inner {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+
+    // disable the scrollbars for IE + Firefox
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    // disable the scrollbar for Chrome.
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}

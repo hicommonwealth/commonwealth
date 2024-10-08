@@ -15,15 +15,13 @@ const {
   GENERATE_IMAGE_RATE_LIMIT,
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
-  ADDRESS_TOKEN_EXPIRES_IN,
-
-  CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
   MESSAGE_RELAYER_PREFETCH,
   EVM_CE_POLL_INTERVAL,
   CF_ZONE_ID,
   CF_API_KEY,
+  PEER_ID,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -34,7 +32,6 @@ const DEFAULTS = {
   SESSION_SECRET: 'my secret',
   MAGIC_SUPPORTED_BASES: [ChainBase.Ethereum],
   MAGIC_DEFAULT_CHAIN: ChainBase.Ethereum,
-  ADDRESS_TOKEN_EXPIRES_IN: '10',
   MESSAGE_RELAYER_TIMEOUT_MS: '200',
   MESSAGE_RELAYER_PREFETCH: '50',
   EVM_CE_POLL_INTERVAL: '120000',
@@ -50,7 +47,6 @@ export const config = configure(
       GENERATE_IMAGE_RATE_LIMIT ?? DEFAULTS.GENERATE_IMAGE_RATE_LIMIT,
       10,
     ),
-    CW_BOT_KEY,
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: parseInt(
       ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS ??
         DEFAULTS.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
@@ -63,10 +59,6 @@ export const config = configure(
         DEFAULTS.MAGIC_SUPPORTED_BASES,
       MAGIC_DEFAULT_CHAIN:
         (MAGIC_DEFAULT_CHAIN as ChainBase) ?? DEFAULTS.MAGIC_DEFAULT_CHAIN,
-      ADDRESS_TOKEN_EXPIRES_IN: parseInt(
-        ADDRESS_TOKEN_EXPIRES_IN ?? DEFAULTS.ADDRESS_TOKEN_EXPIRES_IN,
-        10,
-      ),
     },
     SENDGRID: {
       API_KEY: SENDGRID_API_KEY,
@@ -102,24 +94,13 @@ export const config = configure(
         10,
       ),
     },
+    PEER_ID,
   },
   z.object({
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
-    CW_BOT_KEY: z
-      .string()
-      .optional()
-      .refine(
-        (data) =>
-          !(
-            ['frick', 'production', 'beta', 'demo'].includes(
-              model_config.APP_ENV,
-            ) && !data
-          ),
-        'CW_BOT_KEY is required in frick, production, beta (QA), and demo',
-      ),
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
       SESSION_SECRET: z
@@ -134,7 +115,6 @@ export const config = configure(
         ),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
-      ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
     }),
     SENDGRID: z.object({
       API_KEY: z
@@ -175,5 +155,6 @@ export const config = configure(
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
+    PEER_ID: z.string().optional(),
   }),
 );

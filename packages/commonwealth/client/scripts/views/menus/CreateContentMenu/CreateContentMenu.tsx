@@ -1,4 +1,5 @@
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -42,6 +43,7 @@ const getCreateContentMenuItems = (
     options?: NavigateOptions & { action?: string },
     prefix?: null | string,
   ) => void,
+  tokenizedCommunityEnabled: boolean,
   createDiscordBotConfig?: ReturnType<
     typeof useCreateDiscordBotConfigMutation
   >['mutateAsync'],
@@ -99,10 +101,14 @@ const getCreateContentMenuItems = (
         navigate('/createCommunity', {}, null);
       },
     },
-    {
-      type: 'element',
-      element: <TokenLaunchButton key={2} buttonHeight="sm" />,
-    },
+    ...(tokenizedCommunityEnabled
+      ? [
+          {
+            type: 'element',
+            element: <TokenLaunchButton key={2} buttonHeight="sm" />,
+          } as PopoverMenuItem,
+        ]
+      : []),
   ];
 
   const getDiscordBotConnectionItems = (): PopoverMenuItem[] => {
@@ -192,6 +198,8 @@ export const CreateContentSidebar = ({
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
 
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+
   return (
     <CWSidebarMenu
       className={getClasses<{
@@ -216,7 +224,11 @@ export const CreateContentSidebar = ({
           }, 200);
         },
       }}
-      menuItems={getCreateContentMenuItems(navigate, createDiscordBotConfig)}
+      menuItems={getCreateContentMenuItems(
+        navigate,
+        tokenizedCommunityEnabled,
+        createDiscordBotConfig,
+      )}
     />
   );
 };
@@ -225,6 +237,8 @@ export const CreateContentSidebar = ({
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
+
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   if (
     !user.isLoggedIn ||
@@ -237,7 +251,7 @@ export const CreateContentPopover = () => {
 
   return (
     <PopoverMenu
-      menuItems={getCreateContentMenuItems(navigate)}
+      menuItems={getCreateContentMenuItems(navigate, tokenizedCommunityEnabled)}
       className="create-content-popover"
       renderTrigger={(onClick, isMenuOpen) => (
         <CWTooltip

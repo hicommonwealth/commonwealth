@@ -2,6 +2,7 @@ import {
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  INVALID_STATE_ERROR,
   command as coreCommand,
   query as coreQuery,
   handleEvent,
@@ -18,6 +19,7 @@ const trpcerror = (error: unknown): TRPCError => {
     const { name, message, ...other } = error;
     switch (name) {
       case INVALID_INPUT_ERROR:
+      case INVALID_STATE_ERROR:
         return new TRPCError({ code: 'BAD_REQUEST', message, ...other });
 
       case INVALID_ACTOR_ERROR:
@@ -59,28 +61,34 @@ export const command = <
   commit?: Commit<Input, Output>,
 ) => {
   const md = factory();
-  return buildproc('POST', factory.name, md, tag, track, commit).mutation(
-    async ({ ctx, input }) => {
-      try {
-        return await coreCommand(
-          md,
-          {
-            actor: ctx.actor,
-            payload: input!,
-          },
-          false,
-        );
-      } catch (error) {
-        throw trpcerror(error);
-      }
-    },
-  );
+  return buildproc({
+    method: 'POST',
+    name: factory.name,
+    md,
+    tag,
+    track,
+    commit,
+  }).mutation(async ({ ctx, input }) => {
+    try {
+      return await coreCommand(
+        md,
+        {
+          actor: ctx.actor,
+          payload: input!,
+        },
+        false,
+      );
+    } catch (error) {
+      throw trpcerror(error);
+    }
+  });
 };
 
 /**
  * Builds tRPC query GET endpoint
  * @param factory query factory
  * @param tag query tag used for OpenAPI spec grouping
+ * @param forceSecure whether to force secure requests for rate-limited external-router
  * @returns tRPC query procedure
  */
 export const query = <
@@ -90,24 +98,29 @@ export const query = <
 >(
   factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
+  forceSecure?: boolean,
 ) => {
   const md = factory();
-  return buildproc('GET', factory.name, md, tag).query(
-    async ({ ctx, input }) => {
-      try {
-        return await coreQuery(
-          md,
-          {
-            actor: ctx.actor,
-            payload: input!,
-          },
-          false,
-        );
-      } catch (error) {
-        throw trpcerror(error);
-      }
-    },
-  );
+  return buildproc({
+    method: 'GET',
+    name: factory.name,
+    md,
+    tag,
+    forceSecure,
+  }).query(async ({ ctx, input }) => {
+    try {
+      return await coreQuery(
+        md,
+        {
+          actor: ctx.actor,
+          payload: input!,
+        },
+        false,
+      );
+    } catch (error) {
+      throw trpcerror(error);
+    }
+  });
 };
 
 // TODO: add security options (API key, IP range, internal, etc)

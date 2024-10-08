@@ -19,21 +19,32 @@ import {
 } from 'commonwealth-mdxeditor';
 import 'commonwealth-mdxeditor/style.css';
 import { notifyError } from 'controllers/app/notifications';
-import React, { memo, useCallback, useRef, useState } from 'react';
-import { DesktopEditorFooter } from './DesktopEditorFooter';
+import React, {
+  memo,
+  MutableRefObject,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
+import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
+import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
+import './MarkdownEditor.scss';
+import { MarkdownEditorContext } from './MarkdownEditorContext';
+import { DesktopEditorFooter } from './toolbars/DesktopEditorFooter';
 import { ToolbarForDesktop } from './toolbars/ToolbarForDesktop';
 import { ToolbarForMobile } from './toolbars/ToolbarForMobile';
-import { useEditorErrorHandler } from './useEditorErrorHandler';
 import { useImageUploadHandler } from './useImageUploadHandler';
+import { useMarkdownEditorErrorHandler } from './useMarkdownEditorErrorHandler';
 import { canAcceptFileForImport } from './utils/canAcceptFileForImport';
 import { codeBlockLanguages } from './utils/codeBlockLanguages';
 import { editorTranslator } from './utils/editorTranslator';
 import { fileToText } from './utils/fileToText';
 import { iconComponentFor } from './utils/iconComponentFor';
-
-import './MarkdownEditor.scss';
 
 export type ImageURL = string;
 
@@ -56,28 +67,45 @@ export type UpdateContentStrategy = 'insert' | 'replace';
 export const DEFAULT_UPDATE_CONTENT_STRATEGY =
   'insert' as UpdateContentStrategy;
 
-type EditorProps = {
-  readonly markdown?: MarkdownStr;
-  readonly mode?: MarkdownEditorMode;
-  readonly placeholder?: string;
-  readonly imageHandler?: ImageHandler;
-  readonly onSubmit?: (markdown: MarkdownStr) => void;
-};
+export type MarkdownEditorProps = Readonly<{
+  markdown?: MarkdownStr;
 
-export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
-  const { onSubmit } = props;
-  const errorHandler = useEditorErrorHandler();
+  disabled?: boolean;
+
+  /**
+   * Manually set the mode for the markdown editor, You shouldn't use this
+   * in prod, just in stories and debug code.
+   *
+   * @internal
+   */
+  mode?: MarkdownEditorMode;
+  placeholder?: string;
+  imageHandler?: ImageHandler;
+  SubmitButton?: () => ReactNode;
+  tooltip?: ReactNode;
+  onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
+  onChange?: (markdown: MarkdownStr) => void;
+}>;
+
+export const MarkdownEditor = memo(function MarkdownEditor(
+  props: MarkdownEditorProps,
+) {
+  const { SubmitButton, onMarkdownEditorMethods, disabled, onChange } = props;
+  const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [active, setActive] = useState(false);
 
   const dragCounterRef = useRef(0);
 
-  const mode = props.mode ?? 'desktop';
+  const deviceProfile = useDeviceProfile();
+
+  const mode = props.mode ?? deviceProfile;
   const imageHandler: ImageHandler = props.imageHandler ?? 'S3';
 
   const placeholder = props.placeholder ?? 'Share your thoughts...';
 
-  const mdxEditorRef = React.useRef<MDXEditorMethods>(null);
+  const mdxEditorRef: MutableRefObject<MDXEditorMethods | null> = useRef(null);
 
   const imageUploadHandlerDelegate = useImageUploadHandler(imageHandler);
 
@@ -100,6 +128,19 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
       }
     },
     [imageUploadHandlerDelegate, terminateDragging],
+  );
+
+  const imageUploadHandlerWithMarkdownInsertion = useCallback(
+    (file: File) => {
+      async function doAsync() {
+        const url = await imageUploadHandler(file);
+
+        mdxEditorRef.current?.insertMarkdown(`![](${url} "")`);
+      }
+
+      doAsync().catch(errorHandler);
+    },
+    [errorHandler, imageUploadHandler],
   );
 
   const handleFile = useCallback(async (file: File) => {
@@ -127,9 +168,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
         await handleFile(file);
       }
 
-      doAsync().catch(console.error);
+      doAsync().catch(errorHandler);
     },
-    [handleFile],
+    [handleFile, errorHandler],
   );
 
   const handleFiles = useCallback(
@@ -174,12 +215,16 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
 
       if (files.length === 1) {
         if (canAcceptFileForImport(files[0])) {
-          handleDropAsync(event).catch(console.error);
           event.preventDefault();
+          handleDropAsync(event).catch(errorHandler);
+        } else {
+          notifyError('Can not accept files of this type.');
         }
       }
+
+      terminateDragging();
     },
-    [handleDropAsync],
+    [errorHandler, handleDropAsync, terminateDragging],
   );
 
   const handleDragEnter = useCallback((event: React.DragEvent) => {
@@ -220,77 +265,110 @@ export const MarkdownEditor = memo(function MarkdownEditor(props: EditorProps) {
       if (canAcceptFileForImport(files[0])) {
         // if we can accept this file for import, go ahead and do so...
         event.preventDefault();
-        handleFiles(files).catch(console.error);
+        handleFiles(files).catch(errorHandler);
       }
     },
-    [handleFiles],
+    [errorHandler, handleFiles],
   );
 
-  const handleSubmit = useCallback(() => {
+  const doFocus = useCallback(() => {
     if (mdxEditorRef.current) {
-      const markdown = mdxEditorRef.current.getMarkdown();
-      onSubmit?.(markdown);
+      mdxEditorRef.current.focus();
     }
-  }, [onSubmit]);
+  }, []);
+
+  const handleRef = useCallback(
+    (methods: MDXEditorMethods) => {
+      mdxEditorRef.current = methods;
+      onMarkdownEditorMethods?.(methods);
+    },
+    [onMarkdownEditorMethods],
+  );
+
+  const mdxEditorMethods = useMemo(() => {
+    return {
+      getMarkdown: () => mdxEditorRef.current!.getMarkdown(),
+    };
+  }, []);
 
   return (
-    <div className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}>
-      <div
-        className={clsx(
-          'mdxeditor-container',
-          'mdxeditor-container-mode-' + mode,
-        )}
-        onDrop={handleDrop}
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onPaste={(event) => handlePaste(event)}
-      >
-        <MDXEditor
-          onError={errorHandler}
-          ref={mdxEditorRef}
-          markdown={props.markdown ?? ''}
-          placeholder={placeholder}
-          iconComponentFor={iconComponentFor}
-          translation={editorTranslator}
-          plugins={[
-            toolbarPlugin({
-              location: mode === 'mobile' ? 'bottom' : 'top',
-              toolbarContents: () =>
-                mode === 'mobile' ? (
-                  <ToolbarForMobile onSubmit={handleSubmit} />
-                ) : (
-                  <ToolbarForDesktop />
-                ),
-            }),
-            listsPlugin(),
-            quotePlugin(),
-            headingsPlugin(),
-            linkPlugin(),
-            linkDialogPlugin(),
-            codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-            codeMirrorPlugin({
-              codeBlockLanguages,
-            }),
-            imagePlugin({ imageUploadHandler }),
-            tablePlugin(),
-            thematicBreakPlugin(),
-            frontmatterPlugin(),
-            diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
-            markdownShortcutPlugin(),
-          ]}
-        />
+    <MarkdownEditorModeContext.Provider value={mode}>
+      <MarkdownEditorContext.Provider value={mdxEditorMethods}>
+        <div
+          className={clsx('mdxeditor-parent', 'mdxeditor-parent-mode-' + mode)}
+        >
+          <div
+            className={clsx(
+              'mdxeditor-container',
+              'mdxeditor-container-mode-' + mode,
+              active ? 'mdxeditor-container-active' : null,
+              disabled ? 'mdxeditor-container-disabled' : null,
+            )}
+            onDrop={handleDrop}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onPaste={(event) => handlePaste(event)}
+            onFocus={() => setActive(true)}
+            onBlur={() => setActive(false)}
+          >
+            <MDXEditor
+              onError={errorHandler}
+              ref={handleRef}
+              markdown={props.markdown ?? ''}
+              placeholder={placeholder}
+              iconComponentFor={iconComponentFor}
+              translation={editorTranslator}
+              onChange={(markdown) => onChange?.(markdown)}
+              plugins={[
+                toolbarPlugin({
+                  location: mode === 'mobile' ? 'bottom' : 'top',
+                  toolbarContents: () =>
+                    mode === 'mobile' ? (
+                      <ToolbarForMobile
+                        SubmitButton={SubmitButton}
+                        focus={doFocus}
+                      />
+                    ) : (
+                      <ToolbarForDesktop
+                        onImage={imageUploadHandlerWithMarkdownInsertion}
+                      />
+                    ),
+                }),
+                listsPlugin(),
+                quotePlugin(),
+                headingsPlugin(),
+                linkPlugin(),
+                linkDialogPlugin(),
+                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+                codeMirrorPlugin({
+                  codeBlockLanguages,
+                }),
+                imagePlugin({ imageUploadHandler }),
+                tablePlugin(),
+                thematicBreakPlugin(),
+                frontmatterPlugin(),
+                diffSourcePlugin({
+                  viewMode: 'rich-text',
+                  diffMarkdown: 'boo',
+                }),
+                markdownShortcutPlugin(),
+              ]}
+            />
 
-        {mode === 'desktop' && (
-          <DesktopEditorFooter
-            onImportMarkdown={handleImportMarkdown}
-            onSubmit={handleSubmit}
-          />
-        )}
+            {mode === 'desktop' && (
+              <DesktopEditorFooter
+                onImage={imageUploadHandlerWithMarkdownInsertion}
+                onImportMarkdown={handleImportMarkdown}
+                SubmitButton={SubmitButton}
+              />
+            )}
 
-        {dragging && <DragIndicator />}
-        {uploading && <UploadIndicator />}
-      </div>
-    </div>
+            {dragging && <DragIndicator />}
+            {uploading && <UploadIndicator />}
+          </div>
+        </div>
+      </MarkdownEditorContext.Provider>
+    </MarkdownEditorModeContext.Provider>
   );
 });
