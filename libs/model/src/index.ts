@@ -17,7 +17,6 @@ export * as Webhook from './webhook';
 
 // Core Services
 export * from './services';
-export * from './types';
 
 // Policies
 export * from './policies';

@@ -36,7 +36,7 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Contract, { asMany: 'contracts' })
     .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock)
-    .withOne(db.Topic);
+    .withMany(db.Topic);
 
   db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' }).withMany(
     db.EvmEventSource,
