@@ -81,6 +81,7 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
         actor: { user: { email: 'snapshot@gmail.com' } },
       });
       expect.fail();
+      // // eslint-disable-next-line no-empty
     } catch (e) {}
   });
 });
