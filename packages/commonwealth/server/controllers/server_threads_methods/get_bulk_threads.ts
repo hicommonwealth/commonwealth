@@ -243,7 +243,8 @@ export async function __getBulkThreads(
               'discord_meta', COM.discord_meta,
               'profile_name', U.profile->>'name',
               'profile_avatar_url', U.profile->>'avatar_url',
-              'user_id', U.id
+              'user_id', U.id,
+              'content_url', COM.content_url
           ))) as "recentComments"
           FROM (
             Select tempC.* FROM "Comments" tempC

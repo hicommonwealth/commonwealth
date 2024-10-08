@@ -69,6 +69,7 @@ export async function __getActiveThreads(
         'deleted_at',
         'marked_as_spam_at',
         'discord_meta',
+        'content_url',
       ],
       include: [
         {
