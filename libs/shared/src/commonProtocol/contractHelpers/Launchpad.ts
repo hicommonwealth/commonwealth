@@ -1,5 +1,3 @@
-const lpHook = '';
-
 export const launchToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
@@ -7,22 +5,22 @@ export const launchToken = async (
   symbol: string,
   shares: number[],
   holders: string[],
-  totalSupply: number,
+  totalSupply: string,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehtods
+  const txReceipt = await contract.methods
     .launchTokenWithLiquidity(
       name,
       symbol,
       shares,
       holders,
       totalSupply,
+      1,
       0,
-      0,
-      lpHook,
-      '',
+      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000000',
     )
-    .send({ from: walletAddress });
+    .send({ from: walletAddress, value: 0.00011e18 });
   return txReceipt;
 };
 
@@ -47,7 +45,7 @@ export const sellToken = async (
   amount: number,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehthods
+  const txReceipt = await contract.methhods
     .sellToken(tokenAddress, amount)
     .send({ from: walletAddress });
   return txReceipt;
