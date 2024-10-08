@@ -53,7 +53,6 @@ All redirect URLs that the bot should support need to be inserted/
   - This variable cannot be found on the Discord developer portal (once created it is hidden). To get this
   variable view the config vars of the [`discobot-listener-staging` Heroku app](https://dashboard.heroku.com/apps/discobot-listener-staging/settings)
   or contact one of the following: Jake, Timothee, Ian
-- `CW_BOT_KEY`: This can be any random string, but it must match `CW_BOT_KEY` in `packages/commonwealth/.env`
 - `DISCORD_CLIENT_ID`: this is the client ID of the Discord app.
   - For local test we use the staging Discord app/bot. The client ID can therefore be found on the [developer dashboard](https://discord.com/developers/applications/1027997517964644453/oauth2/general)
     or by contacting Jake or Timothee.
@@ -80,7 +79,6 @@ connect to. For the staging environments this will be the `CLOUDAMQP_URL` enviro
 [`commonwealth-frick` Heroku app](https://dashboard.heroku.com/apps/commonwealth-frick/settings). For production this is
 the `CLOUDAMQP_URL` environment variable in the [`commonwealthapp` Heroku app](https://dashboard.heroku.com/apps/commonwealth-beta/settings).
 - `CLOUDAMQP_APIKEY`: Same principle as `CLOUDAMQP_URL`.
-- `CW_BOT_KEY`: A strong password that matches `CW_BOT_KEY` in the [`commonwealthapp` Heroku app](https://dashboard.heroku.com/apps/commonwealth-beta/settings).
 - `DATABASE_URL`: Same principles as `CLOUDAMQP_URL` and `CLOUDAMQP_APIKEY` (copy variable from the relevant app).
 - `DISCORD_TOKEN`: This is the token of the staging or production Discord bot.
   - This variable cannot be found on the Discord developer portal (once created it is hidden).
@@ -94,7 +92,6 @@ the `CLOUDAMQP_URL` environment variable in the [`commonwealthapp` Heroku app](h
       or the [production bot](https://discord.com/developers/applications/1133050809412763719/oauth2/general).
   The client ID can also be retrieved by contacting Jake or Timothee.
 - `DISCORD_TOKEN`: this is the same as the `DISCORD_TOKEN` in the associated `Discobot app` above.
-- `CW_BOT_KEY`: this is the same as the `CW_BOT_KEY` in the associated `Discobot app` above.
 
 ## Testing
 

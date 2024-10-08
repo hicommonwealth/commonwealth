@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 const {
   TEST_DB_NAME,
-  CW_BOT_KEY,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
@@ -142,7 +141,6 @@ export const config = configure(
     DISCORD: {
       CLIENT_ID: DISCORD_CLIENT_ID,
       BOT_TOKEN: DISCORD_TOKEN,
-      BOT_KEY: CW_BOT_KEY,
     },
   },
   z.object({
@@ -260,23 +258,11 @@ export const config = configure(
         .refine(
           (data) =>
             !(
-              ['production', 'frick', 'beta', 'demo'].includes(
+              ['production', 'frick', 'frack', 'beta', 'demo'].includes(
                 target.APP_ENV,
               ) && !data
             ),
-          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
-        ),
-      BOT_KEY: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['frick', 'production', 'beta', 'demo'].includes(
-                target.APP_ENV,
-              ) && !data
-            ),
-          'CW_BOT_KEY is required in frick, production, beta (QA), and demo',
+          'DISCORD_TOKEN is required in production, frick, frack, beta (QA), and demo',
         ),
     }),
   }),
