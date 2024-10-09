@@ -8,7 +8,9 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
+import { useFetchTokensQuery } from 'state/api/token';
 import useUserStore from 'state/ui/user';
+import { useDebounce } from 'usehooks-ts';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -51,8 +53,27 @@ const TokenInformationForm = ({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+  const [tokenName, setTokenName] = useState<string>();
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const debouncedSearchTerm = useDebounce<string | undefined>(tokenName, 500);
+
+  const { data: tokensList } = useFetchTokensQuery({
+    cursor: 1,
+    limit: 50,
+    search: debouncedSearchTerm,
+    enabled: !!debouncedSearchTerm,
+  });
+
+  const isTokenNameTaken =
+    tokensList && debouncedSearchTerm
+      ? !!tokensList.pages[0].results.find(
+          ({ name }) =>
+            name.toLowerCase().trim() ===
+            debouncedSearchTerm.toLowerCase().trim(),
+        )
+      : false;
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -77,6 +98,8 @@ const TokenInformationForm = ({
 
   const handleSubmit = useCallback(
     (values: FormSubmitValues) => {
+      if (isTokenNameTaken) return;
+
       // get address from user
       if (!selectedAddress) {
         openAddressSelectionModal();
@@ -86,7 +109,7 @@ const TokenInformationForm = ({
 
       onSubmit(values); // token gets created with signature step, this info is only used to generate community details
     },
-    [openAddressSelectionModal, selectedAddress, onSubmit],
+    [isTokenNameTaken, openAddressSelectionModal, selectedAddress, onSubmit],
   );
 
   useEffect(() => {
@@ -172,6 +195,8 @@ const TokenInformationForm = ({
         label="Token name"
         placeholder="Name your token"
         fullWidth
+        onInput={(e) => setTokenName(e.target.value?.trim())}
+        customError={isTokenNameTaken ? 'Token name is already taken' : ''}
       />
 
       <CWTextInput

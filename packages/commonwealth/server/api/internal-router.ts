@@ -13,6 +13,7 @@ import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
 import * as thread from './threads';
+import * as token from './token';
 import * as user from './user';
 import * as wallet from './wallet';
 import * as webhook from './webhook';
@@ -30,6 +31,7 @@ const api = {
   webhook: webhook.trpcRouter,
   superAdmin: superAdmin.trpcRouter,
   discordBot: discordBot.trpcRouter,
+  token: token.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
