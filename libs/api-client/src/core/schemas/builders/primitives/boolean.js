@@ -1,6 +1,7 @@
 import { SchemaType } from '../../Schema';
 import { createIdentitySchemaCreator } from '../../utils/createIdentitySchemaCreator';
 import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
+
 export const boolean = createIdentitySchemaCreator(
   SchemaType.BOOLEAN,
   (value, { breadcrumbsPrefix = [] } = {}) => {

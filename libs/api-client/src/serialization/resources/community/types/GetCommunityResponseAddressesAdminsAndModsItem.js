@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { GetCommunityResponseAddressesAdminsAndModsItemRole } from './GetCommunityResponseAddressesAdminsAndModsItemRole';
+
 export const GetCommunityResponseAddressesAdminsAndModsItem =
   core.serialization.object({
     address: core.serialization.string(),

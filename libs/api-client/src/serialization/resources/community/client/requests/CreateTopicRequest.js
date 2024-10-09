@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../../core';
 import { CreateTopicRequestWeightedVoting } from '../../types/CreateTopicRequestWeightedVoting';
+
 export const CreateTopicRequest = core.serialization.object({
   communityId: core.serialization.property(
     'community_id',

@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { GetCommunityResponseAddressesGroupsItemRequirementsItemAllowData } from './GetCommunityResponseAddressesGroupsItemRequirementsItemAllowData';
+
 export const GetCommunityResponseAddressesGroupsItemRequirementsItemAllow =
   core.serialization.object({
     data: GetCommunityResponseAddressesGroupsItemRequirementsItemAllowData,

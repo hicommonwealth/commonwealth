@@ -20,7 +20,6 @@ import {
   decodeContent,
   emitMentions,
   parseUserMentions,
-  quillToPlain,
   uniqueMentions,
   uploadIfLarge,
 } from '../utils';
@@ -114,7 +113,6 @@ export function CreateThread(): Command<
       }
 
       const body = decodeContent(payload.body);
-      const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
       const mentions = uniqueMentions(parseUserMentions(body));
 
       const { contentUrl } = await uploadIfLarge('threads', body);
@@ -130,7 +128,6 @@ export function CreateThread(): Command<
               topic_id,
               kind,
               body,
-              plaintext,
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,

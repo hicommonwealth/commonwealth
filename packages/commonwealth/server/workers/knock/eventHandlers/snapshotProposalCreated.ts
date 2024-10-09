@@ -30,7 +30,7 @@ export const processSnapshotProposalCreated: EventHandler<
     return false;
   }
 
-  // Sometimes snapshot-listener will receive a webhook event from a
+  // Sometimes this endpoint will receive a webhook event from a
   // proposal that no longer exists. In that event, we will receive null data
   // from the listener. We can't do anything with that data, so we skip it.
   if (!space || !id) {

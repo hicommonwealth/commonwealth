@@ -1,5 +1,5 @@
 import { express } from '@hicommonwealth/adapters';
-import { ChainEvents } from '@hicommonwealth/model';
+import { ChainEvents, Snapshot } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
 
 const PATH = '/api/integration';
@@ -22,6 +22,11 @@ function build() {
       next();
     },
     express.command(ChainEvents.ChainEventCreated()),
+  );
+
+  router.post(
+    '/snapshot/webhook',
+    express.command(Snapshot.CreateSnapshotProposal()),
   );
 
   return router;

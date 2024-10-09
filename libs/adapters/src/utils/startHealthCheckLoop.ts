@@ -7,10 +7,6 @@ export enum ServiceKey {
   CommonwealthConsumer = 'commonwealth-consumer',
   MessageRelayer = 'message-relayer',
   DiscordBotListener = 'discord-bot-listener',
-  ChainEventsApp = 'chain-events-app',
-  ChainEventsConsumer = 'chain-events-consumer',
-  ChainEventsSubscriber = 'chain-events-subscriber',
-  SnapshotListener = 'snapshot-listener',
 }
 
 export type HealthCheckOptions = {

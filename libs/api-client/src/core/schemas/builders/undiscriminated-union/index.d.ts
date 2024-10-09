@@ -1,2 +1,6 @@
-export type { inferParsedUnidiscriminatedUnionSchema, inferRawUnidiscriminatedUnionSchema, UndiscriminatedUnionSchema, } from "./types";
-export { undiscriminatedUnion } from "./undiscriminatedUnion";
+export type {
+  UndiscriminatedUnionSchema,
+  inferParsedUnidiscriminatedUnionSchema,
+  inferRawUnidiscriminatedUnionSchema,
+} from './types';
+export { undiscriminatedUnion } from './undiscriminatedUnion';
