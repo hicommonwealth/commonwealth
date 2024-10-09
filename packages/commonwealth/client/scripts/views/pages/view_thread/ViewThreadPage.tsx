@@ -631,6 +631,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               ) : (
                 <>
                   <MarkdownViewerUsingQuillOrNewEditor
+                    key={threadBody}
                     markdown={threadBody || ''}
                     cutoffLines={50}
                   />
