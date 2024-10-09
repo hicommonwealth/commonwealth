@@ -12,6 +12,7 @@ import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSu
 import overview from 'views/components/MarkdownEditor/markdown/editor_overview.md?raw';
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
 import { useMarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
+import { NewToolbar } from 'views/pages/MarkdownEditorPage/NewToolbar';
 
 function useParams() {
   const [searchParams] = useSearchParams();
@@ -30,6 +31,7 @@ export const MarkdownEditorPage = () => {
   if (mode === 'desktop') {
     return (
       <div className="MarkdownEditorPage MarkdownEditorPageDesktop">
+        <NewToolbar />
         <div className="DesktopInner">
           <Inner mode={mode} />
         </div>
