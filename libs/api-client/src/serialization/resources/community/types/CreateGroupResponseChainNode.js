@@ -6,6 +6,7 @@ import { CreateGroupResponseChainNodeBalanceType } from './CreateGroupResponseCh
 import { CreateGroupResponseChainNodeContractsItem } from './CreateGroupResponseChainNodeContractsItem';
 import { CreateGroupResponseChainNodeCosmosGovVersion } from './CreateGroupResponseChainNodeCosmosGovVersion';
 import { CreateGroupResponseChainNodeHealth } from './CreateGroupResponseChainNodeHealth';
+
 export const CreateGroupResponseChainNode = core.serialization.object({
   id: core.serialization.number().optional(),
   url: core.serialization.string().optional(),

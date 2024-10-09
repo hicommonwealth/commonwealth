@@ -5,6 +5,7 @@ import * as core from '../../../../core';
 import { CreateGroupResponseAddressesItemRole } from './CreateGroupResponseAddressesItemRole';
 import { CreateGroupResponseAddressesItemUser } from './CreateGroupResponseAddressesItemUser';
 import { CreateGroupResponseAddressesItemWalletId } from './CreateGroupResponseAddressesItemWalletId';
+
 export const CreateGroupResponseAddressesItem = core.serialization.object({
   id: core.serialization.number().optional(),
   address: core.serialization.string(),

@@ -4,6 +4,7 @@
 import * as core from '../../../../core';
 import { CreateCommunityResponseCommunityContestManagersItemTopicsItemContestTopicsItem } from './CreateCommunityResponseCommunityContestManagersItemTopicsItemContestTopicsItem';
 import { CreateCommunityResponseCommunityContestManagersItemTopicsItemWeightedVoting } from './CreateCommunityResponseCommunityContestManagersItemTopicsItemWeightedVoting';
+
 export const CreateCommunityResponseCommunityContestManagersItemTopicsItem =
   core.serialization.object({
     id: core.serialization.number().optional(),
