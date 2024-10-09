@@ -9,6 +9,13 @@ export const detailsFormValidationSchema = z.object({
     .max(255, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
   contestDescription: z.string().optional(),
   contestImage: z.string().optional(),
+  contestTopic: z
+    .object({
+      value: z.number(),
+      label: z.string(),
+    })
+    .optional()
+    .refine((value) => !!value, { message: 'You must select a topic' }),
   feeType: z.enum([
     ContestFeeType.CommunityStake,
     ContestFeeType.DirectDeposit,
