@@ -240,7 +240,7 @@ const StakeExchangeForm = ({
     onSetNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
-  const handleInput = (e) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const numericValue = inputValue.replace(/[^0-9]/g, '');
     const parsed = parseInt(numericValue);
