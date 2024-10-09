@@ -10,7 +10,7 @@ export function GetFarcasterUpvoteActionMetadata(): Query<
     auth: [],
     secure: false,
     body: async () => {
-      return {
+      return await Promise.resolve({
         name: 'Upvote Content',
         icon: 'thumbsup',
         description: 'Upvote content on a Commonwealth contest',
@@ -19,7 +19,7 @@ export function GetFarcasterUpvoteActionMetadata(): Query<
           type: 'post',
           postUrl: config.CONTESTS.FARCASTER_ACTION_URL!,
         },
-      };
+      });
     },
   };
 }
