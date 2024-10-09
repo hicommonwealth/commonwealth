@@ -1,5 +1,7 @@
 # Farcaster Local Development
 
+Tags: #cw
+
 ## Create a Farcaster account
 
 First, sign up for a Farcaster account. Warpcast is a Farcaster client that allows you to create an account. It works on mobile and browser.
@@ -14,7 +16,7 @@ ngrok is a reverse proxy that allows you to create a publicly accessible URL tha
 - Go to `Domains` -> `New Domain` to generate a free static domain
 - Use this command to run ngrok:
 	- `ngrok http --url=YOUR_NGROK_DOMAIN 8080`
-	- Save as shell alias or local bash script since you’ll need to run this often
+	- ⭐️ Save as shell alias or local bash script since you’ll need to run this later and often
 
 ## Setup Neynar webhook
 
@@ -37,6 +39,10 @@ NEYNAR_REPLY_WEBHOOK_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/Rep
 FARCASTER_ACTION_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/CastUpvoteAction
 ```
 
+The `ALLOWED_EVENTS` env var contains a comma-seperated list of outbox events. Add these to the list:
+
+`FarcasterCastCreated,FarcasterReplyCastCreated,FarcasterVoteCreated`
+
 ## Run local services
 
 Run services required for testing contests:
@@ -46,7 +52,7 @@ Run services required for testing contests:
 - Consumer: `pnpm start-consumer`
 - App: `pnpm start`
 
-Also ensure that ngrok is running.
+Also ensure that ngrok is running. Don't copy-paste the command from the ngrok website– use the aforementioned script.
 
 ## Add the Upvote cast action
 
@@ -55,7 +61,8 @@ Farcaster allows users to add a custom “action” to their account, which can 
 - Paste URL into browser, you’ll see the Warpcast page, then click `Add Action`
 
 ## How to test the Farcaster/Contests integration
-- First, post a farcaster contest URL on Farcaster. It has this format: `https://YOUR_DOMAIN/api/integration/farcaster/contests/CONTEST_ADDRESS/contestCard`
+- For testing, you can use any contest that has an associated Topic.
+- First, post a farcaster contest URL on Warpcast. It has this format: `https://YOUR_DOMAIN/api/integration/farcaster/contests/CONTEST_ADDRESS/contestCard`
 	- Fill in your ngrok domain and contest address
 	- Upon posting, it should trigger the `CastCreated` webhook and associate the Cast (message) with the contest. It’ll also create a new programatic webhook for `CastReplyCreated`.
 - Then, add a reply message to the contest cast.
