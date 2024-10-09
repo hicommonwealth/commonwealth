@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => {
       JSON.stringify('pk_live_EF89AABAFB87D6F4'),
     'process.env.DISCORD_CLIENT_ID':
       JSON.stringify(env.DISCORD_CLIENT_ID) ||
-      JSON.stringify('1034502265664454776'),
+      JSON.stringify('1027997517964644453'),
     'process.env.SNAPSHOT_HUB_URL': JSON.stringify(env.SNAPSHOT_HUB_URL),
     'process.env.COSMOS_REGISTRY_API': JSON.stringify(env.COSMOS_REGISTRY_API),
     'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),

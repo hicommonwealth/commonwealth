@@ -7,7 +7,6 @@ type ActivityResponse = {
   thread: {
     id: number;
     body: string;
-    plaintext: string;
     title: string;
     numberOfComments: number;
     created_at: string;
@@ -54,7 +53,6 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         body: x.thread.body,
         discord_meta: x.thread.discord_meta,
         numberOfComments: x.thread.numberOfComments,
-        plaintext: x.thread.plaintext,
         read_only: x.thread.read_only,
         archived_at: x.thread.archived_at,
         // @ts-expect-error <StrictNullChecks/>

@@ -8,6 +8,7 @@ export * as Email from './emails';
 export * as Feed from './feed';
 export * as LoadTest from './load-testing';
 export * as Reaction from './reaction';
+export * as Snapshot from './snapshot';
 export * as Subscription from './subscription';
 export * as SuperAdmin from './super-admin';
 export * as Thread from './thread';
@@ -17,7 +18,6 @@ export * as Webhook from './webhook';
 
 // Core Services
 export * from './services';
-export * from './types';
 
 // Policies
 export * from './policies';

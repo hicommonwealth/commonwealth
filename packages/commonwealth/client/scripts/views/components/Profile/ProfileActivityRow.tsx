@@ -9,11 +9,11 @@ import withRouter, {
   useCommonNavigate,
 } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/new_designs/CWTag';
-import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 
 type ProfileActivityRowProps = {
@@ -23,7 +23,8 @@ type ProfileActivityRowProps = {
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
   const { communityId, createdAt, author, id } = activity;
-  let title: string, body: string;
+  let title: string;
+  let body: string = '';
   if (activity instanceof Thread) {
     title = activity.title;
     body = activity.body;
@@ -138,8 +139,9 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
       </div>
       <div className="content">
         <CWText type="b2" className="gray-text">
-          {/* @ts-expect-error StrictNullChecks*/}
-          <QuillRenderer doc={isThread ? body : comment.text} />
+          <MarkdownViewerWithFallback
+            markdown={isThread ? body : comment.text}
+          />
         </CWText>
         <div className="actions">
           <PopoverMenu

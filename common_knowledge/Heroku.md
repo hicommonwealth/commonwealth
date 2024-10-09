@@ -18,13 +18,11 @@ Engineers should be assigned Heroku admin permissions during the onboarding proc
 As of 231107, eight apps are hosted on Heroku:
 
 1. `common-app`
-2. `commonbot`
-3. `commonwealth-frack-eu`
-4. `cosmos-devnet`
-5. `cosmos-devnet-beta`
-6. `cw-discourse-import`
-7. `evmos-devnet`
-8. `snapshot-listener`
+2. `commonwealth-frack-eu`
+3. `cosmos-devnet`
+4. `cosmos-devnet-beta`
+5. `cw-discourse-import`
+6. `evmos-devnet`
 
 ### Common-app
 
@@ -39,14 +37,6 @@ The `common-app` comprises several sub-apps or servers:
 The #eng-infra Slack channel is used to communicate which servers are free for testing, and which PRs each sever is presently pegged to.
 
 For more complete information on our testing environments, and instructions on updating the #eng-infra channel topic, see the dedicated [Testing Environments](./Testing-Environments.md) entry.
-
-### Common-bot
-
-The common-bot app several sub-apps or servers:
-
-1. `discobot-listener`: Handles Commonwealth <> Discord integration. For full documentation, see [Discobot.md](./Discobot.md).
-2. `discobot-listener-staging`: A testing server for Discobot.
-3. `farcaster-bot-experimental`: An in-progress Common 2.0 project.
 
 ## Procfiles
 

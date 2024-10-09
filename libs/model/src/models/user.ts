@@ -72,6 +72,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
       profile: { type: Sequelize.JSONB, allowNull: false },
+      xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: true },
     },
     {
       timestamps: true,
@@ -88,7 +89,6 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
             'isAdmin',
             'created_at',
             'updated_at',
-            'hashed_api_key',
           ],
         },
       },

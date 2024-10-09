@@ -65,6 +65,7 @@ const isCloudflare =
  * A constant that indicates which environment and version the SDK is running in.
  */
 export const RUNTIME = evaluateRuntime();
+
 function evaluateRuntime() {
   if (isBrowser) {
     return {

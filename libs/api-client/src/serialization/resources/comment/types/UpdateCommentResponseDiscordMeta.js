@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { UpdateCommentResponseDiscordMetaUser } from './UpdateCommentResponseDiscordMetaUser';
+
 export const UpdateCommentResponseDiscordMeta = core.serialization.object({
   user: UpdateCommentResponseDiscordMetaUser,
   channelId: core.serialization.property(

@@ -5,6 +5,7 @@ import * as core from '../../../../core';
 import { UpdateCommunityResponseAddressesItemRole } from './UpdateCommunityResponseAddressesItemRole';
 import { UpdateCommunityResponseAddressesItemUser } from './UpdateCommunityResponseAddressesItemUser';
 import { UpdateCommunityResponseAddressesItemWalletId } from './UpdateCommunityResponseAddressesItemWalletId';
+
 export const UpdateCommunityResponseAddressesItem = core.serialization.object({
   id: core.serialization.number().optional(),
   address: core.serialization.string(),
