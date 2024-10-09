@@ -4,11 +4,11 @@ import { parse } from '@ipld/dag-json';
 import { config } from '../config';
 
 const log = logger(import.meta);
-export const canvas = await startCanvasNode(config);
+export const { app: canvas, libp2p } = await startCanvasNode(config);
 
 log.info(
   'canvas: started libp2p with multiaddrs: ' +
-    canvas.libp2p
+    libp2p
       .getMultiaddrs()
       .map((m) => m.toString())
       .join(', '),

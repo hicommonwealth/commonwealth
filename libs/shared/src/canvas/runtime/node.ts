@@ -48,7 +48,7 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
     contract,
   });
 
-  await app.startLibp2p({
+  const libp2p = await app.startLibp2p({
     announce: [announce],
     listen: [listen],
     bootstrapList: [],
@@ -56,5 +56,5 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
     start: true,
   });
 
-  return app;
+  return { app, libp2p };
 };
