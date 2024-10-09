@@ -34,8 +34,9 @@ const NotificationSettings = () => {
   const communityAlerts = useCommunityAlertsQuery({});
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const user = useUserStore();
-  const subscriptionPreference = useSubscriptionPreferences();
+  const subscriptionPreferences = useSubscriptionPreferences();
 
+  // console.log("FIXME: ", JSON.stringify(subscriptionPreferences, null, 2))
   const communityAlertsIndex = createIndexForCommunityAlerts(
     communityAlerts.data || [],
   );

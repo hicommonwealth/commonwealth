@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 // eslint-disable-next-line max-len
 import { useRegisterPushNotificationSubscriptionCallback } from 'views/pages/NotificationSettings/useRegisterPushNotificationSubscriptionCallback';
+// eslint-disable-next-line max-len
 import { useUnregisterPushNotificationSubscriptionCallback } from 'views/pages/NotificationSettings/useUnregisterPushNotificationSubscriptionCallback';
 
 export function usePushNotificationToggleCallback() {
