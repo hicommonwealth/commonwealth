@@ -6,9 +6,6 @@ import erc_1155_abi from '../utils/abi/erc1155';
 import erc_721_abi from '../utils/abi/erc721';
 import { advanceTime, mineBlocks } from '../utils/chainUtil';
 import getProvider from '../utils/getProvider';
-import { IGovernor } from '../utils/governance/IGovernor';
-import { aaveGovernor } from '../utils/governance/aaveGov';
-import { compoundGovernor } from '../utils/governance/compoundGov';
 import { ERC1155 } from './erc1155';
 import { ERC20 } from './erc20';
 import { ERC721 } from './nft';
@@ -49,122 +46,6 @@ export class ChainTesting extends SdkBase {
 
   public getErc20Contract(tokenAddress: string) {
     return new ERC20(tokenAddress);
-  }
-
-  // Proposal
-  /**
-   * Get voting power via ERC20 token for a given wallet
-   * @param accountIndex account index of test chain to get tokens
-   * @param numberOfVotes amount of votes/tokens to receive
-   * @param govType type of governor. 'compound' || 'aave
-   */
-  public async getVotingPower(
-    accountIndex: number,
-    numberOfVotes: string,
-    govType: 'compound' | 'aave' = 'compound',
-  ) {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    return await gov.getVotes(accountIndex, numberOfVotes);
-  }
-
-  /**
-   * Creates an arbitrary Compound proposal
-   * @param accountIndex the index of accounts to create from
-   * @param govType type of governor. 'compound' || 'aave
-   * @returns proposalId of create Proposal
-   */
-  public async createProposal(
-    accountIndex: number,
-    govType = 'compound',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    return await gov.createArbitraryProposal(accountIndex);
-  }
-
-  /**
-   * Cancel a proposal
-   * @param proposalId proposal Id to cancel
-   * @param govType type of governor. 'compound' || 'aave
-   * @returns proposalId of cancelled
-   */
-  public async cancelProposal(
-    proposalId: string,
-    govType = 'compound',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    return await gov.cancelProposal(proposalId);
-  }
-
-  /**
-   * Cast a vote for an account on a proposal
-   * @param proposalId proposal to vote on
-   * @param accountIndex account index to vote
-   * @param forAgainst vote for or against
-   * @param govType type of governor. 'compound' || 'aave
-   */
-  public async castVote(
-    proposalId: string,
-    accountIndex: number,
-    forAgainst: boolean,
-    govType = 'compound',
-  ) {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    return await gov.castVote(proposalId, accountIndex, forAgainst);
-  }
-
-  /**
-   * Queue a proposal for execution
-   * @param proposalId
-   * @param govType type of governor. 'compound' || 'aave
-   */
-  public async queueProposal(
-    proposalId: string,
-    govType = 'compound',
-  ): Promise<{ block: number }> {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    return await gov.queueProposal(proposalId, true);
-  }
-
-  /**
-   * execute a passed proposal
-   * @param proposalId
-   * @param govType type of governor. 'compound' || 'aave
-   */
-  public async executeProposal(proposalId: string, govType = 'compound') {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    return await gov.executeProposal(proposalId, true);
-  }
-
-  /**
-   * Runs a full proposal cycle from getting voting power to execution
-   * @param govType type of governor. 'compound' || 'aave
-   */
-  public async runProposalCycle(govType = 'compound') {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    await gov.endToEndSim();
-
-    return true;
-  }
-
-  /**
-   * get current details of a proposal
-   * @param proposalId
-   * @param govType type of governor. 'compound' || 'aave
-   * @returns JSON data of proposal
-   */
-  public async getProposalDetails(proposalId: string, govType = 'compound') {
-    const gov: IGovernor =
-      govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    return await gov.getProposalDetails(proposalId);
   }
 
   // Chain Data
