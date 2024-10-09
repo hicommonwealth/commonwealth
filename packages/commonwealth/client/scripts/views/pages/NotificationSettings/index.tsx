@@ -2,6 +2,7 @@ import { CommunityAlert } from '@hicommonwealth/schemas';
 import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
+import { useSubscriptionPreferences } from 'state/api/trpc/subscription/useSubscriptionPreferences';
 import useUserStore from 'state/ui/user';
 import ScrollContainer from 'views/components/ScrollContainer';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -33,6 +34,7 @@ const NotificationSettings = () => {
   const communityAlerts = useCommunityAlertsQuery({});
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const user = useUserStore();
+  const subscriptionPreference = useSubscriptionPreferences();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     communityAlerts.data || [],

@@ -1,5 +1,5 @@
 import { trpc } from 'utils/trpcClient';
 
-export function useGetSubscriptionPreferences() {
+export function useSubscriptionPreferences() {
   return trpc.subscription.getSubscriptionPreferences.useQuery({});
 }

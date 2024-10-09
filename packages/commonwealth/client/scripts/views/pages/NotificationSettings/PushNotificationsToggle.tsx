@@ -1,26 +1,14 @@
-import { BrowserType, getBrowserType } from 'helpers/browser';
+import { getBrowserType } from 'helpers/browser';
 import React, { useCallback, useState } from 'react';
 // eslint-disable-next-line max-len
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
 // eslint-disable-next-line max-len
 import { useUnregisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useUnregisterClientRegistrationTokenMutation';
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
+import { computeChannelTypeFromBrowserType } from 'views/pages/NotificationSettings/computeChannelTypeFromBrowserType';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 
 const LOCAL_STORAGE_KEY = 'pushNotificationsEnabled';
-
-function computeChannelTypeFromBrowserType(
-  browserType: BrowserType | undefined,
-): 'FCM' | 'APNS' | undefined {
-  switch (browserType) {
-    case 'safari':
-      return 'APNS';
-    case 'chrome':
-      return 'FCM';
-  }
-
-  return undefined;
-}
 
 export const PushNotificationsToggle = () => {
   const registerClientRegistrationToken =
@@ -30,7 +18,7 @@ export const PushNotificationsToggle = () => {
     useUnregisterClientRegistrationTokenMutation();
 
   const browserType = getBrowserType();
-  const channelType = computeChannelTypeFromBrowserType(browserType) ?? 'APNS'; //cannot be undefined
+  const channelType = computeChannelTypeFromBrowserType(browserType);
 
   const [checked, setChecked] = useState(
     () => localStorage.getItem(LOCAL_STORAGE_KEY) === 'on',
@@ -43,6 +31,8 @@ export const PushNotificationsToggle = () => {
 
   const handleRegisterPushNotificationSubscription = useCallback(() => {
     async function doAsync() {
+      if (!channelType) return;
+
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         console.log('Notification permission granted.');
@@ -60,6 +50,8 @@ export const PushNotificationsToggle = () => {
 
   const handleUnregisterPushNotificationSubscription = useCallback(() => {
     async function doAsync() {
+      if (!channelType) return;
+
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         console.log('Notification permission granted.');
