@@ -3,11 +3,9 @@ import {
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,
   models,
-  proposalEventSignatures,
 } from '@hicommonwealth/model';
 import z from 'zod';
 import { handleCommunityStakeTrades } from './chainEvents/handleCommunityStakeTrades';
-import { handleGovernanceProposalEvents } from './chainEvents/handleGovnernanceProposalEvents';
 
 const log = logger(import.meta);
 
@@ -26,10 +24,6 @@ export const processChainEventCreated: EventHandler<
   ) {
     log.info('Implementation not defined', { payload });
     return false;
-  } else if (
-    proposalEventSignatures.includes(payload.eventSource.eventSignature)
-  ) {
-    return await handleGovernanceProposalEvents(models, payload);
   } else {
     log.error('Attempted to process an unsupported chain-event', undefined, {
       event: payload,
