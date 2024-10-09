@@ -104,6 +104,7 @@ export const iconLookup = {
   h1: withPhosphorIcon(TextHOne),
   h2: withPhosphorIcon(TextHTwo),
   h3: withPhosphorIcon(TextHThree),
+  quote: withPhosphorIcon(Quotes),
   quotes: withPhosphorIcon(Quotes),
   table: withPhosphorIcon(Table),
   image: withPhosphorIcon(Image),
