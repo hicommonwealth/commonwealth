@@ -1,5 +1,8 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
+import {
+  notifyError,
+  notifySuccess,
+} from 'client/scripts/controllers/app/notifications';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -132,7 +135,7 @@ const StakeExchangeForm = ({
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
   });
-
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   const handleBuy = async () => {
     try {
       onSetModalState(ManageCommunityStakeModalState.Loading);
@@ -304,8 +307,14 @@ const StakeExchangeForm = ({
     : numberOfStakeToExchange >= stakeBalance;
 
   const handleClickCopyClipboard = (address: string) => {
-    navigator.clipboard.writeText(address);
-    notifySuccess('successfully copy to clipboard');
+    navigator.clipboard
+      .writeText(address)
+      .then(() => {
+        notifySuccess('successfully copy to clipboard');
+      })
+      .catch(() => {
+        notifyError('Failed to copy clipboard');
+      });
   };
 
   return (
