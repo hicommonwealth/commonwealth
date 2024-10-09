@@ -85,7 +85,7 @@ Definition: `chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh`
 
 Description:
 
-- Builds project on Heroku by calling application build script (above), using configuration variables (CW_BUILD, SL_BUILD, DL_BUILD)
+- Builds project on Heroku by calling application build script (above), using configuration variables (CW_BUILD)
 - Cleans other apps and unnecessary code in the monorepo
 
 ## CI/CD

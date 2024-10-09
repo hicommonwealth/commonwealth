@@ -1,3 +1,0 @@
-FROM snapshot-listener
-RUN apt-get update && apt-get install
-CMD node --import=extensionless/register ./build/scripts/releasePhaseEnvCheck.js

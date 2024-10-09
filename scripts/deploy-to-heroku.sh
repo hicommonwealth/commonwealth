@@ -62,11 +62,3 @@ deploy_heroku_app() {
 
 docker build . --target commonwealth -t commonwealth -f Dockerfile.commonwealth_base
 deploy_heroku_app "./packages/commonwealth/deploy/dockerfiles" ${app_name}
-
-snapshot_listener_app_name=snapshot-listener-staging
-if [ "${app_name}" == "commonwealthapp" ]; then
-  snapshot_listener_app_name="snapshot-listener"
-fi
-
-docker build . --target snapshot-listener -t snapshot-listener -f Dockerfile.commonwealth_base
-deploy_heroku_app "./packages/snapshot-listener/deploy/dockerfiles" ${snapshot_listener_app_name}
