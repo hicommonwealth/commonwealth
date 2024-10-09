@@ -10,16 +10,12 @@ export function usePushNotificationToggleCallback() {
     useUnregisterPushNotificationSubscriptionCallback();
 
   return useCallback(
-    (active: boolean) => {
-      async function doAsync() {
-        if (active) {
-          await registerCallback();
-        } else {
-          await unregisterCallback();
-        }
+    async (active: boolean) => {
+      if (active) {
+        await registerCallback();
+      } else {
+        await unregisterCallback();
       }
-
-      doAsync().catch(console.error);
     },
     [registerCallback, unregisterCallback],
   );

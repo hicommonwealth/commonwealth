@@ -130,7 +130,7 @@ const NotificationSettings = () => {
                   </div>
 
                   <div className="setting-container-right">
-                    <PushNotificationsToggle />
+                    <PushNotificationsToggle pref="mobile_push_notifications_enabled" />
                   </div>
                 </div>
               </div>
