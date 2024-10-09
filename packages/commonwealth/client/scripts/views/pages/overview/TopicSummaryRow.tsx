@@ -71,7 +71,7 @@ export const TopicSummaryRow = ({
             fontWeight="medium"
             className="threads-count-text"
           >
-            {topic.totalThreads || 0} Threads
+            {topic.total_threads || 0} Threads
           </CWText>
         </div>
         {topic.description && <CWText type="b2">{topic.description}</CWText>}

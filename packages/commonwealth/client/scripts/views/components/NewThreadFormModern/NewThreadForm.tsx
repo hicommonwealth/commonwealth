@@ -30,6 +30,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
+import Topic from '../../../models/Topic';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -81,15 +82,16 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
-  } = useNewThreadForm(communityId, topicsForSelector);
+  } = useNewThreadForm(communityId, topicsForSelector as unknown as Topic[]);
 
-  const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
+  const hasTopicOngoingContest =
+    threadTopic?.active_contest_managers?.length > 0;
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  const contestTopicError = threadTopic?.activeContestManagers?.length
-    ? threadTopic?.activeContestManagers
+  const contestTopicError = threadTopic?.active_contest_managers?.length
+    ? threadTopic?.active_contest_managers
         ?.map(
           (acm) =>
             acm?.content?.filter(
@@ -262,7 +264,7 @@ export const NewThreadForm = () => {
                         originalProps,
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
-                        ),
+                        ) as unknown as Topic,
                       }),
                   }}
                   formatOptionLabel={(option) => (
@@ -307,7 +309,7 @@ export const NewThreadForm = () => {
 
               {contestTopicAffordanceVisible && (
                 <ContestTopicBanner
-                  contests={threadTopic?.activeContestManagers.map((acm) => {
+                  contests={threadTopic?.active_contest_managers.map((acm) => {
                     return {
                       name: acm?.contest_manager?.name,
                       address: acm?.contest_manager?.contest_address,

@@ -12,7 +12,8 @@ import * as integrations from './integrations';
 import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
-import * as thread from './threads';
+import * as thread from './thread';
+import * as topic from './topic';
 import * as user from './user';
 import * as wallet from './wallet';
 import * as webhook from './webhook';
@@ -21,6 +22,7 @@ const api = {
   user: user.trpcRouter,
   community: community.trpcRouter,
   thread: thread.trpcRouter,
+  topic: topic.trpcRouter,
   comment: comment.trpcRouter,
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,

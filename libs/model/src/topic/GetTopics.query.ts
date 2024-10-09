@@ -1,30 +1,39 @@
-import { CommunityInstance, TopicAttributes } from '@hicommonwealth/model';
+import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
-import { ServerTopicsController } from '../server_topics_controller';
-
-export type GetTopicsOptions = {
-  community: CommunityInstance;
-  with_contest_managers: boolean;
-};
+import z from 'zod';
+import { models } from '../database';
+import { TopicAttributes } from '../models';
 
 const ActiveContestManagers = schemas.ContestManager.extend({
   content: z.array(schemas.ContestAction),
   contest_manager: schemas.ContestManager,
 });
 
-type TopicWithTotalThreads = TopicAttributes & {
+type TopicWithTotalThreads = TopicAttributes & { id: number } & {
   total_threads: number;
   active_contest_managers: Array<z.infer<typeof ActiveContestManagers>>;
 };
 
-export type GetTopicsResult = TopicWithTotalThreads[];
-export async function __getTopics(
-  this: ServerTopicsController,
-  { community, with_contest_managers }: GetTopicsOptions,
-): Promise<GetTopicsResult> {
-  const baseQuery = `
+export function GetTopics(): Query<typeof schemas.GetTopics> {
+  return {
+    ...schemas.GetTopics,
+    auth: [],
+    secure: false,
+    body: async ({ payload }) => {
+      const {
+        community_id,
+        topic_id,
+        include_threads,
+        include_contest_managers,
+      } = payload;
+
+      const includeThreads = include_threads
+        ? ` JOIN "Threads" th
+        ON t.id = th.topic_id `
+        : '';
+
+      const baseQuery = `
     WITH topic_data AS (
       SELECT t.*, (
         SELECT COUNT(*)::int
@@ -32,14 +41,15 @@ export async function __getTopics(
         WHERE community_id = :community_id AND topic_id = t.id AND deleted_at IS NULL
       ) as total_threads
       FROM "Topics" t
-      WHERE t.community_id = :community_id AND t.deleted_at IS NULL
+      ${includeThreads}
+      WHERE t.community_id = :community_id AND (:topic_id IS NULL OR t.id = :topic_id) AND t.deleted_at IS NULL
     )
   `;
 
-  let sql = baseQuery;
+      let sql = baseQuery;
 
-  if (with_contest_managers) {
-    sql += `
+      if (include_contest_managers) {
+        sql += `
       SELECT td.*,
         COALESCE(
           (
@@ -76,14 +86,16 @@ export async function __getTopics(
         ) as active_contest_managers
       FROM topic_data td
     `;
-  } else {
-    sql += `SELECT *, '[]'::json as active_contest_managers FROM topic_data`;
-  }
+      } else {
+        sql += `SELECT *, '[]'::json as active_contest_managers FROM topic_data`;
+      }
 
-  const topics = await this.models.sequelize.query<TopicWithTotalThreads>(sql, {
-    replacements: { community_id: community.id },
-    type: QueryTypes.SELECT,
-  });
+      const topics = await models.sequelize.query<TopicWithTotalThreads>(sql, {
+        replacements: { community_id, topic_id: topic_id ?? null },
+        type: QueryTypes.SELECT,
+      });
 
-  return topics;
+      return topics;
+    },
+  };
 }

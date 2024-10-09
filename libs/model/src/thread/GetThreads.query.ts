@@ -1,22 +1,50 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { removeUndefined } from '../utils/index';
+import { removeUndefined } from '../utils';
 import { formatSequelizePagination } from '../utils/paginationUtils';
 
-export function GetComments(): Query<typeof schemas.GetComments> {
+export function GetThreads(): Query<typeof schemas.GetThreads> {
   return {
-    ...schemas.GetComments,
+    ...schemas.GetThreads,
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { thread_id, comment_id, include_user, include_reactions } =
-        payload;
+      const {
+        community_id,
+        topic_id,
+        thread_id,
+        include_comments,
+        include_user,
+        include_reactions,
+      } = payload;
 
       const includeArray = [];
+      if (include_comments) {
+        includeArray.push({
+          model: models.Comment,
+          as: 'Comments',
+          include: [
+            {
+              model: models.Address,
+              as: 'Address',
+              attributes: ['id', 'address', 'last_active'],
+              include: [
+                {
+                  model: models.User,
+                  as: 'User',
+                  required: true,
+                  attributes: ['id', 'profile'],
+                },
+              ],
+            },
+          ],
+        });
+      }
       if (include_user) {
         includeArray.push({
           model: models.Address,
+          as: 'Address',
           include: [
             {
               model: models.User,
@@ -37,12 +65,10 @@ export function GetComments(): Query<typeof schemas.GetComments> {
               model: models.Address,
               as: 'Address',
               required: true,
-              attributes: ['address', 'last_active'],
+              attributes: ['id', 'address', 'last_active'],
               include: [
                 {
                   model: models.User,
-                  as: 'User',
-                  required: true,
                   attributes: ['id', 'profile'],
                 },
               ],
@@ -51,14 +77,14 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         });
       }
 
-      const { count, rows: comments } = await models.Comment.findAndCountAll({
-        where: removeUndefined({ thread_id, id: comment_id }),
+      const { count, rows: threads } = await models.Thread.findAndCountAll({
+        where: removeUndefined({ community_id, topic_id, id: thread_id }),
         include: includeArray,
         ...formatSequelizePagination(payload),
         paranoid: false,
       });
 
-      return schemas.buildPaginatedResponse(comments, count as number, payload);
+      return schemas.buildPaginatedResponse(threads, count as number, payload);
     },
   };
 }

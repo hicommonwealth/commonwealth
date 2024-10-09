@@ -10,7 +10,8 @@ import {
   addRateLimiterMiddleware,
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
-import * as thread from './threads';
+import * as thread from './thread';
+import * as topic from './topic';
 
 const {
   createCommunity,
@@ -24,14 +25,16 @@ const {
   joinCommunity,
 } = community.trpcRouter;
 const {
+  getThreads,
   createThread,
   updateThread,
-  deleteThread,
   createThreadReaction,
   deleteReaction,
+  deleteThread,
 } = thread.trpcRouter;
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
+const { getTopics } = topic.trpcRouter;
 
 const api = {
   getCommunities: trpc.query(
@@ -52,7 +55,9 @@ const api = {
   deleteGroup,
   createThread,
   updateThread,
+  getThreads,
   deleteThread,
+  getTopics,
   createComment,
   updateComment,
   deleteComment,

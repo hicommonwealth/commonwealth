@@ -56,4 +56,5 @@ export const trpcRouter = trpc.router({
     undefined,
     applyCanvasSignedDataMiddleware,
   ),
+  getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
 });

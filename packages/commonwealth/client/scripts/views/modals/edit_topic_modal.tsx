@@ -37,7 +37,7 @@ export const EditTopicModal = ({
 }: EditTopicModalProps) => {
   const {
     description: descriptionProp,
-    featuredInSidebar: featuredInSidebarProp,
+    featured_in_sidebar: featuredInSidebarProp,
     id,
     name: nameProp,
   } = topic;
