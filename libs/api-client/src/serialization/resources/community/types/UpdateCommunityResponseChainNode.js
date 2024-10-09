@@ -6,6 +6,7 @@ import { UpdateCommunityResponseChainNodeBalanceType } from './UpdateCommunityRe
 import { UpdateCommunityResponseChainNodeContractsItem } from './UpdateCommunityResponseChainNodeContractsItem';
 import { UpdateCommunityResponseChainNodeCosmosGovVersion } from './UpdateCommunityResponseChainNodeCosmosGovVersion';
 import { UpdateCommunityResponseChainNodeHealth } from './UpdateCommunityResponseChainNodeHealth';
+
 export const UpdateCommunityResponseChainNode = core.serialization.object({
   id: core.serialization.number().optional(),
   url: core.serialization.string().optional(),

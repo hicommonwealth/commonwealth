@@ -1,6 +1,7 @@
 import { SchemaType } from '../../Schema';
 import { JsonError } from './JsonError';
 import { ParseError } from './ParseError';
+
 export function getSchemaUtils(schema) {
   return {
     optional: () => optional(schema),
@@ -21,6 +22,7 @@ export function getSchemaUtils(schema) {
     },
   };
 }
+
 /**
  * schema utils are defined in one file to resolve issues with circular imports
  */
@@ -60,6 +62,7 @@ export function optional(schema) {
     getSchemaUtils(baseSchema),
   );
 }
+
 export function transform(schema, transformer) {
   const baseSchema = {
     parse: (raw, opts) => {

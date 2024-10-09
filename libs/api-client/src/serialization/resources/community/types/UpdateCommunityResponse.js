@@ -15,6 +15,7 @@ import { UpdateCommunityResponseSocialLinksItem } from './UpdateCommunityRespons
 import { UpdateCommunityResponseTerms } from './UpdateCommunityResponseTerms';
 import { UpdateCommunityResponseTopicsItem } from './UpdateCommunityResponseTopicsItem';
 import { UpdateCommunityResponseType } from './UpdateCommunityResponseType';
+
 export const UpdateCommunityResponse = core.serialization.object({
   id: core.serialization.string(),
   name: core.serialization.string(),

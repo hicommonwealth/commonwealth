@@ -12,7 +12,10 @@ export const buildAssociations = (db: DB) => {
     })
     .withMany(db.Wallets)
     .withMany(db.XpLog, { onDelete: 'CASCADE' })
-    .withOne(db.ApiKey, { onDelete: 'CASCADE' });
+    .withOne(db.ApiKey, {
+      targetKey: 'id',
+      onDelete: 'CASCADE',
+    });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -33,7 +36,7 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Contract, { asMany: 'contracts' })
     .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock)
-    .withOne(db.Topic);
+    .withMany(db.Topic);
 
   db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' }).withMany(
     db.EvmEventSource,
@@ -65,7 +68,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     })
     .withOne(db.DiscordBotConfig, {
-      targeyKey: 'discord_config_id',
+      targetKey: 'discord_config_id',
       onDelete: 'CASCADE',
     })
     .withOne(db.User, {

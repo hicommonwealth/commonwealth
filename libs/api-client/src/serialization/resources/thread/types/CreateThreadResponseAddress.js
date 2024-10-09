@@ -5,6 +5,7 @@ import * as core from '../../../../core';
 import { CreateThreadResponseAddressRole } from './CreateThreadResponseAddressRole';
 import { CreateThreadResponseAddressUser } from './CreateThreadResponseAddressUser';
 import { CreateThreadResponseAddressWalletId } from './CreateThreadResponseAddressWalletId';
+
 export const CreateThreadResponseAddress = core.serialization.object({
   id: core.serialization.number().optional(),
   address: core.serialization.string(),

@@ -4,6 +4,7 @@
 import * as core from '../../../../core';
 import { UpdateCommentResponseThreadTopicContestTopicsItem } from './UpdateCommentResponseThreadTopicContestTopicsItem';
 import { UpdateCommentResponseThreadTopicWeightedVoting } from './UpdateCommentResponseThreadTopicWeightedVoting';
+
 export const UpdateCommentResponseThreadTopic = core.serialization.object({
   id: core.serialization.number().optional(),
   name: core.serialization.string().optional(),

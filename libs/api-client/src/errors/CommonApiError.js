@@ -13,6 +13,7 @@ export class CommonApiError extends Error {
     }
   }
 }
+
 function buildMessage({ message, statusCode, body }) {
   let lines = [];
   if (message != null) {

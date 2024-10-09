@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { CreateGroupResponseAddressesItemUserProfileBackgroundImage } from './CreateGroupResponseAddressesItemUserProfileBackgroundImage';
+
 export const CreateGroupResponseAddressesItemUserProfile =
   core.serialization.object({
     name: core.serialization.string().optional(),

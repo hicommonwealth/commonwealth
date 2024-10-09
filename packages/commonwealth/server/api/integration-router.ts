@@ -1,5 +1,5 @@
 import { express } from '@hicommonwealth/adapters';
-import { ChainEvents, Contest, config } from '@hicommonwealth/model';
+import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
 
@@ -50,6 +50,11 @@ function build() {
       express.command(Contest.FarcasterUpvoteAction()),
     );
   }
+
+  router.post(
+    '/snapshot/webhook',
+    express.command(Snapshot.CreateSnapshotProposal()),
+  );
 
   return router;
 }

@@ -27,7 +27,6 @@ export default (
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
       body: { type: Sequelize.TEXT, allowNull: true },
-      plaintext: { type: Sequelize.TEXT, allowNull: true },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
