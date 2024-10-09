@@ -10,14 +10,12 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
-import CommunityContract from './community_contract';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
 import ContestTopic from './contest_topic';
-import Contract from './contract';
 import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
@@ -55,14 +53,12 @@ export const Factories = {
   CommentSubscription,
   Community,
   CommunityAlert,
-  CommunityContract,
   CommunityStake,
   CommunityTags,
   Contest,
   ContestAction,
   ContestManager,
   ContestTopic,
-  Contract,
   ContractAbi,
   DiscordBotConfig,
   EmailUpdateToken,

@@ -115,7 +115,6 @@ export function DeleteCommunity(): Command<
           models.CommunityStake,
           models.DiscordBotConfig,
           models.Topic,
-          models.CommunityContract,
           models.Webhook,
           models.Vote,
           models.Poll,

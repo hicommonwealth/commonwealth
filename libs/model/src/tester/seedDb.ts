@@ -347,52 +347,6 @@ export const seedDb = async () => {
       })),
     );
 
-    const [alexContract, yearnContract, sushiContract] =
-      await models.Contract.bulkCreate([
-        {
-          address: '0xFab46E002BbF0b4509813474841E0716E6730136',
-          token_name: 'Alex',
-          symbol: 'ALEX',
-          type: ChainNetwork.ERC20,
-          chain_node_id: testnetNode.id!,
-        },
-        {
-          address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-          token_name: 'yearn',
-          symbol: 'YFI',
-          type: ChainNetwork.ERC20,
-          chain_node_id: mainnetNode.id!,
-        },
-        {
-          address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
-          token_name: 'sushi',
-          symbol: 'SUSHI',
-          type: ChainNetwork.ERC20,
-          chain_node_id: mainnetNode.id!,
-        },
-      ]);
-
-    await models.CommunityContract.bulkCreate([
-      {
-        community_id: alex.id!,
-        contract_id: alexContract.id!,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
-        community_id: yearn.id!,
-        contract_id: yearnContract.id!,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
-        community_id: sushi.id!,
-        contract_id: sushiContract.id!,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ]);
-
     await models.CommunityStake.create({
       // id: 1, –– ID doesn't exist on the DB table?
       community_id: 'ethereum',
