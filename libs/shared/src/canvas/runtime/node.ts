@@ -1,12 +1,15 @@
 import { Canvas } from '@canvas-js/core';
 import { generateKeyPair, privateKeyFromProtobuf } from '@libp2p/crypto/keys';
+import { Libp2p } from 'libp2p';
 import { ConnectionConfig } from 'pg';
 
 import { contract, contractTopic } from './contract';
 
 export const CANVAS_TOPIC = contractTopic;
 
-export const startCanvasNode = async (config: { PEER_ID?: string }) => {
+export const startCanvasNode = async (config: {
+  PEER_ID?: string;
+}): Promise<{ app: Canvas; libp2p: Libp2p }> => {
   const path =
     process.env.FEDERATION_POSTGRES_DB_URL ??
     (process.env.APP_ENV === 'local'
