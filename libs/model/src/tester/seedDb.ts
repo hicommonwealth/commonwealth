@@ -128,7 +128,7 @@ export const seedDb = async () => {
       }),
     );
 
-    const [alex, yearn, sushi] = await models.Community.bulkCreate(
+    await models.Community.bulkCreate(
       [
         {
           id: 'alex',
