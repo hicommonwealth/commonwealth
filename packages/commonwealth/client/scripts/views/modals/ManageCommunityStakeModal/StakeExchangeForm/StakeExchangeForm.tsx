@@ -304,9 +304,8 @@ const StakeExchangeForm = ({
     : numberOfStakeToExchange >= stakeBalance;
 
   const handleClickCopyClipboard = (address: string) => {
-    navigator.clipboard.writeText(address).then(() => {
-      notifySuccess('successfully copy to clipboard');
-    });
+    navigator.clipboard.writeText(address);
+    notifySuccess('successfully copy to clipboard');
   };
 
   return (
