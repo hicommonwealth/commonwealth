@@ -3,7 +3,7 @@ import { Thread } from '@hicommonwealth/schemas';
 import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';

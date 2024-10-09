@@ -8,8 +8,6 @@ import { createOnchainContestContent, createOnchainContestVote } from './utils';
 
 const log = logger(import.meta);
 
-const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-
 const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
   FarcasterReplyCastCreated: events.FarcasterReplyCastCreated,
@@ -52,6 +50,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
 
         // if webhook exists, update target hashes, otherwise create new webhook
+        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
         if (contestManager.neynar_webhook_id) {
           await client.updateWebhook(
             contestManager.neynar_webhook_id,
