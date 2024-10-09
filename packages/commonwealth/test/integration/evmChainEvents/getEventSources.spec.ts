@@ -1,82 +1,41 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { DB, tester } from '@hicommonwealth/model';
+import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
-import { localRpc } from '../../devnet/evm/evmChainEvents/util';
 import {
-  getTestAbi,
-  getTestCommunityContract,
-  getTestContract,
-  getTestSignatures,
+  createAdditionalEventSources,
+  createEventSources,
+  multipleEventSource,
+  singleEventSource,
 } from './util';
 
 describe('getEventSources', () => {
-  let models: DB;
+  let namespaceAbiInstance: ContractAbiInstance;
+  let stakesAbiInstance: ContractAbiInstance;
 
   beforeAll(async () => {
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-    await tester.seedDb();
+    await tester.bootstrap_testing(true);
+    const res = await createEventSources();
+    namespaceAbiInstance = res.namespaceAbiInstance;
+    stakesAbiInstance = res.stakesAbiInstance;
   });
 
   afterAll(async () => {
     await dispose()();
   });
 
-  test("should not return sources that don't have a community contract", async () => {
+  test('should return a single event source', async () => {
     const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
+    expect(JSON.stringify(result)).to.equal(JSON.stringify(singleEventSource));
   });
 
-  test("should not return sources that don't have an ABI", async () => {
-    await getTestCommunityContract();
+  test('should return multiple event sources', async () => {
+    await createAdditionalEventSources(namespaceAbiInstance, stakesAbiInstance);
     const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
-  });
-
-  test("should not return sources that don't have event signatures", async () => {
-    const abi = await getTestAbi();
-    const contract = await getTestContract();
-    contract.abi_id = abi.id;
-    await contract.save();
-
-    const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
-  });
-
-  test('should return event sources organized by chain node', async () => {
-    const signatures = await getTestSignatures();
-    await getTestAbi();
-    const result = await getEventSources(models);
-
-    const chainNodeId = String(signatures[0].chain_node_id);
-    const contractAddress = signatures[0].contract_address.toLowerCase();
-    expect(result).to.exist.and.to.haveOwnProperty(chainNodeId);
-    expect(result[chainNodeId].rpc).to.equal(localRpc);
-    expect(result[chainNodeId].contracts).to.exist.and.to.haveOwnProperty(
-      contractAddress,
-    );
-    expect(result[chainNodeId].contracts[contractAddress].abi).to.exist;
-    expect(
-      result[chainNodeId].contracts[contractAddress].sources,
-    ).exist.and.to.have.lengthOf(2);
-
-    const propCreatedSource = result[chainNodeId].contracts[
-      contractAddress
-    ].sources.find((s) => s.event_signature === signatures[0].event_signature);
-    expect(propCreatedSource).to.exist.and.to.haveOwnProperty(
-      'kind',
-      signatures[0].kind,
-    );
-
-    const propQueuedSource = result[chainNodeId].contracts[
-      contractAddress
-    ].sources.find((s) => s.event_signature === signatures[1].event_signature);
-    expect(propQueuedSource).to.exist.and.to.haveOwnProperty(
-      'kind',
-      signatures[1].kind,
+    expect(JSON.stringify(result)).to.equal(
+      JSON.stringify(multipleEventSource),
     );
   });
 });
