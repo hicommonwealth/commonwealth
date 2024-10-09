@@ -13,7 +13,7 @@ export const Token = z.object({
   author_address: z.string(),
   community_id: z.string(),
   launchpad_contract_address: z.string(),
-  uniswap_pool_address: z.string().optional(),
+  uniswap_pool_address: z.string().optional().nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
