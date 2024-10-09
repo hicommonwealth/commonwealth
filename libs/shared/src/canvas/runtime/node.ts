@@ -1,11 +1,7 @@
 import { Canvas } from '@canvas-js/core';
-import {
-  createEd25519PeerId,
-  createFromProtobuf,
-} from '@libp2p/peer-id-factory';
+import { generateKeyPair, privateKeyFromProtobuf } from '@libp2p/crypto/keys';
 import { ConnectionConfig } from 'pg';
 
-import { getSessionSigners } from '../signers';
 import { contract, contractTopic } from './contract';
 
 export const CANVAS_TOPIC = contractTopic;
@@ -21,9 +17,9 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
   const listen =
     process.env.FEDERATION_LISTEN_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
 
-  const peerId = config.PEER_ID
-    ? await createFromProtobuf(Buffer.from(config.PEER_ID, 'base64'))
-    : await createEd25519PeerId();
+  const privateKey = config.PEER_ID
+    ? privateKeyFromProtobuf(Buffer.from(config.PEER_ID, 'base64'))
+    : await generateKeyPair('Ed25519');
 
   let pgConnectionConfig: ConnectionConfig | undefined = undefined;
 
@@ -47,19 +43,18 @@ export const startCanvasNode = async (config: { PEER_ID?: string }) => {
   }
 
   const app = await Canvas.initialize({
-    peerId,
     topic: contractTopic,
     path: pgConnectionConfig!,
     contract,
-    signers: getSessionSigners(),
-    bootstrapList: [],
-    announce: [announce],
-    listen: [listen],
   });
 
-  if (config.PEER_ID) {
-    await app.libp2p.start();
-  }
+  await app.startLibp2p({
+    announce: [announce],
+    listen: [listen],
+    bootstrapList: [],
+    privateKey,
+    start: true,
+  });
 
   return app;
 };
