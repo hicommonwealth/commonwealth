@@ -117,7 +117,6 @@ export enum ChainNetwork {
   Terra = 'terra',
   NEAR = 'near',
   Stargaze = 'stargaze',
-  Compound = 'compound',
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
