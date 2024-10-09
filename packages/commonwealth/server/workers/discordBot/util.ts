@@ -1,3 +1,4 @@
+import { models } from '@hicommonwealth/model';
 import { Message, OmitPartialGroupDMChannel, PartialMessage } from 'discord.js';
 
 export function getImageUrls(
@@ -11,9 +12,17 @@ export function getImageUrls(
 
   return attachments
     .filter((attachment) => {
-      return attachment.contentType.startsWith('image');
+      return attachment.contentType?.startsWith('image');
     })
     .map((attachment) => {
       return attachment.url;
     });
+}
+
+export async function getForumLinkedTopic(forumId: string) {
+  return await models.Topic.findOne({
+    where: {
+      channel_id: forumId,
+    },
+  });
 }

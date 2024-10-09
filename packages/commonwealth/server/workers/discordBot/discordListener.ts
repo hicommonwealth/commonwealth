@@ -1,12 +1,9 @@
 import {
   HotShotsStats,
-  RabbitMQAdapter,
-  RascalConfigServices,
   ServiceKey,
-  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { Broker, broker, logger, stats } from '@hicommonwealth/core';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
@@ -14,7 +11,8 @@ import {
   ThreadChannel,
 } from 'discord.js';
 import v8 from 'v8';
-import { config } from '../config';
+import { config } from '../../config';
+import { handleMessage, handleThreadChannel } from './handlers';
 
 const log = logger(import.meta);
 stats({
@@ -25,6 +23,7 @@ let isServiceHealthy = false;
 
 startHealthCheckLoop({
   service: ServiceKey.DiscordBotListener,
+  // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {
     if (!isServiceHealthy) {
       throw new Error('service not healthy');
@@ -41,29 +40,6 @@ log.info(
 async function startDiscordListener() {
   config.APP_ENV === 'local' && console.log(config);
 
-  // async imports to delay calling logger
-  const { handleMessage, handleThreadChannel } = await import(
-    '../discord-listener/handlers'
-  );
-
-  let controller: Broker;
-  try {
-    const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(
-        config.BROKER.RABBITMQ_URI,
-        RascalConfigServices.DiscobotService,
-      ),
-    );
-    await rmqAdapter.init();
-    broker({
-      adapter: rmqAdapter,
-    });
-    controller = rmqAdapter;
-  } catch (e) {
-    log.error('Broker setup failed', e instanceof Error ? e : undefined);
-    throw e;
-  }
-
   const client = new Client({
     intents: [
       IntentsBitField.Flags.Guilds,
@@ -79,36 +55,45 @@ async function startDiscordListener() {
 
   // event types can be found here: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('threadDelete', async (thread: ThreadChannel) => {
-    await handleThreadChannel(controller, thread, 'thread-delete');
+    await handleThreadChannel(thread, EventNames.DiscordThreadDeleted);
   });
 
   // only used for thread title updates - thread body are handled through the 'messageUpdate' event
   client.on(
     'threadUpdate',
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
       await handleThreadChannel(
-        controller,
         newThread,
-        'thread-title-update',
+        EventNames.DiscordThreadTitleUpdated,
         oldThread,
       );
     },
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('messageDelete', async (message) => {
-    await handleMessage(controller, client, message, 'comment-delete');
-  });
-
-  client.on('messageUpdate', async (_, newMessage) => {
     await handleMessage(
-      controller,
       client,
-      newMessage,
-      newMessage.nonce ? 'comment-update' : 'thread-body-update',
+      message,
+      EventNames.DiscordThreadCommentDeleted,
     );
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  client.on('messageUpdate', async (_, newMessage) => {
+    await handleMessage(
+      client,
+      newMessage,
+      newMessage.nonce
+        ? EventNames.DiscordThreadCommentUpdated
+        : EventNames.DiscordThreadBodyUpdated,
+    );
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('messageCreate', async (message) => {
     // this conditional prevents handling of messages like ChannelNameChanged which
     // are emitted inside a thread but which we do not want to replicate in the CW thread.
@@ -118,15 +103,16 @@ async function startDiscordListener() {
     // since the id of the event is not the id of the actual post/thread.
     if (message.type === MessageType.Default) {
       await handleMessage(
-        controller,
         client,
         message,
-        message.nonce ? 'comment-create' : 'thread-create',
+        message.nonce
+          ? EventNames.DiscordThreadCommentCreated
+          : EventNames.DiscordThreadCreated,
       );
     }
   });
 
-  await client.login(config.DISCORD.DISCORD_TOKEN);
+  await client.login(config.DISCORD.BOT_TOKEN);
 }
 
 startDiscordListener().catch((e) => {
