@@ -4,6 +4,7 @@ import {
   CommunityStake,
   communityStakesAbi,
   getAnvil,
+  localRpc,
   NamespaceFactory,
   namespaceFactoryAbi,
 } from '@hicommonwealth/evm-testing';
@@ -27,14 +28,12 @@ import {
   getLogs,
   getProvider,
   parseLogs,
-} from '../../../../server/workers/evmChainEvents/logProcessing';
-import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
+} from '../../../server/workers/evmChainEvents/logProcessing';
+import { startEvmPolling } from '../../../server/workers/evmChainEvents/startEvmPolling';
 import {
   ContractSources,
   EvmSource,
-} from '../../../../server/workers/evmChainEvents/types';
-
-const localRpc = 'http://localhost:8545';
+} from '../../../server/workers/evmChainEvents/types';
 
 const namespaceDeployedLog = {
   address: '0xd8a357847caba76133d5f2cb51317d3c74609710',

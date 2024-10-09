@@ -3,6 +3,8 @@ import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
 import Web3 from 'web3';
 import getProvider from './getProvider';
 
+export const localRpc = 'http://localhost:8545';
+
 export async function advanceTime(seconds: number, blocks = 1) {
   const provider = new Web3.providers.HttpProvider(
     config.TEST_EVM.PROVIDER_URL,
