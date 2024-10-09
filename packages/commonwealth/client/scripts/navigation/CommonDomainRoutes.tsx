@@ -118,7 +118,7 @@ const CommunityNotFoundPage = lazy(
 
 const CommonDomainRoutes = ({
   contestEnabled,
-  farcasterContestEnabled,
+  weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
   <Route
@@ -407,7 +407,7 @@ const CommonDomainRoutes = ({
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
     element={withLayout(
-      farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+      weightedTopicsEnabled ? CommunityTopics : CommunityTopicsOld,
       {
         scoped: true,
       },

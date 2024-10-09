@@ -24,24 +24,25 @@ const EmptyContestsList = ({
 }: EmptyContestsListProps) => {
   const navigate = useCommonNavigate();
   const farcasterContestEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   return (
     <div className="EmptyContestsList">
-      {(farcasterContestEnabled ? !hasWeightedTopic : !isStakeEnabled) ? (
+      {(weightedTopicsEnabled ? !hasWeightedTopic : !isStakeEnabled) ? (
         <EmptyCard
           img={shape2Url}
           title={
-            farcasterContestEnabled
+            weightedTopicsEnabled
               ? 'You must have at least one topic with weighted voting enabled to run contest'
               : 'You must enable Community Stake'
           }
           subtitle={
-            farcasterContestEnabled
+            weightedTopicsEnabled
               ? 'Setting up a contest just takes a few minutes and can be a huge boost to your community.'
               : 'Contests require Community Stake...'
           }
           button={
-            farcasterContestEnabled
+            weightedTopicsEnabled
               ? {
                   label: 'Create a topic',
                   handler: () => navigate('/manage/topics'),

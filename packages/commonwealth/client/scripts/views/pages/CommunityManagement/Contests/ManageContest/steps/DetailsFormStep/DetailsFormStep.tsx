@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useUpdateContestMutation from 'state/api/contests/updateContest';
@@ -64,8 +65,8 @@ const DetailsFormStep = ({
   onSetContestFormData,
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
-  // const farcasterContestEnabled = useFlag('farcasterContest');
-  const farcasterContestEnabled = true;
+  const farcasterContestEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
   const [searchParams] = useSearchParams();
   const contestType = searchParams.get('type');
   const isFarcasterContest = contestType === ContestType.Farcaster;
@@ -77,7 +78,7 @@ const DetailsFormStep = ({
     ContestFormData['prizePercentage']
   >(contestFormData?.prizePercentage || INITIAL_PERCENTAGE_VALUE);
   const [contestDuration, setContestDuration] = useState<number | undefined>(
-    farcasterContestEnabled
+    weightedTopicsEnabled
       ? contestFormData?.contestDuration || initialContestDuration
       : undefined,
   );
@@ -185,7 +186,7 @@ const DetailsFormStep = ({
   };
 
   const handleSubmit = async (values: ContestFormValidationSubmitValues) => {
-    const topicsError = !farcasterContestEnabled && topicsEnabledError;
+    const topicsError = !weightedTopicsEnabled && topicsEnabledError;
 
     if (totalPayoutPercentageError || payoutRowError || topicsError) {
       return;
@@ -271,7 +272,7 @@ const DetailsFormStep = ({
         >
           {({ watch, setValue }) => (
             <>
-              {farcasterContestEnabled && !isFarcasterContest && (
+              {weightedTopicsEnabled && !isFarcasterContest && (
                 <div className="contest-section contest-section-topic">
                   <CWText type="h4">Choose a topic</CWText>
                   <CWText type="b1">
@@ -345,7 +346,7 @@ const DetailsFormStep = ({
 
               <CWDivider />
 
-              {farcasterContestEnabled ? (
+              {weightedTopicsEnabled ? (
                 isFarcasterContest ? (
                   <>
                     <div className="contest-section contest-section-funding">
@@ -686,7 +687,7 @@ const DetailsFormStep = ({
                 </div>
               </div>
 
-              {farcasterContestEnabled ? (
+              {weightedTopicsEnabled ? (
                 <></>
               ) : (
                 <>

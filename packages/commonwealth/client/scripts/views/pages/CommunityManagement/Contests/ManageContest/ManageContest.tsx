@@ -23,7 +23,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
-  const farcasterContestEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const user = useUserStore();
 
@@ -46,7 +46,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
 
   if (
     !user.isLoggedIn ||
-    (farcasterContestEnabled ? false : !stakeEnabled) ||
+    (weightedTopicsEnabled ? false : !stakeEnabled) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     contestNotFound
   ) {

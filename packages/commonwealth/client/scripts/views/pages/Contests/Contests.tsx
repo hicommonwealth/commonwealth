@@ -11,7 +11,7 @@ import { useFlag } from 'hooks/useFlag';
 import './Contests.scss';
 
 const Contests = () => {
-  const farcasterContestEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const {
     stakeEnabled,
@@ -22,7 +22,7 @@ const Contests = () => {
 
   if (
     !isContestDataLoading &&
-    ((farcasterContestEnabled ? false : !stakeEnabled) || !isContestAvailable)
+    ((weightedTopicsEnabled ? false : !stakeEnabled) || !isContestAvailable)
   ) {
     return <Navigate replace to={`/${app.activeChainId()}`} />;
   }

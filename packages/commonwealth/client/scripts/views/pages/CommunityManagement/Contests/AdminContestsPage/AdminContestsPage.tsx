@@ -31,6 +31,7 @@ import './AdminContestsPage.scss';
 
 const AdminContestsPage = () => {
   const farcasterContestEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
   const [contestView, setContestView] = useState<ContestView>(ContestView.List);
 
   const navigate = useCommonNavigate();
@@ -69,7 +70,7 @@ const AdminContestsPage = () => {
       ethChainId: ethChainId!,
       namespace,
       apiEnabled:
-        !!ethChainId && !!namespace && farcasterContestEnabled
+        !!ethChainId && !!namespace && weightedTopicsEnabled
           ? true
           : stakeEnabled,
     });
@@ -90,9 +91,7 @@ const AdminContestsPage = () => {
   }
 
   const showBanner =
-    (farcasterContestEnabled
-      ? hasAtLeastOneWeightedVotingTopic
-      : stakeEnabled) &&
+    (weightedTopicsEnabled ? hasAtLeastOneWeightedVotingTopic : stakeEnabled) &&
     isContestAvailable &&
     ethChainId &&
     namespace;

@@ -104,7 +104,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
   contestEnabled,
-  farcasterContestEnabled,
+  weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
   return [
@@ -307,7 +307,7 @@ const CustomDomainRoutes = ({
       key="/manage/topics"
       path="/manage/topics"
       element={withLayout(
-        farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+        weightedTopicsEnabled ? CommunityTopics : CommunityTopicsOld,
         {
           scoped: true,
         },
