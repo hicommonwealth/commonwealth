@@ -2,8 +2,7 @@ import { EventNames, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { emitEvent } from '../utils';
-import { buildFarcasterContentUrl } from '../utils/buildFarcasterContentUrl';
+import { buildFarcasterContentUrl, emitEvent } from '../utils';
 
 // This webhook processes the cast action event
 export function FarcasterUpvoteAction(): Command<

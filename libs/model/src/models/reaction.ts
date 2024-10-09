@@ -8,7 +8,7 @@ import type {
   ModelInstance,
   ThreadInstance,
 } from '.';
-import { emitEvent, getThreadContestManagers } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 
 export type ReactionAttributes = z.infer<typeof Reaction>;
 export type ReactionInstance = ModelInstance<ReactionAttributes>;

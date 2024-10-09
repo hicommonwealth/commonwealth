@@ -3,8 +3,7 @@ import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { mustExist } from '../middleware/guards';
-import { buildFarcasterContentUrl } from '../utils/buildFarcasterContentUrl';
-import { buildFarcasterWebhookName } from '../utils/buildFarcasterWebhookName';
+import { buildFarcasterContentUrl, buildFarcasterWebhookName } from '../utils';
 import { createOnchainContestContent, createOnchainContestVote } from './utils';
 
 const log = logger(import.meta);
