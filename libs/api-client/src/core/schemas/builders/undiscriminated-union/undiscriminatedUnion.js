@@ -1,6 +1,7 @@
 import { SchemaType } from '../../Schema';
 import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
 import { getSchemaUtils } from '../schema-utils';
+
 export function undiscriminatedUnion(schemas) {
   const baseSchema = {
     parse: (raw, opts) => {
@@ -24,6 +25,7 @@ export function undiscriminatedUnion(schemas) {
     getSchemaUtils(baseSchema),
   );
 }
+
 function validateAndTransformUndiscriminatedUnion(transform, schemas, opts) {
   const errors = [];
   for (const [index, schema] of schemas.entries()) {

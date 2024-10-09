@@ -52,6 +52,7 @@ export const User = z.object({
   xp_points: PG_INT.default(0).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
+  ApiKey: ApiKey.optional(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

@@ -8,6 +8,7 @@ var __awaiter =
             resolve(value);
           });
     }
+
     return new (P || (P = Promise))(function (resolve, reject) {
       function fulfilled(value) {
         try {
@@ -16,6 +17,7 @@ var __awaiter =
           reject(e);
         }
       }
+
       function rejected(value) {
         try {
           step(generator['throw'](value));
@@ -23,15 +25,18 @@ var __awaiter =
           reject(e);
         }
       }
+
       function step(result) {
         result.done
           ? resolve(result.value)
           : adopt(result.value).then(fulfilled, rejected);
       }
+
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
 import { chooseStreamWrapper } from './stream-wrappers/chooseStreamWrapper';
+
 export function getResponseBody(response, responseType) {
   return __awaiter(this, void 0, void 0, function* () {
     if (response.body != null && responseType === 'blob') {
