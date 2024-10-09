@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
 import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import {
   createAdditionalEventSources,
