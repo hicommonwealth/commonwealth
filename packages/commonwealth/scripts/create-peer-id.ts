@@ -1,8 +1,14 @@
 import { logger } from '@hicommonwealth/core';
-import { createEd25519PeerId, exportToProtobuf } from '@libp2p/peer-id-factory';
+import { generateKeyPair, privateKeyToProtobuf } from '@libp2p/crypto/keys';
+import { peerIdFromPrivateKey } from '@libp2p/peer-id';
 
 const log = logger(import.meta);
 
-const id = await createEd25519PeerId();
-log.info(`# ${id}`);
-log.info(`PEER_ID=${Buffer.from(exportToProtobuf(id)).toString('base64')}`);
+const privateKey = await generateKeyPair('Ed25519');
+
+const peerId = peerIdFromPrivateKey(privateKey);
+
+log.info(`# ${peerId}`);
+log.info(
+  `PEER_ID=${Buffer.from(privateKeyToProtobuf(privateKey)).toString('base64')}`,
+);
