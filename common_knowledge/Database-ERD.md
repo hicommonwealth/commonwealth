@@ -36,7 +36,7 @@ erDiagram
   CommunityStakes }|..|| Communities : CommunityStakes_community_id_fkey
   Notifications }|..|| Communities : Notifications_community_id_fkey
   ContestActions }|..|| Threads : ContestActions_threads_fkey
-  ContestTopics }|..|| Topics : ContestTopics_topics_fkey
+
   Topics }|..|| Communities : Topics_community_id_fkey
   Templates }|..|| Communities : Templates_created_for_community_fkey
   Groups }|..|| Communities : Groups_chain_id_fkey
@@ -62,7 +62,7 @@ erDiagram
   SsoTokens }|..|| Addresses : SsoTokens_address_id_fkey
   StarredCommunities }|..|| Communities : Starredcommunities_community_id_fkey
   StarredCommunities }|..|| Users : Starredcommunities_user_id_fkey
-  ContestTopics }|..|| ContestManagers : ContestTopics_contestmanagers_fkey
+
   Reactions }|..|| Addresses : Reactions_address_id_fkey
   Templates }|..|| ContractAbis : Templates_contractabi_id_fkey
   Templates }|..|| Communities : Templates_community_id_fkey
@@ -520,11 +520,6 @@ erDiagram
     integer address_id PK
     timestamp-with-time-zone created_at
     timestamp-with-time-zone updated_at
-  }
-  ContestTopics {
-    character-varying(255) contest_address PK
-    integer topic_id PK
-    timestamp-with-time-zone created_at
   }
   Users {
     character-varying(255) email

@@ -1,7 +1,5 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Op } from 'sequelize';
-import { z } from 'zod';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
@@ -18,8 +16,6 @@ export function UpdateContestManagerMetadata(): Command<
     ...schemas.UpdateContestManagerMetadata,
     auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ payload }) => {
-      const { topic_ids, ...rest } = payload;
-
       const contestManager = await models.ContestManager.findOne({
         where: {
           community_id: payload.id,
@@ -29,69 +25,28 @@ export function UpdateContestManagerMetadata(): Command<
 
       mustExist('Contest Manager', contestManager);
 
-      let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
-
-      if (Array.isArray(topic_ids) && topic_ids.length > 0) {
-        const topics = await models.Topic.findAll({
-          where: {
-            id: {
-              [Op.in]: topic_ids,
-            },
-          },
-        });
-
-        if (topics.length !== topic_ids.length) {
-          throw new InvalidState(Errors.InvalidTopics);
-        }
-
-        contestTopicsToCreate = topics.map((t) => ({
-          contest_address: contestManager.contest_address,
-          topic_id: t.id!,
-          created_at: new Date(),
-        }));
+      if (typeof payload.image_url !== 'undefined') {
+        contestManager.image_url = payload.image_url;
       }
 
-      const result = await models.sequelize.transaction(async (transaction) => {
-        if (payload.topic_ids) {
-          // destroy all old associations
-          await models.ContestTopic.destroy({
-            where: {
-              contest_address: payload.contest_address,
-            },
-            transaction,
-          });
+      if (typeof payload.name !== 'undefined') {
+        contestManager.name = payload.name;
+      }
 
-          // create new associations
-          if (contestTopicsToCreate.length > 0) {
-            await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
-              transaction,
-            });
-          }
+      if (typeof payload.topic_id !== 'undefined') {
+        const topic = await models.Topic.findByPk(payload.topic_id);
+        if (!topic) {
+          throw new InvalidState(Errors.InvalidTopics);
         }
+        contestManager.topic_id = topic.id!;
+      }
 
-        // update metadata
-        return contestManager.update(
-          {
-            ...rest,
-          },
-          { transaction },
-        );
-      });
-
-      const contestTopics = await models.ContestTopic.findAll({
-        where: { contest_address: contestManager.contest_address },
-        include: {
-          model: models.Topic,
-          as: 'Topic',
-        },
-      });
+      await contestManager.save();
 
       return {
         contest_managers: [
           {
-            ...result.get({ plain: true }),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            topics: contestTopics.map((ct) => (ct as any).Topic),
+            ...contestManager.get({ plain: true }),
           },
         ],
       };

@@ -19,7 +19,7 @@ export function DeleteThread(): Command<
     body: async ({ actor, auth }) => {
       const { thread } = mustBeAuthorizedThread(actor, auth);
 
-      const found = await models.ContestTopic.findOne({
+      const found = await models.ContestManager.findOne({
         where: { topic_id: thread.topic_id! },
       });
       if (found) throw new InvalidInput(DeleteThreadErrors.ContestLock);

@@ -36,6 +36,7 @@ const {
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
   NEYNAR_API_KEY,
+  NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
   NEYNAR_REPLY_WEBHOOK_URL,
   FARCASTER_ACTION_URL,
 } = process.env;
@@ -90,6 +91,7 @@ export const config = configure(
         : 2,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
       NEYNAR_API_KEY: NEYNAR_API_KEY,
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
     },
@@ -191,6 +193,7 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
       FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
       NEYNAR_API_KEY: z.string().nullish(),
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
       NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
       FARCASTER_ACTION_URL: z.string().nullish(),
     }),
