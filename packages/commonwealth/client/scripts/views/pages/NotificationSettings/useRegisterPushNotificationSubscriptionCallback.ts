@@ -1,7 +1,10 @@
 import { getBrowserType } from 'helpers/browser';
 import { useCallback } from 'react';
+// eslint-disable-next-line max-len
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
+// eslint-disable-next-line max-len
 import { computeChannelTypeFromBrowserType } from 'views/pages/NotificationSettings/computeChannelTypeFromBrowserType';
+// eslint-disable-next-line max-len
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 
 export function useRegisterPushNotificationSubscriptionCallback() {

@@ -42,11 +42,11 @@ export function useSubscriptionPreferenceSettingCallback(
         //** now we have to determine how to set push notifications.
 
         const pushNotificationsActive =
-          subscriptionPreferences.data['mobile_push_notifications_enabled'] ||
-          subscriptionPreferences.data[
+          subscriptionPreferences.data?.['mobile_push_notifications_enabled'] ||
+          subscriptionPreferences.data?.[
             'mobile_push_discussion_activity_enabled'
           ] ||
-          subscriptionPreferences.data['mobile_push_admin_alerts_enabled'];
+          subscriptionPreferences.data?.['mobile_push_admin_alerts_enabled'];
 
         await pushNotificationToggleCallback(pushNotificationsActive);
 
