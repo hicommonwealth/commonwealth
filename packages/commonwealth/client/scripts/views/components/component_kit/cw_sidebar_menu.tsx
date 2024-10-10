@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isMobile } from 'react-device-detect';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
@@ -150,7 +151,7 @@ type SidebarMenuProps = {
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
-  const { setMenu } = useSidebarStore();
+  const { setMenu, menuName, menuVisible } = useSidebarStore();
 
   return (
     <div
@@ -202,7 +203,11 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             label: 'Explore communities',
             iconLeft: 'compassPhosphor',
             onClick: () => {
-              setMenu({ name: 'default', isVisible: false });
+              if (isMobile && window.innerWidth < 425) {
+                setMenu({ name: 'default', isVisible: menuVisible });
+              } else {
+                setMenu({ name: menuName, isVisible: menuVisible });
+              }
               navigate('/communities', {}, null);
             },
           },
@@ -211,7 +216,11 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             label: 'Notification settings',
             iconLeft: 'person',
             onClick: () => {
-              setMenu({ name: 'default', isVisible: false });
+              if (isMobile && window.innerWidth < 425) {
+                setMenu({ name: 'default', isVisible: menuVisible });
+              } else {
+                setMenu({ name: menuName, isVisible: menuVisible });
+              }
               navigate('/notification-settings');
             },
           } as MenuItem,

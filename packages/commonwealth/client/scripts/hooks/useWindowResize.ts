@@ -1,5 +1,6 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useCallback, useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 
 const useWindowResize = ({ setMenu }) => {
   const [resizing, setResizing] = useState(false);
@@ -14,7 +15,9 @@ const useWindowResize = ({ setMenu }) => {
   );
 
   const onWindowResize = useCallback(() => {
-    setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
+    if (isMobile && window.innerWidth < 425) {
+      setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
+    }
     setToggleMobileView(
       (location.pathname.includes('discussions') ||
         location.pathname.includes('search')) &&
