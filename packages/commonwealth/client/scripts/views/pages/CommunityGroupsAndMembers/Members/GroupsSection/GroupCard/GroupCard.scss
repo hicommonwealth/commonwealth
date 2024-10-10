@@ -35,18 +35,36 @@
         color: $neutral-500;
         font-size: 18px;
       }
+
       .caption {
         color: $neutral-500;
       }
     }
   }
 
-  .gating-tags {
+  .gating-topics {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
-    align-items: center;
     width: 100%;
+
+    .row {
+      padding: 8px 0;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      .Tag {
+        height: auto;
+
+        @include extraSmall {
+          .Text {
+            word-wrap: break-word;
+            white-space: normal;
+          }
+        }
+      }
+    }
   }
 
   .allowlist-table {

@@ -3,6 +3,7 @@ import {
   MembershipAttributes,
   TopicAttributes,
 } from '@hicommonwealth/model';
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { Op, WhereOptions } from 'sequelize';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -12,9 +13,13 @@ export type GetGroupsOptions = {
   includeTopics?: boolean;
 };
 
+export type TopicAttributesWithPermission = TopicAttributes & {
+  permission: GroupTopicPermissionEnum;
+};
+
 type GroupWithExtras = GroupAttributes & {
   memberships?: MembershipAttributes[];
-  topics?: TopicAttributes[];
+  topics?: TopicAttributesWithPermission[];
 };
 export type GetGroupsResult = GroupWithExtras[];
 
@@ -26,6 +31,12 @@ export async function __getGroups(
     where: {
       community_id: communityId,
     },
+    include: [
+      {
+        model: this.models.GroupTopicPermission,
+        attributes: ['topic_id', 'allowed_actions'],
+      },
+    ],
   });
 
   let groupsResult = groups.map((group) => group.toJSON() as GroupWithExtras);
@@ -68,11 +79,21 @@ export async function __getGroups(
         },
       },
     });
+
     groupsResult = groupsResult.map((group) => ({
       ...group,
       topics: topics
-        .map((t) => t.toJSON())
-        .filter((t) => t.group_ids!.includes(group.id!)),
+        .filter((t) => t.group_ids!.includes(group.id!))
+        .map((t) => {
+          const temp: TopicAttributesWithPermission = { ...t.toJSON() };
+          temp.permission =
+            ((group as any).GroupTopicPermissions || []).find(
+              (gtp) => gtp.topic_id === t.id,
+            )?.allowed_actions ||
+            // TODO: this fallback should be via a migration for existing communities
+            GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST;
+          return temp;
+        }),
     }));
   }
 

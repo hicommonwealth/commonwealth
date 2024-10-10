@@ -40,6 +40,8 @@ const GroupsSection = ({
     profiles?.map((p) => [p.address, p]),
   );
 
+  console.log('filteredGroups => ', filteredGroups);
+
   return (
     <section className="GroupsSection">
       {hasNoGroups && <TopicGatingHelpMessage />}
@@ -92,6 +94,7 @@ const GroupsSection = ({
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,
+                permission: x.permission,
               }))}
               canEdit={canManageGroups}
               onEditClick={() => navigate(`/members/groups/${group.id}/update`)}
