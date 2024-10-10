@@ -5,6 +5,7 @@ import { Comment } from './api/resources/comment/client/Client';
 import { Community } from './api/resources/community/client/Client';
 import { Reaction } from './api/resources/reaction/client/Client';
 import { Thread } from './api/resources/thread/client/Client';
+import { User } from './api/resources/user/client/Client';
 import * as core from './core';
 import * as environments from './environments';
 export declare namespace CommonApiClient {
@@ -28,6 +29,8 @@ export declare namespace CommonApiClient {
 export declare class CommonApiClient {
   protected readonly _options: CommonApiClient.Options;
   constructor(_options: CommonApiClient.Options);
+  protected _user: User | undefined;
+  get user(): User;
   protected _community: Community | undefined;
   get community(): Community;
   protected _comment: Comment | undefined;

@@ -5,9 +5,16 @@ import { Comment } from './api/resources/comment/client/Client';
 import { Community } from './api/resources/community/client/Client';
 import { Reaction } from './api/resources/reaction/client/Client';
 import { Thread } from './api/resources/thread/client/Client';
+import { User } from './api/resources/user/client/Client';
 export class CommonApiClient {
   constructor(_options) {
     this._options = _options;
+  }
+  get user() {
+    var _a;
+    return (_a = this._user) !== null && _a !== void 0
+      ? _a
+      : (this._user = new User(this._options));
   }
   get community() {
     var _a;
