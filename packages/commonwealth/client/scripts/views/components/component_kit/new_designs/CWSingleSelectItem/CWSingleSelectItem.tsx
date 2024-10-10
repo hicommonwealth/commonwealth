@@ -5,9 +5,8 @@ import { SingleValueProps } from 'react-select';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import './CWSingleSelectItem.scss';
 type CustomSingleValueProps = {
-  extraProp?: boolean;
-  handleClickCopyClipboard?: (id: string) => void;
-  showIcon?: boolean;
+  showCopyIcon?: boolean;
+  saveToClipboard?: (id: string, successNotification?: boolean) => void;
 };
 
 type OptionProps = {
@@ -18,17 +17,17 @@ type OptionProps = {
 export const CWSingleSelectItem = (
   props: SingleValueProps<OptionProps> & CustomSingleValueProps,
 ) => {
-  const { data, extraProp = false, handleClickCopyClipboard } = props;
+  const { data, showCopyIcon = false, saveToClipboard } = props;
   const handleClickToCopy = (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (handleClickCopyClipboard) {
-      handleClickCopyClipboard(data.value);
+    if (saveToClipboard) {
+      saveToClipboard(data.value, true);
     }
   };
 
   return (
-    <div className="custom-single-value">
-      {extraProp && (
+    <div className="CWSingleSelectItem">
+      {showCopyIcon && (
         <div className="inner-container">
           <CWIcon
             className="check-icon"
@@ -38,9 +37,9 @@ export const CWSingleSelectItem = (
           {formatAddressShort(data.label, 6)}
         </div>
       )}
-      {!extraProp && <span>{data.label}</span>}
+      {!showCopyIcon && <span>{data.label}</span>}
 
-      {extraProp && <CopySimple size={20} onMouseDown={handleClickToCopy} />}
+      {showCopyIcon && <CopySimple size={20} onMouseDown={handleClickToCopy} />}
     </div>
   );
 };

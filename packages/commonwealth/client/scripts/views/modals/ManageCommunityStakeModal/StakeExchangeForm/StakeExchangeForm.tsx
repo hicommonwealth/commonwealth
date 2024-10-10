@@ -1,8 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import {
-  notifyError,
-  notifySuccess,
-} from 'client/scripts/controllers/app/notifications';
+import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -306,17 +303,6 @@ const StakeExchangeForm = ({
     ? false
     : numberOfStakeToExchange >= stakeBalance;
 
-  const handleClickCopyClipboard = (address: string) => {
-    navigator.clipboard
-      .writeText(address)
-      .then(() => {
-        notifySuccess('successfully copy to clipboard');
-      })
-      .catch(() => {
-        notifyError('Failed to copy clipboard');
-      });
-  };
-
   return (
     <div className="StakeExchangeForm">
       <CWModalBody>
@@ -344,8 +330,8 @@ const StakeExchangeForm = ({
           isSearchable={false}
           options={addressOptions}
           onChange={onSetSelectedAddress}
-          handleClickCopyClipboard={handleClickCopyClipboard}
-          showIcon={true}
+          saveToClipboard={saveToClipboard}
+          showCopyIcon={true}
         />
 
         <div className="current-balance-row">

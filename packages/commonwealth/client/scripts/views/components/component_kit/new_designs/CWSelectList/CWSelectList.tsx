@@ -15,8 +15,8 @@ type CustomCWSelectListProps = {
   label?: string;
   hookToForm?: boolean;
   customError?: string;
-  handleClickCopyClipboard?: (id: string) => void;
-  showIcon?: boolean;
+  saveToClipboard?: (id: string, successNotification?: boolean) => void;
+  showCopyIcon?: boolean;
 };
 
 export const CWSelectList = <
@@ -38,8 +38,8 @@ export const CWSelectList = <
     customError,
     components,
     isMulti,
-    showIcon,
-    handleClickCopyClipboard,
+    showCopyIcon,
+    saveToClipboard,
   } = props;
   const formContext = useFormContext();
   const formFieldContext = hookToForm
@@ -133,8 +133,8 @@ export const CWSelectList = <
           SingleValue: (singleValueProps) => (
             <CWSingleSelectItem
               {...singleValueProps}
-              extraProp={showIcon}
-              handleClickCopyClipboard={handleClickCopyClipboard}
+              showCopyIcon={showCopyIcon}
+              saveToClipboard={saveToClipboard}
             />
           ),
         }}
