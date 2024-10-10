@@ -6,7 +6,6 @@ import { CreateThreadResponseReactionsItemAddressUserApiKey } from './CreateThre
 import { CreateThreadResponseReactionsItemAddressUserEmailNotificationInterval } from './CreateThreadResponseReactionsItemAddressUserEmailNotificationInterval';
 import { CreateThreadResponseReactionsItemAddressUserProfile } from './CreateThreadResponseReactionsItemAddressUserProfile';
 import { CreateThreadResponseReactionsItemAddressUserProfileTagsItem } from './CreateThreadResponseReactionsItemAddressUserProfileTagsItem';
-
 export const CreateThreadResponseReactionsItemAddressUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

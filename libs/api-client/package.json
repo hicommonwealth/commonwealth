@@ -1,6 +1,6 @@
 {
   "name": "@commonxyz/api-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "Common Client Proxy",
   "repository": {
@@ -29,7 +29,8 @@
     "publish": "npm publish",
     "run-test": "tsx ./test/index.ts",
     "check-types": "tsc --noEmit",
-    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate"
+    "format": "npx prettier --write 'src/**/*.{js,d.ts}'",
+    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate && pnpm format"
   },
   "keywords": [
     "commonwealth",

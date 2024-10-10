@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const GetCommunitiesResponseResultsItemTermsZero: core.serialization.Schema<
   serializers.GetCommunitiesResponseResultsItemTermsZero.Raw,
   CommonApi.GetCommunitiesResponseResultsItemTermsZero

@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { UpdateThreadResponseReactionsItemAddressUserProfileBackgroundImage } from './UpdateThreadResponseReactionsItemAddressUserProfileBackgroundImage';
-
 export const UpdateThreadResponseReactionsItemAddressUserProfile =
   core.serialization.object({
     name: core.serialization.string().optional(),

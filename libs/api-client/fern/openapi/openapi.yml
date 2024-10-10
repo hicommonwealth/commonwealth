@@ -2982,8 +2982,6 @@ paths:
                           maximum: 2147483647
                         text:
                           type: string
-                        plaintext:
-                          type: string
                         parent_id:
                           type: string
                           nullable: true
@@ -3290,9 +3288,6 @@ paths:
                             stage:
                               type: string
                             body:
-                              type: string
-                              nullable: true
-                            plaintext:
                               type: string
                               nullable: true
                             url:
@@ -4300,12 +4295,7 @@ paths:
                             - address_id
                             - title
                             - kind
-                            - stage
                             - community_id
-                            - view_count
-                            - reaction_count
-                            - reaction_weights_sum
-                            - comment_count
                             - search
                           additionalProperties: false
                           nullable: true
@@ -4611,7 +4601,6 @@ paths:
                         - thread_id
                         - address_id
                         - text
-                        - plaintext
                         - reaction_count
                         - search
                       additionalProperties: false
@@ -10763,9 +10752,6 @@ paths:
                   body:
                     type: string
                     nullable: true
-                  plaintext:
-                    type: string
-                    nullable: true
                   url:
                     type: string
                     nullable: true
@@ -11769,12 +11755,7 @@ paths:
                   - address_id
                   - title
                   - kind
-                  - stage
                   - community_id
-                  - view_count
-                  - reaction_count
-                  - reaction_weights_sum
-                  - comment_count
                   - search
                 additionalProperties: false
         default:
@@ -11872,9 +11853,6 @@ paths:
                   body:
                     type: string
                     nullable: true
-                  plaintext:
-                    type: string
-                    nullable: true
                   url:
                     type: string
                     nullable: true
@@ -12878,12 +12856,7 @@ paths:
                   - address_id
                   - title
                   - kind
-                  - stage
                   - community_id
-                  - view_count
-                  - reaction_count
-                  - reaction_weights_sum
-                  - comment_count
                   - search
                 additionalProperties: false
         default:
@@ -13032,8 +13005,6 @@ paths:
                     maximum: 2147483647
                   text:
                     type: string
-                  plaintext:
-                    type: string
                   parent_id:
                     type: string
                     nullable: true
@@ -13340,9 +13311,6 @@ paths:
                       stage:
                         type: string
                       body:
-                        type: string
-                        nullable: true
-                      plaintext:
                         type: string
                         nullable: true
                       url:
@@ -14348,12 +14316,7 @@ paths:
                       - address_id
                       - title
                       - kind
-                      - stage
                       - community_id
-                      - view_count
-                      - reaction_count
-                      - reaction_weights_sum
-                      - comment_count
                       - search
                     additionalProperties: false
                     nullable: true
@@ -14661,7 +14624,6 @@ paths:
                   - thread_id
                   - address_id
                   - text
-                  - plaintext
                   - reaction_count
                   - search
                   - community_id
@@ -14721,8 +14683,6 @@ paths:
                     maximum: 2147483647
                   text:
                     type: string
-                  plaintext:
-                    type: string
                   parent_id:
                     type: string
                     nullable: true
@@ -15029,9 +14989,6 @@ paths:
                       stage:
                         type: string
                       body:
-                        type: string
-                        nullable: true
-                      plaintext:
                         type: string
                         nullable: true
                       url:
@@ -16037,12 +15994,7 @@ paths:
                       - address_id
                       - title
                       - kind
-                      - stage
                       - community_id
-                      - view_count
-                      - reaction_count
-                      - reaction_weights_sum
-                      - comment_count
                       - search
                     additionalProperties: false
                     nullable: true
@@ -16350,7 +16302,6 @@ paths:
                   - thread_id
                   - address_id
                   - text
-                  - plaintext
                   - reaction_count
                   - search
                   - community_id
