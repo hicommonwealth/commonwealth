@@ -1,6 +1,9 @@
 import { events, Policy } from '@hicommonwealth/core';
 import { buildThreadContentUrl } from '../utils';
-import { createOnchainContestContent } from './utils';
+import {
+  createOnchainContestContent,
+  createOnchainContestVote,
+} from './contest-utils';
 
 const inputs = {
   ThreadCreated: events.ThreadCreated,
@@ -28,7 +31,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload.community_id,
           payload.thread_id,
         );
-        await createOnchainContestContent({
+        await createOnchainContestVote({
           community_id: payload.community_id,
           topic_id: payload.topic_id!,
           content_url,

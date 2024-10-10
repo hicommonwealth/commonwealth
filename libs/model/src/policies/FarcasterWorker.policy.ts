@@ -4,7 +4,10 @@ import { Op } from 'sequelize';
 import { config, models } from '..';
 import { mustExist } from '../middleware/guards';
 import { buildFarcasterContentUrl, buildFarcasterWebhookName } from '../utils';
-import { createOnchainContestContent, createOnchainContestVote } from './utils';
+import {
+  createOnchainContestContent,
+  createOnchainContestVote,
+} from './contest-utils';
 
 const log = logger(import.meta);
 
