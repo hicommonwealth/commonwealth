@@ -13,7 +13,10 @@ export function CreateCommentReaction(): Command<
   return {
     ...schemas.CreateCommentReaction,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT_REACTION }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+        topicPermission: schemas.GroupTopicPermissionEnum.UPVOTE,
+      }),
       verifyReactionSignature,
     ],
     body: async ({ payload, actor, auth }) => {

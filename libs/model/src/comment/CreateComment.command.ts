@@ -33,7 +33,10 @@ export function CreateComment(): Command<
   return {
     ...schemas.CreateComment,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_COMMENT,
+        topicPermission: schemas.GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
+      }),
       verifyCommentSignature,
     ],
     body: async ({ actor, payload, auth }) => {

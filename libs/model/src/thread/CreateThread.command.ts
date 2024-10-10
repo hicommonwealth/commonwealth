@@ -89,7 +89,11 @@ export function CreateThread(): Command<
   return {
     ...schemas.CreateThread,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_THREAD,
+        topicPermission:
+          schemas.GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+      }),
       verifyThreadSignature,
     ],
     body: async ({ actor, payload, auth }) => {
