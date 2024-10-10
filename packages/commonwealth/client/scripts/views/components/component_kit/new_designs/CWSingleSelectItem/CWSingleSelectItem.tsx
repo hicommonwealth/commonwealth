@@ -42,8 +42,6 @@ export const CWSingleSelectItem = (
           {formatAddressShort(data.label, 6)}
         </div>
       )}
-      {!showCopyIcon && <span>{data.label}</span>}
-
       {showCopyIcon && (
         <CopySimple
           size={20}

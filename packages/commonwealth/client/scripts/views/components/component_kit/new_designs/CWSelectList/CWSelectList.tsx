@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import type { GroupBase, Props } from 'react-select';
+import type { GroupBase, Props, SingleValueProps } from 'react-select';
 import Select from 'react-select';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
@@ -23,6 +23,10 @@ type CustomCWSelectListProps = {
   showCopyIcon?: boolean;
 };
 
+type OptionProps = {
+  value: string;
+  label: string;
+};
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
@@ -133,14 +137,16 @@ export const CWSelectList = <
           DropdownIndicator,
           MultiValueRemove,
           Option: components?.Option || Option,
-          // eslint-disable-next-line react/no-multi-comp
-          SingleValue: (singleValueProps) => (
-            <CWSingleSelectItem
-              {...singleValueProps}
-              showCopyIcon={showCopyIcon}
-              saveToClipboard={saveToClipboard}
-            />
-          ),
+          ...(showCopyIcon && {
+            // eslint-disable-next-line react/no-multi-comp
+            SingleValue: (singleValueProps: SingleValueProps<OptionProps>) => (
+              <CWSingleSelectItem
+                {...singleValueProps}
+                showCopyIcon={showCopyIcon}
+                saveToClipboard={saveToClipboard}
+              />
+            ),
+          }),
         }}
         className={getClasses<{
           className?: string;
