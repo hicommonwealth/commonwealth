@@ -6,7 +6,6 @@ import { CreateCommentResponseAddressUserApiKey } from './CreateCommentResponseA
 import { CreateCommentResponseAddressUserEmailNotificationInterval } from './CreateCommentResponseAddressUserEmailNotificationInterval';
 import { CreateCommentResponseAddressUserProfile } from './CreateCommentResponseAddressUserProfile';
 import { CreateCommentResponseAddressUserProfileTagsItem } from './CreateCommentResponseAddressUserProfileTagsItem';
-
 export const CreateCommentResponseAddressUser = core.serialization.object({
   id: core.serialization.number().optional(),
   email: core.serialization.string().optional(),

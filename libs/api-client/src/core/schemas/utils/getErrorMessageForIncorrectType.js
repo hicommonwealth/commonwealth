@@ -1,7 +1,6 @@
 export function getErrorMessageForIncorrectType(value, expectedType) {
   return `Expected ${expectedType}. Received ${getTypeAsString(value)}.`;
 }
-
 function getTypeAsString(value) {
   if (Array.isArray(value)) {
     return 'list';

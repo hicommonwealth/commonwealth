@@ -8,7 +8,6 @@ import { UpdateGroupResponseRequirementsItemThresholdDataSourceOne } from './Upd
 import { UpdateGroupResponseRequirementsItemThresholdDataSourceThree } from './UpdateGroupResponseRequirementsItemThresholdDataSourceThree';
 import { UpdateGroupResponseRequirementsItemThresholdDataSourceTokenId } from './UpdateGroupResponseRequirementsItemThresholdDataSourceTokenId';
 import { UpdateGroupResponseRequirementsItemThresholdDataSourceTokenSymbol } from './UpdateGroupResponseRequirementsItemThresholdDataSourceTokenSymbol';
-
 export declare const UpdateGroupResponseRequirementsItemThresholdDataSource: core.serialization.Schema<
   serializers.UpdateGroupResponseRequirementsItemThresholdDataSource.Raw,
   CommonApi.UpdateGroupResponseRequirementsItemThresholdDataSource

@@ -1,6 +1,6 @@
 {
   "name": "@commonxyz/api-client",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "type": "module",
   "description": "Common Client Proxy",
   "repository": {
@@ -15,21 +15,20 @@
     "access": "public"
   },
   "files": [
-    "build"
+    "src"
   ],
   "exports": {
     ".": {
-      "default": "./build/index.js",
-      "devmode": "./src/index.ts"
+      "default": "./src/index.js"
     }
   },
   "scripts": {
     "build": "echo Generated SDK is prebuilt",
-    "clean": "rm -rf build && rm -rf coverage",
+    "clean": "echo Generated SDK is prebuilt",
+    "check-types": "echo Generated SDK is prebuilt",
     "publish": "npm publish",
-    "run-test": "tsx ./test/index.ts",
-    "check-types": "tsc --noEmit",
-    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate"
+    "format": "npx prettier --write 'src/**/*.{js,d.ts}'",
+    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate && pnpm format"
   },
   "keywords": [
     "commonwealth",
@@ -37,14 +36,5 @@
     "community"
   ],
   "author": "common.xyz",
-  "license": "MIT",
-  "dependencies": {
-    "moment": "^2.23.0",
-    "qs": "^6.13.0",
-    "url-join": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/moment": "^2.13.0",
-    "tsx": "^4.7.2"
-  }
+  "license": "MIT"
 }

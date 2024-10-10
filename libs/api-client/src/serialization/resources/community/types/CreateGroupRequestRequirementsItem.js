@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import { CreateGroupRequestRequirementsItemAllow } from './CreateGroupRequestRequirementsItemAllow';
 import { CreateGroupRequestRequirementsItemThreshold } from './CreateGroupRequestRequirementsItemThreshold';
-
 export const CreateGroupRequestRequirementsItem = core.serialization
   .union('rule', {
     threshold: CreateGroupRequestRequirementsItemThreshold,

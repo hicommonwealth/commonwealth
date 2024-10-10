@@ -5,7 +5,6 @@ import * as core from '../../../../core';
 import { GetCommentsResponseResultsItemAddressRole } from './GetCommentsResponseResultsItemAddressRole';
 import { GetCommentsResponseResultsItemAddressUser } from './GetCommentsResponseResultsItemAddressUser';
 import { GetCommentsResponseResultsItemAddressWalletId } from './GetCommentsResponseResultsItemAddressWalletId';
-
 export const GetCommentsResponseResultsItemAddress = core.serialization.object({
   id: core.serialization.number().optional(),
   address: core.serialization.string(),

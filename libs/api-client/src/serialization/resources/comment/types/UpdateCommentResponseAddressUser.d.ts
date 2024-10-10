@@ -8,7 +8,6 @@ import { UpdateCommentResponseAddressUserApiKey } from './UpdateCommentResponseA
 import { UpdateCommentResponseAddressUserEmailNotificationInterval } from './UpdateCommentResponseAddressUserEmailNotificationInterval';
 import { UpdateCommentResponseAddressUserProfile } from './UpdateCommentResponseAddressUserProfile';
 import { UpdateCommentResponseAddressUserProfileTagsItem } from './UpdateCommentResponseAddressUserProfileTagsItem';
-
 export declare const UpdateCommentResponseAddressUser: core.serialization.ObjectSchema<
   serializers.UpdateCommentResponseAddressUser.Raw,
   CommonApi.UpdateCommentResponseAddressUser
