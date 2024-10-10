@@ -1,6 +1,6 @@
 {
   "name": "@commonxyz/api-client",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "description": "Common Client Proxy",
   "repository": {
@@ -15,12 +15,11 @@
     "access": "public"
   },
   "files": [
-    "build"
+    "src"
   ],
   "exports": {
     ".": {
-      "default": "./build/index.js",
-      "devmode": "./src/index.ts"
+      "default": "./src/index.js"
     }
   },
   "scripts": {
@@ -38,14 +37,5 @@
     "community"
   ],
   "author": "common.xyz",
-  "license": "MIT",
-  "dependencies": {
-    "moment": "^2.23.0",
-    "qs": "^6.13.0",
-    "url-join": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/moment": "^2.13.0",
-    "tsx": "^4.7.2"
-  }
+  "license": "MIT"
 }

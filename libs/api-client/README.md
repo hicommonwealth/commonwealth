@@ -1,6 +1,14 @@
 # Common API
 
-## Manual Setup
+## Documentation
+
+[Fern API Reference](https://common.docs.buildwithfern.com)
+
+## CI/CD Instructions (Developers)
+
+- TODO
+
+## Manual Setup (Developers)
 
 ### Generate a new API client
 
