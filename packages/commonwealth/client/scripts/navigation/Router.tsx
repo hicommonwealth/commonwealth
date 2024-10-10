@@ -15,6 +15,7 @@ import GeneralRoutes from './GeneralRoutes';
 export type RouteFeatureFlags = {
   contestEnabled: boolean;
   farcasterContestEnabled: boolean;
+  tokenizedCommunityEnabled: boolean;
 };
 
 const Router = () => {
@@ -26,9 +27,15 @@ const Router = () => {
     false,
   );
 
+  const tokenizedCommunityEnabled = client.getBooleanValue(
+    'tokenizedCommunity',
+    false,
+  );
+
   const flags = {
     contestEnabled,
     farcasterContestEnabled,
+    tokenizedCommunityEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};

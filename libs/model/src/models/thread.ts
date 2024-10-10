@@ -1,25 +1,19 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils';
-import type { AddressAttributes } from './address';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 import type { CommunityAttributes } from './community';
-import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
-  collaborators?: AddressAttributes[];
-  reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
 };
-
-export type ThreadInstance = ModelInstance<ThreadAttributes> & {
-  // no mixins used
-};
+export type ThreadInstance = ModelInstance<ThreadAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -32,7 +26,6 @@ export default (
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
       body: { type: Sequelize.TEXT, allowNull: true },
-      plaintext: { type: Sequelize.TEXT, allowNull: true },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
@@ -63,7 +56,7 @@ export default (
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -98,6 +91,11 @@ export default (
         allowNull: true,
         defaultValue: new Date(),
       },
+      search: {
+        type: Sequelize.TSVECTOR,
+        allowNull: false,
+      },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -114,7 +112,7 @@ export default (
         { fields: ['community_id', 'updated_at'] },
         { fields: ['community_id', 'pinned'] },
         { fields: ['community_id', 'has_poll'] },
-        { fields: ['canvas_hash'] },
+        { fields: ['canvas_msg_id'] },
       ],
       hooks: {
         afterCreate: async (
@@ -164,3 +162,11 @@ export default (
       },
     },
   );
+
+export function getThreadSearchVector(title: string, body: string) {
+  return Sequelize.fn(
+    'to_tsvector',
+    'english',
+    getDecodedString(title) + ' ' + getDecodedString(body),
+  );
+}

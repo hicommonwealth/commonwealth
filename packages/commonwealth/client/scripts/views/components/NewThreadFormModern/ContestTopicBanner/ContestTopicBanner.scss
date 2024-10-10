@@ -1,0 +1,18 @@
+@import '../../../../../styles/shared';
+
+.ContestTopicBanner {
+  .body {
+    ul {
+      list-style: initial;
+      margin-left: 32px;
+      line-height: 32px;
+      margin-bottom: 8px;
+
+      li {
+        .Text.disabled {
+          color: $neutral-400;
+        }
+      }
+    }
+  }
+}

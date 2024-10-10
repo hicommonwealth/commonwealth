@@ -7,6 +7,7 @@ import { RouteFeatureFlags } from './Router';
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
   () =>
@@ -80,20 +81,21 @@ const ManageContest = lazy(
   () => import('views/pages/CommunityManagement/Contests/ManageContest'),
 );
 const Contests = lazy(() => import('views/pages/Contests'));
+const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
 const SnapshotProposalPage = lazy(
-  () => import('views/pages/snapshot_proposals'),
+  () => import('views/pages/Snapshots/SnapshotProposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
-  () => import('views/pages/view_multiple_snapshot_spaces'),
+  () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
 const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/view_snapshot_proposal'),
+  () => import('views/pages/Snapshots/ViewSnapshotProposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal'),
+  () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
@@ -103,6 +105,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CustomDomainRoutes = ({
   contestEnabled,
   farcasterContestEnabled,
+  tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -118,6 +121,15 @@ const CustomDomainRoutes = ({
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
+    ...(tokenizedCommunityEnabled
+      ? [
+          <Route
+            key="/createTokenCommunity"
+            path="/createTokenCommunity"
+            element={withLayout(LaunchTokenPage, { type: 'common' })}
+          />,
+        ]
+      : []),
     <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
     <Route
       key="/search"
@@ -335,6 +347,13 @@ const CustomDomainRoutes = ({
             key="/contests"
             path="/contests"
             element={withLayout(Contests, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/:scope/contests/:contestAddress"
+            path="/:scope/contests/:contestAddress"
+            element={withLayout(ContestPage, {
               scoped: true,
             })}
           />,

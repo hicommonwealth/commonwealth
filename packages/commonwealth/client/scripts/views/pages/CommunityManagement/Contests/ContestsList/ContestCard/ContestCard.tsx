@@ -45,13 +45,15 @@ interface ContestCardProps {
   imageUrl?: string;
   finishDate: string;
   topics: { id?: number; name?: string }[];
-  score: {
-    creator_address?: string;
-    content_id?: string;
-    votes?: number;
-    prize?: string;
-    tickerPrize?: number;
-  }[];
+  score?:
+    | {
+        creator_address?: string;
+        content_id?: string;
+        votes?: number;
+        prize?: string;
+        tickerPrize?: number;
+      }[]
+    | null;
   decimals?: number;
   ticker?: string;
   isAdmin: boolean;
@@ -60,6 +62,7 @@ interface ContestCardProps {
   feeManagerBalance?: string;
   isRecurring: boolean;
   showShareButton?: boolean;
+  showLeaderboardButton?: boolean;
   isHorizontal?: boolean;
   isFarcaster?: boolean;
 }
@@ -79,6 +82,7 @@ const ContestCard = ({
   feeManagerBalance,
   isRecurring,
   showShareButton = true,
+  showLeaderboardButton = true,
   isHorizontal = false,
   isFarcaster = false,
 }: ContestCardProps) => {
@@ -100,15 +104,15 @@ const ContestCard = ({
 
   const { data: oneOffContestBalance } = useGetContestBalanceQuery({
     contestAddress: address,
-    chainRpc: app.chain.meta?.ChainNode?.url,
-    ethChainId: app.chain.meta?.ChainNode?.ethChainId || 0,
+    chainRpc: app.chain.meta?.ChainNode?.url || '',
+    ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
     apiEnabled: !isRecurring,
   });
 
   const handleCancel = () => {
     cancelContest({
       contest_address: address,
-      id: app.activeChainId(),
+      id: app.activeChainId() || '',
     }).catch((error) => {
       console.error('Failed to cancel contest: ', error);
     });
@@ -140,7 +144,9 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    navigate(`/discussions?featured=mostLikes&contest=${address}`);
+    isFarcaster
+      ? navigate(`/contests/${address}`)
+      : navigate(`/discussions?featured=mostLikes&contest=${address}`);
   };
 
   const handleFundClick = () => {
@@ -166,7 +172,7 @@ const ContestCard = ({
     >
       {imageUrl && (
         <>
-          {isHorizontal && (
+          {isHorizontal && isActive && (
             <CWTag
               label="Active Contest"
               type="contest"
@@ -231,11 +237,13 @@ const ContestCard = ({
           )}
         </>
         <div className="actions">
-          <CWThreadAction
-            label="Leaderboard"
-            action="leaderboard"
-            onClick={handleLeaderboardClick}
-          />
+          {showLeaderboardButton && (
+            <CWThreadAction
+              label="Leaderboard"
+              action="leaderboard"
+              onClick={handleLeaderboardClick}
+            />
+          )}
 
           {showShareButton && (
             <SharePopoverOld

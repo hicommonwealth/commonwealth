@@ -1,7 +1,8 @@
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
+import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import useAppStatus from 'hooks/useAppStatus';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -40,7 +41,7 @@ export const ReactionButton = ({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
 
-  const { isAddedToHomeScreen } = useAppStatus();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
@@ -57,16 +58,19 @@ export const ReactionButton = ({
     thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
   const popoverProps = usePopover();
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
     useCreateThreadReactionMutation({
-      communityId: app.activeChainId(),
+      communityId,
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
-      communityId: app.activeChainId(),
+      communityId,
       address: user.activeAccount?.address || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -87,30 +91,36 @@ export const ReactionButton = ({
         return notifyError('Upvotes on contest entries cannot be removed');
       }
 
-      deleteThreadReaction({
-        communityId: app.activeChainId(),
+      const input = await buildDeleteThreadReactionInput({
+        communityId,
         address: user.activeAccount?.address,
-        threadId: thread.id,
-        reactionId: reactedId as number,
-      }).catch((e) => {
+        threadId: thread.id!,
+        threadMsgId: thread.canvasMsgId,
+        reactionId: +reactedId,
+      });
+      deleteThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        notifyError('Failed to unvote');
+        console.error(e?.response?.data?.error || e?.message);
       });
     } else {
       const input = await buildCreateThreadReactionInput({
-        communityId: app.activeChainId(),
+        communityId,
         address: activeAddress || '',
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId,
         reactionType: 'like',
-        isPWA: isAddedToHomeScreen,
       });
       createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        notifyError('Failed to upvote');
+        console.error(e?.response?.data?.error || e?.message);
       });
     }
   };

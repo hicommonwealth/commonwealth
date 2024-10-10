@@ -1,6 +1,7 @@
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { TransactionReceipt } from 'web3';
+import { AbiItem, TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
+import { Erc20Abi } from './Abi/ERC20Abi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
@@ -161,21 +162,14 @@ class Contest extends ContractBase {
         throw new Error('ETH transfer failed');
       }
     } else {
-      const encodedParameters = this.web3.eth.abi.encodeParameters(
-        ['address', 'uint256'],
-        [this.contractAddress, amount],
+      const token = new this.web3.eth.Contract(
+        Erc20Abi as AbiItem[],
+        tokenAddress,
       );
-      const data = `095ea7b3${encodedParameters.substring(2)}`;
-
-      // Create the transaction object
-      const txObject = {
-        to: tokenAddress,
-        data: data,
-        from: walletAddress,
-      };
-      await this.web3.eth.sendTransaction(txObject);
-
-      txReceipt = this.contract.methods.deposit(weiAmount).send({
+      await token.methods
+        .approve(this.contractAddress, weiAmount)
+        .send({ from: walletAddress });
+      txReceipt = await this.contract.methods.deposit(weiAmount).send({
         from: walletAddress,
         maxPriorityFeePerGas: null,
         maxFeePerGas: null,
@@ -201,7 +195,7 @@ class Contest extends ContractBase {
 
   async getContestBalance(): Promise<number> {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(false);
     }
     this.reInitContract();
     const tokenAddress = await this.contract.methods.contestToken().call();

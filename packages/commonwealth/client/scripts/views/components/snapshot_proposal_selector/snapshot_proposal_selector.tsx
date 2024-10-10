@@ -37,7 +37,7 @@ export const SnapshotProposalSelector = ({
   useEffect(() => {
     if (allProposals.length === 0) {
       setLoading(true);
-      loadMultipleSpacesData(app.chain.meta?.snapshot)
+      loadMultipleSpacesData(app.chain.meta?.snapshot_spaces)
         .then((data = []) => {
           const loadedProposals = data.reduce(
             (acc, curr) => [...acc, ...curr.proposals],

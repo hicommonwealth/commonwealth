@@ -1,49 +1,36 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { signDeleteCommentReaction } from 'controllers/server/sessions';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { ApiEndpoints } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
-  communityId: string;
   address: string;
-  canvasHash: string;
+  communityId: string;
+  commentMsgId: string;
   reactionId: number;
 }
 
-const deleteReaction = async ({
-  communityId,
+export const buildDeleteCommentReactionInput = async ({
   address,
-  canvasHash,
+  communityId,
+  commentMsgId,
   reactionId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteCommentReaction(address, {
-    comment_id: canvasHash,
+    comment_id: commentMsgId,
   });
-
-  return await axios
-    .delete(`${SERVER_URL}/reactions/${reactionId}`, {
-      data: {
-        author_community_id: communityId,
-        address: address,
-        community_id: communityId,
-        jwt: userStore.getState().jwt,
-        ...toCanvasSignedDataApiArgs(canvasSignedData),
-      },
-    })
-    .then((r) => ({
-      ...r,
-      data: {
-        ...r.data,
-        result: {
-          ...(r.data.result || {}),
-          reactionId,
-        },
-      },
-    }));
+  return {
+    author_community_id: communityId,
+    address: address,
+    community_id: communityId,
+    reaction_id: reactionId,
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+  };
 };
 
 interface UseDeleteCommentReactionMutationProps {
@@ -65,11 +52,8 @@ const useDeleteCommentReactionMutation = ({
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: deleteReaction,
-    onSuccess: async (response) => {
-      const { reactionId } = response.data.result;
-
+  return trpc.thread.deleteReaction.useMutation({
+    onSuccess: (deleted) => {
       // update fetch comments query state
       const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
@@ -79,7 +63,9 @@ const useDeleteCommentReactionMutation = ({
           if (comment.id === commentId) {
             return {
               ...comment,
-              reactions: comment.reactions.filter((r) => r.id !== reactionId),
+              reactions: comment.reactions.filter(
+                (r) => r.id !== deleted.reaction_id,
+              ),
             };
           }
           return comment;

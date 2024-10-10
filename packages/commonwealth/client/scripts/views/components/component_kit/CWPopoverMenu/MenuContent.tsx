@@ -21,6 +21,10 @@ const MenuContent = ({
   return (
     <div className={clsx(ComponentType.PopoverMenu, className)}>
       {menuItems.map((item, i) => {
+        if (item.type === 'element') {
+          return item.element;
+        }
+
         if (item.type === 'header') {
           return (
             <CWText
@@ -56,8 +60,7 @@ const MenuContent = ({
         const clickHandler = (e) => {
           e.stopPropagation();
           e.preventDefault();
-          // @ts-expect-error <StrictNullChecks/>
-          onClick(e);
+          onClick?.(e);
 
           if (item.type === 'default' && item.preventClosing) {
             return;

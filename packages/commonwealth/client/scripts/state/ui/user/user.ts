@@ -1,6 +1,7 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
-import ChainInfo from 'models/ChainInfo';
+import { z } from 'zod';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
@@ -20,17 +21,19 @@ type CommonProps = {
   emailNotificationInterval: EmailNotificationInterval | '';
   knockJWT: string;
   addresses: AddressInfo[];
-  activeCommunity: ChainInfo | null;
+  activeCommunity: z.infer<typeof ExtendedCommunity> | null;
   communities: UserCommunities[]; // basic info of user-joined communities with user-associated metadata per community
   accounts: Account[]; // contains full accounts list of the user - when in a active chain/community scope, only
   // contains accounts specific to that community
   activeAccount: Account | null;
   jwt: string | null;
+  isOnPWA: boolean;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
   isWelcomeOnboardFlowComplete: boolean;
   isLoggedIn: boolean;
+  addressSelectorSelectedAddress: string | undefined;
 };
 
 type UserStoreProps = CommonProps & {
@@ -50,11 +53,13 @@ export const userStore = createStore<UserStoreProps>()(
     accounts: [],
     activeAccount: null,
     jwt: null,
+    isOnPWA: false,
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,
     isWelcomeOnboardFlowComplete: false,
     isLoggedIn: false,
+    addressSelectorSelectedAddress: undefined,
     // when logged-in, set the auth-user values
     setData: (data) => {
       if (Object.keys(data).length > 0) {

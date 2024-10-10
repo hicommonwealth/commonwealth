@@ -1,10 +1,9 @@
 import { AppError } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
 import { Op, Transaction } from 'sequelize';
+import { models } from '../database';
 
 export const updateTags = async (
   tag_ids: number[],
-  models: DB,
   id: number | string,
   idType: 'user_id' | 'community_id',
   transaction?: Transaction,

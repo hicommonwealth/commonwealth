@@ -10,7 +10,12 @@ export const buildAssociations = (db: DB) => {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Wallets);
+    .withMany(db.Wallets)
+    .withMany(db.XpLog, { onDelete: 'CASCADE' })
+    .withOne(db.ApiKey, {
+      targetKey: 'id',
+      onDelete: 'CASCADE',
+    });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -30,7 +35,8 @@ export const buildAssociations = (db: DB) => {
   db.ChainNode.withMany(db.Community)
     .withMany(db.Contract, { asMany: 'contracts' })
     .withMany(db.EvmEventSource)
-    .withOne(db.LastProcessedEvmBlock);
+    .withOne(db.LastProcessedEvmBlock)
+    .withMany(db.Topic);
 
   db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' }).withMany(
     db.EvmEventSource,
@@ -61,8 +67,12 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
+    .withOne(db.Token, {
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    })
     .withOne(db.DiscordBotConfig, {
-      targeyKey: 'discord_config_id',
+      targetKey: 'discord_config_id',
       onDelete: 'CASCADE',
     })
     .withOne(db.User, {
@@ -83,7 +93,7 @@ export const buildAssociations = (db: DB) => {
     asMany: 'threads',
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
-  }).withMany(db.ContestTopic);
+  }).withMany(db.ContestTopic, { asMany: 'contest_topics' });
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {

@@ -1,0 +1,44 @@
+@import '../../../../styles/shared';
+
+// Basic layout for the HTML content that is rendered.
+
+.mdxeditor-root-contenteditable {
+  p {
+    line-height: 1.8em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 2.2em;
+  }
+
+  blockquote {
+    margin-left: 20px;
+    border-left: $neutral-300 solid 3px;
+    padding-left: 5px;
+  }
+
+  ol,
+  ul {
+    margin-left: 20px;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  ul {
+    list-style: square;
+  }
+
+  img {
+    max-width: 100%;
+  }
+  th {
+    text-align: left;
+  }
+}

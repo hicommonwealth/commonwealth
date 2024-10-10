@@ -1,16 +1,15 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { signDeleteThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
-  communityId: string;
   address: string;
+  communityId: string;
+  threadMsgId: string;
   threadId: number;
 }
 
@@ -18,35 +17,23 @@ interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
   reactionId: number;
 }
 
-const deleteReaction = async ({
-  communityId,
+export const buildDeleteThreadReactionInput = async ({
   address,
+  communityId,
+  threadMsgId,
   reactionId,
-  threadId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteThreadReaction(address, {
-    thread_id: threadId,
-  });
-
-  const response = await axios.delete(`${SERVER_URL}/reactions/${reactionId}`, {
-    data: {
-      author_community_id: communityId,
-      address: address,
-      community_id: app.chain.id,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
+    thread_id: threadMsgId,
   });
 
   return {
-    ...response,
-    data: {
-      ...response.data,
-      result: {
-        thread_id: threadId,
-        reaction_id: reactionId,
-      },
-    },
+    author_community_id: communityId,
+    address: address,
+    community_id: app.chain.id,
+    reaction_id: reactionId,
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
 };
 
@@ -56,16 +43,21 @@ const useDeleteThreadReactionMutation = ({
 }: UseDeleteThreadReactionMutationProps) => {
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: deleteReaction,
-    onSuccess: async (response) => {
+  return trpc.thread.deleteReaction.useMutation({
+    onSuccess: (deleted) => {
       updateThreadInAllCaches(
         communityId,
         threadId,
         {
           associatedReactions: [
-            { id: response.data.result.reaction_id },
-          ] as any,
+            {
+              id: deleted.reaction_id,
+              type: 'like',
+              voting_weight: 0,
+              address: '',
+              updated_at: '',
+            },
+          ],
         },
         'removeFromExisting',
       );

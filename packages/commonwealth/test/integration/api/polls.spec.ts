@@ -21,8 +21,7 @@ describe('Polls', () => {
 
   let userJWT: string;
   let userAddress: string;
-  // the userAddress with the chain and chain id prefix - this is used by canvas
-  let canvasAddress: string;
+  let userDid: `did:${string}`;
   let userSession: {
     session: Session;
     sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
@@ -50,8 +49,8 @@ describe('Polls', () => {
       { chain },
       'Alice',
     );
-    canvasAddress = userRes.address;
-    userAddress = canvasAddress.split(':')[2];
+    userAddress = userRes.address;
+    userDid = userRes.did;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
       config.AUTH.JWT_SECRET,
@@ -61,6 +60,7 @@ describe('Polls', () => {
       sign: userRes.sign,
     };
     expect(userAddress).to.not.be.null;
+    expect(userDid).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
 
@@ -71,7 +71,8 @@ describe('Polls', () => {
   test('should create a poll for a thread', async () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: 'ethereum',
-      address: canvasAddress,
+      address: userAddress,
+      did: userDid,
       jwt: userJWT,
       title: 'test1',
       body: 'body1',

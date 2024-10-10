@@ -2,6 +2,7 @@ import {
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  INVALID_STATE_ERROR,
   command as coreCommand,
   query as coreQuery,
   handleEvent,
@@ -11,13 +12,14 @@ import {
 } from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { Tag, Track, buildproc, procedure } from './middleware';
+import { Commit, Tag, Track, buildproc, procedure } from './middleware';
 
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
     const { name, message, ...other } = error;
     switch (name) {
       case INVALID_INPUT_ERROR:
+      case INVALID_STATE_ERROR:
         return new TRPCError({ code: 'BAD_REQUEST', message, ...other });
 
       case INVALID_ACTOR_ERROR:
@@ -26,7 +28,7 @@ const trpcerror = (error: unknown): TRPCError => {
       default:
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message,
+          message: `[${name}] ${message}`,
           cause: error,
         });
     }
@@ -41,7 +43,11 @@ const trpcerror = (error: unknown): TRPCError => {
  * Builds tRPC command POST endpoint
  * @param factory command factory
  * @param tag command tag used for OpenAPI spec grouping
- * @param track analytics tracking metadata as tuple of [event, output mapper]
+ * @param track analytics tracking middleware as:
+ * - tuple of `[event, output mapper]`
+ * - or `(input,output) => Promise<[event, data]|undefined>`
+ * @param commit output middleware (best effort), mainly used to commit actions to canvas
+ * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
  * @returns tRPC mutation procedure
  */
 export const command = <
@@ -51,31 +57,38 @@ export const command = <
 >(
   factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
-  track?: Track<Output>,
+  track?: Track<Input, Output>,
+  commit?: Commit<Input, Output>,
 ) => {
   const md = factory();
-  return buildproc('POST', factory.name, md, tag, track).mutation(
-    async ({ ctx, input }) => {
-      try {
-        return await coreCommand(
-          md,
-          {
-            actor: ctx.actor,
-            payload: input!,
-          },
-          false,
-        );
-      } catch (error) {
-        throw trpcerror(error);
-      }
-    },
-  );
+  return buildproc({
+    method: 'POST',
+    name: factory.name,
+    md,
+    tag,
+    track,
+    commit,
+  }).mutation(async ({ ctx, input }) => {
+    try {
+      return await coreCommand(
+        md,
+        {
+          actor: ctx.actor,
+          payload: input!,
+        },
+        false,
+      );
+    } catch (error) {
+      throw trpcerror(error);
+    }
+  });
 };
 
 /**
  * Builds tRPC query GET endpoint
  * @param factory query factory
  * @param tag query tag used for OpenAPI spec grouping
+ * @param forceSecure whether to force secure requests for rate-limited external-router
  * @returns tRPC query procedure
  */
 export const query = <
@@ -85,24 +98,29 @@ export const query = <
 >(
   factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
+  forceSecure?: boolean,
 ) => {
   const md = factory();
-  return buildproc('GET', factory.name, md, tag).query(
-    async ({ ctx, input }) => {
-      try {
-        return await coreQuery(
-          md,
-          {
-            actor: ctx.actor,
-            payload: input!,
-          },
-          false,
-        );
-      } catch (error) {
-        throw trpcerror(error);
-      }
-    },
-  );
+  return buildproc({
+    method: 'GET',
+    name: factory.name,
+    md,
+    tag,
+    forceSecure,
+  }).query(async ({ ctx, input }) => {
+    try {
+      return await coreQuery(
+        md,
+        {
+          actor: ctx.actor,
+          payload: input!,
+        },
+        false,
+      );
+    } catch (error) {
+      throw trpcerror(error);
+    }
+  });
 };
 
 // TODO: add security options (API key, IP range, internal, etc)

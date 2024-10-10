@@ -12,12 +12,12 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
@@ -69,14 +69,14 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const { stakeData } = useCommunityStake();
   const namespace = stakeData?.Community?.namespace;
   const { isContestAvailable, contestsData, stakeEnabled } =
     useCommunityContests();
 
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
+    id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
     includeNodeInfo: true,
   });
@@ -108,10 +108,12 @@ export const HeaderWithFilters = ({
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
-  const { stagesEnabled, customStages } = app.chain?.meta || {};
+  const { stages_enabled, custom_stages } = app.chain?.meta || {};
 
+  const communityId = app.activeChainId() || '';
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
   const urlParams = Object.fromEntries(
@@ -137,7 +139,7 @@ export const HeaderWithFilters = ({
     type: 'contest',
   }));
 
-  const stages = !customStages
+  const stages = !custom_stages
     ? [
         ThreadStage.Discussion,
         ThreadStage.ProposalInReview,
@@ -145,7 +147,7 @@ export const HeaderWithFilters = ({
         ThreadStage.Passed,
         ThreadStage.Failed,
       ]
-    : parseCustomStages(customStages);
+    : parseCustomStages(custom_stages);
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
@@ -248,9 +250,9 @@ export const HeaderWithFilters = ({
       </div>
 
       {selectedTopic?.description && (
-        <QuillRenderer
-          doc={selectedTopic.description}
-          customClass="subheader-text"
+        <MarkdownViewerUsingQuillOrNewEditor
+          markdown={selectedTopic.description}
+          className="subheader-text"
         />
       )}
 
@@ -399,7 +401,7 @@ export const HeaderWithFilters = ({
                   dropdownPosition={rightFiltersDropdownPosition}
                 />
               ) : (
-                stagesEnabled && (
+                stages_enabled && (
                   <Select
                     selected={selectedStage || 'All Stages'}
                     onSelect={(item) =>
@@ -503,7 +505,6 @@ export const HeaderWithFilters = ({
             imageUrl={contest.image_url}
             // @ts-expect-error <StrictNullChecks/>
             topics={contest.topics}
-            // @ts-expect-error <StrictNullChecks/>
             score={score}
             decimals={contest.decimals}
             ticker={contest.ticker}

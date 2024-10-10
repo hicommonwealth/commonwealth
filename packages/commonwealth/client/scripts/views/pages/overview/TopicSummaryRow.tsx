@@ -30,10 +30,11 @@ export const TopicSummaryRow = ({
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
+  const communityId = app.activeChainId() || '';
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
+    communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    apiEnabled: !!user.activeAccount?.address || !!communityId,
   });
 
   if (isLoading) return <TopicSummaryRowSkeleton />;
@@ -88,13 +89,16 @@ export const TopicSummaryRow = ({
             true,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
+          const isTopicGated = !!(memberships || []).find(
+            (membership) =>
+              thread?.topic?.id &&
+              membership.topicIds.includes(thread.topic.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
+              thread?.topic?.id &&
+              membership.topicIds.includes(thread.topic.id) &&
               membership.isAllowed,
           );
 

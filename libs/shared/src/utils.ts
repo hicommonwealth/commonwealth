@@ -1,3 +1,4 @@
+import { fromBech32, toHex } from '@cosmjs/encoding';
 import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
@@ -307,4 +308,34 @@ export function getWebhookDestination(webhookUrl = ''): string {
   }
 
   return destination;
+}
+
+export function getDecodedString(str: string) {
+  try {
+    return decodeURIComponent(str);
+  } catch (err) {
+    return str;
+  }
+}
+
+/**
+ * Convert Cosmos bech32 address to a hexadecimal string
+ * hex is used as a common identifier for addresses across chains.
+ * This allows us to achieve One Signer, One Account
+ *
+ * Example:
+ * bech32ToHex('osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6') => '3822bfccc76238c527ad043fbf1a85ccbbc64373'
+ * bech32ToHex('cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg') => '3822bfccc76238c527ad043fbf1a85ccbbc64373' (same)
+ *
+ * Caveat: Ethermint addresses will share a hex, but it will differ from
+ * their siblings on standard Cosmos derivation paths.
+ * e.g. evmos hex != osmo hex, but evmos hex == inj hex
+ */
+export function bech32ToHex(address: string) {
+  try {
+    const encodedData = fromBech32(address).data;
+    return toHex(encodedData);
+  } catch (e) {
+    console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
+  }
 }

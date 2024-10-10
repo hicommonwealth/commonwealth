@@ -39,7 +39,7 @@ import {
   ManageCommunityStakeModalMode,
   ManageCommunityStakeModalState,
 } from '../types';
-import { capDecimals, convertEthToUsd } from '../utils';
+import { capDecimals, convertTokenAmountToUsd } from '../utils';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -79,9 +79,11 @@ const StakeExchangeForm = ({
   const { selectedCommunity: community } = useManageCommunityStakeModalStore();
 
   const chainRpc =
-    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
   const ethChainId =
-    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
+    community?.ChainNode?.ethChainId ||
+    app?.chain?.meta?.ChainNode?.eth_chain_id ||
+    0;
   // Use the `selectedAddress.value` if buying stake in a non active community (i.e app.activeChainId() != community.id)
   const activeAccountAddress =
     (community ? selectedAddress?.value : user.activeAccount?.address) || '';
@@ -122,7 +124,7 @@ const StakeExchangeForm = ({
 
   const isBuyMode = mode === 'buy';
 
-  const communityId = community?.id || app.activeChainId();
+  const communityId = community?.id || app.activeChainId() || '';
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -140,18 +142,19 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
         ...(community?.ChainNode?.ethChainId && {
           chainId: `${community.ChainNode.ethChainId}`,
         }),
       });
 
+      user.setData({ addressSelectorSelectedAddress: selectedAddress?.value });
       await createStakeTransaction.mutateAsync({
         id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: communityId,
       });
+      user.setData({ addressSelectorSelectedAddress: undefined });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
@@ -167,7 +170,7 @@ const StakeExchangeForm = ({
             id: communityId,
             name: community?.name || app?.chain?.meta?.name,
             base: community?.base || app?.chain?.base,
-            iconUrl: community?.iconUrl || app?.chain?.meta?.iconUrl,
+            iconUrl: community?.iconUrl || app?.chain?.meta?.icon_url || '',
           },
           ...(app.activeChainId() && { activeChainId: app.activeChainId() }),
         });
@@ -196,7 +199,6 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
       });
 
@@ -267,9 +269,9 @@ const StakeExchangeForm = ({
 
   const pricePerUnitUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.price, ethUsdRate)
+      convertTokenAmountToUsd(buyPriceData?.price, ethUsdRate)
     : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(sellPriceData?.price, ethUsdRate);
+      convertTokenAmountToUsd(sellPriceData?.price, ethUsdRate);
 
   const feesPriceEth = isBuyMode
     ? buyPriceData?.fees
@@ -278,9 +280,11 @@ const StakeExchangeForm = ({
 
   const feesPriceUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.fees, ethUsdRate)
-    : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
+      convertTokenAmountToUsd(buyPriceData?.fees, ethUsdRate)
+    : convertTokenAmountToUsd(
+        Math.abs(parseFloat(sellPriceData?.fees || '')),
+        ethUsdRate || '',
+      );
 
   const totalPriceEth = isBuyMode
     ? buyPriceData?.totalPrice
@@ -288,9 +292,9 @@ const StakeExchangeForm = ({
 
   const totalPriceUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
+      convertTokenAmountToUsd(buyPriceData?.totalPrice, ethUsdRate)
     : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
+      convertTokenAmountToUsd(sellPriceData?.totalPrice, ethUsdRate);
 
   const minusDisabled = numberOfStakeToExchange <= 1;
 

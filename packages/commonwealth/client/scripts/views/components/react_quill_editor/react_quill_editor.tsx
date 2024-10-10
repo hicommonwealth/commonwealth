@@ -52,6 +52,7 @@ type ReactQuillEditorProps = {
   tooltipLabel?: string;
   shouldFocus?: boolean;
   cancelEditing?: () => void;
+  fromManageTopic?: boolean;
 } & ReactQuillEditorFormValidationProps;
 
 const TABS = [
@@ -73,6 +74,7 @@ const ReactQuillEditor = ({
   cancelEditing,
   hookToForm,
   name,
+  fromManageTopic = false,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -92,8 +94,11 @@ const ReactQuillEditor = ({
   const formFieldErrorMessage =
     hookToForm &&
     name &&
-    (formContext?.formState?.errors?.[name] as SerializableDeltaStatic)
-      ?.ops?.[0]?.insert?.message;
+    (
+      formContext?.formState?.errors?.[
+        name
+      ] as unknown as SerializableDeltaStatic
+    )?.ops?.[0]?.insert?.message;
 
   const isHookedToFormProper = hookToForm && name && formContext;
 
@@ -172,7 +177,7 @@ const ReactQuillEditor = ({
 
     const editor = editorRef.current?.getEditor();
 
-    if (!contentDeltaToUse.___isMarkdown) {
+    if (!contentDeltaToUse.___isMarkdown && !fromManageTopic) {
       const isContentAvailable =
         getTextFromDelta(editor.getContents()).length > 0;
 
@@ -207,8 +212,7 @@ const ReactQuillEditor = ({
               buttonType: 'secondary',
               buttonHeight: 'sm',
               onClick: () => {
-                // @ts-expect-error <StrictNullChecks/>
-                cancelEditing();
+                cancelEditing?.();
               },
             },
           ],
@@ -354,7 +358,10 @@ const ReactQuillEditor = ({
             </div>
           </div>
         ) : (
-          <MarkdownPreview doc={getTextFromDelta(contentDeltaToUse)} />
+          <MarkdownPreview
+            classNameProp={fromManageTopic ? 'preview' : ''}
+            doc={getTextFromDelta(contentDeltaToUse)}
+          />
         )}
       </div>
       {formFieldErrorMessage && (

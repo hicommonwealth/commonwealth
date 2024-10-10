@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import app from '../../../../../state/index';
+import useSetForumChannelConnectionMutation from '../../../../../state/api/discord/setForumChannelConnection';
 import { CWDropdown } from '../../../../components/component_kit/cw_dropdown';
 import { CWClose } from '../../../../components/component_kit/cw_icons/cw_icons';
 import { CWText } from '../../../../components/component_kit/cw_text';
@@ -8,7 +8,7 @@ import { openConfirmation } from '../../../../modals/confirmation_modal';
 type DiscordChannels = {
   channelName: string;
   channelId: string;
-  onConnect: (topicId: string) => void;
+  onConnect: (topicId: string | number) => void;
 };
 
 export const DiscordConnections = ({
@@ -20,6 +20,9 @@ export const DiscordConnections = ({
   topics: { id: string; name: string; channelId: string | null }[];
   refetchTopics: () => Promise<void>;
 }) => {
+  const { mutateAsync: setForumChannelConnection } =
+    useSetForumChannelConnectionMutation();
+
   const topicOptions = topics.map((topic) => {
     return { label: topic.name, value: topic.id };
   });
@@ -42,7 +45,7 @@ export const DiscordConnections = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await app.discord.setForumChannelConnection(topicId, null);
+              await setForumChannelConnection({ topicId });
               setConnectionVerified(false);
               await refetchTopics();
               setConnectionVerified(true);

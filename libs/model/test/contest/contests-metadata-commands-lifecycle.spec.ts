@@ -55,6 +55,7 @@ describe('Contests metadata commands lifecycle', () => {
       {
         id: community_id,
         namespace,
+        namespace_address: '0x123',
         chain_node_id: chain!.id,
         lifetime_thread_count: 0,
         profile_count: 2,
@@ -64,12 +65,14 @@ describe('Contests metadata commands lifecycle', () => {
             user_id: communityAdminUser!.id,
             role: 'admin',
             is_banned: false,
+            verified: new Date(),
           },
           {
             community_id,
             user_id: memberUser!.id,
             role: 'member',
             is_banned: false,
+            verified: new Date(),
           },
         ],
         topics: [{}, {}, {}],
@@ -97,6 +100,14 @@ describe('Contests metadata commands lifecycle', () => {
             funding_token_address,
             decimals,
             cancelled: false,
+          },
+        ],
+        CommunityStakes: [
+          {
+            stake_id: 1,
+            stake_token: 'XYZ',
+            vote_weight: 3,
+            stake_enabled: true,
           },
         ],
       },
@@ -192,7 +203,7 @@ describe('Contests metadata commands lifecycle', () => {
             interval,
             ticker,
             decimals,
-            topic_ids: topics.map((t) => t.id!),
+            topic_ids: [topics[0].id!],
           },
         },
       );
@@ -214,14 +225,6 @@ describe('Contests metadata commands lifecycle', () => {
       expect(createResult!.contest_managers![0].topics![0]).to.deep.contain({
         id: topics[0].id,
         name: topics[0].name,
-      });
-      expect(createResult!.contest_managers![0].topics![1]).to.deep.contain({
-        id: topics[1].id,
-        name: topics[1].name,
-      });
-      expect(createResult!.contest_managers![0].topics![2]).to.deep.contain({
-        id: topics[2].id,
-        name: topics[2].name,
       });
     });
   });
@@ -316,15 +319,14 @@ describe('Contests metadata commands lifecycle', () => {
             payload: {
               id: community_id,
               contest_address,
-              topic_ids: [topics[0]!.id!, topics[1]!.id!],
+              topic_ids: [topics[0]!.id!],
             },
           },
         );
         const metadata = updateResult?.contest_managers![0];
-        expect(metadata!.topics).to.have.length(2);
+        expect(metadata!.topics).to.have.length(1);
         const resultTopicIds = metadata!.topics!.map((t) => t.id);
         expect(resultTopicIds).to.contain(topics[0]!.id!);
-        expect(resultTopicIds).to.contain(topics[1]!.id!);
       }
 
       {

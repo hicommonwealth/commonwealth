@@ -56,7 +56,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return app.chain?.meta?.node?.ethChainId?.toString() || '1';
+    return app.chain?.meta?.ChainNode?.eth_chain_id?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -142,9 +142,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
-          const wsRpcUrl = app.chain?.meta?.node?.url ?? '';
+          const wsRpcUrl = app.chain?.meta?.ChainNode?.url ?? '';
           const rpcUrl =
-            (app.chain?.meta?.node?.altWalletUrl ?? wsRpcUrl)
+            (app.chain?.meta?.ChainNode?.alt_wallet_url ?? wsRpcUrl)
               ? new URL(wsRpcUrl).host
               : '';
 
@@ -194,7 +194,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     } catch (error) {
       let errorMsg = `Failed to enable Metamask: ${error.message}`;
       if (error.code === 4902) {
-        errorMsg = `Failed to enable Metamask: Please add chain ID ${app?.chain?.meta?.node?.ethChainId}`;
+        errorMsg = `Failed to enable Metamask: Please add chain ID ${app?.chain?.meta?.ChainNode?.eth_chain_id || 0}`;
       }
       console.error(errorMsg);
       this._enabling = false;
@@ -222,7 +222,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       const communityChain = chainId ?? this.getChainId();
       const chainIdHex = `0x${parseInt(communityChain, 10).toString(16)}`;
       try {
-        await window.ethereum.request({
+        await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainIdHex }],
         });
@@ -237,7 +237,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
           const url =
             rpcUrl.length > 0
               ? rpcUrl[0].replace(/(https:\/\/)+/, 'https://')
-              : app?.chain?.meta?.node?.altWalletUrl;
+              : app?.chain?.meta?.ChainNode?.alt_wallet_url || '';
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [

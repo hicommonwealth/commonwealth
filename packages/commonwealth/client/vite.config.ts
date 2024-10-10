@@ -41,6 +41,12 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
       env.FLAG_FARCASTER_CONTEST,
     ),
+    'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
+      env.FLAG_TOKENIZED_COMMUNITY,
+    ),
+    'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
+      env.FLAG_MANAGE_API_KEYS,
+    ),
   };
 
   const config = {
@@ -63,13 +69,14 @@ export default defineConfig(({ mode }) => {
       JSON.stringify('pk_live_EF89AABAFB87D6F4'),
     'process.env.DISCORD_CLIENT_ID':
       JSON.stringify(env.DISCORD_CLIENT_ID) ||
-      JSON.stringify('1034502265664454776'),
+      JSON.stringify('1027997517964644453'),
+    'process.env.SNAPSHOT_HUB_URL': JSON.stringify(env.SNAPSHOT_HUB_URL),
     'process.env.COSMOS_REGISTRY_API': JSON.stringify(env.COSMOS_REGISTRY_API),
     'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
-    'process.env.ETH_ALCHEMY_API_KEY':
+    'process.env.ALCHEMY_PUBLIC_APP_KEY':
       (env.ETH_RPC || '').trim() === 'e2e-test' &&
       (env.NODE_ENV || '').trim() === 'test'
-        ? JSON.stringify(env.ETH_ALCHEMY_API_KEY)
+        ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
   };
 

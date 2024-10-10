@@ -19,7 +19,7 @@ import {
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
-export const ThreadCreated = Thread.extend({
+export const ThreadCreated = Thread.omit({ search: true }).extend({
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
@@ -27,7 +27,7 @@ export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
   community_id: z.string(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
-export const CommentCreated = Comment.extend({
+export const CommentCreated = Comment.omit({ search: true }).extend({
   community_id: z.string(),
   users_mentioned: z
     .array(PG_INT)
@@ -69,16 +69,16 @@ export const SnapshotProposalCreated = z.object({
 export const DiscordMessageCreated = z.object({
   user: z
     .object({
-      id: z.string(),
-      username: z.string(),
+      id: z.string().nullish(),
+      username: z.string().nullish(),
     })
     .optional(),
   title: z.string().optional(),
-  content: z.string().optional(),
+  content: z.string().nullish(),
   message_id: z.string(),
   channel_id: z.string().optional(),
-  parent_channel_id: z.string().optional(),
-  guild_id: z.string().optional(),
+  parent_channel_id: z.string().nullish(),
+  guild_id: z.string().nullish(),
   imageUrls: z.array(z.string()).optional(),
   action: z.union([
     z.literal('thread-delete'),
@@ -89,6 +89,51 @@ export const DiscordMessageCreated = z.object({
     z.literal('comment-update'),
     z.literal('comment-create'),
   ]),
+});
+
+const DiscordEventBase = z.object({
+  user: z.object({
+    id: z.string(),
+    username: z.string(),
+  }),
+  title: z.string(),
+  content: z.string(),
+  message_id: z.string(),
+  channel_id: z.string(),
+  parent_channel_id: z.string(),
+  guild_id: z.string(),
+  imageUrls: z.array(z.string()),
+});
+
+export const DiscordThreadCreated = DiscordEventBase;
+
+export const DiscordThreadBodyUpdated = DiscordEventBase;
+
+export const DiscordThreadTitleUpdated = DiscordEventBase.pick({
+  user: true,
+  title: true,
+  message_id: true,
+  parent_channel_id: true,
+});
+
+export const DiscordThreadCommentCreated = DiscordEventBase.omit({
+  title: true,
+});
+
+export const DiscordThreadCommentUpdated = DiscordEventBase.omit({
+  title: true,
+});
+
+// TODO: Discord differentiates Thread body from the thread itself
+//  currently deleting a thread body is treated as deleting a comment
+//  which will lead to errors
+export const DiscordThreadCommentDeleted = DiscordEventBase.omit({
+  title: true,
+});
+
+export const DiscordThreadDeleted = DiscordEventBase.pick({
+  message_id: true,
+  parent_channel_id: true,
 });
 
 const ChainEventCreatedBase = z.object({

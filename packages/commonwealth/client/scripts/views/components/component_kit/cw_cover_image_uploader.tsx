@@ -229,6 +229,7 @@ export const CWCoverImageUploader = ({
     setIsUploading(true);
 
     const [_imageURL, _uploadStatus] = await uploadImage(file);
+
     setIsUploading(false);
     setUploadStatus(_uploadStatus);
 
@@ -352,8 +353,8 @@ export const CWCoverImageUploader = ({
           uploadStatus === 'success'
             ? 'Image upload succeeded.'
             : uploadStatus === 'failure'
-            ? 'Image upload failed.'
-            : null
+              ? 'Image upload failed.'
+              : null
         }
         validationStatus={uploadStatus}
       />
@@ -411,6 +412,7 @@ export const CWCoverImageUploader = ({
             ) : (
               <>
                 <CWTextInput
+                  autoFocus={true}
                   label="Prompt"
                   size="small"
                   value={prompt}

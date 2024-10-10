@@ -1,7 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import WebWalletController from 'controllers/app/web_wallets';
 import IWebWallet from 'models/IWebWallet';
-import { userStore } from 'state/ui/user';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
@@ -33,7 +32,7 @@ abstract class ContractBase {
             ChainBase.Ethereum,
           )[0];
 
-          if (!this.wallet.api && !userStore.getState().isLoggedIn) {
+          if (!this.wallet.api) {
             await this.wallet.enable(chainId);
           }
           // @ts-expect-error StrictNullChecks

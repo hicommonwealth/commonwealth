@@ -38,7 +38,7 @@ const AdminContestsPage = () => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const { stakeData } = useCommunityStake();
   const namespace = stakeData?.Community?.namespace;
 

@@ -104,8 +104,8 @@ describe('Recap email lifecycle', () => {
     );
 
     sandbox = sinon.createSandbox();
-    notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getMessagesStub: sandbox
           .stub()
           .onFirstCall()
@@ -113,7 +113,7 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-    );
+    });
 
     const res = await query(GetRecapEmailDataQuery(), {
       actor: {
@@ -141,8 +141,8 @@ describe('Recap email lifecycle', () => {
     );
 
     sandbox = sinon.createSandbox();
-    notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getMessagesStub: sandbox
           .stub()
           .onFirstCall()
@@ -150,7 +150,7 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-    );
+    });
 
     const res = await query(GetRecapEmailDataQuery(), {
       actor: {
@@ -178,8 +178,8 @@ describe('Recap email lifecycle', () => {
     );
 
     sandbox = sinon.createSandbox();
-    notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getMessagesStub: sandbox
           .stub()
           .onFirstCall()
@@ -187,7 +187,7 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-    );
+    });
 
     const res = await query(GetRecapEmailDataQuery(), {
       actor: {
@@ -206,7 +206,9 @@ describe('Recap email lifecycle', () => {
 
   test.skip('should throw if the notifications provider fails', async () => {
     sandbox = sinon.createSandbox();
-    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+    notificationsProvider({
+      adapter: ThrowingSpyNotificationsProvider(sandbox),
+    });
 
     await expect(
       await query(GetRecapEmailDataQuery(), {

@@ -7,19 +7,21 @@ import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 
-export const convertEthToUsd = (
-  ethAmount: string | number,
-  ethUsdRate: string,
+export const convertTokenAmountToUsd = (
+  tokenAmount: string | number,
+  tokenToUsdRate: string,
 ) => {
-  const eth =
-    typeof ethAmount === 'number' ? Number(ethAmount) : parseFloat(ethAmount);
-  const rate = parseFloat(ethUsdRate);
+  const amount =
+    typeof tokenAmount === 'number'
+      ? Number(tokenAmount)
+      : parseFloat(tokenAmount);
+  const rate = parseFloat(tokenToUsdRate);
 
-  if (isNaN(eth) || isNaN(rate)) {
+  if (isNaN(amount) || isNaN(rate)) {
     return '';
   }
 
-  return (eth * rate).toFixed(2);
+  return (amount * rate).toFixed(2);
 };
 
 export const buildEtherscanLink = (txHash: string, chainNodeId?: number) => {

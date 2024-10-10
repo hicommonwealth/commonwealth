@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
 import app from 'state';
+import { getChainDecimals } from '../controllers/app/webWallets/utils';
 import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
@@ -32,7 +33,7 @@ export function isDefaultStage(stage: string, customStages?: string[]) {
   return (
     stage === ThreadStage.Discussion ||
     stage ===
-      parseCustomStages(customStages || app?.chain?.meta?.customStages)[0]
+      parseCustomStages(customStages || app?.chain?.meta?.custom_stages)[0]
   );
 }
 
@@ -302,25 +303,6 @@ export const handleRedirectClicks = (
   }
 };
 
-// Returns a default chain for a chainbase
-export function baseToNetwork(n: ChainBase): ChainNetwork {
-  switch (n) {
-    case ChainBase.CosmosSDK:
-      return ChainNetwork.Osmosis;
-    case ChainBase.Substrate:
-      return ChainNetwork.Edgeware;
-    case ChainBase.Ethereum:
-      return ChainNetwork.Ethereum;
-    case ChainBase.NEAR:
-      return ChainNetwork.NEAR;
-    case ChainBase.Solana:
-      return ChainNetwork.Solana;
-    default:
-      // @ts-expect-error <StrictNullChecks/>
-      return null;
-  }
-}
-
 // Decimals For Tokens
 export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
   let decimals;
@@ -328,7 +310,7 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
     // Custom for evmos
     decimals = 18;
   } else if (chain && chain.meta) {
-    decimals = chain.meta.decimals;
+    decimals = getChainDecimals(chain.id || '', chain.base);
   } else if (chain.network === ChainNetwork.ERC721) {
     decimals = 0;
   } else if (chain.network === ChainNetwork.ERC1155) {

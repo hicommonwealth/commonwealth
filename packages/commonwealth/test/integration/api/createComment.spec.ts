@@ -57,7 +57,8 @@ describe('createComment Integration Tests', () => {
     };
     return await chai
       .request(server.app)
-      .del(`/api/comments/${commentId}`)
+      .post(`/api/v1/DeleteComment`)
+      .set('address', validRequest.address)
       .send(validRequest);
   };
 
@@ -148,7 +149,7 @@ describe('createComment Integration Tests', () => {
       server.e2eTestEntities.testThreads[0].id,
     );
 
-    chai.assert.equal(afterCommentCount, beforeCommentCount + 1);
+    chai.assert.equal(afterCommentCount, beforeCommentCount! + 1);
     chai.assert.isNotNull(comment);
     chai.assert.equal(response.status, 200);
 
@@ -161,7 +162,7 @@ describe('createComment Integration Tests', () => {
     );
 
     chai.assert.isNull(comment);
-    chai.assert.equal(afterCommentCount, beforeCommentCount);
+    chai.assert.equal(afterCommentCount, beforeCommentCount!);
     chai.assert.equal(deleteResponse.status, 200);
   });
 });

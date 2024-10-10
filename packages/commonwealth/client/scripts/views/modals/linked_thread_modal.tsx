@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import { notifyError } from '../../controllers/app/notifications';
 import { getAddedAndDeleted } from '../../helpers/threads';
-import useAppStatus from '../../hooks/useAppStatus';
 import type Thread from '../../models/Thread';
 import { LinkSource } from '../../models/Thread';
 import app from '../../state';
@@ -34,17 +33,16 @@ export const LinkedThreadModal = ({
   const [tempLinkedThreads, setTempLinkedThreads] =
     useState<Array<Thread>>(initialLinkedThreads);
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
-
-  const { isAddedToHomeScreen } = useAppStatus();
 
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
@@ -55,20 +53,19 @@ export const LinkedThreadModal = ({
     try {
       if (toAdd.length) {
         const updatedThread = await addThreadLinks({
-          communityId: app.activeChainId(),
+          communityId,
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Thread,
             identifier: String(el.id),
             title: el.title,
           })),
-          isPWA: isAddedToHomeScreen,
         });
         links = updatedThread.links;
       }
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
-          communityId: app.activeChainId(),
+          communityId,
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Thread,

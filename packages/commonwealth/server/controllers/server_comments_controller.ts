@@ -1,10 +1,5 @@
 import { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import {
-  DeleteCommentOptions,
-  DeleteCommentResult,
-  __deleteComment,
-} from './server_comments_methods/delete_comment';
-import {
   SearchCommentsOptions,
   SearchCommentsResult,
   __searchComments,
@@ -28,15 +23,5 @@ export class ServerCommentsController {
     options: SearchCommentsOptions,
   ): Promise<SearchCommentsResult> {
     return __searchComments.call(this, options);
-  }
-
-  /**
-   * Deletes a comment.
-   *
-   */
-  async deleteComment(
-    options: DeleteCommentOptions,
-  ): Promise<DeleteCommentResult> {
-    return __deleteComment.call(this, options);
   }
 }

@@ -1,4 +1,4 @@
-import type { DB } from '@hicommonwealth/model';
+import { DB, buildChainNodeUrl } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { EvmSources } from './types';
 
@@ -11,7 +11,7 @@ export async function getEventSources(models: DB): Promise<EvmSources> {
                                         LOWER(ESS.contract_address) as contract_address,
                                         ESS.abi_id,
                                         -- Aggregate event sources for each contract address
-                                        json_agg(row_to_json(ESS)) AS sources 
+                                        json_agg(row_to_json(ESS))  AS sources
                                  FROM "EvmEventSources" ESS
                                  WHERE active = true
                                  GROUP BY ESS.contract_address, ESS.abi_id, ESS.chain_node_id),
@@ -34,7 +34,7 @@ export async function getEventSources(models: DB): Promise<EvmSources> {
                                         JOIN ContractsAgg CA ON CN.id = CA.chain_node_id)
         SELECT jsonb_object_agg(chain_node_id, jsonb_build_object(
                 'rpc', rpc,
-                'maxBlockRange', COALESCE (max_ce_block_range, ${DEFAULT_MAX_BLOCK_RANGE}),
+                'maxBlockRange', COALESCE(max_ce_block_range, ${DEFAULT_MAX_BLOCK_RANGE}),
                 'contracts', contracts)
                ) as aggregate
         FROM ChainNodesAgg;
@@ -43,6 +43,12 @@ export async function getEventSources(models: DB): Promise<EvmSources> {
   );
 
   if (result.length > 0 && result[0].aggregate) {
+    for (const key of Object.keys(result[0].aggregate)) {
+      result[0].aggregate[key].rpc = buildChainNodeUrl(
+        result[0].aggregate[key].rpc,
+        'private',
+      );
+    }
     return result[0].aggregate;
   }
 

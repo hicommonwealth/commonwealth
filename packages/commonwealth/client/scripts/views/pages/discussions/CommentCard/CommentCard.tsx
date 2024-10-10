@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 
 import {
@@ -15,8 +15,8 @@ import {
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
 import type Comment from 'models/Comment';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -26,7 +26,6 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
@@ -117,25 +116,21 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  const { data: config } = useFetchConfigurationQuery();
-
-  const doVerify = useCallback(async () => {
+  useEffect(() => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
         comment.canvasSignedData,
       );
-      await verify(canvasSignedData);
-      setVerifiedCanvasSignedData(canvasSignedData);
-    } catch (err) {
-      // ignore invalid signed comments
+      if (!canvasSignedData) return;
+      verify(canvasSignedData)
+        .then(() => {
+          setVerifiedCanvasSignedData(canvasSignedData);
+        })
+        .catch(() => null);
+    } catch (error) {
+      // ignore errors or missing data
     }
   }, [comment.canvasSignedData]);
-
-  useEffect(() => {
-    if (!config?.enforceSessionKeys) return;
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    doVerify();
-  }, [config?.enforceSessionKeys, doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
@@ -204,7 +199,7 @@ export const CommentCard = ({
         <div className="comment-content">
           {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
-            <QuillRenderer doc={commentText} />
+            <MarkdownViewerWithFallback markdown={commentText} />
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
