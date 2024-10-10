@@ -269,6 +269,7 @@ const DetailsFormStep = ({
           validationSchema={detailsFormValidationSchema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
+          onErrors={console.error}
         >
           {({ watch, setValue }) => (
             <>
@@ -533,7 +534,11 @@ const DetailsFormStep = ({
                           debouncedTokenValue={debouncedTokenValue}
                           tokenMetadataLoading={tokenMetadataLoading}
                           tokenMetadata={tokenMetadata}
-                          tokenValue={tokenValue}
+                          tokenValue={
+                            editMode
+                              ? contestFormData?.fundingTokenAddress || ''
+                              : tokenValue
+                          }
                           setTokenValue={setTokenValue}
                           tokenError={getTokenError()}
                           containerClassName="funding-token-address-input"
