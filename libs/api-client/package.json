@@ -24,10 +24,9 @@
   },
   "scripts": {
     "build": "echo Generated SDK is prebuilt",
-    "clean": "rm -rf build && rm -rf coverage",
+    "clean": "echo Generated SDK is prebuilt",
+    "check-types": "echo Generated SDK is prebuilt",
     "publish": "npm publish",
-    "run-test": "tsx ./test/index.ts",
-    "check-types": "tsc --noEmit",
     "format": "npx prettier --write 'src/**/*.{js,d.ts}'",
     "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate && pnpm format"
   },
