@@ -6,15 +6,13 @@ import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useTopicGating from 'hooks/useTopicGating';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
@@ -29,7 +27,6 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
-import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -66,7 +63,6 @@ export const NewThreadForm = () => {
 
   const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
   const hasTopics = sortedTopics?.length;
-  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
   const topicsForSelector = hasTopics ? sortedTopics : [];
 
   const {
@@ -110,10 +106,11 @@ export const NewThreadForm = () => {
     includeTopics: true,
     enabled: !!communityId,
   });
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { isRestrictedMembership } = useTopicGating({
     communityId,
-    address: user.activeAccount?.address || '',
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId: threadTopic?.id || 0,
   });
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
@@ -139,24 +136,11 @@ export const NewThreadForm = () => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
 
-  const isTopicGated = !!(memberships || []).find(
-    (membership) =>
-      threadTopic?.id && membership.topics.find((t) => t.id === threadTopic.id),
-  );
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      threadTopic &&
-      threadTopic?.id &&
-      membership.topics.find((t) => t.id === threadTopic?.id) &&
-      membership.isAllowed,
-  );
   const gatedGroupNames = groups
     .filter((group) =>
       group.topics.find((topic) => topic.id === threadTopic?.id),
     )
     .map((group) => group.name);
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
     if (isRestrictedMembership) {

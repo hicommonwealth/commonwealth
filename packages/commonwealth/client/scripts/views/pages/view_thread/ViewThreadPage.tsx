@@ -6,6 +6,7 @@ import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
@@ -14,10 +15,7 @@ import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
@@ -142,10 +140,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { isRestrictedMembership } = useTopicGating({
     communityId,
-    address: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
+    userAddress: user?.activeAccount?.address || '',
+    topicId: thread?.topic?.id || 0,
   });
 
   const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
@@ -153,19 +152,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     objectId: thread?.id || '',
     apiCallEnabled: !!thread?.id && !!communityId,
   });
-
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    membership.topics.find((t) => t.id === thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      membership.topics.find((t) => t.id === thread?.topic?.id) &&
-      membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');

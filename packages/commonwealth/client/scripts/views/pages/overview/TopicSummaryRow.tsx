@@ -1,11 +1,11 @@
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import type Thread from '../../../models/Thread';
@@ -31,9 +31,10 @@ export const TopicSummaryRow = ({
   const user = useUserStore();
 
   const communityId = app.activeChainId() || '';
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+
+  const { memberships } = useTopicGating({
     communityId,
-    address: user.activeAccount?.address || '',
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address || !!communityId,
   });
 

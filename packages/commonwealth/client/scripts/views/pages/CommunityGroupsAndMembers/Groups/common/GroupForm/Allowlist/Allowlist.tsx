@@ -2,10 +2,10 @@ import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
+import useTopicGating from 'hooks/useTopicGating';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import { OptionConfig, Select } from 'views/components/Select';
@@ -85,9 +85,9 @@ const Allowlist = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const communityId = app.activeChainId() || '';
-  const { data: memberships } = useRefreshMembershipQuery({
+  const { memberships } = useTopicGating({
     communityId,
-    address: user.activeAccount?.address || '',
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address,
   });
 

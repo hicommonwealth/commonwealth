@@ -8,6 +8,7 @@ import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard
 
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -17,7 +18,6 @@ import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
 } from 'state/api/feeds';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { DashboardViews } from 'views/pages/user_dashboard';
@@ -50,35 +50,16 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     enabled: !!thread.communityId,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community);
-
   const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { isRestrictedMembership } = useTopicGating({
     communityId: thread.communityId,
-    // @ts-expect-error <StrictNullChecks/>
-    address: account?.address,
+    userAddress: account?.address || '',
     apiEnabled: !!account?.address && !!thread.communityId,
+    topicId: thread?.topic?.id || 0,
   });
-
-  const isTopicGated = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id &&
-      membership.topics.find((t) => t.id === thread.topic.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id &&
-      membership.topics.find((t) => t.id === thread.topic.id) &&
-      membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: Permissions.isCommunityMember(thread.communityId),
