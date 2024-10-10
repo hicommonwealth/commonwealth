@@ -8,14 +8,6 @@ export enum TopicWeightedVoting {
   ERC20 = 'erc20',
 }
 
-export const ContestTopic = z
-  .object({
-    contest_address: z.string(),
-    topic_id: PG_INT,
-    created_at: z.coerce.date(),
-  })
-  .describe('X-Ref to topics in contest');
-
 export const Topic = z.object({
   id: PG_INT.optional(),
   name: z
@@ -57,9 +49,6 @@ export const Topic = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   deleted_at: z.coerce.date().nullish(),
-
-  // associations
-  contest_topics: z.array(ContestTopic).nullish(),
 });
 
 export const ContestManager = z
@@ -108,5 +97,6 @@ export const ContestManager = z
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
     neynar_webhook_id: z.string().nullish(),
+    topic_id: PG_INT,
   })
   .describe('On-Chain Contest Manager');

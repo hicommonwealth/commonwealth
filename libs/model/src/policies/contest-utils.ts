@@ -102,7 +102,6 @@ export async function createOnchainContestVote(payload: {
             FROM "Communities" c
             JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
             JOIN "ContestManagers" cm ON cm.community_id = c.id
-            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
             JOIN "Contests" co ON cm.contest_address = co.contest_address
               AND co.contest_id = (
                 SELECT MAX(contest_id) AS max_id
@@ -112,7 +111,7 @@ export async function createOnchainContestVote(payload: {
             JOIN "ContestActions" added on co.contest_address = added.contest_address
               AND added.content_url = :content_url
               AND added.action = 'added'
-            WHERE ct.topic_id = :topic_id
+            WHERE cm.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
             AND (

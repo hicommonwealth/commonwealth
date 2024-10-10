@@ -27,11 +27,12 @@ select
   cm.prize_percentage,
   cm.payout_structure,
   cm.cancelled,
+  cm.topic_id,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
-    from "ContestTopics" ct
-    left join "Topics" t on ct.topic_id = t.id
-    where cm.contest_address = ct.contest_address
+    from "ContestManagers" cm2
+    left join "Topics" t on cm2.topic_id = t.id
+    WHERE cm2.contest_address = cm.contest_address
   ), '[]'::jsonb) as topics,
   coalesce(c.contests, '[]'::jsonb) as contests
 from

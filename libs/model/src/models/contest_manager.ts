@@ -46,6 +46,7 @@ export default (
         allowNull: true,
       },
       neynar_webhook_id: { type: Sequelize.STRING, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: false },
     },
     {
       tableName: 'ContestManagers',

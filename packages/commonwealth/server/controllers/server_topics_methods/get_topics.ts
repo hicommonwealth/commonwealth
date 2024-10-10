@@ -56,15 +56,14 @@ export async function __getTopics(
                 )
               )
             )
-            FROM "ContestTopics" ct
-            LEFT JOIN "ContestManagers" cm ON cm.contest_address = ct.contest_address
+            FROM "ContestManagers" cm
             JOIN (
               SELECT contest_address, MAX(contest_id) AS max_contest_id,
                 MAX(start_time) as start_time, MAX(end_time) as end_time
               FROM "Contests"
               GROUP BY contest_address
             ) co ON cm.contest_address = co.contest_address
-            WHERE ct.topic_id = td.id
+            WHERE cm.topic_id = td.id
               AND cm.community_id = :community_id
               AND cm.cancelled = false
               AND (

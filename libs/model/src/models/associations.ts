@@ -93,7 +93,7 @@ export const buildAssociations = (db: DB) => {
     asMany: 'threads',
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
-  }).withMany(db.ContestTopic, { asMany: 'contest_topics' });
+  });
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {
@@ -112,9 +112,6 @@ export const buildAssociations = (db: DB) => {
   db.ContestManager.withMany(db.Contest, {
     foreignKey: 'contest_address',
     asMany: 'contests',
-  }).withMany(db.ContestTopic, {
-    foreignKey: 'contest_address',
-    asMany: 'topics',
   });
 
   db.Contest.withMany(db.ContestAction, {

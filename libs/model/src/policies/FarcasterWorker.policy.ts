@@ -110,18 +110,11 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
         mustExist('Contest Manager', contestManager);
 
-        const contestTopic = await models.ContestTopic.findOne({
-          where: {
-            contest_address: contestManager.contest_address,
-          },
-        });
-        mustExist('Contest Topic', contestTopic);
-
         // create onchain content from reply cast
         const content_url = buildFarcasterContentUrl(payload.hash);
         await createOnchainContestContent({
           community_id: contestManager.community_id,
-          topic_id: contestTopic.topic_id,
+          topic_id: contestManager.topic_id, // TODO: remove topic
           author_address: payload.author.custody_address,
           content_url,
         });
@@ -140,13 +133,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
         mustExist('Contest Manager', contestManager);
 
-        const contestTopic = await models.ContestTopic.findOne({
-          where: {
-            contest_address: contestManager.contest_address,
-          },
-        });
-        mustExist('Contest Topic', contestTopic);
-
         const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
 
         const { users } = await client.fetchBulkUsers([
@@ -159,7 +145,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         await createOnchainContestVote({
           community_id: contestManager.community_id,
-          topic_id: contestTopic.topic_id,
+          topic_id: contestManager.topic_id, // TODO: remove topic
           author_address: users[0].custody_address,
           content_url,
         });
