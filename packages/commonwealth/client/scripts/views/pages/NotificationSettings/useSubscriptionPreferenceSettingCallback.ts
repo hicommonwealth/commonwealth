@@ -63,7 +63,7 @@ export function useSubscriptionPreferenceSettingCallback(
     [
       pref,
       pushNotificationToggleCallback,
-      subscriptionPreferences.data,
+      subscriptionPreferences,
       togglePushNotificationActivated,
       updateSubscriptionPreferences,
       user.id,
