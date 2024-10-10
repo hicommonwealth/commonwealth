@@ -22,6 +22,7 @@ export const CWSingleSelectItem = (
   props: SingleValueProps<OptionProps> & CustomSingleValueProps,
 ) => {
   const { data, showCopyIcon = false, saveToClipboard } = props;
+
   const handleClickToCopy = async (event: React.MouseEvent) => {
     event.stopPropagation();
     if (saveToClipboard) {
@@ -43,7 +44,14 @@ export const CWSingleSelectItem = (
       )}
       {!showCopyIcon && <span>{data.label}</span>}
 
-      {showCopyIcon && <CopySimple size={20} onMouseDown={handleClickToCopy} />}
+      {showCopyIcon && (
+        <CopySimple
+          size={20}
+          onMouseDown={(event) => {
+            void handleClickToCopy(event);
+          }}
+        />
+      )}
     </div>
   );
 };
