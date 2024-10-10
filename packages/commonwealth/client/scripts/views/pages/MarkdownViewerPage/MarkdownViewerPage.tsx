@@ -22,7 +22,6 @@ function useParams() {
  */
 export const MarkdownViewerPage = () => {
   const { cutoffLines, quill } = useParams();
-
   return (
     <section className="MarkdownViewerPage">
       {!quill && (
@@ -33,7 +32,7 @@ export const MarkdownViewerPage = () => {
 
       {quill && (
         <div className="inner">
-          <QuillRenderer doc={supported} cutoffLines={cutoffLines} />
+          <QuillRenderer doc={supported} />
         </div>
       )}
     </section>
