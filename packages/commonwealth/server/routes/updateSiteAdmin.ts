@@ -7,6 +7,7 @@ import { success } from '../types';
 
 enum PromoteUserErrors {
   NoUser = 'Must supply a user address',
+  UserNotFound = 'User not found',
   NotAdmin = 'You do not have permission to promote users',
 }
 
@@ -20,11 +21,21 @@ const updateSiteAdmin = async (
   req: TypedRequestBody<PromoteUserReq>,
   res: Response,
 ) => {
-  const { address, siteAdmin } = req.body;
+  let { address } = req.body;
+  const { siteAdmin } = req.body;
+
+  if (!address) {
+    throw new AppError(PromoteUserErrors.NoUser);
+  }
 
   // @ts-expect-error StrictNullChecks
   if (!req.user.isAdmin) {
     throw new AppError(PromoteUserErrors.NotAdmin);
+  }
+
+  if (address.startsWith('0x')) {
+    const { utils } = await import('ethers');
+    address = utils.getAddress(address);
   }
 
   const userAddress = await models.Address.findOne({
@@ -37,7 +48,7 @@ const updateSiteAdmin = async (
   });
 
   if (!userAddress) {
-    throw new AppError(PromoteUserErrors.NoUser);
+    throw new AppError(PromoteUserErrors.UserNotFound);
   }
 
   const user = await models.User.findOne({

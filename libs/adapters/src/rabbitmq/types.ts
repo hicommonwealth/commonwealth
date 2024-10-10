@@ -6,13 +6,12 @@ import {
 } from '@hicommonwealth/core';
 
 export enum RascalPublications {
-  DiscordListener = BrokerPublications.DiscordListener,
   MessageRelayer = BrokerPublications.MessageRelayer,
 }
 
 // SnapshotListener and ChainEvent subscriptions will eventually be replaced by NotificationsProvider
 export enum RascalSubscriptions {
-  DiscordListener = BrokerSubscriptions.DiscordListener,
+  DiscordBotPolicy = BrokerSubscriptions.DiscordBotPolicy,
   ChainEvent = BrokerSubscriptions.ChainEvent,
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
   NotificationsSettings = BrokerSubscriptions.NotificationsSettings,
@@ -22,13 +21,12 @@ export enum RascalSubscriptions {
 
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
-  Discobot = 'DiscobotExchange',
   MessageRelayer = 'MessageRelayerExchange',
 }
 
 export enum RascalQueues {
   DeadLetter = 'DeadLetterQueue',
-  DiscordListener = 'DiscordMessageQueueV2',
+  DiscordBotPolicy = 'DiscordBotPolicy',
   ChainEvent = 'ChainEventQueue',
   NotificationsProvider = 'NotificationsProviderQueue',
   NotificationsSettings = 'NotificationsSettingsQueue',
@@ -40,7 +38,7 @@ export enum RascalBindings {
   NotificationsProvider = 'NotificationsProvider',
   NotificationsSettings = 'NotificationsSettings',
   DeadLetter = 'DeadLetterBinding',
-  DiscordListener = 'DiscordMessageBinding',
+  DiscordBotPolicy = 'DiscordBotPolicy',
   ChainEvent = 'ChainEventBinding',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
@@ -56,8 +54,15 @@ export enum RascalRoutingKeys {
 
   NotificationsSettingsPreferencesUpdated = EventNames.SubscriptionPreferencesUpdated,
 
+  DiscordThreadCreated = EventNames.DiscordThreadCreated,
+  DiscordThreadBodyUpdated = EventNames.DiscordThreadBodyUpdated,
+  DiscordThreadTitleUpdated = EventNames.DiscordThreadTitleUpdated,
+  DiscordThreadDeleted = EventNames.DiscordThreadDeleted,
+  DiscordThreadCommentCreated = EventNames.DiscordThreadCommentCreated,
+  DiscordThreadCommentUpdated = EventNames.DiscordThreadCommentUpdated,
+  DiscordThreadCommentDeleted = EventNames.DiscordThreadCommentDeleted,
+
   DeadLetter = 'DeadLetter',
-  DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
 
   ContestWorkerPolicyThreadCreated = `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}.#`,

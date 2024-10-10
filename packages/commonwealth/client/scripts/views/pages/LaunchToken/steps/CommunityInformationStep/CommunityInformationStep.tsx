@@ -2,6 +2,7 @@ import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import AddressInfo from 'models/AddressInfo';
 import React from 'react';
 import {
   BaseMixpanelPayload,
@@ -12,6 +13,7 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import { fetchCachedNodes } from 'state/api/nodes';
+import useUserStore from 'state/ui/user';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -23,15 +25,18 @@ import { generateCommunityNameFromToken } from './utils';
 
 interface CommunityInformationStepProps {
   handleGoBack: () => void;
-  handleContinue: () => void;
+  handleContinue: (communityId: string) => void;
   tokenInfo?: TokenInfo;
+  selectedAddress?: AddressInfo;
 }
 
 const CommunityInformationStep = ({
   handleGoBack,
   handleContinue,
   tokenInfo,
+  selectedAddress,
 }: CommunityInformationStepProps) => {
+  const user = useUserStore();
   const { isAddedToHomeScreen } = useAppStatus();
 
   const initialValues = {
@@ -59,7 +64,7 @@ const CommunityInformationStep = ({
   ) => {
     const nodes = fetchCachedNodes();
     const baseNode = nodes?.find(
-      (n) => n.ethChainId === commonProtocol.ValidChains.Base,
+      (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
     );
     if (!baseNode || !baseNode.ethChainId) {
       notifyError('Could not find base chain node');
@@ -67,6 +72,13 @@ const CommunityInformationStep = ({
     }
 
     try {
+      // this condition will never be triggered, adding this to avoid typescript errors
+      if (selectedAddress?.address) {
+        user.setData({
+          addressSelectorSelectedAddress: selectedAddress.address,
+        });
+      }
+
       const input = buildCreateCommunityInput({
         id: values.communityId,
         name: values.communityName,
@@ -74,11 +86,10 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        chainNodeId: baseNode.ethChainId,
-        tokenName: tokenInfo?.name || '',
+        chainNodeId: baseNode.id,
       });
       await createCommunityMutation(input);
-      handleContinue();
+      handleContinue(values.communityId);
     } catch (err) {
       notifyError(err.message);
     }

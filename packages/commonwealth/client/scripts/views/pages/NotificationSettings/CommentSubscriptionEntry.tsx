@@ -11,10 +11,10 @@ import { getRelativeTimestamp } from 'helpers/dates';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { User } from 'views/components/user/user';
 import { z } from 'zod';
 
@@ -113,8 +113,9 @@ export const CommentSubscriptionEntry = (
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <QuillRenderer
-            doc={safeTruncateBody(decodeURI(comment.text))}
+          <MarkdownViewerUsingQuillOrNewEditor
+            markdown={safeTruncateBody(decodeURI(comment.text))}
+            cutoffLines={4}
             maxChars={MIN_CHARS_TO_SHOW_MORE}
             customShowMoreButton={<></>}
           />
@@ -123,7 +124,7 @@ export const CommentSubscriptionEntry = (
 
       <div className="SubscriptionFooter">
         <CWThreadAction
-          label={pluralize(thread.comment_count, 'Comment')}
+          label={pluralize(thread.comment_count!, 'Comment')}
           action="comment"
           onClick={(e) => {
             e.preventDefault();

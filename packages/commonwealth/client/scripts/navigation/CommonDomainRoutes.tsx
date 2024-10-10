@@ -4,8 +4,12 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
+const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
 const MarkdownViewerPage = lazy(() => import('views/pages/MarkdownViewerPage'));
+const MarkdownHitHighlighterPage = lazy(
+  () => import('views/pages/MarkdownHitHighlighterPage'),
+);
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
@@ -118,14 +122,26 @@ const CommonDomainRoutes = ({
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
   <Route
-    key="/markdown-editor"
-    path="/markdown-editor"
+    key="/_internal/quill"
+    path="/_internal/quill"
+    element={<QuillPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-editor"
+    path="/_internal/markdown-editor"
     element={<MarkdownEditorPage />}
   />,
 
   <Route
-    key="/markdown-viewer"
-    path="/markdown-viewer"
+    key="/_internal/markdown-hit-highlighter"
+    path="/_internal/markdown-hit-highlighter"
+    element={<MarkdownHitHighlighterPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-viewer"
+    path="/_internal/markdown-viewer"
     element={<MarkdownViewerPage />}
   />,
 

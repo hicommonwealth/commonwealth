@@ -4,6 +4,7 @@
 import * as core from '../../../../core';
 import { GetCommunitiesResponseResultsItemGroupsItemRequirementsItemAllow } from './GetCommunitiesResponseResultsItemGroupsItemRequirementsItemAllow';
 import { GetCommunitiesResponseResultsItemGroupsItemRequirementsItemThreshold } from './GetCommunitiesResponseResultsItemGroupsItemRequirementsItemThreshold';
+
 export const GetCommunitiesResponseResultsItemGroupsItemRequirementsItem =
   core.serialization
     .union('rule', {

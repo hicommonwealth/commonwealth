@@ -1,6 +1,15 @@
 @import '../shared';
 
 .EditTopicModal {
+  .editor {
+    height: 180px;
+    padding-bottom: 50px;
+  }
+  .preview {
+    max-height: 255px;
+    overflow: auto;
+  }
+
   .EditTopicModalFooter {
     display: flex;
     flex-direction: column;

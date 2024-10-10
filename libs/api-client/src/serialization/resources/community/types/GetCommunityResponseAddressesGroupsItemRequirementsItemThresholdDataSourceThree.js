@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { GetCommunityResponseAddressesGroupsItemRequirementsItemThresholdDataSourceThreeSourceType } from './GetCommunityResponseAddressesGroupsItemRequirementsItemThresholdDataSourceThreeSourceType';
+
 export const GetCommunityResponseAddressesGroupsItemRequirementsItemThresholdDataSourceThree =
   core.serialization.object({
     sourceType: core.serialization.property(

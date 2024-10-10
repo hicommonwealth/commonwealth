@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../../core';
 import { CreateCommentRequestDiscordMeta } from '../../types/CreateCommentRequestDiscordMeta';
+
 export const CreateCommentRequest = core.serialization.object({
   threadId: core.serialization.property(
     'thread_id',

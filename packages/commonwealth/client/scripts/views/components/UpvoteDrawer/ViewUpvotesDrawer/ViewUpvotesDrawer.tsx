@@ -5,6 +5,7 @@ import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
@@ -14,7 +15,6 @@ import CWDrawer, {
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
-import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 import './ViewUpvotesDrawer.scss';
 
 type Profile = Account | AddressInfo | MinimumProfile;
@@ -143,8 +143,9 @@ export const ViewUpvotesDrawer = ({
               />
             </div>
             <div className="upvoted-content-body">
-              <QuillRenderer
-                doc={contentBody}
+              <MarkdownViewerWithFallback
+                markdown={contentBody}
+                cutoffLines={10}
                 maxChars={MAIDEN_CHARS_TO_SHOW_MORE}
               />
             </div>
