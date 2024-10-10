@@ -1,8 +1,10 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { readFile, writeFile } from 'fs/promises';
-import { diffSpecs } from 'openapi-diff';
+import pkg from 'openapi-diff';
 import path from 'path';
 import { oasOptions, trpcRouter } from '../api/external-router';
+
+const { diffSpecs } = pkg;
 
 const versioningPath = path.resolve(
   'packages/commonwealth/server/api/external-router.ts',
