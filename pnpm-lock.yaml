@@ -422,24 +422,7 @@ importers:
         specifier: ^4.7.2
         version: 4.9.3
 
-  libs/api-client:
-    dependencies:
-      moment:
-        specifier: ^2.23.0
-        version: 2.30.1
-      qs:
-        specifier: ^6.13.0
-        version: 6.13.0
-      url-join:
-        specifier: ^5.0.0
-        version: 5.0.0
-    devDependencies:
-      '@types/moment':
-        specifier: ^2.13.0
-        version: 2.13.0
-      tsx:
-        specifier: ^4.7.2
-        version: 4.9.3
+  libs/api-client: {}
 
   libs/chains:
     dependencies:
@@ -13084,10 +13067,6 @@ packages:
     resolution: {integrity: sha512-zWmv4RSuB9r2mYQw3zxQuHWeU+42aKi1wWig/j4ele4ygELZ7PEO6MM7rim9oAQH2A5MWfsAVf/jPvTPgCbvUQ==}
     engines: {node: '>=0.6'}
 
-  qs@6.13.0:
-    resolution: {integrity: sha512-+38qI9SOr8tfZ4QmJNplMUxqjbe7LKvvZgWdExBOmd+egZTtjLB67Gu0HRX3u/XOq7UU2Nx6nsjvS16Z9uwfpg==}
-    engines: {node: '>=0.6'}
-
   qs@6.5.3:
     resolution: {integrity: sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==}
     engines: {node: '>=0.6'}
@@ -15083,10 +15062,6 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
-
-  url-join@5.0.0:
-    resolution: {integrity: sha512-n2huDr9h9yzd6exQVnH/jU5mr+Pfx08LRXXZhkLLetAMESRj+anQsTAh940iMrIetKAmry9coFuZQ2jY8/p3WA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
@@ -33552,10 +33527,6 @@ snapshots:
     dependencies:
       side-channel: 1.0.6
 
-  qs@6.13.0:
-    dependencies:
-      side-channel: 1.0.6
-
   qs@6.5.3: {}
 
   query-string@5.1.1:
@@ -35991,8 +35962,6 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
-
-  url-join@5.0.0: {}
 
   url-parse@1.5.10:
     dependencies:
