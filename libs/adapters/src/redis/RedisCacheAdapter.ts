@@ -35,6 +35,7 @@ export class RedisCache implements Cache {
     const redisOptions: RedisClientOptions = {};
     redisOptions['url'] = redis_url;
     if (redis_url.includes('rediss')) {
+      console.log('===using tls');
       redisOptions['socket'] = {
         tls: true,
         rejectUnauthorized: false,
@@ -42,6 +43,7 @@ export class RedisCache implements Cache {
         connectTimeout: CONNECT_TIMEOUT,
       };
     } else {
+      console.log('===not using tls');
       redisOptions['socket'] = {
         reconnectStrategy: redisRetryStrategy,
         connectTimeout: CONNECT_TIMEOUT,
