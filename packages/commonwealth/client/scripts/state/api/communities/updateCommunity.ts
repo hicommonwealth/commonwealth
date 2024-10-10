@@ -24,7 +24,6 @@ interface UpdateCommunityProps {
   defaultOverview?: boolean;
   chainNodeId?: string;
   type?: ChainType;
-  isPWA?: boolean;
 }
 
 export const buildUpdateCommunityInput = ({

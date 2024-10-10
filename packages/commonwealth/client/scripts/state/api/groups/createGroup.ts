@@ -9,7 +9,6 @@ interface CreateGroupProps {
   groupDescription?: string;
   requirementsToFulfill: number | undefined;
   requirements?: any[];
-  isPWA?: boolean;
 }
 
 export const buildCreateGroupInput = ({
