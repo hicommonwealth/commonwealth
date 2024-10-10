@@ -7,6 +7,7 @@ import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { TopicAttributes } from '../models';
+import { buildFarcasterContestFrameUrl } from '../utils';
 
 const Errors = {
   InvalidTopics: 'Invalid topics',
@@ -56,6 +57,10 @@ export function CreateContestManagerMetadata(): Command<
         }));
       }
 
+      const farcaster_frame_url = buildFarcasterContestFrameUrl(
+        payload.contest_address,
+      );
+
       const contestManager = await models.sequelize.transaction(
         async (transaction) => {
           const manager = await models.ContestManager.create(
@@ -64,6 +69,7 @@ export function CreateContestManagerMetadata(): Command<
               community_id: id.toString(),
               created_at: new Date(),
               cancelled: false,
+              farcaster_frame_url,
             },
             { transaction },
           );

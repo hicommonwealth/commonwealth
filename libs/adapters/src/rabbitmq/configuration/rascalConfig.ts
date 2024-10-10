@@ -134,6 +134,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.FarcasterWorkerPolicy]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
@@ -197,6 +203,16 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.ContestProjectionContestContentUpvoted,
       ],
     },
+    [RascalBindings.FarcasterWorkerPolicy]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.FarcasterWorkerPolicy,
+      destinationType: 'queue',
+      bindingKeys: [
+        RascalRoutingKeys.FarcasterWorkerPolicyCastCreated,
+        RascalRoutingKeys.FarcasterWorkerPolicyReplyCastCreated,
+        RascalRoutingKeys.FarcasterWorkerPolicyVoteCreated,
+      ],
+    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
@@ -221,6 +237,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.ContestProjection]: {
       queue: RascalQueues.ContestProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.FarcasterWorkerPolicy]: {
+      queue: RascalQueues.FarcasterWorkerPolicy,
       ...subscriptionConfig,
     },
     [RascalSubscriptions.DiscordBotPolicy]: {

@@ -1,6 +1,7 @@
 import { express } from '@hicommonwealth/adapters';
-import { ChainEvents, Snapshot } from '@hicommonwealth/model';
+import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
+import farcasterRouter from 'server/farcaster/router';
 
 const PATH = '/api/integration';
 
@@ -23,6 +24,32 @@ function build() {
     },
     express.command(ChainEvents.ChainEventCreated()),
   );
+
+  if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
+    // Farcaster frames
+    router.use('/farcaster/contests', farcasterRouter);
+
+    // Farcaster webhooks/actions
+    router.post(
+      '/farcaster/CastCreated',
+      express.command(Contest.FarcasterCastCreatedWebhook()),
+    );
+
+    router.post(
+      '/farcaster/ReplyCastCreated',
+      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
+    );
+
+    router.get(
+      '/farcaster/CastUpvoteAction',
+      express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+    );
+
+    router.post(
+      '/farcaster/CastUpvoteAction',
+      express.command(Contest.FarcasterUpvoteAction()),
+    );
+  }
 
   router.post(
     '/snapshot/webhook',

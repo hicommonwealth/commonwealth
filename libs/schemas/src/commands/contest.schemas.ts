@@ -74,3 +74,108 @@ export const PerformContestRollovers = {
   input: z.object({ id: z.string() }),
   output: z.object({}),
 };
+
+export const FarcasterCast = z.object({
+  object: z.string(),
+  hash: z.string(),
+  thread_hash: z.string(),
+  parent_hash: z.string().nullable(),
+  parent_url: z.string().nullable(),
+  root_parent_url: z.string().nullable(),
+  parent_author: z.object({
+    fid: z.number().nullable(),
+  }),
+  author: z.object({
+    object: z.string(),
+    fid: z.number(),
+    custody_address: z.string(),
+    username: z.string(),
+    display_name: z.string(),
+    pfp_url: z.string().url(),
+    profile: z.object({
+      bio: z.object({
+        text: z.string(),
+      }),
+    }),
+    follower_count: z.number(),
+    following_count: z.number(),
+    verifications: z.array(z.unknown()),
+    verified_addresses: z.object({
+      eth_addresses: z.array(z.string()),
+      sol_addresses: z.array(z.string()),
+    }),
+    active_status: z.string(),
+    power_badge: z.boolean(),
+  }),
+  text: z.string(),
+  timestamp: z.string(),
+  embeds: z.array(
+    z.object({
+      url: z.string().url(),
+    }),
+  ),
+  reactions: z.object({
+    likes_count: z.number(),
+    recasts_count: z.number(),
+    likes: z.array(z.unknown()),
+    recasts: z.array(z.unknown()),
+  }),
+  replies: z.object({
+    count: z.number(),
+  }),
+  channel: z.string().nullable(),
+  mentioned_profiles: z.array(z.unknown()),
+  event_timestamp: z.string(),
+});
+
+export const FarcasterAction = z.object({
+  untrustedData: z.object({
+    fid: z.number(),
+    url: z.string().url(),
+    messageHash: z.string(),
+    timestamp: z.number(),
+    network: z.number(),
+    buttonIndex: z.number(),
+    castId: z.object({
+      fid: z.number(),
+      hash: z.string(),
+    }),
+  }),
+  trustedData: z.object({
+    messageBytes: z.string(),
+  }),
+});
+
+export const FarcasterCastCreatedWebhook = {
+  input: z.object({
+    created_at: z.number(),
+    type: z.string(),
+    data: FarcasterCast,
+  }),
+  output: z.object({
+    status: z.literal('ok'),
+  }),
+};
+
+export const FarcasterUpvoteAction = {
+  input: z.object({
+    untrustedData: z.object({
+      fid: z.number(),
+      url: z.string().url(),
+      messageHash: z.string(),
+      timestamp: z.number(),
+      network: z.number(),
+      buttonIndex: z.number(),
+      castId: z.object({
+        fid: z.number(),
+        hash: z.string(),
+      }),
+    }),
+    trustedData: z.object({
+      messageBytes: z.string(),
+    }),
+  }),
+  output: z.object({
+    message: z.string(),
+  }),
+};

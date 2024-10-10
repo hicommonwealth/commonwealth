@@ -35,6 +35,9 @@ const {
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
+  NEYNAR_API_KEY,
+  NEYNAR_REPLY_WEBHOOK_URL,
+  FARCASTER_ACTION_URL,
 } = process.env;
 
 const NAME =
@@ -86,6 +89,9 @@ export const config = configure(
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 2,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
+      NEYNAR_API_KEY: NEYNAR_API_KEY,
+      NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
+      FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -183,7 +189,10 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
-      FLAG_FARCASTER_CONTEST: z.boolean(),
+      FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
+      NEYNAR_API_KEY: z.string().nullish(),
+      NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
+      FARCASTER_ACTION_URL: z.string().nullish(),
     }),
     AUTH: z
       .object({

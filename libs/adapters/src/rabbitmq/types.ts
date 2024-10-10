@@ -17,6 +17,7 @@ export enum RascalSubscriptions {
   NotificationsSettings = BrokerSubscriptions.NotificationsSettings,
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
   ContestProjection = BrokerSubscriptions.ContestProjection,
+  FarcasterWorkerPolicy = BrokerSubscriptions.FarcasterWorkerPolicy,
 }
 
 export enum RascalExchanges {
@@ -32,6 +33,7 @@ export enum RascalQueues {
   NotificationsSettings = 'NotificationsSettingsQueue',
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
   ContestProjection = 'ContestProjection',
+  FarcasterWorkerPolicy = 'FarcasterWorkerPolicyQueue',
 }
 
 export enum RascalBindings {
@@ -42,6 +44,7 @@ export enum RascalBindings {
   ChainEvent = 'ChainEventBinding',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
+  FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
 }
 
 export enum RascalRoutingKeys {
@@ -73,4 +76,8 @@ export enum RascalRoutingKeys {
   ContestProjectionContestStarted = EventNames.ContestStarted,
   ContestProjectionContestContentAdded = EventNames.ContestContentAdded,
   ContestProjectionContestContentUpvoted = EventNames.ContestContentUpvoted,
+
+  FarcasterWorkerPolicyCastCreated = EventNames.FarcasterCastCreated,
+  FarcasterWorkerPolicyReplyCastCreated = EventNames.FarcasterReplyCastCreated,
+  FarcasterWorkerPolicyVoteCreated = EventNames.FarcasterVoteCreated,
 }
